@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stijl Studio Updater</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,sans-serif;background:#2e1a0e;min-height:100vh;padding:20px 16px}
+h1{font-family:Georgia,serif;font-size:22px;font-style:italic;color:#f7f1e8;margin-bottom:2px}
+.sub{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:20px}
+.card{background:#f7f1e8;border-radius:16px;padding:16px;margin-bottom:12px}
+.lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#9b6240;font-weight:600;margin-bottom:5px;display:block}
+.inp{width:100%;padding:11px 12px;border:1.5px solid #c8b89a;border-radius:9px;font-size:14px;font-family:inherit;background:white;color:#2e1a0e;outline:none;margin-bottom:3px}
+.inp:focus{border-color:#9b6240}
+.hint{font-size:11px;color:#8a7060;line-height:1.6;margin-bottom:12px}
+.hint a{color:#9b6240}
+.divider{border:none;border-top:1px solid #e5d8c4;margin:14px 0}
+.drop{border:2px dashed #c8b89a;border-radius:12px;padding:28px 16px;text-align:center;cursor:pointer;background:white;position:relative;transition:all .2s}
+.drop.over{border-color:#9b6240;background:#fff8f4}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-ico{font-size:36px;margin-bottom:8px}
+.drop-txt{font-size:14px;color:#5c3317;font-weight:500}
+.drop-sub{font-size:11px;color:#8a7060;margin-top:3px}
+.file-list{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.file-row{background:white;border-radius:9px;padding:9px 12px;display:flex;align-items:center;gap:9px;border:1.5px solid #e5d8c4}
+.file-row.ok{border-color:#5a8a60;background:#f0f8f0}
+.file-name{flex:1;font-size:13px;color:#2e1a0e;font-weight:500}
+.file-size{font-size:11px;color:#8a7060}
+.file-x{width:26px;height:26px;border-radius:50%;background:#e5d8c4;border:none;font-size:14px;cursor:pointer;color:#5c3317;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.upload-btn{width:100%;padding:15px;background:#2e1a0e;color:#f7f1e8;border:none;border-radius:13px;font-size:16px;font-weight:700;cursor:pointer;margin-top:4px;font-family:inherit}
+.upload-btn:disabled{background:#c8b89a;cursor:not-allowed}
+.upload-btn:active{opacity:.85}
+.progress{height:5px;background:#e5d8c4;border-radius:3px;margin-top:10px;overflow:hidden;display:none}
+.progress-fill{height:100%;background:#9b6240;border-radius:3px;width:0%;transition:width .3s}
+.log{background:#2e1a0e;border-radius:10px;padding:12px;margin-top:10px;max-height:180px;overflow-y:auto;display:none}
+.log-line{font-size:12px;padding:3px 0;color:rgba(255,255,255,.5);font-family:monospace}
+.log-line.ok{color:#5a8a60}
+.log-line.err{color:#e74c3c}
+.log-line.info{color:#f7f1e8}
+</style>
+</head>
+<body>
+<h1>Stijl Studio</h1>
+<p class="sub">Updater · Publiceer bestanden naar GitHub</p>
+
+<div class="card">
+  <label class="lbl">GitHub Token</label>
+  <input class="inp" type="password" id="token" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off">
+  <div class="hint">
+    Maak een token op <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens</a> → Classic → vink <strong>repo</strong> aan.<br>
+    Token wordt alleen lokaal opgeslagen op dit apparaat.
+  </div>
+
+  <label class="lbl">Repository</label>
+  <input class="inp" type="text" id="repo" value="stijlstudio">
+
+  <label class="lbl">GitHub gebruikersnaam</label>
+  <input class="inp" type="text" id="user" value="jetje1980">
+
+  <hr class="divider">
+
+  <div class="drop" id="drop">
+    <input type="file" multiple accept=".html,.js,.css" onchange="addFiles(this.files)" id="fileinp">
+    <div class="drop-ico">📂</div>
+    <div class="drop-txt">Tik hier om bestanden te kiezen</div>
+    <div class="drop-sub">griette_stylist_BETA.html · stijlstudio_quiz.html · etc.</div>
+  </div>
+
+  <div class="file-list" id="file-list"></div>
+</div>
+
+<button class="upload-btn" id="upload-btn" onclick="upload()" disabled>↑ Publiceer naar GitHub</button>
+<div class="progress" id="progress"><div class="progress-fill" id="progress-fill"></div></div>
+<div class="log" id="log"></div>
+
+<script>
+var files = [];
+
+// Load saved settings
+(function(){
+  try {
+    var s = JSON.parse(localStorage.getItem('ss-upd2')||'{}');
+    if(s.token) document.getElementById('token').value = s.token;
+    if(s.user) document.getElementById('user').value = s.user;
+    if(s.repo) document.getElementById('repo').value = s.repo;
+  } catch(e){}
+  // Auto-save on change
+  ['token','user','repo'].forEach(function(id){
+    document.getElementById(id).addEventListener('change', save);
+  });
+})();
+
+function save(){
+  try {
+    localStorage.setItem('ss-upd2', JSON.stringify({
+      token: document.getElementById('token').value,
+      user: document.getElementById('user').value,
+      repo: document.getElementById('repo').value
+    }));
+  } catch(e){}
+}
+
+// Drag and drop
+var drop = document.getElementById('drop');
+drop.addEventListener('dragover', function(e){ e.preventDefault(); drop.classList.add('over'); });
+drop.addEventListener('dragleave', function(){ drop.classList.remove('over'); });
+drop.addEventListener('drop', function(e){ e.preventDefault(); drop.classList.remove('over'); addFiles(e.dataTransfer.files); });
+
+function addFiles(fl){
+  for(var i=0;i<fl.length;i++){
+    var f = fl[i];
+    var exists = files.findIndex(function(x){return x.name===f.name;});
+    if(exists>-1) files[exists]=f; else files.push(f);
+  }
+  render();
+}
+
+function removeFile(name){
+  files = files.filter(function(f){return f.name!==name;});
+  render();
+}
+
+function render(){
+  var list = document.getElementById('file-list');
+  list.innerHTML = files.map(function(f){
+    return '<div class="file-row"><div class="file-name">'+f.name+'</div>' +
+      '<div class="file-size">'+(f.size/1024).toFixed(0)+'KB</div>' +
+      '<button class="file-x" onclick="removeFile(\''+f.name+'\')">×</button></div>';
+  }).join('');
+  document.getElementById('upload-btn').disabled = files.length === 0;
+}
+
+function addLog(msg, cls){
+  var log = document.getElementById('log');
+  log.style.display = 'block';
+  var line = document.createElement('div');
+  line.className = 'log-line ' + (cls||'');
+  line.textContent = msg;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+async function getSHA(token, user, repo, path){
+  try {
+    var r = await fetch('https://api.github.com/repos/'+user+'/'+repo+'/contents/'+path, {
+      headers: {'Authorization':'Bearer '+token, 'Accept':'application/vnd.github.v3+json'}
+    });
+    if(r.ok){ var d = await r.json(); return d.sha; }
+  } catch(e){}
+  return null;
+}
+
+async function uploadFile(token, user, repo, file){
+  return new Promise(function(resolve, reject){
+    var reader = new FileReader();
+    reader.onload = async function(e){
+      try {
+        var b64 = e.target.result.split(',')[1];
+        var sha = await getSHA(token, user, repo, file.name);
+        var body = {
+          message: 'Update ' + file.name,
+          content: b64,
+          branch: 'main'
+        };
+        if(sha) body.sha = sha;
+        var r = await fetch('https://api.github.com/repos/'+user+'/'+repo+'/contents/'+file.name, {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer '+token,
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.github.v3+json'
+          },
+          body: JSON.stringify(body)
+        });
+        if(r.ok || r.status===201) resolve();
+        else { var err = await r.json(); reject(new Error(err.message||r.status)); }
+      } catch(e){ reject(e); }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function upload(){
+  save();
+  var token = document.getElementById('token').value.trim();
+  var user = document.getElementById('user').value.trim();
+  var repo = document.getElementById('repo').value.trim();
+
+  if(!token){ alert('Vul je GitHub token in.'); return; }
+  if(!files.length){ alert('Kies eerst bestanden.'); return; }
+
+  var btn = document.getElementById('upload-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Bezig...';
+  document.getElementById('progress').style.display = 'block';
+  document.getElementById('log').innerHTML = '';
+  addLog('Uploaden naar ' + user + '/' + repo + '...', 'info');
+
+  var ok = 0, fail = 0;
+  for(var i=0;i<files.length;i++){
+    var f = files[i];
+    addLog('↑ ' + f.name + '...');
+    try {
+      await uploadFile(token, user, repo, f);
+      addLog('✓ ' + f.name, 'ok');
+      ok++;
+      var row = document.querySelectorAll('.file-row')[i];
+      if(row) row.classList.add('ok');
+    } catch(e){
+      addLog('✗ ' + f.name + ': ' + e.message, 'err');
+      fail++;
+    }
+    document.getElementById('progress-fill').style.width = ((i+1)/files.length*100)+'%';
+  }
+
+  if(fail === 0){
+    addLog('🎉 Klaar! Live op GitHub Pages binnen ~1 minuut.', 'ok');
+    btn.textContent = '✓ Gepubliceerd!';
+    setTimeout(function(){ btn.textContent = '↑ Publiceer naar GitHub'; btn.disabled=false; }, 3000);
+  } else {
+    addLog('⚠️ ' + fail + ' bestand(en) mislukt.', 'err');
+    btn.textContent = '↑ Opnieuw proberen';
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
