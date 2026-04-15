@@ -1,0 +1,1933 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Stijl Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--br:#2e1a0e;--bm:#5c3317;--bw:#9b6240;--cr:#f7f1e8;--cd:#ede4d4;--cm:#e5d8c4;--tx:#1a1008;--mu:#8a7060;--wh:#fff;--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--br)}
+body{font-family:"Jost",sans-serif;color:var(--tx)}
+#app{display:flex;flex-direction:column;height:100vh;height:100svh;background:var(--cr);max-width:430px;margin:0 auto}
+/* HEADER */
+.hdr{background:var(--br);padding:calc(var(--st) + 12px) 16px 14px;flex-shrink:0;position:relative;overflow:hidden}
+.hdr::after{content:"S";position:absolute;right:-6px;top:-14px;font-family:"Cormorant Garamond",serif;font-size:130px;color:rgba(255,255,255,.04);pointer-events:none;line-height:1}
+.hdr-row{display:flex;align-items:flex-end;justify-content:space-between}
+.hdr-ey{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--bw);margin-bottom:4px}
+.hdr-title{font-family:"Cormorant Garamond",serif;font-size:27px;font-weight:300;color:var(--cr);line-height:1.05}
+.hdr-title em{font-style:italic;color:rgba(255,255,255,.65)}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.weather-chip{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:5px 10px}
+.weather-chip span{font-size:12px;color:rgba(255,255,255,.7)}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2);transition:background .3s}
+.sync-dot.ok{background:#5a8a60}
+/* TABS */
+.tabs{display:flex;background:var(--br);border-top:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.tab{flex:1;padding:9px 0 calc(9px + var(--sb));display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:none;background:none}
+.tab-ico{font-size:18px;opacity:.45;transition:opacity .2s}
+.tab-lbl{font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.35);font-weight:500;transition:color .2s}
+.tab.on .tab-ico{opacity:1}
+.tab.on .tab-lbl{color:var(--bw)}
+/* CONTENT */
+.panels{flex:1;overflow:hidden;position:relative}
+.panel{position:absolute;inset:0;overflow-y:auto;display:none;background:var(--cr);-webkit-overflow-scrolling:touch}
+.panel.on{display:block}
+/* DAGKAART */
+.dagkaart{margin:10px 12px 0;background:var(--br);border-radius:12px;padding:12px 14px;position:relative;overflow:hidden;cursor:pointer}
+.dagkaart::after{content:"✦";position:absolute;right:-4px;top:-10px;font-size:65px;color:rgba(255,255,255,.04);pointer-events:none}
+.dk-ey{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--bw);margin-bottom:3px}
+.dk-tip{font-family:"Cormorant Garamond",serif;font-size:15px;font-style:italic;color:var(--cr);line-height:1.5}
+.dk-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:3px}
+/* KAST */
+.toolbar{padding:10px 12px 6px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--cd)}
+.searchbox{flex:1;display:flex;align-items:center;gap:7px;background:var(--wh);border:1.5px solid var(--cd);border-radius:20px;padding:7px 11px}
+.searchbox input{border:none;background:none;font-size:13px;font-family:"Jost",sans-serif;color:var(--tx);outline:none;width:100%}
+.searchbox input::placeholder{color:var(--mu)}
+.add-btn{padding:7px 13px;border-radius:20px;background:var(--br);color:var(--cr);border:none;font-size:12px;font-weight:600;font-family:"Jost",sans-serif;cursor:pointer}
+.filters{display:flex;gap:6px;overflow-x:auto;padding:7px 12px;scrollbar-width:none;border-bottom:1px solid var(--cd)}
+.filters::-webkit-scrollbar{display:none}
+.fchip{flex-shrink:0;padding:5px 11px;border-radius:20px;border:1.5px solid var(--cd);background:var(--wh);font-size:11px;font-family:"Jost",sans-serif;color:var(--mu);cursor:pointer;white-space:nowrap}
+.fchip.on{background:var(--br);border-color:var(--br);color:var(--cr)}
+.icount{padding:5px 13px;font-size:10px;color:var(--mu);letter-spacing:.03em}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 11px 80px}
+.icard{background:var(--wh);border-radius:12px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(46,26,14,.07)}
+.icard:active{opacity:.85}
+.iphoto{width:100%;aspect-ratio:3/4;background:var(--cd);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.iphoto img{width:100%;height:100%;object-fit:cover}
+.iphoto-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.iphoto-ph .ico{font-size:30px;opacity:.6}
+.iphoto-ph .lbl{font-size:8px;color:var(--mu);font-family:"Jost",sans-serif;text-align:center;padding:0 4px;line-height:1.3}
+.iinfo{padding:7px 9px 9px}
+.iname{font-size:12px;font-weight:500;color:var(--tx);margin-bottom:2px;line-height:1.3}
+.icat{font-size:10px;color:var(--mu);margin-bottom:4px}
+.itags{display:flex;flex-wrap:wrap;gap:3px}
+.itag{font-size:9px;padding:2px 5px;border-radius:6px;background:var(--cd);color:var(--mu)}
+.empty{text-align:center;padding:50px 24px}
+.empty-ico{font-size:44px;margin-bottom:12px;opacity:.45}
+.empty-t{font-family:"Cormorant Garamond",serif;font-size:24px;font-weight:300;font-style:italic;color:var(--br);margin-bottom:6px}
+.empty-s{font-size:13px;color:var(--mu);line-height:1.65}
+/* FAB */
+.fab{position:fixed;bottom:calc(var(--sb) + 68px);right:16px;width:50px;height:50px;border-radius:50%;background:var(--br);border:none;color:var(--cr);font-size:24px;cursor:pointer;box-shadow:0 4px 14px rgba(46,26,14,.35);z-index:100;display:flex;align-items:center;justify-content:center}
+.fab:active{opacity:.8}
+/* OVERLAY */
+.ov{position:fixed;inset:0;background:rgba(46,26,14,.45);z-index:300;display:none;align-items:flex-end;backdrop-filter:blur(2px)}
+.ov.on{display:flex}
+.sheet{width:100%;max-width:430px;margin:0 auto;background:var(--wh);border-radius:20px 20px 0 0;padding:10px 15px calc(var(--sb) + 14px);max-height:90vh;overflow-y:auto}
+.sh-hdl{width:34px;height:4px;background:var(--cd);border-radius:2px;margin:0 auto 14px}
+.sh-t{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:300;color:var(--br);margin-bottom:3px}
+.sh-s{font-size:12px;color:var(--mu);margin-bottom:14px}
+/* FORM */
+.flbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--bw);margin:12px 0 5px;display:block}
+.fin{width:100%;padding:10px 11px;border:1.5px solid var(--cd);border-radius:9px;font-size:14px;font-family:"Jost",sans-serif;color:var(--tx);background:var(--cr);outline:none;transition:border-color .15s}
+.fin:focus{border-color:var(--bw)}
+.fsel{width:100%;padding:10px 11px;border:1.5px solid var(--cd);border-radius:9px;font-size:13px;font-family:"Jost",sans-serif;color:var(--tx);background:var(--cr);outline:none;appearance:none}
+.tagrow{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:3px}
+.tbtn{padding:5px 10px;border-radius:20px;border:1.5px solid var(--cd);background:var(--wh);font-size:11px;font-family:"Jost",sans-serif;color:var(--mu);cursor:pointer}
+.tbtn.on{background:var(--br);border-color:var(--br);color:var(--cr)}
+.tbtn.onm{background:var(--bw);border-color:var(--bw);color:white}
+.clrgrid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:3px}
+.clrsw{width:32px;height:32px;border-radius:50%;cursor:pointer;border:3px solid transparent;position:relative;box-shadow:0 1px 5px rgba(0,0,0,.12);transition:all .15s}
+.clrsw.on{border-color:var(--br);transform:scale(1.12)}
+.clrsw .ck{display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:11px;font-weight:700;border-radius:50%}
+.clrsw.on .ck{display:flex}
+.ph-area{width:100%;aspect-ratio:16/9;border:2px dashed var(--cd);border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;position:relative;overflow:hidden;margin-top:3px}
+.ph-area img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ph-lbl{font-size:12px;color:var(--mu);pointer-events:none}
+.sbtn{width:100%;padding:13px;background:var(--br);color:var(--cr);border:none;border-radius:11px;font-size:14px;font-weight:600;font-family:"Jost",sans-serif;cursor:pointer;margin-top:16px}
+.sbtn:active{opacity:.8}
+.sbtn:disabled{opacity:.4;cursor:not-allowed}
+/* DETAIL */
+.det-img{width:100%;aspect-ratio:3/4;border-radius:11px;background:var(--cd);display:flex;align-items:center;justify-content:center;font-size:55px;overflow:hidden;margin-bottom:12px}
+.det-img img{width:100%;height:100%;object-fit:cover}
+.det-name{font-family:"Cormorant Garamond",serif;font-size:24px;font-weight:300;color:var(--br);margin-bottom:2px}
+.det-cat{font-size:12px;color:var(--mu);margin-bottom:10px}
+.det-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px}
+.det-btns{display:flex;gap:7px}
+.det-btn{flex:1;padding:10px;border-radius:9px;font-size:12px;font-family:"Jost",sans-serif;cursor:pointer;border:1.5px solid var(--cd);background:var(--wh);color:var(--mu)}
+.det-btn.pr{background:var(--br);border-color:var(--br);color:var(--cr)}
+.det-btn.dl{color:#c0392b;border-color:#e8c0ba}
+/* BOARDS */
+.bscroll{display:flex;gap:7px;overflow-x:auto;padding:10px 12px 8px;scrollbar-width:none;border-bottom:1px solid var(--cd)}
+.bscroll::-webkit-scrollbar{display:none}
+.bchip{flex-shrink:0;padding:7px 14px;border-radius:20px;border:1.5px solid var(--cd);background:var(--wh);font-size:11px;font-family:"Jost",sans-serif;color:var(--mu);cursor:pointer;display:flex;align-items:center;gap:4px}
+.bchip.on{background:var(--br);border-color:var(--br);color:var(--cr)}
+.bchip-add{border-style:dashed}
+.bcont{padding:0 12px 80px}
+.bhead{display:flex;align-items:center;justify-content:space-between;margin:12px 0 10px}
+.btitle{font-family:"Cormorant Garamond",serif;font-size:24px;font-weight:300;color:var(--br)}
+.bactions{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.babtn{padding:7px 12px;border-radius:20px;border:1.5px solid var(--cd);background:var(--wh);font-size:11px;font-family:"Jost",sans-serif;color:var(--mu);cursor:pointer;white-space:nowrap}
+.babtn.pr{background:var(--br);border-color:var(--br);color:var(--cr)}
+.babtn.ai{background:rgba(155,98,64,.1);color:var(--bw);border-color:var(--bw)}
+.babtn.dl{color:#c0392b;border-color:#e8c0ba}
+.ocard{background:var(--wh);border-radius:11px;padding:11px;margin-bottom:9px;box-shadow:0 2px 8px rgba(46,26,14,.06)}
+.oitems{display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap}
+.othumb{display:flex;flex-direction:column;align-items:center;gap:2px;width:52px}
+.othumb-img{width:52px;height:64px;border-radius:7px;background:var(--cd);display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden}
+.othumb-img img{width:100%;height:100%;object-fit:cover}
+.othumb-lbl{font-size:8px;color:var(--mu);text-align:center;line-height:1.2;max-width:52px}
+.odesc{font-family:"Cormorant Garamond",serif;font-size:13px;font-style:italic;color:var(--br);line-height:1.55;margin-bottom:8px;padding:7px;background:var(--cr);border-radius:6px}
+.obtns{display:flex;gap:5px}
+.obtn{flex:1;padding:6px;border-radius:7px;border:1.5px solid var(--cd);background:var(--wh);font-size:10px;font-family:"Jost",sans-serif;color:var(--mu);cursor:pointer;text-align:center}
+.obtn.dl{color:#c0392b;border-color:#e8c0ba}
+/* PICKER */
+.pgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:11px}
+.pitem{background:var(--cr);border:2px solid transparent;border-radius:9px;padding:5px;cursor:pointer;text-align:center;position:relative}
+.pitem.on{border-color:var(--bw);background:linear-gradient(135deg,#fff8f4,#fdf0e8)}
+.pitem-img{width:100%;aspect-ratio:3/4;border-radius:6px;background:var(--cd);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;margin-bottom:3px}
+.pitem-img img{width:100%;height:100%;object-fit:cover}
+.pitem-lbl{font-size:9px;color:var(--tx);font-weight:500;line-height:1.2}
+.pchk{position:absolute;top:3px;right:3px;width:15px;height:15px;border-radius:50%;background:var(--bw);color:white;font-size:8px;font-weight:700;display:none;align-items:center;justify-content:center}
+.pitem.on .pchk{display:flex}
+/* CHAT */
+.chat-wrap{display:flex;flex-direction:column;height:100%}
+.qps{display:flex;gap:5px;overflow-x:auto;padding:8px 11px 4px;scrollbar-width:none;flex-shrink:0;border-bottom:1px solid var(--cd)}
+.qps::-webkit-scrollbar{display:none}
+.qp{flex-shrink:0;padding:5px 11px;border-radius:20px;border:1.5px solid var(--cd);background:var(--wh);font-size:11px;font-family:"Jost",sans-serif;color:var(--mu);cursor:pointer;white-space:nowrap}
+.msgs{flex:1;overflow-y:auto;padding:11px 12px;display:flex;flex-direction:column;gap:9px}
+.msg{max-width:85%}
+.msg.u{align-self:flex-end}
+.msg.a{align-self:flex-start}
+.bubble{padding:9px 12px;border-radius:13px;font-size:13px;line-height:1.65}
+.msg.u .bubble{background:var(--br);color:var(--cr);border-bottom-right-radius:3px}
+.msg.a .bubble{background:var(--wh);color:var(--tx);border-bottom-left-radius:3px;box-shadow:0 2px 7px rgba(46,26,14,.07)}
+.msg.a .bubble strong{color:var(--bw)}
+.av{width:20px;height:20px;border-radius:50%;background:var(--br);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--cr);margin-bottom:3px}
+.dots span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--cd);margin:0 1px;animation:dot .8s infinite}
+.dots span:nth-child(2){animation-delay:.15s}
+.dots span:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,60%,100%{transform:translateY(0);background:var(--cd)}30%{transform:translateY(-4px);background:var(--bw)}}
+.cin-bar{border-top:1px solid var(--cd);padding:7px 11px calc(var(--sb) + 7px);display:flex;gap:7px;align-items:flex-end;background:var(--wh);flex-shrink:0}
+.cin{flex:1;border:1.5px solid var(--cd);border-radius:20px;padding:8px 12px;font-size:13px;font-family:"Jost",sans-serif;background:var(--cr);color:var(--tx);outline:none;resize:none;max-height:85px;line-height:1.5}
+.cin:focus{border-color:var(--bw)}
+.csnd{width:36px;height:36px;border-radius:50%;background:var(--br);border:none;color:var(--cr);font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+/* DNA */
+.dna-hero{background:linear-gradient(135deg,var(--br),#4a2810);margin:12px;border-radius:14px;padding:20px 16px;position:relative;overflow:hidden;text-align:center}
+.dna-hero::after{content:"✦";position:absolute;right:-8px;bottom:-16px;font-size:90px;color:rgba(255,255,255,.04);pointer-events:none}
+.dna-ey{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(240,212,192,.6);margin-bottom:6px}
+.dna-nm{font-family:"Cormorant Garamond",serif;font-size:30px;font-style:italic;font-weight:300;color:white;margin-bottom:3px}
+.dna-ar{font-family:"Cormorant Garamond",serif;font-size:17px;font-style:italic;color:rgba(240,212,192,.85);margin-bottom:12px}
+.dna-tags{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.dna-tag{padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);font-size:9px;color:white}
+.dsec{margin:0 12px 9px;background:var(--wh);border-radius:11px;padding:12px 13px;box-shadow:0 2px 7px rgba(46,26,14,.05)}
+.dsec-t{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:6px}
+.dsec-b{font-size:13px;color:var(--tx);line-height:1.7;font-weight:300}
+.dkracht{background:linear-gradient(135deg,var(--bw),#8b5230);margin:0 12px 9px;border-radius:11px;padding:12px 13px}
+.dkracht-t{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:4px}
+.dkracht-b{font-family:"Cormorant Garamond",serif;font-size:16px;font-style:italic;color:white;line-height:1.5}
+.dc{display:inline-block;padding:2px 8px;border-radius:20px;background:var(--cd);color:var(--bm);font-size:10px;margin:2px}
+.dc.bad{background:#fee4e4;color:#c0392b}
+.cdots{display:flex;flex-wrap:wrap;gap:8px}
+.cdw{display:flex;flex-direction:column;align-items:center;gap:2px}
+.cdot{width:22px;height:22px;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.cdotl{font-size:7px;color:var(--mu);text-align:center;width:26px;line-height:1.2}
+.dfig{background:linear-gradient(135deg,#fff8f4,#fdf0e8);border-left:3px solid var(--bw);margin:0 12px 9px;border-radius:11px;padding:12px 13px}
+.dedit{display:block;width:calc(100% - 24px);margin:0 12px 12px;padding:11px;background:var(--cd);border:1.5px solid var(--cm);border-radius:9px;font-size:13px;font-family:"Jost",sans-serif;color:var(--bm);cursor:pointer;text-align:center}
+/* TOAST */
+.toast{position:fixed;top:calc(var(--st) + 55px);left:50%;transform:translateX(-50%) translateY(-70px);background:var(--br);color:var(--cr);padding:8px 16px;border-radius:100px;font-size:12px;z-index:999;white-space:nowrap;transition:transform .3s;pointer-events:none;box-shadow:0 4px 14px rgba(46,26,14,.3)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+/* AI spinner */
+.spin{display:inline-block;width:11px;height:11px;border:2px solid rgba(155,98,64,.3);border-top-color:var(--bw);border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:3px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── OUTFIT GENERATOR ── */
+.gen-overlay{position:fixed;inset:0;background:rgba(46,26,14,.5);z-index:400;display:none;align-items:flex-end;backdrop-filter:blur(3px)}
+.gen-overlay.on{display:flex}
+.gen-sheet{width:100%;max-width:430px;margin:0 auto;background:var(--wh);border-radius:22px 22px 0 0;padding:10px 15px calc(var(--sb) + 14px);max-height:92vh;overflow-y:auto}
+.gen-sec{margin-bottom:14px}
+.gen-lbl{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:7px;display:block}
+.mood-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.mood-btn{padding:10px 6px;border:2px solid var(--cd);border-radius:11px;background:var(--wh);font-size:11px;font-family:'Jost',sans-serif;color:var(--mu);cursor:pointer;text-align:center;transition:all .15s}
+.mood-btn.on{border-color:var(--bw);background:linear-gradient(135deg,#fff8f4,#fdf0e8);color:var(--br);font-weight:600}
+.cyclus-row{display:flex;gap:6px;flex-wrap:wrap}
+.cyc-btn{padding:7px 12px;border-radius:20px;border:1.5px solid var(--cd);background:var(--wh);font-size:11px;font-family:'Jost',sans-serif;color:var(--mu);cursor:pointer}
+.cyc-btn.on{background:var(--bw);border-color:var(--bw);color:white}
+.cnt-row{display:flex;gap:7px}
+.cnt-btn{flex:1;height:38px;border-radius:9px;border:1.5px solid var(--cd);background:var(--wh);font-size:13px;font-weight:600;font-family:'Jost',sans-serif;color:var(--mu);cursor:pointer}
+.cnt-btn.on{background:var(--br);border-color:var(--br);color:var(--cr)}
+.anchor-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;max-height:200px;overflow-y:auto}
+.anchor-item{border:2px solid transparent;border-radius:9px;padding:5px;cursor:pointer;text-align:center;background:var(--cr)}
+.anchor-item.on{border-color:var(--bw);background:#fff8f4}
+.anchor-img{width:100%;aspect-ratio:3/4;border-radius:6px;background:var(--cd);display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden;margin-bottom:3px}
+.anchor-img img{width:100%;height:100%;object-fit:cover}
+.anchor-lbl{font-size:9px;color:var(--tx);line-height:1.2}
+
+/* ── OUTFIT RESULT SWIPE ── */
+.result-overlay{position:fixed;inset:0;background:var(--cr);z-index:500;display:none;flex-direction:column}
+.result-overlay.on{display:flex}
+.result-hdr{padding:calc(var(--st) + 10px) 14px 10px;display:flex;align-items:center;justify-content:space-between;background:var(--wh);border-bottom:1px solid var(--cd);flex-shrink:0}
+.result-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;color:var(--br)}
+.result-close{width:34px;height:34px;border-radius:50%;background:var(--cd);border:none;font-size:16px;cursor:pointer;color:var(--mu)}
+.result-scroll{flex:1;overflow-y:auto;padding:12px}
+.outfit-result-card{background:var(--wh);border-radius:14px;padding:13px;margin-bottom:10px;box-shadow:0 2px 8px rgba(46,26,14,.07)}
+.outfit-desc-result{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--br);line-height:1.6;margin-bottom:12px;padding:10px;background:var(--cr);border-radius:9px}
+.swipe-items{display:flex;flex-direction:column;gap:8px}
+.swipe-item{display:flex;align-items:center;gap:10px;background:var(--cr);border-radius:10px;padding:8px;position:relative;overflow:hidden;transition:transform .2s,opacity .2s}
+.swipe-item.removing{transform:translateX(-100%);opacity:0}
+.swipe-item.adding{animation:slideInR .3s ease}
+@keyframes slideInR{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.swipe-item-img{width:52px;height:64px;border-radius:8px;background:var(--cd);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;flex-shrink:0}
+.swipe-item-img img{width:100%;height:100%;object-fit:cover}
+.swipe-item-info{flex:1;min-width:0}
+.swipe-item-name{font-size:13px;font-weight:500;color:var(--tx);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.swipe-item-cat{font-size:10px;color:var(--mu)}
+.swipe-btns{display:flex;gap:5px;flex-shrink:0}
+.swipe-no{width:32px;height:32px;border-radius:50%;background:#fee4e4;border:none;color:#c0392b;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.swipe-yes{width:32px;height:32px;border-radius:50%;background:#e8f4e8;border:none;color:#2a6a2a;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.loading-outfit{text-align:center;padding:40px 20px}
+.loading-outfit .spin{width:30px;height:30px;border:3px solid var(--cd);border-top-color:var(--bw);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+.result-footer{padding:10px 14px calc(var(--sb) + 10px);background:var(--wh);border-top:1px solid var(--cd);flex-shrink:0}
+.save-outfit-btn{width:100%;padding:13px;background:var(--br);color:var(--cr);border:none;border-radius:11px;font-size:15px;font-weight:600;font-family:'Jost',sans-serif;cursor:pointer}
+
+/* OUTFIT GENERATOR */
+.result-item{background:var(--cr);border-radius:11px;padding:10px;margin-bottom:9px;position:relative;border:2px solid var(--cd)}
+.result-item.locked{border-color:var(--bw)}
+.result-item-row{display:flex;gap:10px;align-items:flex-start}
+.result-item-img{width:64px;height:80px;border-radius:8px;background:var(--cd);display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;flex-shrink:0}
+.result-item-img img{width:100%;height:100%;object-fit:cover}
+.result-item-info{flex:1}
+.result-item-name{font-size:13px;font-weight:600;color:var(--tx);margin-bottom:2px}
+.result-item-cat{font-size:10px;color:var(--mu);margin-bottom:6px}
+.result-item-why{font-size:11px;color:var(--bw);font-style:italic;line-height:1.5}
+.result-item-btns{display:flex;gap:6px;margin-top:8px}
+.result-btn{padding:5px 11px;border-radius:20px;border:1.5px solid var(--cd);background:var(--wh);font-size:11px;font-family:"Jost",sans-serif;color:var(--mu);cursor:pointer}
+.result-btn.swap{background:var(--br);border-color:var(--br);color:var(--cr)}
+.result-btn.lock{color:var(--bw);border-color:var(--bw)}
+.result-btn.locked{background:var(--bw);border-color:var(--bw);color:white}
+.result-desc{font-family:"Cormorant Garamond",serif;font-size:15px;font-style:italic;color:var(--br);line-height:1.6;padding:10px;background:linear-gradient(135deg,#fff8f4,#fdf0e8);border-radius:9px;margin-bottom:12px}
+.gen-loading{text-align:center;padding:32px 16px;color:var(--mu);font-size:14px}
+.gen-spinner{width:32px;height:32px;border:3px solid var(--cd);border-top-color:var(--bw);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+
+/* FEEDBACK */
+.fb-fab{position:fixed;bottom:calc(var(--sb) + 70px);right:14px;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#2A1E14,#1C1612);color:rgba(240,212,192,.8);border:1px solid rgba(255,255,255,.15);font-size:17px;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(46,26,14,.4)}
+.fb-sheet{width:100%;max-width:430px;margin:0 auto;background:var(--wh);border-radius:22px 22px 0 0;padding:10px 15px calc(var(--sb) + 14px);max-height:90vh;overflow-y:auto}
+.fb-types{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.fb-type{padding:7px 13px;border-radius:100px;border:1.5px solid var(--cd);background:var(--wh);font-size:11px;font-family:'Jost',sans-serif;color:var(--mu);cursor:pointer}
+.fb-type.on{background:var(--br);border-color:var(--br);color:var(--cr)}
+.fb-stars{display:flex;gap:8px;margin-bottom:12px}
+.fb-star{font-size:26px;cursor:pointer;opacity:.25;line-height:1;transition:opacity .15s}
+.fb-star.on{opacity:1}
+.fb-ta{width:100%;min-height:85px;border:1.5px solid var(--cd);border-radius:9px;padding:10px 11px;font-family:'Jost',sans-serif;font-size:13px;background:var(--cr);color:var(--tx);outline:none;resize:none;line-height:1.55;margin-bottom:12px}
+.fb-ta:focus{border-color:var(--bw)}
+/* WORN LOG */
+.worn-overlay{position:fixed;inset:0;background:var(--cr);z-index:400;display:none;flex-direction:column}
+.worn-overlay.on{display:flex}
+.worn-hdr{padding:calc(var(--st)+10px) 14px 10px;display:flex;align-items:center;justify-content:space-between;background:var(--wh);border-bottom:1px solid var(--cd);flex-shrink:0}
+.worn-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;color:var(--br)}
+.worn-close{width:34px;height:34px;border-radius:50%;background:var(--cd);border:none;font-size:16px;cursor:pointer}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:12px}
+.cal-day{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:500;cursor:pointer;position:relative}
+.cal-day.has-outfit{background:var(--br);color:var(--cr)}
+.cal-day.today{border:2px solid var(--bw)}
+.cal-day.empty{background:var(--cd);color:var(--mu);cursor:default}
+.cal-day-num{font-size:11px;font-weight:600}
+.cal-day-dot{width:5px;height:5px;border-radius:50%;background:var(--bw);position:absolute;bottom:3px}
+.log-outfit-row{display:flex;align-items:center;gap:9px;padding:10px 14px;border-bottom:1px solid var(--cd)}
+.log-outfit-thumbs{display:flex;gap:4px}
+.log-thumb{width:38px;height:46px;border-radius:6px;background:var(--cd);display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden}
+.log-thumb img{width:100%;height:100%;object-fit:cover}
+.log-info{flex:1}
+.log-date{font-size:11px;font-weight:600;color:var(--br)}
+.log-items{font-size:10px;color:var(--mu);margin-top:1px}
+/* CYCLUS / MOOD */
+.tracker-panel{padding:14px}
+.tracker-today{background:var(--br);border-radius:13px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden}
+.tracker-today::after{content:'✦';position:absolute;right:-5px;top:-10px;font-size:80px;color:rgba(255,255,255,.04)}
+.tracker-mood-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.mood-sel{padding:8px 13px;border-radius:100px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);font-size:12px;font-family:'Jost',sans-serif;color:rgba(255,255,255,.8);cursor:pointer;transition:all .15s}
+.mood-sel.on{background:rgba(255,255,255,.25);border-color:white;color:white;font-weight:600}
+.cyclus-btns{display:flex;gap:6px;flex-wrap:wrap}
+.cyc-sel{padding:6px 11px;border-radius:100px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);font-size:11px;color:rgba(255,255,255,.7);cursor:pointer}
+.cyc-sel.on{background:rgba(255,255,255,.2);color:white}
+.tracker-history{margin-top:4px}
+.tracker-week{display:flex;gap:6px;padding:12px 0}
+.tracker-day-dot{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tracker-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;background:var(--cd)}
+.tracker-day-lbl{font-size:8px;color:var(--mu);text-align:center}
+
+/* INSPO SCAN */
+.inspo-match-card{background:var(--wh);border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(46,26,14,.06)}
+.inspo-match-row{display:flex;gap:10px;align-items:center;margin-bottom:6px}
+.inspo-match-img{width:52px;height:64px;border-radius:8px;background:var(--cd);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;flex-shrink:0}
+.inspo-match-img img{width:100%;height:100%;object-fit:cover}
+.inspo-match-info{flex:1}
+.inspo-match-name{font-size:13px;font-weight:500;color:var(--tx);margin-bottom:2px}
+.inspo-match-why{font-size:11px;color:var(--mu);line-height:1.4}
+.inspo-match-score{font-size:10px;color:var(--bw);font-weight:600}
+.inspo-missing{background:linear-gradient(135deg,#fff8f4,#fdf0e8);border:1.5px solid var(--cm);border-radius:12px;padding:12px;margin-bottom:10px}
+
+/* WEEK PLANNER */
+.week-day-card{background:var(--wh);border-radius:12px;padding:11px;margin-bottom:9px;box-shadow:0 2px 8px rgba(46,26,14,.06)}
+.week-day-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.week-day-name{font-size:12px;font-weight:600;color:var(--br)}
+.week-day-date{font-size:10px;color:var(--mu)}
+.week-day-today .week-day-name{color:var(--bw)}
+.week-outfit-thumbs{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.week-thumb{width:44px;height:54px;border-radius:7px;background:var(--cd);display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden}
+.week-thumb img{width:100%;height:100%;object-fit:cover}
+.week-add-outfit{padding:6px 12px;border-radius:20px;border:1.5px dashed var(--cd);background:transparent;font-size:11px;font-family:Jost,sans-serif;color:var(--mu);cursor:pointer}
+.week-outfit-desc{font-size:11px;color:var(--mu);margin-top:5px;font-style:italic}
+/* INSPO RESULT */
+.inspo-match-card{margin:12px 14px 0;background:var(--wh);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(46,26,14,.08)}
+.inspo-match-hdr{background:var(--br);padding:12px 14px}
+.inspo-match-title{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:var(--cr)}
+.inspo-match-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px}
+.inspo-analysis{padding:12px 14px;font-size:13px;color:var(--tx);line-height:1.7;border-bottom:1px solid var(--cd)}
+.inspo-items-grid{padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.inspo-item-card{border-radius:10px;overflow:hidden;background:var(--cr);border:1.5px solid var(--cd)}
+.inspo-item-photo{aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;font-size:28px;background:var(--cd)}
+.inspo-item-photo img{width:100%;height:100%;object-fit:cover}
+.inspo-item-info{padding:7px 8px}
+.inspo-item-name{font-size:11px;font-weight:500;color:var(--tx);margin-bottom:2px;line-height:1.3}
+.inspo-item-match{font-size:9px;color:var(--bw);font-weight:600}
+.inspo-tip{padding:11px 14px;background:linear-gradient(135deg,#fff8f4,#fdf0e8);font-size:12px;font-style:italic;color:var(--bw);border-top:1px solid var(--cd)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div>
+        <div class="hdr-ey">Stijl Studio <span style="background:var(--bw);color:white;padding:1px 5px;border-radius:4px;font-size:8px">v3</span></div>
+        <div class="hdr-title"><em id="uname">Jouw</em><br>Garderobe</div>
+      </div>
+      <div class="hdr-right">
+        <div class="weather-chip"><span id="wico">🌤</span><span id="wtemp"></span></div>
+        <div class="sync-dot" id="sdot"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panels">
+    <!-- KAST -->
+    <div class="panel on" id="p-kast">
+      <div class="toolbar">
+        <div class="searchbox"><span style="font-size:13px;color:var(--mu)">🔍</span><input id="srch" placeholder="Zoek in je kast..." oninput="renderKast()"></div>
+        <button class="add-btn" onclick="openAdd()">+ Item</button>
+        <button style="padding:7px 11px;border-radius:20px;background:transparent;border:1.5px solid var(--cd);font-size:11px;font-family:Jost,sans-serif;color:var(--mu);cursor:pointer" onclick="openWorn()">📅</button>
+      </div>
+      <div class="filters" id="filters">
+        <div class="fchip on" onclick="setFilter('',this)">Alle</div>
+        <div class="fchip" onclick="setFilter('ongedragen',this)">Niet gedragen</div>
+        <div class="fchip" onclick="setFilter('tops',this)">Tops</div>
+        <div class="fchip" onclick="setFilter('bottoms',this)">Broeken &amp; Rokken</div>
+        <div class="fchip" onclick="setFilter('jurken',this)">Jurken</div>
+        <div class="fchip" onclick="setFilter('layers',this)">Laagjes</div>
+        <div class="fchip" onclick="setFilter('shoes',this)">Schoenen</div>
+        <div class="fchip" onclick="setFilter('bags',this)">Tassen</div>
+      </div>
+      <div id="dagkaart-wrap"></div>
+      <div class="icount" id="icount">0 items</div>
+      <div class="grid" id="igrid"></div>
+      <div id="kempty" class="empty" style="display:none"><div class="empty-ico">👗</div><div class="empty-t">Jouw kast wacht</div><div class="empty-s">Tik op <strong>+ Item</strong> om te beginnen.</div></div>
+    </div>
+    <!-- BOARDS -->
+    <div class="panel" id="p-boards">
+      <div class="bscroll" id="bscroll"></div>
+      <div class="bcont" id="bcont"></div>
+    </div>
+    <!-- STYLIST -->
+    <div class="panel" id="p-chat">
+      <div class="chat-wrap">
+        <div class="qps" id="qps">
+          <button class="qp" onclick="sendQ(this)">Wie wil ik vandaag zijn?</button>
+          <button class="qp" onclick="sendQ(this)">Stel een outfit voor</button>
+          <button class="qp" onclick="sendQ(this)">Wat mis ik in mijn kast?</button>
+          <button class="qp" onclick="sendQ(this)">Combineer mijn lievelingsitem</button>
+          <button class="qp" onclick="sendQ(this)">Kleuradvies voor vandaag</button>
+        </div>
+        <div class="msgs" id="msgs"></div>
+        <div class="cin-bar">
+          <textarea class="cin" id="cin" placeholder="Vraag je stylist..." rows="1"
+            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,85)+'px'"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"></textarea>
+          <button class="csnd" id="csnd" onclick="sendChat()">↑</button>
+        </div>
+      </div>
+    </div>
+    <!-- INSPO -->
+    <div class="panel" id="p-inspo">
+      <div style="padding:16px 14px 10px">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--br);margin-bottom:3px">Inspiratie Scan</div>
+        <div style="font-size:13px;color:var(--mu);line-height:1.6">Upload een outfit die je aanspreekt &mdash; ik zoek welke items uit jouw garderobe die look benaderen.</div>
+      </div>
+      <div style="padding:0 14px 14px">
+        <div id="inspo-upload-area" onclick="document.getElementById('inspo-file-inp').click()" style="border:2px dashed var(--cd);border-radius:14px;padding:36px 20px;text-align:center;cursor:pointer;background:var(--wh);position:relative;overflow:hidden">
+          <input type="file" id="inspo-file-inp" accept="image/*" style="display:none" onchange="runInspoScan(event)">
+          <div id="inspo-upload-inner">
+            <div style="font-size:42px;margin-bottom:10px">🖼</div>
+            <div style="font-size:14px;color:var(--tx);font-weight:500">Tik om inspiratiefoto toe te voegen</div>
+            <div style="font-size:11px;color:var(--mu);margin-top:4px">Pinterest &middot; Instagram &middot; Catwalk</div>
+          </div>
+        </div>
+      </div>
+      <div id="inspo-result" style="padding:0 14px 80px"></div>
+    </div>
+
+    <!-- WEEK -->
+    <div class="panel" id="p-week">
+      <div style="padding:14px 14px 10px;border-bottom:1px solid var(--cd);display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--br)">Weekplanner</div>
+          <div style="font-size:11px;color:var(--mu)" id="week-range"></div>
+        </div>
+        <div style="display:flex;gap:7px">
+          <button style="padding:6px 12px;border-radius:20px;border:1.5px solid var(--cd);background:var(--wh);font-size:11px;font-family:Jost,sans-serif;color:var(--mu);cursor:pointer" onclick="weekNav(-1)">←</button>
+          <button style="padding:6px 12px;border-radius:20px;border:1.5px solid var(--cd);background:var(--wh);font-size:11px;font-family:Jost,sans-serif;color:var(--mu);cursor:pointer" onclick="weekNav(1)">→</button>
+        </div>
+      </div>
+      <div id="week-grid" style="padding:10px 12px 80px"></div>
+    </div>
+
+    <!-- DNA -->
+    <div class="panel" id="p-dna">
+      <div id="dna-cont" style="padding-bottom:20px"></div>
+      <a id="start-quiz-link" href="stijlstudio_quiz.html" style="display:none;width:calc(100% - 24px);margin:0 12px 12px;padding:14px;background:#2e1a0e;color:#f7f1e8;border-radius:11px;font-size:14px;font-weight:600;font-family:Jost,sans-serif;text-align:center;text-decoration:none;box-sizing:border-box">Start Stijl DNA quiz &rarr;</a>
+      <button class="dedit" id="redo-quiz-btn" style="display:none" onclick="window.location.href='stijlstudio_quiz.html'">🔄 Stijl DNA opnieuw doen</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" id="t-kast" onclick="showP('kast')"><span class="tab-ico">👗</span><span class="tab-lbl">Kast</span></button>
+    <button class="tab" id="t-boards" onclick="showP('boards')"><span class="tab-ico">✦</span><span class="tab-lbl">Boards</span></button>
+    <button class="tab" id="t-chat" onclick="showP('chat')"><span class="tab-ico">💬</span><span class="tab-lbl">Stylist</span></button>
+    <button class="tab" id="t-inspo" onclick="showP('inspo')"><span class="tab-ico">✨</span><span class="tab-lbl">Inspo</span></button>
+    <button class="tab" id="t-week" onclick="showP('week')"><span class="tab-ico">📅</span><span class="tab-lbl">Week</span></button>
+    <button class="tab" id="t-dna" onclick="showP('dna')"><span class="tab-ico">🧬</span><span class="tab-lbl">DNA</span></button>
+  </div>
+</div>
+
+
+<!-- FEEDBACK FAB -->
+<button class="fb-fab" id="fb-fab" onclick="openFeedback()">💬</button>
+
+<!-- FEEDBACK SHEET -->
+<div class="ov" id="ov-fb" onclick="if(event.target===this)closeFeedback()">
+<div class="fb-sheet">
+  <div class="sh-hdl"></div>
+  <div class="sh-t">Feedback ✦</div>
+  <div class="sh-s">Jij bent een van de eerste testers — alles helpt.</div>
+  <div class="fb-types">
+    <button class="fb-type on" id="fbt-alg" onclick="pickFbType(this,'alg')">Algemeen</button>
+    <button class="fb-type" id="fbt-mis" onclick="pickFbType(this,'mis')">Dit mis ik</button>
+    <button class="fb-type" id="fbt-bug" onclick="pickFbType(this,'bug')">Bug</button>
+    <button class="fb-type" id="fbt-idee" onclick="pickFbType(this,'idee')">Idee</button>
+  </div>
+  <div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:7px">Beoordeling</div>
+  <div class="fb-stars" id="fb-stars">
+    <span class="fb-star" onclick="pickStar(1)">⭐</span>
+    <span class="fb-star" onclick="pickStar(2)">⭐</span>
+    <span class="fb-star" onclick="pickStar(3)">⭐</span>
+    <span class="fb-star" onclick="pickStar(4)">⭐</span>
+    <span class="fb-star" onclick="pickStar(5)">⭐</span>
+  </div>
+  <textarea class="fb-ta" id="fb-ta" placeholder="Wat werkt goed? Wat mist er? Wat zou je dagelijks willen gebruiken?"></textarea>
+  <button class="sbtn" onclick="submitFeedback()">Verstuur feedback</button>
+</div>
+</div>
+
+<!-- WORN LOG OVERLAY -->
+<div class="worn-overlay" id="ov-worn">
+  <div class="worn-hdr">
+    <div class="worn-title">Outfit log</div>
+    <button class="worn-close" onclick="closeWorn()">✕</button>
+  </div>
+  <div id="worn-body" style="flex:1;overflow-y:auto"></div>
+</div>
+
+<button class="fab" id="fab" onclick="openAdd()">+</button>
+<div class="toast" id="toast"></div>
+
+<!-- ADD ITEM -->
+<div class="ov" id="ov-add" onclick="if(event.target===this)closeAdd()">
+<div class="sheet">
+  <div class="sh-hdl"></div>
+  <div class="sh-t">Item toevoegen</div>
+  <div class="sh-s">Voeg een kledingstuk toe aan je garderobe</div>
+  <label class="flbl">Naam *</label>
+  <input class="fin" id="ai-name" placeholder="bijv. Beige linnen blouse">
+  <label class="flbl">Categorie</label>
+  <select class="fsel" id="ai-cat" onchange="updateSecs()">
+    <option value="tops">Tops &amp; blouses</option>
+    <option value="bottoms">Rokken &amp; broeken</option>
+    <option value="jurken">Jurken</option>
+    <option value="layers">Laagjes &amp; jassen</option>
+    <option value="shoes">Schoenen</option>
+    <option value="bags">Tassen &amp; accessoires</option>
+    <option value="overig">Overig</option>
+  </select>
+  <label class="flbl">Kleur</label>
+  <div class="clrgrid" id="clrgrid"></div>
+  <div style="font-size:10px;color:var(--mu);margin-top:3px" id="clrlbl">Geen kleur geselecteerd</div>
+  <label class="flbl">Pasvorm</label>
+  <div class="tagrow" id="tr-pv">
+    <button class="tbtn" onclick="tSingle(this,'pv')">aansluitend</button>
+    <button class="tbtn" onclick="tSingle(this,'pv')">licht oversized</button>
+    <button class="tbtn" onclick="tSingle(this,'pv')">wijd</button>
+    <button class="tbtn" onclick="tSingle(this,'pv')">cropped</button>
+    <button class="tbtn" onclick="tSingle(this,'pv')">gestructureerd</button>
+    <button class="tbtn" onclick="tSingle(this,'pv')">wrap</button>
+    <button class="tbtn" onclick="tSingle(this,'pv')">flared</button>
+  </div>
+  <div id="sec-hals">
+    <label class="flbl">Hals</label>
+    <div class="tagrow" id="tr-hl">
+      <button class="tbtn" onclick="tSingle(this,'hl')">ronde hals</button>
+      <button class="tbtn" onclick="tSingle(this,'hl')">V-hals</button>
+      <button class="tbtn" onclick="tSingle(this,'hl')">boothals</button>
+      <button class="tbtn" onclick="tSingle(this,'hl')">sweetheart</button>
+      <button class="tbtn" onclick="tSingle(this,'hl')">col / gesloten</button>
+      <button class="tbtn" onclick="tSingle(this,'hl')">spaghetti</button>
+    </div>
+  </div>
+  <div id="sec-mouw">
+    <label class="flbl">Mouw</label>
+    <div class="tagrow" id="tr-mw">
+      <button class="tbtn" onclick="tSingle(this,'mw')">mouwloos</button>
+      <button class="tbtn" onclick="tSingle(this,'mw')">kort</button>
+      <button class="tbtn" onclick="tSingle(this,'mw')">3/4</button>
+      <button class="tbtn" onclick="tSingle(this,'mw')">lang</button>
+      <button class="tbtn" onclick="tSingle(this,'mw')">pofmouw</button>
+    </div>
+  </div>
+  <label class="flbl">Materiaal <span style="font-size:8px;font-weight:300;text-transform:none;letter-spacing:0;color:var(--mu)">(meerdere mogelijk)</span></label>
+  <div style="font-size:9px;color:var(--mu);margin-bottom:4px">soepel:</div>
+  <div class="tagrow">
+    <button class="tbtn" onclick="tMulti(this,'mt')">viscose</button>
+    <button class="tbtn" onclick="tMulti(this,'mt')">tencel</button>
+    <button class="tbtn" onclick="tMulti(this,'mt')">modal</button>
+    <button class="tbtn" onclick="tMulti(this,'mt')">satijn</button>
+    <button class="tbtn" onclick="tMulti(this,'mt')">jersey</button>
+    <button class="tbtn" onclick="tMulti(this,'mt')">zijde</button>
+    <button class="tbtn" onclick="tMulti(this,'mt')">chiffon</button>
+  </div>
+  <div style="font-size:9px;color:var(--mu);margin:6px 0 4px">stevig:</div>
+  <div class="tagrow">
+    <button class="tbtn" onclick="tMulti(this,'mt')">katoen</button>
+    <button class="tbtn" onclick="tMulti(this,'mt')">linnen</button>
+    <button class="tbtn" onclick="tMulti(this,'mt')">denim</button>
+    <button class="tbtn" onclick="tMulti(this,'mt')">wol</button>
+    <button class="tbtn" onclick="tMulti(this,'mt')">rib</button>
+    <button class="tbtn" onclick="tMulti(this,'mt')">leer</button>
+  </div>
+  <div style="font-size:9px;color:var(--mu);margin:6px 0 4px">luxe:</div>
+  <div class="tagrow">
+    <button class="tbtn" onclick="tMulti(this,'mt')">cashmere</button>
+    <button class="tbtn" onclick="tMulti(this,'mt')">merino</button>
+    <button class="tbtn" onclick="tMulti(this,'mt')">velvet</button>
+    <button class="tbtn" onclick="tMulti(this,'mt')">mesh</button>
+    <button class="tbtn" onclick="tMulti(this,'mt')">kant</button>
+    <button class="tbtn" onclick="tMulti(this,'mt')">kasjmier</button>
+  </div>
+  <label class="flbl">Stofgewicht</label>
+  <div class="tagrow">
+    <button class="tbtn" onclick="tSingle(this,'sw')">luchtig</button>
+    <button class="tbtn" onclick="tSingle(this,'sw')">medium</button>
+    <button class="tbtn" onclick="tSingle(this,'sw')">stevig</button>
+  </div>
+  <div id="sec-len">
+    <label class="flbl">Lengte</label>
+    <div class="tagrow">
+      <button class="tbtn" onclick="tSingle(this,'len')">crop</button>
+      <button class="tbtn" onclick="tSingle(this,'len')">normaal</button>
+      <button class="tbtn" onclick="tSingle(this,'len')">midi</button>
+      <button class="tbtn" onclick="tSingle(this,'len')">maxi</button>
+    </div>
+  </div>
+  <label class="flbl">Seizoen</label>
+  <div class="tagrow">
+    <button class="tbtn" onclick="tSingle(this,'sz')">zomer</button>
+    <button class="tbtn" onclick="tSingle(this,'sz')">winter</button>
+    <button class="tbtn" onclick="tSingle(this,'sz')">beide</button>
+  </div>
+  <label class="flbl">Stofstructuur</label>
+  <div class="tagrow">
+    <button class="tbtn" onclick="tSingle(this,'str')">glad</button>
+    <button class="tbtn" onclick="tSingle(this,'str')">gestructureerd</button>
+    <button class="tbtn" onclick="tSingle(this,'str')">geribd</button>
+    <button class="tbtn" onclick="tSingle(this,'str')">geweven</button>
+    <button class="tbtn" onclick="tSingle(this,'str')">gebreid</button>
+    <button class="tbtn" onclick="tSingle(this,'str')">kant</button>
+    <button class="tbtn" onclick="tSingle(this,'str')">fluweel</button>
+    <button class="tbtn" onclick="tSingle(this,'str')">metallic</button>
+  </div>
+  <label class="flbl">Patroon</label>
+  <div class="tagrow">
+    <button class="tbtn" onclick="tSingle(this,'pat')">effen</button>
+    <button class="tbtn" onclick="tSingle(this,'pat')">gestreept</button>
+    <button class="tbtn" onclick="tSingle(this,'pat')">geblokt</button>
+    <button class="tbtn" onclick="tSingle(this,'pat')">bloemen</button>
+    <button class="tbtn" onclick="tSingle(this,'pat')">abstract</button>
+    <button class="tbtn" onclick="tSingle(this,'pat')">dierenprint</button>
+    <button class="tbtn" onclick="tSingle(this,'pat')">grafisch</button>
+  </div>
+  <label class="flbl">Status</label>
+  <div class="tagrow">
+    <button class="tbtn on" id="st-schoon" onclick="tStatus(this,'schoon')">✓ Schoon</button>
+    <button class="tbtn" id="st-was" onclick="tStatus(this,'was')">🫧 In de was</button>
+    <button class="tbtn" id="st-stom" onclick="tStatus(this,'stomerij')">👔 Stomerij</button>
+  </div>
+  <label class="flbl">Locatie in kast</label>
+  <div class="tagrow">
+    <button class="tbtn" onclick="tSingle(this,'loc')">Rails links</button>
+    <button class="tbtn" onclick="tSingle(this,'loc')">Rails rechts</button>
+    <button class="tbtn" onclick="tSingle(this,'loc')">Lade 1</button>
+    <button class="tbtn" onclick="tSingle(this,'loc')">Lade 2</button>
+    <button class="tbtn" onclick="tSingle(this,'loc')">Lade 3</button>
+    <button class="tbtn" onclick="tSingle(this,'loc')">Plank</button>
+    <button class="tbtn" onclick="tSingle(this,'loc')">Schoenenkast</button>
+    <button class="tbtn" onclick="tSingle(this,'loc')">Seizoensopslag</button>
+  </div>
+  <label class="flbl">Foto</label>
+  <div class="ph-area" id="ph-area" onclick="document.getElementById('ph-inp').click()">
+    <div class="ph-lbl" id="ph-lbl" style="text-align:center"><div style="font-size:26px;margin-bottom:4px">📷</div>Tik om foto toe te voegen</div>
+    <input type="file" id="ph-inp" accept="image/*" style="display:none" onchange="onPhoto(event)">
+  </div>
+  <button class="sbtn" id="add-sbtn" onclick="submitAdd()">Item toevoegen</button>
+</div>
+</div>
+
+<!-- ITEM DETAIL -->
+<div class="ov" id="ov-det" onclick="if(event.target===this)closeDet()">
+<div class="sheet"><div class="sh-hdl"></div><div id="det-body"></div></div>
+</div>
+
+<!-- ITEM PICKER -->
+<div class="ov" id="ov-pick" onclick="if(event.target===this)closePick()">
+<div class="sheet">
+  <div class="sh-hdl"></div>
+  <div class="sh-t" id="pick-title">Kies items voor outfit</div>
+  <div style="font-size:12px;color:var(--mu);margin-bottom:11px">Tik om te selecteren</div>
+  <div class="pgrid" id="pgrid"></div>
+  <button class="sbtn" id="pick-sbtn" onclick="confirmPick()">Selecteer items</button>
+</div>
+</div>
+
+
+<!-- OUTFIT GENERATOR -->
+<div class="gen-overlay" id="ov-gen" onclick="if(event.target===this)closeGen()">
+<div class="gen-sheet">
+  <div class="sh-hdl"></div>
+  <div class="sh-t">Outfit genereren</div>
+  <div class="sh-s" id="gen-board-lbl">voor board</div>
+
+  <div class="gen-sec">
+    <label class="gen-lbl">Hoe voel je je vandaag?</label>
+    <div class="mood-grid" id="mood-grid">
+      <button class="mood-btn" onclick="pickMood(this,'energiek')">⚡<br>Energiek</button>
+      <button class="mood-btn" onclick="pickMood(this,'relaxed')">☁️<br>Relaxed</button>
+      <button class="mood-btn" onclick="pickMood(this,'krachtig')">💪<br>Krachtig</button>
+      <button class="mood-btn" onclick="pickMood(this,'romantisch')">🌸<br>Romantisch</button>
+      <button class="mood-btn" onclick="pickMood(this,'zakelijk')">💼<br>Zakelijk</button>
+      <button class="mood-btn" onclick="pickMood(this,'speels')">🎨<br>Speels</button>
+    </div>
+  </div>
+
+  <div class="gen-sec">
+    <label class="gen-lbl">Cyclus fase (optioneel)</label>
+    <div class="cyclus-row">
+      <button class="cyc-btn" onclick="pickCyclus(this,'menstruatie')">🔴 Menstruatie</button>
+      <button class="cyc-btn" onclick="pickCyclus(this,'folliculair')">🌱 Folliculair</button>
+      <button class="cyc-btn" onclick="pickCyclus(this,'ovulatie')">✨ Ovulatie</button>
+      <button class="cyc-btn" onclick="pickCyclus(this,'luteaal')">🌙 Luteaal</button>
+    </div>
+  </div>
+
+  <div class="gen-sec">
+    <label class="gen-lbl">Aantal items in outfit</label>
+    <div class="cnt-row" id="cnt-row">
+      <button class="cnt-btn" onclick="pickCnt(this,2)">2</button>
+      <button class="cnt-btn on" onclick="pickCnt(this,3)">3</button>
+      <button class="cnt-btn" onclick="pickCnt(this,4)">4</button>
+      <button class="cnt-btn" onclick="pickCnt(this,5)">5</button>
+      <button class="cnt-btn" onclick="pickCnt(this,0)">Vrij</button>
+    </div>
+  </div>
+
+  <div class="gen-sec">
+    <label class="gen-lbl">Verplicht items meenemen (optioneel)</label>
+    <div class="anchor-grid" id="anchor-grid"></div>
+  </div>
+
+  <button class="sbtn" id="gen-go-btn" onclick="runGen()">✦ Genereer outfit</button>
+</div>
+</div>
+
+<!-- OUTFIT RESULT -->
+<div class="result-overlay" id="ov-result">
+  <div class="result-hdr">
+    <div class="result-title" id="result-title">Jouw outfit</div>
+    <button class="result-close" onclick="closeResult()">✕</button>
+  </div>
+  <div class="result-scroll" id="result-scroll"></div>
+  <div class="result-footer">
+    <button class="save-outfit-btn" id="save-outfit-btn" onclick="saveGeneratedOutfit()">Outfit opslaan op board</button>
+  </div>
+</div>
+
+<!-- NEW BOARD -->
+<div class="ov" id="ov-nb" onclick="if(event.target===this)closeNB()">
+<div class="sheet">
+  <div class="sh-hdl"></div>
+  <div class="sh-t">Nieuw board</div>
+  <label class="flbl">Naam</label>
+  <input class="fin" id="nb-name" placeholder="bijv. Parijs weekend">
+  <label class="flbl">Emoji</label>
+  <div class="tagrow" id="emojis">
+    <button class="tbtn" onclick="pickEmoji(this)">✈️</button>
+    <button class="tbtn" onclick="pickEmoji(this)">🌊</button>
+    <button class="tbtn" onclick="pickEmoji(this)">💼</button>
+    <button class="tbtn on" onclick="pickEmoji(this)">✨</button>
+    <button class="tbtn" onclick="pickEmoji(this)">🌹</button>
+    <button class="tbtn" onclick="pickEmoji(this)">🗼</button>
+    <button class="tbtn" onclick="pickEmoji(this)">☀️</button>
+    <button class="tbtn" onclick="pickEmoji(this)">❄️</button>
+    <button class="tbtn" onclick="pickEmoji(this)">🌿</button>
+    <button class="tbtn" onclick="pickEmoji(this)">🎉</button>
+  </div>
+  <button class="sbtn" onclick="createBoard()">Board aanmaken</button>
+</div>
+</div>
+
+<script>
+// CONFIG
+var SB='https://osuqtfsxmquwqsbgzlqn.supabase.co';
+var SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
+var CL='dhggari0g';
+var CP='griette-photos';
+var WK='https://griette-stylist.griette.workers.dev';
+var VALID={'SS-GRIET':1,'SS-EVA25':1,'SS-INEZ25':1};
+
+// STATE
+var code=null,prof=null,items=[],worn={},boards=[],actBoard=null;
+var filter='',addTags={},pendPhoto=null,pickBoard=null,pickSel=[],chatHist=[],syncT=null;
+
+// KLEUREN
+var KLRS=[
+  // Neutraal
+  {n:'Zwart',c:'#1C1612',t:'w',g:'Neutraal'},{n:'Antraciet',c:'#4A4A4A',t:'w',g:'Neutraal'},{n:'Donkergrijs',c:'#5A5A5A',t:'w',g:'Neutraal'},{n:'Grijs',c:'#888',t:'w',g:'Neutraal'},{n:'Lichtgrijs',c:'#C4C4C4',t:'k',g:'Neutraal'},
+  {n:'Wit',c:'#FDFAF6',t:'k',b:1,g:'Neutraal'},{n:'Offwhite',c:'#F0EDE8',t:'k',g:'Neutraal'},{n:'Creme',c:'#F5E6C8',t:'k',g:'Neutraal'},{n:'Zand',c:'#C8B89A',t:'k',g:'Neutraal'},{n:'Beige',c:'#D4C4A8',t:'k',g:'Neutraal'},
+  // Warm
+  {n:'Camel',c:'#D4B896',t:'k',g:'Warm'},{n:'Lichtbruin',c:'#C8A878',t:'k',g:'Warm'},{n:'Bruin',c:'#8B6F5E',t:'w',g:'Warm'},{n:'Donkerbruin',c:'#6B3F2A',t:'w',g:'Warm'},{n:'Cognac',c:'#9B4A2A',t:'w',g:'Warm'},
+  {n:'Terra',c:'#C4714A',t:'w',g:'Warm'},{n:'Baksteen',c:'#A85238',t:'w',g:'Warm'},{n:'Roestbruin',c:'#8B4A2A',t:'w',g:'Warm'},{n:'Oranje',c:'#D4834A',t:'w',g:'Warm'},{n:'Abrikoos',c:'#E8A878',t:'k',g:'Warm'},
+  {n:'Oker',c:'#C4A84A',t:'k',g:'Warm'},{n:'Mosterd',c:'#C4943A',t:'k',g:'Warm'},{n:'Geel',c:'#E8D048',t:'k',g:'Warm'},{n:'Olijf',c:'#8B9E4A',t:'w',g:'Warm'},{n:'Kaki',c:'#7A8A4A',t:'w',g:'Warm'},
+  {n:'Salie',c:'#8AAA7A',t:'k',g:'Warm'},
+  // Koel
+  {n:'Navy',c:'#1B3A5C',t:'w',g:'Koel'},{n:'Marineblauw',c:'#2A4A6C',t:'w',g:'Koel'},{n:'Kobalt',c:'#4A6FA5',t:'w',g:'Koel'},{n:'Korenblauw',c:'#5A80B8',t:'w',g:'Koel'},{n:'Lichtblauw',c:'#A0B4C8',t:'k',g:'Koel'},
+  {n:'Ijsblauw',c:'#C8DCE8',t:'k',g:'Koel'},{n:'Turquoise',c:'#3A9AA8',t:'w',g:'Koel'},{n:'Mintgroen',c:'#8AC8A8',t:'k',g:'Koel'},{n:'Smaragd',c:'#2A6A4A',t:'w',g:'Koel'},{n:'Flessengroen',c:'#2A5A3A',t:'w',g:'Koel'},
+  {n:'Paars',c:'#8B5E83',t:'w',g:'Koel'},{n:'Lila',c:'#B490B8',t:'k',g:'Koel'},{n:'Lavendel',c:'#C8B4D4',t:'k',g:'Koel'},{n:'Mauve',c:'#C89898',t:'k',g:'Koel'},
+  // Intens
+  {n:'Rood',c:'#C44A4A',t:'w',g:'Intens'},{n:'Felrood',c:'#E83030',t:'w',g:'Intens'},{n:'Bordeaux',c:'#8B2A2A',t:'w',g:'Intens'},{n:'Crimson',c:'#A82840',t:'w',g:'Intens'},
+  {n:'Lichtroze',c:'#F0C8C8',t:'k',g:'Intens'},{n:'Roze',c:'#E8A0B0',t:'k',g:'Intens'},{n:'Oudroze',c:'#C87888',t:'w',g:'Intens'},{n:'Felroze',c:'#D45A8B',t:'w',g:'Intens'},{n:'Fuchsia',c:'#C83878',t:'w',g:'Intens'},
+  {n:'Pruim',c:'#8B2A6B',t:'w',g:'Intens'},{n:'Aubergine',c:'#6A1A5A',t:'w',g:'Intens'},
+  // Metallic
+  {n:'Goud',c:'#C4A44A',t:'k',g:'Metallic'},{n:'Zilver',c:'#B8B8B8',t:'k',g:'Metallic'},{n:'Brons',c:'#A87840',t:'w',g:'Metallic'},{n:'Koper',c:'#B86840',t:'w',g:'Metallic'}
+];
+var KM={};KLRS.forEach(function(k){KM[k.n]=k.c;});
+var ICOS={tops:'👕',bottoms:'👖',jurken:'👗',layers:'🧥',shoes:'👟',bags:'👜',overig:'💍'};
+var CATS={tops:'Top',bottoms:'Broek/Rok',jurken:'Jurk',layers:'Laagje',shoes:'Schoenen',bags:'Tas',overig:'Overig'};
+var TIPS={
+  klassiek:['Draag vandaag je sterkste basisstuk met één accent.','1 kleur, 3 materialen. Dat is alles.','Kies kwaliteit over kwantiteit — elke dag.'],
+  createur:['Laat één item het verhaal vertellen.','Durf vandaag dat stuk dat al maanden hangt.','Kleur is jouw taal. Spreek vandaag.'],
+  naturel:['Comfort EN stijl sluiten elkaar niet uit.','Wide-leg + ingestopte top: jouw handtekening.','Draag het item dat jou blij maakt.'],
+  romantisch:['Voeg één delicaat detail toe aan je basis.','Zachtheid is kracht. Draag het bewust.','Wikkeljurk of fluide rok — jouw silhouet.'],
+  stoer:['Contrast: stoer jasje over iets zachts.','Sterke lijn, simpele basis.','Zwart of navy als fundament.'],
+  modern:['Tonal: één kleur, drie texturen.','Minder is jouw statement.','Boxy boven + strak onder.']
+};
+
+// BOOT
+(function(){
+  try{code=localStorage.getItem('ss-code');}catch(e){}
+  if(!code||!VALID[code]){window.location.replace('stijlstudio.html');return;}
+  try{prof=JSON.parse(localStorage.getItem('ss-prof-'+code)||'null');}catch(e){}
+  try{items=JSON.parse(localStorage.getItem('ss-items-'+code)||'[]');}catch(e){}
+  try{worn=JSON.parse(localStorage.getItem('ss-worn-'+code)||'{}');}catch(e){}
+  try{boards=JSON.parse(localStorage.getItem('ss-boards-'+code)||'[]');}catch(e){}
+  var nm=prof?prof.name:(code==='SS-GRIET'?'Griette':'jou');
+  document.getElementById('uname').textContent=nm+"'s";
+  initClrGrid();
+  renderKast();renderBoards();renderDNA();renderDagkaart();initChat();
+  // Default board zodat features direct zichtbaar zijn
+  if(boards.length===0){boards=[{id:'b1',label:'Mijn looks',emoji:'✨',outfits:[]}];}
+  if(!actBoard&&boards.length>0){actBoard=boards[0].id;}
+  renderBoards();
+  loadTodayTracker();
+  // Wire up static buttons (Samsung Internet safe)
+  var rqb=document.getElementById('redo-quiz-btn');
+  if(rqb)rqb.onclick=function(){window.location.href='stijlstudio_quiz.html';};
+  loadSB();fetchWX();
+})();
+
+// SUPABASE
+function sbPost(t,d){fetch(SB+'/rest/v1/'+t,{method:'POST',headers:{'Content-Type':'application/json','apikey':SK,'Authorization':'Bearer '+SK,'Prefer':'return=minimal,resolution=merge-duplicates'},body:JSON.stringify(d)}).catch(function(){});}
+function sbGet(p){return fetch(SB+'/rest/v1/'+p,{headers:{'apikey':SK,'Authorization':'Bearer '+SK}}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});}
+function loadSB(){sbGet('users?code=eq.'+code+'&select=naam,style_dna,items,worn_log,boards&limit=1').then(function(d){if(!d||!d[0])return;var u=d[0];if(u.style_dna&&!prof){prof={name:u.naam,stijlDNA:u.style_dna};try{localStorage.setItem('ss-prof-'+code,JSON.stringify(prof));}catch(e){}renderDNA();renderDagkaart();document.getElementById('uname').textContent=prof.name+"'s";}if(u.items&&u.items.length&&!items.length){items=u.items;try{localStorage.setItem('ss-items-'+code,JSON.stringify(items));}catch(e){}renderKast();}if(u.boards&&u.boards.length&&!boards.length){boards=u.boards;try{localStorage.setItem('ss-boards-'+code,JSON.stringify(boards));}catch(e){}renderBoards();}setSynced(1);});}
+function saveLocal(){try{localStorage.setItem('ss-items-'+code,JSON.stringify(items));localStorage.setItem('ss-worn-'+code,JSON.stringify(worn));localStorage.setItem('ss-boards-'+code,JSON.stringify(boards));}catch(e){}clearTimeout(syncT);setSynced(0);syncT=setTimeout(function(){sbPost('users',{code:code,naam:prof?prof.name:'',style_dna:prof?prof.stijlDNA:null,items:items,worn_log:worn,boards:boards,last_seen:new Date().toISOString()});setTimeout(function(){setSynced(1);},1000);},2500);}
+function setSynced(v){var d=document.getElementById('sdot');if(d)d.className='sync-dot'+(v?' ok':'');}
+
+// CLOUDINARY
+function uploadPhoto(file,id){var fd=new FormData();fd.append('file',file);fd.append('upload_preset',CP);fd.append('folder','ss/'+code.toLowerCase());fd.append('public_id',code.toLowerCase()+'/'+id);return fetch('https://api.cloudinary.com/v1_1/'+CL+'/image/upload',{method:'POST',body:fd}).then(function(r){return r.ok?r.json():null;}).then(function(d){return d?d.secure_url:null;}).catch(function(){return null;});}
+
+// NAV
+function showP(n){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('on');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});document.getElementById('p-'+n).classList.add('on');document.getElementById('t-'+n).classList.add('on');document.getElementById('fab').style.display=n==='kast'?'flex':'none';if(n==='inspo')loadInspo();if(n==='week')renderWeek();}
+
+// KAST
+function renderKast(){
+  var q=(document.getElementById('srch')||{}).value||'';
+  var today=new Date().toISOString().split('T')[0];
+  var todayWorn=worn[today]||[];
+  var f=items.filter(function(it){
+    if(filter==='ongedragen'){var used=false;var ks=Object.keys(worn);for(var i=0;i<ks.length;i++){if((worn[ks[i]]||[]).indexOf(it.id)>-1){used=true;break;}}if(used)return false;}
+    else if(filter&&filter!=='ongedragen'&&it.cat!==filter)return false;
+    if(q&&it.name.toLowerCase().indexOf(q.toLowerCase())<0)return false;
+    return true;
+  });
+  document.getElementById('icount').textContent=f.length+' item'+(f.length!==1?'s':'');
+  var grid=document.getElementById('igrid');
+  var empty=document.getElementById('kempty');
+  if(!f.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  grid.innerHTML=f.map(function(it){
+    var klc=it.tags&&it.tags.kleur?KM[it.tags.kleur]:null;
+    var bg=klc?'background:linear-gradient(160deg,'+klc+'22,'+klc+'44)':'background:var(--cm)';
+    var pho=it.photo?'<img src="'+it.photo+'" loading="lazy">':
+      '<div class="iphoto-ph" style="'+bg+'"><div class="ico">'+(ICOS[it.cat||'tops'])+'</div><div class="lbl">'+(klc?it.tags.kleur+'<br>':'')+'foto toevoegen</div></div>';
+    var klbar=!it.photo&&klc?'<div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:'+klc+'"></div>':'';
+    var tags=[];
+    if(it.tags){if(it.tags.kleur)tags.push(it.tags.kleur);if(it.tags.pv)tags.push(it.tags.pv);if(it.tags.mt&&it.tags.mt.length)tags.push(it.tags.mt.slice(0,1).join(''));}
+    var dot=klc?'<div style="width:8px;height:8px;border-radius:50%;background:'+klc+';display:inline-block;vertical-align:middle;margin-right:3px;border:1px solid rgba(0,0,0,.08)"></div>':'';
+    return '<div class="icard" onclick="openDet(\''+it.id+'\')">'+
+      '<div class="iphoto">'+pho+klbar+'</div>'+
+      '<div class="iinfo">'+
+        '<div class="iname">'+it.name+'</div>'+
+        '<div class="icat">'+dot+(CATS[it.cat||'tops']||'')+'</div>'+
+        '<div class="itags">'+tags.map(function(t){return '<span class="itag">'+t+'</span>';}).join('')+'</div>'+
+      '</div></div>';
+  }).join('');
+}
+function setFilter(f,el){filter=f;document.querySelectorAll('.fchip').forEach(function(c){c.classList.remove('on');});el.classList.add('on');renderKast();}
+
+// DAGKAART
+
+// ADD ITEM
+function initClrGrid(){
+  var g=document.getElementById('clrgrid');if(!g)return;
+  var groups={};
+  KLRS.forEach(function(k){var gr=k.g||'Overig';if(!groups[gr])groups[gr]=[];groups[gr].push(k);});
+  var html='';
+  Object.keys(groups).forEach(function(gr){
+    html+='<div style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);font-weight:600;margin:10px 0 6px;width:100%">'+gr+'</div>';
+    html+='<div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:4px">';
+    groups[gr].forEach(function(k){
+      html+='<div style="display:flex;flex-direction:column;align-items:center;gap:2px">'+
+        '<div class="clrsw" data-k="'+k.n+'" onclick="pickClr(this)" style="background:'+k.c+';'+(k.b?'border:1.5px solid #CCC':'')+'">' +
+        '<div class="ck" style="color:'+(k.t==='w'?'white':'#333')+'">&#x2713;</div></div>'+
+        '<div style="font-size:7px;color:var(--mu);text-align:center;width:32px;line-height:1.2">'+k.n+'</div></div>';
+    });
+    html+='</div>';
+  });
+  g.innerHTML=html;
+}
+function pickClr(el){document.querySelectorAll('.clrsw').forEach(function(s){s.classList.remove('on');});el.classList.add('on');addTags.kleur=el.dataset.k;document.getElementById('clrlbl').textContent=el.dataset.k+' geselecteerd';}
+function tStatus(el,val){
+  addTags.status=val;
+  document.querySelectorAll('[id^="st-"]').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+}
+function tSingle(el,key){var p=el.closest('.tagrow');p.querySelectorAll('.tbtn').forEach(function(b){b.classList.remove('on');});el.classList.add('on');addTags[key]=el.textContent.trim();}
+function tMulti(el,key){el.classList.toggle('onm');var all=[];document.querySelectorAll('.tbtn.onm[onclick*="\''+key+'\'"]').forEach(function(b){all.push(b.textContent.trim());});addTags[key]=all;}
+function updateSecs(){var c=document.getElementById('ai-cat').value;var hs=['tops','jurken','layers'];document.getElementById('sec-hals').style.display=hs.indexOf(c)>-1?'':'none';document.getElementById('sec-mouw').style.display=hs.indexOf(c)>-1?'':'none';document.getElementById('sec-len').style.display=['tops','bottoms','jurken'].indexOf(c)>-1?'':'none';}
+function onPhoto(e){var f=e.target.files[0];if(!f)return;pendPhoto=f;var r=new FileReader();r.onload=function(ev){var a=document.getElementById('ph-area');document.getElementById('ph-lbl').style.display='none';var img=a.querySelector('img')||document.createElement('img');img.src=ev.target.result;img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:9px';a.appendChild(img);};r.readAsDataURL(f);}
+function openAdd(){addTags={status:'schoon'};pendPhoto=null;document.getElementById('ai-name').value='';document.querySelectorAll('#ov-add .tbtn').forEach(function(b){b.classList.remove('on','onm');});document.querySelectorAll('.clrsw').forEach(function(s){s.classList.remove('on');});document.getElementById('clrlbl').textContent='Geen kleur geselecteerd';document.getElementById('ph-lbl').style.display='';var oi=document.querySelector('#ph-area img');if(oi)oi.remove();updateSecs();document.getElementById('ov-add').classList.add('on');setTimeout(function(){document.getElementById('ai-name').focus();},120);}
+function closeAdd(){document.getElementById('ov-add').classList.remove('on');}
+function submitAdd(){
+  var nm=document.getElementById('ai-name').value.trim();
+  if(!nm){toast('Geef je item een naam');return;}
+  var btn=document.getElementById('add-sbtn');btn.disabled=true;btn.textContent=pendPhoto?'📷 Foto uploaden...':'Toevoegen...';
+  var id='i'+Date.now()+Math.random().toString(36).slice(2,5);
+  function finish(url){
+    items.push({id:id,name:nm,cat:document.getElementById('ai-cat').value,photo:url,tags:Object.assign({},addTags),added:new Date().toISOString()});
+    saveLocal();renderKast();renderDagkaart();closeAdd();toast('✓ '+nm+' toegevoegd');
+    btn.disabled=false;btn.textContent='Item toevoegen';
+  }
+  if(pendPhoto){uploadPhoto(pendPhoto,id).then(finish);}else{finish(null);}
+}
+
+// ITEM DETAIL
+function openDet(id){
+  var it=items.find(function(i){return i.id===id;});if(!it)return;
+  var tg=it.tags||{};
+  var allT=[];
+  if(tg.kleur)allT.push(tg.kleur);if(tg.pv)allT.push(tg.pv);if(tg.hl)allT.push(tg.hl);if(tg.mw)allT.push(tg.mw);if(tg.sw)allT.push(tg.sw);if(tg.len)allT.push(tg.len);if(tg.sz)allT.push(tg.sz);if(tg.mt&&tg.mt.length)allT=allT.concat(tg.mt);
+  var imgH=it.photo?'<div class="det-img"><img src="'+it.photo+'"></div>':'<div class="det-img">'+ICOS[it.cat||'tops']+'</div>';
+  document.getElementById('det-body').innerHTML=imgH+
+    '<div class="det-name">'+it.name+'</div>'+
+    '<div class="det-cat">'+(CATS[it.cat||'tops']||'')+(function(){var dates=Object.keys(worn).sort().reverse();for(var i=0;i<dates.length;i++){if((worn[dates[i]]||[]).indexOf(id)>-1)return ' &middot; Gedragen op '+dates[i].split('-').reverse().join('-');}return '';})()+'</div>'+
+    '<div class="det-tags">'+allT.map(function(t){return '<span class="itag">'+t+'</span>';}).join('')+'</div>'+
+    '<div class="det-btns" style="flex-wrap:wrap;gap:6px">'+
+      '<button class="det-btn pr" onclick="markWorn(\''+id+'\')">&#10003; Gedragen</button>'+
+      '<button class="det-btn" onclick="copyToBoard(\''+id+'\')">+ Board</button>'+
+    '</div>'+
+    '<div class="det-btns" style="margin-top:6px;flex-wrap:wrap;gap:6px">'+
+      '<button class="det-btn'+(it.tags&&it.tags.status==='was'?' pr':'')+'" onclick="setItemStatus(\''+id+'\',\'was\')">Was</button>'+
+      '<button class="det-btn'+(it.tags&&it.tags.status==='stomerij'?' pr':'')+'" onclick="setItemStatus(\''+id+'\',\'stomerij\')">Stomerij</button>'+
+      '<button class="det-btn'+(!it.tags||!it.tags.status||it.tags.status==='schoon'?' pr':'')+'" onclick="setItemStatus(\''+id+'\',\'schoon\')">Schoon</button>'+
+    '</div>'+
+    (it.tags&&it.tags.loc?'<div style="font-size:11px;color:var(--mu);margin-top:7px;padding:5px 8px;background:var(--cr);border-radius:7px">Locatie: '+it.tags.loc+'</div>':'')+
+    '<div class="det-btns" style="margin-top:8px">'+
+      '<button class="det-btn dl" onclick="delItem(\''+id+'\')">Verwijder</button>'+
+    '</div>';
+  document.getElementById('ov-det').classList.add('on');
+}
+function closeDet(){document.getElementById('ov-det').classList.remove('on');}
+
+function setItemStatus(id,status){
+  var it=items.find(function(i){return i.id===id;});
+  if(!it)return;
+  if(!it.tags)it.tags={};
+  it.tags.status=status;
+  saveLocal();
+  openDet(id); // refresh detail
+  toast(status==='was'?'🫧 In de was gezet':status==='stomerij'?'👔 Naar stomerij':'✓ Schoon gemarkeerd');
+}
+
+var _copyItemId=null;
+function copyToBoard(itemId){
+  if(!boards.length){toast('Maak eerst een board aan');return;}
+  var it=items.find(function(i){return i.id===itemId;});
+  if(!it)return;
+  _copyItemId=itemId;
+  var html='<div class="sh-hdl"></div><div class="sh-t">Kopieer naar board</div><div style="margin-bottom:14px">';
+  boards.forEach(function(b){
+    html+='<div data-bid="'+b.id+'" class="copy-board-row" style="padding:12px;border:1.5px solid var(--cd);border-radius:9px;margin-bottom:7px;cursor:pointer;font-family:Jost,sans-serif;font-size:13px;color:var(--tx)">'+b.emoji+' '+b.label+'</div>';
+  });
+  html+='</div>';
+  document.getElementById('det-body').innerHTML=html;
+  document.querySelectorAll('.copy-board-row').forEach(function(el){
+    el.onclick=function(){addItemToBoard(this.dataset.bid,_copyItemId);};
+  });
+}
+
+function addItemToBoard(boardId,itemId){
+  var b=boards.find(function(x){return x.id===boardId;});
+  if(!b)return;
+  if(!b.outfits)b.outfits=[];
+  // Check if item already on this board
+  var exists=b.outfits.find(function(o){return o.items&&o.items.indexOf(itemId)>-1&&o.items.length===1;});
+  if(!exists){b.outfits.push({id:'o'+Date.now(),items:[itemId],desc:''});}
+  saveLocal();
+  closeDet();
+  toast('Item toegevoegd aan '+b.label);
+}
+function markWorn(id){var td=new Date().toISOString().split('T')[0];if(!worn[td])worn[td]=[];if(worn[td].indexOf(id)<0)worn[td].push(id);saveLocal();closeDet();toast('✓ Gelogd als gedragen vandaag');}
+function delItem(id){if(!confirm('Item verwijderen?'))return;items=items.filter(function(i){return i.id!==id;});saveLocal();renderKast();closeDet();toast('Item verwijderd');}
+
+// BOARDS
+function renderBoards(){
+  var sc=document.getElementById('bscroll');
+  sc.innerHTML=boards.map(function(b){return '<button class="bchip'+(b.id===actBoard?' on':'')+'" onclick="switchB(\''+b.id+'\')">'+b.emoji+' '+b.label+'</button>';}).join('')+'<button class="bchip bchip-add" onclick="openNB()">+ Nieuw board</button>';
+  var ct=document.getElementById('bcont');
+  var bd=boards.find(function(b){return b.id===actBoard;});
+  if(!bd){ct.innerHTML='<div class="empty" style="margin-top:20px"><div class="empty-ico">✦</div><div class="empty-t">Nog geen boards</div><div class="empty-s">Tik op <strong>+ Nieuw board</strong> om te beginnen.</div></div>';return;}
+  var ofs=bd.outfits||[];
+  ct.innerHTML=
+    '<div class="bhead"><div class="btitle">'+bd.emoji+' '+bd.label+'</div></div>'+
+    '<div class="bactions" style="padding:0 12px 0">'+
+      '<button class="babtn pr" onclick="openPick(\''+bd.id+'\')">+ Outfit</button>'+
+      '<button class="babtn ai" id="aibtn-'+bd.id+'" onclick="openGen(\''+bd.id+'\')">❖ AI genereren</button>'+
+      '<button class="babtn dl" onclick="delBoard(\''+bd.id+'\')">Verwijder</button>'+
+    '</div>'+
+    (ofs.length?ofs.map(function(o){return renderOCard(bd.id,o);}).join(''):
+    '<div class="empty" style="padding:20px 0"><div class="empty-ico" style="font-size:30px">✦</div><div class="empty-t" style="font-size:17px">Nog geen outfits</div><div class="empty-s">Tik op <strong>+ Outfit</strong> om items te kiezen, of laat de AI outfits genereren.</div></div>');
+}
+function renderOCard(bid,o){
+  var its=(o.items||[]).map(function(id){var it=items.find(function(i){return i.id===id;});var img=it&&it.photo?'<img src="'+it.photo+'">':'<span>'+(it?ICOS[it.cat||'tops']:'👕')+'</span>';return '<div class="othumb"><div class="othumb-img">'+img+'</div><div class="othumb-lbl">'+(it?it.name.slice(0,12):'?')+'</div></div>';}).join('');
+  return '<div class="ocard"><div class="oitems">'+its+'</div>'+(o.desc?'<div class="odesc">'+o.desc+'</div>':'')+'<div class="obtns"><button class="obtn dl" onclick="delOutfit(\''+bid+'\',\''+o.id+'\')">Verwijder</button></div></div>';
+}
+function switchB(id){actBoard=id;renderBoards();}
+function openNB(){document.getElementById('nb-name').value='';document.querySelectorAll('#emojis .tbtn').forEach(function(b){b.classList.remove('on');});var d=document.querySelector('#emojis .tbtn:nth-child(4)');if(d)d.classList.add('on');document.getElementById('ov-nb').classList.add('on');}
+function closeNB(){document.getElementById('ov-nb').classList.remove('on');}
+function pickEmoji(el){document.querySelectorAll('#emojis .tbtn').forEach(function(b){b.classList.remove('on');});el.classList.add('on');}
+function createBoard(){var nm=document.getElementById('nb-name').value.trim();if(!nm){toast('Geef het board een naam');return;}var eb=document.querySelector('#emojis .tbtn.on');var emoji=eb?eb.textContent.trim():'✨';var nb={id:'b'+Date.now(),label:nm,emoji:emoji,outfits:[]};boards.push(nb);actBoard=nb.id;saveLocal();renderBoards();closeNB();toast('✓ Board "'+nm+'" aangemaakt');}
+function delBoard(id){var b=boards.find(function(x){return x.id===id;});if(!b)return;if(!confirm('Board "'+b.label+'" verwijderen?'))return;boards=boards.filter(function(x){return x.id!==id;});actBoard=boards.length?boards[0].id:null;saveLocal();renderBoards();toast('Board verwijderd');}
+function delOutfit(bid,oid){var b=boards.find(function(x){return x.id===bid;});if(!b)return;b.outfits=(b.outfits||[]).filter(function(o){return o.id!==oid;});saveLocal();renderBoards();}
+
+// ITEM PICKER
+function openPick(bid){pickBoard=bid;pickSel=[];renderPGrid();document.getElementById('ov-pick').classList.add('on');}
+function closePick(){document.getElementById('ov-pick').classList.remove('on');pickSel=[];}
+function renderPGrid(){
+  var g=document.getElementById('pgrid');
+  if(!items.length){g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--mu);font-size:13px">Voeg eerst items toe aan je kast.</div>';return;}
+  g.innerHTML=items.map(function(it){var s=pickSel.indexOf(it.id)>-1;var img=it.photo?'<img src="'+it.photo+'">':'<span>'+ICOS[it.cat||'tops']+'</span>';return '<div class="pitem'+(s?' on':'')+'" onclick="togPick(\''+it.id+'\')"><div class="pchk">✓</div><div class="pitem-img">'+img+'</div><div class="pitem-lbl">'+it.name.slice(0,14)+'</div></div>';}).join('');
+  var pb=document.getElementById('pick-sbtn');if(pb)pb.textContent=pickSel.length?'Outfit opslaan ('+pickSel.length+')':'Selecteer items';
+}
+function togPick(id){var i=pickSel.indexOf(id);if(i>-1)pickSel.splice(i,1);else pickSel.push(id);renderPGrid();}
+function confirmPick(){if(!pickSel.length){toast('Selecteer minimaal 1 item');return;}var b=boards.find(function(x){return x.id===pickBoard;});if(!b)return;if(!b.outfits)b.outfits=[];b.outfits.push({id:'o'+Date.now(),items:pickSel.slice(),desc:''});saveLocal();renderBoards();closePick();toast('Outfit opgeslagen!');}
+
+// AI GENERATE
+function initChat(){
+  if(chatInit)return;chatInit=true;
+  var nm=prof?prof.name:'jou';
+  var dna=prof&&prof.stijlDNA;
+  var arch=dna?(dna.archetypes||[]).join(' x '):'';
+  var gr='Hoi '+nm+'!\n\nIk ben jouw persoonlijke stylist.'+(arch?'\n\nJij bent **'+arch+'**.'  :'')+'\n\nStel me alles over je garderobe, outfits of stijl.';
+  addMsg('a',gr);
+}
+function sysPrompt(){
+  var dna=prof&&prof.stijlDNA;
+  var wt=items.length?items.slice(0,25).map(function(it){var t=it.tags?[it.tags.kleur,it.tags.pv,(it.tags.mt||[]).join('/')].filter(Boolean).join(', '):'';return it.name+(t?' ['+t+']':'');}).join(', '):'Garderobe is leeg.';
+  return 'Je bent de persoonlijke digitale stylist van '+(prof?prof.name:'deze gebruiker')+'. Spreek haar aan als je/jij. Bondig. Eindig altijd met een concrete actie.\n\n'+(dna?'STIJL: '+(dna.archetypes||[]).join(' & ')+' | Silhouet: '+(dna.silhouet||'')+' | Materialen: '+(dna.materialen||[]).join(', ')+' | Kleuren: '+(dna.kleuren||[]).join(', ')+' | Figuur: '+(dna.figuurTip||'')+'\n\n':'')+
+  'GARDEROBE ('+items.length+' items): '+wt;
+}
+function addMsg(role,txt){
+  var el=document.createElement('div');el.className='msg '+role;
+  var ht=txt.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');
+  el.innerHTML=(role==='a'?'<div class="av">✦</div>':'')+'<div class="bubble">'+ht+'</div>';
+  document.getElementById('msgs').appendChild(el);
+  document.getElementById('msgs').scrollTop=999999;
+  chatHist.push({role:role==='a'?'assistant':'user',content:txt});
+}
+function showTyping(){var el=document.createElement('div');el.className='msg a';el.id='typing';el.innerHTML='<div class="av">✦</div><div class="bubble"><div class="dots"><span></span><span></span><span></span></div></div>';document.getElementById('msgs').appendChild(el);document.getElementById('msgs').scrollTop=999999;}
+function sendChat(){
+  var cin=document.getElementById('cin');var txt=cin.value.trim();if(!txt)return;
+  cin.value='';cin.style.height='auto';document.getElementById('csnd').disabled=true;
+  // keep quick prompts visible
+  addMsg('u',txt);showTyping();
+  var msgs=chatHist.slice(-10).map(function(m){return{role:m.role,content:m.content};});
+  fetch(WK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:700,system:sysPrompt(),messages:msgs})})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    var ti=document.getElementById('typing');if(ti)ti.remove();
+    var reply=(d.content&&d.content[0]&&d.content[0].text)||'Probeer opnieuw.';
+    addMsg('a',reply);
+  })
+  .catch(function(){var ti=document.getElementById('typing');if(ti)ti.remove();addMsg('a','Er ging iets mis. Probeer opnieuw.');})
+  .catch(function(){document.getElementById('csnd').disabled=false;});
+}
+function sendQ(el){document.getElementById('cin').value=el.textContent;sendChat();}
+
+// DNA
+var CMAP_DNA={};KLRS.forEach(function(k){CMAP_DNA[k.n]=k.c;});
+function renderDNA(){
+  var ct=document.getElementById('dna-cont');
+  var sqb=document.getElementById('start-quiz-link');
+  var rqb=document.getElementById('redo-quiz-btn');
+  if(!prof||!prof.stijlDNA){
+    ct.innerHTML='<div class="empty" style="margin-top:30px"><div class="empty-ico" style="font-size:44px;margin-bottom:12px">🧬</div><div class="empty-t" style="font-family:Cormorant Garamond,serif;font-size:24px;font-style:italic;color:var(--br);margin-bottom:6px">Nog geen Stijl DNA</div><div class="empty-s" style="font-size:13px;color:var(--mu);line-height:1.65">Doe de quiz om jouw persoonlijke stijlprofiel aan te maken.</div></div>';
+    if(sqb)sqb.style.display='block';
+    if(rqb)rqb.style.display='none';
+    return;
+  }
+  if(sqb)sqb.style.display='none';
+  if(rqb)rqb.style.display='block';
+  var dna=prof.stijlDNA;
+  var archs=dna.archetypes||[dna.primaryArchetype||''];
+  function sec(t,b){return '<div class="dsec"><div class="dsec-t">'+t+'</div><div class="dsec-b">'+b+'</div></div>';}
+  function chips(arr,bad){return arr.map(function(x){return '<span class="dc'+(bad?' bad':'')+'">'+(typeof x==='string'?x:x)+'</span>';}).join('');}
+  var klH=(dna.kleuren||[]).map(function(k){var c=CMAP_DNA[k]||'#888';return '<div class="cdw"><div class="cdot" style="background:'+c+';'+(k==='Wit'||k==='Creme'?'border:1px solid #DDD':'')+';"></div><div class="cdotl">'+k+'</div></div>';}).join('');
+  ct.innerHTML=
+    '<div class="dna-hero"><div class="dna-ey">Jouw Stijl DNA</div><div class="dna-nm">'+prof.name+'</div><div class="dna-ar">'+archs.join(' x ')+'</div><div class="dna-tags">'+(dna.kw||[]).map(function(k){return '<span class="dna-tag">'+k+'</span>';}).join('')+'</div></div>'+
+    sec('Wie jij bent',(dna.beschrijving||'').replace(/\n/g,'<br>'))+
+    '<div class="dkracht"><div class="dkracht-t">Jouw kracht</div><div class="dkracht-b">'+(dna.kracht||'')+'</div></div>'+
+    sec('Silhouet &amp; proporties',(dna.silhouet||'')+(dna.proporties?'<br><br><strong>Proporties:</strong> '+dna.proporties:''))+
+    (dna.materialen&&dna.materialen.length?sec('Materialen','<div>'+chips(dna.materialen)+'</div>'+(dna.materialen_vermijd&&dna.materialen_vermijd.length?'<div style="margin-top:7px;font-size:10px;color:var(--mu);margin-bottom:4px">Vermijd:</div><div>'+chips(dna.materialen_vermijd,true)+'</div>':'')):'') +
+    (klH?sec('Kleuren ('+(dna.kleurtemp||'')+')', '<div class="cdots">'+klH+'</div>'):'') +
+    (dna.figuurTip?'<div class="dfig"><div class="dsec-t">Figuuradvies &middot; '+(dna.figuur||'')+'</div><div class="dsec-b">'+dna.figuurTip+(dna.benadruk&&dna.benadruk.length?'<br><br><strong>Benadrukken:</strong> '+dna.benadruk.join(', '):'')+(dna.verbergen&&dna.verbergen.length?'<br><strong>Minder:</strong> '+dna.verbergen.join(', '):'')+'</div></div>':'') +
+    (dna.sleutelitems&&dna.sleutelitems.length?sec('Sleutelitems','<div>'+chips(dna.sleutelitems)+'</div>'):'') +
+    (dna.nogo&&dna.nogo.length?sec('No-go\'s','<div>'+chips(dna.nogo,true)+'</div>'):'') +
+    '';
+}
+function goQuiz(){window.location.href='stijlstudio_quiz.html';}
+
+// WEATHER
+function fetchWX(){if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(function(p){fetch('https://wttr.in/'+p.coords.latitude+','+p.coords.longitude+'?format=%t').then(function(r){return r.text();}).then(function(t){var deg=parseInt((t.match(/([\+\-]?\d+)/)||[])[1]||'15');document.getElementById('wico').textContent=deg>22?'☀️':deg>14?'🌤':deg>7?'🌥':'🧥';document.getElementById('wtemp').textContent=deg+'°';}).catch(function(){});},function(){});}
+
+
+// ═══════════════════════════════════════════════════════
+// OUTFIT GENERATOR
+// ═══════════════════════════════════════════════════════
+var genState={mood:'',occ:'',cyc:'',cnt:'4',board:'__none__',anchors:[]};
+var resultItems=[];  // [{item, why, locked}]
+var genBoardId=null;
+
+
+
+
+
+function genPick(key,val,el){
+  genState[key]=val;
+  // Clear other buttons in same group
+  if(el&&el.parentElement){
+    el.parentElement.querySelectorAll('.tbtn').forEach(function(b){b.classList.remove('on');});
+    el.classList.add('on');
+  }
+}
+
+function renderGenAnchors(){
+  var g=document.getElementById('gen-anchors');if(!g)return;
+  if(!items.length){g.innerHTML='<div style="grid-column:1/-1;font-size:12px;color:var(--mu);padding:8px 0">Voeg eerst items toe aan je kast.</div>';return;}
+  g.innerHTML=items.slice(0,12).map(function(it){
+    var on=genState.anchors.indexOf(it.id)>-1;
+    var img=it.photo?'<img src="'+it.photo+'">':'<span>'+ICOS[it.cat||'tops']+'</span>';
+    return '<div onclick="togAnchor(\''+it.id+'\')" style="background:'+(on?'linear-gradient(135deg,#fff8f4,#fdf0e8)':'var(--cr)')+';border:2px solid '+(on?'var(--bw)':'var(--cd)')+';border-radius:9px;padding:5px;cursor:pointer;text-align:center">'+
+      '<div style="width:100%;aspect-ratio:3/4;border-radius:6px;background:var(--cd);display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden;margin-bottom:3px">'+img+'</div>'+
+      '<div style="font-size:8px;color:var(--tx);font-weight:500;line-height:1.2">'+it.name.slice(0,12)+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function togGenAnchor(id){
+  var i=genState.anchors.indexOf(id);
+  if(i>-1)genState.anchors.splice(i,1);else genState.anchors.push(id);
+  renderGenAnchors();
+}
+
+async function runGenerator(){
+  if(!items.length){toast('Voeg eerst items toe aan je kast');return;}
+  closeGen();
+  // Show loading
+  document.getElementById('result-body').innerHTML='<div class="gen-loading"><div class="gen-spinner"></div>Outfit wordt gegenereerd...</div>';
+  document.getElementById('ov-result').classList.add('on');
+
+  var dna=prof&&prof.stijlDNA;
+  var wardrobeText=items.map(function(it){
+    var t=it.tags?[it.tags.kleur,it.tags.pv,it.tags.sw,(it.tags.mt||[]).join('/')].filter(Boolean).join(', '):'';
+    return it.id+'|'+it.name+'|'+it.cat+(t?' ['+t+']':'');
+  }).join('\n');
+
+  var cyclusTips={
+    menstruatie:'Kies zachte, comfortabele stoffen. Vermijd strakke tailleringen. Denk aan soepele materialen die meebewegen.',
+    folliculair:'Je voelt je energiek. Frissere kleuren en lichtere stoffen passen bij deze fase.',
+    ovulatie:'Je straalt. Dit is het moment voor je meest zelfverzekerde outfit. Statement stuk toegestaan.',
+    luteaal:'Kies iets wat je stevig en zeker voelt. Warme kleuren en comfortabele volumes.'
+  };
+
+  var styleCtx=dna?'Stijl: '+(dna.archetypes||[]).join(' & ')+'. Silhouet: '+(dna.silhouet||'')+'. Proporties: '+(dna.proporties||'')+'. Materialen: '+(dna.materialen||[]).join(', ')+'. Kleuren: '+(dna.kleuren||[]).join(', ')+'. Figuur: '+(dna.figuurTip||'')+'. No-gos: '+(dna.nogo||[]).join(', ')+'.':'';
+  var moodCtx=genState.mood?'Stemming: '+genState.mood+'.':'';
+  var occCtx=genState.occ?'Gelegenheid: '+genState.occ+'.':'';
+  var cycCtx=genState.cyc?(cyclusTips[genState.cyc]||''):'';
+  var cntCtx=genState.cnt==='ai'?'Kies zelf het ideale aantal items.':'Gebruik precies '+genState.cnt+' items.';
+  var anchorCtx=genState.anchors.length?'Verplicht te gebruiken items: '+genState.anchors.map(function(id){var it=items.find(function(i){return i.id===id;});return it?it.name:'';}).filter(Boolean).join(', ')+'.':'';
+
+  var prompt='Je bent een expert personal stylist. Genereer een complete outfit.\n\n'+
+    styleCtx+'\n'+moodCtx+'\n'+occCtx+'\n'+
+    (cycCtx?'Cyclus: '+cycCtx+'\n':'')+
+    cntCtx+'\n'+anchorCtx+'\n\n'+
+    'Garderobe (id|naam|categorie|tags):\n'+wardrobeText+'\n\n'+
+    'Geef als JSON: {'+
+      'desc:"stijlomschrijving in 1 zin",'+
+      'items:[{id:"item-id",why:"waarom dit item in deze outfit"},...],'+
+      'tip:"een concrete stijlingreep voor deze look"'+
+    '}\nAlleen JSON, geen markdown.';
+
+  try{
+    fetch(WK,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:800,
+        system:'Je geeft alleen valide JSON terug. Geen markdown. Geen uitleg.',
+        messages:[{role:'user',content:prompt}]})});
+  (data.content&&data.content[0]&&data.content[0].text)||'{}';
+    txt=txt.replace(/```json|```/g,'').trim();
+    var result=JSON.parse(txt);
+
+    resultItems=(result.items||[]).map(function(ri){
+      var it=items.find(function(i){return i.id===ri.id;});
+      return {item:it,why:ri.why||'',locked:false};
+    }).filter(function(r){return r.item;});
+
+    renderResult(result.desc||'',result.tip||'');
+  }catch(e){
+    document.getElementById('result-body').innerHTML='<div style="padding:20px;text-align:center;color:var(--mu)">Er ging iets mis. Probeer opnieuw.</div>'+
+      '<button class="sbtn" onclick="closeResult()" style="margin:0 12px;width:calc(100% - 24px)">Sluiten</button>';
+  }
+}
+
+
+
+async function swapItem(idx){
+  var r=resultItems[idx];
+  if(!r||!r.item)return;
+  var lockedIds=resultItems.filter(function(x,i){return i!==idx&&x.item;}).map(function(x){return x.item.id;});
+  var lockedNames=resultItems.filter(function(x,i){return i!==idx&&x.item;}).map(function(x){return x.item.name;});
+  var dna=prof&&prof.stijlDNA;
+  var prompt='Huidige outfit bevat: '+lockedNames.join(', ')+'.\n'+
+    'Vervang "'+r.item.name+'" ('+r.item.cat+') door een beter passend alternatief.\n'+
+    (dna?'Stijl: '+(dna.archetypes||[]).join(' & ')+'. Kleuren: '+(dna.kleuren||[]).join(', ')+'.\n':'')+
+    'Beschikbare items (id|naam|cat):\n'+
+    items.filter(function(i){return lockedIds.indexOf(i.id)<0&&i.id!==r.item.id;}).map(function(i){return i.id+'|'+i.name+'|'+i.cat;}).join('\n')+'\n\n'+
+    'Geef ALLEEN JSON: {id:"item-id",why:"waarom dit beter past"}';
+
+  // Show spinner on button
+  var el=document.getElementById('ritem-'+idx);
+  if(el)el.style.opacity='0.5';
+
+  try{
+    fetch(WK,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:200,
+        system:'Alleen valide JSON terug.',
+        messages:[{role:'user',content:prompt}]})});
+  (data.content&&data.content[0]&&data.content[0].text)||'{}';
+    txt=txt.replace(/```json|```/g,'').trim();
+    var swap=JSON.parse(txt);
+    var newItem=items.find(function(i){return i.id===swap.id;});
+    if(newItem){resultItems[idx]={item:newItem,why:swap.why||'',locked:false};}
+  }catch(e){}
+
+  if(el)el.style.opacity='1';
+  renderResult('','');
+}
+
+function lockItem(idx){
+  resultItems[idx].locked=!resultItems[idx].locked;
+  var el=document.getElementById('ritem-'+idx);
+  if(el){
+    el.classList.toggle('locked',resultItems[idx].locked);
+    var btn=el.querySelector('.result-btn.lock,.result-btn.locked');
+    if(btn){btn.className='result-btn lock'+(resultItems[idx].locked?' locked':'');btn.textContent=resultItems[idx].locked?'Vast':'Vastzetten';}
+  }
+}
+
+function saveResult(){
+  if(!boards.length){
+    // Create default board and save
+    var nb={id:'b'+Date.now(),label:'Gegenereerde looks',emoji:'✦',outfits:[]};
+    boards.push(nb);actBoard=nb.id;
+    saveLocal();renderBoards();
+    saveToBoard(nb.id);
+  } else {
+    // Show board picker
+    var html='<div class="sh-hdl"></div><div class="sh-t">Opslaan op board</div>';
+    boards.forEach(function(b){
+      html+='<div onclick="saveToBoard(\''+b.id+'\')" style="padding:12px;border:1.5px solid var(--cd);border-radius:9px;margin-bottom:7px;cursor:pointer;font-size:13px;font-family:Jost,sans-serif;color:var(--tx)">'+b.emoji+' '+b.label+'</div>';
+    });
+    document.getElementById('result-body').innerHTML=html;
+  }
+}
+
+function saveToBoard(boardId){
+  var b=boards.find(function(x){return x.id===boardId;});
+  if(!b)return;
+  if(!b.outfits)b.outfits=[];
+  b.outfits.push({
+    id:'o'+Date.now(),
+    items:resultItems.map(function(r){return r.item?r.item.id:null;}).filter(Boolean),
+    desc:''
+  });
+  saveLocal();renderBoards();closeResult();
+  toast('Outfit opgeslagen op '+b.label+'!');
+}
+
+// OUTFIT GENERATOR
+
+// OUTFIT GENERATOR + SWIPE
+var genBoardId=null,genMood=null,genCyclus=null,genCnt=3,genAnchors=[];
+var resultOutfits=[],resultBoardId=null;
+
+function openGen(boardId){
+  genBoardId=boardId;genMood=null;genCyclus=null;genCnt=3;genAnchors=[];
+  var b=boards.find(function(x){return x.id===boardId;});
+  document.getElementById('gen-board-lbl').textContent='voor board: '+(b?b.emoji+' '+b.label:'');
+  document.querySelectorAll('.mood-btn').forEach(function(b){b.classList.remove('on');});
+  document.querySelectorAll('.cyc-btn').forEach(function(b){b.classList.remove('on');});
+  document.querySelectorAll('.cnt-btn').forEach(function(b){b.classList.remove('on');});
+  var d3=document.querySelector('[onclick*="pickCnt"][onclick*=",3)"]');if(d3)d3.classList.add('on');
+  var ag=document.getElementById('anchor-grid');
+  if(items.length){ag.innerHTML=items.map(function(it){var img=it.photo?'<img src="'+it.photo+'">':'<span>'+ICOS[it.cat||'tops']+'</span>';return '<div class="anchor-item" onclick="togAnchor(this,\''+it.id+'\')" data-id="'+it.id+'"><div class="anchor-img">'+img+'</div><div class="anchor-lbl">'+it.name.slice(0,14)+'</div></div>';}).join('');}
+  else{ag.innerHTML='<div style="grid-column:1/-1;font-size:12px;color:var(--mu);padding:8px">Voeg eerst items toe.</div>';}
+  document.getElementById('ov-gen').classList.add('on');
+}
+function closeGen(){document.getElementById('ov-gen').classList.remove('on');}
+function pickMood(el,v){genMood=v;document.querySelectorAll('.mood-btn').forEach(function(b){b.classList.remove('on');});el.classList.add('on');}
+function pickCyclus(el,v){if(genCyclus===v){genCyclus=null;el.classList.remove('on');}else{genCyclus=v;document.querySelectorAll('.cyc-btn').forEach(function(b){b.classList.remove('on');});el.classList.add('on');}}
+function pickCnt(el,v){genCnt=v;document.querySelectorAll('.cnt-btn').forEach(function(b){b.classList.remove('on');});el.classList.add('on');}
+function togAnchor(el,id){var i=genAnchors.indexOf(id);if(i>-1)genAnchors.splice(i,1);else genAnchors.push(id);el.classList.toggle('on',genAnchors.indexOf(id)>-1);}
+
+function runGen(){
+  if(items.length<2){toast('Voeg eerst meer items toe aan je kast');return;}
+  closeGen();
+  resultBoardId=genBoardId;resultOutfits=[];
+  document.getElementById('result-scroll').innerHTML='<div class="loading-outfit"><div class="spin" style="width:30px;height:30px;border:3px solid var(--cd);border-top-color:var(--bw);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px"></div><div style="font-family:Cormorant Garamond,serif;font-size:18px;font-style:italic;color:var(--br)">Jouw outfit wordt samengesteld...</div></div>';
+  document.getElementById('result-title').textContent='Outfit genereren';
+  document.getElementById('save-outfit-btn').style.display='none';
+  document.getElementById('ov-result').classList.add('on');
+  var wt=items.map(function(it){var t=it.tags?[it.tags.kleur,it.tags.pv,it.tags.str,(it.tags.mt||[]).join('/')].filter(Boolean).join(', '):'';return it.id+'|'+it.name+'|'+it.cat+(t?' ['+t+']':'');}).join('\n');
+  var dna=prof&&prof.stijlDNA;
+  var ctx='';
+  if(dna)ctx+='Stijl: '+(dna.archetypes||[]).join(' & ')+'. Silhouet: '+(dna.silhouet||'')+'. Kleuren: '+(dna.kleuren||[]).join(', ')+'. Figuuradvies: '+(dna.figuurTip||'')+'\n';
+  if(genMood)ctx+='Mood vandaag: '+genMood+'.\n';
+  if(genCyclus){var cycAdv={menstruatie:'zachte materialen en comfort',folliculair:'kleur en energie',ovulatie:'krachtig en vrouwelijk',luteaal:'soepel en warm'};ctx+='Cyclusfase: '+genCyclus+' ('+( cycAdv[genCyclus]||'')+')\n';}
+  if(genCnt>0)ctx+='Maak een outfit van precies '+genCnt+' items.\n';
+  if(genAnchors.length){var anms=genAnchors.map(function(id){var it=items.find(function(i){return i.id===id;});return it?it.name:'';}).filter(Boolean);ctx+='Verplicht in outfit: '+anms.join(', ')+'.\n';}
+  var prompt='Je bent een stylist. Maak 1 complete outfit.\n\n'+ctx+'\nGarderobe (id|naam|cat|tags):\n'+wt+'\n\nGeef ALLEEN JSON: {"items":["id1","id2","id3"],"desc":"stijlomschrijving","why":"waarom dit werkt"}. Geen markdown.';
+  fetch(WK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,system:'Geef alleen valide JSON.',messages:[{role:'user',content:prompt}]})})
+  .then(function(r){return r.json();})
+  .then(function(data){
+    var txt=(data.content&&data.content[0]&&data.content[0].text)||'{}';
+    txt=txt.replace(/```json|```/g,'').trim();
+    var outfit=JSON.parse(txt);
+    var validIds=(outfit.items||[]).filter(function(id){return items.find(function(it){return it.id===id;});});
+    if(!validIds.length){toast('Kon geen outfit genereren. Probeer opnieuw.');closeResult();return;}
+    resultOutfits=[{id:'og'+Date.now(),items:validIds,desc:outfit.desc||'',why:outfit.why||''}];
+    renderResult();
+  })
+  .catch(function(){toast('Er ging iets mis. Probeer opnieuw.');closeResult();});
+}
+
+function renderResult(){
+  var outfit=resultOutfits[0];if(!outfit){closeResult();return;}
+  document.getElementById('result-title').textContent='Jouw outfit';
+  document.getElementById('save-outfit-btn').style.display='block';
+  var html='';
+  if(outfit.desc)html+='<div class="outfit-desc-result">'+outfit.desc+'</div>';
+  if(outfit.why)html+='<div style="font-size:11px;color:var(--mu);margin-bottom:12px;font-style:italic">'+outfit.why+'</div>';
+  html+='<div id="swipe-items-list">';
+  outfit.items.forEach(function(id,idx){html+=renderSwipeItem(id,idx);});
+  html+='</div>';
+  html+='<div style="font-size:11px;color:var(--mu);text-align:center;margin-top:14px">Tik op X om een item te vervangen door een alternatief dat naadloos past</div>';
+  document.getElementById('result-scroll').innerHTML=html;
+}
+
+function renderSwipeItem(itemId,idx){
+  var it=items.find(function(i){return i.id===itemId;});
+  if(!it)return '';
+  var img=it.photo?'<img src="'+it.photo+'">':'<span>'+ICOS[it.cat||'tops']+'</span>';
+  return '<div class="swipe-item" id="si-'+idx+'" data-id="'+itemId+'">'+
+    '<div class="swipe-item-img">'+img+'</div>'+
+    '<div class="swipe-item-info"><div class="swipe-item-name">'+it.name+'</div>'+
+    '<div class="swipe-item-cat">'+(CATS[it.cat]||'')+(it.tags&&it.tags.kleur?' \u00b7 '+it.tags.kleur:'')+'</div></div>'+
+    '<div class="swipe-btns">'+
+      '<button class="swipe-no" onclick="replaceItem('+idx+')">&#x2715;</button>'+
+      '<button class="swipe-yes" onclick="keepItem('+idx+')">&#x2713;</button>'+
+    '</div></div>';
+}
+
+function keepItem(idx){var el=document.getElementById('si-'+idx);if(el){el.querySelector('.swipe-btns').innerHTML='<span style="color:#2a6a2a;font-size:13px;font-weight:700">\u2713</span>';}}
+
+function replaceItem(idx){
+  var outfit=resultOutfits[0];if(!outfit)return;
+  var currentId=outfit.items[idx];
+  var currentItem=items.find(function(i){return i.id===currentId;});
+  if(!currentItem)return;
+  var el=document.getElementById('si-'+idx);
+  if(el)el.querySelector('.swipe-btns').innerHTML='<div style="width:22px;height:22px;border:2px solid var(--cd);border-top-color:var(--bw);border-radius:50%;animation:spin .8s linear infinite"></div>';
+  var keepNames=outfit.items.filter(function(id,i){return i!==idx;}).map(function(id){var it=items.find(function(i){return i.id===id;});return it?it.name:'';}).filter(Boolean).join(', ');
+  var available=items.filter(function(it){return outfit.items.indexOf(it.id)<0;});
+  if(!available.length){if(el)el.outerHTML=renderSwipeItem(currentId,idx);return;}
+  var wt=available.map(function(it){return it.id+'|'+it.name+'|'+it.cat;}).join('\n');
+  var prompt='Outfit heeft: '+keepNames+'. Vervang "'+currentItem.name+'" ('+currentItem.cat+'). Kies beste alternatief:\n'+wt+'\n\nJSON: {"id":"item_id","reason":"waarom dit past"}';
+  fetch(WK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:150,system:'Alleen valide JSON.',messages:[{role:'user',content:prompt}]})})
+  .then(function(r){return r.json();})
+  .then(function(data){
+    var txt=(data.content&&data.content[0]&&data.content[0].text)||'{}';
+    txt=txt.replace(/```json|```/g,'').trim();
+    var result=JSON.parse(txt);
+    var newItem=items.find(function(i){return i.id===result.id;});
+    if(!newItem){if(el)el.outerHTML=renderSwipeItem(currentId,idx);return;}
+    outfit.items[idx]=result.id;
+    var newHtml=renderSwipeItem(result.id,idx);
+    if(el){
+      el.style.transition='transform .2s,opacity .2s';
+      el.style.transform='translateX(-100%)';el.style.opacity='0';
+      setTimeout(function(){
+        var tmp=document.createElement('div');tmp.innerHTML=newHtml;var newEl=tmp.firstChild;
+        newEl.style.transform='translateX(100%)';newEl.style.opacity='0';newEl.style.transition='transform .3s,opacity .3s';
+        el.parentNode.replaceChild(newEl,el);
+        setTimeout(function(){newEl.style.transform='';newEl.style.opacity='';},30);
+      },200);
+    }
+  })
+  .catch(function(){if(el)el.outerHTML=renderSwipeItem(currentId,idx);});
+}
+
+function closeResult(){document.getElementById('ov-result').classList.remove('on');}
+function saveGeneratedOutfit(){
+  var outfit=resultOutfits[0];if(!outfit)return;
+  var b=boards.find(function(x){return x.id===resultBoardId;});
+  if(!b&&boards.length>0)b=boards[0];
+  if(!b){toast('Maak eerst een board aan');return;}
+  if(!b.outfits)b.outfits=[];
+  b.outfits.push({id:'og'+Date.now(),items:outfit.items.slice(),desc:outfit.desc||''});
+  saveLocal();renderBoards();closeResult();showP('boards');
+  toast('Outfit opgeslagen op "'+b.label+'"!');
+}
+
+
+// FEEDBACK
+var fbType='alg',fbStars=0;
+function openFeedback(){fbType='alg';fbStars=0;document.getElementById('fb-ta').value='';document.querySelectorAll('.fb-star').forEach(function(s){s.classList.remove('on');});document.querySelectorAll('.fb-type').forEach(function(b){b.classList.remove('on');});document.getElementById('fbt-alg').classList.add('on');document.getElementById('ov-fb').classList.add('on');}
+function closeFeedback(){document.getElementById('ov-fb').classList.remove('on');}
+function pickFbType(el,v){fbType=v;document.querySelectorAll('.fb-type').forEach(function(b){b.classList.remove('on');});el.classList.add('on');}
+function pickStar(n){fbStars=n;document.querySelectorAll('.fb-star').forEach(function(s,i){s.classList.toggle('on',i<n);});}
+function submitFeedback(){
+  var msg=document.getElementById('fb-ta').value.trim();
+  if(!msg){toast('Schrijf iets om te versturen');return;}
+  sbPost('feedback',{user_code:code,user_naam:prof?prof.name:'',type:fbType,bericht:msg,rating:fbStars||null,created_at:new Date().toISOString()});
+  closeFeedback();
+  document.getElementById('fb-ta').value='';
+  toast('Dankjewel voor je feedback!');
+}
+
+// WORN LOG
+function openWorn(){
+  document.getElementById('ov-worn').classList.add('on');
+  renderWornLog();
+}
+function closeWorn(){document.getElementById('ov-worn').classList.remove('on');}
+function renderWornLog(){
+  var body=document.getElementById('worn-body');
+  var dates=Object.keys(worn).sort().reverse();
+  if(!dates.length){body.innerHTML='<div class="empty" style="margin-top:40px"><div class="empty-ico">📅</div><div class="empty-t">Nog niets gelogd</div><div class="empty-s">Markeer items als gedragen vanuit je kast.</div></div>';return;}
+  // Calendar week view
+  var today=new Date();
+  var calHtml='<div style="padding:12px 14px 6px"><div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:10px">Afgelopen 7 dagen</div>';
+  calHtml+='<div class="tracker-week">';
+  for(var i=6;i>=0;i--){
+    var d=new Date(today);d.setDate(d.getDate()-i);
+    var ds=d.toISOString().split('T')[0];
+    var dayWorn=worn[ds]||[];
+    var dayName=['Zo','Ma','Di','Wo','Do','Vr','Za'][d.getDay()];
+    var isToday=ds===today.toISOString().split('T')[0];
+    calHtml+='<div class="tracker-day-dot">'+
+      '<div class="tracker-dot" style="background:'+(dayWorn.length?'var(--br)':'var(--cd)')+';'+(isToday?'border:2px solid var(--bw)':'')+';color:'+(dayWorn.length?'var(--cr)':'var(--mu)')+'">'+
+        (dayWorn.length?dayWorn.length:'·')+
+      '</div>'+
+      '<div class="tracker-day-lbl">'+(isToday?'<strong>'+dayName+'</strong>':dayName)+'</div></div>';
+  }
+  calHtml+='</div></div>';
+  // Log entries
+  var logHtml=dates.slice(0,30).map(function(ds){
+    var ids=worn[ds]||[];
+    if(!ids.length)return '';
+    var parts=ds.split('-');var dateStr=parts[2]+'-'+parts[1]+'-'+parts[0];
+    var thumbs=ids.slice(0,4).map(function(id){
+      var it=items.find(function(i){return i.id===id;});
+      var img=it&&it.photo?'<img src="'+it.photo+'">':'<span>'+(it?ICOS[it.cat||'tops']:'👕')+'</span>';
+      return '<div class="log-thumb">'+img+'</div>';
+    }).join('');
+    var names=ids.map(function(id){var it=items.find(function(i){return i.id===id;});return it?it.name:'';}).filter(Boolean).slice(0,3).join(', ');
+    return '<div class="log-outfit-row"><div class="log-outfit-thumbs">'+thumbs+'</div><div class="log-info"><div class="log-date">'+dateStr+'</div><div class="log-items">'+names+'</div></div></div>';
+  }).join('');
+  body.innerHTML=calHtml+logHtml;
+}
+
+// FOTO SYNC - ensure photos load from Cloudinary URLs saved in items
+function syncPhotos(){
+  // Photos are stored as cloudinary URLs in item.photo
+  // On load, we just need to display them - no extra sync needed
+  // But we call renderKast to refresh
+  renderKast();
+  setSynced(1);
+}
+
+// CYCLUS + MOOD TRACKER
+var todayMood=null,todayCyclus=null;
+function loadTodayTracker(){
+  var td=new Date().toISOString().split('T')[0];
+  try{
+    var saved=JSON.parse(localStorage.getItem('ss-tracker-'+code)||'{}');
+    var today=saved[td]||{};
+    todayMood=today.mood||null;
+    todayCyclus=today.cyclus||null;
+  }catch(e){}
+}
+function saveTodayTracker(){
+  var td=new Date().toISOString().split('T')[0];
+  try{
+    var saved=JSON.parse(localStorage.getItem('ss-tracker-'+code)||'{}');
+    saved[td]={mood:todayMood,cyclus:todayCyclus,ts:new Date().toISOString()};
+    // Keep 90 days
+    var keys=Object.keys(saved).sort();
+    while(keys.length>90){delete saved[keys.shift()];keys.shift();}
+    localStorage.setItem('ss-tracker-'+code,JSON.stringify(saved));
+    sbPost('griette_data',{key:code+'_tracker',value:JSON.stringify(saved),updated_at:new Date().toISOString()});
+  }catch(e){}
+}
+function pickTodayMood(el,v){
+  todayMood=v;
+  document.querySelectorAll('.mood-sel').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+  saveTodayTracker();
+  renderDagkaart();
+  toast('Mood opgeslagen');
+}
+function pickTodayCyclus(el,v){
+  todayCyclus=todayCyclus===v?null:v;
+  document.querySelectorAll('.cyc-sel').forEach(function(b){b.classList.remove('on');});
+  if(todayCyclus)el.classList.add('on');
+  saveTodayTracker();
+  toast('Cyclus opgeslagen');
+}
+
+// OUTFIT LOG PANEL (add as modal from kast header)
+function openOutfitLog(){openWorn();}
+
+// EXTEND DAGKAART with mood/cyclus context
+var _origRenderDagkaart=renderDagkaart;
+function renderDagkaart(){
+  var w=document.getElementById('dagkaart-wrap');if(!w)return;
+  var ar=prof&&prof.stijlDNA?(prof.stijlDNA.archetypes||[])[0]||'naturel':'naturel';
+  var tips=TIPS[ar]||TIPS.naturel;
+  var tip=tips[new Date().getDay()%tips.length];
+  var cnt=items.length;
+  // Add mood/cyclus context to tip if available
+  var moodEmoji={'energiek':'⚡','relaxed':'☁️','krachtig':'💪','romantisch':'🌸','zakelijk':'💼','speels':'🎨'};
+  var cycAdv={'menstruatie':'Kies vandaag voor comfort en zachte stoffen.','folliculair':'Goed moment voor kleur en expressie.','ovulatie':'Je straalt — draag iets wat dat benadrukt.','luteaal':'Soepele stoffen en cocon-silhouetten voelen goed.'};
+  var extraCtx=(todayMood?'<div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:4px">'+(moodEmoji[todayMood]||'')+ ' Mood: '+todayMood+(todayCyclus?' · '+todayCyclus:'')+'</div>':'');
+  var cycTip=todayCyclus&&cycAdv[todayCyclus]?'<div style="font-size:11px;font-style:italic;color:rgba(240,212,192,.75);margin-top:5px">'+cycAdv[todayCyclus]+'</div>':'';
+  w.innerHTML='<div class="dagkaart" onclick="showP(\'chat\')">'+
+    '<div class="dk-ey">Stijl tip voor vandaag</div>'+
+    '<div class="dk-tip">&#8220;'+tip+'&#8221;</div>'+
+    cycTip+extraCtx+
+    '<div class="dk-sub" style="display:flex;align-items:center;justify-content:space-between">'+
+      '<span>'+cnt+' items</span>'+
+      '<span onclick="event.stopPropagation();openMoodTracker()" style="cursor:pointer;font-size:10px;color:rgba(255,255,255,.5)">+ Mood &amp; cyclus</span>'+
+      '<span onclick="event.stopPropagation();openWorn()" style="cursor:pointer;font-size:10px;color:rgba(255,255,255,.5)">📅 Log</span>'+
+    '</div>'+
+  '</div>';
+}
+
+// MOOD TRACKER SHEET
+function openMoodTracker(){
+  var sheet_html='<div class="sh-hdl"></div><div class="sh-t">Mood &amp; cyclus vandaag</div>'+
+    '<div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:8px">Hoe voel je je?</div>'+
+    '<div class="tracker-mood-row" id="mood-tracker-row" style="background:var(--br);border-radius:12px;padding:12px">'+
+      ['energiek','relaxed','krachtig','romantisch','zakelijk','speels'].map(function(m){
+        return '<button class="mood-sel'+(todayMood===m?' on':'')+'" onclick="pickTodayMood(this,\''+m+'\')" style="font-size:11px">'+({'energiek':'⚡','relaxed':'☁️','krachtig':'💪','romantisch':'🌸','zakelijk':'💼','speels':'🎨'}[m]||'')+' '+m+'</button>';
+      }).join('')+
+    '</div>'+
+    '<div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin:14px 0 8px">Cyclusfase (optioneel)</div>'+
+    '<div class="cyclus-btns">'+
+      [{v:'menstruatie',e:'🔴'},{v:'folliculair',e:'🌱'},{v:'ovulatie',e:'✨'},{v:'luteaal',e:'🌙'}].map(function(c){
+        return '<button class="cyc-sel'+(todayCyclus===c.v?' on':'')+'" onclick="pickTodayCyclus(this,\''+c.v+'\')">'+c.e+' '+c.v+'</button>';
+      }).join('')+
+    '</div>';
+
+  // Show in a sheet overlay
+  document.getElementById('det-body').innerHTML=sheet_html;
+  document.getElementById('ov-det').classList.add('on');
+}
+
+
+// INSPO SCAN
+var inspoBase64=null,inspoMime=null,inspoGallery=[];
+
+
+function handleInspoFile(e){
+  var f=e.target.files[0];if(!f)return;
+  inspoMime=f.type||'image/jpeg';
+  var r=new FileReader();
+  r.onload=function(ev){
+    var full=ev.target.result;
+    inspoBase64=full.split(',')[1];
+    document.getElementById('inspo-preview-img').src=full;
+    document.getElementById('inspo-preview').style.display='block';
+    document.getElementById('inspo-drop').style.display='none';
+    document.getElementById('inspo-scan-btn').style.display='block';
+    document.getElementById('inspo-result').style.display='none';
+  };
+  r.readAsDataURL(f);
+}
+
+
+
+
+function renderInspoGallery(){
+  var g=document.getElementById('inspo-gallery');if(!g)return;
+  if(!inspoGallery.length){g.innerHTML='';document.querySelector('#inspo-gallery-section > div').style.display='none';return;}
+  document.querySelector('#inspo-gallery-section > div').style.display='block';
+  g.innerHTML=inspoGallery.map(function(e){
+    return '<div style="position:relative;border-radius:10px;overflow:hidden;aspect-ratio:3/4;background:var(--cd);cursor:pointer" onclick="showInspoEntry(\''+e.id+'\')">'+
+      (e.imgSrc?'<img src="'+e.imgSrc+'" style="width:100%;height:100%;object-fit:cover">':'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:30px;opacity:.3">📸</div>')+
+      '<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(46,26,14,.7));padding:6px 8px">'+
+        '<div style="font-size:9px;color:rgba(255,255,255,.8);line-height:1.3">'+(e.result&&e.result.stijlanalyse?e.result.stijlanalyse.slice(0,50)+'...':'')+'</div>'+
+      '</div>'+
+      '<button onclick="event.stopPropagation();deleteInspoEntry(\''+e.id+'\')" style="position:absolute;top:5px;right:5px;background:rgba(46,26,14,.5);color:white;border:none;border-radius:50%;width:22px;height:22px;font-size:11px;cursor:pointer">✕</button>'+
+    '</div>';
+  }).join('');
+}
+
+function showInspoEntry(id){
+  var e=inspoGallery.find(function(x){return x.id===id;});
+  if(!e||!e.result)return;
+  if(e.imgSrc){document.getElementById('inspo-preview-img').src=e.imgSrc;document.getElementById('inspo-preview').style.display='block';document.getElementById('inspo-drop').style.display='none';}
+  document.getElementById('inspo-result').style.display='block';
+  renderInspoResult(e.result);
+  document.getElementById('p-inspo').scrollTop=0;
+}
+
+function deleteInspoEntry(id){
+  inspoGallery=inspoGallery.filter(function(x){return x.id!==id;});
+  try{localStorage.setItem('ss-inspo-'+code,JSON.stringify(inspoGallery));}catch(e){}
+  renderInspoGallery();
+}
+
+
+// ═══════════════════════════════════════════════════
+// INSPIRATIE SCAN
+// ═══════════════════════════════════════════════════
+var inspoImageData = null;
+
+
+
+
+
+function renderInspoResults(result) {
+  var ct = document.getElementById('inspo-results');
+  var html = '';
+
+  // Look description
+  if(result.look_beschrijving) {
+    html += '<div style="background:var(--br);border-radius:12px;padding:13px 14px;margin-bottom:12px">'+
+      '<div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);margin-bottom:5px">De look</div>'+
+      '<div style="font-family:Cormorant Garamond,serif;font-size:15px;font-style:italic;color:var(--cr);line-height:1.6">'+result.look_beschrijving+'</div>'+
+    '</div>';
+  }
+
+  // Matches from wardrobe
+  if(result.matches && result.matches.length) {
+    html += '<div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:8px">Uit jouw kast</div>';
+    result.matches.forEach(function(m) {
+      var it = items.find(function(i){return i.id===m.id;});
+      var img = it && it.photo ? '<img src="'+it.photo+'">' : '<span>'+(it?ICOS[it.cat||'tops']:'?')+'</span>';
+      var name = it ? it.name : (m.naam||m.id);
+      var scoreColor = m.score==='hoog'?'#5a8a60':'var(--bw)';
+      html += '<div class="inspo-match-card">'+
+        '<div class="inspo-match-row">'+
+          '<div class="inspo-match-img">'+img+'</div>'+
+          '<div class="inspo-match-info">'+
+            '<div class="inspo-match-name">'+name+'</div>'+
+            '<div class="inspo-match-why">'+m.waarom+'</div>'+
+            '<div class="inspo-match-score" style="color:'+scoreColor+';margin-top:3px">Match: '+m.score+'</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+    });
+  } else if(items.length === 0) {
+    html += '<div style="background:var(--cd);border-radius:11px;padding:12px 14px;font-size:13px;color:var(--mu);margin-bottom:10px">Voeg eerst items toe aan je kast — dan kan ik zien wat je al hebt.</div>';
+  }
+
+  // Missing items
+  if(result.missend && result.missend.length) {
+    html += '<div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:#c0392b;font-weight:600;margin:12px 0 8px">Dit mis je nog</div>';
+    result.missend.forEach(function(m) {
+      html += '<div class="inspo-missing">'+
+        '<div style="font-size:13px;font-weight:500;color:var(--br);margin-bottom:3px">'+m.item+'</div>'+
+        '<div style="font-size:11px;color:var(--mu)">'+m.waarom+'</div>'+
+      '</div>';
+    });
+  }
+
+  ct.innerHTML = html || '<div style="text-align:center;padding:20px;color:var(--mu)">Geen resultaten</div>';
+}
+
+
+// INSPIRATIE SCAN
+var inspoImageData=null;
+function handleInspoUpload(e){
+  var f=e.target.files[0];if(!f)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    inspoImageData=ev.target.result;
+    var prev=document.getElementById('inspo-preview');
+    var ph=document.getElementById('inspo-placeholder');
+    var bw=document.getElementById('inspo-scan-btn-wrap');
+    if(prev){prev.src=inspoImageData;prev.style.display='block';}
+    if(ph)ph.style.display='none';
+    if(bw)bw.style.display='block';
+    document.getElementById('inspo-result').innerHTML='';
+  };
+  reader.readAsDataURL(f);
+}
+function resetInspo(){
+  inspoImageData=null;
+  var prev=document.getElementById('inspo-preview');
+  var ph=document.getElementById('inspo-placeholder');
+  var bw=document.getElementById('inspo-scan-btn-wrap');
+  if(prev)prev.style.display='none';
+  if(ph)ph.style.display='';
+  if(bw)bw.style.display='none';
+  document.getElementById('inspo-result').innerHTML='';
+  document.getElementById('inspo-file').value='';
+}
+
+
+
+
+
+// WEEKPLANNER
+var weekOffset=0;
+function weekNav(dir){weekOffset+=dir;renderWeek();}
+function getWeekDates(off){
+  var today=new Date(),day=today.getDay();
+  var mon=new Date(today);mon.setDate(today.getDate()-(day===0?6:day-1)+(off*7));
+  var dates=[];
+  for(var i=0;i<7;i++){var d=new Date(mon);d.setDate(mon.getDate()+i);dates.push(d);}
+  return dates;
+}
+function renderWeek(){
+  var dates=getWeekDates(weekOffset);
+  var today=new Date().toISOString().split('T')[0];
+  var DNM=['Ma','Di','Wo','Do','Vr','Za','Zo'];
+  var MON=['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+  var first=dates[0],last=dates[6];
+  var rng=document.getElementById('week-range');
+  if(rng)rng.textContent=first.getDate()+' '+MON[first.getMonth()]+' - '+last.getDate()+' '+MON[last.getMonth()]+' '+last.getFullYear();
+  var wp={};try{wp=JSON.parse(localStorage.getItem('ss-weekplan-'+code)||'{}');}catch(e){}
+  var html='';
+  dates.forEach(function(d,i){
+    var ds=d.toISOString().split('T')[0];
+    var isToday=ds===today;
+    var planned=wp[ds]||[];
+    var wornDay=worn[ds]||[];
+    var allIds=planned.slice();
+    wornDay.forEach(function(id){if(allIds.indexOf(id)<0)allIds.push(id);});
+    html+='<div class="week-day-card'+(isToday?' week-day-today':'')+'">'+
+      '<div class="week-day-hdr"><div class="week-day-name">'+DNM[i]+(isToday?' &middot; vandaag':'')+'</div><div class="week-day-date">'+d.getDate()+' '+MON[d.getMonth()]+'</div></div>'+
+      '<div class="week-outfit-thumbs">';
+    allIds.slice(0,5).forEach(function(id){
+      var it=items.find(function(x){return x.id===id;});
+      var img=it&&it.photo?'<img src="'+it.photo+'">':'<span>'+(it?ICOS[it.cat||'tops']:'?')+'</span>';
+      html+='<div class="week-thumb">'+img+'</div>';
+    });
+    if(allIds.length>5)html+='<div style="font-size:11px;color:var(--mu)">+'+( allIds.length-5)+'</div>';
+    html+='<button class="week-add-outfit" onclick="openWeekPicker(\''+ds+'\')">'+(allIds.length?'wijzig':'+ outfit')+'</button>';
+    html+='</div>';
+    if(wornDay.length)html+='<div class="week-outfit-desc">Gedragen: '+wornDay.length+' item'+(wornDay.length!==1?'s':'')+'</div>';
+    html+='</div>';
+  });
+  document.getElementById('week-grid').innerHTML=html;
+}
+function openWeekPicker(ds){
+  pickBoard='WEEK_'+ds;pickSel=[];
+  try{var wp=JSON.parse(localStorage.getItem('ss-weekplan-'+code)||'{}');pickSel=(wp[ds]||[]).slice();}catch(e){}
+  renderPGrid();
+  var pt=document.getElementById('pick-title');
+  if(pt)pt.textContent='Outfit plannen: '+ds.split('-').reverse().join('-');
+  document.getElementById('ov-pick').classList.add('on');
+}
+var _baseConfirmPick=window.confirmPick;
+window.confirmPick=function(){
+  if(pickBoard&&pickBoard.indexOf('WEEK_')===0){
+    var ds=pickBoard.replace('WEEK_','');
+    try{var wp=JSON.parse(localStorage.getItem('ss-weekplan-'+code)||'{}');wp[ds]=pickSel.slice();localStorage.setItem('ss-weekplan-'+code,JSON.stringify(wp));}catch(e){}
+    closePick();renderWeek();
+    toast('Outfit gepland!');
+  } else {
+    if(typeof _baseConfirmPick==='function')_baseConfirmPick();
+    else confirmPick();
+  }
+};
+
+// INSPO SCAN
+var inspoLoaded=false;
+function loadInspo(){
+  // Nothing to preload - wait for user to upload
+}
+function runInspoScan(evt){
+  var file=evt.target.files[0];
+  if(!file)return;
+  // Show preview
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var b64=e.target.result;
+    var area=document.getElementById('inspo-upload-area');
+    area.innerHTML='<img src="'+b64+'" style="width:100%;border-radius:11px;max-height:240px;object-fit:cover;display:block">'+
+      '<div style="text-align:center;margin-top:8px;font-size:11px;color:var(--mu)">Analyseren...</div>';
+    document.getElementById('inspo-result').innerHTML='<div style="text-align:center;padding:30px"><div class="spin" style="width:28px;height:28px;border:3px solid var(--cd);border-top-color:var(--bw);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px"></div><div style="font-family:Cormorant Garamond,serif;font-size:18px;font-style:italic;color:var(--br)">Look wordt geanalyseerd...</div></div>';
+    analyzeInspoPhoto(b64.split(',')[1],b64);
+  };
+  reader.readAsDataURL(file);
+  // Reset input so same file can be selected again
+  evt.target.value='';
+}
+
+function analyzeInspoPhoto(b64data,fullDataUrl){
+  var wt=items.map(function(it){
+    var t=it.tags?[it.tags.kleur,it.tags.pv,it.tags.str,(it.tags.mt||[]).join('/')].filter(Boolean).join(', '):'';
+    return it.id+'|'+it.name+'|'+it.cat+(t?' ['+t+']':'');
+  }).join('\n');
+
+  var dna=prof&&prof.stijlDNA;
+  var profCtx=dna?'Stijlprofiel: '+(dna.archetypes||[]).join(' & ')+'. Kleuren: '+(dna.kleuren||[]).join(', ')+'. Silhouet: '+(dna.silhouet||'')+'.':'';
+
+  var prompt='Analyseer deze outfit-inspiratiefoto.\n\n'+profCtx+'\n\nGarderobe (id|naam|cat|tags):\n'+(wt||'Garderobe leeg')+'\n\nGeef als JSON: {"look_beschrijving":"wat zie je in de foto (stijl, kleuren, silhouet, gelegenheid)","matches":[{"item_id":"id","match_score":"hoog/medium/laag","waarom":"waarom dit item de look benadert"}],"ontbreekt":[{"item":"naam van ontbrekend item","waarom":"waarom dit de look zou completen"}],"styling_tip":"hoe combineer je dit met haar garderobe"}. Max 3 matches, max 3 ontbrekende items. Alleen JSON.';
+
+  var messages=[{
+    role:'user',
+    content:[
+      {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64data}},
+      {type:'text',text:prompt}
+    ]
+  }];
+
+  fetch(WK,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:600,system:'Je bent een stylist. Geef alleen valide JSON. Geen markdown.',messages:messages})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    var txt=(data.content&&data.content[0]&&data.content[0].text)||'{}';
+    txt=txt.replace(/```json|```/g,'').trim();
+    var result=JSON.parse(txt);
+    renderInspoResult(result,fullDataUrl);
+  })
+  .catch(function(err){
+    document.getElementById('inspo-result').innerHTML='<div style="text-align:center;padding:20px;color:var(--mu)">Er ging iets mis. <button onclick="document.getElementById(\'inspo-file-inp\').click()" style="color:var(--bw);background:none;border:none;cursor:pointer;font-size:13px;text-decoration:underline">Probeer opnieuw</button></div>';
+    // Reset upload area
+    resetInspoUpload();
+  });
+}
+
+function renderInspoResult(result,imgUrl){
+  var area=document.getElementById('inspo-upload-area');
+  // Keep preview image, remove loading text
+  area.innerHTML='<img src="'+imgUrl+'" style="width:100%;border-radius:11px;max-height:200px;object-fit:cover;display:block">'+
+    '<button onclick="resetInspoUpload()" style="margin-top:8px;width:100%;padding:8px;background:var(--cd);border:none;border-radius:8px;font-size:12px;font-family:Jost,sans-serif;color:var(--mu);cursor:pointer">↺ Andere foto</button>';
+
+  var html='';
+
+  // Look description
+  if(result.look_beschrijving){
+    html+='<div style="background:var(--br);border-radius:11px;padding:12px 13px;margin-bottom:14px">'+
+      '<div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:rgba(240,212,192,.6);margin-bottom:4px">Wat ik zie in deze look</div>'+
+      '<div style="font-family:Cormorant Garamond,serif;font-size:15px;font-style:italic;color:var(--cr);line-height:1.6">'+result.look_beschrijving+'</div>'+
+    '</div>';
+  }
+
+  // Matched items
+  var matches=(result.matches||[]).filter(function(m){return items.find(function(i){return i.id===m.item_id;});});
+  if(matches.length){
+    html+='<div class="inspo-section-title">Items uit jouw kast die passen</div>';
+    matches.forEach(function(m){
+      var it=items.find(function(i){return i.id===m.item_id;});
+      if(!it)return;
+      var img=it.photo?'<img src="'+it.photo+'">':'<span style="font-size:22px">'+ICOS[it.cat||'tops']+'</span>';
+      var scoreClr=m.match_score==='hoog'?'#5a8a60':m.match_score==='medium'?'#C4714A':'#8a7060';
+      html+='<div class="inspo-match-card">'+
+        '<div class="inspo-match-img">'+img+'</div>'+
+        '<div class="inspo-match-info">'+
+          '<div class="inspo-match-name">'+it.name+'</div>'+
+          '<div class="inspo-match-why">'+( m.waarom||'')+'</div>'+
+          '<div class="inspo-match-score" style="color:'+scoreClr+'">'+m.match_score+' match</div>'+
+        '</div></div>';
+    });
+  } else if(items.length) {
+    html+='<div style="padding:12px;background:var(--cr);border-radius:9px;font-size:13px;color:var(--mu);margin-bottom:14px">Geen directe matches in je kast — maar de ontbrekende items hieronder helpen je deze look te bouwen.</div>';
+  }
+
+  // Missing items
+  var missing=result.ontbreekt||[];
+  if(missing.length){
+    html+='<div class="inspo-section-title">Dit zou de look compleet maken</div>';
+    missing.forEach(function(m){
+      html+='<div class="inspo-miss-item">'+
+        '<div class="inspo-miss-name">'+m.item+'</div>'+
+        '<div class="inspo-miss-why">'+( m.waarom||'')+'</div>'+
+      '</div>';
+    });
+  }
+
+  // Styling tip
+  if(result.styling_tip){
+    html+='<div style="background:linear-gradient(135deg,#fff8f4,#fdf0e8);border-radius:11px;padding:12px 13px;margin-top:4px">'+
+      '<div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);margin-bottom:4px">Stijlingtip</div>'+
+      '<div style="font-family:Cormorant Garamond,serif;font-size:15px;font-style:italic;color:var(--br);line-height:1.65">'+result.styling_tip+'</div>'+
+    '</div>';
+  }
+
+  // Save to board button
+  if(matches.length){
+    var matchIds=matches.map(function(m){return m.item_id;});
+    html+='<button class="inspo-save-btn" onclick="saveInspoToBoard()">+ Sla look op als outfit</button>';
+    window._inspoMatchIds=matchIds;
+  }
+
+  document.getElementById('inspo-result').innerHTML=html;
+}
+
+function resetInspoUpload(){
+  window._inspoMatchIds=null;
+  document.getElementById('inspo-upload-area').innerHTML=
+    '<input type="file" id="inspo-file-inp" accept="image/*" style="display:none" onchange="runInspoScan(event)">'+
+    '<div id="inspo-upload-inner">'+
+      '<div style="font-size:42px;margin-bottom:10px">\uD83D\uDDBC</div>'+
+      '<div style="font-size:14px;color:var(--tx);font-weight:500">Tik om inspiratiefoto toe te voegen</div>'+
+      '<div style="font-size:11px;color:var(--mu);margin-top:4px">Pinterest &middot; Instagram &middot; Catwalk</div>'+
+    '</div>';
+  document.getElementById('inspo-result').innerHTML='';
+}
+
+function saveInspoToBoard(){
+  var ids=window._inspoMatchIds;
+  if(!ids||!ids.length){toast('Geen items om op te slaan');return;}
+  if(!boards.length){toast('Maak eerst een board aan');return;}
+  var b=boards.find(function(x){return x.id===actBoard;})||boards[0];
+  if(!b.outfits)b.outfits=[];
+  b.outfits.push({id:'inspo'+Date.now(),items:ids,desc:'Gevonden via Inspiratie Scan'});
+  saveLocal();renderBoards();
+  toast('Look opgeslagen op "'+b.label+'"!');
+}
+
