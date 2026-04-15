@@ -439,7 +439,7 @@ body{font-family:"Jost",sans-serif;color:var(--tx)}
           <button style="padding:6px 12px;border-radius:20px;border:1.5px solid var(--cd);background:var(--wh);font-size:11px;font-family:Jost,sans-serif;color:var(--mu);cursor:pointer" onclick="weekNav(1)">→</button>
         </div>
       </div>
-      <div id="week-grid" style="padding:10px 12px 80px"></div>
+      <div id="week-grid" style="padding:10px 12px 80px"><div style="text-align:center;padding:30px 20px;color:var(--mu);font-size:13px">Tik op een dag om een outfit te plannen</div></div>
     </div>
 
     <!-- DNA -->
@@ -642,10 +642,10 @@ body{font-family:"Jost",sans-serif;color:var(--tx)}
     <button class="tbtn" onclick="tSingle(this,'loc')">Seizoensopslag</button>
   </div>
   <label class="flbl">Foto</label>
-  <div class="ph-area" id="ph-area" onclick="document.getElementById('ph-inp').click()">
+  <div class="ph-area" id="ph-area" onclick="document.getElementById('ph-inp').click()" style="cursor:pointer">
     <div class="ph-lbl" id="ph-lbl" style="text-align:center"><div style="font-size:26px;margin-bottom:4px">📷</div>Tik om foto toe te voegen</div>
-    <input type="file" id="ph-inp" accept="image/*" style="display:none" onchange="onPhoto(event)">
   </div>
+  <input type="file" id="ph-inp" accept="image/*" style="display:none" onchange="onPhoto(event)">
   <div style="margin-top:8px">
     <button onclick="openLabelScan()" style="width:100%;padding:10px;background:var(--cr);border:1.5px dashed var(--cd);border-radius:9px;font-size:12px;font-family:Jost,sans-serif;color:var(--mu);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px">
       <span style="font-size:16px">🏷️</span> Label scannen → AI leest materiaal automatisch
@@ -842,7 +842,26 @@ function saveLocal(){try{localStorage.setItem('ss-items-'+code,JSON.stringify(it
 function setSynced(v){var d=document.getElementById('sdot');if(d)d.className='sync-dot'+(v?' ok':'');}
 
 // CLOUDINARY
-function uploadPhoto(file,id){var fd=new FormData();fd.append('file',file);fd.append('upload_preset',CP);fd.append('folder','ss/'+code.toLowerCase());fd.append('public_id',code.toLowerCase()+'/'+id);return fetch('https://api.cloudinary.com/v1_1/'+CL+'/image/upload',{method:'POST',body:fd}).then(function(r){return r.ok?r.json():null;}).then(function(d){return d?d.secure_url:null;}).catch(function(){return null;});}
+function uploadPhoto(file,id){
+  // Try Cloudinary first, fall back to base64 local storage
+  var fd=new FormData();
+  fd.append('file',file);
+  fd.append('upload_preset',CP);
+  fd.append('folder','ss/'+code.toLowerCase());
+  fd.append('public_id',code.toLowerCase()+'/'+id);
+  return fetch('https://api.cloudinary.com/v1_1/'+CL+'/image/upload',{method:'POST',body:fd})
+  .then(function(r){return r.ok?r.json():null;})
+  .then(function(d){return d?d.secure_url:null;})
+  .catch(function(){
+    // Fallback: store as base64 data URL
+    return new Promise(function(resolve){
+      var reader=new FileReader();
+      reader.onload=function(e){resolve(e.target.result);};
+      reader.onerror=function(){resolve(null);};
+      reader.readAsDataURL(file);
+    });
+  });
+}
 
 // NAV
 function showP(n){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('on');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});document.getElementById('p-'+n).classList.add('on');document.getElementById('t-'+n).classList.add('on');document.getElementById('fab').style.display=n==='kast'?'flex':'none';if(n==='inspo')loadInspo();if(n==='week')renderWeek();}
@@ -850,7 +869,7 @@ function showP(n){document.querySelectorAll('.panel').forEach(function(p){p.clas
 // KAST
 function renderKast(){
   var q=(document.getElementById('srch')||{}).value||'';
-  var today=new Date().toISOString().split('T')[0];
+  var today=(function(){var _d=new Date();return _d.getFullYear()+'-'+(_d.getMonth()<9?'0':'')+(_d.getMonth()+1)+'-'+(_d.getDate()<10?'0':'')+_d.getDate();})();
   var todayWorn=worn[today]||[];
   var f=items.filter(function(it){
     if(filter==='ongedragen'){var used=false;var ks=Object.keys(worn);for(var i=0;i<ks.length;i++){if((worn[ks[i]]||[]).indexOf(it.id)>-1){used=true;break;}}if(used)return false;}
@@ -995,7 +1014,7 @@ function addItemToBoard(boardId,itemId){
   closeDet();
   toast('Item toegevoegd aan '+b.label);
 }
-function markWorn(id){var td=new Date().toISOString().split('T')[0];if(!worn[td])worn[td]=[];if(worn[td].indexOf(id)<0)worn[td].push(id);saveLocal();closeDet();toast('✓ Gelogd als gedragen vandaag');}
+function markWorn(id){var td=(function(){var _d=new Date();return _d.getFullYear()+'-'+(_d.getMonth()<9?'0':'')+(_d.getMonth()+1)+'-'+(_d.getDate()<10?'0':'')+_d.getDate();})();if(!worn[td])worn[td]=[];if(worn[td].indexOf(id)<0)worn[td].push(id);saveLocal();closeDet();toast('✓ Gelogd als gedragen vandaag');}
 function delItem(id){if(!confirm('Item verwijderen?'))return;items=items.filter(function(i){return i.id!==id;});saveLocal();renderKast();closeDet();toast('Item verwijderd');}
 
 // BOARDS
@@ -1143,6 +1162,8 @@ function renderDNA(){
   }
   if(sqb)sqb.style.display='none';
   if(rqb)rqb.style.display='block';
+  try {
+
   var dna=prof.stijlDNA;
   var archs=dna.archetypes||[dna.primaryArchetype||'naturel'];
   var ar=ARCHS[archs[0]]||ARCHS.naturel;
@@ -1160,7 +1181,7 @@ function renderDNA(){
   h+='<div class="dna-hero"><div class="dna-ey">Jouw Stijl DNA</div>'+
     '<div class="dna-nm">'+prof.name+(prof.leeftijd?' · '+prof.leeftijd:'')+'</div>'+
     '<div class="dna-ar">'+archs.map(function(a){return (ARCHS[a]||{}).naam||a;}).join(' x ')+'</div>'+
-    '<div class="dna-tags">'+ar.kw.map(function(k){return '<span class="dna-tag">'+k+'</span>';}).join('')+(ar2?ar2.kw.slice(0,2).map(function(k){return '<span class="dna-tag">'+k+'</span>';}).join(''):'')+
+    '<div class="dna-tags">'+ar.kw.map(function(k){return '<span class="dna-tag">'+k+'</span>';}).join('')+(ar2&&ar2.kw?ar2.kw.slice(0,2).map(function(k){return '<span class="dna-tag">'+k+'</span>';}).join(''):'')+
     '</div></div>';
 
   // Action buttons
@@ -1202,7 +1223,7 @@ function renderDNA(){
   var figTip=dna.figuurTip||'';
   var benL=dna.benadruk||[];
   var verL=dna.verbergen||[];
-  var silBody=dna.silhouet+'<br><br>'+
+  var silBody=(dna.silhouet||ar.silhouet||'')+'<br><br>'+
     row('\u2705',benL.length?'Benadrukken: '+benL.join(', '):'Taille altijd benadrukken')+
     row('\u2705',ar.proporties||'Aansluitend boven + volume onder')+
     row('\u274c',verL.length?'Minder zichtbaar: '+verL.join(', '):'Wijd + wijd \u2014 silhouet verdwijnt')+
@@ -1222,7 +1243,7 @@ function renderDNA(){
   matBody+='<br><strong>Stevig (tegenhanger):</strong> '+mats.filter(function(m){return ['katoen','linnen','denim','wol','rib','tweed'].indexOf(m.toLowerCase())>-1;}).join(' \u00b7 ')||'denim, wol, katoen';
   matBody+='<br><strong>Luxe:</strong> '+mats.filter(function(m){return ['kasjmier','cashmere','velvet','merino','zijde'].indexOf(m.toLowerCase())>-1;}).join(' \u00b7 ')||'—';
   matBody+='<br><br><strong>Beste combo:</strong> soepel + stevig = diepte zonder gedoe';
-  if(matsVermijd&&matsVermijd.length)matBody+='<br><br>'+row('\u274c','Vermijd: '+matsVermijd.join(', '));
+  matsVermijd=matsVermijd||[];if(matsVermijd.length)matBody+='<br><br>'+row('\u274c','Vermijd: '+matsVermijd.join(', '));
   h+=sec('🧵','Materialen & textuur',matBody);
 
   // Prints
@@ -1247,13 +1268,16 @@ function renderDNA(){
 
   // Sleutelitems
   var ki=ar.sleutelitems||[];
-  if(ar2)ki=ki.concat(ar2.sleutelitems.slice(0,2));
+  if(ar2&&ar2.sleutelitems)ki=ki.concat(ar2.sleutelitems.slice(0,2));
   h+='<div class="dsec"><div class="dsec-t">\u2728 Sleutelitems voor jouw garderobe</div><div class="dsec-b"><div>'+ki.map(function(i){return chip(i,false);}).join('')+'</div></div></div>';
 
-  ct.innerHTML=h;
+
+    ct.innerHTML=h;
+  } catch(e) {
+    ct.innerHTML='<div style="padding:20px;font-size:13px;color:var(--mu)">Rapport kon niet laden. Fout: '+e.message+'<br><br><button onclick="window.location.href=\'stijlstudio_quiz.html\'" style="padding:10px 20px;background:var(--br);color:var(--cr);border:none;border-radius:9px;font-size:13px;cursor:pointer">Quiz opnieuw doen</button></div>';
+  }
 }
 
-// SHOPPING LIST GENERATOR
 function generateShoppingList(){
   if(!prof||!prof.stijlDNA){toast('Doe eerst de quiz');return;}
   var dna=prof.stijlDNA;
@@ -1477,7 +1501,7 @@ function getWeekDates(off){
 }
 function renderWeek(){
   var dates=getWeekDates(weekOffset);
-  var today=new Date().toISOString().split('T')[0];
+  var today=(function(){var _d=new Date();return _d.getFullYear()+'-'+(_d.getMonth()<9?'0':'')+(_d.getMonth()+1)+'-'+(_d.getDate()<10?'0':'')+_d.getDate();})();
   var DNM=['Ma','Di','Wo','Do','Vr','Za','Zo'];
   var MON=['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
   var first=dates[0],last=dates[6];
@@ -1486,7 +1510,7 @@ function renderWeek(){
   var wp={};try{wp=JSON.parse(localStorage.getItem('ss-weekplan-'+code)||'{}');}catch(e){}
   var html='';
   dates.forEach(function(d,i){
-    var ds=d.toISOString().split('T')[0];
+    var ds=d.getFullYear()+'-'+(d.getMonth()<9?'0':'')+(d.getMonth()+1)+'-'+(d.getDate()<10?'0':'')+d.getDate();
     var isToday=ds===today;
     var planned=wp[ds]||[];
     var wornDay=worn[ds]||[];
@@ -1501,12 +1525,16 @@ function renderWeek(){
       html+='<div class="week-thumb">'+img+'</div>';
     });
     if(allIds.length>5)html+='<div style="font-size:11px;color:var(--mu)">+'+( allIds.length-5)+'</div>';
-    html+='<button class="week-add-outfit" onclick="openWeekPicker(\''+ds+'\')">'+(allIds.length?'wijzig':'+ outfit')+'</button>';
+    html+='<button class="week-add-outfit" onclick="openWeekPicker(\''+ds+'\')">'+(allIds.length?'✓ Wijzig':'+ Plan outfit')+'</button>';
     html+='</div>';
     if(wornDay.length)html+='<div class="week-outfit-desc">Gedragen: '+wornDay.length+' item'+(wornDay.length!==1?'s':'')+'</div>';
     html+='</div>';
   });
-  document.getElementById('week-grid').innerHTML=html;
+  var intro='';
+  if(!Object.keys(worn).length && !Object.keys(wp||{}).length){
+    intro='<div style="padding:12px 4px 4px;font-size:12px;color:var(--mu);line-height:1.7;font-style:italic">Tik op <strong>+ plan</strong> bij een dag om een outfit in te plannen. Gedragen items zie je hier automatisch verschijnen.</div>';
+  }
+  document.getElementById('week-grid').innerHTML=intro+html;
 }
 function openWeekPicker(ds){
   pickBoard='WEEK_'+ds;pickSel=[];
@@ -1779,11 +1807,11 @@ function renderDagkaart(){
 // CYCLUS + MOOD
 var todayMood=null,todayCyclus=null;
 function loadTodayTracker(){
-  var td=new Date().toISOString().split('T')[0];
+  var td=(function(){var _d=new Date();return _d.getFullYear()+'-'+(_d.getMonth()<9?'0':'')+(_d.getMonth()+1)+'-'+(_d.getDate()<10?'0':'')+_d.getDate();})();
   try{var s=JSON.parse(localStorage.getItem('ss-tracker-'+code)||'{}');var t=s[td]||{};todayMood=t.mood||null;todayCyclus=t.cyclus||null;}catch(e){}
 }
 function saveTodayTracker(){
-  var td=new Date().toISOString().split('T')[0];
+  var td=(function(){var _d=new Date();return _d.getFullYear()+'-'+(_d.getMonth()<9?'0':'')+(_d.getMonth()+1)+'-'+(_d.getDate()<10?'0':'')+_d.getDate();})();
   try{var s=JSON.parse(localStorage.getItem('ss-tracker-'+code)||'{}');s[td]={mood:todayMood,cyclus:todayCyclus};var ks=Object.keys(s).sort();while(ks.length>90){delete s[ks.shift()];}localStorage.setItem('ss-tracker-'+code,JSON.stringify(s));}catch(e){}
 }
 function pickTodayMood(el,v){todayMood=v;document.querySelectorAll('.mood-sel').forEach(function(b){b.classList.remove('on');});el.classList.add('on');saveTodayTracker();renderDagkaart();toast('Mood opgeslagen');closeDet();}
