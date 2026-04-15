@@ -554,6 +554,7 @@ body{font-family:"Jost",sans-serif;color:var(--tx)}
     <!-- DNA -->
     <div class="panel" id="p-dna">
       <div id="dna-cont" style="padding-bottom:20px"></div>
+      <div id="dna-reset-wrap" style="display:none;padding:0 12px 12px"><button onclick="resetProfile()" style="width:100%;padding:10px;background:transparent;border:1.5px solid #e8c0ba;border-radius:9px;font-size:12px;font-family:Jost,sans-serif;color:#c0392b;cursor:pointer">Profiel wissen en opnieuw beginnen</button></div>
       <button id="start-quiz-link" onclick="openQuiz()" style="cursor:pointer" style="display:none;width:calc(100% - 24px);margin:0 12px 12px;padding:14px;background:#2e1a0e;color:#f7f1e8;border-radius:11px;font-size:14px;font-weight:600;font-family:Jost,sans-serif;text-align:center;text-decoration:none;box-sizing:border-box">Start Stijl DNA quiz &rarr;</button>
       <button class="dedit" id="redo-quiz-btn" onclick="openQuiz()" style="display:none">🔄 Stijl DNA opnieuw doen</button>
     </div>
@@ -919,6 +920,17 @@ var TIPS={
   try{code=localStorage.getItem('ss-code');}catch(e){}
   if(!code||!VALID[code]){window.location.replace('stijlstudio.html');return;}
   try{prof=JSON.parse(localStorage.getItem('ss-prof-'+code)||'null');}catch(e){}
+  // Validate profile - wipe if corrupt (old format)
+  if(prof&&prof.stijlDNA){
+    var archs=prof.stijlDNA.archetypes||[];
+    var validKeys=['klassiek','createur','naturel','romantisch','stoer','modern'];
+    var ok=archs.length>0&&validKeys.indexOf(archs[0])>-1;
+    if(!ok){
+      // Profile exists but has invalid archetype - clear it
+      try{localStorage.removeItem('ss-prof-'+code);}catch(e2){}
+      prof=null;
+    }
+  }
   try{items=JSON.parse(localStorage.getItem('ss-items-'+code)||'[]');}catch(e){}
   try{worn=JSON.parse(localStorage.getItem('ss-worn-'+code)||'{}');}catch(e){}
   try{boards=JSON.parse(localStorage.getItem('ss-boards-'+code)||'[]');}catch(e){}
@@ -1275,6 +1287,7 @@ function renderDNA(){
   }
   if(sqb)sqb.style.display='none';
   if(rqb)rqb.style.display='block';
+  var drsw=document.getElementById('dna-reset-wrap');if(drsw)drsw.style.display='block';
 
   try {
   var dna=prof.stijlDNA||{};
@@ -1406,6 +1419,7 @@ function renderDNA(){
       '</div>';
     if (sqb) sqb.style.display = 'block';
     if (rqb) rqb.style.display = 'none';
+    var drsw2=document.getElementById('dna-reset-wrap');if(drsw2)drsw2.style.display='none';
   }
 }
 
@@ -2475,6 +2489,16 @@ function closeFeedback(){document.getElementById('ov-fb').classList.remove('on')
 function pickFbType(el,v){fbType=v;document.querySelectorAll('.fb-type').forEach(function(b){b.classList.remove('on');});el.classList.add('on');}
 function pickStar(n){fbStars=n;document.querySelectorAll('.fb-star').forEach(function(s,i){s.classList.toggle('on',i<n);});}
 function submitFeedback(){var msg=document.getElementById('fb-ta').value.trim();if(!msg){toast('Schrijf iets om te versturen');return;}sbPost('feedback',{user_code:code,user_naam:prof?prof.name:'',type:fbType,bericht:msg,rating:fbStars||null,created_at:new Date().toISOString()});closeFeedback();toast('Dankjewel voor je feedback!');}
+
+
+function resetProfile(){
+  if(!confirm('Profiel wissen? Je doet dan de quiz opnieuw.'))return;
+  try{localStorage.removeItem('ss-prof-'+code);}catch(e){}
+  prof=null;
+  renderDNA();
+  renderDagkaart();
+  toast('Profiel gewist. Doe de quiz opnieuw.');
+}
 
 // TOAST
 var _tt;function toast(m){var el=document.getElementById('toast');el.textContent=m;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(function(){el.classList.remove('show');},2600);}
