@@ -1276,6 +1276,7 @@ function renderDNA(){
   if(sqb)sqb.style.display='none';
   if(rqb)rqb.style.display='block';
 
+  try {
   var dna=prof.stijlDNA||{};
   var archs=dna.archetypes||[dna.primaryArchetype||'naturel'];
   var ar=ARCHS[archs[0]]||ARCHS.naturel||{};
@@ -1392,6 +1393,20 @@ function renderDNA(){
   }
 
   ct.innerHTML=h;
+
+  } catch(e) {
+    // Profile data corrupt - clear it and show quiz
+    console.error('renderDNA crash:', e);
+    try { localStorage.removeItem('ss-prof-'+code); } catch(ex) {}
+    prof = null;
+    ct.innerHTML = '<div class="empty" style="margin-top:20px">' +
+      '<div class="empty-ico" style="font-size:44px;margin-bottom:12px">&#x1f9ec;</div>' +
+      '<div class="empty-t">Stijlprofiel opnieuw instellen</div>' +
+      '<div class="empty-s">Er was een probleem met je profiel. Doe de quiz opnieuw &mdash; het duurt maar 2 minuten.</div>' +
+      '</div>';
+    if (sqb) sqb.style.display = 'block';
+    if (rqb) rqb.style.display = 'none';
+  }
 }
 
 
