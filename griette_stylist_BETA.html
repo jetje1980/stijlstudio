@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Stijl Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--br:#2e1a0e;--bm:#5c3317;--bw:#9b6240;--cr:#f7f1e8;--cd:#ede4d4;--cm:#e5d8c4;--tx:#1a1008;--mu:#8a7060;--wh:#fff;--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--br)}
+body{font-family:'Jost',sans-serif;color:var(--tx);display:flex;flex-direction:column;height:100vh;max-width:430px;margin:0 auto}
+/* HEADER */
+.hdr{background:var(--br);padding:calc(var(--st) + 12px) 16px 14px;flex-shrink:0;position:relative;overflow:hidden}
+.hdr::after{content:'S';position:absolute;right:-4px;top:-14px;font-family:'Cormorant Garamond',serif;font-size:130px;color:rgba(255,255,255,.04);pointer-events:none;line-height:1}
+.hdr-row{display:flex;align-items:flex-end;justify-content:space-between}
+.hdr-ey{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--bw);margin-bottom:4px}
+.hdr-h1{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;color:var(--cr);line-height:1.05}
+.hdr-h1 em{font-style:italic;opacity:.7}
+.hdr-right{display:flex;gap:7px;align-items:center}
+.weather-pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:5px 10px;font-size:11px;color:rgba(255,255,255,.7);display:flex;align-items:center;gap:4px}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2);transition:background .3s}
+.sync-dot.ok{background:#5a8a60}
+/* DAGKAART */
+.dagkaart{margin:10px 12px 0;background:linear-gradient(135deg,#3d2210,#2e1a0e);border-radius:12px;padding:12px 14px;cursor:pointer;border:1px solid rgba(255,255,255,.06)}
+.dag-ey{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--bw);margin-bottom:4px}
+.dag-tip{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;font-weight:300;color:var(--cr);line-height:1.5}
+.dag-sub{font-size:10px;color:rgba(255,255,255,.35);margin-top:4px}
+/* TABS */
+.tabs{display:flex;background:var(--br);border-top:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.tab{flex:1;padding:9px 0 calc(9px + var(--sb));display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;background:none}
+.tab-ico{font-size:18px;opacity:.45;transition:opacity .2s}
+.tab-lbl{font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.35);font-family:'Jost',sans-serif;font-weight:500;transition:color .2s}
+.tab.on .tab-ico{opacity:1}
+.tab.on .tab-lbl{color:var(--bw)}
+/* CONTENT */
+.content{flex:1;overflow:hidden;position:relative;background:var(--cr)}
+.panel{position:absolute;inset:0;overflow-y:auto;display:none;background:var(--cr);-webkit-overflow-scrolling:touch}
+.panel.on{display:block}
+/* KAST */
+.toolbar{padding:10px 12px 8px;display:flex;gap:8px;align-items:center;background:var(--cr);border-bottom:1px solid var(--cd);flex-shrink:0;position:sticky;top:0;z-index:10}
+.search{flex:1;display:flex;align-items:center;gap:7px;background:var(--wh);border:1.5px solid var(--cd);border-radius:20px;padding:7px 12px}
+.search input{border:none;background:none;font-size:13px;font-family:'Jost',sans-serif;color:var(--tx);outline:none;width:100%}
+.search input::placeholder{color:var(--mu)}
+.add-btn{padding:8px 14px;background:var(--br);color:var(--cr);border:none;border-radius:20px;font-size:12px;font-family:'Jost',sans-serif;font-weight:600;cursor:pointer;flex-shrink:0}
+.filters{display:flex;gap:6px;overflow-x:auto;padding:8px 12px;scrollbar-width:none;border-bottom:1px solid var(--cd)}
+.filters::-webkit-scrollbar{display:none}
+.fc{flex-shrink:0;padding:5px 12px;border-radius:20px;border:1.5px solid var(--cd);background:var(--wh);font-size:11px;font-family:'Jost',sans-serif;color:var(--mu);cursor:pointer;white-space:nowrap;transition:all .15s}
+.fc.on{background:var(--br);border-color:var(--br);color:var(--cr)}
+.icount{padding:6px 14px;font-size:10px;color:var(--mu)}
+/* ITEM GRID */
+.igrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 12px 80px}
+.icard{background:var(--wh);border-radius:12px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(46,26,14,.08);transition:transform .15s}
+.icard:active{transform:scale(.97)}
+.iphoto{width:100%;aspect-ratio:3/4;background:var(--cd);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;gap:5px}
+.iphoto img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.iphoto-ico{font-size:30px;opacity:.6;position:relative}
+.iphoto-txt{font-size:9px;color:var(--mu);font-family:'Jost',sans-serif;font-weight:500;letter-spacing:.05em;position:relative;text-align:center;padding:0 4px}
+.kleur-bar{position:absolute;bottom:0;left:0;right:0;height:4px}
+.ibadges{position:absolute;top:5px;left:5px}
+.ibadge{font-size:8px;font-weight:700;padding:2px 5px;border-radius:4px;background:var(--br);color:var(--cr);letter-spacing:.04em;text-transform:uppercase;font-family:'Jost',sans-serif}
+.iinfo{padding:8px 10px 10px}
+.iname{font-size:12px;font-weight:500;color:var(--tx);margin-bottom:2px;line-height:1.3}
+.icat{font-size:10px;color:var(--mu);margin-bottom:4px;display:flex;align-items:center;gap:3px}
+.itags{display:flex;flex-wrap:wrap;gap:3px}
+.itag{font-size:9px;padding:2px 6px;border-radius:8px;background:var(--cd);color:var(--mu)}
+/* EMPTY STATE */
+.empty{text-align:center;padding:50px 24px}
+.empty-ico{font-size:48px;margin-bottom:14px;opacity:.5}
+.empty-ttl{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;font-style:italic;color:var(--br);margin-bottom:7px}
+.empty-sub{font-size:13px;color:var(--mu);line-height:1.7}
+/* FAB */
+.fab{position:fixed;bottom:calc(var(--sb) + 68px);right:16px;width:50px;height:50px;border-radius:50%;background:var(--br);border:none;color:var(--cr);font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(46,26,14,.35);z-index:90;display:flex;align-items:center;justify-content:center}
+.fab:active{opacity:.85}
+/* BOARDS */
+.bscroll{display:flex;gap:7px;overflow-x:auto;padding:10px 12px 0;scrollbar-width:none;flex-shrink:0}
+.bscroll::-webkit-scrollbar{display:none}
+.bchip{flex-shrink:0;padding:7px 14px;border-radius:20px;border:1.5px solid var(--cd);background:var(--wh);font-size:11px;font-family:'Jost',sans-serif;color:var(--mu);cursor:pointer;white-space:nowrap;transition:all .15s}
+.bchip.on{background:var(--br);border-color:var(--br);color:var(--cr)}
+.bchip-add{border-style:dashed}
+.bcont{padding:10px 12px 80px}
+.board-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.board-ttl{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--br)}
+.board-actions{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.bab{padding:7px 12px;border-radius:20px;border:1.5px solid var(--cd);background:var(--wh);font-size:11px;font-family:'Jost',sans-serif;color:var(--mu);cursor:pointer;white-space:nowrap}
+.bab.primary{background:var(--br);border-color:var(--br);color:var(--cr)}
+.bab.ai{background:rgba(155,98,64,.1);color:var(--bw);border-color:var(--bw)}
+.bab.del{color:#c0392b;border-color:#e8c0ba}
+.outfit-card{background:var(--wh);border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(46,26,14,.06)}
+.outfit-items{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.oit{display:flex;flex-direction:column;align-items:center;gap:3px;width:54px}
+.oit-img{width:54px;height:66px;border-radius:7px;background:var(--cd);display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden}
+.oit-img img{width:100%;height:100%;object-fit:cover}
+.oit-name{font-size:8px;color:var(--mu);text-align:center;line-height:1.3;max-width:54px}
+.outfit-desc{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:var(--br);line-height:1.55;margin-bottom:8px;padding:8px;background:var(--cr);border-radius:7px}
+.outfit-btns{display:flex;gap:6px}
+.obt{flex:1;padding:7px;border-radius:8px;border:1.5px solid var(--cd);background:var(--wh);font-size:11px;font-family:'Jost',sans-serif;color:var(--mu);cursor:pointer;text-align:center}
+.obt.del{color:#c0392b;border-color:#e8c0ba}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{display:inline-block;width:11px;height:11px;border:2px solid rgba(155,98,64,.3);border-top-color:var(--bw);border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:3px}
+/* CHAT */
+.chat-wrap{display:flex;flex-direction:column;height:100%}
+.qps{display:flex;gap:6px;overflow-x:auto;padding:8px 12px 4px;scrollbar-width:none;flex-shrink:0;border-bottom:1px solid var(--cd)}
+.qps::-webkit-scrollbar{display:none}
+.qp{flex-shrink:0;padding:6px 12px;border-radius:20px;border:1.5px solid var(--cd);background:var(--cr);font-size:11px;font-family:'Jost',sans-serif;color:var(--mu);cursor:pointer;white-space:nowrap}
+.msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:9px}
+.msg{max-width:86%;animation:fi .25s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg.u{align-self:flex-end}
+.msg.a{align-self:flex-start}
+.msg-av{width:22px;height:22px;background:var(--br);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--cr);margin-bottom:3px}
+.bubble{padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.65}
+.msg.u .bubble{background:var(--br);color:var(--cr);border-bottom-right-radius:4px}
+.msg.a .bubble{background:var(--wh);color:var(--tx);border-bottom-left-radius:4px;box-shadow:0 2px 8px rgba(46,26,14,.08)}
+.msg.a .bubble strong{color:var(--bw)}
+.tdots span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--cd);margin:0 2px;animation:td .8s infinite}
+.tdots span:nth-child(2){animation-delay:.15s}
+.tdots span:nth-child(3){animation-delay:.3s}
+@keyframes td{0%,60%,100%{transform:translateY(0);background:var(--cd)}30%{transform:translateY(-4px);background:var(--bw)}}
+.cinput-bar{border-top:1px solid var(--cd);padding:8px 12px calc(var(--sb) + 8px);display:flex;gap:7px;align-items:flex-end;background:var(--wh);flex-shrink:0}
+.cinput{flex:1;border:1.5px solid var(--cd);border-radius:20px;padding:9px 13px;font-size:13px;font-family:'Jost',sans-serif;background:var(--cr);color:var(--tx);outline:none;resize:none;max-height:90px;line-height:1.5}
+.cinput:focus{border-color:var(--bw)}
+.csend{width:38px;height:38px;border-radius:50%;background:var(--br);border:none;color:var(--cr);font-size:15px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.csend:active{opacity:.8}
+/* DNA */
+.dna-hero{background:linear-gradient(135deg,var(--br),#4a2810);margin:12px;border-radius:14px;padding:20px 16px;text-align:center}
+.dna-ey{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(240,212,192,.55);margin-bottom:6px}
+.dna-nm{font-family:'Cormorant Garamond',serif;font-size:30px;font-style:italic;font-weight:300;color:white;margin-bottom:3px}
+.dna-ar{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:rgba(240,212,192,.8);margin-bottom:12px}
+.dna-tags{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.dna-tag{padding:3px 9px;border-radius:100px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);font-size:10px;color:white}
+.dsec{margin:0 12px 10px;background:var(--wh);border-radius:12px;padding:12px;box-shadow:0 2px 8px rgba(46,26,14,.06)}
+.dsec-t{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:6px}
+.dsec-b{font-size:13px;color:var(--tx);line-height:1.7;font-weight:300}
+.dkracht{background:linear-gradient(135deg,var(--bw),#8b5230);margin:0 12px 10px;border-radius:12px;padding:12px 14px}
+.dkracht-t{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.55);font-weight:600;margin-bottom:4px}
+.dkracht-b{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:white;line-height:1.5}
+.dc{display:inline-block;padding:3px 8px;border-radius:100px;background:var(--cd);color:var(--bm);font-size:10px;margin:2px}
+.dc.bad{background:#fee4e4;color:#c0392b}
+.cdots{display:flex;flex-wrap:wrap;gap:8px}
+.cdot-w{display:flex;flex-direction:column;align-items:center;gap:2px}
+.cdot{width:22px;height:22px;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.cdot-l{font-size:7px;color:var(--mu);text-align:center;width:26px;line-height:1.2}
+.dfig{background:linear-gradient(135deg,#fff8f4,#fdf0e8);border-left:3px solid var(--bw);margin:0 12px 10px;border-radius:12px;padding:12px}
+.dna-edit-btn{display:block;width:calc(100% - 24px);margin:0 12px 14px;padding:12px;background:var(--cd);border:1.5px solid var(--cm);border-radius:10px;font-size:13px;font-family:'Jost',sans-serif;color:var(--bm);cursor:pointer;text-align:center}
+/* OVERLAY / SHEET */
+.ov{position:fixed;inset:0;background:rgba(46,26,14,.5);z-index:200;display:none;align-items:flex-end;backdrop-filter:blur(2px)}
+.ov.on{display:flex}
+.sheet{width:100%;max-width:430px;margin:0 auto;background:var(--wh);border-radius:20px 20px 0 0;padding:10px 16px calc(var(--sb) + 14px);max-height:92vh;overflow-y:auto;animation:su .3s cubic-bezier(.32,.72,0,1)}
+@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sh{width:36px;height:4px;background:var(--cd);border-radius:2px;margin:0 auto 14px}
+.sttl{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--br);margin-bottom:3px}
+.ssub{font-size:12px;color:var(--mu);margin-bottom:16px}
+/* FORM */
+.flbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--bw);margin-bottom:5px;margin-top:13px;display:block}
+.finput{width:100%;padding:10px 12px;border:1.5px solid var(--cd);border-radius:10px;font-size:14px;font-family:'Jost',sans-serif;color:var(--tx);background:var(--cr);outline:none;transition:border-color .15s}
+.finput:focus{border-color:var(--bw)}
+.fsel{width:100%;padding:10px 12px;border:1.5px solid var(--cd);border-radius:10px;font-size:13px;font-family:'Jost',sans-serif;color:var(--tx);background:var(--cr);outline:none;appearance:none}
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:3px}
+.tb{padding:6px 10px;border-radius:20px;border:1.5px solid var(--cd);background:var(--wh);font-size:11px;font-family:'Jost',sans-serif;color:var(--mu);cursor:pointer;transition:all .15s}
+.tb.sel{background:var(--br);border-color:var(--br);color:var(--cr)}
+.tb.msel{background:var(--bw);border-color:var(--bw);color:white}
+.cgrid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:4px}
+.csww{display:flex;flex-direction:column;align-items:center;gap:2px}
+.csw{width:32px;height:32px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .15s;position:relative;box-shadow:0 1px 5px rgba(0,0,0,.12)}
+.csw.sel{border-color:var(--br);transform:scale(1.12)}
+.csw .ck{display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:10px;font-weight:700;border-radius:50%}
+.csw.sel .ck{display:flex}
+.cswl{font-size:7px;color:var(--mu);text-align:center;width:32px;line-height:1.2}
+.photo-area{width:100%;aspect-ratio:16/9;border:2px dashed var(--cd);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;position:relative;overflow:hidden;margin-top:3px}
+.photo-area img.preview{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px}
+.photo-area input{display:none}
+.sbtn{width:100%;padding:13px;background:var(--br);color:var(--cr);border:none;border-radius:12px;font-size:14px;font-weight:600;font-family:'Jost',sans-serif;cursor:pointer;margin-top:18px}
+.sbtn:active{opacity:.85}
+.sbtn:disabled{opacity:.5;cursor:not-allowed}
+/* ITEM DETAIL */
+.det-img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;margin-bottom:12px;background:var(--cd);display:flex;align-items:center;justify-content:center;font-size:56px;overflow:hidden}
+.det-img img{width:100%;height:100%;object-fit:cover}
+.det-name{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;color:var(--br);margin-bottom:2px}
+.det-meta{font-size:12px;color:var(--mu);margin-bottom:10px}
+.det-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px}
+.det-actions{display:flex;gap:7px}
+.dact{flex:1;padding:10px;border-radius:10px;font-size:12px;font-family:'Jost',sans-serif;cursor:pointer;border:1.5px solid var(--cd);background:var(--wh);color:var(--mu);text-align:center}
+.dact.primary{background:var(--br);border-color:var(--br);color:var(--cr)}
+.dact.danger{color:#c0392b;border-color:#e8c0ba}
+/* PICKER */
+.picker-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:12px}
+.pi{background:var(--cr);border:2px solid transparent;border-radius:9px;padding:5px;cursor:pointer;text-align:center;position:relative;transition:all .15s}
+.pi.sel{border-color:var(--bw);background:#fff8f4}
+.pi-img{width:100%;aspect-ratio:3/4;border-radius:5px;background:var(--cd);display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden;margin-bottom:3px}
+.pi-img img{width:100%;height:100%;object-fit:cover}
+.pi-name{font-size:8px;color:var(--tx);font-weight:500;line-height:1.3}
+.pi-chk{position:absolute;top:3px;right:3px;width:15px;height:15px;border-radius:50%;background:var(--bw);color:white;font-size:8px;display:none;align-items:center;justify-content:center;font-weight:700}
+.pi.sel .pi-chk{display:flex}
+/* TOAST */
+.toast{position:fixed;top:calc(var(--st) + 55px);left:50%;transform:translateX(-50%) translateY(-70px);background:var(--br);color:var(--cr);padding:8px 16px;border-radius:100px;font-size:12px;font-family:'Jost',sans-serif;z-index:500;white-space:nowrap;transition:transform .3s cubic-bezier(.32,.72,0,1);pointer-events:none;box-shadow:0 4px 14px rgba(46,26,14,.3)}
+.toast.on{transform:translateX(-50%) translateY(0)}
+/* BOARD NEW SHEET */
+.emoji-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<div id="app" style="display:flex;flex-direction:column;height:100vh;max-width:430px;margin:0 auto">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-row">
+    <div>
+      <div class="hdr-ey">Stijl Studio</div>
+      <div class="hdr-h1"><em id="uname">Jouw</em><br>Garderobe</div>
+    </div>
+    <div class="hdr-right">
+      <div class="weather-pill"><span id="w-ico">🌤</span><span id="w-tmp">--</span></div>
+      <div class="sync-dot" id="sdot"></div>
+    </div>
+  </div>
+  <div class="dagkaart" id="dagkaart" style="display:none" onclick="showPanel('chat')">
+    <div class="dag-ey">Stijl tip voor vandaag</div>
+    <div class="dag-tip" id="dag-tip"></div>
+    <div class="dag-sub" id="dag-sub"></div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- KAST -->
+  <div class="panel on" id="p-kast">
+    <div class="toolbar">
+      <div class="search"><span style="font-size:13px;color:var(--mu)">🔍</span><input id="search" type="text" placeholder="Zoek in je kast..."></div>
+      <button class="add-btn" onclick="openAdd()">+ Item</button>
+    </div>
+    <div class="filters" id="filters">
+      <div class="fc on" onclick="setFilter('alle',this)">Alle</div>
+      <div class="fc" onclick="setFilter('ongedragen',this)">Ongedragen</div>
+      <div class="fc" onclick="setFilter('tops',this)">Tops</div>
+      <div class="fc" onclick="setFilter('bottoms',this)">Broeken &amp; Rokken</div>
+      <div class="fc" onclick="setFilter('jurken',this)">Jurken</div>
+      <div class="fc" onclick="setFilter('layers',this)">Laagjes</div>
+      <div class="fc" onclick="setFilter('shoes',this)">Schoenen</div>
+      <div class="fc" onclick="setFilter('bags',this)">Tassen</div>
+    </div>
+    <div class="icount" id="icount">0 items</div>
+    <div class="igrid" id="igrid"></div>
+    <div id="empty-kast" style="display:none" class="empty">
+      <div class="empty-ico">👗</div>
+      <div class="empty-ttl">Jouw kast wacht</div>
+      <div class="empty-sub">Tik op <strong>+ Item</strong> om te beginnen.</div>
+    </div>
+  </div>
+
+  <!-- BOARDS -->
+  <div class="panel" id="p-boards">
+    <div class="bscroll" id="bchips"></div>
+    <div class="bcont" id="bcont"></div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="panel" id="p-chat">
+    <div class="chat-wrap">
+      <div class="qps" id="qps">
+        <button class="qp" onclick="sendQ(this)">Wie wil ik vandaag zijn?</button>
+        <button class="qp" onclick="sendQ(this)">Stel een outfit voor</button>
+        <button class="qp" onclick="sendQ(this)">Wat mis ik in mijn kast?</button>
+        <button class="qp" onclick="sendQ(this)">Combineer mijn lievelingsitem</button>
+        <button class="qp" onclick="sendQ(this)">Kleuradvies voor vandaag</button>
+      </div>
+      <div class="msgs" id="msgs"></div>
+      <div class="cinput-bar">
+        <textarea class="cinput" id="cinput" placeholder="Vraag je stylist..." rows="1"
+          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+        <button class="csend" id="csend" onclick="sendChat()">↑</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DNA -->
+  <div class="panel" id="p-dna">
+    <div id="dna-content" style="padding-bottom:20px"></div>
+    <button class="dna-edit-btn" onclick="window.location.href='stijlstudio_quiz.html'">🧬 Stijl DNA opnieuw doen</button>
+  </div>
+
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on" id="t-kast" onclick="showPanel('kast')"><span class="tab-ico">👗</span><span class="tab-lbl">Kast</span></button>
+  <button class="tab" id="t-boards" onclick="showPanel('boards')"><span class="tab-ico">✦</span><span class="tab-lbl">Boards</span></button>
+  <button class="tab" id="t-chat" onclick="showPanel('chat')"><span class="tab-ico">💬</span><span class="tab-lbl">Stylist</span></button>
+  <button class="tab" id="t-dna" onclick="showPanel('dna')"><span class="tab-ico">🧬</span><span class="tab-lbl">DNA</span></button>
+</div>
+
+</div><!-- app -->
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="openAdd()">+</button>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ADD ITEM SHEET -->
+<div class="ov" id="ov-add" onclick="if(event.target===this)closeAdd()">
+<div class="sheet">
+  <div class="sh"></div>
+  <div class="sttl">Item toevoegen</div>
+  <div class="ssub">Voeg een kledingstuk toe aan jouw garderobe</div>
+  <label class="flbl">Naam *</label>
+  <input class="finput" id="a-name" type="text" placeholder="bijv. Beige linnen blouse">
+  <label class="flbl">Categorie</label>
+  <select class="fsel" id="a-cat" onchange="updateAddVis()">
+    <option value="tops">Tops &amp; blouses</option>
+    <option value="bottoms">Rokken &amp; broeken</option>
+    <option value="jurken">Jurken</option>
+    <option value="layers">Laagjes &amp; jassen</option>
+    <option value="shoes">Schoenen</option>
+    <option value="bags">Tassen &amp; accessoires</option>
+    <option value="overig">Overig</option>
+  </select>
+  <label class="flbl">Kleur</label>
+  <div class="cgrid" id="a-kleuren"></div>
+  <div id="a-kleur-lbl" style="font-size:11px;color:var(--mu);margin-top:4px">Geen kleur geselecteerd</div>
+  <label class="flbl">Pasvorm</label>
+  <div class="tag-row" id="a-pasvorm">
+    <button class="tb" onclick="tSingle(this,'pasvorm')">aansluitend</button>
+    <button class="tb" onclick="tSingle(this,'pasvorm')">licht oversized</button>
+    <button class="tb" onclick="tSingle(this,'pasvorm')">wijd</button>
+    <button class="tb" onclick="tSingle(this,'pasvorm')">cropped</button>
+    <button class="tb" onclick="tSingle(this,'pasvorm')">gestructureerd</button>
+    <button class="tb" onclick="tSingle(this,'pasvorm')">wrap</button>
+    <button class="tb" onclick="tSingle(this,'pasvorm')">flared</button>
+  </div>
+  <div id="sec-hals">
+    <label class="flbl">Hals</label>
+    <div class="tag-row">
+      <button class="tb" onclick="tSingle(this,'hals')">ronde hals</button>
+      <button class="tb" onclick="tSingle(this,'hals')">V-hals</button>
+      <button class="tb" onclick="tSingle(this,'hals')">boothals</button>
+      <button class="tb" onclick="tSingle(this,'hals')">sweetheart</button>
+      <button class="tb" onclick="tSingle(this,'hals')">spaghetti</button>
+      <button class="tb" onclick="tSingle(this,'hals')">col</button>
+    </div>
+  </div>
+  <div id="sec-mouw">
+    <label class="flbl">Mouw</label>
+    <div class="tag-row">
+      <button class="tb" onclick="tSingle(this,'mouw')">mouwloos</button>
+      <button class="tb" onclick="tSingle(this,'mouw')">kort</button>
+      <button class="tb" onclick="tSingle(this,'mouw')">3/4</button>
+      <button class="tb" onclick="tSingle(this,'mouw')">lang</button>
+      <button class="tb" onclick="tSingle(this,'mouw')">pofmouw</button>
+    </div>
+  </div>
+  <label class="flbl">Materiaal <span style="font-size:9px;color:var(--mu);text-transform:none;letter-spacing:0">(meerdere)</span></label>
+  <div style="font-size:9px;color:var(--mu);margin-bottom:4px">soepel:</div>
+  <div class="tag-row"><button class="tb" onclick="tMulti(this,'materiaal')">viscose</button><button class="tb" onclick="tMulti(this,'materiaal')">tencel</button><button class="tb" onclick="tMulti(this,'materiaal')">modal</button><button class="tb" onclick="tMulti(this,'materiaal')">satijn</button><button class="tb" onclick="tMulti(this,'materiaal')">jersey</button><button class="tb" onclick="tMulti(this,'materiaal')">zijde</button></div>
+  <div style="font-size:9px;color:var(--mu);margin-bottom:4px;margin-top:7px">stevig:</div>
+  <div class="tag-row"><button class="tb" onclick="tMulti(this,'materiaal')">katoen</button><button class="tb" onclick="tMulti(this,'materiaal')">linnen</button><button class="tb" onclick="tMulti(this,'materiaal')">denim</button><button class="tb" onclick="tMulti(this,'materiaal')">wol</button><button class="tb" onclick="tMulti(this,'materiaal')">leer</button><button class="tb" onclick="tMulti(this,'materiaal')">rib</button></div>
+  <div style="font-size:9px;color:var(--mu);margin-bottom:4px;margin-top:7px">luxe:</div>
+  <div class="tag-row"><button class="tb" onclick="tMulti(this,'materiaal')">cashmere</button><button class="tb" onclick="tMulti(this,'materiaal')">merino</button><button class="tb" onclick="tMulti(this,'materiaal')">velvet</button></div>
+  <label class="flbl">Stofgewicht</label>
+  <div class="tag-row"><button class="tb" onclick="tSingle(this,'structuur')">luchtig</button><button class="tb" onclick="tSingle(this,'structuur')">medium</button><button class="tb" onclick="tSingle(this,'structuur')">stevig</button></div>
+  <div id="sec-lengte">
+    <label class="flbl">Lengte</label>
+    <div class="tag-row"><button class="tb" onclick="tSingle(this,'lengte')">crop</button><button class="tb" onclick="tSingle(this,'lengte')">normaal</button><button class="tb" onclick="tSingle(this,'lengte')">midi</button><button class="tb" onclick="tSingle(this,'lengte')">maxi</button></div>
+  </div>
+  <label class="flbl">Seizoen</label>
+  <div class="tag-row"><button class="tb" onclick="tSingle(this,'seizoen')">zomer</button><button class="tb" onclick="tSingle(this,'seizoen')">winter</button><button class="tb" onclick="tSingle(this,'seizoen')">beide</button></div>
+  <label class="flbl">Foto</label>
+  <div class="photo-area" id="photo-area" onclick="document.getElementById('photo-in').click()">
+    <div id="photo-ph" style="text-align:center">
+      <div style="font-size:26px;opacity:.4;margin-bottom:5px">📷</div>
+      <div style="font-size:12px;color:var(--mu)">Tik om foto toe te voegen</div>
+    </div>
+    <input type="file" id="photo-in" accept="image/*" onchange="onPhoto(event)">
+  </div>
+  <button class="sbtn" id="add-sbtn" onclick="submitAdd()">Item toevoegen</button>
+</div>
+</div>
+
+<!-- ITEM DETAIL -->
+<div class="ov" id="ov-det" onclick="if(event.target===this)closeDet()">
+<div class="sheet"><div class="sh"></div><div id="det-cont"></div></div>
+</div>
+
+<!-- BOARD NEW SHEET -->
+<div class="ov" id="ov-board" onclick="if(event.target===this)closeBoard()">
+<div class="sheet">
+  <div class="sh"></div>
+  <div class="sttl">Nieuw board</div>
+  <label class="flbl">Naam</label>
+  <input class="finput" id="b-name" type="text" placeholder="bijv. Parijs weekend">
+  <label class="flbl">Emoji</label>
+  <div class="emoji-row" id="emoji-row">
+    <button class="tb" onclick="pickEmoji(this)">✨</button>
+    <button class="tb" onclick="pickEmoji(this)">✈️</button>
+    <button class="tb" onclick="pickEmoji(this)">🌊</button>
+    <button class="tb" onclick="pickEmoji(this)">💼</button>
+    <button class="tb" onclick="pickEmoji(this)">🌹</button>
+    <button class="tb" onclick="pickEmoji(this)">🗼</button>
+    <button class="tb" onclick="pickEmoji(this)">☀️</button>
+    <button class="tb" onclick="pickEmoji(this)">❄️</button>
+    <button class="tb" onclick="pickEmoji(this)">🌿</button>
+    <button class="tb" onclick="pickEmoji(this)">🎉</button>
+  </div>
+  <button class="sbtn" onclick="createBoard()">Board aanmaken</button>
+</div>
+</div>
+
+<!-- ITEM PICKER FOR OUTFITS -->
+<div class="ov" id="ov-picker" onclick="if(event.target===this)closePicker()">
+<div class="sheet">
+  <div class="sh"></div>
+  <div class="sttl">Kies items voor outfit</div>
+  <div class="ssub">Tik om te selecteren. Meerdere items mogelijk.</div>
+  <div class="picker-grid" id="picker-grid"></div>
+  <button class="sbtn" id="picker-sbtn" onclick="confirmPicker()">Selecteer items</button>
+</div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════
+var SB = 'https://osuqtfsxmquwqsbgzlqn.supabase.co';
+var SK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
+var CL_CLOUD = 'dhggari0g';
+var CL_PRESET = 'griette-photos';
+var WK = 'https://griette-stylist.griette.workers.dev';
+var VALID = {'SS-GRIET':true,'SS-EVA25':true,'SS-INEZ25':true};
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+var CODE = null, PROF = null;
+var items = [], wornLog = {}, boards = [], activeBoardId = null;
+var chatHistory = [], filter = 'alle', newTags = {}, pendingPhoto = null;
+var pickerBoardId = null, pickerSel = [];
+var syncTimer = null, toastTimer = null;
+
+// ══════════════════════════════════════════
+// KLEUREN
+// ══════════════════════════════════════════
+var KL = [
+  {n:'Zwart',c:'#1C1612',t:'w'},{n:'Antraciet',c:'#4A4A4A',t:'w'},{n:'Grijs',c:'#888',t:'w'},
+  {n:'Wit',c:'#FDFAF6',t:'k',b:1},{n:'Creme',c:'#F5E6C8',t:'k'},{n:'Zand',c:'#C8B89A',t:'k'},
+  {n:'Camel',c:'#D4B896',t:'k'},{n:'Bruin',c:'#8B6F5E',t:'w'},{n:'Terra',c:'#C4714A',t:'w'},
+  {n:'Oranje',c:'#D4834A',t:'w'},{n:'Oker',c:'#C4A84A',t:'k'},{n:'Olijf',c:'#8B9E4A',t:'w'},
+  {n:'Navy',c:'#1B3A5C',t:'w'},{n:'Kobalt',c:'#4A6FA5',t:'w'},{n:'Lichtblauw',c:'#A0B4C8',t:'k'},
+  {n:'Smaragd',c:'#4A7A5E',t:'w'},{n:'Paars',c:'#8B5E83',t:'w'},{n:'Mauve',c:'#D4A0A0',t:'k'},
+  {n:'Rood',c:'#C44A4A',t:'w'},{n:'Bordeaux',c:'#8B2A2A',t:'w'},{n:'Roze',c:'#E8A0B0',t:'k'},
+  {n:'Felroze',c:'#D45A8B',t:'w'},{n:'Pruim',c:'#8B2A6B',t:'w'},{n:'Goud',c:'#C4A44A',t:'k'}
+];
+var KLM = {};
+KL.forEach(function(k){KLM[k.n]=k.c;});
+
+var CAT_ICO = {tops:'👕',bottoms:'👖',jurken:'👗',layers:'🧥',shoes:'👟',bags:'👜',overig:'💍'};
+var CAT_LBL = {tops:'Top',bottoms:'Broek/Rok',jurken:'Jurk',layers:'Laagje',shoes:'Schoenen',bags:'Tas',overig:'Overig'};
+
+var DAGTIPS = {
+  klassiek:['Draag vandaag je sterkste basisstuk met één accent.','Kies één kleur en bouw er omheen.','Investeer in de pasvorm — alles hangt eraan.','Minder stukken, meer intentie.','Kwaliteit boven kwantiteit, ook vandaag.'],
+  createur:['Laat één item het verhaal vertellen.','Durf vandaag dat stuk dat in de kast hangt.','Kleur is jouw taal. Spreek vandaag.','Statement piece + simpele basis = jij.','Draag iets dat een gevoel geeft.'],
+  naturel:['Kies comfort én stijl vandaag.','Wide-leg + ingestopte top: jouw handtekening.','Draag het item dat jou blij maakt.','Textuurdiversiteit: soepel + stevig.','Effortless is een keuze.'],
+  romantisch:['Voeg één delicaat detail toe aan je basis.','Zachtheid is kracht. Draag het bewust.','Wikkeljurk of fluide rok? Jouw silhouet.','Een kleurtip: warm tonen bij jouw huid.','Zacht materiaal maakt het verschil.'],
+  stoer:['Contrast: stoer jasje over iets zachts.','Sterke lijn, simpele basis.','Zwart of navy als fundament.','Één kleur die zegt: hier ben ik.','Kwaliteitsleer of structured wol vandaag.'],
+  modern:['Tonal dressing: één kleur, drie texturen.','Minder is jouw statement.','Architecturaal silhouet: boxy boven + strak onder.','Precisie in pasvorm is alles.','Eén item, perfect. De rest volgt.']
+};
+
+// ══════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════
+(function(){
+  try{CODE=localStorage.getItem('ss-code');}catch(e){}
+  if(!CODE||!VALID[CODE]){window.location.replace('stijlstudio.html');return;}
+  try{PROF=JSON.parse(localStorage.getItem('ss-prof-'+CODE)||'null');}catch(e){}
+  try{items=JSON.parse(localStorage.getItem('ss-items-'+CODE)||'[]');}catch(e){}
+  try{wornLog=JSON.parse(localStorage.getItem('ss-worn-'+CODE)||'{}');}catch(e){}
+  try{boards=JSON.parse(localStorage.getItem('ss-boards-'+CODE)||'[]');}catch(e){}
+  var name=PROF?PROF.name:(CODE==='SS-GRIET'?'Griette':'jou');
+  document.getElementById('uname').textContent=name+"'s";
+  buildColors();
+  renderKast();
+  renderBoards();
+  renderDNA();
+  renderDagkaart();
+  initChat();
+  fetchWeather();
+  loadSupa();
+})();
+
+// ══════════════════════════════════════════
+// SUPABASE
+// ══════════════════════════════════════════
+function sbPost(tbl,d){
+  fetch(SB+'/rest/v1/'+tbl,{method:'POST',headers:{'Content-Type':'application/json','apikey':SK,'Authorization':'Bearer '+SK,'Prefer':'return=minimal,resolution=merge-duplicates'},body:JSON.stringify(d)}).catch(function(){});
+}
+function sbGet(path){
+  return fetch(SB+'/rest/v1/'+path,{headers:{'apikey':SK,'Authorization':'Bearer '+SK}}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});
+}
+function saveLocal(){
+  try{localStorage.setItem('ss-items-'+CODE,JSON.stringify(items));}catch(e){}
+  try{localStorage.setItem('ss-worn-'+CODE,JSON.stringify(wornLog));}catch(e){}
+  try{localStorage.setItem('ss-boards-'+CODE,JSON.stringify(boards));}catch(e){}
+  setSynced(false);
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(function(){
+    sbPost('users',{code:CODE,naam:PROF?PROF.name:'',style_dna:PROF?PROF.stijlDNA:null,items:items,worn_log:wornLog,boards:boards,last_seen:new Date().toISOString()});
+    setSynced(true);
+  },2500);
+}
+function setSynced(v){var d=document.getElementById('sdot');if(d)d.className='sync-dot'+(v?' ok':'');}
+async function loadSupa(){
+  var d=await sbGet('users?code=eq.'+CODE+'&select=naam,style_dna,items,worn_log,boards&limit=1');
+  if(!d||!d[0])return;
+  var u=d[0];
+  if(u.style_dna&&!PROF){PROF={name:u.naam,stijlDNA:u.style_dna};try{localStorage.setItem('ss-prof-'+CODE,JSON.stringify(PROF));}catch(e){}renderDNA();renderDagkaart();document.getElementById('uname').textContent=(PROF.name||'jou')+"'s";}
+  if(u.items&&u.items.length>0&&items.length===0){items=u.items;try{localStorage.setItem('ss-items-'+CODE,JSON.stringify(items));}catch(e){}renderKast();}
+  if(u.worn_log){wornLog=u.worn_log;try{localStorage.setItem('ss-worn-'+CODE,JSON.stringify(wornLog));}catch(e){}}
+  if(u.boards&&u.boards.length>0&&boards.length===0){boards=u.boards;try{localStorage.setItem('ss-boards-'+CODE,JSON.stringify(boards));}catch(e){}renderBoards();}
+  setSynced(true);
+}
+
+// ══════════════════════════════════════════
+// CLOUDINARY
+// ══════════════════════════════════════════
+async function uploadPhoto(file,itemId){
+  var fd=new FormData();
+  fd.append('file',file);fd.append('upload_preset',CL_PRESET);
+  fd.append('folder','stijlstudio/'+CODE.toLowerCase());
+  fd.append('public_id',CODE.toLowerCase()+'/'+itemId);
+  try{var r=await fetch('https://api.cloudinary.com/v1_1/'+CL_CLOUD+'/image/upload',{method:'POST',body:fd});if(r.ok){var d=await r.json();return d.secure_url;}}catch(e){}
+  return null;
+}
+
+// ══════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════
+function showPanel(name){
+  ['kast','boards','chat','dna'].forEach(function(n){
+    var p=document.getElementById('p-'+n);var t=document.getElementById('t-'+n);
+    if(p)p.className='panel'+(n===name?' on':'');
+    if(t)t.className='tab'+(n===name?' on':'');
+  });
+  var fab=document.getElementById('fab');
+  if(fab)fab.style.display=(name==='kast'?'flex':'none');
+}
+
+// ══════════════════════════════════════════
+// KAST
+// ══════════════════════════════════════════
+function renderKast(){
+  var q=(document.getElementById('search')||{}).value||'';
+  var today=new Date().toISOString().split('T')[0];
+  var todayWorn=wornLog[today]||[];
+  var filtered=items.filter(function(it){
+    if(filter==='ongedragen'){var used=false;var ks=Object.keys(wornLog);for(var i=0;i<ks.length;i++){if((wornLog[ks[i]]||[]).indexOf(it.id)>-1){used=true;break;}}if(used)return false;}
+    else if(filter!=='alle'&&it.cat!==filter)return false;
+    if(q&&it.name.toLowerCase().indexOf(q.toLowerCase())<0)return false;
+    return true;
+  });
+  document.getElementById('icount').textContent=filtered.length+' item'+(filtered.length!==1?'s':'');
+  var grid=document.getElementById('igrid');
+  var emp=document.getElementById('empty-kast');
+  if(filtered.length===0){grid.innerHTML='';emp.style.display='block';return;}
+  emp.style.display='none';
+  grid.innerHTML=filtered.map(function(it){
+    var tags=it.tags||{};
+    var klr=tags.kleur&&KLM[tags.kleur]?KLM[tags.kleur]:null;
+    var bg=klr?'background:linear-gradient(160deg,'+klr+'22,'+klr+'44)':'background:var(--cd)';
+    var photoHtml=it.photo?'<img src="'+it.photo+'" loading="lazy">':'<span class="iphoto-ico">'+CAT_ICO[it.cat||'tops']+'</span>'+(klr?'':'')+'<span class="iphoto-txt">'+(tags.kleur?tags.kleur+'<br>':'')+'+ foto</span>';
+    var klrBar=(!it.photo&&klr)?'<div class="kleur-bar" style="background:'+klr+'"></div>':'';
+    var badge=tags.seizoen==='zomer'?'<span class="ibadge">Z</span>':tags.seizoen==='winter'?'<span class="ibadge">W</span>':'';
+    var tagChips='';
+    if(tags.pasvorm)tagChips+='<span class="itag">'+tags.pasvorm+'</span>';
+    if(tags.materiaal&&tags.materiaal.length)tagChips+='<span class="itag">'+tags.materiaal.slice(0,2).join(', ')+'</span>';
+    return '<div class="icard" onclick="openDet(\''+it.id+'\')">'+
+      '<div class="iphoto" style="'+bg+'">'+photoHtml+klrBar+'<div class="ibadges">'+badge+'</div></div>'+
+      '<div class="iinfo"><div class="iname">'+it.name+'</div>'+
+      '<div class="icat">'+(klr?'<span style="width:8px;height:8px;border-radius:50%;background:'+klr+';display:inline-block;border:1px solid rgba(0,0,0,.1)"></span>':'')+CAT_LBL[it.cat||'tops']+'</div>'+
+      '<div class="itags">'+tagChips+'</div></div></div>';
+  }).join('');
+}
+function setFilter(f,el){
+  filter=f;
+  document.querySelectorAll('.fc').forEach(function(c){c.classList.remove('on');});
+  el.classList.add('on');
+  renderKast();
+}
+document.getElementById('search').oninput=function(){renderKast();};
+
+// ══════════════════════════════════════════
+// ADD ITEM
+// ══════════════════════════════════════════
+function buildColors(){
+  var g=document.getElementById('a-kleuren');
+  if(!g)return;
+  g.innerHTML=KL.map(function(k){
+    return '<div class="csww"><div class="csw" data-k="'+k.n+'" onclick="pickKleur(this)" style="background:'+k.c+';'+(k.b?'border:1.5px solid #CCC;':'')+'"><span class="ck" style="color:'+(k.t==='w'?'white':'#333')+'">✓</span></div><div class="cswl">'+k.n+'</div></div>';
+  }).join('');
+}
+function pickKleur(el){
+  document.querySelectorAll('.csw').forEach(function(s){s.classList.remove('sel');});
+  el.classList.add('sel');
+  newTags.kleur=el.dataset.k;
+  document.getElementById('a-kleur-lbl').textContent=el.dataset.k+' geselecteerd';
+}
+function tSingle(el,type){
+  var parent=el.closest('.tag-row');
+  parent.querySelectorAll('.tb').forEach(function(b){b.classList.remove('sel');});
+  el.classList.add('sel');
+  newTags[type]=el.textContent.trim();
+}
+function tMulti(el,type){
+  el.classList.toggle('msel');
+  var all=[];
+  document.querySelectorAll('.tb.msel').forEach(function(b){
+    if((b.getAttribute('onclick')||'').indexOf("'"+type+"'")>-1)all.push(b.textContent.trim());
+  });
+  newTags[type]=all;
+}
+function updateAddVis(){
+  var cat=document.getElementById('a-cat').value;
+  var showH=['tops','jurken','layers'].indexOf(cat)>-1;
+  var showM=['tops','jurken','layers'].indexOf(cat)>-1;
+  var showL=['tops','bottoms','jurken'].indexOf(cat)>-1;
+  document.getElementById('sec-hals').style.display=showH?'':'none';
+  document.getElementById('sec-mouw').style.display=showM?'':'none';
+  document.getElementById('sec-lengte').style.display=showL?'':'none';
+}
+function onPhoto(e){
+  var f=e.target.files[0];if(!f)return;
+  pendingPhoto=f;
+  var r=new FileReader();
+  r.onload=function(ev){
+    var area=document.getElementById('photo-area');
+    document.getElementById('photo-ph').style.display='none';
+    var img=area.querySelector('img.preview')||document.createElement('img');
+    img.className='preview';img.src=ev.target.result;
+    area.appendChild(img);
+  };
+  r.readAsDataURL(f);
+}
+function openAdd(){
+  newTags={};pendingPhoto=null;
+  document.getElementById('a-name').value='';
+  document.getElementById('a-cat').value='tops';
+  document.querySelectorAll('#ov-add .tb').forEach(function(b){b.classList.remove('sel','msel');});
+  document.querySelectorAll('.csw').forEach(function(s){s.classList.remove('sel');});
+  document.getElementById('a-kleur-lbl').textContent='Geen kleur geselecteerd';
+  document.getElementById('photo-ph').style.display='';
+  var pi=document.querySelector('#photo-area img.preview');if(pi)pi.remove();
+  document.getElementById('photo-in').value='';
+  updateAddVis();
+  document.getElementById('ov-add').classList.add('on');
+  setTimeout(function(){document.getElementById('a-name').focus();},100);
+}
+function closeAdd(){document.getElementById('ov-add').classList.remove('on');}
+async function submitAdd(){
+  var name=document.getElementById('a-name').value.trim();
+  if(!name){toast('Geef je item een naam');return;}
+  var btn=document.getElementById('add-sbtn');
+  btn.disabled=true;btn.textContent='Toevoegen...';
+  var id='item_'+Date.now()+'_'+Math.floor(Math.random()*9999);
+  var photoUrl=null;
+  if(pendingPhoto){btn.textContent='Foto uploaden...';photoUrl=await uploadPhoto(pendingPhoto,id);}
+  items.push({id:id,name:name,cat:document.getElementById('a-cat').value,photo:photoUrl,tags:Object.assign({},newTags),addedAt:new Date().toISOString()});
+  saveLocal();renderKast();closeAdd();
+  toast('✓ '+name+' toegevoegd');
+  btn.disabled=false;btn.textContent='Item toevoegen';
+}
+
+// ══════════════════════════════════════════
+// ITEM DETAIL
+// ══════════════════════════════════════════
+function openDet(id){
+  var it=items.find(function(i){return i.id===id;});if(!it)return;
+  var tags=it.tags||{};
+  var allTags=[];
+  if(tags.kleur)allTags.push(tags.kleur);
+  if(tags.pasvorm)allTags.push(tags.pasvorm);
+  if(tags.hals)allTags.push(tags.hals);
+  if(tags.mouw)allTags.push(tags.mouw);
+  if(tags.structuur)allTags.push(tags.structuur);
+  if(tags.lengte)allTags.push(tags.lengte);
+  if(tags.seizoen)allTags.push(tags.seizoen);
+  if(tags.materiaal&&tags.materiaal.length)allTags=allTags.concat(tags.materiaal);
+  var imgH=it.photo?'<div class="det-img"><img src="'+it.photo+'"></div>':'<div class="det-img">'+CAT_ICO[it.cat||'tops']+'</div>';
+  document.getElementById('det-cont').innerHTML=imgH+
+    '<div class="det-name">'+it.name+'</div>'+
+    '<div class="det-meta">'+CAT_LBL[it.cat||'tops']+'</div>'+
+    '<div class="det-tags">'+allTags.map(function(t){return '<span class="itag">'+t+'</span>';}).join('')+'</div>'+
+    '<div class="det-actions">'+
+      '<button class="dact" onclick="markWorn(\''+id+'\')">✓ Gedragen</button>'+
+      '<button class="dact danger" onclick="deleteItem(\''+id+'\')">Verwijder</button>'+
+    '</div>';
+  document.getElementById('ov-det').classList.add('on');
+}
+function closeDet(){document.getElementById('ov-det').classList.remove('on');}
+function markWorn(id){
+  var today=new Date().toISOString().split('T')[0];
+  if(!wornLog[today])wornLog[today]=[];
+  if(wornLog[today].indexOf(id)<0)wornLog[today].push(id);
+  saveLocal();closeDet();toast('✓ Gelogd als gedragen');
+}
+function deleteItem(id){
+  if(!confirm('Item verwijderen?'))return;
+  items=items.filter(function(i){return i.id!==id;});
+  saveLocal();renderKast();closeDet();toast('Item verwijderd');
+}
+
+// ══════════════════════════════════════════
+// BOARDS
+// ══════════════════════════════════════════
+function renderBoards(){
+  var chips=document.getElementById('bchips');
+  chips.innerHTML=boards.map(function(b){
+    return '<button class="bchip'+(b.id===activeBoardId?' on':'')+'" onclick="switchBoard(\''+b.id+'\')">'+(b.emoji||'✦')+' '+b.label+'</button>';
+  }).join('')+'<button class="bchip bchip-add" onclick="openBoardSheet()">+ Nieuw board</button>';
+  var cont=document.getElementById('bcont');
+  var board=boards.find(function(b){return b.id===activeBoardId;});
+  if(!board){
+    cont.innerHTML='<div class="empty" style="margin-top:20px"><div class="empty-ico">✦</div><div class="empty-ttl">Nog geen boards</div><div class="empty-sub">Maak een board aan om outfits op te slaan.</div></div>';
+    return;
+  }
+  var loading=board._aiLoading;
+  var outfits=board.outfits||[];
+  cont.innerHTML=
+    '<div class="board-hdr"><div class="board-ttl">'+(board.emoji||'✦')+' '+board.label+'</div></div>'+
+    '<div class="board-actions">'+
+      '<button class="bab primary" onclick="openPicker(\''+board.id+'\')">+ Outfit kiezen</button>'+
+      '<button class="bab ai" onclick="aiGen(\''+board.id+'\')">'+(loading?'<span class="spinner"></span>Bezig...':'✦ AI genereren')+'</button>'+
+      '<button class="bab del" onclick="delBoard(\''+board.id+'\')">Verwijder</button>'+
+    '</div>'+
+    (outfits.length?outfits.map(function(o){return outfitCard(board.id,o);}).join(''):
+    '<div class="empty" style="padding:20px 0"><div class="empty-ico" style="font-size:30px">✨</div><div class="empty-ttl" style="font-size:16px">Nog geen outfits</div><div class="empty-sub">Tik <strong>+ Outfit kiezen</strong> of laat de AI genereren.</div></div>');
+}
+function outfitCard(boardId,o){
+  var its=(o.items||[]).map(function(id){
+    var it=items.find(function(i){return i.id===id;});
+    var img=it&&it.photo?'<img src="'+it.photo+'">':'<span style="font-size:18px">'+(it?CAT_ICO[it.cat||'tops']:'👕')+'</span>';
+    return '<div class="oit"><div class="oit-img">'+img+'</div><div class="oit-name">'+(it?it.name.slice(0,12):'?')+'</div></div>';
+  }).join('');
+  return '<div class="outfit-card">'+
+    '<div class="outfit-items">'+its+'</div>'+
+    (o.desc?'<div class="outfit-desc">'+o.desc+'</div>':'')+
+    '<div class="outfit-btns">'+
+      '<button class="obt del" onclick="delOutfit(\''+boardId+'\',\''+o.id+'\')">Verwijder</button>'+
+    '</div></div>';
+}
+function switchBoard(id){activeBoardId=id;renderBoards();}
+function openBoardSheet(){
+  document.getElementById('b-name').value='';
+  document.querySelectorAll('#emoji-row .tb').forEach(function(b){b.classList.remove('sel');});
+  var f=document.querySelector('#emoji-row .tb');if(f)f.classList.add('sel');
+  document.getElementById('ov-board').classList.add('on');
+}
+function closeBoard(){document.getElementById('ov-board').classList.remove('on');}
+function pickEmoji(el){
+  document.querySelectorAll('#emoji-row .tb').forEach(function(b){b.classList.remove('sel');});
+  el.classList.add('sel');
+}
+function createBoard(){
+  var name=document.getElementById('b-name').value.trim();
+  if(!name){toast('Geef het board een naam');return;}
+  var eb=document.querySelector('#emoji-row .tb.sel');
+  var emoji=eb?eb.textContent.trim():'✨';
+  var nb={id:'board_'+Date.now(),label:name,emoji:emoji,outfits:[]};
+  boards.push(nb);activeBoardId=nb.id;
+  saveLocal();renderBoards();closeBoard();toast('Board "'+name+'" aangemaakt');
+}
+function delBoard(id){
+  var b=boards.find(function(x){return x.id===id;});if(!b)return;
+  if(!confirm('Board "'+b.label+'" verwijderen?'))return;
+  boards=boards.filter(function(x){return x.id!==id;});
+  activeBoardId=boards.length?boards[0].id:null;
+  saveLocal();renderBoards();toast('Board verwijderd');
+}
+function delOutfit(bId,oId){
+  var b=boards.find(function(x){return x.id===bId;});if(!b)return;
+  b.outfits=(b.outfits||[]).filter(function(o){return o.id!==oId;});
+  saveLocal();renderBoards();
+}
+
+// ITEM PICKER
+function openPicker(boardId){
+  pickerBoardId=boardId;pickerSel=[];
+  renderPickerGrid();
+  document.getElementById('picker-sbtn').textContent='Selecteer items';
+  document.getElementById('ov-picker').classList.add('on');
+}
+function closePicker(){document.getElementById('ov-picker').classList.remove('on');pickerSel=[];}
+function renderPickerGrid(){
+  var g=document.getElementById('picker-grid');
+  if(items.length===0){g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--mu);font-size:13px">Voeg eerst items toe aan je kast.</div>';return;}
+  g.innerHTML=items.map(function(it){
+    var sel=pickerSel.indexOf(it.id)>-1;
+    var img=it.photo?'<img src="'+it.photo+'">':'<span>'+CAT_ICO[it.cat||'tops']+'</span>';
+    return '<div class="pi'+(sel?' sel':'')+'" onclick="togglePi(\''+it.id+'\')">'+
+      '<div class="pi-chk">✓</div>'+
+      '<div class="pi-img">'+img+'</div>'+
+      '<div class="pi-name">'+it.name.slice(0,14)+'</div></div>';
+  }).join('');
+}
+function togglePi(id){
+  var idx=pickerSel.indexOf(id);
+  if(idx>-1)pickerSel.splice(idx,1);else pickerSel.push(id);
+  renderPickerGrid();
+  document.getElementById('picker-sbtn').textContent=pickerSel.length?'Outfit opslaan ('+pickerSel.length+' items)':'Selecteer items';
+}
+function confirmPicker(){
+  if(!pickerSel.length){toast('Selecteer minimaal 1 item');return;}
+  var b=boards.find(function(x){return x.id===pickerBoardId;});if(!b)return;
+  if(!b.outfits)b.outfits=[];
+  b.outfits.push({id:'outfit_'+Date.now(),items:pickerSel.slice(),desc:''});
+  saveLocal();renderBoards();closePicker();toast('Outfit opgeslagen!');
+}
+
+// AI GENERATE
+async function aiGen(boardId){
+  var b=boards.find(function(x){return x.id===boardId;});if(!b)return;
+  if(items.length<2){toast('Voeg eerst meer items toe aan je kast');return;}
+  b._aiLoading=true;renderBoards();
+  try{
+    var wText=items.slice(0,25).map(function(it){
+      var t=it.tags?[it.tags.kleur,it.tags.pasvorm,(it.tags.materiaal||[]).join('/')].filter(Boolean).join(','):'';
+      return it.id+'|'+it.name+'|'+it.cat+(t?' ['+t+']':'');
+    }).join('\n');
+    var dna=PROF&&PROF.stijlDNA;
+    var ctx=dna?'Stijl: '+(dna.archetypes||[]).join(' & ')+'. '+(dna.silhouet||'')+'. Kleuren: '+(dna.kleuren||[]).join(', ')+'.':'';
+    var prompt='Je bent een stylist. Maak 3 complete outfit combinaties van deze garderobe voor het board "'+b.label+'".\n\n'+ctx+'\n\nGarderobe (id|naam|cat|tags):\n'+wText+'\n\nGeef ALLEEN een JSON array terug: [{"items":["id1","id2"],"desc":"korte beschrijving"}, ...]. Gebruik alleen bestaande IDs.';
+    var res=await fetch(WK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:700,system:'Geef alleen valide JSON terug. Geen uitleg, geen markdown.',messages:[{role:'user',content:prompt}]})});
+    var data=await res.json();
+    var txt=(data.content&&data.content[0]&&data.content[0].text)||data.message||'[]';
+    txt=txt.replace(/```json|```/g,'').trim();
+    var outfits=JSON.parse(txt);
+    if(!b.outfits)b.outfits=[];
+    var added=0;
+    outfits.forEach(function(o,i){
+      var valid=(o.items||[]).filter(function(id){return items.find(function(it){return it.id===id;});});
+      if(valid.length>0){b.outfits.push({id:'outfit_ai_'+Date.now()+'_'+i,items:valid,desc:o.desc||''});added++;}
+    });
+    saveLocal();
+    toast(added>0?'✦ '+added+' outfits gegenereerd!':'Geen geldige outfits — probeer opnieuw');
+  }catch(e){toast('Er ging iets mis. Probeer opnieuw.');}
+  b._aiLoading=false;renderBoards();
+}
+
+// ══════════════════════════════════════════
+// DAGKAART
+// ══════════════════════════════════════════
+function renderDagkaart(){
+  var el=document.getElementById('dagkaart');
+  var tip=document.getElementById('dag-tip');
+  var sub=document.getElementById('dag-sub');
+  if(!PROF||!PROF.stijlDNA){el.style.display='none';return;}
+  var arch=(PROF.stijlDNA.archetypes||[])[0]||PROF.stijlDNA.primaryArchetype||'naturel';
+  var tips=DAGTIPS[arch]||DAGTIPS.naturel;
+  var t=tips[new Date().getDay()%tips.length];
+  if(tip)tip.textContent='"'+t+'"';
+  var cnt=items.length;
+  var today=new Date().toISOString().split('T')[0];
+  var tw=(wornLog[today]||[]).length;
+  if(sub)sub.textContent=cnt+' items in je kast'+(tw?' · '+tw+' gedragen vandaag':'');
+  el.style.display='block';
+}
+
+// ══════════════════════════════════════════
+// CHAT
+// ══════════════════════════════════════════
+function buildSysPrompt(){
+  var dna=PROF&&PROF.stijlDNA;
+  var wText=items.length?items.slice(0,30).map(function(it){var t=it.tags?[it.tags.kleur,it.tags.pasvorm,(it.tags.materiaal||[]).join('/')].filter(Boolean).join(', '):'';return it.name+(t?' ['+t+']':'');}).join('\n  - '):'Garderobe is nog leeg.';
+  return 'Je bent de persoonlijke digitale stylist van '+(PROF?PROF.name:'deze gebruiker')+'. Spreek haar aan als je/jij. Bondig. Eindig altijd met één concrete actie.\n\n'+(dna?'STIJLPROFIEL:\nArchetype: '+(dna.archetypes||[]).join(' & ')+'\nKibbe: '+(dna.kibbe||'')+'\nSilhouet: '+(dna.silhouet||'')+'\nMaterialen: '+(dna.materialen||[]).join(', ')+'\nKleuren: '+(dna.kleuren||[]).join(', ')+' ('+(dna.kleurtemp||'')+')'+'\nFiguur: '+(dna.figuurTip||'')+'\nBenadrukken: '+(dna.benadruk||[]).join(', ')+'\nNo-gos: '+(dna.nogo||[]).join(', ')+'\n\n':'')+
+    'GARDEROBE ('+items.length+' items):\n  - '+wText;
+}
+function initChat(){
+  var name=PROF?PROF.name:'jou';
+  var dna=PROF&&PROF.stijlDNA;
+  var arch=dna?(dna.archetypes||[]).join(' × '):'';
+  var greeting='Hoi '+name+'! ✦\n\nIk ben jouw persoonlijke stylist.'+(arch?'\n\nJij bent **'+arch+'**.':'')+'\n\nStel me alles over je garderobe, outfits of stijl.';
+  addMsg('a',greeting);
+}
+function addMsg(role,text){
+  var msgs=document.getElementById('msgs');
+  var div=document.createElement('div');
+  div.className='msg '+role;
+  var html=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br>');
+  div.innerHTML=(role==='a'?'<div class="msg-av">✦</div>':'')+
+    '<div class="bubble">'+html+'</div>';
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+  chatHistory.push({role:role==='a'?'assistant':'user',content:text});
+}
+function showTyping(){
+  var msgs=document.getElementById('msgs');
+  var d=document.createElement('div');d.className='msg a';d.id='typing';
+  d.innerHTML='<div class="msg-av">✦</div><div class="bubble"><div class="tdots"><span></span><span></span><span></span></div></div>';
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+}
+async function sendChat(){
+  var inp=document.getElementById('cinput');
+  var text=inp.value.trim();if(!text)return;
+  inp.value='';inp.style.height='auto';
+  document.getElementById('csend').disabled=true;
+  document.getElementById('qps').style.display='none';
+  addMsg('u',text);showTyping();
+  try{
+    var msgs=chatHistory.slice(-12);
+    var res=await fetch(WK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:800,system:buildSysPrompt(),messages:msgs})});
+    var data=await res.json();
+    var tp=document.getElementById('typing');if(tp)tp.remove();
+    var reply=(data.content&&data.content[0]&&data.content[0].text)||data.message||data.text||'Probeer het opnieuw.';
+    addMsg('a',reply);
+  }catch(e){var tp2=document.getElementById('typing');if(tp2)tp2.remove();addMsg('a','Er ging iets mis. Probeer opnieuw.');}
+  document.getElementById('csend').disabled=false;
+}
+function sendQ(el){
+  document.getElementById('cinput').value=el.textContent;
+  sendChat();
+}
+
+// ══════════════════════════════════════════
+// DNA
+// ══════════════════════════════════════════
+var CMAP={};
+KL.forEach(function(k){CMAP[k.n]=k.c;});
+
+function renderDNA(){
+  var cont=document.getElementById('dna-content');
+  if(!PROF||!PROF.stijlDNA){
+    cont.innerHTML='<div class="empty" style="margin-top:20px"><div class="empty-ico">🧬</div><div class="empty-ttl">Nog geen Stijl DNA</div><div class="empty-sub">Doe de quiz om jouw persoonlijke stijlprofiel aan te maken.</div></div><button class="sbtn" style="margin:0 12px;width:calc(100% - 24px)" onclick="window.location.href=\'stijlstudio_quiz.html\'">Start Stijl DNA quiz →</button>';
+    return;
+  }
+  var dna=PROF.stijlDNA;
+  var archs=dna.archetypes||[dna.primaryArchetype||'naturel'];
+  var klDots=(dna.kleuren||[]).slice(0,14).map(function(k){var c=CMAP[k]||'#888';return '<div class="cdot-w"><div class="cdot" style="background:'+c+';'+(k==='Wit'||k==='Creme'?'border:1px solid #DDD':'')+'"></div><div class="cdot-l">'+k+'</div></div>';}).join('');
+  var h='<div class="dna-hero">'+
+    '<div class="dna-ey">Jouw Stijl DNA</div>'+
+    '<div class="dna-nm">'+PROF.name+'</div>'+
+    '<div class="dna-ar">'+archs.join(' × ')+'</div>'+
+    '<div class="dna-tags">'+(dna.uitstraling||[]).map(function(u){return '<span class="dna-tag">'+u+'</span>';}).join('')+(dna.kw||[]).map(function(k){return '<span class="dna-tag">'+k+'</span>';}).join('')+'</div>'+
+  '</div>';
+  if(dna.beschrijving)h+='<div class="dsec"><div class="dsec-t">Wie jij bent</div><div class="dsec-b">'+dna.beschrijving.replace(/\n/g,'<br>')+'<br><br><span style="font-size:10px;color:var(--mu)">Kibbe: '+( dna.kibbe||'')+' · Kitchener: '+(dna.kitchener||'')+'</span></div></div>';
+  if(dna.kracht)h+='<div class="dkracht"><div class="dkracht-t">Jouw kracht</div><div class="dkracht-b">'+dna.kracht+'</div></div>';
+  if(dna.silhouet)h+='<div class="dsec"><div class="dsec-t">Silhouet &amp; proporties</div><div class="dsec-b">'+dna.silhouet+(dna.proporties?'<br><br>'+dna.proporties:'')+'</div></div>';
+  if(dna.materialen&&dna.materialen.length)h+='<div class="dsec"><div class="dsec-t">Materialen</div><div class="dsec-b"><div>'+dna.materialen.map(function(m){return '<span class="dc">'+m+'</span>';}).join('')+'</div>'+(dna.materialen_vermijd&&dna.materialen_vermijd.length?'<div style="margin-top:7px;font-size:10px;color:var(--mu);margin-bottom:3px">Vermijd:</div><div>'+dna.materialen_vermijd.map(function(m){return '<span class="dc bad">'+m+'</span>';}).join('')+'</div>':'')+'</div></div>';
+  if(klDots)h+='<div class="dsec"><div class="dsec-t">Kleuren ('+(dna.kleurtemp||'')+')</div><div class="cdots">'+klDots+'</div></div>';
+  if(dna.figuurTip)h+='<div class="dfig"><div class="dsec-t">Figuuradvies</div><div class="dsec-b">'+dna.figuurTip+(dna.benadruk&&dna.benadruk.length?'<br><br><strong>Benadrukken:</strong> '+dna.benadruk.join(', '):'')+( dna.verbergen&&dna.verbergen.length?'<br><strong>Minder tonen:</strong> '+dna.verbergen.join(', '):'')+'</div></div>';
+  if(dna.sleutelitems&&dna.sleutelitems.length)h+='<div class="dsec"><div class="dsec-t">Sleutelitems</div><div>'+dna.sleutelitems.map(function(i){return '<span class="dc">✦ '+i+'</span>';}).join('')+'</div></div>';
+  if(dna.nogo&&dna.nogo.length)h+='<div class="dsec"><div class="dsec-t">No-go\'s</div><div>'+dna.nogo.map(function(n){return '<span class="dc bad">'+n+'</span>';}).join('')+'</div></div>';
+  cont.innerHTML=h;
+}
+
+// ══════════════════════════════════════════
+// WEATHER
+// ══════════════════════════════════════════
+function fetchWeather(){
+  if(!navigator.geolocation)return;
+  navigator.geolocation.getCurrentPosition(function(pos){
+    fetch('https://wttr.in/'+pos.coords.latitude+','+pos.coords.longitude+'?format=%t').then(function(r){return r.text();}).then(function(t){
+      var m=t.match(/([\+\-]?\d+)/);var deg=m?parseInt(m[1]):15;
+      document.getElementById('w-ico').textContent=deg>22?'☀️':deg>14?'🌤':deg>7?'🌥':'🧥';
+      document.getElementById('w-tmp').textContent=deg+'°';
+    }).catch(function(){});
+  });
+}
+
+// ══════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════
+function toast(msg){
+  var el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){el.classList.remove('on');},2600);
+}
+</script>
+</body>
+</html>
