@@ -344,6 +344,105 @@ body{font-family:"Jost",sans-serif;color:var(--tx)}
 .inspo-item-name{font-size:11px;font-weight:500;color:var(--tx);margin-bottom:2px;line-height:1.3}
 .inspo-item-match{font-size:9px;color:var(--bw);font-weight:600}
 .inspo-tip{padding:11px 14px;background:linear-gradient(135deg,#fff8f4,#fdf0e8);font-size:12px;font-style:italic;color:var(--bw);border-top:1px solid var(--cd)}
+
+/* QUIZ */
+.q-slide{padding:20px 16px 16px;animation:qsi .3s ease}
+@keyframes qsi{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.q-ey{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:5px}
+.q-ttl{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;line-height:1.2;color:var(--br);margin-bottom:5px}
+.q-ttl em{font-style:italic;color:var(--bw)}
+.q-sub{font-size:13px;color:var(--mu);line-height:1.65;margin-bottom:16px}
+.q-nin{width:100%;font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;font-style:italic;border:none;border-bottom:2px solid var(--cd);background:transparent;color:var(--br);padding:7px 0;outline:none;-webkit-appearance:none}
+.q-nin:focus{border-color:var(--bw)}
+.q-nin::placeholder{color:var(--cd)}
+.q-lbl{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin:14px 0 6px;display:block}
+.q-g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+.q-g1{display:flex;flex-direction:column;gap:7px;margin-bottom:6px}
+.q-card{background:var(--wh);border:2px solid var(--cd);border-radius:12px;padding:10px;cursor:pointer;position:relative;text-align:center;transition:all .15s}
+.q-card:active{transform:scale(.97)}
+.q-card.on{border-color:var(--bw);background:linear-gradient(135deg,#fff8f4,#fdf0e8)}
+.q-card.row{display:flex;align-items:flex-start;gap:9px;text-align:left;padding:11px}
+.q-chk{position:absolute;top:5px;right:5px;width:15px;height:15px;border-radius:50%;background:var(--bw);color:white;font-size:8px;display:none;align-items:center;justify-content:center;font-weight:700}
+.q-card.on .q-chk{display:flex}
+.q-chal{background:var(--wh);border:2px solid var(--cd);border-radius:9px;padding:10px 12px;cursor:pointer;margin-bottom:6px;position:relative;transition:all .15s}
+.q-chal.on{border-color:var(--bw);background:#fff8f4}
+.q-grp{margin-bottom:11px}
+.q-grl{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--mu);font-weight:600;margin-bottom:6px}
+.q-crow{display:flex;flex-wrap:wrap;gap:7px}
+.q-csw{width:32px;height:32px;border-radius:50%;cursor:pointer;border:3px solid transparent;position:relative;box-shadow:0 1px 5px rgba(0,0,0,.12);transition:all .15s}
+.q-csw.on{border-color:var(--br);transform:scale(1.12)}
+.q-cwrap{display:flex;flex-direction:column;align-items:center;gap:2px}
+.q-cswl{font-size:7px;color:var(--mu);text-align:center;width:32px;line-height:1.2}
+.q-chip{padding:6px 11px;border-radius:100px;border:2px solid var(--cd);background:var(--wh);font-size:11px;color:var(--mu);cursor:pointer;transition:all .15s}
+.q-chip.on{background:var(--bw);border-color:var(--bw);color:white}
+.q-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
+.q-selfie-lbl{display:block;cursor:pointer;width:100%;aspect-ratio:3/4;max-height:260px;border:2px dashed var(--cd);border-radius:14px;overflow:hidden;position:relative;background:var(--cr);margin-bottom:10px}
+.q-selfie-lbl:active{opacity:.85}
+/* UITSLAG */
+.q-hero{background:linear-gradient(135deg,var(--br),#4a2810);margin:12px;border-radius:14px;padding:20px 16px;text-align:center}
+.q-hero-nm{font-family:'Cormorant Garamond',serif;font-size:28px;font-style:italic;color:white;margin-bottom:2px}
+.q-hero-ar{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:rgba(240,212,192,.85);margin-bottom:12px}
+.q-sec{margin:0 12px 9px;background:var(--wh);border-radius:11px;padding:12px 13px;box-shadow:0 2px 7px rgba(46,26,14,.05)}
+.q-sec-t{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:6px}
+.q-sec-b{font-size:13px;color:var(--tx);line-height:1.7}
+.q-kracht{background:linear-gradient(135deg,var(--bw),#8b5230);margin:0 12px 9px;border-radius:11px;padding:12px 13px}
+
+/* ── QUIZ OVERLAY ── */
+.quiz-ov{position:fixed;inset:0;background:var(--cr);z-index:600;display:none;flex-direction:column;max-width:430px;left:50%;transform:translateX(-50%)}
+.quiz-ov.on{display:flex}
+.quiz-hdr{background:var(--wh);border-bottom:1px solid var(--cd);padding:calc(var(--st)+10px) 16px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.quiz-logo{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--br)}
+.quiz-steplbl{font-size:11px;color:var(--mu)}
+.quiz-prog{height:3px;background:var(--cd);flex-shrink:0}
+.quiz-bar{height:100%;background:linear-gradient(90deg,var(--bw),var(--br));transition:width .4s;border-radius:0 2px 2px 0}
+.quiz-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.quiz-footer{border-top:1px solid var(--cd);padding:9px 14px calc(var(--sb)+9px);display:flex;gap:9px;background:var(--wh);flex-shrink:0}
+.quiz-nxt{flex:1;height:48px;border-radius:100px;background:var(--br);color:var(--cr);border:none;font-family:'Jost',sans-serif;font-size:15px;font-weight:600;cursor:pointer}
+.quiz-nxt:active{opacity:.85}
+.quiz-bck{width:48px;height:48px;border-radius:50%;background:var(--cd);border:none;font-size:16px;cursor:pointer;color:var(--mu)}
+.qslide{padding:22px 16px 16px;animation:qsi .25s ease}
+@keyframes qsi{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.qey{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:5px}
+.qttl{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;line-height:1.2;color:var(--br);margin-bottom:5px}
+.qttl em{font-style:italic;color:var(--bw)}
+.qsub{font-size:13px;color:var(--mu);line-height:1.65;margin-bottom:16px}
+.qnin{width:100%;font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;font-style:italic;border:none;border-bottom:2px solid var(--cd);background:transparent;color:var(--br);padding:7px 0;outline:none;transition:border-color .2s}
+.qnin:focus{border-color:var(--bw)}
+.qnin::placeholder{color:var(--cd)}
+.qg2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+.qg1{display:flex;flex-direction:column;gap:7px;margin-bottom:6px}
+.qcard{background:var(--wh);border:2px solid var(--cd);border-radius:12px;padding:10px;cursor:pointer;transition:all .15s;position:relative;text-align:center}
+.qcard:active{transform:scale(.97)}
+.qcard.on{border-color:var(--bw);background:linear-gradient(135deg,#fff8f4,#fdf0e8)}
+.qcard.row{display:flex;align-items:flex-start;gap:9px;text-align:left;padding:11px}
+.qchk{position:absolute;top:5px;right:5px;width:15px;height:15px;border-radius:50%;background:var(--bw);color:white;font-size:8px;display:none;align-items:center;justify-content:center;font-weight:700}
+.qcard.on .qchk{display:flex}
+.qchal{background:var(--wh);border:2px solid var(--cd);border-radius:9px;padding:11px 13px;cursor:pointer;margin-bottom:6px;position:relative;transition:all .15s}
+.qchal.on{border-color:var(--bw);background:#fff8f4}
+.qcgrp{margin-bottom:11px}
+.qcgl{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--mu);font-weight:600;margin-bottom:6px}
+.qcrow{display:flex;flex-wrap:wrap;gap:7px}
+.qcwrap{display:flex;flex-direction:column;align-items:center;gap:2px}
+.qcsw{width:34px;height:34px;border-radius:50%;cursor:pointer;border:3px solid transparent;position:relative;box-shadow:0 1px 4px rgba(0,0,0,.1);transition:all .15s}
+.qcsw.on{border-color:var(--br);transform:scale(1.1)}
+.qcsw .qck{display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:10px;font-weight:700;border-radius:50%}
+.qcsw.on .qck{display:flex}
+.qcswl{font-size:7px;color:var(--mu);text-align:center;width:34px;line-height:1.2}
+.qchips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
+.qchip{padding:7px 11px;border-radius:100px;border:2px solid var(--cd);background:var(--wh);font-size:11px;font-weight:500;color:var(--mu);cursor:pointer}
+.qchip.on{background:var(--bw);border-color:var(--bw);color:white}
+.qbvsec{margin-bottom:12px}
+.qbvl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:6px}
+.qbvl.pos{color:var(--bw)}.qbvl.neg{color:#5c3317}
+.qfavin{width:100%;font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:300;border:none;border-bottom:2px solid var(--cd);background:transparent;color:var(--br);padding:6px 0;outline:none;margin-bottom:13px}
+.qfavin:focus{border-color:var(--bw)}
+.qfavin::placeholder{color:var(--cd)}
+.qtbtn{padding:5px 10px;border-radius:20px;border:1.5px solid var(--cd);background:var(--wh);font-size:11px;font-family:'Jost',sans-serif;color:var(--mu);cursor:pointer}
+.qtbtn.on{background:var(--br);border-color:var(--br);color:var(--cr)}
+.qerr{font-size:12px;color:#c0392b;margin-top:6px;min-height:16px}
+.qselfie-label{display:block;cursor:pointer;width:100%;aspect-ratio:3/4;max-height:260px;border:2px dashed var(--cd);border-radius:14px;overflow:hidden;position:relative;background:var(--cr);margin-bottom:10px}
+.qselfie-label:active{opacity:.85}
+.qselfie-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;pointer-events:none}
 </style>
 </head>
 <body>
@@ -445,8 +544,8 @@ body{font-family:"Jost",sans-serif;color:var(--tx)}
     <!-- DNA -->
     <div class="panel" id="p-dna">
       <div id="dna-cont" style="padding-bottom:20px"></div>
-      <a id="start-quiz-link" href="stijlstudio_quiz.html" style="display:none;width:calc(100% - 24px);margin:0 12px 12px;padding:14px;background:#2e1a0e;color:#f7f1e8;border-radius:11px;font-size:14px;font-weight:600;font-family:Jost,sans-serif;text-align:center;text-decoration:none;box-sizing:border-box">Start Stijl DNA quiz &rarr;</a>
-      <button class="dedit" id="redo-quiz-btn" style="display:none" onclick="window.location.href='stijlstudio_quiz.html'">🔄 Stijl DNA opnieuw doen</button>
+      <a id="start-quiz-link" href="#" style="display:none;width:calc(100% - 24px);margin:0 12px 12px;padding:14px;background:#2e1a0e;color:#f7f1e8;border-radius:11px;font-size:14px;font-weight:600;font-family:Jost,sans-serif;text-align:center;text-decoration:none;box-sizing:border-box">Start Stijl DNA quiz &rarr;</a>
+      <button class="dedit" id="redo-quiz-btn" style="display:none">🔄 Stijl DNA opnieuw doen</button>
     </div>
   </div>
 
@@ -823,6 +922,10 @@ var TIPS={
   renderBoards();
   loadTodayTracker();
   // Wire up static buttons (Samsung Internet safe)
+  var sqbl=document.getElementById('start-quiz-link');
+  if(sqbl)sqbl.onclick=function(e){e.preventDefault();openQuiz();};
+  var rqbl=document.getElementById('redo-quiz-btn');
+  if(rqbl)rqbl.onclick=function(){openQuiz();};
   var rqb=document.getElementById('redo-quiz-btn');
   if(rqb)rqb.onclick=function(){window.location.href='stijlstudio_quiz.html';};
   loadSB();fetchWX();
@@ -1173,7 +1276,7 @@ function renderDNA(){
     return '<div class="dsec"><div class="dsec-t">'+emoji+' '+title+'</div><div class="dsec-b">'+body+'</div></div>';
   }
   function row(icon,txt){return '<div style="display:flex;gap:7px;margin-bottom:5px;align-items:flex-start"><span style="flex-shrink:0">'+icon+'</span><span style="font-size:13px;line-height:1.55">'+txt+'</span></div>';}
-  function chip(t,bad){return '<span style="display:inline-block;padding:2px 8px;border-radius:20px;background:'+(bad?'#fee4e4':'var(--cd)')+';color:'+(bad?'#c0392b':'#5c3317')+';font-size:10px;margin:2px">'+t+'</span>';}
+  function dchip(t,bad){return '<span style="display:inline-block;padding:2px 8px;border-radius:20px;background:'+(bad?'#fee4e4':'var(--cd)')+';color:'+(bad?'#c0392b':'#5c3317')+';font-size:10px;margin:2px">'+t+'</span>';}
 
   var h='';
 
@@ -1778,6 +1881,311 @@ var todayMood=null,todayCyclus=null;
 var fbType='alg',fbStars=0;
 
 
+
+// ═══════════════════════════════════════════════════════
+// INGEBOUWDE QUIZ
+// ═══════════════════════════════════════════════════════
+var QUIZ_ARCHS={
+  klassiek:{naam:'De Klassieke',kw:['Tijdloos','Elegant','Intentioneel'],kibbe:'Classic / Dramatic Classic',kitchener:'Classic essence',beschrijving:'Jij kiest kwaliteit boven kwantiteit. Structuur en proportie zijn je gereedschap.',kracht:'Intuïtief gevoel voor wat werkt.',tip:'3-kleuregel: 1 neutrale basis + 1 tint + 1 accent.',kleuren_basis:['Marineblauw','Grijs','Camel','Creme'],kleuren_accent:['Bordeaux','Smaragd','Kobalt'],kleurtemp:'koel tot neutraal',materialen:['Wol','Katoen','Zijde','Linnen','Kasjmier'],materialen_vermijd:['Synthetisch glanzend'],silhouet:'Gebalanceerd en gestructureerd.',proporties:'Aansluitend boven + volume onder.',sleutelitems:['Perfecte blazer','Zijden blouse','Straight-leg broek','Wrap jurk','Trenchcoat'],fig:{schouders_breed:'Benadruk taille. Geen pofmouwen.',heupen_breed:'Structuur boven. A-lijn verlengt.',gelijkmatig:'Wikkeljurk definieert taille.',zandloper:'Aansluitend is jouw kracht.',slank:'Verticale lijnen en monochroom.',rondingen:'Zachte V-hals en empire.'}},
+  createur:{naam:'De Createur',kw:['Expressief','Uniek','Verrassend'],kibbe:'Soft Dramatic',kitchener:'Dramatic essence',beschrijving:'Kleding is communicatie. Je stijl vertelt een verhaal voordat je iets zegt.',kracht:'Kleurinstinct en compositiegevoel.',tip:'1 statement-stuk per outfit.',kleuren_basis:['Ivoor','Zwart'],kleuren_accent:['Felroze','Kobalt','Smaragd','Rood'],kleurtemp:'hoog contrast',materialen:['Zijde','Velvet','Jersey','Leer'],materialen_vermijd:['Doffe synthetische stoffen'],silhouet:'Gedurfd. Statement volumes.',proporties:'Volume aan een kant.',sleutelitems:['Statement jas','Print jurk','Bold colour broek'],fig:{schouders_breed:'Statement top + simple bottom.',heupen_breed:'Expressief jasje + strakke broek.',gelijkmatig:'Asymmetrie.',zandloper:'Jouw curves zijn canvas.',slank:'Oversized pieces.',rondingen:'Flowing met expressieve print.'}},
+  naturel:{naam:'De Naturel',kw:['Authentiek','Moeiteloos','Eerlijk'],kibbe:'Natural family',kitchener:'Natural essence',beschrijving:'Jij wil er goed uitzien zonder er uren over na te denken.',kracht:'Moeiteloosheid is een stijl.',tip:'Soepel + stevig in een outfit.',kleuren_basis:['Zand','Taupe','Olijf','Camel'],kleuren_accent:['Terra','Donkerblauw','Mosterd'],kleurtemp:'warm aardetinten',materialen:['Linnen','Katoen','Jersey','Denim','Wol'],materialen_vermijd:['Synthetisch strak'],silhouet:'Relaxed en effortless.',proporties:'Wide-leg + aansluitende top.',sleutelitems:['Wide-leg jeans','Linnen blouse','Boyfriend blazer','Chelsea boots'],fig:{schouders_breed:'Soepele tops.',heupen_breed:'Wide-leg + simple top.',gelijkmatig:'Wide-leg + instop.',zandloper:'Soepele jersey.',slank:'Layering.',rondingen:'Zachte jerseys.'}},
+  romantisch:{naam:'De Romantische',kw:['Vrouwelijk','Zacht','Detail-minded'],kibbe:'Romantic',kitchener:'Romantic essence',beschrijving:'Je hebt aandacht voor fijne details. Zachtheid is jouw kracht.',kracht:'Gevoel voor detail en textuur.',tip:'Balanceer zachtheid met een sterk element.',kleuren_basis:['Ivoor','Creme','Dusty rose'],kleuren_accent:['Bordeaux','Dieppaars','Felroze'],kleurtemp:'warm en zacht',materialen:['Zijde','Chiffon','Satijn','Kant','Viscose'],materialen_vermijd:['Stijf katoen'],silhouet:'Curves benadrukt, zacht.',proporties:'Taille altijd benadrukken.',sleutelitems:['Wikkeljurk','Fluide midi rok','Zijden blouse'],fig:{schouders_breed:'Off-shoulder.',heupen_breed:'Empire of wrap.',gelijkmatig:'Wrap benadrukt proportie.',zandloper:'Zachte materialen.',slank:'Gelaagde rokken.',rondingen:'Viscose en satijn.'}},
+  stoer:{naam:'De Stoere',kw:['Krachtig','Direct','Doelbewust'],kibbe:'Dramatic',kitchener:'Dramatic essence',beschrijving:'Sterke lijnen, kwaliteitsmaterialen, doelbewuste keuzes.',kracht:'Heldere stijl-identiteit.',tip:'Stoer jasje over iets zachts.',kleuren_basis:['Zwart','Grijs','Wit','Navy'],kleuren_accent:['Rood','Kobalt'],kleurtemp:'hoog contrast',materialen:['Leer','Wol','Denim','Katoen'],materialen_vermijd:['Te zachte jersey'],silhouet:'Recht gesneden.',proporties:'Structured boven + recht onder.',sleutelitems:['Leren jas','Oversized blazer','Straight-leg jeans'],fig:{schouders_breed:'Recht gesneden blazer.',heupen_breed:'Straight-leg + oversized blazer.',gelijkmatig:'Monochroom.',zandloper:'Blazer accentueert taille.',slank:'Oversized is statement.',rondingen:'Blazer over vloeiende broek.'}},
+  modern:{naam:'De Moderne',kw:['Strak','Intentioneel','Precies'],kibbe:'Dramatic Classic',kitchener:'Classic essence',beschrijving:'Minder is meer. Niets toevallig, alles intentioneel.',kracht:'Jouw kast is een capsule wardrobe.',tip:'Tonal dressing: een kleur, drie texturen.',kleuren_basis:['Zwart','Wit','Grijs','Camel'],kleuren_accent:['Een accent max'],kleurtemp:'neutraal tot koel',materialen:['Merino','Zijde','Katoen','Kasjmier'],materialen_vermijd:['Ruisende synthetische stoffen'],silhouet:'Architecturaal.',proporties:'Boxy boven + tailored onder.',sleutelitems:['Perfect zwart shirt','Tailored trousers','Architecturale blazer'],fig:{schouders_breed:'Clean lines.',heupen_breed:'Straight-cut.',gelijkmatig:'Monochrome sets.',zandloper:'Architecturale vormen.',slank:'Boxy blazer.',rondingen:'Vloeiende jersey.'}}
+};
+var QUIZ_KLGS=[
+  {g:'Neutraal',items:[{n:'Zwart',c:'#1C1612',t:'w'},{n:'Antraciet',c:'#4A4A4A',t:'w'},{n:'Grijs',c:'#888',t:'w'},{n:'Wit',c:'#FDFAF6',t:'k',b:1},{n:'Creme',c:'#F5E6C8',t:'k'},{n:'Zand',c:'#C8B89A',t:'k'}]},
+  {g:'Warm',items:[{n:'Camel',c:'#D4B896',t:'k'},{n:'Bruin',c:'#8B6F5E',t:'w'},{n:'Terra',c:'#C4714A',t:'w'},{n:'Oker',c:'#C4A84A',t:'k'},{n:'Olijf',c:'#8B9E4A',t:'w'},{n:'Mosterd',c:'#C4943A',t:'k'}]},
+  {g:'Koel',items:[{n:'Navy',c:'#1B3A5C',t:'w'},{n:'Kobalt',c:'#4A6FA5',t:'w'},{n:'Lichtblauw',c:'#A0B4C8',t:'k'},{n:'Smaragd',c:'#4A7A5E',t:'w'},{n:'Paars',c:'#8B5E83',t:'w'},{n:'Mauve',c:'#D4A0A0',t:'k'}]},
+  {g:'Intens',items:[{n:'Rood',c:'#C44A4A',t:'w'},{n:'Bordeaux',c:'#8B2A2A',t:'w'},{n:'Roze',c:'#E8A0B0',t:'k'},{n:'Felroze',c:'#D45A8B',t:'w'},{n:'Pruim',c:'#8B2A6B',t:'w'},{n:'Goud',c:'#C4A44A',t:'k'}]}
+];
+var QUIZ_BENS=['Taille benadrukken','Benen verlengen','Decollte openen','Schouders breed','Niets'];
+var QUIZ_VERS=['Buik minder','Heupen smaller','Boven minimaliseren','Dijen minder','Niets'];
+var QUIZ_NOGS=['Grote prints','Grote logos','Crop tops','Hoge hakken','Glanzend','Gesloten hals','Minirokjes','Diep decollte','Pofmouwen'];
+var QUIZ_AGE=['18-25','26-35','36-45','46-55','56-65','65+'];
+var QUIZ_FIGS=[{l:'Schouders breder',k:'schouders_breed'},{l:'Heupen breder',k:'heupen_breed'},{l:'Gelijkmatig',k:'gelijkmatig'},{l:'Zandloper',k:'zandloper'},{l:'Vol &amp; rond',k:'rondingen'},{l:'Slank &amp; lang',k:'slank'}];
+var qStep=0,qAns={},qNS=10;
+
+
+
+
+
+
+
+
+// ═══════════════════════════════════════════════════════
+// QUIZ (ingebouwd in app)
+// ═══════════════════════════════════════════════════════
+var KLGS=[
+  {g:'Neutraal',items:[{n:'Zwart',c:'#1C1612',t:'w'},{n:'Antraciet',c:'#4A4A4A',t:'w'},{n:'Grijs',c:'#888',t:'w'},{n:'Wit',c:'#FDFAF6',t:'k',b:1},{n:'Creme',c:'#F5E6C8',t:'k'},{n:'Zand',c:'#C8B89A',t:'k'}]},
+  {g:'Warm',items:[{n:'Camel',c:'#D4B896',t:'k'},{n:'Bruin',c:'#8B6F5E',t:'w'},{n:'Terra',c:'#C4714A',t:'w'},{n:'Oranje',c:'#D4834A',t:'w'},{n:'Oker',c:'#C4A84A',t:'k'},{n:'Olijf',c:'#8B9E4A',t:'w'}]},
+  {g:'Koel',items:[{n:'Navy',c:'#1B3A5C',t:'w'},{n:'Kobalt',c:'#4A6FA5',t:'w'},{n:'Lichtblauw',c:'#A0B4C8',t:'k'},{n:'Smaragd',c:'#4A7A5E',t:'w'},{n:'Paars',c:'#8B5E83',t:'w'},{n:'Mauve',c:'#D4A0A0',t:'k'}]},
+  {g:'Intens',items:[{n:'Rood',c:'#C44A4A',t:'w'},{n:'Bordeaux',c:'#8B2A2A',t:'w'},{n:'Roze',c:'#E8A0B0',t:'k'},{n:'Felroze',c:'#D45A8B',t:'w'},{n:'Pruim',c:'#8B2A6B',t:'w'},{n:'Goud',c:'#C4A44A',t:'k'}]}
+];
+var QBENS=['Taille benadrukken','Benen verlengen','Decollte openen','Schouders breed','Niets'];
+var QVERS=['Buik minder zichtbaar','Heupen smaller','Boven minimaliseren','Dijen','Niets'];
+var QNOGS=['Grote prints','Grote logos','Crop tops','Hoge hakken','Glanzende stoffen','Gesloten halslijnen','Minirokjes','Pofmouwen'];
+var QAGE=['18-25','26-35','36-45','46-55','56-65','65+'];
+var QFIGS=[
+  {e:'&#9651;',l:'Schouders breder',k:'schouders_breed'},
+  {e:'&#9661;',l:'Heupen breder',k:'heupen_breed'},
+  {e:'&#9645;',l:'Gelijkmatig',k:'gelijkmatig'},
+  {e:'&#10022;',l:'Zandloper',k:'zandloper'},
+  {e:'&#9675;',l:'Vol &amp; rond',k:'rondingen'},
+  {e:'|',l:'Slank &amp; lang',k:'slank'}
+];
+var qStep=0,qAns={},QNS=10;
+
+
+
+
+
+
+
+
+// ══════════════════════════════════════════════════════
+// QUIZ (ingebouwd in app)
+// ══════════════════════════════════════════════════════
+var QNS=10,qStep=0,qAns={};
+var QARCHS={
+  klassiek:{naam:'De Klassieke',kw:['Tijdloos','Elegant','Intentioneel'],kibbe:'Classic / Dramatic Classic',kitchener:'Classic essence',beschrijving:'Jij kiest kwaliteit boven kwantiteit. Structuur en proportie zijn je gereedschap.',kracht:'Intuitief gevoel voor wat werkt. Jouw kast heeft het fundament van een capsule wardrobe.',tip:'3-kleuregel: 1 neutrale basis + 1 tint + 1 accent.',kleuren_basis:['Marineblauw','Grijs','Camel','Creme','Zwart'],kleuren_accent:['Bordeaux','Smaragdgroen','Kobalt'],kleurtemp:'koel tot neutraal',materialen:['Wol','Katoen','Zijde','Linnen','Kasjmier'],materialen_vermijd:['Synthetisch glanzend'],silhouet:'Gebalanceerd en gestructureerd. Taille subtiel gedefinieerd.',proporties:'Aansluitend boven + volume onder.',sleutelitems:['Perfecte blazer','Zijden blouse','Straight-leg broek','Wrap jurk','Trenchcoat'],fig:{schouders_breed:'Benadruk de taille.',heupen_breed:'Structuur boven.',gelijkmatig:'Wikkeljurk definieert taille.',zandloper:'Aansluitende silhouetten.',slank:'Verticale lijnen.',rondingen:'V-hals en empire-taille.'}},
+  createur:{naam:'De Createur',kw:['Expressief','Uniek','Verrassend'],kibbe:'Soft Dramatic',kitchener:'Dramatic essence',beschrijving:'Kleding is voor jou communicatie. Je stijl vertelt een verhaal voordat je iets zegt.',kracht:'Kleurinstinct en compositiegevoel zijn jouw superkracht.',tip:'1 statement-stuk per outfit.',kleuren_basis:['Ivoor','Zwart'],kleuren_accent:['Felroze','Kobalt','Saffraan','Smaragd'],kleurtemp:'hoog contrast',materialen:['Zijde','Velvet','Jersey','Leer'],materialen_vermijd:['Doffe synthetische stoffen'],silhouet:'Gedurfd. Statement volumes.',proporties:'Volume aan een kant.',sleutelitems:['Statement jas','Print jurk','Bold colour broek'],fig:{schouders_breed:'Statement top + eenvoudige bottom.',heupen_breed:'Expressief jasje + strakke broek.',gelijkmatig:'Asymmetrie.',zandloper:'Jouw curves zijn het canvas.',slank:'Oversized statement.',rondingen:'Flowing materialen.'}},
+  naturel:{naam:'De Naturel',kw:['Authentiek','Moeiteloos','Eerlijk'],kibbe:'Natural family',kitchener:'Natural essence',beschrijving:'Jij wil er goed uitzien zonder er uren over na te denken.',kracht:'Moeiteloosheid is een stijl.',tip:'Soepel + stevig in een outfit.',kleuren_basis:['Zand','Taupe','Gebroken wit','Olijf','Camel'],kleuren_accent:['Terra','Donkerblauw','Mosterd'],kleurtemp:'warm aardetinten',materialen:['Linnen','Katoen','Jersey','Denim','Wol'],materialen_vermijd:['Synthetisch strak'],silhouet:'Relaxed en effortless.',proporties:'Wide-leg + aansluitende top.',sleutelitems:['Wide-leg jeans','Linnen blouse','Boyfriend blazer','Kwaliteits shirt'],fig:{schouders_breed:'Soepele tops.',heupen_breed:'Wide-leg + eenvoudige top.',gelijkmatig:'Wide-leg + instop.',zandloper:'Soepele jersey.',slank:'Layering.',rondingen:'Zachte jerseys.'}},
+  romantisch:{naam:'De Romantische',kw:['Vrouwelijk','Zacht','Detail-minded'],kibbe:'Romantic',kitchener:'Romantic essence',beschrijving:'Je hebt aandacht voor fijne details. Zachtheid is jouw kracht.',kracht:'Gevoel voor detail geeft outfits rijkdom.',tip:'Balanceer zachtheid met een sterk element.',kleuren_basis:['Ivoor','Creme','Dusty rose'],kleuren_accent:['Bordeaux','Dieppaars','Felroze','Goud'],kleurtemp:'warm en zacht',materialen:['Zijde','Chiffon','Satijn','Kant','Viscose'],materialen_vermijd:['Stijf katoen'],silhouet:'Curves benadrukt, gedrapeerd.',proporties:'Taille altijd benadrukken.',sleutelitems:['Wikkeljurk','Fluide midi rok','Zijden blouse'],fig:{schouders_breed:'Off-shoulder.',heupen_breed:'Empire-taille.',gelijkmatig:'Wrap jurk.',zandloper:'Zachte materialen.',slank:'Gelaagde rokken.',rondingen:'Viscose en satijn.'}},
+  stoer:{naam:'De Stoere',kw:['Krachtig','Direct','Doelbewust'],kibbe:'Dramatic',kitchener:'Dramatic essence',beschrijving:'Sterke lijnen, kwaliteitsmaterialen, doelbewuste keuzes.',kracht:'Heldere, herkenbare stijl-identiteit.',tip:'Stoer jasje over iets zachts.',kleuren_basis:['Zwart','Grijs','Wit','Navy'],kleuren_accent:['Rood','Kobalt'],kleurtemp:'hoog contrast',materialen:['Kwaliteitsleer','Wol','Denim'],materialen_vermijd:['Te zachte jersey'],silhouet:'Recht gesneden en structured.',proporties:'Structured boven + recht onder.',sleutelitems:['Leren jas','Oversized blazer','Straight-leg jeans'],fig:{schouders_breed:'Recht gesneden blazer.',heupen_breed:'Straight-leg + oversized blazer.',gelijkmatig:'Monochroom.',zandloper:'Structured blazer.',slank:'Oversized.',rondingen:'Blazer over vloeiende broek.'}},
+  modern:{naam:'De Moderne',kw:['Strak','Intentioneel','Precies'],kibbe:'Dramatic Classic',kitchener:'Classic essence',beschrijving:'Minder is meer. Alles intentioneel.',kracht:'Jouw kast is een capsule wardrobe.',tip:'Tonal: een kleur, drie texturen.',kleuren_basis:['Zwart','Wit','Grijs','Camel'],kleuren_accent:['Maximaal een accent'],kleurtemp:'neutraal tot koel',materialen:['Merino wol','Zijde','Katoen','Kasjmier'],materialen_vermijd:['Drukke prints'],silhouet:'Architecturaal en precies.',proporties:'Boxy boven + tailored onder.',sleutelitems:['Perfect zwart shirt','Tailored trousers','Architecturale blazer'],fig:{schouders_breed:'Clean lines.',heupen_breed:'Straight-cut.',gelijkmatig:'Monochrome sets.',zandloper:'Architecturale vormen.',slank:'Boxy blazer.',rondingen:'Vloeiende jersey.'}}
+};
+var QCHALS={
+  combineren:{d:'Combineer-blokkade',tip:'Je ziet het potentieel maar brengt het niet samen.'},
+  teveel:{d:'Kopen zonder connectie',tip:'Je koopt vanuit hoop, niet vanuit identiteit.'},
+  watikmij:{d:'Stijl-zoektocht',tip:'Je weet al wat je NIET wil. Dat is het begin.'},
+  mezelf:{d:'Identiteitskloof',tip:'Jouw kleding representeert jou van vroeger.'},
+  anderen:{d:'Externe sturing',tip:'Wie wil ik vandaag zijn? is sterker dan wat vinden anderen?'},
+  overzicht:{d:'Garderobe-chaos',tip:'Een kast zonder systeem is elke ochtend stress.'}
+};
+var QKLGS=[
+  {g:'Neutraal',items:[{n:'Zwart',c:'#1C1612',t:'w'},{n:'Antraciet',c:'#4A4A4A',t:'w'},{n:'Grijs',c:'#888',t:'w'},{n:'Wit',c:'#FDFAF6',t:'k',b:1},{n:'Creme',c:'#F5E6C8',t:'k'},{n:'Zand',c:'#C8B89A',t:'k'}]},
+  {g:'Warm',items:[{n:'Camel',c:'#D4B896',t:'k'},{n:'Bruin',c:'#8B6F5E',t:'w'},{n:'Terra',c:'#C4714A',t:'w'},{n:'Oker',c:'#C4A84A',t:'k'},{n:'Olijf',c:'#8B9E4A',t:'w'}]},
+  {g:'Koel',items:[{n:'Navy',c:'#1B3A5C',t:'w'},{n:'Kobalt',c:'#4A6FA5',t:'w'},{n:'Lichtblauw',c:'#A0B4C8',t:'k'},{n:'Smaragd',c:'#4A7A5E',t:'w'},{n:'Paars',c:'#8B5E83',t:'w'}]},
+  {g:'Intens',items:[{n:'Rood',c:'#C44A4A',t:'w'},{n:'Bordeaux',c:'#8B2A2A',t:'w'},{n:'Roze',c:'#E8A0B0',t:'k'},{n:'Felroze',c:'#D45A8B',t:'w'},{n:'Goud',c:'#C4A44A',t:'k'}]}
+];
+var QCMAP={};QKLGS.forEach(function(g){g.items.forEach(function(o){QCMAP[o.n]=o.c;});});
+var QFIGS=[{e:'&#9651;',l:'Schouders breder',k:'schouders_breed'},{e:'&#9661;',l:'Heupen breder',k:'heupen_breed'},{e:'&#9645;',l:'Gelijkmatig',k:'gelijkmatig'},{e:'&#10022;',l:'Zandloper',k:'zandloper'},{e:'&#9675;',l:'Vol &amp; rond',k:'rondingen'},{e:'|',l:'Slank &amp; lang',k:'slank'}];
+var QBENS=['Taille benadrukken','Benen verlengen','Decollte openen','Schouders breed','Niets specifiek'];
+var QVERS=['Buik minder zichtbaar','Heupen smaller','Boven minimaliseren','Dijen minder breed','Niets'];
+var QNOGS=['Grote prints','Grote logos','Crop tops','Hoge hakken','Glanzende stoffen','Gesloten halslijnen','Minirokjes','Diep decollte','Pofmouwen','Legging als broek'];
+var QAGE=['18-25','26-35','36-45','46-55','56-65','65+'];
+
+function openQuiz(){
+  qStep=0;qAns={};
+  document.getElementById('quiz-ov').classList.add('on');
+  qRender();
+}
+function closeQuiz(){document.getElementById('quiz-ov').classList.remove('on');}
+
+function qRender(){
+  var lbl=document.getElementById('q-lbl');
+  var bar=document.getElementById('q-bar');
+  var bck=document.getElementById('q-bck');
+  var nxt=document.getElementById('q-nxt');
+  var ftr=document.getElementById('q-footer');
+  var body=document.getElementById('q-body');
+  lbl.textContent=qStep<QNS?'Stap '+(qStep+1)+' van '+QNS:'Jouw Stijl DNA';
+  bar.style.width=(qStep>=QNS?100:Math.round((qStep+1)/QNS*100))+'%';
+  bck.style.display=qStep>0&&qStep<QNS?'flex':'none';
+  ftr.style.display=qStep>=QNS?'none':'flex';
+  nxt.disabled=false;
+  nxt.textContent=qStep===QNS-1?'Afronden':'Verder';
+  if(qStep>=QNS){qRenderUitslag();return;}
+
+  var h='';
+  if(qStep===0){
+    h='<div class="qslide"><div class="qey">Welkom</div><div class="qttl">Hoe heet je?</div><div class="qsub">Ik maak een stijlprofiel dat echt bij jou past.</div>'+
+      '<input class="qnin" id="q-nin" type="text" placeholder="Jouw naam..." autocomplete="given-name" value="'+(qAns.name||'')+'">'+
+      '<div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin:14px 0 6px">Leeftijd (optioneel)</div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:5px">'+QAGE.map(function(a){return '<button class="qtbtn'+(qAns.leeftijd===a?' on':'')+'" onclick="qPickAge(\''+a+'\')">'+a+'</button>';}).join('')+'</div>'+
+      '<div class="qerr" id="q-err"></div></div>';
+  } else if(qStep===1){
+    h='<div class="qslide"><div class="qey">Stap 1 &middot; Uitstraling</div><div class="qttl">Wat wil je dat mensen <em>voelen</em>?</div><div class="qsub">Kies alles wat resoneert.</div><div class="qg2">';
+    [{e:'&#9889;',l:'Krachtig'},{e:'&#10024;',l:'Zelfverzekerd'},{e:'&#127807;',l:'Rustig'},{e:'&#127912;',l:'Creatief'},{e:'&#127800;',l:'Vrouwelijk'},{e:'&#128142;',l:'Elegant'}].forEach(function(o){
+      var s=(qAns.uitstraling||[]).indexOf(o.l)>-1;
+      h+='<div class="qcard'+(s?' on':'')+'" onclick="qTogArr(\'uitstraling\',\''+o.l+'\',99)"><div class="qchk">&#10003;</div><span style="font-size:22px;display:block;margin-bottom:3px">'+o.e+'</span><div style="font-size:12px;font-weight:600;color:var(--tx)">'+o.l+'</div></div>';
+    });
+    h+='</div></div>';
+  } else if(qStep===2){
+    h='<div class="qslide"><div class="qey">Stap 2 &middot; Archetype</div><div class="qttl">Wie jij <em>bent</em></div><div class="qsub">Kies maximaal 2.</div><div class="qg1">';
+    [{bg:'#F0E8DC',l:'De Klassieke',d:'Tijdloos, gestructureerd.',k:'klassiek'},{bg:'#F0E0F4',l:'De Createur',d:'Expressief, verrassend.',k:'createur'},{bg:'#E0F0E8',l:'De Naturel',d:'Moeiteloos, authentiek.',k:'naturel'},{bg:'#F4E0E8',l:'De Romantische',d:'Vrouwelijk, zacht.',k:'romantisch'},{bg:'#E0E4F4',l:'De Stoere',d:'Krachtig, direct.',k:'stoer'},{bg:'#EBEBEB',l:'De Moderne',d:'Minimaal, intentioneel.',k:'modern'}].forEach(function(o){
+      var s=(qAns.archetypes||[]).indexOf(o.k)>-1;
+      h+='<div class="qcard row'+(s?' on':'')+'" onclick="qTogArr(\'archetypes\',\''+o.k+'\',2)"><div class="qchk">&#10003;</div><div style="width:32px;height:32px;border-radius:7px;background:'+o.bg+';flex-shrink:0;display:flex;align-items:center;justify-content:center">&#10022;</div><div><div style="font-size:12px;font-weight:600;color:var(--tx)">'+o.l+'</div><div style="font-size:10px;color:var(--mu)">'+o.d+'</div></div></div>';
+    });
+    h+='</div></div>';
+  } else if(qStep===3){
+    h='<div class="qslide"><div class="qey">Stap 3 &middot; Uitdaging</div><div class="qttl">Waar herken je <em>jezelf</em> in?</div><div class="qsub">Kies maximaal 2.</div>';
+    [{l:'Ik weet niet hoe ik dingen goed combineer',s:'Potentieel maar breng het niet samen',k:'combineren'},{l:'Ik koop veel maar draag weinig',s:'Volle kast, maar niets aan',k:'teveel'},{l:'Ik weet niet wat bij me past',s:'Nog op zoek',k:'watikmij'},{l:'Ik herken mezelf niet in mijn kleding',s:'Voelt niet als ik',k:'mezelf'},{l:'Ik kleed me voor anderen',s:'Ik pas me aan',k:'anderen'},{l:'Geen overzicht over mijn garderobe',s:'Ik weet niet wat ik heb',k:'overzicht'}].forEach(function(o){
+      var s=(qAns.uitdagingen||[]).indexOf(o.k)>-1;
+      h+='<div class="qchal'+(s?' on':'')+'" onclick="qTogArr(\'uitdagingen\',\''+o.k+'\',2)"><div class="qchk" style="position:absolute;top:10px;right:10px;display:'+(s?'flex':'none')+'">&#10003;</div><div style="font-size:13px;font-weight:500;color:var(--tx)">'+o.l+'</div><div style="font-size:10px;color:var(--mu);margin-top:2px">'+o.s+'</div></div>';
+    });
+    h+='</div>';
+  } else if(qStep===4){
+    h='<div class="qslide"><div class="qey">Stap 4 &middot; Kleuren</div><div class="qttl">Welke kleuren zijn <em>jij</em>?</div><div class="qsub">Kies meerdere.</div>';
+    QKLGS.forEach(function(g){
+      h+='<div class="qcgrp"><div class="qcgl">'+g.g+'</div><div class="qcrow">';
+      g.items.forEach(function(k){
+        var s=(qAns.kleuren||[]).indexOf(k.n)>-1;
+        h+='<div class="qcwrap"><div class="qcsw'+(s?' on':'')+'" onclick="qTogKleur(\''+k.n+'\')" style="background:'+k.c+';'+(k.b?'border:1.5px solid #CCC;':'')+'"><div class="qck" style="color:'+(k.t==='w'?'white':'#333')+'">&#10003;</div></div><div class="qcswl">'+k.n+'</div></div>';
+      });
+      h+='</div></div>';
+    });
+    var kl=qAns.kleuren||[];
+    h+='<div style="font-size:11px;color:var(--mu);margin-top:3px">'+(kl.length?kl.join(' &middot; '):'Nog niets')+'</div></div>';
+  } else if(qStep===5){
+    h='<div class="qslide"><div class="qey">Stap 5 &middot; Figuur</div><div class="qttl">Jouw <em>lichaam</em></div><div class="qsub">Zo geef ik proportietips die werken.</div><div class="qg2">';
+    QFIGS.forEach(function(o){
+      var s=qAns.figuur===o.k;
+      h+='<div class="qcard'+(s?' on':'')+'" onclick="qSetFig(\''+o.k+'\')"><div class="qchk">&#10003;</div><span style="font-size:20px;display:block;margin-bottom:3px">'+o.e+'</span><div style="font-size:11px;font-weight:600;color:var(--tx)">'+o.l+'</div></div>';
+    });
+    h+='</div></div>';
+  } else if(qStep===6){
+    h='<div class="qslide"><div class="qey">Stap 6 &middot; Focus</div><div class="qttl">Wat wil je <em>benadrukken</em>?</div><div class="qsub">En wat liever minder zichtbaar?</div>';
+    h+='<div class="qbvsec"><div class="qbvl pos">+ Benadrukken</div><div class="qchips">';
+    QBENS.forEach(function(o,i){var s=(qAns.benadruk||[]).indexOf(i)>-1;h+='<div class="qchip'+(s?' on':'')+'" onclick="qTogIdx(\'benadruk\','+i+')">'+o+'</div>';});
+    h+='</div></div><div class="qbvsec"><div class="qbvl neg">- Minder zichtbaar</div><div class="qchips">';
+    QVERS.forEach(function(o,i){var s=(qAns.verbergen||[]).indexOf(i)>-1;h+='<div class="qchip'+(s?' on':'')+'" onclick="qTogIdx(\'verbergen\','+i+')">'+o+'</div>';});
+    h+='</div></div></div>';
+  } else if(qStep===7){
+    h='<div class="qslide"><div class="qey">Stap 7 &middot; Lievelingsitem</div><div class="qttl">Jouw <em>ankerstuk</em></div><div class="qsub">Het item dat altijd werkt.</div>'+
+      '<input class="qfavin" id="q-favin" type="text" placeholder="bijv. Mijn rode wikkelrok..." value="'+(qAns.favNaam||'')+'">'+
+      '<div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:6px">Categorie</div><div class="qchips">';
+    ['Top','Broek','Rok','Jurk','Jas','Schoenen','Tas'].forEach(function(cat){
+      h+='<div class="qchip'+(qAns.favCat===cat?' on':'')+'" onclick="qSetFavCat(\''+cat+'\')">'+cat+'</div>';
+    });
+    h+='</div></div>';
+  } else if(qStep===8){
+    // SELFIE - label wrapping = meest betrouwbaar op mobiel
+    var hasSelfie=!!qAns.selfiePreview;
+    h='<div class="qslide"><div class="qey">Stap 8 &middot; Selfie</div>'+
+      '<div class="qttl">Jouw <em>postuur</em></div>'+
+      '<div class="qsub">Optioneel. Helpt me proporties te personaliseren.</div>'+
+      '<label class="qselfie-label">'+
+        (hasSelfie?'<img src="'+qAns.selfiePreview+'" alt="selfie" style="width:100%;height:100%;object-fit:cover;display:block">':
+          '<div class="qselfie-ph"><div style="font-size:44px;opacity:.35">&#128248;</div><div style="font-size:14px;font-weight:500;color:var(--tx);text-align:center">Tik hier om foto toe te voegen</div><div style="font-size:10px;color:var(--mu);text-align:center">Camera of galerij</div></div>')+
+        '<input type="file" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;top:0;left:0" onchange="qHandleSelfie(event)">'+
+      '</label>'+
+      (hasSelfie?'<div style="font-size:12px;color:#5a8a60;text-align:center;margin-bottom:8px">&#10003; Foto toegevoegd</div>':
+        '<div style="font-size:12px;color:var(--mu);text-align:center">Sla over als je wil</div>')+
+    '</div>';
+  } else if(qStep===9){
+    h='<div class="qslide"><div class="qey">Stap 9 &middot; No-gos</div><div class="qttl">Wat draag je <em>absoluut niet</em>?</div><div class="qsub">Optioneel.</div><div class="qchips">';
+    QNOGS.forEach(function(o,i){var s=(qAns.nogo||[]).indexOf(i)>-1;h+='<div class="qchip'+(s?' on':'')+'" onclick="qTogIdx(\'nogo\','+i+')">'+o+'</div>';});
+    h+='</div></div>';
+  }
+  body.innerHTML=h;
+  body.scrollTop=0;
+  if(qStep===0)setTimeout(function(){var el=document.getElementById('q-nin');if(el)el.focus();},100);
+  if(qStep===7)setTimeout(function(){var el=document.getElementById('q-favin');if(el)el.focus();},100);
+}
+
+function qHandleSelfie(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){qAns.selfiePreview=ev.target.result;qRender();};r.readAsDataURL(f);}
+function qPickAge(v){qAns.leeftijd=v;document.querySelectorAll('.qtbtn').forEach(function(b){b.classList.toggle('on',b.textContent===v);});}
+function qTogArr(key,val,max){var a=qAns[key]||[];var i=a.indexOf(val);if(i>-1)a.splice(i,1);else{if(a.length>=max)a.shift();a.push(val);}qAns[key]=a;qRender();}
+function qTogKleur(n){var a=qAns.kleuren||[];var i=a.indexOf(n);if(i>-1)a.splice(i,1);else a.push(n);qAns.kleuren=a;qRender();}
+function qSetFig(k){qAns.figuur=k;qRender();}
+function qTogIdx(key,i){var a=qAns[key]||[];var idx=a.indexOf(i);if(idx>-1)a.splice(idx,1);else a.push(i);qAns[key]=a;var els=document.querySelectorAll('[onclick="qTogIdx(\''+key+'\','+i+')"]');els.forEach(function(el){el.classList.toggle('on',a.indexOf(i)>-1);});}
+function qSetFavCat(cat){qAns.favCat=cat;document.querySelectorAll('[onclick^="qSetFavCat"]').forEach(function(el){el.classList.toggle('on',el.textContent===cat);});}
+
+function qNext(){
+  if(qStep===0){
+    var el=document.getElementById('q-nin');if(el)qAns.name=el.value.trim();
+    if(!qAns.name){var err=document.getElementById('q-err');if(err){err.textContent='Vul je naam in.';setTimeout(function(){err.textContent='';},2000);}return;}
+  }
+  if(qStep===7){var el2=document.getElementById('q-favin');if(el2&&el2.value.trim())qAns.favNaam=el2.value.trim();}
+  if(qStep<QNS-1){qStep++;qRender();}
+  else{qFinish();}
+}
+function qPrev(){if(qStep>0){qStep--;qRender();}}
+
+function qFinish(){
+  var archs=qAns.archetypes||['naturel'];
+  var pK=archs[0]||'naturel';
+  var ar=QARCHS[pK]||QARCHS.naturel;
+  var ar2=archs[1]?QARCHS[archs[1]]:null;
+  var fig=qAns.figuur||'gelijkmatig';
+  var figTip=ar.fig?ar.fig[fig]||'':'';
+  var benL=(qAns.benadruk||[]).map(function(i){return QBENS[i];}).filter(Boolean);
+  var verL=(qAns.verbergen||[]).map(function(i){return QVERS[i];}).filter(Boolean);
+  var nogoL=(qAns.nogo||[]).map(function(i){return QNOGS[i];}).filter(Boolean);
+  var kl=qAns.kleuren||[];
+  var wKl=['Terra','Camel','Bruin','Oker','Olijf'];
+  var kKl=['Navy','Kobalt','Smaragd','Paars','Lichtblauw'];
+  var wc=0,kc=0;kl.forEach(function(k){if(wKl.indexOf(k)>-1)wc++;if(kKl.indexOf(k)>-1)kc++;});
+  var kt=wc>kc?'warm':kc>wc?'koel':'neutraal';
+  prof={
+    name:qAns.name||'Gebruiker',
+    leeftijd:qAns.leeftijd||'',
+    selfie:qAns.selfiePreview||null,
+    stijlDNA:{
+      archetypes:archs,primaryArchetype:pK,
+      kibbe:ar.kibbe+(ar2?' / '+ar2.kibbe:''),
+      kitchener:ar.kitchener+(ar2?' / '+ar2.kitchener:''),
+      uitdagingen:qAns.uitdagingen||[],uitstraling:qAns.uitstraling||[],
+      figuur:fig,figuurTip:figTip,benadruk:benL,verbergen:verL,
+      kleuren:kl,kleurtemp:kt,nogo:nogoL,
+      favNaam:qAns.favNaam||'',favCat:qAns.favCat||'',
+      beschrijving:ar.beschrijving,kracht:ar.kracht,tip:ar.tip,
+      kw:ar.kw.concat(ar2?ar2.kw.slice(0,2):[]),
+      silhouet:ar.silhouet,proporties:ar.proporties,
+      materialen:ar.materialen.concat(ar2?ar2.materialen.slice(0,2):[]),
+      materialen_vermijd:ar.materialen_vermijd||[],
+      sleutelitems:ar.sleutelitems.concat(ar2&&ar2.sleutelitems?ar2.sleutelitems.slice(0,2):[]),
+      kleuren_basis:ar.kleuren_basis||[],kleuren_accent:ar.kleuren_accent||[]
+    }
+  };
+  // Update header name
+  var uname=document.getElementById('uname');
+  if(uname)uname.textContent=prof.name+"'s";
+  // Save
+  try{localStorage.setItem('ss-prof-'+code,JSON.stringify(prof));}catch(e){}
+  sbPost('users',{code:code,naam:prof.name,style_dna:prof.stijlDNA,last_seen:new Date().toISOString()});
+  qStep=QNS;qRender();
+}
+
+function qRenderUitslag(){
+  var ar=QARCHS[prof.stijlDNA.primaryArchetype]||QARCHS.naturel;
+  var ar2=prof.stijlDNA.archetypes[1]?QARCHS[prof.stijlDNA.archetypes[1]]:null;
+  var dna=prof.stijlDNA;
+  var ch0=QCHALS[(dna.uitdagingen||[])[0]]||QCHALS.combineren;
+  function qchip(t,bad){return '<span style="display:inline-block;padding:2px 8px;border-radius:20px;background:'+(bad?'#fee4e4':'var(--cd)')+';color:'+(bad?'#c0392b':'#5c3317')+';font-size:10px;margin:2px">'+(t||'')+'</span>';}
+  var klH=(dna.kleuren||[]).map(function(k){var c=QCMAP[k]||'#888';return '<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div style="width:22px;height:22px;border-radius:50%;background:'+c+';'+(k==='Wit'||k==='Creme'?'border:1px solid #DDD':'')+';box-shadow:0 1px 3px rgba(0,0,0,.12)"></div><div style="font-size:7px;color:var(--mu);text-align:center;width:26px">'+k+'</div></div>';}).join('');
+  var h='';
+  h+='<div style="background:linear-gradient(135deg,var(--br),#4a2810);margin:12px;border-radius:14px;padding:20px 16px;text-align:center">'+
+    '<div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(240,212,192,.6);margin-bottom:6px">Jouw Stijl DNA</div>'+
+    '<div style="font-family:Cormorant Garamond,serif;font-size:28px;font-style:italic;color:white;margin-bottom:2px">'+prof.name+'</div>'+
+    '<div style="font-family:Cormorant Garamond,serif;font-size:17px;font-style:italic;color:rgba(240,212,192,.85);margin-bottom:10px">'+ar.naam+(ar2?' &times; '+ar2.naam:'')+'</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center">'+ar.kw.map(function(k){return '<span style="padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);font-size:9px;color:white">'+k+'</span>';}).join('')+'</div></div>';
+  if(prof.selfie)h+='<div style="padding:0 12px 12px"><div style="width:100%;border-radius:12px;overflow:hidden;max-height:200px"><img src="'+prof.selfie+'" style="width:100%;object-fit:cover;display:block"></div></div>';
+  function qsec(t,b){return '<div style="margin:0 12px 9px;background:white;border-radius:11px;padding:12px 13px;box-shadow:0 2px 7px rgba(46,26,14,.05)"><div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:6px">'+t+'</div><div style="font-size:13px;color:var(--tx);line-height:1.7">'+b+'</div></div>';}
+  h+=sec('Wie jij bent',ar.beschrijving+'<br><br><em style="color:var(--bw)">'+ar.kracht+'</em>');
+  h+='<div style="background:linear-gradient(135deg,var(--bw),#8b5230);margin:0 12px 9px;border-radius:11px;padding:12px 13px"><div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:4px">Jouw stijlwapen</div><div style="font-family:Cormorant Garamond,serif;font-size:16px;font-style:italic;color:white;line-height:1.5">'+ar.tip+'</div></div>';
+  h+=sec('Silhouet &amp; proporties',dna.silhouet+'<br><br><strong>Proportieregel:</strong> '+dna.proporties+(dna.figuurTip?'<br><br><strong>Figuuradvies:</strong> '+dna.figuurTip:''));
+  h+=sec('Materialen','<strong>Voor jou:</strong> '+ar.materialen.join(', ')+(ar.materialen_vermijd&&ar.materialen_vermijd.length?'<br><strong>Vermijd:</strong> '+ar.materialen_vermijd.join(', '):''));
+  if(klH)h+=sec('Kleuren','<div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px">'+klH+'</div>');
+  if(dna.nogo&&dna.nogo.length)h+=sec('No-go\'s','<div>'+dna.nogo.map(function(n){return qchip(n,true);}).join('')+'</div>');
+  if(ch0)h+=sec('Jouw stijlthema','<strong style="color:var(--bw)">'+ch0.d+'</strong><br>'+ch0.tip);
+  h+=sec('Sleutelitems','<div>'+ar.sleutelitems.map(function(i){return qchip(i,false);}).join('')+'</div>');
+  h+='<button onclick="qDone()" style="display:block;width:calc(100% - 24px);margin:4px 12px 20px;padding:14px;background:var(--br);color:var(--cr);border:none;border-radius:11px;font-size:15px;font-weight:600;font-family:Jost,sans-serif;cursor:pointer">Naar mijn garderobe &#8594;</button>';
+  var body=document.getElementById('q-body');
+  body.innerHTML=h;
+  body.scrollTop=0;
+}
+
+function qDone(){
+  closeQuiz();
+  renderDNA();
+  renderDagkaart();
+  showP('dna');
+  toast('Stijl DNA opgeslagen! Welkom, '+( prof?prof.name:'')+'');
+}
+
 // TOAST
 var _tt;function toast(m){var el=document.getElementById('toast');if(!el)return;el.textContent=m;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(function(){el.classList.remove('show');},2600);}
 
@@ -1967,5 +2375,37 @@ function runLabelScan(evt){
   reader.readAsDataURL(file);evt.target.value='';
 }
 </script>
+
+<!-- QUIZ OVERLAY (ingebouwd in app) -->
+<div id="ov-quiz" style="position:fixed;inset:0;z-index:600;display:none;flex-direction:column;background:var(--cr);max-width:430px;margin:0 auto">
+  <div style="background:var(--wh);border-bottom:1px solid var(--cd);padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--br)">Stijl DNA Quiz</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="font-size:11px;color:var(--mu);font-weight:500" id="q-steplbl">Stap 1 van 10</div>
+      <button onclick="closeQuiz()" style="width:30px;height:30px;border-radius:50%;background:var(--cd);border:none;font-size:14px;cursor:pointer;color:var(--mu)">&#x2715;</button>
+    </div>
+  </div>
+  <div style="height:3px;background:var(--cd);flex-shrink:0"><div id="q-pbar" style="height:100%;background:linear-gradient(90deg,var(--bw),var(--br));width:0%;transition:width .4s;border-radius:0 2px 2px 0"></div></div>
+  <div id="q-content" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
+  <div id="q-footer" style="border-top:1px solid var(--cd);padding:9px 14px calc(env(safe-area-inset-bottom,0px) + 9px);display:flex;gap:9px;background:var(--wh);flex-shrink:0">
+    <button id="q-bck" onclick="qPrev()" style="display:none;width:48px;height:48px;border-radius:50%;background:var(--cd);border:none;font-size:16px;cursor:pointer;color:var(--mu)">&#8592;</button>
+    <button id="q-nxt" onclick="qNext()" style="flex:1;height:48px;border-radius:100px;background:var(--br);color:var(--cr);border:none;font-family:'Jost',sans-serif;font-size:15px;font-weight:600;cursor:pointer">Verder</button>
+  </div>
+</div>
+
+
+<!-- QUIZ OVERLAY (embedded in app) -->
+<div class="quiz-ov" id="quiz-ov">
+  <div class="quiz-hdr">
+    <div class="quiz-logo">Stijl Studio &middot; DNA Quiz</div>
+    <div class="quiz-steplbl" id="q-lbl">Stap 1 van 10</div>
+  </div>
+  <div class="quiz-prog"><div class="quiz-bar" id="q-bar" style="width:0%"></div></div>
+  <div class="quiz-body" id="q-body"></div>
+  <div class="quiz-footer" id="q-footer">
+    <button class="quiz-bck" id="q-bck" style="display:none" onclick="qPrev()">&#8592;</button>
+    <button class="quiz-nxt" id="q-nxt" onclick="qNext()">Verder</button>
+  </div>
+</div>
 </body>
 </html>
