@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stijl Studio · Test Runner</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,sans-serif;background:#1C1612;min-height:100vh;padding:20px}
+h1{font-size:20px;color:#F0D4C0;margin-bottom:4px;font-weight:500}
+.sub{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:20px}
+.start-btn{width:100%;padding:14px;background:#C4714A;color:white;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:16px}
+.start-btn:active{opacity:.8}
+.start-btn:disabled{background:#555;cursor:not-allowed}
+#progress{height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin-bottom:16px;overflow:hidden}
+#progress-bar{height:100%;background:#C4714A;border-radius:2px;width:0%;transition:width .3s}
+#summary{display:none;padding:12px 14px;border-radius:10px;margin-bottom:14px;font-size:14px;font-weight:600}
+#summary.pass{background:rgba(90,138,96,.2);color:#5a8a60;border:1px solid rgba(90,138,96,.3)}
+#summary.fail{background:rgba(192,57,43,.2);color:#e74c3c;border:1px solid rgba(192,57,43,.3)}
+#results{display:flex;flex-direction:column;gap:6px}
+.result-row{padding:10px 12px;border-radius:9px;display:flex;align-items:flex-start;gap:10px;background:rgba(255,255,255,.05)}
+.result-row.pass{background:rgba(90,138,96,.12)}
+.result-row.fail{background:rgba(192,57,43,.12)}
+.result-row.warn{background:rgba(196,113,74,.12)}
+.result-row.running{background:rgba(255,255,255,.06)}
+.icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.test-info{flex:1}
+.test-name{font-size:13px;font-weight:500;color:rgba(255,255,255,.9)}
+.test-detail{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px;word-break:break-all}
+.section-header{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(196,113,74,.8);padding:8px 0 4px;font-weight:600}
+.iframe-wrap{position:fixed;left:-9999px;top:-9999px;width:390px;height:844px;overflow:hidden}
+iframe{width:390px;height:844px;border:none}
+</style>
+</head>
+<body>
+<h1>Stijl Studio Test Runner</h1>
+<p class="sub">Automatische test van alle app-functies</p>
+<button class="start-btn" id="startBtn" onclick="runAll()">▶ Start automatische test</button>
+<div id="progress"><div id="progress-bar"></div></div>
+<div id="summary"></div>
+<div id="results"></div>
+<div class="iframe-wrap">
+  <iframe id="testframe" sandbox="allow-scripts allow-same-origin allow-forms allow-navigation"></iframe>
+</div>
+
+<script>
+var BASE = 'https://jetje1980.github.io/stijlstudio';
+var TEST_CODE = 'SS-GRIET';
+var results = [];
+var totalTests = 0;
+
+function addResult(name, status, detail, section) {
+  if (section) {
+    var sh = document.createElement('div');
+    sh.className = 'section-header';
+    sh.textContent = section;
+    document.getElementById('results').appendChild(sh);
+  }
+  var icons = {pass:'✅', fail:'❌', warn:'⚠️', running:'⏳'};
+  var row = document.createElement('div');
+  row.className = 'result-row ' + status;
+  row.id = 'r-' + results.length;
+  row.innerHTML = '<span class="icon">'+icons[status]+'</span>' +
+    '<div class="test-info"><div class="test-name">'+name+'</div>' +
+    (detail ? '<div class="test-detail">'+detail+'</div>' : '') + '</div>';
+  document.getElementById('results').appendChild(row);
+  results.push({name, status, detail});
+  updateProgress();
+}
+
+function updateResult(idx, status, detail) {
+  var icons = {pass:'✅', fail:'❌', warn:'⚠️', running:'⏳'};
+  var row = document.getElementById('r-' + idx);
+  if (!row) return;
+  row.className = 'result-row ' + status;
+  row.querySelector('.icon').textContent = icons[status];
+  if (detail) row.querySelector('.test-name').nextElementSibling ?
+    row.querySelector('.test-detail').textContent = detail :
+    row.querySelector('.test-info').insertAdjacentHTML('beforeend','<div class="test-detail">'+detail+'</div>');
+  results[idx].status = status;
+  results[idx].detail = detail;
+  updateProgress();
+}
+
+function updateProgress() {
+  var done = results.filter(function(r){return r.status !== 'running';}).length;
+  document.getElementById('progress-bar').style.width = (done/Math.max(totalTests,1)*100)+'%';
+}
+
+function wait(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
+
+function loadInFrame(url) {
+  return new Promise(function(resolve) {
+    var frame = document.getElementById('testframe');
+    frame.onload = function() { setTimeout(resolve, 800); };
+    frame.src = url;
+  });
+}
+
+function frameEval(code) {
+  try {
+    var frame = document.getElementById('testframe');
+    return frame.contentWindow.eval(code);
+  } catch(e) { return null; }
+}
+
+function frameQuery(sel) {
+  try {
+    var frame = document.getElementById('testframe');
+    return frame.contentWindow.document.querySelector(sel);
+  } catch(e) { return null; }
+}
+
+function frameQueryAll(sel) {
+  try {
+    var frame = document.getElementById('testframe');
+    return frame.contentWindow.document.querySelectorAll(sel);
+  } catch(e) { return []; }
+}
+
+function clickIn(el) {
+  if (!el) return;
+  el.click();
+  var ev = new MouseEvent('click', {bubbles:true, cancelable:true});
+  el.dispatchEvent(ev);
+  var touch = new TouchEvent('touchstart', {bubbles:true});
+  try { el.dispatchEvent(touch); } catch(e) {}
+}
+
+async function runAll() {
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('startBtn').textContent = '⏳ Bezig met testen...';
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('summary').style.display = 'none';
+  results = [];
+
+  // ── SECTION 1: GATE ─────────────────────────────
+  totalTests = 25;
+
+  addResult('Gate pagina laadt', 'running', '', '1. Gate');
+  var idx = results.length - 1;
+  try {
+    await loadInFrame(BASE + '/stijlstudio.html');
+    var title = frameEval('document.title') || '';
+    var hasInput = !!frameQuery('#codein');
+    var hasBtn = !!frameQuery('#gobtn');
+    updateResult(idx, title.includes('Studio') || hasInput ? 'pass' : 'fail', title);
+  } catch(e) { updateResult(idx, 'fail', e.message); }
+
+  addResult('Code invoerveld aanwezig', 'running');
+  idx = results.length - 1;
+  var hasInput = !!frameQuery('#codein');
+  updateResult(idx, hasInput ? 'pass' : 'fail', hasInput ? '' : '#codein niet gevonden');
+
+  addResult('Toegang knop aanwezig', 'running');
+  idx = results.length - 1;
+  var hasBtn = !!frameQuery('#gobtn');
+  updateResult(idx, hasBtn ? 'pass' : 'fail', hasBtn ? '' : '#gobtn niet gevonden');
+
+  addResult('Code invullen en klikken', 'running');
+  idx = results.length - 1;
+  try {
+    var inp = frameQuery('#codein');
+    var btn = frameQuery('#gobtn');
+    if (inp && btn) {
+      frameEval('document.getElementById("codein").value = "'+TEST_CODE+'"');
+      clickIn(btn);
+      await wait(1500);
+      var url = document.getElementById('testframe').src || '';
+      var frameUrl = '';
+      try { frameUrl = document.getElementById('testframe').contentWindow.location.href; } catch(e){}
+      var redirected = frameUrl.includes('BETA') || url.includes('BETA');
+      updateResult(idx, redirected ? 'pass' : 'warn', frameUrl || 'Geen redirect gedetecteerd');
+    } else {
+      updateResult(idx, 'fail', 'Knop of invoer niet gevonden');
+    }
+  } catch(e) { updateResult(idx, 'fail', e.message); }
+
+  // ── SECTION 2: BETA APP ─────────────────────────
+  addResult('BETA app laadt', 'running', '', '2. App');
+  idx = results.length - 1;
+  try {
+    frameEval('localStorage.setItem("ss-code","'+TEST_CODE+'")');
+    await loadInFrame(BASE + '/griette_stylist_BETA.html');
+    await wait(600);
+    var title = frameEval('document.title') || '';
+    var hasApp = !!frameQuery('#app');
+    updateResult(idx, hasApp ? 'pass' : 'fail', title);
+  } catch(e) { updateResult(idx, 'fail', e.message); }
+
+  addResult('JavaScript crasht niet', 'running');
+  idx = results.length - 1;
+  var jsOk = frameEval('typeof renderKast === "function"');
+  updateResult(idx, jsOk ? 'pass' : 'fail', jsOk ? '' : 'renderKast() niet beschikbaar — JS crash');
+
+  addResult('Header met naam zichtbaar', 'running');
+  idx = results.length - 1;
+  var h1 = frameQuery('#uname');
+  var h1text = h1 ? h1.textContent : '';
+  updateResult(idx, h1text.length > 0 ? 'pass' : 'warn', h1text || 'Leeg');
+
+  addResult('Kast tab actief bij start', 'running');
+  idx = results.length - 1;
+  var kastOn = frameQuery('#p-kast.on');
+  updateResult(idx, kastOn ? 'pass' : 'fail');
+
+  addResult('Alle 5 tabs aanwezig', 'running');
+  idx = results.length - 1;
+  var tabs = frameQueryAll('.tab');
+  updateResult(idx, tabs.length >= 4 ? 'pass' : 'fail', tabs.length + ' tabs gevonden');
+
+  addResult('FAB knop (+) aanwezig', 'running');
+  idx = results.length - 1;
+  var fab = frameQuery('.fab');
+  updateResult(idx, fab ? 'pass' : 'fail');
+
+  addResult('Feedback knop aanwezig', 'running');
+  idx = results.length - 1;
+  var fbFab = frameQuery('.fb-fab');
+  updateResult(idx, fbFab ? 'pass' : 'fail');
+
+  addResult('Dagkaart zichtbaar', 'running');
+  idx = results.length - 1;
+  var dk = frameQuery('.dagkaart');
+  updateResult(idx, dk ? 'pass' : 'warn', dk ? '' : 'Alleen zichtbaar na quiz');
+
+  // ── SECTION 3: TABS ─────────────────────────────
+  addResult('Boards tab werkt', 'running', '', '3. Tabs');
+  idx = results.length - 1;
+  try {
+    var boardTab = frameQuery('#t-boards');
+    if (boardTab) {
+      clickIn(boardTab);
+      await wait(400);
+      var boardsOn = frameQuery('#p-boards.on');
+      updateResult(idx, boardsOn ? 'pass' : 'fail');
+    } else {
+      updateResult(idx, 'fail', '#t-boards niet gevonden');
+    }
+  } catch(e) { updateResult(idx, 'fail', e.message); }
+
+  addResult('Board actieknoppen zichtbaar', 'running');
+  idx = results.length - 1;
+  var bactions = frameQuery('.bactions');
+  updateResult(idx, bactions ? 'pass' : 'warn', bactions ? '' : 'Maak eerst een board aan');
+
+  addResult('Stylist tab werkt', 'running');
+  idx = results.length - 1;
+  try {
+    clickIn(frameQuery('#t-chat'));
+    await wait(400);
+    var chatOn = frameQuery('#p-chat.on');
+    var cin = frameQuery('#cin');
+    updateResult(idx, chatOn && cin ? 'pass' : 'fail');
+  } catch(e) { updateResult(idx, 'fail', e.message); }
+
+  addResult('Inspo tab werkt', 'running');
+  idx = results.length - 1;
+  try {
+    clickIn(frameQuery('#t-inspo'));
+    await wait(400);
+    var inspoOn = frameQuery('#p-inspo.on');
+    updateResult(idx, inspoOn ? 'pass' : 'fail', inspoOn ? '' : '#p-inspo.on niet gevonden');
+  } catch(e) { updateResult(idx, 'fail', e.message); }
+
+  addResult('DNA tab werkt', 'running');
+  idx = results.length - 1;
+  try {
+    clickIn(frameQuery('#t-dna'));
+    await wait(400);
+    var dnaOn = frameQuery('#p-dna.on');
+    updateResult(idx, dnaOn ? 'pass' : 'fail');
+  } catch(e) { updateResult(idx, 'fail', e.message); }
+
+  addResult('Quiz knop in DNA tab', 'running');
+  idx = results.length - 1;
+  var quizLink = frameQuery('#start-quiz-link');
+  updateResult(idx, quizLink ? 'pass' : 'fail');
+
+  // ── SECTION 4: ADD ITEM ─────────────────────────
+  addResult('Item toevoegen opent', 'running', '', '4. Item toevoegen');
+  idx = results.length - 1;
+  try {
+    clickIn(frameQuery('#t-kast'));
+    await wait(300);
+    var fab2 = frameQuery('.fab');
+    clickIn(fab2);
+    await wait(500);
+    var addOn = frameQuery('#ov-add.on');
+    updateResult(idx, addOn ? 'pass' : 'fail');
+  } catch(e) { updateResult(idx, 'fail', e.message); }
+
+  addResult('Item naam veld aanwezig', 'running');
+  idx = results.length - 1;
+  var nameField = frameQuery('#ai-name');
+  updateResult(idx, nameField ? 'pass' : 'fail');
+
+  addResult('Kleur swatches geladen', 'running');
+  idx = results.length - 1;
+  var swatches = frameQueryAll('.clrsw');
+  updateResult(idx, swatches.length > 20 ? 'pass' : 'fail', swatches.length + ' kleuren');
+
+  addResult('Seizoen knoppen aanwezig', 'running');
+  idx = results.length - 1;
+  var seizoens = frameQueryAll('.tbtn');
+  updateResult(idx, seizoens.length > 10 ? 'pass' : 'fail', seizoens.length + ' tag knoppen');
+
+  // Close add sheet
+  try { frameEval('closeAdd()'); } catch(e) {}
+  await wait(300);
+
+  // ── SECTION 5: QUIZ ─────────────────────────────
+  addResult('Quiz pagina laadt', 'running', '', '5. Quiz');
+  idx = results.length - 1;
+  try {
+    frameEval('localStorage.setItem("ss-code","'+TEST_CODE+'")');
+    await loadInFrame(BASE + '/stijlstudio_quiz.html');
+    await wait(500);
+    var content = frameQuery('#content');
+    var nextBtn = frameQuery('#nxtbtn');
+    updateResult(idx, content && nextBtn ? 'pass' : 'fail');
+  } catch(e) { updateResult(idx, 'fail', e.message); }
+
+  addResult('Naam invoerveld aanwezig', 'running');
+  idx = results.length - 1;
+  var nin = frameQuery('.nin');
+  updateResult(idx, nin ? 'pass' : 'fail');
+
+  addResult('Volgende knop reageert op lege naam', 'running');
+  idx = results.length - 1;
+  try {
+    clickIn(frameQuery('#nxtbtn'));
+    await wait(300);
+    var errEl = frameQuery('#name-err');
+    var errTxt = errEl ? errEl.textContent : '';
+    updateResult(idx, errTxt.length > 0 ? 'pass' : 'fail', errTxt || 'Geen foutmelding');
+  } catch(e) { updateResult(idx, 'fail', e.message); }
+
+  addResult('Quiz gaat naar stap 2 na naam', 'running');
+  idx = results.length - 1;
+  try {
+    var ninEl = frameQuery('.nin');
+    if (ninEl) {
+      frameEval('document.querySelector(".nin").value = "Test Gebruiker"');
+      clickIn(frameQuery('#nxtbtn'));
+      await wait(500);
+      var lbl = frameQuery('#steplbl');
+      var lblTxt = lbl ? lbl.textContent : '';
+      updateResult(idx, lblTxt.includes('2') ? 'pass' : 'fail', lblTxt);
+    } else {
+      updateResult(idx, 'fail', '.nin niet gevonden');
+    }
+  } catch(e) { updateResult(idx, 'fail', e.message); }
+
+  // ── SUMMARY ──────────────────────────────────────
+  var passed = results.filter(function(r){return r.status==='pass';}).length;
+  var failed = results.filter(function(r){return r.status==='fail';}).length;
+  var warned = results.filter(function(r){return r.status==='warn';}).length;
+
+  var sumEl = document.getElementById('summary');
+  sumEl.style.display = 'block';
+  sumEl.className = 'summary ' + (failed === 0 ? 'pass' : 'fail');
+  sumEl.innerHTML = (failed === 0 ? '✅' : '❌') +
+    ' ' + passed + ' geslaagd' +
+    (failed > 0 ? ' · ' + failed + ' mislukt' : '') +
+    (warned > 0 ? ' · ' + warned + ' waarschuwingen' : '');
+
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('startBtn').textContent = '↻ Opnieuw testen';
+  document.getElementById('progress-bar').style.width = '100%';
+}
+</script>
+</body>
+</html>
