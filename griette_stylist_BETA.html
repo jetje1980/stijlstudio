@@ -1275,121 +1275,125 @@ function renderDNA(){
   }
   if(sqb)sqb.style.display='none';
   if(rqb)rqb.style.display='block';
-  try {
 
-  var dna=prof.stijlDNA;
+  var dna=prof.stijlDNA||{};
   var archs=dna.archetypes||[dna.primaryArchetype||'naturel'];
-  var ar=ARCHS[archs[0]]||ARCHS.naturel;
-  var ar2=archs[1]?ARCHS[archs[1]]:null;
+  var ar=ARCHS[archs[0]]||ARCHS.naturel||{};
+  var ar2=archs[1]?(ARCHS[archs[1]]||null):null;
 
-  function sec(emoji,title,body){
-    return '<div class="dsec"><div class="dsec-t">'+emoji+' '+title+'</div><div class="dsec-b">'+body+'</div></div>';
-  }
-  function row(icon,txt){return '<div style="display:flex;gap:7px;margin-bottom:5px;align-items:flex-start"><span style="flex-shrink:0">'+icon+'</span><span style="font-size:13px;line-height:1.55">'+txt+'</span></div>';}
-  function dchip(t,bad){return '<span style="display:inline-block;padding:2px 8px;border-radius:20px;background:'+(bad?'#fee4e4':'var(--cd)')+';color:'+(bad?'#c0392b':'#5c3317')+';font-size:10px;margin:2px">'+t+'</span>';}
+  function safeStr(v){return (v&&typeof v==='string')?v:'';}
+  function safeArr(v){return Array.isArray(v)?v:[];}
+  function sec(t,b){return '<div class="dsec"><div class="dsec-t">'+t+'</div><div class="dsec-b">'+b+'</div></div>';}
+  function dchip(t,bad){return '<span style="display:inline-block;padding:2px 8px;border-radius:20px;background:'+(bad?'#fee4e4':'var(--cd)')+';color:'+(bad?'#c0392b':'#5c3317')+';font-size:10px;margin:2px">'+(t||'')+'</span>';}
+  function row(ico,txt){return '<div style="display:flex;gap:7px;margin-bottom:5px;align-items:flex-start"><span style="flex-shrink:0">'+ico+'</span><span style="font-size:13px;line-height:1.55">'+txt+'</span></div>';}
 
   var h='';
 
   // Hero
   h+='<div class="dna-hero"><div class="dna-ey">Jouw Stijl DNA</div>'+
-    '<div class="dna-nm">'+prof.name+(prof.leeftijd?' · '+prof.leeftijd:'')+'</div>'+
-    '<div class="dna-ar">'+archs.map(function(a){return (ARCHS[a]||{}).naam||a;}).join(' x ')+'</div>'+
-    '<div class="dna-tags">'+ar.kw.map(function(k){return '<span class="dna-tag">'+k+'</span>';}).join('')+(ar2&&ar2.kw?ar2.kw.slice(0,2).map(function(k){return '<span class="dna-tag">'+k+'</span>';}).join(''):'')+
-    '</div></div>';
+    '<div class="dna-nm">'+safeStr(prof.name)+(prof.leeftijd?' &middot; '+prof.leeftijd:'')+'</div>'+
+    '<div class="dna-ar">'+safeStr(ar.naam||archs[0])+(ar2?' &times; '+safeStr(ar2.naam||archs[1]):'')+'</div>'+
+    '<div class="dna-tags">'+safeArr(ar.kw).map(function(k){return '<span class="dna-tag">'+k+'</span>';}).join('')+'</div></div>';
+
+  // Selfie
+  if(prof.selfie){
+    h+='<div style="padding:0 12px 12px"><div style="width:100%;border-radius:12px;overflow:hidden;max-height:200px"><img src="'+prof.selfie+'" style="width:100%;object-fit:cover;display:block"></div></div>';
+  }
 
   // Action buttons
   h+='<div style="display:flex;gap:7px;padding:0 12px;margin-bottom:2px">'+
-    '<button onclick="generateShoppingList()" style="flex:1;padding:11px 8px;background:var(--br);color:var(--cr);border:none;border-radius:11px;font-size:12px;font-weight:600;font-family:Jost,sans-serif;cursor:pointer;text-align:center">&#x1f6cd; Shoppinglijst</button>'+
-    '<button onclick="showPatterns()" style="flex:1;padding:11px 8px;background:white;color:var(--br);border:1.5px solid var(--cd);border-radius:11px;font-size:12px;font-weight:600;font-family:Jost,sans-serif;cursor:pointer;text-align:center">&#x1f9e0; Stijlpatronen</button>'+
+    '<button onclick="generateShoppingList()" style="flex:1;padding:11px 8px;background:var(--br);color:var(--cr);border:none;border-radius:11px;font-size:12px;font-weight:600;font-family:Jost,sans-serif;cursor:pointer">&#x1f6cd; Shoppinglijst</button>'+
+    '<button onclick="showPatterns()" style="flex:1;padding:11px 8px;background:white;color:var(--br);border:1.5px solid var(--cd);border-radius:11px;font-size:12px;font-weight:600;font-family:Jost,sans-serif;cursor:pointer">&#x1f9e0; Stijlpatronen</button>'+
   '</div>';
 
-  // Kleurenstrategie
-  var kl=dna.kleuren||[];
-  var klBasic=ar.kleuren_basis||[];
-  var klAccent=ar.kleuren_accent||[];
-  // Color dots helper
-  function clrDot(n){var c=CMAP_DNA[n]||'#888';return '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:'+c+';vertical-align:middle;margin-right:3px;border:1px solid rgba(0,0,0,.08)"></span>';}
-  // Split-complementair combos based on chosen colors
-  var warmKl=kl.filter(function(k){return ['Terra','Camel','Oker','Oranje','Mosterd','Abrikoos','Roestbruin'].indexOf(k)>-1;});
-  var koolKl=kl.filter(function(k){return ['Navy','Kobalt','Smaragd','Lichtblauw','Mintgroen','Turquoise'].indexOf(k)>-1;});
-  var warmBase=klBasic.filter(function(k){return ['Camel','Bruin','Terra','Zand','Creme','Beige'].indexOf(k)>-1;});
-  var combo1=warmKl.length&&koolKl.length?warmKl[0]+' + lichtroze + '+koolKl[0]:klBasic[0]&&klAccent[0]?klBasic[0]+' + '+klAccent[0]+' + '+( klBasic[1]||'creme'):'Je basiskleur + accent + neutraal';
-  var combo2=kl.length>=2?kl[0]+' + zachte tint + '+(warmBase[0]||'taupe'):klBasic[0]+' + lichtere versie + neutraal';
-  var klBody=
-    '<strong>Basis:</strong> '+(klBasic.map(function(k){return clrDot(k)+k;}).join(' \xb7 ')||'—')+
-    '<br><strong>Accenten:</strong> '+(klAccent.map(function(k){return clrDot(k)+k;}).join(' \xb7 ')||'—')+
-    '<br><strong>Vermijd:</strong> champagne & grijzige tinten (tenzij in casual zacht materiaal)'+
-    '<br><br><strong>Split-complementair (aanbevolen):</strong><br>'+
-    row('\u2666',combo1)+
-    row('\u2666',combo2)+
-    '<br><strong>Ton-sur-ton (verfijnd):</strong><br>'+
-    row('\u2666',klBasic[0]?klBasic[0]+' + lichtere tint + '+(klBasic[1]||'neutraal'):'1 kleur, 3 texturen')+
-    '<br><strong>Kleuren dicht bij je gezicht:</strong><br>'+
-    row('\u2713',(klBasic.slice(0,2).join(', ')||'Jouw basiskleuren')+' — zetten je uitstraling kracht bij');
-  h+=sec('🎨','Kleurenstrategie',klBody);
+  // Wie jij bent
+  var beschrijving=safeStr(dna.beschrijving||ar.beschrijving);
+  h+=sec('Wie jij bent', beschrijving+'<br><br><em style="color:var(--bw)">'+(safeStr(dna.kracht||ar.kracht))+'</em>');
 
-  // Kracht
-  h+='<div class="dkracht"><div class="dkracht-t">Jouw stijlwapen</div><div class="dkracht-b">'+ar.tip+'</div></div>';
+  // Stijlwapen
+  h+='<div class="dkracht"><div class="dkracht-t">Jouw stijlwapen</div><div class="dkracht-b">'+safeStr(dna.tip||ar.tip)+'</div></div>';
 
   // Silhouet
-  var fig=dna.figuur||'gelijkmatig';
-  var figTip=dna.figuurTip||'';
-  var benL=dna.benadruk||[];
-  var verL=dna.verbergen||[];
-  var silBody=(dna.silhouet||ar.silhouet||'')+'<br><br>'+
-    row('\u2705',benL.length?'Benadrukken: '+benL.join(', '):'Taille altijd benadrukken')+
-    row('\u2705',ar.proporties||'Aansluitend boven + volume onder')+
-    row('\u274c',verL.length?'Minder zichtbaar: '+verL.join(', '):'Wijd + wijd \u2014 silhouet verdwijnt')+
-    (figTip?'<br><em style="font-size:12px;color:var(--mu)">Figuuradvies ('+fig+'): '+figTip+'</em>':'');
-  h+=sec('👗','Silhouet & vormen',silBody);
+  var benL=safeArr(dna.benadruk);
+  var verL=safeArr(dna.verbergen);
+  var figTip=safeStr(dna.figuurTip);
+  var silBody=safeStr(dna.silhouet||ar.silhouet||'');
+  if(dna.proporties||ar.proporties)silBody+='<br><br><strong>Proportieregel:</strong> '+safeStr(dna.proporties||ar.proporties);
+  if(figTip)silBody+='<br><br><strong>Figuuradvies ('+safeStr(dna.figuur)+'):</strong> '+figTip;
+  if(benL.length)silBody+='<br><br><em>Benadrukken: '+benL.join(', ')+'</em>';
+  if(verL.length)silBody+='<br><em>Minder: '+verL.join(', ')+'</em>';
+  h+=sec('Silhouet & proporties', silBody);
 
-  // Halslijnen
-  var hlBody=row('\u2705','Ronde hals \u00b7 boothals \u00b7 V-hals \u00b7 sweetheart \u00b7 spaghetti')+
-    row('\u274c','Hoge of gesloten halslijnen \u2014 te zwaar')+
-    '<br><em style="font-size:12px;color:var(--mu)">Open halslijn = lucht rond het gezicht = jouw uitstraling spreekt.</em>';
-  h+=sec('👌','Halslijnen',hlBody);
+  // Body analysis
+  if(dna.bodyAnalysis){
+    var ba=dna.bodyAnalysis;
+    h+=sec('Lichaamsprofiel',
+      '<strong>Silhouet:</strong> '+safeStr(ba.silhouet)+'<br>'+
+      '<strong>Kleuren:</strong> '+safeStr(ba.kleuren)+'<br>'+
+      '<strong>Vormen:</strong> '+safeStr(ba.vormen)+'<br><br>'+
+      '<em style="color:var(--bw)">'+safeStr(ba.tip)+'</em>'
+    );
+  }
+
+  // Kleurenstrategie
+  var kl=safeArr(dna.kleuren);
+  var klBasic=safeArr(dna.kleuren_basis||ar.kleuren_basis);
+  var klAccent=safeArr(dna.kleuren_accent||ar.kleuren_accent);
+  var klDots=kl.map(function(k){
+    var c=CMAP_DNA[k]||'#888';
+    return '<div style="display:flex;flex-direction:column;align-items:center;gap:2px">'+
+      '<div style="width:22px;height:22px;border-radius:50%;background:'+c+';box-shadow:0 1px 3px rgba(0,0,0,.1);'+(k==='Wit'||k==='Creme'?'border:1px solid #CCC':'')+';"></div>'+
+      '<div style="font-size:7px;color:var(--mu);text-align:center;width:26px">'+k+'</div></div>';
+  }).join('');
+  var klBody='';
+  if(klBasic.length)klBody+='<strong>Basis:</strong> '+klBasic.join(' &middot; ')+'<br>';
+  if(klAccent.length)klBody+='<strong>Accenten:</strong> '+klAccent.join(' &middot; ')+'<br>';
+  if(kl.length)klBody+='<strong>Jouw keuze:</strong> '+kl.join(' &middot; ')+'<br>';
+  if(dna.kleurtemp)klBody+='<strong>Temperatuur:</strong> '+dna.kleurtemp;
+  if(klDots)klBody+='<br><br><div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:6px">'+klDots+'</div>';
+  if(klBody)h+=sec('Kleuren', klBody);
 
   // Materialen
-  var mats=dna.materialen||ar.materialen;
-  var matsVermijd=dna.materialen_vermijd||ar.materialen_vermijd;
-  var matBody='<strong>Soepel (beweging):</strong> '+mats.filter(function(m){return ['viscose','tencel','modal','jersey','zijde','chiffon','satijn'].indexOf(m.toLowerCase())>-1;}).join(' \u00b7 ')||'viscose, tencel, jersey';
-  matBody+='<br><strong>Stevig (tegenhanger):</strong> '+mats.filter(function(m){return ['katoen','linnen','denim','wol','rib','tweed'].indexOf(m.toLowerCase())>-1;}).join(' \u00b7 ')||'denim, wol, katoen';
-  matBody+='<br><strong>Luxe:</strong> '+mats.filter(function(m){return ['kasjmier','cashmere','velvet','merino','zijde'].indexOf(m.toLowerCase())>-1;}).join(' \u00b7 ')||'—';
-  matBody+='<br><br><strong>Beste combo:</strong> soepel + stevig = diepte zonder gedoe';
-  matsVermijd=matsVermijd||[];if(matsVermijd.length)matBody+='<br><br>'+row('\u274c','Vermijd: '+matsVermijd.join(', '));
-  h+=sec('🧵','Materialen & textuur',matBody);
+  var mats=safeArr(dna.materialen||ar.materialen);
+  var matsV=safeArr(dna.materialen_vermijd||ar.materialen_vermijd);
+  if(mats.length){
+    var matBody='<strong>Voor jou:</strong> '+mats.join(', ');
+    if(matsV.length)matBody+='<br><strong>Vermijd:</strong> '+matsV.join(', ');
+    h+=sec('Materialen', matBody);
+  }
 
-  // Prints
-  var ar_naam=(archs[0]||'naturel');
-  var printDo={klassiek:'Subtiele strepen \u00b7 kleine check \u00b7 fijne jacquard',createur:'Grote prints \u00b7 abstract \u00b7 grafisch \u00b7 kleurblok',naturel:'Subtiele textuur \u00b7 kleine print \u00b7 effen',romantisch:'Bloemen (subtiel) \u00b7 paisley \u00b7 delicate print',stoer:'Grafisch \u00b7 streep \u00b7 dierenprint \u00b7 camouflage',modern:'Effen \u00b7 geometrisch \u00b7 kleurblok'};
-  var printNot={klassiek:'Grote drukke prints \u00b7 tropische prints',createur:'Saaie all-over prints',naturel:'Grote logo\'s \u00b7 drukke prints',romantisch:'Grafische prints \u00b7 grote geometrie',stoer:'Romantische bloemenprints',modern:'Veelkleurige drukke prints'};
-  var nogo=dna.nogo||[];
-  var printBody=row('\u2705',printDo[ar_naam]||'Subtiele prints')+
-    row('\u274c',printNot[ar_naam]||'Grote drukke prints')+
-    (nogo.length?row('\u274c','Jouw no-go\'s: '+nogo.join(', ')):'');
-  printBody+='<br><em style="font-size:12px;color:var(--mu)">Regel: max 1 print per outfit + effen stuk in bijpassende tint.</em>';
-  h+=sec('\u270f\ufe0f','Prints',printBody);
-
-  // Stappenplan
-  var stapBody='<strong>Stap 1:</strong> Kies je bovenstuk (aansluitend of wijd?)<br>'+
-    '<strong>Stap 2:</strong> Kies onderstuk met contrast (wijd \u2194 aansluitend)<br>'+
-    '<strong>Stap 3:</strong> Voeg kleur toe via 1 accentstuk<br>'+
-    '<strong>Stap 4:</strong> Mix materialen: soepel + stevig<br>'+
-    '<strong>Stap 5:</strong> Accessoire in accentkleur als finishing touch<br>'+
-    '<br><em style="font-size:12px;color:var(--mu)">Jouw kracht: '+ar.kracht+'</em>';
-  h+=sec('📋','Stappenplan combineren',stapBody);
+  // Textuur voorkeur
+  var texG=safeArr(dna.texGevoel);
+  var favM=safeArr(dna.favMaten);
+  var favV=safeArr(dna.favVormen);
+  if(texG.length||favM.length||favV.length){
+    var texBody='';
+    if(texG.length)texBody+='<strong>Stofgevoel:</strong> '+texG.join(', ')+'<br>';
+    if(favM.length)texBody+='<strong>Materialen:</strong> '+favM.join(', ')+'<br>';
+    if(favV.length)texBody+='<strong>Vormen:</strong> '+favV.join(', ');
+    h+=sec('Textuur & stofvoorkeur', texBody);
+  }
 
   // Sleutelitems
-  var ki=ar.sleutelitems||[];
-  if(ar2&&ar2.sleutelitems)ki=ki.concat(ar2.sleutelitems.slice(0,2));
-  h+='<div class="dsec"><div class="dsec-t">\u2728 Sleutelitems voor jouw garderobe</div><div class="dsec-b"><div>'+ki.map(function(i){return chip(i,false);}).join('')+'</div></div></div>';
+  var ki=safeArr(dna.sleutelitems||ar.sleutelitems);
+  if(ki.length)h+=sec('Sleutelitems','<div>'+ki.map(function(i){return dchip(i,false);}).join('')+'</div>');
 
+  // No-gos
+  var nogoL=safeArr(dna.nogo);
+  if(nogoL.length)h+=sec("No-go's",'<div>'+nogoL.map(function(n){return dchip(n,true);}).join('')+'</div>');
 
-    ct.innerHTML=h;
-  } catch(e) {
-    ct.innerHTML='<div style="padding:20px;font-size:13px;color:var(--mu)">Rapport kon niet laden. Fout: '+e.message+'<br><br><button onclick="window.location.href=\'openQuiz()\'" style="padding:10px 20px;background:var(--br);color:var(--cr);border:none;border-radius:9px;font-size:13px;cursor:pointer">Quiz opnieuw doen</button></div>';
+  // Stijlthema
+  var chKey=(safeArr(dna.uitdagingen)[0])||'combineren';
+  var ch=CHALS[chKey]||CHALS.combineren;
+  if(ch){
+    h+='<div class="dsec" style="border-left:3px solid var(--bw)">'+
+      '<div class="dsec-t">Jouw stijlthema</div>'+
+      '<div class="dsec-b"><strong style="color:var(--bw)">'+safeStr(ch.d)+'</strong><br>'+safeStr(ch.tip)+'</div></div>';
   }
+
+  ct.innerHTML=h;
 }
+
 
 
 // STIJLPATRONEN
