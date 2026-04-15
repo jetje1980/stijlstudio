@@ -2273,8 +2273,205 @@ function showPatterns(){
   document.getElementById('ov-det').classList.add('on');
 }
 
+
+// DAGKAART
+var TIPS={
+  klassiek:['Draag vandaag je sterkste basisstuk met één accent.','1 kleur, 3 materialen.','Kies kwaliteit — elke dag.'],
+  createur:['Laat één item het verhaal vertellen.','Durf dat stuk dat al maanden hangt.','Kleur is jouw taal.'],
+  naturel:['Comfort EN stijl sluiten elkaar niet uit.','Wide-leg + ingestopte top.','Draag wat jou blij maakt.'],
+  romantisch:['Voeg één delicaat detail toe.','Zachtheid is kracht.','Wikkeljurk — jouw silhouet.'],
+  stoer:['Stoer jasje over iets zachts.','Sterke lijn, simpele basis.','Zwart of navy als fundament.'],
+  modern:['Tonal: één kleur, drie texturen.','Minder is jouw statement.','Boxy boven + strak onder.']
+};
+function renderDagkaart(){
+  var w=document.getElementById('dagkaart-wrap');if(!w)return;
+  var ar=prof&&prof.stijlDNA?(prof.stijlDNA.archetypes||[])[0]||'naturel':'naturel';
+  var tips=TIPS[ar]||TIPS.naturel;
+  var tip=tips[new Date().getDay()%tips.length];
+  var cnt=items.length;
+  var moodEmoji={energiek:'\u26a1',relaxed:'\u2601\ufe0f',krachtig:'\ud83d\udcaa',romantisch:'\ud83c\udf38',zakelijk:'\ud83d\udcbc',speels:'\ud83c\udfa8'};
+  var cycAdv={menstruatie:'Zachte materialen vandaag.',folliculair:'Goed moment voor kleur.',ovulatie:'Je straalt.',luteaal:'Soepel en warm.'};
+  var extraCtx=todayMood?'<div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:4px">'+(moodEmoji[todayMood]||'')+' '+todayMood+(todayCyclus?' &middot; '+todayCyclus:'')+'</div>':'';
+  var cycTip=todayCyclus&&cycAdv[todayCyclus]?'<div style="font-size:11px;font-style:italic;color:rgba(240,212,192,.7);margin-top:4px">'+cycAdv[todayCyclus]+'</div>':'';
+  w.innerHTML='<div class="dagkaart" onclick="showP(\'chat\')">'+
+    '<div class="dk-ey">Stijl tip voor vandaag</div>'+
+    '<div class="dk-tip">&#8220;'+tip+'&#8221;</div>'+cycTip+extraCtx+
+    '<div class="dk-sub" style="display:flex;align-items:center;justify-content:space-between">'+
+      '<span>'+cnt+' items</span>'+
+      '<span onclick="event.stopPropagation();openMoodTracker()" style="cursor:pointer;font-size:10px;color:rgba(255,255,255,.5)">+ Mood</span>'+
+      '<span onclick="event.stopPropagation();openWorn()" style="cursor:pointer;font-size:10px;color:rgba(255,255,255,.5)">\ud83d\udcc5 Log</span>'+
+    '</div></div>';
+}
+
+// OUTFIT GENERATOR
+var genBoardId=null,genMood=null,genCyclus=null,genCnt=3,genAnchors=[];
+var resultOutfits=[],resultBoardId=null;
+function openGen(boardId){
+  genBoardId=boardId;genMood=null;genCyclus=null;genCnt=3;genAnchors=[];
+  var b=boards.find(function(x){return x.id===boardId;});
+  document.getElementById('gen-board-lbl').textContent='voor: '+(b?b.emoji+' '+b.label:'');
+  document.querySelectorAll('.mood-btn').forEach(function(b){b.classList.remove('on');});
+  document.querySelectorAll('.cyc-btn').forEach(function(b){b.classList.remove('on');});
+  document.querySelectorAll('.cnt-btn').forEach(function(b){b.classList.remove('on');});
+  var d3=document.querySelector('[onclick*="pickCnt"][onclick*=",3)"]');if(d3)d3.classList.add('on');
+  var ag=document.getElementById('anchor-grid');
+  if(ag){if(items.length){ag.innerHTML=items.map(function(it){var img=it.photo?'<img src="'+it.photo+'">':'<span>'+ICOS[it.cat||'tops']+'</span>';return '<div class="anchor-item" data-id="'+it.id+'"><div class="anchor-img">'+img+'</div><div class="anchor-lbl">'+it.name.slice(0,14)+'</div></div>';}).join('');ag.querySelectorAll('.anchor-item').forEach(function(el){el.onclick=function(){togAnchor(el,el.dataset.id);};});}else{ag.innerHTML='<div style="grid-column:1/-1;font-size:12px;color:var(--mu);padding:8px">Voeg eerst items toe.</div>';}}
+  document.getElementById('ov-gen').classList.add('on');
+}
+function closeGen(){document.getElementById('ov-gen').classList.remove('on');}
+function pickMood(el,v){genMood=v;document.querySelectorAll('.mood-btn').forEach(function(b){b.classList.remove('on');});el.classList.add('on');}
+function pickCyclus(el,v){if(genCyclus===v){genCyclus=null;el.classList.remove('on');}else{genCyclus=v;document.querySelectorAll('.cyc-btn').forEach(function(b){b.classList.remove('on');});el.classList.add('on');}}
+function pickCnt(el,v){genCnt=v;document.querySelectorAll('.cnt-btn').forEach(function(b){b.classList.remove('on');});el.classList.add('on');}
+function togAnchor(el,id){var i=genAnchors.indexOf(id);if(i>-1)genAnchors.splice(i,1);else genAnchors.push(id);el.classList.toggle('on',genAnchors.indexOf(id)>-1);}
+function runGen(){
+  if(items.length<2){toast('Voeg eerst meer items toe');return;}
+  closeGen();resultBoardId=genBoardId;resultOutfits=[];
+  document.getElementById('result-scroll').innerHTML='<div class="loading-outfit"><div class="spin" style="width:28px;height:28px;border:3px solid var(--cd);border-top-color:var(--bw);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px"></div><div style="font-family:Cormorant Garamond,serif;font-size:18px;font-style:italic;color:var(--br)">Outfit wordt samengesteld...</div></div>';
+  document.getElementById('result-title').textContent='Outfit genereren';
+  document.getElementById('save-outfit-btn').style.display='none';
+  document.getElementById('ov-result').classList.add('on');
+  var wt=items.map(function(it){var t=it.tags?[it.tags.kleur,it.tags.pv,it.tags.str,(it.tags.mt||[]).join('/')].filter(Boolean).join(', '):'';return it.id+'|'+it.name+'|'+it.cat+(t?' ['+t+']':'');}).join('\n');
+  var dna=prof&&prof.stijlDNA;
+  var ctx='';
+  if(dna)ctx+='Stijl: '+(dna.archetypes||[]).join(' & ')+'. Silhouet: '+(dna.silhouet||'')+'. Kleuren: '+(dna.kleuren||[]).join(', ')+'.\n';
+  if(genMood)ctx+='Mood: '+genMood+'.\n';
+  if(genCyclus)ctx+='Cyclus: '+genCyclus+'.\n';
+  if(genCnt>0)ctx+='Precies '+genCnt+' items.\n';
+  if(genAnchors.length)ctx+='Verplicht: '+genAnchors.map(function(id){var it=items.find(function(i){return i.id===id;});return it?it.name:'';}).filter(Boolean).join(', ')+'.\n';
+  fetch(WK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,system:'Geef alleen valide JSON.',messages:[{role:'user',content:'Maak 1 complete outfit.\n\n'+ctx+'\nGarderobe:\n'+wt+'\n\nJSON: {"items":["id1","id2"],"desc":"stijlomschrijving","why":"waarom dit werkt"}'}]})})
+  .then(function(r){return r.json();})
+  .then(function(data){
+    var txt=(data.content&&data.content[0]&&data.content[0].text)||'{}';
+    txt=txt.replace(/```json|```/g,'').trim();
+    var outfit=JSON.parse(txt);
+    var validIds=(outfit.items||[]).filter(function(id){return items.find(function(it){return it.id===id;});});
+    if(!validIds.length){toast('Kon geen outfit genereren. Probeer opnieuw.');closeResult();return;}
+    resultOutfits=[{id:'og'+Date.now(),items:validIds,desc:outfit.desc||'',why:outfit.why||''}];
+    renderResult();
+  })
+  .catch(function(){toast('Er ging iets mis.');closeResult();});
+}
+function renderResult(){
+  var outfit=resultOutfits[0];if(!outfit){closeResult();return;}
+  document.getElementById('result-title').textContent='Jouw outfit';
+  document.getElementById('save-outfit-btn').style.display='block';
+  var html='';
+  if(outfit.desc)html+='<div class="outfit-desc-result">'+outfit.desc+'</div>';
+  if(outfit.why)html+='<div style="font-size:11px;color:var(--mu);margin-bottom:12px;font-style:italic">'+outfit.why+'</div>';
+  html+='<div id="swipe-items-list">';
+  outfit.items.forEach(function(id,idx){html+=renderSwipeItem(id,idx);});
+  html+='</div><div style="font-size:11px;color:var(--mu);text-align:center;margin-top:14px">Tik op \u2715 om een item te vervangen</div>';
+  document.getElementById('result-scroll').innerHTML=html;
+}
+function renderSwipeItem(itemId,idx){
+  var it=items.find(function(i){return i.id===itemId;});if(!it)return '';
+  var img=it.photo?'<img src="'+it.photo+'">':'<span>'+ICOS[it.cat||'tops']+'</span>';
+  return '<div class="swipe-item" id="si-'+idx+'" data-id="'+itemId+'">'+
+    '<div class="swipe-item-img">'+img+'</div>'+
+    '<div class="swipe-item-info"><div class="swipe-item-name">'+it.name+'</div>'+
+    '<div class="swipe-item-cat">'+(CATS[it.cat]||'')+(it.tags&&it.tags.kleur?' \u00b7 '+it.tags.kleur:'')+'</div></div>'+
+    '<div class="swipe-btns"><button class="swipe-no" onclick="replaceItem('+idx+')">&#x2715;</button>'+
+    '<button class="swipe-yes" onclick="keepItem('+idx+')">&#x2713;</button></div></div>';
+}
+function keepItem(idx){var el=document.getElementById('si-'+idx);if(el){el.querySelector('.swipe-btns').innerHTML='<span style="color:#2a6a2a;font-size:13px;font-weight:700">\u2713</span>';}}
+function replaceItem(idx){
+  var outfit=resultOutfits[0];if(!outfit)return;
+  var currentId=outfit.items[idx];
+  var currentItem=items.find(function(i){return i.id===currentId;});if(!currentItem)return;
+  var el=document.getElementById('si-'+idx);
+  if(el)el.querySelector('.swipe-btns').innerHTML='<div style="width:20px;height:20px;border:2px solid var(--cd);border-top-color:var(--bw);border-radius:50%;animation:spin .8s linear infinite"></div>';
+  var keepNames=outfit.items.filter(function(id,i){return i!==idx;}).map(function(id){var it=items.find(function(i){return i.id===id;});return it?it.name:'';}).filter(Boolean).join(', ');
+  var available=items.filter(function(it){return outfit.items.indexOf(it.id)<0;});
+  if(!available.length){if(el)el.outerHTML=renderSwipeItem(currentId,idx);return;}
+  var wt=available.map(function(it){return it.id+'|'+it.name+'|'+it.cat;}).join('\n');
+  fetch(WK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:150,system:'Alleen valide JSON.',messages:[{role:'user',content:'Outfit heeft: '+keepNames+'. Vervang "'+currentItem.name+'". Kies alternatief:\n'+wt+'\n\nJSON: {"id":"item_id","reason":"waarom"}'}]})})
+  .then(function(r){return r.json();})
+  .then(function(data){
+    var txt=(data.content&&data.content[0]&&data.content[0].text)||'{}';
+    txt=txt.replace(/```json|```/g,'').trim();
+    var result=JSON.parse(txt);
+    var newItem=items.find(function(i){return i.id===result.id;});
+    if(!newItem){if(el)el.outerHTML=renderSwipeItem(currentId,idx);return;}
+    outfit.items[idx]=result.id;
+    if(el){el.style.transition='transform .2s,opacity .2s';el.style.transform='translateX(-100%)';el.style.opacity='0';setTimeout(function(){var tmp=document.createElement('div');tmp.innerHTML=renderSwipeItem(result.id,idx);var newEl=tmp.firstChild;newEl.style.transform='translateX(100%)';newEl.style.opacity='0';newEl.style.transition='transform .3s,opacity .3s';el.parentNode.replaceChild(newEl,el);setTimeout(function(){newEl.style.transform='';newEl.style.opacity='';},30);},200);}
+  })
+  .catch(function(){if(el)el.outerHTML=renderSwipeItem(currentId,idx);});
+}
+function closeResult(){document.getElementById('ov-result').classList.remove('on');}
+function saveGeneratedOutfit(){
+  var outfit=resultOutfits[0];if(!outfit)return;
+  var b=boards.find(function(x){return x.id===resultBoardId;});
+  if(!b&&boards.length>0)b=boards[0];
+  if(!b){toast('Maak eerst een board aan');return;}
+  if(!b.outfits)b.outfits=[];
+  b.outfits.push({id:'og'+Date.now(),items:outfit.items.slice(),desc:outfit.desc||''});
+  saveLocal();renderBoards();closeResult();showP('boards');
+  toast('Outfit opgeslagen op "'+b.label+'"!');
+}
+
+// WORN LOG
+function openWorn(){document.getElementById('ov-worn').classList.add('on');renderWornLog();}
+function closeWorn(){document.getElementById('ov-worn').classList.remove('on');}
+function renderWornLog(){
+  var body=document.getElementById('worn-body');
+  var dates=Object.keys(worn).sort().reverse();
+  if(!dates.length){body.innerHTML='<div class="empty" style="margin-top:40px"><div class="empty-ico">\ud83d\udcc5</div><div class="empty-t">Nog niets gelogd</div><div class="empty-s">Markeer items als gedragen vanuit je kast.</div></div>';return;}
+  var today=new Date();
+  var calHtml='<div style="padding:12px 14px 6px"><div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:10px">Afgelopen 7 dagen</div><div class="tracker-week">';
+  for(var i=6;i>=0;i--){var d=new Date(today);d.setDate(d.getDate()-i);var ds=d.toISOString().split('T')[0];var dw=worn[ds]||[];var dn=['\u0536o','Ma','Di','Wo','Do','Vr','Za'][d.getDay()];var isTod=ds===today.toISOString().split('T')[0];calHtml+='<div class="tracker-day-dot"><div class="tracker-dot" style="background:'+(dw.length?'var(--br)':'var(--cd)')+';'+(isTod?'border:2px solid var(--bw)':'')+';color:'+(dw.length?'var(--cr)':'var(--mu)')+'">'+( dw.length?dw.length:'\u00b7')+'</div><div class="tracker-day-lbl">'+(isTod?'<strong>'+dn+'</strong>':dn)+'</div></div>';}
+  calHtml+='</div></div>';
+  var logHtml=dates.slice(0,30).map(function(ds){var ids=worn[ds]||[];if(!ids.length)return '';var parts=ds.split('-');var dateStr=parts[2]+'-'+parts[1]+'-'+parts[0];var thumbs=ids.slice(0,4).map(function(id){var it=items.find(function(i){return i.id===id;});var img=it&&it.photo?'<img src="'+it.photo+'">':'<span>'+(it?ICOS[it.cat||'tops']:'\ud83d\udc55')+'</span>';return '<div class="log-thumb">'+img+'</div>';}).join('');var names=ids.map(function(id){var it=items.find(function(i){return i.id===id;});return it?it.name:'';}).filter(Boolean).slice(0,3).join(', ');return '<div class="log-outfit-row"><div class="log-outfit-thumbs">'+thumbs+'</div><div class="log-info"><div class="log-date">'+dateStr+'</div><div class="log-items">'+names+'</div></div></div>';}).join('');
+  body.innerHTML=calHtml+logHtml;
+}
+
+// MOOD + CYCLUS
+var todayMood=null,todayCyclus=null;
+function loadTodayTracker(){
+  var td=new Date().toISOString().split('T')[0];
+  try{var saved=JSON.parse(localStorage.getItem('ss-tracker-'+code)||'{}');var today=saved[td]||{};todayMood=today.mood||null;todayCyclus=today.cyclus||null;}catch(e){}
+}
+function saveTodayTracker(){
+  var td=new Date().toISOString().split('T')[0];
+  try{var saved=JSON.parse(localStorage.getItem('ss-tracker-'+code)||'{}');saved[td]={mood:todayMood,cyclus:todayCyclus};localStorage.setItem('ss-tracker-'+code,JSON.stringify(saved));}catch(e){}
+}
+function pickTodayMood(el,v){todayMood=v;document.querySelectorAll('.mood-sel').forEach(function(b){b.classList.remove('on');});el.classList.add('on');saveTodayTracker();renderDagkaart();toast('Mood opgeslagen');}
+function pickTodayCyclus(el,v){todayCyclus=todayCyclus===v?null:v;document.querySelectorAll('.cyc-sel').forEach(function(b){b.classList.remove('on');});if(todayCyclus)el.classList.add('on');saveTodayTracker();toast('Cyclus opgeslagen');}
+function openMoodTracker(){
+  document.getElementById('det-body').innerHTML='<div class="sh-hdl"></div><div class="sh-t">Mood &amp; cyclus</div>'+
+    '<div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:8px">Hoe voel je je?</div>'+
+    '<div style="background:var(--br);border-radius:12px;padding:12px;display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px">'+
+      [['energiek','\u26a1'],['relaxed','\u2601\ufe0f'],['krachtig','\ud83d\udcaa'],['romantisch','\ud83c\udf38'],['zakelijk','\ud83d\udcbc'],['speels','\ud83c\udfa8']].map(function(m){return '<button class="mood-sel'+(todayMood===m[0]?' on':'')+'" onclick="pickTodayMood(this,\''+m[0]+'\')">'+m[1]+' '+m[0]+'</button>';}).join('')+
+    '</div>'+
+    '<div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:8px">Cyclusfase</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:6px">'+
+      [['menstruatie','\ud83d\udd34'],['folliculair','\ud83c\udf31'],['ovulatie','\u2728'],['luteaal','\ud83c\udf19']].map(function(c){return '<button class="cyc-sel'+(todayCyclus===c[0]?' on':'')+'" onclick="pickTodayCyclus(this,\''+c[0]+'\')">'+c[1]+' '+c[0]+'</button>';}).join('')+
+    '</div>';
+  document.getElementById('ov-det').classList.add('on');
+}
+
+// FEEDBACK
+var fbType='alg',fbStars=0;
+function openFeedback(){fbType='alg';fbStars=0;try{document.getElementById('fb-ta').value='';}catch(e){}document.querySelectorAll('.fb-star').forEach(function(s){s.classList.remove('on');});document.querySelectorAll('.fb-type').forEach(function(b){b.classList.remove('on');});var al=document.getElementById('fbt-alg');if(al)al.classList.add('on');document.getElementById('ov-fb').classList.add('on');}
+function closeFeedback(){document.getElementById('ov-fb').classList.remove('on');}
+function pickFbType(el,v){fbType=v;document.querySelectorAll('.fb-type').forEach(function(b){b.classList.remove('on');});el.classList.add('on');}
+function pickStar(n){fbStars=n;document.querySelectorAll('.fb-star').forEach(function(s,i){s.classList.toggle('on',i<n);});}
+function submitFeedback(){var msg=document.getElementById('fb-ta').value.trim();if(!msg){toast('Schrijf iets om te versturen');return;}sbPost('feedback',{user_code:code,user_naam:prof?prof.name:'',type:fbType,bericht:msg,rating:fbStars||null,created_at:new Date().toISOString()});closeFeedback();toast('Dankjewel voor je feedback!');}
+
 // TOAST
 var _tt;function toast(m){var el=document.getElementById('toast');el.textContent=m;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(function(){el.classList.remove('show');},2600);}
 </script>
+
+<div class="quiz-ov" id="quiz-ov">
+  <div class="quiz-hdr">
+    <div class="quiz-logo">Stijl Studio &middot; DNA Quiz</div>
+    <div class="quiz-steplbl" id="q-lbl">Stap 1 van 11</div>
+  </div>
+  <div class="quiz-prog"><div class="quiz-bar" id="q-bar" style="width:0%"></div></div>
+  <div class="quiz-body" id="q-body"></div>
+  <div class="quiz-footer" id="q-footer">
+    <button class="quiz-bck" id="q-bck" style="display:none" onclick="qPrev()">&#8592;</button>
+    <button class="quiz-nxt" id="q-nxt" onclick="qNext()">Verder</button>
+  </div>
+</div>
 </body>
 </html>
