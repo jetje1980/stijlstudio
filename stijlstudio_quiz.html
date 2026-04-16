@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Stijl DNA Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--br:#2e1a0e;--bw:#9b6240;--cr:#f7f1e8;--cd:#ede4d4;--tx:#1a1008;--mu:#8a7060;--wh:#fff}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--cr)}
+body{font-family:Jost,sans-serif;color:var(--tx);display:flex;flex-direction:column;max-width:430px;margin:0 auto;height:100vh}
+.hdr{background:var(--wh);border-bottom:1px solid var(--cd);padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.logo{font-family:"Cormorant Garamond",serif;font-size:15px;font-style:italic;color:var(--br)}
+.prog{height:3px;background:var(--cd);flex-shrink:0}
+.pbar{height:100%;background:linear-gradient(90deg,var(--bw),var(--br));width:10%;transition:width .4s;border-radius:0 2px 2px 0}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+/* Steps */
+.step{display:none;padding:24px 16px 20px}
+.step.active{display:block}
+.ey{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:6px}
+.ttl{font-family:"Cormorant Garamond",serif;font-size:28px;font-weight:300;color:var(--br);margin-bottom:5px;line-height:1.2}
+.ttl em{font-style:italic;color:var(--bw)}
+.sub{font-size:13px;color:var(--mu);line-height:1.65;margin-bottom:18px}
+/* Name input */
+.nin{width:100%;font-family:"Cormorant Garamond",serif;font-size:32px;font-weight:300;font-style:italic;border:none;border-bottom:2px solid var(--cd);background:transparent;color:var(--br);padding:7px 0;outline:none;-webkit-appearance:none;margin-bottom:16px}
+.nin:focus{border-color:var(--bw)}
+.nin::placeholder{color:var(--cd)}
+/* Age buttons */
+.age-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px}
+.abtn{padding:8px 14px;border-radius:100px;border:1.5px solid var(--cd);background:var(--wh);font-size:13px;font-family:Jost,sans-serif;color:var(--mu);cursor:pointer}
+.abtn.on{background:var(--br);border-color:var(--br);color:var(--cr)}
+.err{font-size:12px;color:#c0392b;margin-top:8px;min-height:18px}
+/* Cards 2-col */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:8px}
+.g1{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+.card{background:var(--wh);border:2px solid var(--cd);border-radius:12px;padding:12px 10px;cursor:pointer;position:relative;text-align:center;-webkit-tap-highlight-color:transparent}
+.card.on{border-color:var(--bw);background:linear-gradient(135deg,#fff8f4,#fdf0e8)}
+.card.row{display:flex;align-items:center;gap:10px;text-align:left;padding:12px}
+.ce{font-size:22px;display:block;margin-bottom:4px}
+.cl{font-size:12px;font-weight:600;color:var(--tx)}
+.cs{font-size:10px;color:var(--mu);margin-top:2px;line-height:1.3}
+.ck{position:absolute;top:5px;right:5px;width:15px;height:15px;border-radius:50%;background:var(--bw);color:white;font-size:8px;display:none;align-items:center;justify-content:center;font-weight:700}
+.card.on .ck{display:flex}
+/* Challenge cards */
+.chal{background:var(--wh);border:2px solid var(--cd);border-radius:10px;padding:12px 14px;cursor:pointer;margin-bottom:7px;position:relative}
+.chal.on{border-color:var(--bw);background:#fff8f4}
+.chal .ck{position:absolute;top:50%;right:12px;transform:translateY(-50%)}
+.chal.on .ck{display:flex}
+/* Colour swatches */
+.cgrp{margin-bottom:12px}
+.cgl{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--mu);font-weight:600;margin-bottom:7px}
+.crow{display:flex;flex-wrap:wrap;gap:8px}
+.cwrap{display:flex;flex-direction:column;align-items:center;gap:3px}
+.csw{width:36px;height:36px;border-radius:50%;cursor:pointer;border:3px solid transparent;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.csw.on{border-color:var(--br);transform:scale(1.1)}
+.cswl{font-size:7px;color:var(--mu);text-align:center;width:36px;line-height:1.2}
+/* Chips */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
+.chip{padding:8px 12px;border-radius:100px;border:2px solid var(--cd);background:var(--wh);font-size:12px;font-weight:500;color:var(--mu);cursor:pointer}
+.chip.on{background:var(--bw);border-color:var(--bw);color:white}
+.bvsec{margin-bottom:14px}
+.bvl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:7px}
+.bvl.pos{color:var(--bw)}.bvl.neg{color:#5c3317}
+/* Fav input */
+.favin{width:100%;font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:300;border:none;border-bottom:2px solid var(--cd);background:transparent;color:var(--br);padding:6px 0;outline:none;margin-bottom:14px;-webkit-appearance:none}
+.favin:focus{border-color:var(--bw)}
+.favin::placeholder{color:var(--cd)}
+/* Selfie */
+.selfie-wrap{position:relative;width:100%;aspect-ratio:3/4;max-height:260px;border:2px dashed var(--cd);border-radius:14px;overflow:hidden;background:var(--cr);margin-bottom:12px}
+.selfie-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.selfie-ph .ico{font-size:44px;opacity:.35}
+.selfie-ph .stxt{font-size:14px;font-weight:500;color:var(--tx);text-align:center}
+#selfie-img{width:100%;height:100%;object-fit:cover;display:none}
+/* Footer */
+.ftr{border-top:1px solid var(--cd);padding:10px 14px 20px;display:flex;gap:9px;background:var(--wh);flex-shrink:0}
+.nxt{flex:1;height:50px;border-radius:100px;background:var(--br);color:var(--cr);border:none;font-family:Jost,sans-serif;font-size:16px;font-weight:600;cursor:pointer;-webkit-appearance:none}
+.bck{width:50px;height:50px;border-radius:50%;background:var(--cd);border:none;font-size:18px;cursor:pointer;color:var(--mu);-webkit-appearance:none}
+/* Uitslag */
+.u-hero{background:linear-gradient(135deg,var(--br),#4a2810);margin:12px;border-radius:14px;padding:22px 16px;text-align:center}
+.u-nm{font-family:"Cormorant Garamond",serif;font-size:28px;font-style:italic;color:white;margin-bottom:3px}
+.u-ar{font-family:"Cormorant Garamond",serif;font-size:17px;font-style:italic;color:rgba(240,212,192,.85);margin-bottom:10px}
+.u-tags{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.u-tag{padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);font-size:9px;color:white}
+.usec{margin:0 12px 9px;background:var(--wh);border-radius:11px;padding:13px 14px;box-shadow:0 2px 7px rgba(46,26,14,.05)}
+.usec-t{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:6px}
+.usec-b{font-size:13px;color:var(--tx);line-height:1.7}
+.uc{display:inline-block;padding:2px 9px;border-radius:20px;background:var(--cd);color:#5c3317;font-size:10px;margin:2px}
+.uc.bad{background:#fee4e4;color:#c0392b}
+.ukracht{background:linear-gradient(135deg,var(--bw),#8b5230);margin:0 12px 9px;border-radius:11px;padding:13px 14px}
+.ukracht-t{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:4px}
+.ukracht-b{font-family:"Cormorant Garamond",serif;font-size:15px;font-style:italic;color:white;line-height:1.5}
+.gobtn{display:block;width:calc(100% - 24px);margin:4px 12px 24px;padding:15px;background:var(--br);color:var(--cr);border-radius:11px;font-size:15px;font-weight:600;font-family:Jost,sans-serif;text-align:center;text-decoration:none;cursor:pointer;border:none;-webkit-appearance:none}
+#step-uitslag{display:none;padding-bottom:20px}
+#step-uitslag.active{display:block}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="logo">Stijl Studio &middot; DNA Quiz</div>
+  <div id="steplbl" style="font-size:11px;color:var(--mu)">Stap 1 van 10</div>
+</div>
+<div class="prog"><div class="pbar" id="pbar"></div></div>
+
+<div class="scroll" id="scroll">
+
+<!-- STAP 0: NAAM -->
+<div class="step active" id="step-0">
+  <div class="ey">Welkom</div>
+  <div class="ttl">Hoe heet je?</div>
+  <div class="sub">Ik maak een stijlprofiel dat echt bij jou past.</div>
+  <input class="nin" id="nin" type="text" placeholder="Jouw naam..." autocomplete="given-name">
+  <div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:8px">Leeftijd (optioneel)</div>
+  <div class="age-row" id="age-row">
+    <button class="abtn" id="a0">18-25</button>
+    <button class="abtn" id="a1">26-35</button>
+    <button class="abtn" id="a2">36-45</button>
+    <button class="abtn" id="a3">46-55</button>
+    <button class="abtn" id="a4">56-65</button>
+    <button class="abtn" id="a5">65+</button>
+  </div>
+  <div class="err" id="nerr"></div>
+</div>
+
+<!-- STAP 1: UITSTRALING -->
+<div class="step" id="step-1">
+  <div class="ey">Stap 1 &middot; Uitstraling</div>
+  <div class="ttl">Wat wil je dat mensen <em>voelen</em>?</div>
+  <div class="sub">Kies alles wat resoneert.</div>
+  <div class="g2">
+    <div class="card" id="u-Krachtig"><div class="ck">&#10003;</div><span class="ce">&#9889;</span><div class="cl">Krachtig</div><div class="cs">Ik heb hier de leiding</div></div>
+    <div class="card" id="u-Zelfverzekerd"><div class="ck">&#10003;</div><span class="ce">&#10024;</span><div class="cl">Zelfverzekerd</div><div class="cs">Ik weet wie ik ben</div></div>
+    <div class="card" id="u-Rustig"><div class="ck">&#10003;</div><span class="ce">&#127807;</span><div class="cl">Rustig</div><div class="cs">Ik hoef niets te bewijzen</div></div>
+    <div class="card" id="u-Creatief"><div class="ck">&#10003;</div><span class="ce">&#127912;</span><div class="cl">Creatief</div><div class="cs">Ik ben niet als de rest</div></div>
+    <div class="card" id="u-Vrouwelijk"><div class="ck">&#10003;</div><span class="ce">&#127800;</span><div class="cl">Vrouwelijk</div><div class="cs">Zacht maar sterk</div></div>
+    <div class="card" id="u-Elegant"><div class="ck">&#10003;</div><span class="ce">&#128142;</span><div class="cl">Elegant</div><div class="cs">Stijl zonder effort</div></div>
+  </div>
+</div>
+
+<!-- STAP 2: ARCHETYPE -->
+<div class="step" id="step-2">
+  <div class="ey">Stap 2 &middot; Archetype</div>
+  <div class="ttl">Wie jij <em>bent</em></div>
+  <div class="sub">Kies maximaal 2.</div>
+  <div class="g1">
+    <div class="card row" id="ar-klassiek"><div class="ck">&#10003;</div><div style="width:32px;height:32px;border-radius:7px;background:#F0E8DC;flex-shrink:0"></div><div><div class="cl">De Klassieke</div><div class="cs">Tijdloos, gestructureerd</div></div></div>
+    <div class="card row" id="ar-createur"><div class="ck">&#10003;</div><div style="width:32px;height:32px;border-radius:7px;background:#F0E0F4;flex-shrink:0"></div><div><div class="cl">De Createur</div><div class="cs">Expressief, verrassend</div></div></div>
+    <div class="card row" id="ar-naturel"><div class="ck">&#10003;</div><div style="width:32px;height:32px;border-radius:7px;background:#E0F0E8;flex-shrink:0"></div><div><div class="cl">De Naturel</div><div class="cs">Moeiteloos, authentiek</div></div></div>
+    <div class="card row" id="ar-romantisch"><div class="ck">&#10003;</div><div style="width:32px;height:32px;border-radius:7px;background:#F4E0E8;flex-shrink:0"></div><div><div class="cl">De Romantische</div><div class="cs">Vrouwelijk, zacht</div></div></div>
+    <div class="card row" id="ar-stoer"><div class="ck">&#10003;</div><div style="width:32px;height:32px;border-radius:7px;background:#E0E4F4;flex-shrink:0"></div><div><div class="cl">De Stoere</div><div class="cs">Krachtig, direct</div></div></div>
+    <div class="card row" id="ar-modern"><div class="ck">&#10003;</div><div style="width:32px;height:32px;border-radius:7px;background:#EBEBEB;flex-shrink:0"></div><div><div class="cl">De Moderne</div><div class="cs">Minimaal, intentioneel</div></div></div>
+  </div>
+</div>
+
+<!-- STAP 3: UITDAGING -->
+<div class="step" id="step-3">
+  <div class="ey">Stap 3 &middot; Uitdaging</div>
+  <div class="ttl">Waar herken je <em>jezelf</em> in?</div>
+  <div class="sub">Kies maximaal 2.</div>
+  <div class="chal" id="ch-combineren"><div class="ck">&#10003;</div><div class="cl">Ik weet niet hoe ik dingen goed combineer</div><div class="cs">Potentieel maar breng het niet samen</div></div>
+  <div class="chal" id="ch-teveel"><div class="ck">&#10003;</div><div class="cl">Ik koop veel maar draag weinig</div><div class="cs">Volle kast maar niets aan</div></div>
+  <div class="chal" id="ch-watikmij"><div class="ck">&#10003;</div><div class="cl">Ik weet niet wat bij me past</div><div class="cs">Nog op zoek naar mijn stijl</div></div>
+  <div class="chal" id="ch-mezelf"><div class="ck">&#10003;</div><div class="cl">Ik herken mezelf niet in mijn kleding</div><div class="cs">Voelt niet als ik</div></div>
+  <div class="chal" id="ch-anderen"><div class="ck">&#10003;</div><div class="cl">Ik kleed me voor anderen</div><div class="cs">Ik pas me aan</div></div>
+  <div class="chal" id="ch-overzicht"><div class="ck">&#10003;</div><div class="cl">Geen overzicht over mijn garderobe</div><div class="cs">Ik weet niet wat ik heb</div></div>
+</div>
+
+<!-- STAP 4: KLEUREN -->
+<div class="step" id="step-4">
+  <div class="ey">Stap 4 &middot; Kleuren</div>
+  <div class="ttl">Welke kleuren zijn <em>jij</em>?</div>
+  <div class="sub">Kies meerdere.</div>
+  <div class="cgrp"><div class="cgl">Neutraal</div><div class="crow">
+    <div class="cwrap"><div class="csw" id="kl-Zwart" style="background:#1C1612"></div><div class="cswl">Zwart</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Antraciet" style="background:#4A4A4A"></div><div class="cswl">Antraciet</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Grijs" style="background:#888"></div><div class="cswl">Grijs</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Wit" style="background:#FDFAF6;border:1.5px solid #CCC"></div><div class="cswl">Wit</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Creme" style="background:#F5E6C8"></div><div class="cswl">Creme</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Zand" style="background:#C8B89A"></div><div class="cswl">Zand</div></div>
+  </div></div>
+  <div class="cgrp"><div class="cgl">Warm</div><div class="crow">
+    <div class="cwrap"><div class="csw" id="kl-Camel" style="background:#D4B896"></div><div class="cswl">Camel</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Bruin" style="background:#8B6F5E"></div><div class="cswl">Bruin</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Terra" style="background:#C4714A"></div><div class="cswl">Terra</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Oranje" style="background:#D4834A"></div><div class="cswl">Oranje</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Oker" style="background:#C4A84A"></div><div class="cswl">Oker</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Olijf" style="background:#8B9E4A"></div><div class="cswl">Olijf</div></div>
+  </div></div>
+  <div class="cgrp"><div class="cgl">Koel</div><div class="crow">
+    <div class="cwrap"><div class="csw" id="kl-Navy" style="background:#1B3A5C"></div><div class="cswl">Navy</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Kobalt" style="background:#4A6FA5"></div><div class="cswl">Kobalt</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Lichtblauw" style="background:#A0B4C8"></div><div class="cswl">Lichtblauw</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Smaragd" style="background:#4A7A5E"></div><div class="cswl">Smaragd</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Paars" style="background:#8B5E83"></div><div class="cswl">Paars</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Mauve" style="background:#D4A0A0"></div><div class="cswl">Mauve</div></div>
+  </div></div>
+  <div class="cgrp"><div class="cgl">Intens</div><div class="crow">
+    <div class="cwrap"><div class="csw" id="kl-Rood" style="background:#C44A4A"></div><div class="cswl">Rood</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Bordeaux" style="background:#8B2A2A"></div><div class="cswl">Bordeaux</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Roze" style="background:#E8A0B0"></div><div class="cswl">Roze</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Felroze" style="background:#D45A8B"></div><div class="cswl">Felroze</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Pruim" style="background:#8B2A6B"></div><div class="cswl">Pruim</div></div>
+    <div class="cwrap"><div class="csw" id="kl-Goud" style="background:#C4A44A"></div><div class="cswl">Goud</div></div>
+  </div></div>
+  <div id="kl-sel" style="font-size:11px;color:var(--mu);margin-top:4px">Nog niets geselecteerd</div>
+</div>
+
+<!-- STAP 5: FIGUUR -->
+<div class="step" id="step-5">
+  <div class="ey">Stap 5 &middot; Figuur</div>
+  <div class="ttl">Jouw <em>lichaam</em></div>
+  <div class="sub">Zo geef ik proportietips die echt werken.</div>
+  <div class="g2">
+    <div class="card" id="fig-schouders_breed"><div class="ck">&#10003;</div><span class="ce" style="font-size:20px">&#9651;</span><div class="cl">Schouders breder</div></div>
+    <div class="card" id="fig-heupen_breed"><div class="ck">&#10003;</div><span class="ce" style="font-size:20px">&#9661;</span><div class="cl">Heupen breder</div></div>
+    <div class="card" id="fig-gelijkmatig"><div class="ck">&#10003;</div><span class="ce" style="font-size:20px">&#9645;</span><div class="cl">Gelijkmatig</div></div>
+    <div class="card" id="fig-zandloper"><div class="ck">&#10003;</div><span class="ce" style="font-size:20px">&#10022;</span><div class="cl">Zandloper</div></div>
+    <div class="card" id="fig-rondingen"><div class="ck">&#10003;</div><span class="ce" style="font-size:20px">&#9675;</span><div class="cl">Vol &amp; rond</div></div>
+    <div class="card" id="fig-slank"><div class="ck">&#10003;</div><span class="ce" style="font-size:20px">|</span><div class="cl">Slank &amp; lang</div></div>
+  </div>
+</div>
+
+<!-- STAP 6: FOCUS -->
+<div class="step" id="step-6">
+  <div class="ey">Stap 6 &middot; Focus</div>
+  <div class="ttl">Wat wil je <em>benadrukken</em>?</div>
+  <div class="sub">En wat liever minder zichtbaar?</div>
+  <div class="bvsec">
+    <div class="bvl pos">+ Benadrukken</div>
+    <div class="chips">
+      <div class="chip" id="bn-0">Taille</div>
+      <div class="chip" id="bn-1">Benen</div>
+      <div class="chip" id="bn-2">Decollte</div>
+      <div class="chip" id="bn-3">Schouders</div>
+      <div class="chip" id="bn-4">Niets</div>
+    </div>
+  </div>
+  <div class="bvsec">
+    <div class="bvl neg">- Minder zichtbaar</div>
+    <div class="chips">
+      <div class="chip" id="vb-0">Buik</div>
+      <div class="chip" id="vb-1">Heupen</div>
+      <div class="chip" id="vb-2">Boven</div>
+      <div class="chip" id="vb-3">Dijen</div>
+      <div class="chip" id="vb-4">Niets</div>
+    </div>
+  </div>
+</div>
+
+<!-- STAP 7: LIEVELINGSITEM -->
+<div class="step" id="step-7">
+  <div class="ey">Stap 7 &middot; Lievelingsitem</div>
+  <div class="ttl">Jouw <em>ankerstuk</em></div>
+  <div class="sub">Het item dat altijd werkt.</div>
+  <input class="favin" id="favin" type="text" placeholder="bijv. Mijn rode wikkelrok...">
+  <div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--bw);font-weight:600;margin-bottom:8px">Categorie</div>
+  <div class="chips">
+    <div class="chip" id="fc-Top">Top</div>
+    <div class="chip" id="fc-Broek">Broek</div>
+    <div class="chip" id="fc-Rok">Rok</div>
+    <div class="chip" id="fc-Jurk">Jurk</div>
+    <div class="chip" id="fc-Jas">Jas</div>
+    <div class="chip" id="fc-Schoenen">Schoenen</div>
+    <div class="chip" id="fc-Tas">Tas</div>
+  </div>
+</div>
+
+<!-- STAP 8: SELFIE -->
+<div class="step" id="step-8">
+  <div class="ey">Stap 8 &middot; Selfie</div>
+  <div class="ttl">Jouw <em>postuur</em></div>
+  <div class="sub">Optioneel. Helpt me proporties te personaliseren.</div>
+  <label class="selfie-wrap" style="display:block;cursor:pointer">
+    <div class="selfie-ph" id="selfie-ph">
+      <div class="ico">&#128248;</div>
+      <div class="stxt">Tik hier voor camera of galerij</div>
+    </div>
+    <img id="selfie-img" src="" alt="selfie">
+    <input type="file" accept="image/*" id="selfie-input" style="position:absolute;width:1px;height:1px;opacity:0;top:0;left:0">
+  </label>
+  <div id="selfie-status" style="font-size:12px;color:var(--mu);text-align:center">Sla over als je wil</div>
+</div>
+
+<!-- STAP 9: NO-GOS -->
+<div class="step" id="step-9">
+  <div class="ey">Stap 9 &middot; No-gos</div>
+  <div class="ttl">Wat draag je <em>absoluut niet</em>?</div>
+  <div class="sub">Optioneel.</div>
+  <div class="chips">
+    <div class="chip" id="ng-0">Grote prints</div>
+    <div class="chip" id="ng-1">Logos</div>
+    <div class="chip" id="ng-2">Crop tops</div>
+    <div class="chip" id="ng-3">Hoge hakken</div>
+    <div class="chip" id="ng-4">Glanzende stoffen</div>
+    <div class="chip" id="ng-5">Gesloten hals</div>
+    <div class="chip" id="ng-6">Minirokjes</div>
+    <div class="chip" id="ng-7">Diep decollte</div>
+    <div class="chip" id="ng-8">Pofmouwen</div>
+    <div class="chip" id="ng-9">Legging</div>
+  </div>
+</div>
+
+<!-- UITSLAG -->
+<div id="step-uitslag"></div>
+
+</div><!-- end scroll -->
+
+<div class="ftr" id="ftr">
+  <button class="bck" id="bckbtn">&#8592;</button>
+  <button class="nxt" id="nxtbtn">Verder</button>
+</div>
+
+<script>
+// ── CONFIG ──
+var SB='https://osuqtfsxmquwqsbgzlqn.supabase.co';
+var SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
+
+var CODE = null;
+try { CODE = localStorage.getItem('ss-code'); } catch(e) {}
+if (!CODE) { window.location.replace('stijlstudio.html'); }
+
+// ── STATE ──
+var NS = 10;
+var step = 0;
+var ans = { uitstraling:[], archetypes:[], uitdagingen:[], kleuren:[], benadruk:[], verbergen:[], nogo:[], figuur:'', leeftijd:'', favNaam:'', favCat:'', selfiePreview:'' };
+
+// ── ARCHETYPES DATA ──
+var ARCHS = {
+  klassiek:{naam:'De Klassieke',kw:['Tijdloos','Elegant','Intentioneel'],kibbe:'Classic',kitchener:'Classic essence',beschrijving:'Jij kiest kwaliteit boven kwantiteit. Structuur en proportie zijn je gereedschap.',kracht:'Intuitief gevoel voor wat werkt.',tip:'3-kleuregel: 1 neutrale basis + 1 tint + 1 accent.',kleuren_basis:['Marineblauw','Grijs','Camel','Creme','Zwart'],kleuren_accent:['Bordeaux','Smaragd','Kobalt'],kleurtemp:'koel tot neutraal',materialen:['Wol','Katoen','Zijde','Linnen','Kasjmier'],materialen_vermijd:['Synthetisch glanzend'],silhouet:'Gebalanceerd en gestructureerd.',proporties:'Aansluitend boven + volume onder.',sleutelitems:['Blazer','Zijden blouse','Straight-leg broek','Wrap jurk','Trenchcoat'],fig:{schouders_breed:'Benadruk de taille.',heupen_breed:'Structuur boven.',gelijkmatig:'Wikkeljurk.',zandloper:'Aansluitend silhouet.',slank:'Verticale lijnen.',rondingen:'V-hals.'}},
+  createur:{naam:'De Createur',kw:['Expressief','Uniek','Verrassend'],kibbe:'Soft Dramatic',kitchener:'Dramatic essence',beschrijving:'Kleding is voor jou communicatie. Je stijl vertelt een verhaal voordat je iets zegt.',kracht:'Kleurinstinct is jouw superkracht.',tip:'1 statement-stuk per outfit. De rest ondersteunt.',kleuren_basis:['Ivoor','Zwart'],kleuren_accent:['Felroze','Kobalt','Saffraan','Smaragd'],kleurtemp:'hoog contrast',materialen:['Zijde','Velvet','Jersey','Leer'],materialen_vermijd:['Doffe synthetische stoffen'],silhouet:'Gedurfd en expressief.',proporties:'Volume aan een kant.',sleutelitems:['Statement jas','Print jurk','Bold colour broek'],fig:{schouders_breed:'Statement top + eenvoudige bottom.',heupen_breed:'Expressief jasje.',gelijkmatig:'Asymmetrie.',zandloper:'Jouw curves zijn het canvas.',slank:'Oversized statement.',rondingen:'Flowing materialen.'}},
+  naturel:{naam:'De Naturel',kw:['Authentiek','Moeiteloos','Eerlijk'],kibbe:'Natural',kitchener:'Natural essence',beschrijving:'Jij wil er goed uitzien zonder er uren over na te denken.',kracht:'Moeiteloosheid is een stijl.',tip:'Soepel + stevig in een outfit.',kleuren_basis:['Zand','Taupe','Wit','Olijf','Camel'],kleuren_accent:['Terra','Donkerblauw','Mosterd'],kleurtemp:'warm aardetinten',materialen:['Linnen','Katoen','Jersey','Denim','Wol'],materialen_vermijd:['Synthetisch strak'],silhouet:'Relaxed en effortless.',proporties:'Wide-leg + aansluitende top.',sleutelitems:['Wide-leg jeans','Linnen blouse','Boyfriend blazer','Kwaliteits shirt'],fig:{schouders_breed:'Soepele tops.',heupen_breed:'Wide-leg + eenvoudige top.',gelijkmatig:'Wide-leg + instop.',zandloper:'Soepele jersey.',slank:'Layering.',rondingen:'Zachte jerseys.'}},
+  romantisch:{naam:'De Romantische',kw:['Vrouwelijk','Zacht','Detail-minded'],kibbe:'Romantic',kitchener:'Romantic essence',beschrijving:'Je hebt aandacht voor fijne details. Zachtheid is jouw kracht.',kracht:'Detail en textuur geven outfits rijkdom.',tip:'Balanceer zachtheid met een sterk element.',kleuren_basis:['Ivoor','Creme','Dusty rose'],kleuren_accent:['Bordeaux','Dieppaars','Felroze'],kleurtemp:'warm en zacht',materialen:['Zijde','Chiffon','Satijn','Kant','Viscose'],materialen_vermijd:['Stijf katoen'],silhouet:'Curves benadrukt, gedrapeerd.',proporties:'Taille altijd benadrukken.',sleutelitems:['Wikkeljurk','Fluide midi rok','Zijden blouse'],fig:{schouders_breed:'Off-shoulder.',heupen_breed:'Empire-taille.',gelijkmatig:'Wrap jurk.',zandloper:'Zachte materialen.',slank:'Gelaagde rokken.',rondingen:'Viscose.'}},
+  stoer:{naam:'De Stoere',kw:['Krachtig','Direct','Doelbewust'],kibbe:'Dramatic',kitchener:'Dramatic essence',beschrijving:'Sterke lijnen, kwaliteitsmaterialen, doelbewuste keuzes.',kracht:'Heldere, herkenbare stijl-identiteit.',tip:'Stoer jasje over iets zachts.',kleuren_basis:['Zwart','Grijs','Wit','Navy'],kleuren_accent:['Rood','Kobalt'],kleurtemp:'hoog contrast',materialen:['Leer','Wol','Denim'],materialen_vermijd:['Te zachte jersey'],silhouet:'Recht gesneden en structured.',proporties:'Structured boven + recht onder.',sleutelitems:['Leren jas','Oversized blazer','Straight-leg jeans'],fig:{schouders_breed:'Recht gesneden blazer.',heupen_breed:'Straight-leg + blazer.',gelijkmatig:'Monochroom.',zandloper:'Structured blazer.',slank:'Oversized.',rondingen:'Blazer over vloeiende broek.'}},
+  modern:{naam:'De Moderne',kw:['Strak','Intentioneel','Precies'],kibbe:'Dramatic Classic',kitchener:'Classic essence',beschrijving:'Minder is meer. Alles intentioneel, niets toevallig.',kracht:'Jouw kast is een capsule wardrobe.',tip:'Tonal dressing: een kleur, drie texturen.',kleuren_basis:['Zwart','Wit','Grijs','Camel'],kleuren_accent:['Max een accent'],kleurtemp:'neutraal tot koel',materialen:['Merino wol','Zijde','Katoen','Kasjmier'],materialen_vermijd:['Drukke prints'],silhouet:'Architecturaal en precies.',proporties:'Boxy boven + tailored onder.',sleutelitems:['Perfect zwart shirt','Tailored trousers','Architecturale blazer'],fig:{schouders_breed:'Clean lines.',heupen_breed:'Straight-cut.',gelijkmatig:'Monochrome sets.',zandloper:'Architecturale vormen.',slank:'Boxy blazer.',rondingen:'Vloeiende jersey.'}}
+};
+
+var CMAP = {Zwart:'#1C1612',Antraciet:'#4A4A4A',Grijs:'#888',Wit:'#FDFAF6',Creme:'#F5E6C8',Zand:'#C8B89A',Camel:'#D4B896',Bruin:'#8B6F5E',Terra:'#C4714A',Oranje:'#D4834A',Oker:'#C4A84A',Olijf:'#8B9E4A',Navy:'#1B3A5C',Kobalt:'#4A6FA5',Lichtblauw:'#A0B4C8',Smaragd:'#4A7A5E',Paars:'#8B5E83',Mauve:'#D4A0A0',Rood:'#C44A4A',Bordeaux:'#8B2A2A',Roze:'#E8A0B0',Felroze:'#D45A8B',Pruim:'#8B2A6B',Goud:'#C4A44A'};
+var NOGS = ['Grote prints','Logos','Crop tops','Hoge hakken','Glanzende stoffen','Gesloten hals','Minirokjes','Diep decollte','Pofmouwen','Legging'];
+var BENS = ['Taille','Benen','Decollte','Schouders','Niets'];
+var VERS = ['Buik','Heupen','Boven','Dijen','Niets'];
+
+// ── NAVIGATION ──
+function showStep(n) {
+  for (var s = 0; s < NS; s++) {
+    var el = document.getElementById('step-' + s);
+    if (el) el.style.display = (s === n) ? 'block' : 'none';
+  }
+  var uitslag = document.getElementById('step-uitslag');
+  if (uitslag) uitslag.style.display = n >= NS ? 'block' : 'none';
+  document.getElementById('ftr').style.display = n >= NS ? 'none' : 'flex';
+  document.getElementById('bckbtn').style.display = n > 0 ? 'flex' : 'none';
+  document.getElementById('steplbl').textContent = n < NS ? 'Stap ' + (n + 1) + ' van ' + NS : 'Jouw Stijl DNA';
+  document.getElementById('pbar').style.width = (n >= NS ? 100 : Math.round((n + 1) / NS * 100)) + '%';
+  document.getElementById('nxtbtn').textContent = n === NS - 1 ? 'Afronden' : 'Verder';
+  document.getElementById('scroll').scrollTop = 0;
+}
+
+function next() {
+  if (step === 0) {
+    var nm = document.getElementById('nin').value.trim();
+    if (!nm) {
+      document.getElementById('nerr').textContent = 'Vul je naam in om verder te gaan.';
+      setTimeout(function() { document.getElementById('nerr').textContent = ''; }, 2500);
+      return;
+    }
+    ans.name = nm;
+  }
+  if (step === 7) {
+    var fv = document.getElementById('favin').value.trim();
+    if (fv) ans.favNaam = fv;
+  }
+  if (step < NS - 1) {
+    step++;
+    showStep(step);
+  } else {
+    finish();
+  }
+}
+
+function prev() {
+  if (step > 0) { step--; showStep(step); }
+}
+
+// ── CLICK HANDLERS ── all static, all simple
+// Age buttons
+var ageBtns = document.querySelectorAll('.abtn');
+for (var i = 0; i < ageBtns.length; i++) {
+  (function(btn) {
+    btn.addEventListener('click', function() {
+      ans.leeftijd = btn.textContent;
+      for (var j = 0; j < ageBtns.length; j++) ageBtns[j].classList.remove('on');
+      btn.classList.add('on');
+    });
+  })(ageBtns[i]);
+}
+
+// Uitstraling
+var uCards = document.querySelectorAll('[id^="u-"]');
+for (var i = 0; i < uCards.length; i++) {
+  (function(card) {
+    card.addEventListener('click', function() {
+      var val = card.id.replace('u-', '');
+      var idx = ans.uitstraling.indexOf(val);
+      if (idx > -1) { ans.uitstraling.splice(idx, 1); card.classList.remove('on'); }
+      else { ans.uitstraling.push(val); card.classList.add('on'); }
+    });
+  })(uCards[i]);
+}
+
+// Archetypes (max 2)
+var arCards = document.querySelectorAll('[id^="ar-"]');
+for (var i = 0; i < arCards.length; i++) {
+  (function(card) {
+    card.addEventListener('click', function() {
+      var val = card.id.replace('ar-', '');
+      var idx = ans.archetypes.indexOf(val);
+      if (idx > -1) { ans.archetypes.splice(idx, 1); card.classList.remove('on'); }
+      else if (ans.archetypes.length < 2) { ans.archetypes.push(val); card.classList.add('on'); }
+      else { // shift oldest
+        var old = ans.archetypes.shift();
+        document.getElementById('ar-' + old).classList.remove('on');
+        ans.archetypes.push(val); card.classList.add('on');
+      }
+    });
+  })(arCards[i]);
+}
+
+// Uitdagingen (max 2)
+var chCards = document.querySelectorAll('[id^="ch-"]');
+for (var i = 0; i < chCards.length; i++) {
+  (function(card) {
+    card.addEventListener('click', function() {
+      var val = card.id.replace('ch-', '');
+      var idx = ans.uitdagingen.indexOf(val);
+      if (idx > -1) { ans.uitdagingen.splice(idx, 1); card.classList.remove('on'); }
+      else if (ans.uitdagingen.length < 2) { ans.uitdagingen.push(val); card.classList.add('on'); }
+      else {
+        var old = ans.uitdagingen.shift();
+        document.getElementById('ch-' + old).classList.remove('on');
+        ans.uitdagingen.push(val); card.classList.add('on');
+      }
+    });
+  })(chCards[i]);
+}
+
+// Kleuren
+var klSwatches = document.querySelectorAll('[id^="kl-"]');
+for (var i = 0; i < klSwatches.length; i++) {
+  (function(sw) {
+    sw.addEventListener('click', function() {
+      var val = sw.id.replace('kl-', '');
+      var idx = ans.kleuren.indexOf(val);
+      if (idx > -1) { ans.kleuren.splice(idx, 1); sw.classList.remove('on'); }
+      else { ans.kleuren.push(val); sw.classList.add('on'); }
+      var sel = document.getElementById('kl-sel');
+      if (sel) sel.textContent = ans.kleuren.length ? ans.kleuren.join(' · ') : 'Nog niets';
+    });
+  })(klSwatches[i]);
+}
+
+// Figuur (single select)
+var figCards = document.querySelectorAll('[id^="fig-"]');
+for (var i = 0; i < figCards.length; i++) {
+  (function(card) {
+    card.addEventListener('click', function() {
+      for (var j = 0; j < figCards.length; j++) figCards[j].classList.remove('on');
+      card.classList.add('on');
+      ans.figuur = card.id.replace('fig-', '');
+    });
+  })(figCards[i]);
+}
+
+// Benadruk chips
+var bnChips = document.querySelectorAll('[id^="bn-"]');
+for (var i = 0; i < bnChips.length; i++) {
+  (function(chip) {
+    chip.addEventListener('click', function() {
+      var idx = parseInt(chip.id.replace('bn-', ''));
+      var pos = ans.benadruk.indexOf(idx);
+      if (pos > -1) { ans.benadruk.splice(pos, 1); chip.classList.remove('on'); }
+      else { ans.benadruk.push(idx); chip.classList.add('on'); }
+    });
+  })(bnChips[i]);
+}
+
+// Verbergen chips
+var vbChips = document.querySelectorAll('[id^="vb-"]');
+for (var i = 0; i < vbChips.length; i++) {
+  (function(chip) {
+    chip.addEventListener('click', function() {
+      var idx = parseInt(chip.id.replace('vb-', ''));
+      var pos = ans.verbergen.indexOf(idx);
+      if (pos > -1) { ans.verbergen.splice(pos, 1); chip.classList.remove('on'); }
+      else { ans.verbergen.push(idx); chip.classList.add('on'); }
+    });
+  })(vbChips[i]);
+}
+
+// Favoriete categorie
+var fcChips = document.querySelectorAll('[id^="fc-"]');
+for (var i = 0; i < fcChips.length; i++) {
+  (function(chip) {
+    chip.addEventListener('click', function() {
+      for (var j = 0; j < fcChips.length; j++) fcChips[j].classList.remove('on');
+      chip.classList.add('on');
+      ans.favCat = chip.id.replace('fc-', '');
+    });
+  })(fcChips[i]);
+}
+
+// No-gos
+var ngChips = document.querySelectorAll('[id^="ng-"]');
+for (var i = 0; i < ngChips.length; i++) {
+  (function(chip) {
+    chip.addEventListener('click', function() {
+      var idx = parseInt(chip.id.replace('ng-', ''));
+      var pos = ans.nogo.indexOf(idx);
+      if (pos > -1) { ans.nogo.splice(pos, 1); chip.classList.remove('on'); }
+      else { ans.nogo.push(idx); chip.classList.add('on'); }
+    });
+  })(ngChips[i]);
+}
+
+// Selfie
+document.getElementById('selfie-input').addEventListener('change', function(e) {
+  var f = e.target.files[0]; if (!f) return;
+  var r = new FileReader();
+  r.onload = function(ev) {
+    ans.selfiePreview = ev.target.result;
+    var img = document.getElementById('selfie-img');
+    img.src = ev.target.result;
+    img.style.display = 'block';
+    document.getElementById('selfie-ph').style.display = 'none';
+    document.getElementById('selfie-status').textContent = 'Foto toegevoegd';
+    document.getElementById('selfie-status').style.color = '#5a8a60';
+  };
+  r.readAsDataURL(f);
+});
+
+// Footer buttons
+document.getElementById('nxtbtn').addEventListener('click', next);
+document.getElementById('bckbtn').addEventListener('click', prev);
+
+// ── FINISH ──
+function finish() {
+  var archs = ans.archetypes.length ? ans.archetypes : ['naturel'];
+  var pK = archs[0];
+  var ar = ARCHS[pK] || ARCHS.naturel;
+  var ar2 = archs[1] ? ARCHS[archs[1]] : null;
+  var fig = ans.figuur || 'gelijkmatig';
+  var figTip = ar.fig && ar.fig[fig] ? ar.fig[fig] : '';
+  var benL = ans.benadruk.map(function(i) { return BENS[i] || ''; }).filter(Boolean);
+  var verL = ans.verbergen.map(function(i) { return VERS[i] || ''; }).filter(Boolean);
+  var nogoL = ans.nogo.map(function(i) { return NOGS[i] || ''; }).filter(Boolean);
+  var kl = ans.kleuren;
+  var wc = 0, kc = 0;
+  kl.forEach(function(k) { if (['Terra','Camel','Bruin','Oker','Olijf'].indexOf(k) > -1) wc++; if (['Navy','Kobalt','Smaragd','Paars'].indexOf(k) > -1) kc++; });
+  var kt = wc > kc ? 'warm' : kc > wc ? 'koel' : 'neutraal';
+  var prof = {
+    name: ans.name || 'Gebruiker',
+    leeftijd: ans.leeftijd || '',
+    selfie: ans.selfiePreview || null,
+    stijlDNA: {
+      archetypes: archs, primaryArchetype: pK,
+      kibbe: ar.kibbe + (ar2 ? ' / ' + ar2.kibbe : ''),
+      kitchener: ar.kitchener + (ar2 ? ' / ' + ar2.kitchener : ''),
+      uitdagingen: ans.uitdagingen, uitstraling: ans.uitstraling,
+      figuur: fig, figuurTip: figTip, benadruk: benL, verbergen: verL,
+      kleuren: kl, kleurtemp: kt, nogo: nogoL,
+      favNaam: ans.favNaam || '', favCat: ans.favCat || '',
+      beschrijving: ar.beschrijving || '', kracht: ar.kracht || '', tip: ar.tip || '',
+      kw: (ar.kw || []).concat(ar2 && ar2.kw ? ar2.kw.slice(0, 2) : []),
+      silhouet: ar.silhouet || '', proporties: ar.proporties || '',
+      materialen: (ar.materialen || []).concat(ar2 && ar2.materialen ? ar2.materialen.slice(0, 2) : []),
+      materialen_vermijd: ar.materialen_vermijd || [],
+      sleutelitems: (ar.sleutelitems || []).concat(ar2 && ar2.sleutelitems ? ar2.sleutelitems.slice(0, 2) : []),
+      kleuren_basis: ar.kleuren_basis || [], kleuren_accent: ar.kleuren_accent || []
+    }
+  };
+  try { localStorage.setItem('ss-prof-' + CODE, JSON.stringify(prof)); } catch(e) {}
+  fetch(SB + '/rest/v1/users', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','apikey':SK,'Authorization':'Bearer '+SK,'Prefer':'return=minimal,resolution=merge-duplicates'},
+    body: JSON.stringify({code:CODE,naam:prof.name,style_dna:prof.stijlDNA,last_seen:new Date().toISOString()})
+  }).catch(function() {});
+  renderUitslag(prof, ar, ar2, figTip, benL, nogoL);
+  step = NS;
+  showStep(NS);
+}
+
+// ── UITSLAG ──
+function renderUitslag(prof, ar, ar2, figTip, benL, nogoL) {
+  function chip(t, bad) { return '<span class="uc' + (bad ? ' bad' : '') + '">' + (t || '') + '</span>'; }
+  var dna = prof.stijlDNA;
+  var kw = dna.kw || [];
+  var klH = (dna.kleuren || []).map(function(k) {
+    var c = CMAP[k] || '#888';
+    return '<div class="cwrap"><div style="width:22px;height:22px;border-radius:50%;background:' + c + ';' + (k === 'Wit' ? 'border:1px solid #CCC' : '') + ';"></div><div class="cswl">' + k + '</div></div>';
+  }).join('');
+  var h = '';
+  h += '<div class="u-hero">' +
+    '<div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(240,212,192,.6);margin-bottom:6px">Jouw Stijl DNA</div>' +
+    '<div class="u-nm">' + prof.name + (prof.leeftijd ? ' &middot; ' + prof.leeftijd : '') + '</div>' +
+    '<div class="u-ar">' + ar.naam + (ar2 ? ' &times; ' + ar2.naam : '') + '</div>' +
+    '<div class="u-tags">' + kw.map(function(k) { return '<span class="u-tag">' + k + '</span>'; }).join('') + '</div></div>';
+  if (prof.selfie) h += '<div style="padding:0 12px 12px"><img src="' + prof.selfie + '" style="width:100%;border-radius:12px;max-height:200px;object-fit:cover;display:block"></div>';
+  h += '<div class="usec"><div class="usec-t">Wie jij bent</div><div class="usec-b">' + (dna.beschrijving || '') + '<br><br><em style="color:var(--bw)">' + (dna.kracht || '') + '</em></div></div>';
+  h += '<div class="ukracht"><div class="ukracht-t">Jouw stijlwapen</div><div class="ukracht-b">' + (dna.tip || '') + '</div></div>';
+  h += '<div class="usec"><div class="usec-t">Silhouet &amp; proporties</div><div class="usec-b">' + (dna.silhouet || '') + (dna.proporties ? '<br><br><strong>Regel:</strong> ' + dna.proporties : '') + (figTip ? '<br><br><strong>Figuuradvies:</strong> ' + figTip : '') + (benL.length ? '<br><br><em>Benadrukken: ' + benL.join(', ') + '</em>' : '') + '</div></div>';
+  if (dna.materialen && dna.materialen.length) h += '<div class="usec"><div class="usec-t">Materialen</div><div class="usec-b"><strong>Voor jou:</strong> ' + dna.materialen.join(', ') + (dna.materialen_vermijd && dna.materialen_vermijd.length ? '<br><strong>Vermijd:</strong> ' + dna.materialen_vermijd.join(', ') : '') + '</div></div>';
+  if (klH) h += '<div class="usec"><div class="usec-t">Kleuren</div><div class="usec-b"><div style="display:flex;flex-wrap:wrap;gap:7px">' + klH + '</div></div></div>';
+  if (dna.sleutelitems && dna.sleutelitems.length) h += '<div class="usec"><div class="usec-t">Sleutelitems</div><div class="usec-b">' + dna.sleutelitems.map(function(i) { return chip(i, false); }).join('') + '</div></div>';
+  if (nogoL && nogoL.length) h += '<div class="usec"><div class="usec-t">No-go&#39;s</div><div class="usec-b">' + nogoL.map(function(n) { return chip(n, true); }).join('') + '</div></div>';
+  h += '<a href="griette_stylist_BETA.html" class="gobtn">Naar mijn garderobe &#8594;</a>';
+  document.getElementById('step-uitslag').innerHTML = h;
+}
+
+// ── INIT ──
+showStep(0);
+</script>
+</body>
+</html>
