@@ -1,0 +1,4039 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#FAF8F4">
+<title>Stylist — Jouw Digitale Kleerkast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #FAF8F4;
+  --ivory: #F3EFE8;
+  --warm-white: #FFFFFF;
+  --charcoal: #1E1A18;
+  --brown: #3D2E28;
+  --text: #2A2320;
+  --text-muted: #8B7B72;
+  --text-light: #B0A098;
+  --rose: #C47A8A;
+  --rose-light: #EDD8DF;
+  --rose-pale: #FBF1F4;
+  --rose-dark: #9A5468;
+  --gold: #C9A96E;
+  --gold-light: #EFE0C2;
+  --sage: #7A9688;
+  --sage-light: #D5E5DF;
+  --border: #E5DDD5;
+  --border-light: #F0EBE5;
+  --card: #FFFFFF;
+  --shadow-sm: 0 1px 8px rgba(30,26,24,0.06);
+  --shadow: 0 2px 20px rgba(30,26,24,0.10);
+  --shadow-lg: 0 8px 40px rgba(30,26,24,0.14);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+  --nav-h: 68px;
+  --header-h: 56px;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Jost', sans-serif;
+  --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; overflow: hidden; }
+body {
+  font-family: var(--font-body);
+  background: var(--cream);
+  color: var(--text);
+  height: 100%;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* ══════════════════════════════════════
+   SCROLLBAR
+══════════════════════════════════════ */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* ══════════════════════════════════════
+   ONBOARDING
+══════════════════════════════════════ */
+#onboarding {
+  position: fixed; inset: 0;
+  background: var(--cream);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.ob-header {
+  padding: 20px 24px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ob-logo {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--charcoal);
+  letter-spacing: 0.02em;
+}
+.ob-logo span { color: var(--rose); font-style: italic; }
+.ob-progress {
+  display: flex;
+  gap: 5px;
+}
+.ob-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: var(--transition);
+}
+.ob-dot.active { background: var(--rose); transform: scale(1.3); }
+.ob-dot.done { background: var(--rose-light); }
+
+.ob-slides {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+.ob-slide {
+  position: absolute;
+  inset: 0;
+  padding: 32px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transform: translateX(40px);
+  transition: 0.35s cubic-bezier(0.4,0,0.2,1);
+  pointer-events: none;
+  overflow-y: auto;
+}
+.ob-slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: all;
+}
+.ob-slide.exit {
+  opacity: 0;
+  transform: translateX(-40px);
+}
+.ob-emoji { font-size: 48px; margin-bottom: 16px; }
+.ob-title {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1.2;
+  margin-bottom: 10px;
+  color: var(--charcoal);
+}
+.ob-title em { color: var(--rose); font-style: italic; }
+.ob-sub {
+  font-size: 15px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+  font-weight: 300;
+  line-height: 1.6;
+}
+.ob-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 16px;
+  background: var(--warm-white);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+  margin-bottom: 16px;
+}
+.ob-input:focus { border-color: var(--rose); }
+.ob-input::placeholder { color: var(--text-light); }
+
+/* Visual option cards */
+.ob-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.ob-cards.two-col { grid-template-columns: repeat(2, 1fr); }
+.ob-card {
+  background: var(--warm-white);
+  border: 2.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.ob-card:active { transform: scale(0.97); }
+.ob-card.selected {
+  border-color: var(--rose);
+  background: var(--rose-pale);
+}
+.ob-card-icon { font-size: 28px; }
+.ob-card-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.3;
+}
+.ob-card.selected .ob-card-label { color: var(--rose-dark); }
+
+/* Color palettes */
+.ob-palettes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.ob-palette {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--warm-white);
+  border: 2.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.ob-palette.selected { border-color: var(--rose); background: var(--rose-pale); }
+.ob-palette-swatches {
+  display: flex;
+  gap: 4px;
+}
+.ob-swatch {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.5);
+}
+.ob-palette-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+.ob-palette-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+/* Chips */
+.ob-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.ob-chip {
+  padding: 9px 16px;
+  border: 2px solid var(--border);
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  background: var(--warm-white);
+  color: var(--text);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.ob-chip:active { transform: scale(0.96); }
+.ob-chip.selected {
+  background: var(--rose);
+  border-color: var(--rose);
+  color: white;
+}
+
+/* Hint text */
+.ob-hint {
+  font-size: 12px;
+  color: var(--text-light);
+  text-align: center;
+  margin-top: 6px;
+}
+
+/* DNA Result */
+.ob-result-card {
+  background: linear-gradient(135deg, var(--charcoal) 0%, #2D2420 100%);
+  border-radius: var(--radius);
+  padding: 24px;
+  color: white;
+  margin-bottom: 16px;
+}
+.ob-result-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: var(--gold-light);
+}
+.ob-result-name {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-style: italic;
+  margin-bottom: 16px;
+}
+.ob-result-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ob-result-tag {
+  padding: 5px 12px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 100px;
+  font-size: 12px;
+}
+
+.ob-footer {
+  padding: 16px 24px 32px;
+  flex-shrink: 0;
+}
+.btn-primary {
+  width: 100%;
+  padding: 16px;
+  background: var(--charcoal);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-primary:active { transform: scale(0.98); opacity: 0.9; }
+.btn-primary.rose { background: var(--rose); }
+.btn-primary:disabled { opacity: 0.4; cursor: default; }
+.btn-secondary {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  font-family: var(--font-body);
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+/* ══════════════════════════════════════
+   MAIN APP
+══════════════════════════════════════ */
+#app {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+#app.visible { display: flex; }
+
+/* Header */
+#header {
+  height: var(--header-h);
+  background: var(--cream);
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+.header-left {
+  display: flex;
+  flex-direction: column;
+}
+.header-logo {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--charcoal);
+}
+.header-logo em { color: var(--rose); font-style: italic; }
+.header-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  margin-top: -2px;
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.weather-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: var(--ivory);
+  border-radius: 100px;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  border: 1px solid var(--border);
+}
+.avatar-btn {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--rose-light);
+  border: 2px solid var(--rose-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--rose-dark);
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+/* Content */
+#content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+.tab-pane {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  display: none;
+  padding-bottom: calc(var(--nav-h) + 12px);
+  -webkit-overflow-scrolling: touch;
+}
+.tab-pane.active { display: block; }
+
+/* Bottom Nav */
+#bottom-nav {
+  height: var(--nav-h);
+  background: var(--warm-white);
+  border-top: 1px solid var(--border-light);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  flex-shrink: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 100;
+  position: relative;
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: var(--transition);
+  padding: 6px 0;
+  position: relative;
+}
+.nav-item::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 2px;
+  background: var(--rose);
+  border-radius: 0 0 2px 2px;
+  transition: width 0.25s ease;
+}
+.nav-item.active::before { width: 32px; }
+.nav-icon { font-size: 22px; transition: transform 0.2s; }
+.nav-item.active .nav-icon { transform: scale(1.1); }
+.nav-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-light);
+  letter-spacing: 0.03em;
+}
+.nav-item.active .nav-label { color: var(--rose); font-weight: 600; }
+
+/* ══════════════════════════════════════
+   SHARED COMPONENTS
+══════════════════════════════════════ */
+.section-header {
+  padding: 18px 18px 10px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--charcoal);
+}
+.section-title em { color: var(--rose); font-style: italic; }
+.section-action {
+  font-size: 13px;
+  color: var(--rose);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+}
+.card-padded { padding: 16px; }
+
+.btn-small {
+  padding: 8px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: var(--transition);
+  -webkit-tap-highlight-color: transparent;
+  border: 1.5px solid var(--border);
+  background: var(--warm-white);
+  color: var(--text);
+}
+.btn-small.active, .btn-small:active {
+  background: var(--charcoal);
+  color: white;
+  border-color: var(--charcoal);
+}
+.btn-small.rose { background: var(--rose); color: white; border-color: var(--rose); }
+.btn-small.outline-rose { border-color: var(--rose); color: var(--rose); background: var(--rose-pale); }
+
+.icon-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--warm-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: var(--transition);
+  -webkit-tap-highlight-color: transparent;
+}
+.icon-btn:active { transform: scale(0.92); }
+.icon-btn.rose { background: var(--rose); border-color: var(--rose); color: white; }
+
+.divider {
+  height: 1px;
+  background: var(--border-light);
+  margin: 0 18px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+}
+.empty-state-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+.empty-state-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--charcoal);
+  margin-bottom: 6px;
+}
+.empty-state-text { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+/* Toast */
+#toast {
+  position: fixed;
+  bottom: calc(var(--nav-h) + 16px);
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--charcoal);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 2000;
+  opacity: 0;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  pointer-events: none;
+}
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30,26,24,0.5);
+  z-index: 500;
+  display: none;
+  align-items: flex-end;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal-sheet {
+  width: 100%;
+  background: var(--cream);
+  border-radius: 24px 24px 0 0;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.modal-handle {
+  width: 40px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 14px auto 8px;
+  flex-shrink: 0;
+}
+.modal-header {
+  padding: 0 18px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 500;
+}
+.modal-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--ivory);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: var(--text-muted);
+}
+.modal-body {
+  padding: 0 18px 24px;
+  overflow-y: auto;
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ══════════════════════════════════════
+   KAST TAB
+══════════════════════════════════════ */
+/* Dagkaart */
+.dagkaart {
+  margin: 14px 18px;
+  background: linear-gradient(135deg, #2A2320 0%, #3D2E28 100%);
+  border-radius: var(--radius);
+  padding: 20px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+.dagkaart::before {
+  content: '';
+  position: absolute;
+  top: -20px; right: -20px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(196,122,138,0.15);
+}
+.dagkaart-date {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.dagkaart-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+.dagkaart-title em { color: var(--gold-light); font-style: italic; }
+.dagkaart-moods {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.mood-chip {
+  padding: 6px 12px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.8);
+  -webkit-tap-highlight-color: transparent;
+}
+.mood-chip.active {
+  background: var(--rose);
+  border-color: var(--rose);
+  color: white;
+}
+.dagkaart-outfit {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-bottom: 14px;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.dagkaart-outfit-empty {
+  text-align: center;
+  color: rgba(255,255,255,0.4);
+}
+.dagkaart-outfit-empty .icon { font-size: 28px; margin-bottom: 6px; }
+.dagkaart-outfit-empty p { font-size: 13px; }
+.dagkaart-outfit-content { width: 100%; }
+.outfit-items-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.outfit-item-chip {
+  padding: 4px 10px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 100px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.9);
+}
+.outfit-tip {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  font-style: italic;
+  font-family: var(--font-display);
+}
+.dagkaart-actions {
+  display: flex;
+  gap: 8px;
+}
+.dagkaart-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.8);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: var(--transition);
+  -webkit-tap-highlight-color: transparent;
+}
+.dagkaart-btn:active { background: rgba(255,255,255,0.15); }
+.dagkaart-btn.primary {
+  background: var(--rose);
+  border-color: var(--rose);
+  color: white;
+}
+
+/* Garderobe grid */
+.garderobe-filters {
+  padding: 0 18px 12px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.garderobe-filters::-webkit-scrollbar { display: none; }
+.filter-chip {
+  padding: 7px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--warm-white);
+  border: 1.5px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition);
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+.filter-chip.active {
+  background: var(--charcoal);
+  border-color: var(--charcoal);
+  color: white;
+}
+
+.garderobe-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 0 18px;
+}
+.item-card {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  aspect-ratio: 3/4;
+  display: flex;
+  flex-direction: column;
+}
+.item-card:active { transform: scale(0.97); }
+.item-photo {
+  flex: 1;
+  background: var(--ivory);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  position: relative;
+  overflow: hidden;
+}
+.item-photo img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  position: absolute;
+}
+.item-info {
+  padding: 8px;
+}
+.item-name {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.item-tags {
+  display: flex;
+  gap: 4px;
+  margin-top: 3px;
+  flex-wrap: wrap;
+}
+.item-tag {
+  font-size: 9px;
+  padding: 2px 6px;
+  background: var(--ivory);
+  border-radius: 100px;
+  color: var(--text-muted);
+}
+.item-worn-badge {
+  position: absolute;
+  top: 6px; right: 6px;
+  background: var(--charcoal);
+  color: white;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 100px;
+}
+.item-season-badge {
+  position: absolute;
+  top: 6px; left: 6px;
+  font-size: 12px;
+  background: rgba(255,255,255,0.85);
+  border-radius: 50%;
+  width: 22px; height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.add-item-card {
+  background: var(--ivory);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-sm);
+  aspect-ratio: 3/4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  transition: var(--transition);
+  -webkit-tap-highlight-color: transparent;
+}
+.add-item-card:active { background: var(--rose-pale); border-color: var(--rose); color: var(--rose-dark); }
+.add-item-card .plus { font-size: 24px; color: var(--rose); }
+
+/* Demo banner */
+.demo-banner {
+  margin: 0 18px 14px;
+  padding: 12px 16px;
+  background: var(--gold-light);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.demo-banner-icon { font-size: 20px; }
+.demo-banner-text { font-size: 13px; color: var(--brown); flex: 1; line-height: 1.4; }
+.demo-banner-btn {
+  padding: 6px 12px;
+  background: var(--gold);
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brown);
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: var(--font-body);
+}
+
+/* ══════════════════════════════════════
+   OUTFITS TAB
+══════════════════════════════════════ */
+.gelegenheden-scroll {
+  padding: 14px 18px 8px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.gelegenheden-scroll::-webkit-scrollbar { display: none; }
+.gelegenheid-chip {
+  padding: 8px 16px;
+  background: var(--warm-white);
+  border: 2px solid var(--border);
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition);
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+  color: var(--text);
+}
+.gelegenheid-chip.active {
+  background: var(--charcoal);
+  border-color: var(--charcoal);
+  color: white;
+}
+.gelegenheid-chip.manage {
+  border-style: dashed;
+  color: var(--text-muted);
+}
+
+.outfits-controls {
+  padding: 0 18px 14px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.basis-row {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.basis-row::-webkit-scrollbar { display: none; }
+
+.outfit-card {
+  margin: 0 18px 14px;
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+}
+.outfit-card-header {
+  padding: 14px 16px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.outfit-label {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.2;
+  flex: 1;
+}
+.outfit-card-items {
+  padding: 10px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.outfit-item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.outfit-item-thumb {
+  width: 44px; height: 44px;
+  border-radius: var(--radius-xs);
+  background: var(--ivory);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+}
+.outfit-item-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.outfit-item-meta { flex: 1; }
+.outfit-item-name { font-size: 13px; font-weight: 500; }
+.outfit-item-sub { font-size: 11px; color: var(--text-muted); }
+.outfit-stylist-note {
+  margin: 0 16px 14px;
+  padding: 10px 14px;
+  background: var(--rose-pale);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-style: italic;
+  color: var(--rose-dark);
+  line-height: 1.5;
+}
+.outfit-actions {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.outfit-action-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--warm-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: var(--transition);
+  -webkit-tap-highlight-color: transparent;
+}
+.outfit-action-btn:active { transform: scale(0.9); }
+.outfit-action-btn.liked { background: var(--rose-pale); border-color: var(--rose); }
+.outfit-action-btn.disliked { background: var(--ivory); }
+.outfit-action-btn.saved { background: var(--gold-light); border-color: var(--gold); }
+.outfit-action-label { font-size: 11px; color: var(--text-muted); margin-left: auto; }
+
+.generate-btn {
+  width: calc(100% - 36px);
+  margin: 0 18px 18px;
+  padding: 14px;
+  background: var(--charcoal);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+.generate-btn:active { opacity: 0.85; transform: scale(0.99); }
+.generate-btn:disabled { opacity: 0.5; cursor: default; }
+.generate-btn .sparkle { font-size: 16px; }
+
+.outfits-loading {
+  padding: 32px 18px;
+  text-align: center;
+}
+.loading-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.loading-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--rose);
+  animation: dotPulse 1.2s ease-in-out infinite;
+}
+.loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dotPulse {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+.loading-text { font-size: 14px; color: var(--text-muted); font-style: italic; font-family: var(--font-display); }
+
+/* ══════════════════════════════════════
+   STYLIST (CHAT) TAB
+══════════════════════════════════════ */
+#tab-stylist {
+  display: none;
+  flex-direction: column;
+  padding-bottom: 0;
+}
+#tab-stylist.active { display: flex; }
+.chat-header {
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.stylist-avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dark) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.stylist-info { flex: 1; }
+.stylist-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--charcoal);
+}
+.stylist-status {
+  font-size: 11px;
+  color: var(--sage);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.stylist-status::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--sage);
+  flex-shrink: 0;
+}
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+.msg {
+  max-width: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.msg.user { align-self: flex-end; align-items: flex-end; }
+.msg.assistant { align-self: flex-start; align-items: flex-start; }
+.msg-bubble {
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.msg.user .msg-bubble {
+  background: var(--charcoal);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+.msg.assistant .msg-bubble {
+  background: var(--warm-white);
+  color: var(--text);
+  border: 1px solid var(--border-light);
+  border-bottom-left-radius: 4px;
+}
+.msg-time {
+  font-size: 10px;
+  color: var(--text-light);
+}
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--warm-white);
+  border: 1px solid var(--border-light);
+  border-radius: 18px;
+  border-bottom-left-radius: 4px;
+  width: fit-content;
+}
+.typing-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--rose);
+  animation: dotPulse 1.2s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+.chat-quick-chips {
+  padding: 8px 18px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.chat-quick-chips::-webkit-scrollbar { display: none; }
+.quick-chip {
+  padding: 7px 14px;
+  background: var(--rose-pale);
+  border: 1.5px solid var(--rose-light);
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--rose-dark);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: var(--transition);
+}
+.quick-chip:active { background: var(--rose-light); }
+
+.chat-input-area {
+  padding: 10px 18px calc(10px + env(safe-area-inset-bottom));
+  background: var(--warm-white);
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+.chat-textarea {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 22px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  background: var(--cream);
+  color: var(--text);
+  outline: none;
+  resize: none;
+  max-height: 100px;
+  overflow-y: auto;
+  line-height: 1.5;
+}
+.chat-textarea:focus { border-color: var(--rose); }
+.chat-send-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--rose);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+.chat-send-btn:active { transform: scale(0.92); }
+.chat-send-btn:disabled { opacity: 0.4; }
+
+/* ══════════════════════════════════════
+   WEEK TAB
+══════════════════════════════════════ */
+.week-days {
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.week-day-card {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+}
+.week-day-header {
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+.week-day-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+.week-day-name.today { color: var(--rose); }
+.week-day-date { font-size: 12px; color: var(--text-muted); }
+.week-day-outfit-preview {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.week-outfit-item {
+  width: 32px; height: 32px;
+  border-radius: var(--radius-xs);
+  background: var(--ivory);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+}
+.week-day-body {
+  display: none;
+  padding: 0 14px 14px;
+  border-top: 1px solid var(--border-light);
+}
+.week-day-body.open { display: block; }
+.week-add-btn {
+  width: 100%;
+  padding: 10px;
+  background: var(--ivory);
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* ══════════════════════════════════════
+   MEER TAB
+══════════════════════════════════════ */
+.meer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 14px 18px;
+}
+.meer-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+  padding: 18px 16px;
+  cursor: pointer;
+  transition: var(--transition);
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.meer-card:active { transform: scale(0.97); }
+.meer-card-icon { font-size: 28px; }
+.meer-card-title { font-weight: 600; font-size: 14px; }
+.meer-card-sub { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+.meer-card.highlight {
+  background: linear-gradient(135deg, var(--charcoal) 0%, #3D2E28 100%);
+  color: white;
+  border: none;
+}
+.meer-card.highlight .meer-card-sub { color: rgba(255,255,255,0.6); }
+.meer-card.rose-bg { background: var(--rose-pale); border-color: var(--rose-light); }
+
+/* Inzichten strip */
+.inzichten-strip {
+  margin: 0 18px 14px;
+  padding: 14px 16px;
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+}
+.inzichten-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.inzicht-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.inzicht-label { font-size: 13px; flex: 1; }
+.inzicht-bar-track {
+  width: 80px;
+  height: 6px;
+  background: var(--ivory);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.inzicht-bar-fill {
+  height: 100%;
+  background: var(--rose);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+.inzicht-count { font-size: 11px; color: var(--text-muted); width: 20px; text-align: right; }
+
+/* ══════════════════════════════════════
+   FORM ELEMENTS
+══════════════════════════════════════ */
+.form-group {
+  margin-bottom: 16px;
+}
+.form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 6px;
+}
+.form-input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-body);
+  font-size: 14px;
+  background: var(--warm-white);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus { border-color: var(--rose); }
+.form-select {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-body);
+  font-size: 14px;
+  background: var(--warm-white);
+  color: var(--text);
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B7B72' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+.tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tag-toggle {
+  padding: 6px 12px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--ivory);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  transition: var(--transition);
+  -webkit-tap-highlight-color: transparent;
+}
+.tag-toggle.active {
+  background: var(--charcoal);
+  border-color: var(--charcoal);
+  color: white;
+}
+.photo-upload-area {
+  width: 100%;
+  aspect-ratio: 3/2;
+  background: var(--ivory);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition);
+}
+.photo-upload-area:active { border-color: var(--rose); background: var(--rose-pale); }
+.photo-upload-area .upload-icon { font-size: 32px; }
+.photo-upload-area img {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.photo-upload-area input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 0;
+}
+
+/* DNA tab content */
+.dna-profile {
+  padding: 14px 18px;
+}
+.dna-hero {
+  background: linear-gradient(135deg, var(--charcoal) 0%, #3D2E28 100%);
+  border-radius: var(--radius);
+  padding: 22px;
+  color: white;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.dna-hero::after {
+  content: '✦';
+  position: absolute;
+  right: 20px; top: 20px;
+  font-size: 40px;
+  opacity: 0.1;
+  color: var(--gold);
+}
+.dna-hero-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.dna-hero-name {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-style: italic;
+  color: var(--gold-light);
+  margin-bottom: 14px;
+}
+.dna-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dna-tag {
+  padding: 5px 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 100px;
+  font-size: 12px;
+  background: rgba(255,255,255,0.08);
+}
+.dna-section {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.dna-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dna-section-title span { font-size: 16px; }
+.dna-content {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.6;
+}
+.color-swatches-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.color-swatch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--ivory);
+  border-radius: 100px;
+  font-size: 12px;
+  color: var(--text);
+}
+.color-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  flex-shrink: 0;
+}
+.dna-edit-btn {
+  width: 100%;
+  padding: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--warm-white);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* Cyclus */
+.cyclus-card {
+  margin: 14px 18px;
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+}
+.cyclus-header {
+  padding: 16px;
+  background: linear-gradient(135deg, #F5E6EA 0%, #EDD8DF 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.cyclus-dag { font-size: 11px; color: var(--rose-dark); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+.cyclus-fase {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--charcoal);
+  margin-top: 2px;
+}
+.cyclus-badge {
+  padding: 5px 12px;
+  background: var(--rose);
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+.cyclus-body { padding: 14px 16px; }
+.cyclus-advies {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 12px;
+  font-style: italic;
+  font-family: var(--font-display);
+}
+.cyclus-bar {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+  gap: 2px;
+}
+.cyclus-segment {
+  flex: 1;
+  background: var(--ivory);
+  border-radius: 2px;
+}
+.cyclus-segment.active { background: var(--rose); }
+.cyclus-segment.past { background: var(--rose-light); }
+.cyclus-days-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-light);
+}
+
+/* Shopping */
+.shopping-section {
+  padding: 14px 18px;
+}
+.shopping-cat-chip {
+  padding: 7px 14px;
+  background: var(--warm-white);
+  border: 1.5px solid var(--border);
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+.shopping-cat-chip.active {
+  background: var(--charcoal);
+  border-color: var(--charcoal);
+  color: white;
+}
+
+/* Boards */
+.boards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 14px 18px;
+}
+.board-card {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.board-card:active { transform: scale(0.97); }
+.board-card-top {
+  aspect-ratio: 1;
+  background: var(--ivory);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  position: relative;
+}
+.board-outfit-count {
+  position: absolute;
+  bottom: 6px; right: 6px;
+  background: var(--charcoal);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 100px;
+}
+.board-info { padding: 10px 12px; }
+.board-name { font-size: 13px; font-weight: 600; }
+.board-count { font-size: 11px; color: var(--text-muted); }
+
+/* Scroll hint for mobile */
+.scroll-x-hint {
+  position: relative;
+}
+.scroll-x-hint::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 30px;
+  background: linear-gradient(to right, transparent, var(--cream));
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     ONBOARDING OVERLAY
+══════════════════════════════════════ -->
+<div id="onboarding">
+  <div class="ob-header">
+    <div class="ob-logo"><em>Stylist</em> App</div>
+    <div class="ob-progress" id="ob-progress"></div>
+  </div>
+
+  <div class="ob-slides" id="ob-slides">
+
+    <!-- Stap 0: Welkom + naam -->
+    <div class="ob-slide active" data-step="0">
+      <div style="margin-top:12px">
+        <div class="ob-emoji">✨</div>
+        <h1 class="ob-title">Jouw persoonlijke<br><em>digitale stylist</em></h1>
+        <p class="ob-sub">In 6 stappen bouwen we jouw stijl DNA op. Geen stylist nodig — jij weet het zelf het beste.</p>
+        <div class="form-group">
+          <label class="form-label">Hoe heet je?</label>
+          <input type="text" class="ob-input" id="ob-naam" placeholder="Jouw naam..." autocomplete="off">
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);line-height:1.6">Daarna stel ik outfits voor op basis van jouw stijl, de temperatuur en hoe je je voelt.</p>
+      </div>
+    </div>
+
+    <!-- Stap 1: Silhouet -->
+    <div class="ob-slide" data-step="1">
+      <div class="ob-emoji">👗</div>
+      <h1 class="ob-title">Jouw <em>silhouet</em></h1>
+      <p class="ob-sub">Welke pasvorm geeft je het meeste vertrouwen?</p>
+      <div class="ob-cards" id="ob-silhouet">
+        <div class="ob-card" data-val="taille">
+          <span class="ob-card-icon">⏳</span>
+          <span class="ob-card-label">Taille benadrukken</span>
+        </div>
+        <div class="ob-card" data-val="flow">
+          <span class="ob-card-icon">🌊</span>
+          <span class="ob-card-label">Vloeiend & casual</span>
+        </div>
+        <div class="ob-card" data-val="strak">
+          <span class="ob-card-icon">📐</span>
+          <span class="ob-card-label">Gestructureerd & strak</span>
+        </div>
+        <div class="ob-card" data-val="oversized">
+          <span class="ob-card-icon">🫧</span>
+          <span class="ob-card-label">Oversized & relaxed</span>
+        </div>
+        <div class="ob-card" data-val="mix">
+          <span class="ob-card-icon">🎭</span>
+          <span class="ob-card-label">Mix — situatie-afhankelijk</span>
+        </div>
+      </div>
+      <p class="ob-hint">Kies wat het meeste bij je past</p>
+    </div>
+
+    <!-- Stap 2: Kleurpalet -->
+    <div class="ob-slide" data-step="2">
+      <div class="ob-emoji">🎨</div>
+      <h1 class="ob-title">Jouw <em>kleurpalet</em></h1>
+      <p class="ob-sub">Welke kleuren voel jij je het lekkerst in?</p>
+      <div class="ob-palettes" id="ob-kleuren">
+        <div class="ob-palette" data-val="neutraal">
+          <div class="ob-palette-swatches">
+            <div class="ob-swatch" style="background:#2A2320"></div>
+            <div class="ob-swatch" style="background:#8B7B72"></div>
+            <div class="ob-swatch" style="background:#E5DDD5"></div>
+            <div class="ob-swatch" style="background:#FAF8F4"></div>
+          </div>
+          <span class="ob-palette-name">Neutrale basis</span>
+          <span class="ob-palette-desc">Zwart · Grijs · Beige</span>
+        </div>
+        <div class="ob-palette" data-val="warm">
+          <div class="ob-palette-swatches">
+            <div class="ob-swatch" style="background:#8B4513"></div>
+            <div class="ob-swatch" style="background:#C9853A"></div>
+            <div class="ob-swatch" style="background:#E8C19A"></div>
+            <div class="ob-swatch" style="background:#F5E8D0"></div>
+          </div>
+          <span class="ob-palette-name">Warm & aards</span>
+          <span class="ob-palette-desc">Cognac · Terracotta · Camel</span>
+        </div>
+        <div class="ob-palette" data-val="koel">
+          <div class="ob-palette-swatches">
+            <div class="ob-swatch" style="background:#1A3A5C"></div>
+            <div class="ob-swatch" style="background:#4A7B9D"></div>
+            <div class="ob-swatch" style="background:#A8C4D8"></div>
+            <div class="ob-swatch" style="background:#E0EEF5"></div>
+          </div>
+          <span class="ob-palette-name">Koel & helder</span>
+          <span class="ob-palette-desc">Navy · Lichtblauw · Grijs</span>
+        </div>
+        <div class="ob-palette" data-val="kleurrijk">
+          <div class="ob-palette-swatches">
+            <div class="ob-swatch" style="background:#C4384A"></div>
+            <div class="ob-swatch" style="background:#E87A3A"></div>
+            <div class="ob-swatch" style="background:#F5C842"></div>
+            <div class="ob-swatch" style="background:#3A8A5C"></div>
+          </div>
+          <span class="ob-palette-name">Kleurrijk & opvallend</span>
+          <span class="ob-palette-desc">Rood · Oranje · Olijf</span>
+        </div>
+        <div class="ob-palette" data-val="soft">
+          <div class="ob-palette-swatches">
+            <div class="ob-swatch" style="background:#C47A8A"></div>
+            <div class="ob-swatch" style="background:#DDA0AA"></div>
+            <div class="ob-swatch" style="background:#E8C8D0"></div>
+            <div class="ob-swatch" style="background:#F8F0F2"></div>
+          </div>
+          <span class="ob-palette-name">Soft & romantisch</span>
+          <span class="ob-palette-desc">Roze · Lila · Nude</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stap 3: Gelegenheden -->
+    <div class="ob-slide" data-step="3">
+      <div class="ob-emoji">📅</div>
+      <h1 class="ob-title">Jouw <em>leven</em></h1>
+      <p class="ob-sub">Waarvoor heb je meestal kleding nodig? Kies alles wat van toepassing is.</p>
+      <div class="ob-chips" id="ob-gelegenheden">
+        <div class="ob-chip" data-val="werkdag">💼 Werkdag</div>
+        <div class="ob-chip" data-val="thuiswerken">🏠 Thuiswerken</div>
+        <div class="ob-chip" data-val="casual">☀️ Casual weekend</div>
+        <div class="ob-chip" data-val="avond">🍷 Avond uit</div>
+        <div class="ob-chip" data-val="sport">🏃 Sport</div>
+        <div class="ob-chip" data-val="bijzonder">🌹 Bijzondere gelegenheid</div>
+        <div class="ob-chip" data-val="vakantie">✈️ Vakantie</div>
+        <div class="ob-chip" data-val="date">💋 Date night</div>
+      </div>
+      <p class="ob-hint">Meerdere opties mogelijk</p>
+    </div>
+
+    <!-- Stap 4: Stijl woorden -->
+    <div class="ob-slide" data-step="4">
+      <div class="ob-emoji">💫</div>
+      <h1 class="ob-title">Jouw <em>stijl</em></h1>
+      <p class="ob-sub">Welke woorden beschrijven jouw ideale stijl? Kies je top 3.</p>
+      <div class="ob-chips" id="ob-stijl">
+        <div class="ob-chip" data-val="minimalistisch">🤍 Minimalistisch</div>
+        <div class="ob-chip" data-val="klassiek">🎩 Klassiek</div>
+        <div class="ob-chip" data-val="stoer">⚡ Stoer</div>
+        <div class="ob-chip" data-val="romantisch">🌸 Romantisch</div>
+        <div class="ob-chip" data-val="sportief">🎯 Sportief-chic</div>
+        <div class="ob-chip" data-val="boho">🌿 Boho</div>
+        <div class="ob-chip" data-val="elegant">✨ Elegant</div>
+        <div class="ob-chip" data-val="urban">🏙 Urban</div>
+        <div class="ob-chip" data-val="kleurrijk">🎨 Kleurrijk & speels</div>
+      </div>
+      <p class="ob-hint">Kies 1–3 woorden</p>
+    </div>
+
+    <!-- Stap 5: Materiaal -->
+    <div class="ob-slide" data-step="5">
+      <div class="ob-emoji">🧵</div>
+      <h1 class="ob-title">Jouw <em>comfort</em></h1>
+      <p class="ob-sub">Wat draag jij het liefst qua materiaal?</p>
+      <div class="ob-cards two-col" id="ob-materiaal">
+        <div class="ob-card" data-val="soepel">
+          <span class="ob-card-icon">💧</span>
+          <span class="ob-card-label">Soepel & vloeiend<br><small style="font-weight:300;color:var(--text-muted)">Viscose, tencel, zijde</small></span>
+        </div>
+        <div class="ob-card" data-val="stevig">
+          <span class="ob-card-icon">🪨</span>
+          <span class="ob-card-label">Stevig & gestructureerd<br><small style="font-weight:300;color:var(--text-muted)">Denim, katoen, wol</small></span>
+        </div>
+        <div class="ob-card" data-val="warm">
+          <span class="ob-card-icon">🔥</span>
+          <span class="ob-card-label">Warm & gezellig<br><small style="font-weight:300;color:var(--text-muted)">Cashmere, fleece, rib</small></span>
+        </div>
+        <div class="ob-card" data-val="licht">
+          <span class="ob-card-icon">🌬</span>
+          <span class="ob-card-label">Luchtig & zomers<br><small style="font-weight:300;color:var(--text-muted)">Linnen, katoen, mesh</small></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stap 6: No-go's -->
+    <div class="ob-slide" data-step="6">
+      <div class="ob-emoji">🚫</div>
+      <h1 class="ob-title">Jouw <em>no-go's</em></h1>
+      <p class="ob-sub">Wat draag jij absoluut niet? Ik houd hier rekening mee.</p>
+      <div class="ob-chips" id="ob-nogo">
+        <div class="ob-chip" data-val="prints">🌀 Drukke prints</div>
+        <div class="ob-chip" data-val="oversized_nogo">📦 Super oversized</div>
+        <div class="ob-chip" data-val="highheels">👠 Hoge hakken</div>
+        <div class="ob-chip" data-val="mini">🩲 Mini-rokken</div>
+        <div class="ob-chip" data-val="strak_nogo">🫶 Super strak</div>
+        <div class="ob-chip" data-val="pailletten">✨ Pailletten</div>
+        <div class="ob-chip" data-val="kunstleer">🖤 Kunstleer</div>
+        <div class="ob-chip" data-val="capri">🦵 Driekwart broeken</div>
+      </div>
+      <p class="ob-hint">Niets verplicht — sla over als alles prima is</p>
+    </div>
+
+    <!-- Stap 7: Resultaat -->
+    <div class="ob-slide" data-step="7">
+      <div class="ob-emoji">🎉</div>
+      <h1 class="ob-title" id="ob-result-title">Jouw Stijl <em>DNA</em></h1>
+      <p class="ob-sub">Dit is jouw persoonlijk stijlprofiel. Je stylist gebruikt dit bij elke suggestie.</p>
+      <div class="ob-result-card" id="ob-result-card">
+        <!-- dynamisch gevuld -->
+      </div>
+      <div id="ob-result-extra" style="font-size:13px;color:var(--text-muted);line-height:1.7;padding:0 0 16px">
+        <!-- extra info -->
+      </div>
+    </div>
+
+  </div><!-- /ob-slides -->
+
+  <div class="ob-footer">
+    <button class="btn-primary" id="ob-next-btn">Volgende →</button>
+    <button class="btn-secondary" id="ob-skip-btn">Overslaan</button>
+  </div>
+</div><!-- /onboarding -->
+
+
+<!-- ══════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════ -->
+<div id="app">
+
+  <!-- Header -->
+  <div id="header">
+    <div class="header-left">
+      <div class="header-logo"><em>Stylist</em></div>
+      <div class="header-sub" id="header-sub">Jouw Digitale Kleerkast</div>
+    </div>
+    <div class="header-right">
+      <div class="weather-chip" id="weather-chip" onclick="fetchWeather()">
+        <span id="weather-icon">🌤</span>
+        <span id="weather-temp">--°</span>
+      </div>
+      <div class="avatar-btn" id="avatar-btn" onclick="openDNAModal()">?</div>
+    </div>
+  </div>
+
+  <!-- Tab Content -->
+  <div id="content">
+
+    <!-- ═══ TAB: KAST ═══ -->
+    <div class="tab-pane active" id="tab-kast">
+      <!-- Dagkaart -->
+      <div class="dagkaart" id="dagkaart">
+        <div class="dagkaart-date" id="dagkaart-date">Vandaag</div>
+        <div class="dagkaart-title">Wat trek je <em>aan?</em></div>
+        <div class="dagkaart-moods" id="dagkaart-moods">
+          <div class="mood-chip active" data-val="vrij" onclick="selectMood(this)">👗 Vrij</div>
+          <div class="mood-chip" data-val="rok" onclick="selectMood(this)">👘 Rok/jurk</div>
+          <div class="mood-chip" data-val="broek" onclick="selectMood(this)">👖 Broek</div>
+          <div class="mood-chip" data-val="sneakers" onclick="selectMood(this)">👟 Sneakers</div>
+          <div class="mood-chip" data-val="casual" onclick="selectMood(this)">🤍 Casual</div>
+        </div>
+        <div class="dagkaart-outfit" id="dagkaart-outfit" onclick="generateDagOutfit()">
+          <div class="dagkaart-outfit-empty">
+            <div class="icon">✦</div>
+            <p>Tik voor een outfitsuggestie</p>
+          </div>
+        </div>
+        <div class="dagkaart-actions">
+          <div class="dagkaart-btn primary" onclick="markWorn()">❖ Dit draag ik!</div>
+          <div class="dagkaart-btn" onclick="generateDagOutfit()">↻</div>
+          <div class="dagkaart-btn" onclick="generateDagOutfit('warm')">☀️ Te warm</div>
+          <div class="dagkaart-btn" onclick="openGisterenModal()">📆</div>
+        </div>
+      </div>
+
+      <!-- Demo banner -->
+      <div class="demo-banner" id="demo-banner" style="display:none">
+        <span class="demo-banner-icon">👗</span>
+        <span class="demo-banner-text">Laad 15 voorbeelditems om de app direct te verkennen.</span>
+        <button class="demo-banner-btn" onclick="loadDemoItems()">Laad items</button>
+      </div>
+
+      <!-- Garderobe header -->
+      <div class="section-header">
+        <div class="section-title">Jouw <em>kast</em></div>
+        <div class="section-action" onclick="openItemModal()">+ Toevoegen</div>
+      </div>
+
+      <!-- Filters -->
+      <div class="garderobe-filters" id="garderobe-filters">
+        <div class="filter-chip active" data-cat="alle" onclick="filterGarderobe(this)">Alle</div>
+        <div class="filter-chip" data-cat="ongedragen" onclick="filterGarderobe(this)">● Ongedragen</div>
+        <div class="filter-chip" data-cat="tops" onclick="filterGarderobe(this)">Tops</div>
+        <div class="filter-chip" data-cat="bottoms" onclick="filterGarderobe(this)">Broeken & rokken</div>
+        <div class="filter-chip" data-cat="jurken" onclick="filterGarderobe(this)">Jurken</div>
+        <div class="filter-chip" data-cat="layers" onclick="filterGarderobe(this)">Laagjes</div>
+        <div class="filter-chip" data-cat="shoes" onclick="filterGarderobe(this)">Schoenen</div>
+        <div class="filter-chip" data-cat="bags" onclick="filterGarderobe(this)">Tassen</div>
+        <div class="filter-chip" data-cat="accessories" onclick="filterGarderobe(this)">Accessoires</div>
+      </div>
+
+      <!-- Grid -->
+      <div class="garderobe-grid" id="garderobe-grid"></div>
+      <div style="height:16px"></div>
+    </div>
+
+    <!-- ═══ TAB: OUTFITS ═══ -->
+    <div class="tab-pane" id="tab-outfits">
+      <div class="section-header">
+        <div class="section-title">Outfits <em>voor jou</em></div>
+      </div>
+      <div class="gelegenheden-scroll" id="gelegenheden-scroll">
+        <div class="gelegenheid-chip active" data-val="casual" onclick="selectGelegenheid(this)">☀️ Casual</div>
+        <div class="gelegenheid-chip" data-val="werkdag" onclick="selectGelegenheid(this)">💼 Werkdag</div>
+        <div class="gelegenheid-chip" data-val="avond" onclick="selectGelegenheid(this)">🍷 Avond</div>
+        <div class="gelegenheid-chip" data-val="vakantie" onclick="selectGelegenheid(this)">✈️ Vakantie</div>
+        <div class="gelegenheid-chip" data-val="bijzonder" onclick="selectGelegenheid(this)">🌹 Bijzonder</div>
+        <div class="gelegenheid-chip" data-val="sport" onclick="selectGelegenheid(this)">🏃 Sport</div>
+        <div class="gelegenheid-chip manage" onclick="manageGelegenheden()">+ Beheer</div>
+      </div>
+
+      <!-- Basis voorkeur -->
+      <div class="outfits-controls">
+        <div class="basis-row" id="basis-row">
+          <div class="btn-small active" data-basis="vrij" onclick="selectBasis(this)">Vrij</div>
+          <div class="btn-small" data-basis="rok" onclick="selectBasis(this)">Rok</div>
+          <div class="btn-small" data-basis="broek" onclick="selectBasis(this)">Broek</div>
+          <div class="btn-small" data-basis="sneakers" onclick="selectBasis(this)">👟</div>
+          <div class="btn-small" data-basis="sandalen" onclick="selectBasis(this)">👡</div>
+          <div class="btn-small" data-basis="laarzen" onclick="selectBasis(this)">🥾</div>
+        </div>
+      </div>
+
+      <button class="generate-btn" id="generate-outfits-btn" onclick="generateOutfits()">
+        <span class="sparkle">✦</span> Genereer outfits
+      </button>
+
+      <div id="outfits-container">
+        <div class="empty-state" id="outfits-empty">
+          <div class="empty-state-icon">✨</div>
+          <div class="empty-state-title">Klaar voor suggesties</div>
+          <div class="empty-state-text">Kies een gelegenheid en klik op Genereer voor outfits op maat.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: STYLIST (CHAT) ═══ -->
+    <div class="tab-pane" id="tab-stylist">
+      <div class="chat-header">
+        <div class="stylist-avatar">👗</div>
+        <div class="stylist-info">
+          <div class="stylist-name" id="chat-stylist-name">Jouw Stylist</div>
+          <div class="stylist-status">Online · klaar om te helpen</div>
+        </div>
+        <div class="icon-btn" onclick="clearChat()" title="Gesprek wissen">🗑</div>
+      </div>
+
+      <div class="chat-messages" id="chat-messages"></div>
+
+      <div class="chat-quick-chips" id="chat-quick-chips">
+        <div class="quick-chip" onclick="sendQuickMsg(this)">Wat draag ik vandaag?</div>
+        <div class="quick-chip" onclick="sendQuickMsg(this)">Analyseer mijn garderobe</div>
+        <div class="quick-chip" onclick="sendQuickMsg(this)">Shopping tips</div>
+        <div class="quick-chip" onclick="sendQuickMsg(this)">Combinaties voor mijn witte blouse</div>
+        <div class="quick-chip" onclick="sendQuickMsg(this)">Wat mis ik in mijn kast?</div>
+      </div>
+
+      <div class="chat-input-area">
+        <textarea class="chat-textarea" id="chat-input" placeholder="Stel een vraag aan je stylist..." rows="1"
+          onkeydown="chatKeyDown(event)" oninput="autoResize(this)"></textarea>
+        <button class="chat-send-btn" id="chat-send-btn" onclick="sendChat()">➤</button>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: WEEK ═══ -->
+    <div class="tab-pane" id="tab-week">
+      <div class="section-header">
+        <div class="section-title">Week<em>planner</em></div>
+        <div class="section-action" onclick="generateWeekOutfits()">✦ Auto-vul</div>
+      </div>
+      <div class="week-days" id="week-days"></div>
+    </div>
+
+    <!-- ═══ TAB: MEER ═══ -->
+    <div class="tab-pane" id="tab-meer">
+      <div class="section-header">
+        <div class="section-title">Meer</div>
+      </div>
+
+      <!-- Inzichten strip -->
+      <div class="inzichten-strip" id="inzichten-strip">
+        <div class="inzichten-title">📊 Jouw kast in cijfers</div>
+        <div id="inzichten-content">
+          <p style="font-size:13px;color:var(--text-muted)">Voeg items toe om je inzichten te zien.</p>
+        </div>
+      </div>
+
+      <div class="meer-grid">
+        <div class="meer-card highlight" onclick="openBoards()">
+          <span class="meer-card-icon">🗂</span>
+          <span class="meer-card-title">Boards</span>
+          <span class="meer-card-sub">Sla outfits op per gelegenheid</span>
+        </div>
+        <div class="meer-card rose-bg" onclick="openDNAModal()">
+          <span class="meer-card-icon">🧬</span>
+          <span class="meer-card-title">Stijl DNA</span>
+          <span class="meer-card-sub">Bekijk & pas je profiel aan</span>
+        </div>
+        <div class="meer-card" onclick="openCyclus()">
+          <span class="meer-card-icon">🧡</span>
+          <span class="meer-card-title">Cyclus</span>
+          <span class="meer-card-sub">Dag bijhouden & outfit aanpassen</span>
+        </div>
+        <div class="meer-card" onclick="openShopping()">
+          <span class="meer-card-icon">🛍</span>
+          <span class="meer-card-title">Shopping</span>
+          <span class="meer-card-sub">Vind wat je mist in je kast</span>
+        </div>
+        <div class="meer-card" onclick="openInspoScan()">
+          <span class="meer-card-icon">📸</span>
+          <span class="meer-card-title">Inspo Scan</span>
+          <span class="meer-card-sub">Upload looks die je inspireren</span>
+        </div>
+        <div class="meer-card" onclick="openOutfitHistory()">
+          <span class="meer-card-icon">📅</span>
+          <span class="meer-card-title">Geschiedenis</span>
+          <span class="meer-card-sub">Wat droeg je wanneer?</span>
+        </div>
+      </div>
+
+      <!-- Cyclus kaart preview -->
+      <div class="cyclus-card" id="cyclus-preview">
+        <div class="cyclus-header">
+          <div>
+            <div class="cyclus-dag" id="cy-dag-label">Cyclus</div>
+            <div class="cyclus-fase" id="cy-fase-label">Nog niet gestart</div>
+          </div>
+          <div class="cyclus-badge" id="cy-badge" onclick="openCyclus()">Starten →</div>
+        </div>
+        <div class="cyclus-body">
+          <div class="cyclus-advies" id="cy-advies">Start je cyclus tracker voor persoonlijk outfitadvies per fase.</div>
+          <div class="cyclus-bar" id="cy-bar"></div>
+          <div class="cyclus-days-label">
+            <span>Dag 1</span>
+            <span id="cy-length">Dag 28</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- Bottom Nav -->
+  <nav id="bottom-nav">
+    <div class="nav-item active" data-tab="kast" onclick="switchTab('kast')">
+      <span class="nav-icon">👗</span>
+      <span class="nav-label">Kast</span>
+    </div>
+    <div class="nav-item" data-tab="outfits" onclick="switchTab('outfits')">
+      <span class="nav-icon">✨</span>
+      <span class="nav-label">Outfits</span>
+    </div>
+    <div class="nav-item" data-tab="stylist" onclick="switchTab('stylist')">
+      <span class="nav-icon">💬</span>
+      <span class="nav-label">Stylist</span>
+    </div>
+    <div class="nav-item" data-tab="week" onclick="switchTab('week')">
+      <span class="nav-icon">📅</span>
+      <span class="nav-label">Week</span>
+    </div>
+    <div class="nav-item" data-tab="meer" onclick="switchTab('meer')">
+      <span class="nav-icon">⋯</span>
+      <span class="nav-label">Meer</span>
+    </div>
+  </nav>
+
+</div><!-- /app -->
+
+
+<!-- ══════════════════════════════════════
+     MODALS
+══════════════════════════════════════ -->
+
+<!-- Item toevoegen modal -->
+<div class="modal-overlay" id="modal-item">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">Item toevoegen</span>
+      <button class="modal-close" onclick="closeModal('modal-item')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <div class="photo-upload-area" id="item-photo-upload" onclick="document.getElementById('item-photo-input').click()">
+          <span class="upload-icon">📷</span>
+          <span>Foto toevoegen (optioneel)</span>
+          <input type="file" id="item-photo-input" accept="image/*" onchange="handlePhotoUpload(event)">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Naam</label>
+        <input type="text" class="form-input" id="item-naam" placeholder="bijv. Witte linnen blouse">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Categorie</label>
+        <select class="form-select" id="item-categorie">
+          <option value="tops">Tops</option>
+          <option value="bottoms">Broeken & rokken</option>
+          <option value="jurken">Jurken</option>
+          <option value="layers">Laagjes / jassen</option>
+          <option value="shoes">Schoenen</option>
+          <option value="bags">Tassen</option>
+          <option value="accessories">Accessoires</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kleur</label>
+        <input type="text" class="form-input" id="item-kleur" placeholder="bijv. marineblauw">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pasvorm</label>
+        <div class="tags-row" id="item-pasvorm">
+          <div class="tag-toggle" data-val="aansluitend">aansluitend</div>
+          <div class="tag-toggle" data-val="normaal">normaal</div>
+          <div class="tag-toggle" data-val="licht oversized">licht oversized</div>
+          <div class="tag-toggle" data-val="wijd">wijd</div>
+          <div class="tag-toggle" data-val="wrap">wrap</div>
+          <div class="tag-toggle" data-val="flared">flared</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Seizoen</label>
+        <div class="tags-row" id="item-seizoen">
+          <div class="tag-toggle" data-val="zomer">☀️ Zomer</div>
+          <div class="tag-toggle" data-val="winter">❄️ Winter</div>
+          <div class="tag-toggle active" data-val="beide">🌱 Beide</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Materiaal</label>
+        <div class="tags-row" id="item-materiaal">
+          <div class="tag-toggle" data-val="viscose">viscose</div>
+          <div class="tag-toggle" data-val="katoen">katoen</div>
+          <div class="tag-toggle" data-val="denim">denim</div>
+          <div class="tag-toggle" data-val="linnen">linnen</div>
+          <div class="tag-toggle" data-val="wol">wol</div>
+          <div class="tag-toggle" data-val="zijde">zijde</div>
+          <div class="tag-toggle" data-val="cashmere">cashmere</div>
+          <div class="tag-toggle" data-val="leer">leer</div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="saveItem()" style="margin-top:8px">Item opslaan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Boards modal -->
+<div class="modal-overlay" id="modal-boards">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">🗂 Boards</span>
+      <button class="modal-close" onclick="closeModal('modal-boards')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="boards-grid" id="boards-grid"></div>
+      <button class="btn-primary" onclick="addBoard()" style="margin-top:4px">+ Nieuw board</button>
+    </div>
+  </div>
+</div>
+
+<!-- DNA modal -->
+<div class="modal-overlay" id="modal-dna">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">🧬 Stijl DNA</span>
+      <button class="modal-close" onclick="closeModal('modal-dna')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="dna-profile" id="dna-profile-content" style="padding:0"></div>
+      <button class="dna-edit-btn" onclick="redoOnboarding()">✏️ Stijl DNA opnieuw instellen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cyclus modal -->
+<div class="modal-overlay" id="modal-cyclus">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">🧡 Cyclus</span>
+      <button class="modal-close" onclick="closeModal('modal-cyclus')">✕</button>
+    </div>
+    <div class="modal-body" id="cyclus-modal-body">
+      <!-- dynamisch gevuld -->
+    </div>
+  </div>
+</div>
+
+<!-- Shopping modal -->
+<div class="modal-overlay" id="modal-shopping">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">🛍 Shopping</span>
+      <button class="modal-close" onclick="closeModal('modal-shopping')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="shopping-section" style="padding:0">
+        <p style="font-size:14px;color:var(--text-muted);margin-bottom:16px">Op basis van jouw stijl DNA en garderobe zoek ik wat er mist.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+          <div class="shopping-cat-chip active" onclick="this.classList.toggle('active')">✦ Wat mist er</div>
+          <div class="shopping-cat-chip" onclick="this.classList.toggle('active')">Tops</div>
+          <div class="shopping-cat-chip" onclick="this.classList.toggle('active')">Broeken</div>
+          <div class="shopping-cat-chip" onclick="this.classList.toggle('active')">Laagjes</div>
+          <div class="shopping-cat-chip" onclick="this.classList.toggle('active')">Schoenen</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <div class="btn-small">€ Budget</div>
+          <div class="btn-small">€€ Midden</div>
+          <div class="btn-small">€€€ Premium</div>
+        </div>
+        <button class="btn-primary" onclick="generateShoppingList()">✦ Maak shoppinglijst</button>
+        <div id="shopping-result" style="margin-top:16px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Inspo Scan modal -->
+<div class="modal-overlay" id="modal-inspo">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">📸 Inspo Scan</span>
+      <button class="modal-close" onclick="closeModal('modal-inspo')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--text-muted);margin-bottom:16px">Upload outfits die je inspireren — ik zoek welke items uit jouw garderobe die look benaderen.</p>
+      <div class="photo-upload-area" id="inspo-upload" onclick="document.getElementById('inspo-input').click()" style="margin-bottom:16px">
+        <span class="upload-icon">🖼</span>
+        <span>Tik om inspiratiefoto toe te voegen</span>
+        <input type="file" id="inspo-input" accept="image/*" onchange="handleInspoUpload(event)">
+      </div>
+      <div id="inspo-result"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Outfit history modal -->
+<div class="modal-overlay" id="modal-history">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">📅 Outfitgeschiedenis</span>
+      <button class="modal-close" onclick="closeModal('modal-history')">✕</button>
+    </div>
+    <div class="modal-body" id="history-body">
+      <!-- dynamisch gevuld -->
+    </div>
+  </div>
+</div>
+
+<!-- Gisteren modal -->
+<div class="modal-overlay" id="modal-gisteren">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">📆 Gisteren</span>
+      <button class="modal-close" onclick="closeModal('modal-gisteren')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--text-muted);margin-bottom:16px">Wat droeg je gisteren? Zo houd ik bij welke items je al gedragen hebt.</p>
+      <div id="gisteren-items" class="garderobe-grid" style="margin-bottom:16px"></div>
+      <button class="btn-primary" onclick="saveGisteren()">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+// STATE & CONSTANTS
+// ══════════════════════════════════════
+const WORKER_URL = 'https://griette-stylist.griette.workers.dev';
+const STORAGE_KEY = 'stylistApp_v1';
+
+let state = {
+  items: {},
+  photos: {},
+  wornLog: {},
+  outfitLikes: {},
+  outfitFeedback: {},
+  wellbeingLog: {},
+  cyclusData: { startDate: null, lengthDays: 28, history: [], avgLength: 28 },
+  boards: [
+    { id: 'inspiratie', label: 'Inspiratie', emoji: '✨', outfits: [] },
+    { id: 'vakantie', label: 'Vakantie', emoji: '✈️', outfits: [] },
+    { id: 'werkweek', label: 'Werkweek', emoji: '💼', outfits: [] },
+  ],
+  chatHistory: [],
+  weekPlan: {},
+  userProfile: null,
+  currentMood: 'vrij',
+  currentGelegenheid: 'casual',
+  currentBasis: 'vrij',
+  currentDagOutfit: null,
+  weather: { temp: null, icon: '🌤', desc: 'Mild' },
+};
+
+const DEMO_ITEMS = [
+  { id:'d1', name:'Witte linnen blouse', category:'tops', color:'wit', fit:'normaal', material:['linnen'], season:'zomer', emoji:'👚' },
+  { id:'d2', name:'Zwarte slim broek', category:'bottoms', color:'zwart', fit:'aansluitend', material:['katoen'], season:'beide', emoji:'👖' },
+  { id:'d3', name:'Camel trenchcoat', category:'layers', color:'camel', fit:'gestructureerd', material:['wol'], season:'beide', emoji:'🧥' },
+  { id:'d4', name:'Marineblauw wrap jurk', category:'jurken', color:'marineblauw', fit:'wrap', material:['viscose'], season:'beide', emoji:'👗' },
+  { id:'d5', name:'Witte sneakers', category:'shoes', color:'wit', fit:'', material:[], season:'zomer', emoji:'👟' },
+  { id:'d6', name:'Zwarte enkellaarzen', category:'shoes', color:'zwart', fit:'', material:['leer'], season:'winter', emoji:'👢' },
+  { id:'d7', name:'Nude kitten heels', category:'shoes', color:'nude', fit:'', material:[], season:'beide', emoji:'👠' },
+  { id:'d8', name:'Gestreepte marinière', category:'tops', color:'marineblauw/wit', fit:'normaal', material:['katoen'], season:'beide', emoji:'👕' },
+  { id:'d9', name:'Beige wide-leg chino', category:'bottoms', color:'beige', fit:'wijd', material:['katoen'], season:'zomer', emoji:'👖' },
+  { id:'d10', name:'Cognac leren schoudertas', category:'bags', color:'cognac', fit:'', material:['leer'], season:'beide', emoji:'👜' },
+  { id:'d11', name:'Zwarte tote bag', category:'bags', color:'zwart', fit:'', material:[], season:'beide', emoji:'🛍' },
+  { id:'d12', name:'Olijfgroene blazer', category:'layers', color:'olijfgroen', fit:'licht oversized', material:['wol'], season:'beide', emoji:'🧥' },
+  { id:'d13', name:'Satijnen top blush', category:'tops', color:'blush/roze', fit:'normaal', material:['zijde'], season:'zomer', emoji:'👚' },
+  { id:'d14', name:'Donkerblauwe straight jeans', category:'bottoms', color:'donkerblauw', fit:'normaal', material:['denim'], season:'beide', emoji:'👖' },
+  { id:'d15', name:'Gouden hoop oorbellen', category:'accessories', color:'goud', fit:'', material:[], season:'beide', emoji:'💛' },
+];
+
+const CYCLUS_FASES = [
+  { naam: 'Menstruatie', dagen: [1,5], kleur: '#C47A8A', advies: 'Kies comfort: zachte stoffen, warme kleuren, je favoriete comfortabele outfit. Je hoeft er niet voor iemand uit te zien.', emoji: '🔴' },
+  { naam: 'Folliculair', dagen: [6,13], kleur: '#7A9688', advies: 'Je energie groeit — experimenteer met kleur en nieuwe combinaties. Dit is het perfecte moment voor bold choices.', emoji: '🌱' },
+  { naam: 'Ovulatie', dagen: [14,17], kleur: '#C9A96E', advies: 'Je straalt van nature. Kies outfits die je dat gevoel versterken — elegante silhouetten, je favoriete kleuren.', emoji: '🌸' },
+  { naam: 'Luteaal', dagen: [18,28], kleur: '#8B7B72', advies: 'Comfort is key maar je kunt er nog steeds mooi uitzien. Oversized blazer, stretchy broek, zachte trui — chic en comfortabel.', emoji: '🍂' },
+];
+
+// ══════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════
+function saveState() {
+  try {
+    const toSave = { ...state };
+    delete toSave.photos; // photos apart opslaan (IndexedDB)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+  } catch(e) { console.warn('Save failed', e); }
+}
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state = { ...state, ...parsed };
+    }
+  } catch(e) { console.warn('Load failed', e); }
+}
+
+// IndexedDB voor foto's
+let photoDB;
+function initPhotoDB() {
+  return new Promise((resolve) => {
+    const req = indexedDB.open('StylistPhotos', 1);
+    req.onupgradeneeded = (e) => {
+      e.target.result.createObjectStore('photos');
+    };
+    req.onsuccess = (e) => { photoDB = e.target.result; resolve(); };
+    req.onerror = () => resolve();
+  });
+}
+function savePhoto(id, dataUrl) {
+  if (!photoDB) return;
+  const tx = photoDB.transaction('photos', 'readwrite');
+  tx.objectStore('photos').put(dataUrl, id);
+}
+function loadPhoto(id) {
+  return new Promise((resolve) => {
+    if (!photoDB) { resolve(null); return; }
+    const tx = photoDB.transaction('photos', 'readonly');
+    const req = tx.objectStore('photos').get(id);
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => resolve(null);
+  });
+}
+
+// ══════════════════════════════════════
+// ONBOARDING
+// ══════════════════════════════════════
+let obStep = 0;
+let obData = {};
+let currentPhoto = null;
+
+function initOnboarding() {
+  renderObProgress();
+  document.getElementById('ob-next-btn').addEventListener('click', obNext);
+  document.getElementById('ob-skip-btn').addEventListener('click', obSkip);
+  document.getElementById('ob-naam').addEventListener('input', () => {
+    document.getElementById('ob-next-btn').disabled = !document.getElementById('ob-naam').value.trim();
+  });
+  document.getElementById('ob-next-btn').disabled = true;
+
+  // Single-select handlers
+  setupObSingleSelect('ob-silhouet');
+  setupObSingleSelect('ob-materiaal');
+  setupObPalettes();
+
+  // Multi-select handlers
+  setupObMultiSelect('ob-gelegenheden', 8);
+  setupObMultiSelect('ob-stijl', 3);
+  setupObMultiSelect('ob-nogo', 8);
+}
+
+function setupObSingleSelect(containerId) {
+  const container = document.getElementById(containerId);
+  container.querySelectorAll('.ob-card').forEach(card => {
+    card.addEventListener('click', () => {
+      container.querySelectorAll('.ob-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      updateObNextBtn();
+    });
+  });
+}
+function setupObPalettes() {
+  document.querySelectorAll('#ob-kleuren .ob-palette').forEach(p => {
+    p.addEventListener('click', () => {
+      document.querySelectorAll('#ob-kleuren .ob-palette').forEach(x => x.classList.remove('selected'));
+      p.classList.add('selected');
+      updateObNextBtn();
+    });
+  });
+}
+function setupObMultiSelect(containerId, max) {
+  const container = document.getElementById(containerId);
+  container.querySelectorAll('.ob-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const selected = container.querySelectorAll('.ob-chip.selected');
+      if (chip.classList.contains('selected')) {
+        chip.classList.remove('selected');
+      } else if (selected.length < max) {
+        chip.classList.add('selected');
+      }
+      updateObNextBtn();
+    });
+  });
+}
+
+function updateObNextBtn() {
+  const btn = document.getElementById('ob-next-btn');
+  btn.disabled = !isObStepValid();
+}
+
+function isObStepValid() {
+  switch(obStep) {
+    case 0: return !!document.getElementById('ob-naam').value.trim();
+    case 1: return !!document.querySelector('#ob-silhouet .ob-card.selected');
+    case 2: return !!document.querySelector('#ob-kleuren .ob-palette.selected');
+    case 3: return document.querySelectorAll('#ob-gelegenheden .ob-chip.selected').length > 0;
+    case 4: return document.querySelectorAll('#ob-stijl .ob-chip.selected').length > 0;
+    case 5: return !!document.querySelector('#ob-materiaal .ob-card.selected');
+    case 6: return true; // No-go's optioneel
+    case 7: return true;
+    default: return true;
+  }
+}
+
+function obNext() {
+  if (!isObStepValid()) return;
+
+  // Collect data for current step
+  switch(obStep) {
+    case 0:
+      obData.naam = document.getElementById('ob-naam').value.trim();
+      break;
+    case 1:
+      obData.silhouet = document.querySelector('#ob-silhouet .ob-card.selected')?.dataset.val;
+      break;
+    case 2:
+      obData.kleurenpalet = document.querySelector('#ob-kleuren .ob-palette.selected')?.dataset.val;
+      break;
+    case 3:
+      obData.gelegenheden = [...document.querySelectorAll('#ob-gelegenheden .ob-chip.selected')].map(c => c.dataset.val);
+      break;
+    case 4:
+      obData.stijl = [...document.querySelectorAll('#ob-stijl .ob-chip.selected')].map(c => c.dataset.val);
+      break;
+    case 5:
+      obData.materiaal = document.querySelector('#ob-materiaal .ob-card.selected')?.dataset.val;
+      break;
+    case 6:
+      obData.nogo = [...document.querySelectorAll('#ob-nogo .ob-chip.selected')].map(c => c.dataset.val);
+      break;
+    case 7:
+      completeOnboarding();
+      return;
+  }
+
+  const nextStep = obStep + 1;
+  if (nextStep === 7) buildResultSlide();
+  goToObStep(nextStep);
+}
+
+function obSkip() {
+  if (obStep === 6) {
+    obData.nogo = [];
+  }
+  const nextStep = obStep + 1;
+  if (nextStep === 7) buildResultSlide();
+  if (nextStep <= 7) goToObStep(nextStep);
+  else completeOnboarding();
+}
+
+function goToObStep(step) {
+  const slides = document.querySelectorAll('.ob-slide');
+  slides[obStep].classList.remove('active');
+  slides[obStep].classList.add('exit');
+  setTimeout(() => slides[obStep].classList.remove('exit'), 400);
+
+  obStep = step;
+  slides[obStep].classList.add('active');
+
+  renderObProgress();
+  updateObNextBtn();
+
+  // Adjust next/skip button
+  const nextBtn = document.getElementById('ob-next-btn');
+  const skipBtn = document.getElementById('ob-skip-btn');
+  if (obStep === 7) {
+    nextBtn.textContent = '✦ Start de app!';
+    nextBtn.classList.add('rose');
+    skipBtn.style.display = 'none';
+  } else if (obStep === 6) {
+    nextBtn.textContent = 'Klaar →';
+    skipBtn.style.display = 'block';
+    skipBtn.textContent = 'Geen no-go\'s';
+  } else {
+    nextBtn.textContent = 'Volgende →';
+    nextBtn.classList.remove('rose');
+    skipBtn.style.display = obStep >= 3 ? 'block' : 'none';
+    skipBtn.textContent = 'Overslaan';
+  }
+}
+
+function renderObProgress() {
+  const container = document.getElementById('ob-progress');
+  const totalSteps = 8;
+  let html = '';
+  for (let i = 0; i < totalSteps - 1; i++) {
+    const cls = i < obStep ? 'ob-dot done' : i === obStep ? 'ob-dot active' : 'ob-dot';
+    html += `<div class="${cls}"></div>`;
+  }
+  container.innerHTML = html;
+}
+
+const KLEURENPALET_LABELS = {
+  neutraal: { label: 'Neutrale basis', kleuren: ['zwart', 'grijs', 'beige', 'wit'], hex: ['#2A2320','#8B7B72','#D5C8B8','#FAF8F4'] },
+  warm: { label: 'Warm & aards', kleuren: ['bruin', 'cognac', 'terracotta', 'camel'], hex: ['#8B4513','#B87333','#C67B55','#D4A574'] },
+  koel: { label: 'Koel & helder', kleuren: ['navy', 'ijsblauw', 'grijs', 'wit'], hex: ['#1A3A5C','#4A7B9D','#B0C4D8','#E8F0F5'] },
+  kleurrijk: { label: 'Kleurrijk & bold', kleuren: ['rood', 'oranje', 'geel', 'groen'], hex: ['#C4384A','#E87A3A','#F5C842','#3A8A5C'] },
+  soft: { label: 'Soft & romantisch', kleuren: ['roze', 'lila', 'nude', 'wit'], hex: ['#C47A8A','#A878B4','#D4A4A4','#F8F0F2'] },
+};
+
+const SILHOUET_LABELS = {
+  taille: 'Taille altijd benadrukken — wijd + wijd is verboden',
+  flow: 'Vloeiend & relaxed — comfort staat voorop',
+  strak: 'Gestructureerd & strak — clean lines',
+  oversized: 'Oversized mag — combineer met iets gestructureerds',
+  mix: 'Mix & match — per situatie verschilt het',
+};
+
+function buildResultSlide() {
+  const palet = KLEURENPALET_LABELS[obData.kleurenpalet] || KLEURENPALET_LABELS.neutraal;
+  const stijlWords = (obData.stijl || []).join(' · ');
+  const gelegWords = (obData.gelegenheden || []).join(', ');
+
+  const card = document.getElementById('ob-result-card');
+  card.innerHTML = `
+    <div class="ob-result-title">Jouw Stijl DNA</div>
+    <div class="ob-result-name">${obData.naam || 'Jij'}</div>
+    <div class="ob-result-tags">
+      ${(obData.stijl||[]).map(s=>`<span class="ob-result-tag">${s}</span>`).join('')}
+      <span class="ob-result-tag">${palet.label}</span>
+      ${obData.silhouet ? `<span class="ob-result-tag">${obData.silhouet}</span>` : ''}
+    </div>
+  `;
+
+  document.getElementById('ob-result-extra').innerHTML = `
+    <p style="margin-bottom:8px"><strong>Kleuren:</strong> ${palet.kleuren.join(', ')}</p>
+    <p style="margin-bottom:8px"><strong>Silhouet:</strong> ${SILHOUET_LABELS[obData.silhouet] || 'Vrije keuze'}</p>
+    <p style="margin-bottom:8px"><strong>Gelegenheden:</strong> ${gelegWords || 'Alles'}</p>
+    ${obData.nogo?.length ? `<p><strong>Vermijd:</strong> ${obData.nogo.join(', ')}</p>` : ''}
+  `;
+}
+
+function completeOnboarding() {
+  state.userProfile = {
+    naam: obData.naam || 'Jij',
+    silhouet: obData.silhouet,
+    kleurenpalet: obData.kleurenpalet,
+    gelegenheden: obData.gelegenheden || [],
+    stijl: obData.stijl || [],
+    materiaal: obData.materiaal,
+    nogo: obData.nogo || [],
+    created: new Date().toISOString(),
+  };
+  saveState();
+
+  document.getElementById('onboarding').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  initApp();
+
+  // Show demo banner if no items
+  if (Object.keys(state.items).length === 0) {
+    document.getElementById('demo-banner').style.display = 'flex';
+  }
+}
+
+function redoOnboarding() {
+  closeModal('modal-dna');
+  obStep = 0;
+  obData = {};
+  const slides = document.querySelectorAll('.ob-slide');
+  slides.forEach((s, i) => {
+    s.classList.remove('active', 'exit');
+    if (i === 0) s.classList.add('active');
+  });
+  document.getElementById('ob-next-btn').textContent = 'Volgende →';
+  document.getElementById('ob-next-btn').classList.remove('rose');
+  document.getElementById('ob-skip-btn').style.display = 'none';
+  document.getElementById('ob-next-btn').disabled = true;
+  renderObProgress();
+  document.getElementById('onboarding').style.display = 'flex';
+  document.getElementById('app').classList.remove('visible');
+}
+
+// ══════════════════════════════════════
+// APP INIT
+// ══════════════════════════════════════
+function initApp() {
+  updateHeaderProfile();
+  renderGarderobe();
+  renderDagkaart();
+  renderWeekDays();
+  renderInzichten();
+  renderBoards();
+  renderDNAProfile();
+  renderCyclusPreview();
+  fetchWeather();
+  initChat();
+}
+
+function updateHeaderProfile() {
+  if (!state.userProfile) return;
+  const naam = state.userProfile.naam;
+  document.getElementById('header-sub').textContent = `Hoi ${naam}!`;
+  document.getElementById('avatar-btn').textContent = naam.charAt(0).toUpperCase();
+}
+
+// ══════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+  if (tab === 'meer') { renderInzichten(); renderCyclusPreview(); }
+  if (tab === 'outfits') { renderGelegenheden(); }
+}
+
+// ══════════════════════════════════════
+// GARDEROBE
+// ══════════════════════════════════════
+let currentFilter = 'alle';
+
+function filterGarderobe(el) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  currentFilter = el.dataset.cat;
+  renderGarderobe();
+}
+
+function renderGarderobe() {
+  const grid = document.getElementById('garderobe-grid');
+  let items = Object.values(state.items);
+
+  if (currentFilter !== 'alle') {
+    if (currentFilter === 'ongedragen') {
+      items = items.filter(i => !isRecentlyWorn(i.id));
+    } else {
+      items = items.filter(i => i.category === currentFilter);
+    }
+  }
+
+  let html = '';
+  items.forEach(item => {
+    const wornCount = getWornCount(item.id);
+    const seasonBadge = item.season === 'zomer' ? '☀️' : item.season === 'winter' ? '❄️' : '';
+    html += `
+      <div class="item-card" onclick="openItemDetail('${item.id}')">
+        <div class="item-photo" id="photo-${item.id}">
+          ${seasonBadge ? `<div class="item-season-badge">${seasonBadge}</div>` : ''}
+          ${wornCount > 0 ? `<div class="item-worn-badge">${wornCount}×</div>` : ''}
+          <span style="font-size:32px">${item.emoji || getCategoryEmoji(item.category)}</span>
+        </div>
+        <div class="item-info">
+          <div class="item-name">${item.name}</div>
+          <div class="item-tags">
+            ${item.color ? `<span class="item-tag">${item.color}</span>` : ''}
+            ${item.fit ? `<span class="item-tag">${item.fit}</span>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  // Add button
+  html += `
+    <div class="add-item-card" onclick="openItemModal()">
+      <span class="plus">+</span>
+      <span>Toevoegen</span>
+    </div>
+  `;
+
+  grid.innerHTML = html;
+
+  // Load photos
+  items.forEach(item => {
+    if (state.photos[item.id]) {
+      loadPhoto(item.id).then(dataUrl => {
+        if (dataUrl) {
+          const el = document.getElementById('photo-' + item.id);
+          if (el) el.innerHTML = `<img src="${dataUrl}" alt="${item.name}">`;
+        }
+      });
+    }
+  });
+}
+
+function getCategoryEmoji(cat) {
+  const map = { tops:'👚', bottoms:'👖', jurken:'👗', layers:'🧥', shoes:'👟', bags:'👜', accessories:'💍' };
+  return map[cat] || '👔';
+}
+
+function isRecentlyWorn(id) {
+  const log = state.wornLog[id] || [];
+  if (!log.length) return false;
+  const lastWorn = new Date(log[log.length-1]);
+  const today = new Date();
+  const diff = (today - lastWorn) / (1000 * 60 * 60 * 24);
+  return diff < 14;
+}
+
+function getWornCount(id) {
+  return (state.wornLog[id] || []).length;
+}
+
+// Item Modal
+let itemPhotoData = null;
+
+function openItemModal() {
+  itemPhotoData = null;
+  document.getElementById('item-naam').value = '';
+  document.getElementById('item-kleur').value = '';
+  document.getElementById('item-categorie').value = 'tops';
+  document.querySelectorAll('#item-pasvorm .tag-toggle').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#item-seizoen .tag-toggle').forEach(t => t.classList.remove('active'));
+  document.querySelector('#item-seizoen [data-val="beide"]').classList.add('active');
+  document.querySelectorAll('#item-materiaal .tag-toggle').forEach(t => t.classList.remove('active'));
+  const photoArea = document.getElementById('item-photo-upload');
+  photoArea.innerHTML = `<span class="upload-icon">📷</span><span>Foto toevoegen (optioneel)</span><input type="file" id="item-photo-input" accept="image/*" onchange="handlePhotoUpload(event)">`;
+  openModal('modal-item');
+}
+
+function handlePhotoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    itemPhotoData = e.target.result;
+    const area = document.getElementById('item-photo-upload');
+    area.innerHTML = `<img src="${itemPhotoData}" alt="foto"><input type="file" id="item-photo-input" accept="image/*" onchange="handlePhotoUpload(event)">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveItem() {
+  const naam = document.getElementById('item-naam').value.trim();
+  if (!naam) { showToast('Vul een naam in'); return; }
+
+  const id = 'item_' + Date.now();
+  const categorie = document.getElementById('item-categorie').value;
+  const kleur = document.getElementById('item-kleur').value.trim();
+  const pasvorm = document.querySelector('#item-pasvorm .tag-toggle.active')?.dataset.val || '';
+  const seizoen = document.querySelector('#item-seizoen .tag-toggle.active')?.dataset.val || 'beide';
+  const materiaal = [...document.querySelectorAll('#item-materiaal .tag-toggle.active')].map(t => t.dataset.val);
+
+  state.items[id] = {
+    id, name: naam, category: categorie, color: kleur, fit: pasvorm,
+    season: seizoen, material: materiaal,
+    emoji: getCategoryEmoji(categorie),
+    addedAt: new Date().toISOString(),
+  };
+
+  if (itemPhotoData) {
+    state.photos[id] = true;
+    savePhoto(id, itemPhotoData);
+  }
+
+  saveState();
+  renderGarderobe();
+  closeModal('modal-item');
+  showToast(`${naam} toegevoegd ✓`);
+
+  // Hide demo banner
+  document.getElementById('demo-banner').style.display = 'none';
+}
+
+// Single-select tag toggles
+document.addEventListener('click', (e) => {
+  const toggle = e.target.closest('.tag-toggle');
+  if (!toggle) return;
+  const container = toggle.closest('[id^="item-"]');
+  if (!container) return;
+
+  const containerId = container.id;
+  if (containerId === 'item-materiaal') {
+    // multi-select
+    toggle.classList.toggle('active');
+  } else {
+    // single-select
+    container.querySelectorAll('.tag-toggle').forEach(t => t.classList.remove('active'));
+    toggle.classList.add('active');
+  }
+});
+
+function openItemDetail(id) {
+  const item = state.items[id];
+  if (!item) return;
+  // Simplified: show toast with quick actions
+  // In een echte app: open detail modal
+  const wornCount = getWornCount(id);
+  showToast(`${item.name} — ${wornCount}× gedragen`);
+}
+
+// Load demo items
+function loadDemoItems() {
+  DEMO_ITEMS.forEach(item => {
+    state.items[item.id] = { ...item, addedAt: new Date().toISOString() };
+  });
+  saveState();
+  renderGarderobe();
+  document.getElementById('demo-banner').style.display = 'none';
+  showToast('15 voorbeelditems geladen! ✓');
+  renderInzichten();
+}
+
+// ══════════════════════════════════════
+// DAGKAART
+// ══════════════════════════════════════
+function renderDagkaart() {
+  const now = new Date();
+  const dagen = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
+  const maanden = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+  document.getElementById('dagkaart-date').textContent =
+    `${dagen[now.getDay()]} ${now.getDate()} ${maanden[now.getMonth()]}`;
+}
+
+function selectMood(el) {
+  document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  state.currentMood = el.dataset.val;
+  // Reset outfit
+  document.getElementById('dagkaart-outfit').innerHTML = `
+    <div class="dagkaart-outfit-empty">
+      <div class="icon">✦</div>
+      <p>Tik voor een outfitsuggestie</p>
+    </div>
+  `;
+}
+
+async function generateDagOutfit(filter) {
+  const outfit = document.getElementById('dagkaart-outfit');
+  outfit.innerHTML = `
+    <div class="dagkaart-outfit-empty">
+      <div class="loading-dots" style="margin-bottom:4px">
+        <div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div>
+      </div>
+      <p style="font-size:11px;color:rgba(255,255,255,0.5)">Stylist denkt na...</p>
+    </div>
+  `;
+
+  const items = Object.values(state.items);
+  if (items.length < 2) {
+    outfit.innerHTML = `<div class="dagkaart-outfit-empty"><div class="icon">👗</div><p>Voeg items toe om outfits te genereren</p></div>`;
+    return;
+  }
+
+  const prompt = buildDagOutfitPrompt(filter);
+  try {
+    const response = await callAI(prompt, 300);
+    const parsed = parseOutfitResponse(response);
+    renderDagOutfit(parsed);
+  } catch(e) {
+    // Fallback: random outfit
+    const fallback = generateFallbackOutfit();
+    renderDagOutfit(fallback);
+  }
+}
+
+function buildDagOutfitPrompt(filter) {
+  const items = Object.values(state.items).map(i => `${i.name} (${i.category}, ${i.color})`).join(', ');
+  const profiel = buildProfileText();
+  const temp = state.weather?.desc || 'mild';
+  const mood = state.currentMood;
+
+  return `Je bent een persoonlijke stylist. Stel een outfit voor op basis van:
+- Garderobe: ${items}
+- Weer: ${temp}
+- Mood: ${mood}
+- Profiel: ${profiel}
+${filter === 'warm' ? '- Let op: het is te warm, kies lichtere items' : ''}
+
+Reageer ALLEEN met JSON: {"items": ["item naam 1", "item naam 2", ...], "tip": "korte stijltip max 15 woorden"}`;
+}
+
+function parseOutfitResponse(text) {
+  try {
+    const match = text.match(/\{[\s\S]*\}/);
+    if (match) return JSON.parse(match[0]);
+  } catch(e) {}
+  return { items: ['Jouw outfit'], tip: 'Vertrouw op je eigen smaak vandaag.' };
+}
+
+function generateFallbackOutfit() {
+  const items = Object.values(state.items);
+  const tops = items.filter(i => i.category === 'tops');
+  const bottoms = items.filter(i => i.category === 'bottoms' || i.category === 'jurken');
+  const shoes = items.filter(i => i.category === 'shoes');
+
+  const outfit = [];
+  if (tops.length) outfit.push(tops[Math.floor(Math.random()*tops.length)].name);
+  if (bottoms.length) outfit.push(bottoms[Math.floor(Math.random()*bottoms.length)].name);
+  if (shoes.length) outfit.push(shoes[Math.floor(Math.random()*shoes.length)].name);
+
+  return { items: outfit, tip: 'Jouw keuze, jouw stijl.' };
+}
+
+function renderDagOutfit(data) {
+  state.currentDagOutfit = data;
+  const chips = (data.items || []).map(i => `<span class="outfit-item-chip">${i}</span>`).join('');
+  document.getElementById('dagkaart-outfit').innerHTML = `
+    <div class="dagkaart-outfit-content">
+      <div class="outfit-items-display">${chips}</div>
+      ${data.tip ? `<div class="outfit-tip">"${data.tip}"</div>` : ''}
+    </div>
+  `;
+}
+
+function markWorn() {
+  if (!state.currentDagOutfit) { showToast('Genereer eerst een outfit'); return; }
+  const today = new Date().toISOString().split('T')[0];
+  const items = Object.values(state.items).filter(i =>
+    state.currentDagOutfit.items?.some(name => i.name.toLowerCase().includes(name.toLowerCase().slice(0,5)))
+  );
+  items.forEach(item => {
+    if (!state.wornLog[item.id]) state.wornLog[item.id] = [];
+    state.wornLog[item.id].push(today);
+  });
+  state.wellbeingLog[today] = { ...(state.wellbeingLog[today]||{}), outfit: state.currentDagOutfit };
+  saveState();
+  showToast('Outfit gelogd! ✓');
+  renderGarderobe();
+}
+
+// ══════════════════════════════════════
+// OUTFITS TAB
+// ══════════════════════════════════════
+function selectGelegenheid(el) {
+  document.querySelectorAll('.gelegenheid-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  state.currentGelegenheid = el.dataset.val;
+}
+
+function selectBasis(el) {
+  document.querySelectorAll('#basis-row .btn-small').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  state.currentBasis = el.dataset.basis;
+}
+
+function renderGelegenheden() {
+  // Reactivate current
+  document.querySelectorAll('.gelegenheid-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.val === state.currentGelegenheid);
+  });
+}
+
+async function generateOutfits() {
+  const btn = document.getElementById('generate-outfits-btn');
+  const container = document.getElementById('outfits-container');
+
+  const items = Object.values(state.items);
+  if (items.length < 3) {
+    showToast('Voeg meer items toe voor outfits');
+    return;
+  }
+
+  btn.disabled = true;
+  container.innerHTML = `
+    <div class="outfits-loading">
+      <div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>
+      <div class="loading-text">Jouw stylist stelt ${state.currentGelegenheid} looks samen...</div>
+    </div>
+  `;
+
+  const prompt = buildOutfitsPrompt();
+  try {
+    const response = await callAI(prompt, 800);
+    const outfits = parseOutfitsResponse(response);
+    renderOutfitCards(outfits);
+  } catch(e) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">😕</div><div class="empty-state-title">Probeer opnieuw</div><div class="empty-state-text">Er ging iets mis. Zorg dat je verbinding hebt.</div></div>`;
+  }
+  btn.disabled = false;
+}
+
+function buildOutfitsPrompt() {
+  const items = Object.values(state.items).map(i => `${i.name} (${i.category}, ${i.color || 'neutraal'})`).join('\n');
+  const profiel = buildProfileText();
+
+  return `Je bent een persoonlijke stylist. Genereer 4 outfits voor: ${state.currentGelegenheid}.
+Weer: ${state.weather?.desc || 'mild'}. Basis voorkeur: ${state.currentBasis}.
+Garderobe:\n${items}
+
+Stijlprofiel: ${profiel}
+
+Reageer ALLEEN met JSON array van 4 outfits:
+[{"label": "Look naam", "items": ["item 1", "item 2", "item 3"], "tip": "stijltip max 20 woorden"}]`;
+}
+
+function parseOutfitsResponse(text) {
+  try {
+    const match = text.match(/\[[\s\S]*\]/);
+    if (match) return JSON.parse(match[0]);
+  } catch(e) {}
+  // Fallback
+  return [
+    { label: 'Look 1', items: Object.values(state.items).slice(0,3).map(i=>i.name), tip: 'Simpel en effectief.' }
+  ];
+}
+
+function renderOutfitCards(outfits) {
+  const container = document.getElementById('outfits-container');
+  if (!outfits.length) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🤔</div><div class="empty-state-title">Geen outfits gevonden</div></div>';
+    return;
+  }
+
+  container.innerHTML = outfits.map((outfit, idx) => {
+    const itemsHtml = (outfit.items || []).map(itemName => {
+      const item = findItemByName(itemName);
+      return `
+        <div class="outfit-item-row">
+          <div class="outfit-item-thumb">${item ? (item.emoji || getCategoryEmoji(item.category)) : '👔'}</div>
+          <div class="outfit-item-meta">
+            <div class="outfit-item-name">${itemName}</div>
+            ${item ? `<div class="outfit-item-sub">${item.category} · ${item.color || ''}</div>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="outfit-card" id="outfit-${idx}">
+        <div class="outfit-card-header">
+          <div class="outfit-label">${outfit.label || `Look ${idx+1}`}</div>
+          <div class="icon-btn" onclick="saveOutfitToBoard(${idx})">+</div>
+        </div>
+        <div class="outfit-card-items">${itemsHtml}</div>
+        ${outfit.tip ? `<div class="outfit-stylist-note">"${outfit.tip}"</div>` : ''}
+        <div class="outfit-actions">
+          <div class="outfit-action-btn" id="like-${idx}" onclick="likeOutfit(${idx}, true)">❤️</div>
+          <div class="outfit-action-btn" id="dislike-${idx}" onclick="likeOutfit(${idx}, false)">✕</div>
+          <div class="outfit-action-btn" onclick="logOutfit(${idx})">📸</div>
+          <div class="outfit-action-label">${state.currentGelegenheid}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Store outfits in memory
+  window._currentOutfits = outfits;
+}
+
+function findItemByName(name) {
+  const items = Object.values(state.items);
+  return items.find(i => i.name.toLowerCase().includes(name.toLowerCase().slice(0, 8)));
+}
+
+function likeOutfit(idx, liked) {
+  const id = `outfit_${Date.now()}_${idx}`;
+  state.outfitLikes[id] = liked;
+  document.getElementById(liked ? `like-${idx}` : `dislike-${idx}`).classList.add(liked ? 'liked' : 'disliked');
+  saveState();
+  showToast(liked ? 'Opgeslagen als favoriet ❤️' : 'Feedback onthouden');
+}
+
+function logOutfit(idx) {
+  const outfit = window._currentOutfits?.[idx];
+  if (!outfit) return;
+  const today = new Date().toISOString().split('T')[0];
+  state.wellbeingLog[today] = { ...(state.wellbeingLog[today]||{}), outfit };
+  saveState();
+  showToast('Outfit gelogd ✓');
+}
+
+function saveOutfitToBoard(idx) {
+  const outfit = window._currentOutfits?.[idx];
+  if (!outfit) return;
+  // Add to first board
+  if (state.boards.length > 0) {
+    state.boards[0].outfits.push({ ...outfit, savedAt: new Date().toISOString() });
+    saveState();
+    showToast(`Opgeslagen in ${state.boards[0].label} ✓`);
+  }
+}
+
+function manageGelegenheden() {
+  showToast('Gelegenheden beheren — binnenkort beschikbaar');
+}
+
+// ══════════════════════════════════════
+// CHAT
+// ══════════════════════════════════════
+function initChat() {
+  const naam = state.userProfile?.naam || 'jou';
+  if (state.chatHistory.length === 0) {
+    addChatMessage('assistant', `Hoi ${naam}! 👗 Ik ben jouw persoonlijke stylist. Ik ken jouw garderobe en stijlprofiel. Wat kan ik voor je doen?`);
+  } else {
+    renderChatHistory();
+  }
+}
+
+function buildProfileText() {
+  const p = state.userProfile;
+  if (!p) return 'Onbekend profiel';
+  const palet = KLEURENPALET_LABELS[p.kleurenpalet];
+  return `Naam: ${p.naam}. Stijl: ${(p.stijl||[]).join(', ')}. Kleuren: ${palet?.kleuren?.join(', ') || p.kleurenpalet}. Silhouet: ${SILHOUET_LABELS[p.silhouet] || p.silhouet}. Gelegenheden: ${(p.gelegenheden||[]).join(', ')}. Materiaal voorkeur: ${p.materiaal}. No-go's: ${(p.nogo||[]).join(', ')||'geen'}.`;
+}
+
+function buildSystemPrompt() {
+  const profiel = buildProfileText();
+  const items = Object.values(state.items).map(i => `${i.name} (${i.category}, ${i.color || ''})`).join(', ') || 'Nog geen items';
+  const wornRecent = Object.entries(state.wornLog).filter(([,log]) => log.length > 0).map(([id]) => state.items[id]?.name).filter(Boolean).join(', ') || 'Nog niets gelogd';
+  const cyclusInfo = getCyclusInfo();
+
+  return `Je bent een warme, deskundige persoonlijke stylist én lifestyle coach.
+Je spreekt ${state.userProfile?.naam || 'de gebruiker'} altijd aan met haar naam, in het Nederlands, informeel.
+Je kent haar volledig:
+
+STIJLPROFIEL: ${profiel}
+
+GARDEROBE (${Object.keys(state.items).length} items): ${items}
+
+RECENT GEDRAGEN: ${wornRecent}
+
+CYCLUS: ${cyclusInfo}
+
+REGELS:
+- Geef concrete, actionable stijladvies
+- Verwijs altijd naar items uit haar garderobe
+- Herken patronen ("je draagt vaak...")
+- Denk als een vriendin die ook stylist is
+- Wees enthousiast maar eerlijk
+- Geef nooit een generieke tip — altijd specifiek op haar profiel
+- Reacties max 150 woorden tenzij anders gevraagd`;
+}
+
+function getCyclusInfo() {
+  if (!state.cyclusData.startDate) return 'Niet bijgehouden';
+  const start = new Date(state.cyclusData.startDate);
+  const today = new Date();
+  const dag = Math.floor((today - start) / (1000*60*60*24)) + 1;
+  const fase = CYCLUS_FASES.find(f => dag >= f.dagen[0] && dag <= f.dagen[1]);
+  return fase ? `Dag ${dag}, ${fase.naam} fase — ${fase.advies}` : `Dag ${dag}`;
+}
+
+function addChatMessage(role, content) {
+  state.chatHistory.push({ role, content, time: new Date().toLocaleTimeString('nl', {hour:'2-digit', minute:'2-digit'}) });
+  renderChatHistory();
+  saveState();
+}
+
+function renderChatHistory() {
+  const container = document.getElementById('chat-messages');
+  container.innerHTML = state.chatHistory.map(msg => `
+    <div class="msg ${msg.role}">
+      <div class="msg-bubble">${msg.content.replace(/\n/g, '<br>')}</div>
+      <div class="msg-time">${msg.time || ''}</div>
+    </div>
+  `).join('');
+  container.scrollTop = container.scrollHeight;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  input.style.height = 'auto';
+
+  addChatMessage('user', msg);
+
+  // Show typing
+  const container = document.getElementById('chat-messages');
+  const typingEl = document.createElement('div');
+  typingEl.className = 'msg assistant';
+  typingEl.id = 'typing';
+  typingEl.innerHTML = '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+  container.appendChild(typingEl);
+  container.scrollTop = container.scrollHeight;
+
+  document.getElementById('chat-send-btn').disabled = true;
+
+  try {
+    const messages = state.chatHistory.map(m => ({ role: m.role, content: m.content }));
+    const response = await callAIWithSystem(buildSystemPrompt(), messages, 400);
+    typingEl.remove();
+    addChatMessage('assistant', response);
+  } catch(e) {
+    typingEl.remove();
+    addChatMessage('assistant', 'Even geen verbinding. Probeer het zo opnieuw!');
+  }
+
+  document.getElementById('chat-send-btn').disabled = false;
+}
+
+function sendQuickMsg(el) {
+  const msg = el.textContent;
+  document.getElementById('chat-input').value = msg;
+  sendChat();
+}
+
+function chatKeyDown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendChat();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+
+function clearChat() {
+  state.chatHistory = [];
+  saveState();
+  initChat();
+}
+
+// ══════════════════════════════════════
+// WEEK PLANNER
+// ══════════════════════════════════════
+function renderWeekDays() {
+  const container = document.getElementById('week-days');
+  const today = new Date();
+  const dagen = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
+  const dagenLang = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
+  const maanden = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+
+  let html = '';
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    const key = date.toISOString().split('T')[0];
+    const isToday = i === 0;
+    const dagPlan = state.weekPlan[key];
+
+    html += `
+      <div class="week-day-card">
+        <div class="week-day-header" onclick="toggleWeekDay('${key}')">
+          <div>
+            <div class="week-day-name ${isToday?'today'}">${isToday?'Vandaag':dagenLang[date.getDay()]}</div>
+            <div class="week-day-date">${date.getDate()} ${maanden[date.getMonth()]}</div>
+          </div>
+          <div class="week-day-outfit-preview">
+            ${dagPlan ? `
+              ${(dagPlan.items||[]).slice(0,3).map(name => {
+                const item = findItemByName(name);
+                return `<div class="week-outfit-item">${item?.emoji || '👔'}</div>`;
+              }).join('')}
+            ` : `<div style="font-size:12px;color:var(--text-light)">Leeg</div>`}
+            <div style="font-size:14px;color:var(--text-light);margin-left:4px">›</div>
+          </div>
+        </div>
+        <div class="week-day-body" id="week-body-${key}">
+          ${dagPlan ? `
+            <div style="padding-top:10px">
+              <div class="outfit-items-display" style="flex-wrap:wrap">
+                ${(dagPlan.items||[]).map(name => `<span class="outfit-item-chip" style="background:var(--ivory);color:var(--text);border:1px solid var(--border)">${name}</span>`).join('')}
+              </div>
+              ${dagPlan.tip ? `<p style="font-size:13px;color:var(--text-muted);margin-top:8px;font-style:italic">"${dagPlan.tip}"</p>` : ''}
+            </div>
+          ` : ''}
+          <button class="week-add-btn" onclick="addWeekOutfit('${key}')">+ ${dagPlan ? 'Wijzig' : 'Outfit toevoegen'}</button>
+        </div>
+      </div>
+    `;
+  }
+  container.innerHTML = html;
+}
+
+function toggleWeekDay(key) {
+  const body = document.getElementById('week-body-' + key);
+  body.classList.toggle('open');
+}
+
+async function addWeekOutfit(key) {
+  const items = Object.values(state.items);
+  if (items.length < 2) { showToast('Voeg eerst items toe'); return; }
+
+  showToast('Outfit plannen...');
+  const date = new Date(key);
+  const dag = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'][date.getDay()];
+
+  const prompt = `Plan een outfit voor ${dag}. Garderobe: ${items.map(i=>i.name).join(', ')}. Profiel: ${buildProfileText()}. JSON: {"items": ["item1","item2","item3"], "tip": "tip"}`;
+  try {
+    const r = await callAI(prompt, 200);
+    const outfit = parseOutfitResponse(r);
+    state.weekPlan[key] = outfit;
+    saveState();
+    renderWeekDays();
+  } catch(e) {
+    showToast('Probeer opnieuw');
+  }
+}
+
+async function generateWeekOutfits() {
+  showToast('Week plannen...');
+  const today = new Date();
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    const key = date.toISOString().split('T')[0];
+    await addWeekOutfit(key);
+    await new Promise(r => setTimeout(r, 300));
+  }
+}
+
+// ══════════════════════════════════════
+// INZICHTEN
+// ══════════════════════════════════════
+function renderInzichten() {
+  const items = Object.values(state.items);
+  const content = document.getElementById('inzichten-content');
+
+  if (items.length === 0) {
+    content.innerHTML = '<p style="font-size:13px;color:var(--text-muted)">Voeg items toe om je inzichten te zien.</p>';
+    return;
+  }
+
+  // Meest gedragen
+  const worn = items.map(i => ({ name: i.name, count: getWornCount(i.id) }))
+    .sort((a,b) => b.count - a.count).slice(0, 4);
+
+  const maxCount = Math.max(...worn.map(w=>w.count), 1);
+
+  // Categories
+  const cats = {};
+  items.forEach(i => cats[i.category] = (cats[i.category]||0) + 1);
+
+  content.innerHTML = `
+    <div style="margin-bottom:12px">
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;font-weight:600">MEEST GEDRAGEN</div>
+      ${worn.map(w => `
+        <div class="inzicht-row">
+          <div class="inzicht-label">${w.name}</div>
+          <div class="inzicht-bar-track">
+            <div class="inzicht-bar-fill" style="width:${Math.max((w.count/maxCount)*100,8)}%"></div>
+          </div>
+          <div class="inzicht-count">${w.count}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <span style="font-size:12px;color:var(--text-muted)">${items.length} items totaal</span>
+      ${Object.entries(cats).map(([cat, n]) => `<span style="font-size:12px;color:var(--text-muted)">${getCategoryEmoji(cat)} ${n}</span>`).join('')}
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════
+// BOARDS
+// ══════════════════════════════════════
+function openBoards() {
+  renderBoards();
+  openModal('modal-boards');
+}
+
+function renderBoards() {
+  const grid = document.getElementById('boards-grid');
+  grid.innerHTML = state.boards.map(board => `
+    <div class="board-card" onclick="openBoardDetail('${board.id}')">
+      <div class="board-card-top">
+        <span style="font-size:32px">${board.emoji}</span>
+        ${board.outfits.length ? `<div class="board-outfit-count">${board.outfits.length}</div>` : ''}
+      </div>
+      <div class="board-info">
+        <div class="board-name">${board.label}</div>
+        <div class="board-count">${board.outfits.length} outfits</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openBoardDetail(id) {
+  const board = state.boards.find(b => b.id === id);
+  if (!board) return;
+  showToast(`Board: ${board.label} — ${board.outfits.length} outfits`);
+}
+
+function addBoard() {
+  const name = prompt('Naam voor het nieuwe board:');
+  if (!name) return;
+  const emojis = ['🌊','🌸','⚡','🎪','🌿','🔥','💫','🎨'];
+  state.boards.push({
+    id: 'board_' + Date.now(),
+    label: name,
+    emoji: emojis[Math.floor(Math.random()*emojis.length)],
+    outfits: []
+  });
+  saveState();
+  renderBoards();
+}
+
+// ══════════════════════════════════════
+// DNA PROFIEL
+// ══════════════════════════════════════
+function openDNAModal() {
+  renderDNAProfile();
+  openModal('modal-dna');
+}
+
+function renderDNAProfile() {
+  const p = state.userProfile;
+  if (!p) return;
+
+  const palet = KLEURENPALET_LABELS[p.kleurenpalet] || KLEURENPALET_LABELS.neutraal;
+  const content = document.getElementById('dna-profile-content');
+
+  content.innerHTML = `
+    <div class="dna-hero" style="margin-bottom:14px">
+      <div class="dna-hero-label">Stijl DNA van</div>
+      <div class="dna-hero-name">${p.naam}</div>
+      <div class="dna-tags">
+        ${(p.stijl||[]).map(s=>`<span class="dna-tag">${s}</span>`).join('')}
+        <span class="dna-tag">${palet.label}</span>
+      </div>
+    </div>
+
+    <div class="dna-section">
+      <div class="dna-section-title"><span>🎨</span> Kleurenpalet</div>
+      <div class="dna-content">${palet.label}</div>
+      <div class="color-swatches-row">
+        ${palet.hex.map((hex, i) => `
+          <div class="color-swatch">
+            <div class="color-dot" style="background:${hex}"></div>
+            ${palet.kleuren[i] || ''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="dna-section">
+      <div class="dna-section-title"><span>👗</span> Silhouet</div>
+      <div class="dna-content">${SILHOUET_LABELS[p.silhouet] || 'Vrije keuze'}</div>
+    </div>
+
+    <div class="dna-section">
+      <div class="dna-section-title"><span>🧵</span> Materiaal</div>
+      <div class="dna-content">${p.materiaal ? `Voorkeur: ${p.materiaal}` : 'Geen specifieke voorkeur'}</div>
+    </div>
+
+    <div class="dna-section">
+      <div class="dna-section-title"><span>📅</span> Gelegenheden</div>
+      <div class="dna-content">${(p.gelegenheden||[]).join(', ') || 'Alle gelegenheden'}</div>
+    </div>
+
+    ${p.nogo?.length ? `
+    <div class="dna-section">
+      <div class="dna-section-title"><span>🚫</span> Vermijden</div>
+      <div class="dna-content">${p.nogo.join(', ')}</div>
+    </div>
+    ` : ''}
+  `;
+}
+
+// ══════════════════════════════════════
+// CYCLUS
+// ══════════════════════════════════════
+function openCyclus() {
+  renderCyclusModal();
+  openModal('modal-cyclus');
+}
+
+function getCyclusInfo2() {
+  if (!state.cyclusData.startDate) return null;
+  const start = new Date(state.cyclusData.startDate);
+  const today = new Date();
+  const dag = Math.floor((today - start) / (1000*60*60*24)) % state.cyclusData.lengthDays + 1;
+  const fase = CYCLUS_FASES.find(f => dag >= f.dagen[0] && dag <= f.dagen[1]) || CYCLUS_FASES[3];
+  return { dag, fase, start };
+}
+
+function renderCyclusPreview() {
+  const info = getCyclusInfo2();
+  const badge = document.getElementById('cy-badge');
+
+  if (!info) {
+    document.getElementById('cy-dag-label').textContent = 'Cyclus tracker';
+    document.getElementById('cy-fase-label').textContent = 'Nog niet gestart';
+    document.getElementById('cy-advies').textContent = 'Start je cyclus tracker voor persoonlijk outfitadvies per fase.';
+    badge.textContent = 'Starten →';
+    badge.onclick = openCyclus;
+    return;
+  }
+
+  const { dag, fase } = info;
+  document.getElementById('cy-dag-label').textContent = `Dag ${dag}`;
+  document.getElementById('cy-fase-label').textContent = `${fase.emoji} ${fase.naam}`;
+  document.getElementById('cy-advies').textContent = fase.advies;
+  document.getElementById('cy-length').textContent = `Dag ${state.cyclusData.lengthDays}`;
+  badge.textContent = fase.emoji;
+  badge.onclick = openCyclus;
+
+  // Bar
+  const bar = document.getElementById('cy-bar');
+  let barHtml = '';
+  for (let i = 1; i <= state.cyclusData.lengthDays; i++) {
+    const cls = i < dag ? 'past' : i === dag ? 'active' : '';
+    barHtml += `<div class="cyclus-segment ${cls}"></div>`;
+  }
+  bar.innerHTML = barHtml;
+}
+
+function renderCyclusModal() {
+  const body = document.getElementById('cyclus-modal-body');
+  const info = getCyclusInfo2();
+
+  body.innerHTML = `
+    ${info ? `
+      <div style="padding:14px 0;margin-bottom:16px;border-bottom:1px solid var(--border-light)">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Huidige fase</div>
+        <div style="font-size:24px;font-family:var(--font-display);font-weight:500;margin-bottom:6px">${info.fase.emoji} ${info.fase.naam} — Dag ${info.dag}</div>
+        <p style="font-size:13px;color:var(--text-muted);line-height:1.6;font-style:italic">${info.fase.advies}</p>
+      </div>
+      <div style="margin-bottom:16px">
+        <div class="cyclus-bar" style="height:10px;margin-bottom:4px">
+          ${Array.from({length:state.cyclusData.lengthDays}, (_,i) => `
+            <div class="cyclus-segment ${i+1 < info.dag ? 'past' : i+1 === info.dag ? 'active' : ''}"></div>
+          `).join('')}
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-light)">
+          <span>Dag 1</span><span>Dag ${state.cyclusData.lengthDays}</span>
+        </div>
+      </div>
+    ` : ''}
+
+    <div style="margin-bottom:16px">
+      <div class="form-label" style="margin-bottom:8px">Fases & stijladvies</div>
+      ${CYCLUS_FASES.map(fase => `
+        <div style="padding:12px;background:var(--ivory);border-radius:var(--radius-xs);margin-bottom:8px;border-left:3px solid ${fase.kleur}">
+          <div style="font-weight:600;font-size:13px;margin-bottom:4px">${fase.emoji} ${fase.naam} — Dag ${fase.dagen[0]}-${fase.dagen[1]}</div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.5">${fase.advies}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div style="margin-bottom:16px">
+      <label class="form-label">Cycluslengte (dagen)</label>
+      <input type="number" class="form-input" id="cyclus-length" value="${state.cyclusData.lengthDays}" min="21" max="40">
+    </div>
+
+    <button class="btn-primary" onclick="startNieuweCyclus()">
+      ${info ? '↻ Nieuwe cyclus starten' : '▶ Cyclus starten (vandaag)'}
+    </button>
+    ${info ? `<button class="btn-secondary" onclick="resetCyclus()">Cyclus resetten</button>` : ''}
+  `;
+}
+
+function startNieuweCyclus() {
+  const length = parseInt(document.getElementById('cyclus-length').value) || 28;
+  state.cyclusData.startDate = new Date().toISOString().split('T')[0];
+  state.cyclusData.lengthDays = length;
+  state.cyclusData.history.push({ start: state.cyclusData.startDate, length });
+  saveState();
+  renderCyclusPreview();
+  renderCyclusModal();
+  showToast('Nieuwe cyclus gestart ✓');
+}
+
+function resetCyclus() {
+  state.cyclusData.startDate = null;
+  saveState();
+  renderCyclusPreview();
+  renderCyclusModal();
+  showToast('Cyclus gereset');
+}
+
+// ══════════════════════════════════════
+// SHOPPING
+// ══════════════════════════════════════
+function openShopping() {
+  openModal('modal-shopping');
+}
+
+async function generateShoppingList() {
+  const resultEl = document.getElementById('shopping-result');
+  resultEl.innerHTML = '<div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>';
+
+  const items = Object.values(state.items);
+  const profiel = buildProfileText();
+  const prompt = `Je bent een persoonlijke stylist. Analyseer deze garderobe en geef 5 concrete shopping-tips.
+Garderobe: ${items.map(i=>i.name).join(', ')||'Leeg'}
+Profiel: ${profiel}
+Geef 5 items die ze missen, met winkeladvies. Maak het specifiek en concreet.`;
+
+  try {
+    const r = await callAI(prompt, 400);
+    resultEl.innerHTML = `<div style="font-size:14px;line-height:1.7;color:var(--text);white-space:pre-wrap">${r}</div>`;
+  } catch(e) {
+    resultEl.innerHTML = '<p style="color:var(--text-muted)">Even geen verbinding. Probeer opnieuw.</p>';
+  }
+}
+
+// ══════════════════════════════════════
+// INSPO SCAN
+// ══════════════════════════════════════
+function openInspoScan() { openModal('modal-inspo'); }
+
+function handleInspoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const dataUrl = e.target.result;
+    const uploadArea = document.getElementById('inspo-upload');
+    uploadArea.innerHTML = `<img src="${dataUrl}" alt="inspo" style="width:100%;height:100%;object-fit:cover;position:absolute"><input type="file" id="inspo-input" accept="image/*" onchange="handleInspoUpload(event)">`;
+
+    const result = document.getElementById('inspo-result');
+    result.innerHTML = '<div class="loading-dots" style="justify-content:center;padding:16px"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>';
+
+    const items = Object.values(state.items).map(i=>i.name).join(', ');
+    const prompt = `Ik heb een inspiratiefoto geüpload. Welke items uit mijn garderobe kunnen een vergelijkbare look creëren?
+Mijn garderobe: ${items||'Nog leeg'}
+Geef 3 concrete combinaties.`;
+
+    try {
+      const r = await callAI(prompt, 300);
+      result.innerHTML = `<div style="font-size:14px;line-height:1.7;color:var(--text);margin-top:12px">${r}</div>`;
+    } catch(e) {
+      result.innerHTML = '<p style="color:var(--text-muted);margin-top:12px">Scan mislukt. Probeer opnieuw.</p>';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+// ══════════════════════════════════════
+// OUTFIT HISTORY
+// ══════════════════════════════════════
+function openOutfitHistory() {
+  const body = document.getElementById('history-body');
+  const entries = Object.entries(state.wellbeingLog)
+    .filter(([,v]) => v.outfit)
+    .sort((a,b) => b[0].localeCompare(a[0]))
+    .slice(0, 20);
+
+  if (!entries.length) {
+    body.innerHTML = '<div class="empty-state" style="padding:32px 0"><div class="empty-state-icon">📅</div><div class="empty-state-title">Nog niets gelogd</div><div class="empty-state-text">Log je outfits via de dagkaart om ze hier te zien.</div></div>';
+  } else {
+    body.innerHTML = entries.map(([date, data]) => `
+      <div style="padding:12px 0;border-bottom:1px solid var(--border-light)">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">${formatDate(date)}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          ${(data.outfit?.items||[]).map(i=>`<span style="padding:4px 10px;background:var(--ivory);border-radius:100px;font-size:12px">${i}</span>`).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+  openModal('modal-history');
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr);
+  const dagen = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
+  const maanden = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+  return `${dagen[d.getDay()]} ${d.getDate()} ${maanden[d.getMonth()]}`;
+}
+
+// ══════════════════════════════════════
+// GISTEREN
+// ══════════════════════════════════════
+let selectedGisterenItems = new Set();
+
+function openGisterenModal() {
+  selectedGisterenItems = new Set();
+  const grid = document.getElementById('gisteren-items');
+  const items = Object.values(state.items);
+  grid.innerHTML = items.map(item => `
+    <div class="item-card" id="gist-${item.id}" onclick="toggleGisterenItem('${item.id}')">
+      <div class="item-photo" style="background:var(--ivory)">
+        <span style="font-size:28px">${item.emoji || getCategoryEmoji(item.category)}</span>
+      </div>
+      <div class="item-info">
+        <div class="item-name">${item.name}</div>
+      </div>
+    </div>
+  `).join('');
+  openModal('modal-gisteren');
+}
+
+function toggleGisterenItem(id) {
+  const el = document.getElementById('gist-' + id);
+  if (selectedGisterenItems.has(id)) {
+    selectedGisterenItems.delete(id);
+    el.style.outline = 'none';
+  } else {
+    selectedGisterenItems.add(id);
+    el.style.outline = '2px solid var(--rose)';
+    el.style.borderRadius = 'var(--radius-sm)';
+  }
+}
+
+function saveGisteren() {
+  const gisteren = new Date();
+  gisteren.setDate(gisteren.getDate() - 1);
+  const key = gisteren.toISOString().split('T')[0];
+
+  selectedGisterenItems.forEach(id => {
+    if (!state.wornLog[id]) state.wornLog[id] = [];
+    state.wornLog[id].push(key);
+  });
+
+  const outfit = { items: [...selectedGisterenItems].map(id => state.items[id]?.name).filter(Boolean) };
+  state.wellbeingLog[key] = { ...(state.wellbeingLog[key]||{}), outfit };
+
+  saveState();
+  closeModal('modal-gisteren');
+  showToast(`${selectedGisterenItems.size} items gelogd voor gisteren ✓`);
+  renderGarderobe();
+}
+
+// ══════════════════════════════════════
+// WEATHER
+// ══════════════════════════════════════
+async function fetchWeather() {
+  if (!navigator.geolocation) return;
+  document.getElementById('weather-chip').innerHTML = `<span>🌤</span><span>ophalen...</span>`;
+
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    try {
+      const { latitude: lat, longitude: lon } = pos.coords;
+      const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode&timezone=auto`);
+      const d = await r.json();
+      const temp = Math.round(d.current.temperature_2m);
+      const code = d.current.weathercode;
+      const icon = getWeatherIcon(code);
+      const desc = temp >= 22 ? 'Warm' : temp >= 14 ? 'Mild' : 'Koel';
+      state.weather = { temp, icon, desc };
+      document.getElementById('weather-icon').textContent = icon;
+      document.getElementById('weather-temp').textContent = `${temp}°`;
+    } catch(e) {
+      document.getElementById('weather-chip').innerHTML = `<span>🌤</span><span>--°</span>`;
+    }
+  }, () => {
+    document.getElementById('weather-chip').innerHTML = `<span>🌤</span><span>--°</span>`;
+  });
+}
+
+function getWeatherIcon(code) {
+  if (code === 0) return '☀️';
+  if (code <= 3) return '⛅';
+  if (code <= 55) return '🌦';
+  if (code <= 67) return '🌧';
+  if (code <= 77) return '🌨';
+  if (code <= 82) return '🌧';
+  return '⛈';
+}
+
+// ══════════════════════════════════════
+// AI API
+// ══════════════════════════════════════
+async function callAI(prompt, maxTokens = 400) {
+  const r = await fetch(WORKER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: maxTokens,
+      messages: [{ role: 'user', content: prompt }],
+    }),
+  });
+  if (!r.ok) throw new Error('API error');
+  const d = await r.json();
+  return d.content?.[0]?.text || '';
+}
+
+async function callAIWithSystem(systemPrompt, messages, maxTokens = 400) {
+  const r = await fetch(WORKER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      messages: messages.slice(-10), // max 10 berichten context
+    }),
+  });
+  if (!r.ok) throw new Error('API error');
+  const d = await r.json();
+  return d.content?.[0]?.text || '';
+}
+
+// ══════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// ══════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+async function init() {
+  await initPhotoDB();
+  loadState();
+
+  if (!state.userProfile) {
+    // Onboarding
+    document.getElementById('onboarding').style.display = 'flex';
+    document.getElementById('app').classList.remove('visible');
+    initOnboarding();
+  } else {
+    document.getElementById('onboarding').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    initApp();
+
+    if (Object.keys(state.items).length === 0) {
+      document.getElementById('demo-banner').style.display = 'flex';
+    }
+  }
+}
+
+init();
+</script>
+</body>
+</html>
