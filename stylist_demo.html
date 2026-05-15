@@ -2447,7 +2447,14 @@ body {
 // STATE & CONSTANTS
 // ══════════════════════════════════════
 const WORKER_URL = 'https://griette-stylist.griette.workers.dev';
-const STORAGE_KEY = 'stylistApp_v1';
+
+// Controleer login — stuur terug als er geen code is
+const _SS_CODE = (() => { try { return localStorage.getItem('ss-code'); } catch(e) { return null; } })();
+if (!_SS_CODE) { window.location.replace('stijlstudio.html'); }
+
+// Data volledig scheiden per gebruiker via de inlogcode
+const STORAGE_KEY = 'stylistApp_v1_' + _SS_CODE;
+const PHOTO_DB_NAME = 'StylistPhotos_' + _SS_CODE;
 
 let state = {
   items: {},
@@ -2522,7 +2529,7 @@ function loadState() {
 let photoDB;
 function initPhotoDB() {
   return new Promise((resolve) => {
-    const req = indexedDB.open('StylistPhotos', 1);
+    const req = indexedDB.open(PHOTO_DB_NAME, 1);
     req.onupgradeneeded = (e) => {
       e.target.result.createObjectStore('photos');
     };
