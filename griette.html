@@ -30,18 +30,18 @@ body{background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);min
 .eyebrow{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--brown-warm);margin-bottom:8px;}
 .header h1{font-family:'Bodoni Moda',serif;font-size:34px;font-weight:400;color:var(--cream);line-height:1.05;}
 .header h1 em{font-style:italic;color:#9AACB8;}
-.header p{margin-top:6px;font-size:11px;color:rgba(247,241,232,0.45);font-weight:300;}
+.header p{margin-top:6px;font-size:11px;color:rgba(245,242,238,0.45);font-weight:300;}
 
 /* BOTTOM NAV */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--brown);z-index:300;display:flex;align-items:stretch;box-shadow:0 -2px 16px rgba(46,26,14,0.18);padding-bottom:env(safe-area-inset-bottom,0);}
-.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px 10px;cursor:pointer;border:none;background:transparent;color:rgba(247,241,232,0.45);font-family:'Jost',sans-serif;font-size:8px;letter-spacing:1px;text-transform:uppercase;gap:4px;transition:color 0.18s;position:relative;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--brown);z-index:300;display:flex;align-items:stretch;box-shadow:0 -2px 16px rgba(28,26,24,0.18);padding-bottom:env(safe-area-inset-bottom,0);}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px 10px;cursor:pointer;border:none;background:transparent;color:rgba(245,242,238,0.45);font-family:'Jost',sans-serif;font-size:8px;letter-spacing:1px;text-transform:uppercase;gap:4px;transition:color 0.18s;position:relative;}
 .bnav-item.active{color:var(--cream);}
 .bnav-item .bnav-icon{font-size:20px;line-height:1;}
 .bnav-item::after{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:#8090A0;border-radius:0 0 2px 2px;opacity:0;transition:opacity 0.18s;}
 .bnav-item.active::after{opacity:1;}
 .meer-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--cream);border-radius:20px 20px 0 0;z-index:400;padding:16px 16px calc(80px + env(safe-area-inset-bottom,0));transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);max-height:80vh;overflow-y:auto;}
 .meer-sheet.open{transform:translateY(0);}
-.meer-sheet-backdrop{position:fixed;inset:0;background:rgba(46,26,14,0.5);z-index:390;display:none;}
+.meer-sheet-backdrop{position:fixed;inset:0;background:rgba(28,26,24,0.5);z-index:390;display:none;}
 .meer-sheet-backdrop.open{display:block;}
 
 /* PANELS */
@@ -58,7 +58,7 @@ body{background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);min
 .items-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
 .item-card{background:var(--white);border-radius:10px;overflow:hidden;cursor:pointer;position:relative;display:flex;flex-direction:column;border:1.5px solid var(--cream-dark);transition:border-color 0.2s,transform 0.15s;}
 .item-card:active{transform:scale(0.98);}
-.item-card.selected{border-color:var(--brown-warm);box-shadow:0 0 0 2px rgba(155,98,64,0.2);}
+.item-card.selected{border-color:var(--brown-warm);box-shadow:0 0 0 2px rgba(74,82,96,0.2);}
 .item-card .photo-area{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:var(--cream);position:relative;overflow:hidden;}
 .item-card .photo-area img{width:100%;height:100%;object-fit:cover;}
 .placeholder{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px;}
@@ -104,7 +104,7 @@ body{background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);min
 
 .outfit-slot{width:70px;height:80px;flex-shrink:0;border-radius:8px;overflow:hidden;background:var(--cream);display:flex;align-items:center;justify-content:center;position:relative;border:1.5px solid var(--cream-dark);}
 .outfit-slot img{width:100%;height:100%;object-fit:cover;}
-.outfit-slot .slot-label{position:absolute;bottom:0;left:0;right:0;background:rgba(46,26,14,0.6);color:white;font-size:7px;padding:2px 3px;text-align:center;line-height:1.2;}
+.outfit-slot .slot-label{position:absolute;bottom:0;left:0;right:0;background:rgba(28,26,24,0.6);color:white;font-size:7px;padding:2px 3px;text-align:center;line-height:1.2;}
 .outfit-slot .remove-slot{position:absolute;top:2px;right:2px;background:rgba(255,255,255,0.88);border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--brown);z-index:2;}
 .outfit-slot .swap-slot{position:absolute;bottom:2px;right:2px;background:rgba(155,98,64,0.85);border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:white;z-index:2;}
 .outfit-drop-zone{width:70px;height:80px;flex-shrink:0;border-radius:8px;border:1.5px dashed var(--brown-warm);display:flex;align-items:center;justify-content:center;color:var(--brown-warm);font-size:20px;cursor:pointer;background:transparent;}
@@ -114,7 +114,7 @@ body{background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);min
 .outfit-note input{width:100%;background:transparent;border:none;border-top:1px solid var(--cream-dark);padding-top:8px;font-size:10px;color:var(--muted);font-family:'Jost',sans-serif;outline:none;}
 
 /* PICKER MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(46,26,14,0.5);z-index:500;display:none;align-items:flex-end;}
+.modal-overlay{position:fixed;inset:0;background:rgba(28,26,24,0.5);z-index:500;display:none;align-items:flex-end;}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:80vh;overflow-y:auto;padding:20px 16px 40px;}
 .modal-handle{width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 16px;}
@@ -125,7 +125,7 @@ body{background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);min
 .modal-add-btn{padding:8px 18px;background:var(--brown);color:var(--cream);border:none;border-radius:20px;font-size:10px;font-family:'Jost',sans-serif;cursor:pointer;letter-spacing:1px;text-transform:uppercase;}
 .modal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
 .modal-item{background:var(--white);border-radius:8px;overflow:hidden;cursor:pointer;border:1.5px solid var(--cream-dark);transition:border-color 0.15s;}
-.modal-item.sel{border-color:var(--brown-warm);box-shadow:0 0 0 2px rgba(155,98,64,0.2);}
+.modal-item.sel{border-color:var(--brown-warm);box-shadow:0 0 0 2px rgba(74,82,96,0.2);}
 .modal-item .mphoto{aspect-ratio:1;background:var(--cream-dark);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:16px;position:relative;}
 .modal-item .mphoto img{width:100%;height:100%;object-fit:cover;}
 .modal-item .mcheck{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:var(--brown-warm);color:white;font-size:9px;display:none;align-items:center;justify-content:center;}
@@ -151,7 +151,7 @@ body{background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);min
 .occ-selector::-webkit-scrollbar{display:none;}
 .occ-chip{flex-shrink:0;padding:8px 14px;border-radius:20px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;white-space:nowrap;transition:all 0.2s;}
 .occ-chip.active{background:var(--brown);color:var(--cream);border-color:var(--brown);}
-.sug-card{background:var(--white);border-radius:14px;overflow:hidden;margin-bottom:14px;border:1.5px solid var(--cream-dark);box-shadow:0 2px 12px rgba(46,26,14,0.06);}
+.sug-card{background:var(--white);border-radius:14px;overflow:hidden;margin-bottom:14px;border:1.5px solid var(--cream-dark);box-shadow:0 2px 12px rgba(28,26,24,0.06);}
 .sug-card-header{padding:14px 16px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
 .sug-card-title{font-family:'Bodoni Moda',serif;font-size:18px;font-weight:400;color:var(--brown);}
 .sug-card-sub{font-size:10px;color:var(--muted);margin-top:2px;font-weight:300;}
@@ -178,7 +178,7 @@ body{background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);min
 .worn-badge{position:absolute;top:4px;right:4px;background:var(--brown-warm);color:white;font-size:7px;letter-spacing:0.5px;padding:2px 5px;border-radius:6px;text-transform:uppercase;font-family:'Jost',sans-serif;}
 .ai-tip-card{background:linear-gradient(135deg,var(--brown),var(--brown-mid));border-radius:12px;padding:14px 16px;margin-bottom:14px;color:var(--cream);}
 .ai-tip-card .tip-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);margin-bottom:6px;}
-.ai-tip-card .tip-text{font-size:12px;line-height:1.6;color:rgba(247,241,232,0.9);}
+.ai-tip-card .tip-text{font-size:12px;line-height:1.6;color:rgba(245,242,238,0.9);}
 .today-weather-btn.active{background:var(--brown);color:var(--cream);border-color:var(--brown);}
 .today-occ-btn{padding:10px;border:1.5px solid var(--cream-dark);border-radius:10px;background:var(--white);font-size:10px;font-family:'Jost',sans-serif;cursor:pointer;text-align:center;transition:all 0.2s;color:var(--text);}
 .today-occ-btn.active{background:var(--brown);color:var(--cream);border-color:var(--brown);}
@@ -210,16 +210,16 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 /* INSPO GALLERY */
 .inspo-gallery-card{position:relative;border-radius:10px;overflow:hidden;background:var(--cream-dark);aspect-ratio:3/4;cursor:pointer;}
 .inspo-gallery-card img{width:100%;height:100%;object-fit:cover;}
-.inspo-gallery-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(46,26,14,0.75));padding:8px;}
-.inspo-gallery-label{font-size:8px;color:rgba(247,241,232,0.8);line-height:1.3;}
-.inspo-gallery-del{position:absolute;top:5px;right:5px;background:rgba(46,26,14,0.5);color:white;border:none;border-radius:50%;width:22px;height:22px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.inspo-gallery-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(28,26,24,0.75));padding:8px;}
+.inspo-gallery-label{font-size:8px;color:rgba(245,242,238,0.8);line-height:1.3;}
+.inspo-gallery-del{position:absolute;top:5px;right:5px;background:rgba(28,26,24,0.5);color:white;border:none;border-radius:50%;width:22px;height:22px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 
 /* OUTFIT SELFIE */
 .outfit-selfie-row{position:relative;overflow:hidden;max-height:0;transition:max-height 0.3s ease;}
 .outfit-selfie-row.has-selfie{max-height:280px;}
 .selfie-img{width:100%;height:220px;object-fit:cover;display:block;}
-.selfie-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(46,26,14,0.7));padding:10px 12px;display:flex;justify-content:space-between;align-items:flex-end;}
-.selfie-date{font-size:9px;color:rgba(247,241,232,0.7);letter-spacing:1px;}
+.selfie-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(28,26,24,0.7));padding:10px 12px;display:flex;justify-content:space-between;align-items:flex-end;}
+.selfie-date{font-size:9px;color:rgba(245,242,238,0.7);letter-spacing:1px;}
 .selfie-del-btn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:white;border-radius:10px;padding:3px 8px;font-size:9px;cursor:pointer;font-family:'Jost',sans-serif;}
 .selfie-add-hint{display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;color:var(--muted);font-size:10px;cursor:pointer;}
 
@@ -231,7 +231,7 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 .inspo-drop-text{font-size:11px;color:var(--muted);line-height:1.5;}
 .inspo-preview{position:relative;border-radius:10px;overflow:hidden;margin-bottom:14px;}
 .inspo-preview img{width:100%;max-height:260px;object-fit:cover;display:block;}
-.inspo-clear{position:absolute;top:8px;right:8px;background:rgba(46,26,14,0.6);color:white;border:none;border-radius:50%;width:26px;height:26px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.inspo-clear{position:absolute;top:8px;right:8px;background:rgba(28,26,24,0.6);color:white;border:none;border-radius:50%;width:26px;height:26px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .inspo-analyze-btn{width:100%;padding:12px;background:var(--brown);color:var(--cream);border:none;border-radius:12px;font-size:11px;font-family:'Jost',sans-serif;cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;}
 .inspo-analyze-btn:disabled{opacity:0.5;pointer-events:none;}
 .inspo-result{background:var(--cream);border-radius:12px;padding:14px;}
@@ -257,13 +257,13 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 .weather-banner{background:var(--brown);color:var(--cream);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;}
 .weather-left{display:flex;align-items:center;gap:8px;}
 .weather-icon{font-size:22px;line-height:1;}
-.weather-temp{font-family:'Bodoni Moda',serif;font-size:22px;font-weight:400;color:#c9a87a;}
-.weather-desc{font-size:10px;color:rgba(247,241,232,0.6);margin-top:1px;}
+.weather-temp{font-family:'Bodoni Moda',serif;font-size:22px;font-weight:400;color:#8090A0;}
+.weather-desc{font-size:10px;color:rgba(245,242,238,0.6);margin-top:1px;}
 .weather-right{text-align:right;}
-.weather-city{font-size:10px;color:rgba(247,241,232,0.5);letter-spacing:1px;text-transform:uppercase;}
-.weather-advice{font-size:10px;color:#c9a87a;margin-top:2px;font-style:italic;}
-.weather-loading{font-size:10px;color:rgba(247,241,232,0.4);padding:8px 16px;background:var(--brown);}
-.weather-refresh{background:none;border:none;color:rgba(247,241,232,0.4);font-size:12px;cursor:pointer;padding:2px 4px;}
+.weather-city{font-size:10px;color:rgba(245,242,238,0.5);letter-spacing:1px;text-transform:uppercase;}
+.weather-advice{font-size:10px;color:#8090A0;margin-top:2px;font-style:italic;}
+.weather-loading{font-size:10px;color:rgba(245,242,238,0.4);padding:8px 16px;background:var(--brown);}
+.weather-refresh{background:none;border:none;color:rgba(245,242,238,0.4);font-size:12px;cursor:pointer;padding:2px 4px;}
 
 /* GENERATE MORE BUTTON */
 .outfit-like-btn:active{transform:scale(0.95);}
@@ -273,7 +273,7 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 .gen-more-btn.loading{opacity:0.5;pointer-events:none;}
 
 /* WEATHER OUTFIT BADGE */
-.weather-outfit-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(155,98,64,0.1);border-radius:10px;padding:3px 8px;font-size:9px;color:var(--brown-warm);margin-bottom:8px;border:1px solid rgba(155,98,64,0.2);}
+.weather-outfit-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(155,98,64,0.1);border-radius:10px;padding:3px 8px;font-size:9px;color:var(--brown-warm);margin-bottom:8px;border:1px solid rgba(74,82,96,0.2);}
 
 /* AI GENERATING INDICATOR */
 .ai-thinking{display:flex;align-items:center;gap:6px;padding:8px 12px;color:var(--muted);font-size:10px;font-style:italic;}
@@ -291,7 +291,7 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
   <p>Upload foto's · Sleep items op een board · Maak outfits</p>
 </div>
 
-<div id="weather-banner" class="weather-loading" style="display:flex;justify-content:space-between;align-items:center;"><span>🌤 Weer ophalen...</span><span style="display:flex;align-items:center;gap:8px;"><span id="sync-indicator" style="font-size:9px;opacity:0.5;">⟳</span><button onclick="fetchWeather()" style="background:none;border:none;color:rgba(247,241,232,0.6);font-size:11px;cursor:pointer;padding:2px 6px;border:1px solid rgba(247,241,232,0.2);border-radius:8px;">↻ Weer</button></span></div>
+<div id="weather-banner" class="weather-loading" style="display:flex;justify-content:space-between;align-items:center;"><span>🌤 Weer ophalen...</span><span style="display:flex;align-items:center;gap:8px;"><span id="sync-indicator" style="font-size:9px;opacity:0.5;">⟳</span><button onclick="fetchWeather()" style="background:none;border:none;color:rgba(245,242,238,0.6);font-size:11px;cursor:pointer;padding:2px 6px;border:1px solid rgba(245,242,238,0.2);border-radius:8px;">↻ Weer</button></span></div>
 
 <div class="tabs" style="display:none">
   <button class="tab active" onclick="showPanel('garderobe',this)">Garderobe</button>
@@ -393,7 +393,7 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
       <div>
         <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,168,122,0.8);margin-bottom:4px;">Vandaag</div>
         <div id="daily-card-text" style="font-family:'Bodoni Moda',serif;font-size:18px;font-weight:400;color:var(--cream);line-height:1.2;">Wat trek je aan?</div>
-        <div id="daily-card-sub" style="font-size:9px;color:rgba(247,241,232,0.5);margin-top:3px;">Tik voor een outfit van de stylist</div>
+        <div id="daily-card-sub" style="font-size:9px;color:rgba(245,242,238,0.5);margin-top:3px;">Tik voor een outfit van de stylist</div>
       </div>
       <div id="daily-card-weather" style="text-align:right;">
         <div style="font-size:28px;" id="daily-weather-icon">👗</div>
@@ -403,13 +403,13 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
     <div style="padding:0 16px 10px;border-top:1px solid rgba(255,255,255,0.1);">
       <div style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(201,168,122,0.6);margin-bottom:6px;margin-top:8px;">Mood</div>
       <div style="display:flex;gap:5px;flex-wrap:wrap;">
-        <button id="dq-rok" onclick="setDailyPref('bottom','rok',this)" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.2);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(247,241,232,0.7);">Rok/jurk</button>
-        <button id="dq-broek" onclick="setDailyPref('bottom','broek',this)" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.2);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(247,241,232,0.7);">Broek</button>
+        <button id="dq-rok" onclick="setDailyPref('bottom','rok',this)" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.2);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.7);">Rok/jurk</button>
+        <button id="dq-broek" onclick="setDailyPref('bottom','broek',this)" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.2);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.7);">Broek</button>
         <div style="width:1px;background:rgba(255,255,255,0.15);margin:0 1px;"></div>
-        <button id="dq-sneakers" onclick="setDailyPref('shoe','sneakers',this)" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.2);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(247,241,232,0.7);">Sneakers</button>
-        <button id="dq-sandalen" onclick="setDailyPref('shoe','sandalen',this)" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.2);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(247,241,232,0.7);">Sandalen</button>
-        <button onclick="showYesterdayQuickLog()" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.15);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(247,241,232,0.5);">📆 Gisteren</button>
-        <button id="dq-laarzen" onclick="setDailyPref('shoe','laarzen',this)" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.2);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(247,241,232,0.7);">Laarzen</button>
+        <button id="dq-sneakers" onclick="setDailyPref('shoe','sneakers',this)" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.2);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.7);">Sneakers</button>
+        <button id="dq-sandalen" onclick="setDailyPref('shoe','sandalen',this)" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.2);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.7);">Sandalen</button>
+        <button onclick="showYesterdayQuickLog()" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.15);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.5);">📆 Gisteren</button>
+        <button id="dq-laarzen" onclick="setDailyPref('shoe','laarzen',this)" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.2);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.7);">Laarzen</button>
       </div>
     </div>
     <div id="daily-outfit-preview" style="display:none;padding:0 16px 14px;">
@@ -417,11 +417,11 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
         <button onclick="logDailyOutfit()" style="flex:1;min-width:100px;padding:8px;background:rgba(255,255,255,0.15);border:none;border-radius:8px;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:var(--cream);">❖ Dit draag ik!</button>
         <button onclick="refreshQuickOutfit()" style="padding:8px 12px;background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:14px;cursor:pointer;color:var(--cream);">&#x21bb;</button>
-        <button onclick="quickOutfitFeedback('te warm')" style="padding:8px 10px;background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:9px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(247,241,232,0.65);">Te warm</button>
-        <button onclick="quickOutfitFeedback('al gedragen')" style="padding:8px 10px;background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:9px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(247,241,232,0.65);">Al gedragen</button>
-        <button onclick="quickOutfitFeedback('geen mood')" style="padding:8px 10px;background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:9px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(247,241,232,0.65);">Geen mood</button>
+        <button onclick="quickOutfitFeedback('te warm')" style="padding:8px 10px;background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:9px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.65);">Te warm</button>
+        <button onclick="quickOutfitFeedback('al gedragen')" style="padding:8px 10px;background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:9px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.65);">Al gedragen</button>
+        <button onclick="quickOutfitFeedback('geen mood')" style="padding:8px 10px;background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:9px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.65);">Geen mood</button>
       </div>
-      <button onclick="showYesterdayQuickLog()" id="gisteren-btn" style="width:100%;margin-top:6px;padding:7px;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:8px;font-size:9px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(247,241,232,0.5);">📆 Gisteren gelogd?</button>
+      <button onclick="showYesterdayQuickLog()" id="gisteren-btn" style="width:100%;margin-top:6px;padding:7px;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:8px;font-size:9px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.5);">📆 Gisteren gelogd?</button>
     </div>
   </div>
 
@@ -599,53 +599,53 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
   </div>
 
   <div style="background:var(--brown);border-radius:14px;padding:24px 18px;color:var(--cream);margin-bottom:20px;">
-    <div style="font-family:'Bodoni Moda',serif;font-size:20px;font-weight:400;color:#c9a87a;margin-bottom:18px;">Jouw stijlprofiel</div>
+    <div style="font-family:'Bodoni Moda',serif;font-size:20px;font-weight:400;color:#8090A0;margin-bottom:18px;">Jouw stijlprofiel</div>
 
     <div style="margin-bottom:14px;">
       <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);margin-bottom:5px;">Stijl</div>
-      <div style="font-size:12px;color:rgba(247,241,232,0.75);line-height:1.7;font-weight:300;">Klassiek casual · Krachtig · Kleurrijk · Vrouwelijk</div>
+      <div style="font-size:12px;color:rgba(245,242,238,0.75);line-height:1.7;font-weight:300;">Klassiek casual · Krachtig · Kleurrijk · Vrouwelijk</div>
     </div>
 
     <div style="margin-bottom:14px;">
       <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);margin-bottom:8px;">Kleurenbasis</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;">
-        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#162038;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(247,241,232,0.6);">Donkerblauw</span></div>
-        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#5c3317;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(247,241,232,0.6);">Bruin</span></div>
-        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#111;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(247,241,232,0.6);">Zwart</span></div>
-        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#f0e8d8;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(247,241,232,0.6);">Gebroken wit</span></div>
+        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#162038;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(245,242,238,0.6);">Donkerblauw</span></div>
+        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#5c3317;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(245,242,238,0.6);">Bruin</span></div>
+        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#111;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(245,242,238,0.6);">Zwart</span></div>
+        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#f0e8d8;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(245,242,238,0.6);">Gebroken wit</span></div>
       </div>
     </div>
 
     <div style="margin-bottom:14px;">
       <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);margin-bottom:8px;">Accentkleuren</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;">
-        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#d4668a;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(247,241,232,0.6);">Felroze</span></div>
-        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#7b3fa0;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(247,241,232,0.6);">Paars</span></div>
-        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#d4b84a;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(247,241,232,0.6);">Geel</span></div>
-        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#b5232a;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(247,241,232,0.6);">Oranje-rood</span></div>
-        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#a8c4e0;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(247,241,232,0.6);">Lichtblauw</span></div>
-        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#4a8a5c;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(247,241,232,0.6);">Groen</span></div>
+        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#d4668a;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(245,242,238,0.6);">Felroze</span></div>
+        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#7b3fa0;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(245,242,238,0.6);">Paars</span></div>
+        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#d4b84a;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(245,242,238,0.6);">Geel</span></div>
+        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#b5232a;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(245,242,238,0.6);">Oranje-rood</span></div>
+        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#a8c4e0;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(245,242,238,0.6);">Lichtblauw</span></div>
+        <div style="display:flex;align-items:center;gap:5px;"><div style="width:18px;height:18px;border-radius:50%;background:#4a8a5c;border:1px solid rgba(255,255,255,0.15);"></div><span style="font-size:10px;color:rgba(245,242,238,0.6);">Groen</span></div>
       </div>
     </div>
 
     <div style="margin-bottom:14px;">
       <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);margin-bottom:5px;">Silhouet</div>
-      <div style="font-size:12px;color:rgba(247,241,232,0.75);line-height:1.7;font-weight:300;">Schouders en heupen gelijk breed → taille altijd benadrukken. Wijd onder = aansluitend boven, en andersom.</div>
+      <div style="font-size:12px;color:rgba(245,242,238,0.75);line-height:1.7;font-weight:300;">Schouders en heupen gelijk breed → taille altijd benadrukken. Wijd onder = aansluitend boven, en andersom.</div>
     </div>
 
     <div style="margin-bottom:14px;">
       <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);margin-bottom:5px;">Halslijnen</div>
-      <div style="font-size:12px;color:rgba(247,241,232,0.75);line-height:1.7;font-weight:300;">Open en zacht: ronde hals, boothals, sweetheart, V-hals. Geen hoge of gesloten halslijnen.</div>
+      <div style="font-size:12px;color:rgba(245,242,238,0.75);line-height:1.7;font-weight:300;">Open en zacht: ronde hals, boothals, sweetheart, V-hals. Geen hoge of gesloten halslijnen.</div>
     </div>
 
     <div style="margin-bottom:14px;">
       <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);margin-bottom:5px;">Oversized regel</div>
-      <div style="font-size:12px;color:rgba(247,241,232,0.75);line-height:1.7;font-weight:300;">Altijd instoppen, riem, of structuurgevend combineren. Nooit twee wijde items zonder taille-accent.</div>
+      <div style="font-size:12px;color:rgba(245,242,238,0.75);line-height:1.7;font-weight:300;">Altijd instoppen, riem, of structuurgevend combineren. Nooit twee wijde items zonder taille-accent.</div>
     </div>
 
     <div>
       <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);margin-bottom:5px;">Vermijd</div>
-      <div style="font-size:12px;color:rgba(247,241,232,0.75);line-height:1.7;font-weight:300;">Champagne en grijzige tinten. Hoge of gesloten halslijnen.</div>
+      <div style="font-size:12px;color:rgba(245,242,238,0.75);line-height:1.7;font-weight:300;">Champagne en grijzige tinten. Hoge of gesloten halslijnen.</div>
     </div>
   </div>
 </div>
@@ -1535,7 +1535,7 @@ function renderTagButtons(itemId, container) {
   }
   addMatGroup('Soepel & vloeiend:',['viscose','tencel','modal','satijn/satin','jersey','zijde','chiffon','crêpe','lyocell'],'#a8c4e0');
   addMatGroup('Stevig & structuur:',['katoen','biologisch katoen','denim','wol','rib/ribstof','linnen','tweed','corduroy','canvas','polyester'],'var(--brown-warm)');
-  addMatGroup('Luxe & zacht:',['cashmere','merino','velvet/fluweel','suède','leer','bamboe','modal-mix'],'#c9a87a');
+  addMatGroup('Luxe & zacht:',['cashmere','merino','velvet/fluweel','suède','leer','bamboe','modal-mix'],'#8090A0');
   addMatGroup('Print/afwerking:',['gestreept','geblokt','print/bloemen','stippen','kant','broderie','jacquard'],'#9b6240');
   // STRUCTUUR (soepel vs stevig — voor styling matching)
   var r4=makeSection('Valgedrag (voor stijladvies)');
@@ -2363,13 +2363,13 @@ function confirmAddItem() {
       var toast2 = document.createElement('div');
       toast2.style.cssText = 'position:fixed;bottom:80px;left:16px;right:16px;background:var(--brown);'
         + 'color:var(--cream);border-radius:12px;padding:12px 16px;z-index:800;'
-        + 'display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(46,26,14,0.3);';
+        + 'display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(28,26,24,0.3);';
       toast2.innerHTML = '<span style="flex:1;font-size:11px;">❖ ' + name + ' toegevoegd. Combinaties bekijken?</span>'
         + '<button type="button" data-iid="' + id + '" onclick="showNewItemCombos(this.dataset.iid);this.closest(\'div\').remove();" '
         + 'style="padding:6px 12px;background:var(--cream);color:var(--brown);border:none;border-radius:8px;'
         + 'font-size:10px;font-family:Jost,sans-serif;cursor:pointer;white-space:nowrap;">Bekijk →</button>'
         + '<button type="button" onclick="this.parentElement.remove();" '
-        + 'style="background:none;border:none;color:rgba(247,241,232,0.5);font-size:16px;cursor:pointer;">×</button>';
+        + 'style="background:none;border:none;color:rgba(245,242,238,0.5);font-size:16px;cursor:pointer;">×</button>';
       document.body.appendChild(toast2);
       setTimeout(function(){ if(toast2.parentElement) toast2.remove(); }, 6000);
     }
@@ -2501,7 +2501,7 @@ function showToast(msg) {
 const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" rx="100" fill="#2e1a0e"/>
   <rect x="40" y="40" width="432" height="432" rx="80" fill="#3d2410"/>
-  <text y="340" x="256" text-anchor="middle" font-size="280" font-family="Georgia,serif" fill="#c9a87a">G</text>
+  <text y="340" x="256" text-anchor="middle" font-size="280" font-family="Georgia,serif" fill="#8090A0">G</text>
   <text y="430" x="256" text-anchor="middle" font-size="48" font-family="Georgia,serif" fill="#9b6240" letter-spacing="8">STYLIST</text>
 </svg>`;
 const iconUrl = 'data:image/svg+xml,' + encodeURIComponent(iconSvg);
@@ -2665,14 +2665,14 @@ function renderInspoGallery() {
     const delBtn = document.createElement('button');
     delBtn.className = 'inspo-gallery-del';
     delBtn.textContent = '×';
-    delBtn.style.cssText = 'position:absolute;top:6px;right:6px;background:rgba(46,26,14,0.65);color:white;border:none;border-radius:50%;width:26px;height:26px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;';
+    delBtn.style.cssText = 'position:absolute;top:6px;right:6px;background:rgba(28,26,24,0.65);color:white;border:none;border-radius:50%;width:26px;height:26px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;';
     delBtn.onclick = function(e) { e.stopPropagation(); deleteInspoEntry(entry.id); };
 
     const imgOrIcon = entry.dataUrl
       ? '<img src="' + entry.dataUrl + '" alt="" style="width:100%;height:100%;object-fit:cover;">'
       : '<div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:30px;">🖼</div>';
 
-    card.innerHTML = imgOrIcon + '<div class="inspo-gallery-overlay" style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(46,26,14,0.7));padding:8px;"><div style="font-size:8px;color:rgba(247,241,232,0.8);">' + entry.label + '</div></div>';
+    card.innerHTML = imgOrIcon + '<div class="inspo-gallery-overlay" style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(28,26,24,0.7));padding:8px;"><div style="font-size:8px;color:rgba(245,242,238,0.8);">' + entry.label + '</div></div>';
     card.style.cssText = 'position:relative;border-radius:10px;overflow:hidden;background:var(--cream-dark);aspect-ratio:3/4;cursor:pointer;';
     card.appendChild(delBtn);
     card.onclick = function(e) { if (e.target !== delBtn && !delBtn.contains(e.target)) openInspoEntry(entry); };
@@ -3461,7 +3461,7 @@ function openBoardPicker(itemIds, isSelfie) {
 
   var overlay = document.createElement('div');
   overlay.id = 'board-picker-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.55);z-index:600;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.55);z-index:600;display:flex;align-items:flex-end;';
 
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;padding:20px 16px 40px;max-height:80vh;overflow-y:auto;';
@@ -3800,7 +3800,7 @@ function refreshWornBadges() {
       var badge = document.createElement('div');
       badge.className = 'worn-memory-badge';
       badge.textContent = label;
-      badge.style.cssText = 'position:absolute;top:4px;left:4px;background:rgba(46,26,14,0.75);color:white;font-size:7px;padding:2px 5px;border-radius:5px;letter-spacing:0.3px;font-family:Jost,sans-serif;pointer-events:none;';
+      badge.style.cssText = 'position:absolute;top:4px;left:4px;background:rgba(28,26,24,0.75);color:white;font-size:7px;padding:2px 5px;border-radius:5px;letter-spacing:0.3px;font-family:Jost,sans-serif;pointer-events:none;';
       card.style.position = 'relative';
       card.appendChild(badge);
     }
@@ -4691,7 +4691,7 @@ async function fetchWeather() {
       <div class="weather-left">
         <div class="weather-icon">🌤</div>
         <div>
-          <div style="font-size:11px;color:rgba(247,241,232,0.6);">Locatie niet beschikbaar</div>
+          <div style="font-size:11px;color:rgba(245,242,238,0.6);">Locatie niet beschikbaar</div>
           <div class="weather-desc">Sta locatietoegang toe voor echt weer</div>
         </div>
       </div>
@@ -4811,7 +4811,7 @@ function openRatingPrompt(outfitId) {
   if (existing) existing.remove();
   var overlay = document.createElement('div');
   overlay.id = 'rating-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.55);z-index:700;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.55);z-index:700;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;padding:20px 16px 40px;';
   sheet.innerHTML = '<div style="width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 16px;"></div>' +
@@ -5380,7 +5380,7 @@ function generatePaklijst(board) {
 
   var overlay = document.createElement('div');
   overlay.id = 'paklijst-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.55);z-index:700;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.55);z-index:700;display:flex;align-items:flex-end;';
 
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:20px 16px 40px;';
@@ -5716,7 +5716,7 @@ function buildOutfitFromInspo(itemIds) {
 
   var overlay = document.createElement('div');
   overlay.id = 'inspo-outfit-preview';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:650;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:650;display:flex;align-items:flex-end;';
 
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;padding:20px 16px 40px;';
@@ -5785,7 +5785,7 @@ async function showNewItemCombos(itemId) {
 
   var overlay = document.createElement('div');
   overlay.id = 'newitem-combos-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.55);z-index:600;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.55);z-index:600;display:flex;align-items:flex-end;';
 
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:20px 16px 50px;';
@@ -5877,7 +5877,7 @@ async function showDailyInspirationTip() {
 
   var overlay = document.createElement('div');
   overlay.id = 'daily-inspo-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:600;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:600;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:20px 16px 50px;';
   sheet.innerHTML = '<div style="width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 16px;"></div>'
@@ -6173,7 +6173,7 @@ function showDayDetail(dateStr, dayNum) {
 
   var overlay = document.createElement('div');
   overlay.id = 'day-detail-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:600;'
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:600;'
     + 'display:flex;align-items:flex-end;';
 
   var sheet = document.createElement('div');
@@ -6267,7 +6267,7 @@ function editWornLogForDate(dateStr, dayNum) {
   var parts = dateStr.split('-');
   var dateLabel = dayNum + ' ' + MN[parseInt(parts[1])-1];
   var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:660;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:660;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:70vh;overflow-y:auto;padding:20px 16px 40px;';
   sheet.innerHTML = '<div style="width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 14px;"></div>'
@@ -6331,7 +6331,7 @@ async function reuploadAllPhotos() {
 
   var overlay = document.createElement('div');
   overlay.id = 'reupload-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:700;display:flex;align-items:center;justify-content:center;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:700;display:flex;align-items:center;justify-content:center;';
   var box = document.createElement('div');
   box.style.cssText = 'background:var(--cream);border-radius:16px;padding:24px 20px;width:280px;text-align:center;';
   box.innerHTML = '<div style="font-family:Bodoni Moda,serif;font-size:20px;color:var(--brown);margin-bottom:8px;">📤 Foto’s uploaden</div>'
@@ -6414,7 +6414,7 @@ function openWornTodayPicker() {
   if (existing) existing.remove();
   var overlay = document.createElement('div');
   overlay.id = 'worn-picker-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.55);z-index:600;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.55);z-index:600;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:88vh;display:flex;flex-direction:column;';
   var hdr = document.createElement('div');
@@ -6592,7 +6592,7 @@ function openPackingPlanner(boardId) {
   if (existing) existing.remove();
   var overlay = document.createElement('div');
   overlay.id = 'packing-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:700;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:700;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding:20px 16px 50px;';
   sheet.innerHTML = '<div style="width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 16px;"></div>'
@@ -6647,7 +6647,7 @@ async function generateBoardOutfitsWithCounts(boardId, counts, extra) {
   if (existing) existing.remove();
   var overlay = document.createElement('div');
   overlay.id = 'bgen-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:700;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:700;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding:20px 16px 50px;';
   sheet.innerHTML = '<div style="width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 16px;"></div>'
@@ -6776,7 +6776,7 @@ function openBoardSettings(boardId) {
 
   var overlay = document.createElement('div');
   overlay.id = 'bset-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:650;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:650;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding:20px 16px 50px;';
 
@@ -6997,7 +6997,7 @@ async function generateBoardOutfits(boardId) {
   if (existing) existing.remove();
   var overlay = document.createElement('div');
   overlay.id = 'bgen-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:700;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:700;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding:20px 16px 50px;';
   sheet.innerHTML = '<div style="width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 16px;"></div>'
@@ -7107,7 +7107,7 @@ function openItemAnchorPicker(boardId) {
 
   var overlay = document.createElement('div');
   overlay.id = 'anchor-picker-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:650;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:650;display:flex;align-items:flex-end;';
 
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:80vh;overflow-y:auto;padding:20px 16px 40px;';
@@ -7188,7 +7188,7 @@ async function generateOutfitFromAnchor(boardId, anchorId, anchorName) {
     if (existing2) existing2.remove();
     var ov2 = document.createElement('div');
     ov2.id = 'anchor-result-overlay';
-    ov2.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:650;display:flex;align-items:flex-end;';
+    ov2.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:650;display:flex;align-items:flex-end;';
     var sh2 = document.createElement('div');
     sh2.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding:20px 16px 40px;';
     sh2.innerHTML = '<div style="width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 14px;"></div>'
@@ -7466,7 +7466,7 @@ function setDailyPref(type, val, btn) {
       if(!b) return;
       var isActive = (id==='dq-'+_dailyPrefBottom);
       b.style.background = isActive?activeStyle:'transparent';
-      b.style.color = isActive?'var(--cream)':'rgba(247,241,232,0.7)';
+      b.style.color = isActive?'var(--cream)':'rgba(245,242,238,0.7)';
       b.style.borderColor = isActive?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.2)';
     });
   } else {
@@ -7477,7 +7477,7 @@ function setDailyPref(type, val, btn) {
       if(!b) return;
       var isActive = (id==='dq-'+_dailyPrefShoe);
       b.style.background = isActive?activeStyle:'transparent';
-      b.style.color = isActive?'var(--cream)':'rgba(247,241,232,0.7)';
+      b.style.color = isActive?'var(--cream)':'rgba(245,242,238,0.7)';
       b.style.borderColor = isActive?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.2)';
     });
   }
@@ -7582,7 +7582,7 @@ async function generateQuickOutfit(feedback){
     if(tEl)tEl.textContent=parsed.naam||'Jouw look van vandaag';
     if(sEl)sEl.textContent=parsed.reden||'';
     var iDiv=document.getElementById('daily-outfit-items');
-    if(iDiv){iDiv.innerHTML=_quickOutfitIds.map(function(id){var nm=getItemName(id);var ph=photos[id]?'<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:rgba(247,241,232,0.6);padding:2px;">'+nm.split(' ')[0]+'</span>';return '<div style="flex-shrink:0;width:52px;"><div style="width:52px;height:64px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;">'+ph+'</div><div style="font-size:7px;color:rgba(247,241,232,0.6);text-align:center;margin-top:2px;">'+(nm.length>10?nm.substring(0,9)+'\u2026':nm)+'</div></div>';}).join('');}
+    if(iDiv){iDiv.innerHTML=_quickOutfitIds.map(function(id){var nm=getItemName(id);var ph=photos[id]?'<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:rgba(245,242,238,0.6);padding:2px;">'+nm.split(' ')[0]+'</span>';return '<div style="flex-shrink:0;width:52px;"><div style="width:52px;height:64px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;">'+ph+'</div><div style="font-size:7px;color:rgba(245,242,238,0.6);text-align:center;margin-top:2px;">'+(nm.length>10?nm.substring(0,9)+'\u2026':nm)+'</div></div>';}).join('');}
     var pr=document.getElementById('daily-outfit-preview');if(pr)pr.style.display='block';
   }catch(e2){var s2=document.getElementById('daily-card-sub');if(s2)s2.textContent='Tik voor een outfitsuggestie';}
 }
@@ -7592,7 +7592,7 @@ function showOutfitFeedbackPicker(itemIds) {
   var ex = document.getElementById('feedback-picker'); if(ex){ex.remove();return;}
   var overlay = document.createElement('div');
   overlay.id = 'feedback-picker';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.5);z-index:650;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.5);z-index:650;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;padding:20px 16px 40px;';
   sheet.innerHTML = '<div style="width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 14px;"></div>'
@@ -7725,7 +7725,7 @@ function openOutfitBuilder() {
 
   var overlay = document.createElement('div');
   overlay.id = 'outfit-builder-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:650;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:650;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding:20px 16px 50px;';
 
@@ -7900,7 +7900,7 @@ async function generateFromBuilder() {
     // Show results in picker
     var ov2 = document.createElement('div');
     ov2.id = 'builder-result-overlay';
-    ov2.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:700;display:flex;align-items:flex-end;';
+    ov2.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:700;display:flex;align-items:flex-end;';
     var sh2 = document.createElement('div');
     sh2.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding:20px 16px 50px;';
     sh2.innerHTML = '<div style="width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 14px;"></div>'
@@ -7985,7 +7985,7 @@ function openYesterdayLog() {
   var existing = wornLog[yd] || [];
 
   var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:650;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:650;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:20px 16px 40px;';
 
@@ -8052,7 +8052,7 @@ function showPatternInsights() {
   if (!p.totalDaysLogged) { showToast('Nog niet genoeg data. Log eerst een paar outfits!'); return; }
 
   var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:650;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:650;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:20px 16px 50px;';
 
@@ -8151,7 +8151,7 @@ function getCyclusFase(day) {
     uitleg: 'Je menstruatie. Je lichaam werkt hard. Draag wat je comfortabel maakt \u2014 zachte materialen, niets te strak.' };
   if (day <= 13) return { fase: 'folliculair', emoji: '\uD83C\uDF31', kleur: '#4a8a5c',
     uitleg: 'Je energie groeit. Je voelt je frisser en creatiever. Goede tijd voor nieuwe combinaties.' };
-  if (day <= 16) return { fase: 'ovulatie', emoji: '\u2728', kleur: '#c9a87a',
+  if (day <= 16) return { fase: 'ovulatie', emoji: '\u2728', kleur: '#8090A0',
     uitleg: 'Topenergie. Je straalt. Dit is het moment voor je krachtigste, meest vrouwelijke look.' };
   return { fase: 'luteaal', emoji: '\uD83C\uDF42', kleur: '#7b5c3a',
     uitleg: 'Je lichaam bereidt zich voor. Comfort wint het. Kies voor soepele stoffen en vertrouwde items.' };
@@ -8162,7 +8162,7 @@ function openCyclusTracker() {
   if (existing) existing.remove();
   var overlay = document.createElement('div');
   overlay.id = 'cyclus-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:650;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:650;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding:20px 16px 50px;';
   var day = getCyclusDay();
@@ -8384,7 +8384,7 @@ async function getCyclusOutfitAdvies(day, fase) {
     if(subEl)subEl.textContent=parsed.reden||'';
 
     var iDiv=document.getElementById('daily-outfit-items');
-    if(iDiv){iDiv.innerHTML=_quickOutfitIds.map(function(id){var nm=getItemName(id);var ph=photos[id]?'<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:rgba(247,241,232,0.6);padding:2px;">'+nm.split(' ')[0]+'</span>';return '<div style="flex-shrink:0;width:52px;"><div style="width:52px;height:64px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;">'+ph+'</div><div style="font-size:7px;color:rgba(247,241,232,0.6);text-align:center;margin-top:2px;">'+(nm.length>10?nm.substring(0,9)+'\u2026':nm)+'</div></div>';}).join('');}
+    if(iDiv){iDiv.innerHTML=_quickOutfitIds.map(function(id){var nm=getItemName(id);var ph=photos[id]?'<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:rgba(245,242,238,0.6);padding:2px;">'+nm.split(' ')[0]+'</span>';return '<div style="flex-shrink:0;width:52px;"><div style="width:52px;height:64px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;">'+ph+'</div><div style="font-size:7px;color:rgba(245,242,238,0.6);text-align:center;margin-top:2px;">'+(nm.length>10?nm.substring(0,9)+'\u2026':nm)+'</div></div>';}).join('');}
 
     var pr=document.getElementById('daily-outfit-preview');if(pr)pr.style.display='block';
     showPanel('garderobe',null);
@@ -8436,7 +8436,7 @@ function openCyclusLog() {
 
   var overlay = document.createElement('div');
   overlay.id = 'cyclus-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:700;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:700;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:20px 16px 50px;';
 
@@ -8549,7 +8549,7 @@ function openWellbeingLog() {
 
   var overlay = document.createElement('div');
   overlay.id = 'wellbeing-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:650;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:650;display:flex;align-items:flex-end;';
 
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding:20px 16px 50px;';
@@ -8697,7 +8697,7 @@ async function getWellbeingOutfitAdvies(entry, cyclusDay, fase) {
     if(tEl)tEl.textContent=parsed.naam||'Jouw look van vandaag';
     if(sEl)sEl.textContent=parsed.reden||'';
     var iDiv=document.getElementById('daily-outfit-items');
-    if(iDiv){iDiv.innerHTML=_quickOutfitIds.map(function(id){var nm=getItemName(id);var ph=photos[id]?'<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:rgba(247,241,232,0.6);padding:2px;">'+nm.split(' ')[0]+'</span>';return '<div style="flex-shrink:0;width:52px;"><div style="width:52px;height:64px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;">'+ph+'</div><div style="font-size:7px;color:rgba(247,241,232,0.6);text-align:center;margin-top:2px;">'+(nm.length>10?nm.substring(0,9)+'\u2026':nm)+'</div></div>';}).join('');}
+    if(iDiv){iDiv.innerHTML=_quickOutfitIds.map(function(id){var nm=getItemName(id);var ph=photos[id]?'<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:rgba(245,242,238,0.6);padding:2px;">'+nm.split(' ')[0]+'</span>';return '<div style="flex-shrink:0;width:52px;"><div style="width:52px;height:64px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;">'+ph+'</div><div style="font-size:7px;color:rgba(245,242,238,0.6);text-align:center;margin-top:2px;">'+(nm.length>10?nm.substring(0,9)+'\u2026':nm)+'</div></div>';}).join('');}
     var pr=document.getElementById('daily-outfit-preview');if(pr)pr.style.display='block';
     showPanel('garderobe',null);
   } catch(e) { showToast('\u26a0 Kon geen advies ophalen'); }
@@ -8708,7 +8708,7 @@ function openGarminImport() {
   var ex = document.getElementById('garmin-overlay'); if(ex) ex.remove();
   var overlay = document.createElement('div');
   overlay.id = 'garmin-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:650;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:650;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;padding:20px 16px 50px;max-height:80vh;overflow-y:auto;';
   sheet.innerHTML = '<div style="width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 16px;"></div>'
@@ -8969,7 +8969,7 @@ function showInzichten() {
   if (existing) { existing.remove(); return; }
   var overlay = document.createElement('div');
   overlay.id = 'inzichten-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.55);z-index:500;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.55);z-index:500;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding:20px 16px 60px;';
   sheet.innerHTML = '<div style="width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 16px;"></div>'
@@ -9194,7 +9194,7 @@ function openWellbeingForDate(dateStr) {
   var ex = document.getElementById('wellbeing-overlay'); if(ex) ex.remove();
   var overlay = document.createElement('div');
   overlay.id = 'wellbeing-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:700;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:700;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:20px 16px 50px;';
   var dLabel = new Date(dateStr).toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'});
@@ -9252,9 +9252,9 @@ function checkSeizoenswissel() {
   setTimeout(function(){
     var banner = document.createElement('div');
     banner.style.cssText = 'background:linear-gradient(135deg,var(--brown),var(--brown-warm));border-radius:14px;padding:14px 16px;margin-bottom:14px;cursor:pointer;';
-    banner.innerHTML = '<div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(247,241,232,0.7);margin-bottom:4px;">Seizoenswissel</div>'
+    banner.innerHTML = '<div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(245,242,238,0.7);margin-bottom:4px;">Seizoenswissel</div>'
       + '<div style="font-family:Bodoni Moda,serif;font-size:16px;color:var(--cream);margin-bottom:4px;">' + (isWarm ? '\u2600\uFE0F Tijd voor je zomerkast' : '\uD83C\uDF42 Tijd voor je herfst/winterkast') + '</div>'
-      + '<div style="font-size:10px;color:rgba(247,241,232,0.7);">' + toStow.length + ' items die je kunt wegleggen \u2192</div>';
+      + '<div style="font-size:10px;color:rgba(245,242,238,0.7);">' + toStow.length + ' items die je kunt wegleggen \u2192</div>';
     banner.addEventListener('click', function(){
       banner.remove();
       localStorage.setItem('griette-seizoen-check', newSeizoen);
@@ -9267,7 +9267,7 @@ function checkSeizoenswissel() {
 
 function showSeizoenswisselDetail(items, isWarm) {
   var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:650;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:650;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:20px 16px 50px;';
   var label = isWarm ? 'zomer' : 'herfst/winter';
@@ -9317,7 +9317,7 @@ function checkOutfitHerhaling() {
         if (!herhalingBanner) {
           herhalingBanner = document.createElement('div');
           herhalingBanner.id = 'herhaling-hint';
-          herhalingBanner.style.cssText = 'font-size:9px;color:rgba(247,241,232,0.5);text-align:center;padding:4px 16px 8px;cursor:pointer;';
+          herhalingBanner.style.cssText = 'font-size:9px;color:rgba(245,242,238,0.5);text-align:center;padding:4px 16px 8px;cursor:pointer;';
           herhalingBanner.addEventListener('click', function(){
             herhalingBanner.remove();
             generateQuickOutfit('andere outfit, vermijd eerder gedragen combos');
@@ -9491,7 +9491,7 @@ function openSwapPicker(evtOrBtn) {
 
   // Build swipe overlay
   var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.65);z-index:700;display:flex;align-items:center;justify-content:center;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.65);z-index:700;display:flex;align-items:center;justify-content:center;';
 
   var catLabel = {tops:'Top',bottoms:'Rok/Broek',jurken:'Jurk',layers:'Laagje',shoes:'Schoenen',bags:'Tas'}[currentItem.cat]||currentItem.cat;
 
@@ -9509,7 +9509,7 @@ function openSwapPicker(evtOrBtn) {
     var ph2 = photos[alt.id]
       ? '<img src="'+photos[alt.id]+'" style="width:100%;height:100%;object-fit:cover;border-radius:16px;">'
       : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;border-radius:16px;background:var(--cream-dark);"><span style="font-size:13px;color:var(--muted);padding:8px;text-align:center;">'+alt.name+'</span></div>';
-    return '<div style="width:220px;background:var(--cream);border-radius:20px;overflow:hidden;box-shadow:0 8px 32px rgba(46,26,14,0.25);">'
+    return '<div style="width:220px;background:var(--cream);border-radius:20px;overflow:hidden;box-shadow:0 8px 32px rgba(28,26,24,0.25);">'
       + '<div style="width:220px;height:270px;background:var(--cream-dark);">'+ph2+'</div>'
       + '<div style="padding:14px 16px 8px;">'
       + '<div style="font-family:Bodoni Moda,serif;font-size:18px;color:var(--brown);margin-bottom:3px;">'+alt.name+'</div>'
@@ -9622,7 +9622,7 @@ function showCapsuleOverzicht(boardId) {
   // Build overlay
   var overlay = document.createElement('div');
   overlay.id = 'capsule-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:700;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:700;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding:20px 16px 60px;';
 
@@ -9743,7 +9743,7 @@ function showCapsuleOverzicht(boardId) {
 // ============ BOARD MANAGEMENT ============
 function openNewBoardDialog() {
   var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:700;display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:700;display:flex;align-items:center;justify-content:center;padding:20px;';
   var box = document.createElement('div');
   box.style.cssText = 'background:var(--cream);border-radius:20px;padding:24px;width:100%;max-width:340px;';
   var emojis = ['✈️','🌊','💼','✨','🌹','🗼','☀️','🎉','🌿','❄️','🏖️','🎭'];
@@ -9802,7 +9802,7 @@ function setSugTemp(val, btn) {
 // ============ EXTRA ITEM PICKER (for capsule) ============
 function openExtraItemPicker(onSelect) {
   var ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.7);z-index:800;display:flex;align-items:flex-end;';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.7);z-index:800;display:flex;align-items:flex-end;';
   var sh = document.createElement('div');
   sh.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:80vh;overflow-y:auto;padding:20px 16px 50px;';
   sh.innerHTML = '<div style="width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 14px;"></div>'
@@ -9867,7 +9867,7 @@ function showCopyToBoardPicker(fromBoardId, outfitId) {
   var outfit = fromBoard && fromBoard.outfits.find(function(o){ return o.id === outfitId; });
   if (!outfit) return;
   var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.55);z-index:650;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.55);z-index:650;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;padding:20px 16px 40px;';
   sheet.innerHTML = '<div style="width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 14px;"></div>'
@@ -9897,7 +9897,7 @@ function showCopyToBoardPicker(fromBoardId, outfitId) {
 // ============ SAVE SUGGESTION TO BOARD ============
 function showSaveSugToBoardPicker(itemIds) {
   var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.55);z-index:650;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.55);z-index:650;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;padding:20px 16px 40px;max-height:80vh;overflow-y:auto;';
   var nameHtml = '<div style="font-family:Bodoni Moda,serif;font-size:20px;font-weight:400;color:var(--brown);margin-bottom:12px;">❖ Bewaar in board</div>'
@@ -9986,7 +9986,7 @@ function showDagboek() {
   });
   var overlay = document.createElement('div');
   overlay.id = 'dagboek-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.6);z-index:600;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.6);z-index:600;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding:20px 16px 50px;';
   var total = Object.values(byMonth).reduce(function(a,b){ return a+b.length; },0);
@@ -10006,7 +10006,7 @@ function showDagboek() {
         var wrap = document.createElement('div');
         wrap.style.cssText = 'aspect-ratio:3/4;border-radius:10px;overflow:hidden;position:relative;cursor:pointer;background:var(--cream-dark);';
         wrap.innerHTML = '<img src="' + entry.selfie.url + '" style="width:100%;height:100%;object-fit:cover;">'
-          + '<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(46,26,14,0.6));padding:5px 6px;font-size:8px;color:white;">'
+          + '<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(28,26,24,0.6));padding:5px 6px;font-size:8px;color:white;">'
           + (entry.selfie.date||'') + '</div>';
         wrap.addEventListener('click', (function(url){
           return function() {
@@ -10058,7 +10058,7 @@ function runGarderobeCheck() {
   });
   var overlay = document.createElement('div');
   overlay.id = 'gcheck-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.55);z-index:600;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.55);z-index:600;display:flex;align-items:flex-end;';
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding:20px 16px 50px;';
   var content = '<div style="width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 16px;"></div>'
@@ -10227,7 +10227,7 @@ Schrijf warm, direct, als een goede vriendin. In het Nederlands. Niet te lang.`;
     resultDiv.innerHTML = '<div style="background:var(--brown);border-radius:14px;padding:16px;color:var(--cream);">' +
       '<div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);margin-bottom:8px;">Jouw outfit voor vandaag</div>' +
       '<div style="font-family:Bodoni Moda,serif;font-size:17px;font-weight:400;margin-bottom:10px;line-height:1.5;">' + (outfit || text) + '</div>' +
-      (waarom ? '<div style="font-size:11px;color:rgba(247,241,232,0.8);margin-bottom:8px;line-height:1.6;">✦ ' + waarom + '</div>' : '') +
+      (waarom ? '<div style="font-size:11px;color:rgba(245,242,238,0.8);margin-bottom:8px;line-height:1.6;">✦ ' + waarom + '</div>' : '') +
       (tip ? '<div style="font-size:11px;color:var(--brown-warm);line-height:1.6;">→ ' + tip + '</div>' : '') +
       '</div>';
     if (dismissBtn) dismissBtn.style.display = 'block';
@@ -10847,7 +10847,7 @@ function openItemSwap(currentItemId, currentCat, comboIds, cardEl) {
 
   var overlay = document.createElement('div');
   overlay.id = 'swap-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(46,26,14,0.55);z-index:600;display:flex;align-items:flex-end;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(28,26,24,0.55);z-index:600;display:flex;align-items:flex-end;';
 
   var sheet = document.createElement('div');
   sheet.style.cssText = 'background:var(--cream);border-radius:20px 20px 0 0;width:100%;max-height:75vh;overflow-y:auto;padding:20px 16px 40px;';
@@ -10973,7 +10973,7 @@ var vibePrompts = {
 // ============ LIKED COLOR PATTERN BOOST ============
 
 </script>
-<div style="display:none;gap:8px;align-items:center;position:fixed;left:0;right:0;background:var(--cream);padding:10px 12px;border-top:1px solid var(--cream-dark);z-index:400;bottom:62px;box-shadow:0 -4px 12px rgba(46,26,14,0.06);" id="chat-input-bar">
+<div style="display:none;gap:8px;align-items:center;position:fixed;left:0;right:0;background:var(--cream);padding:10px 12px;border-top:1px solid var(--cream-dark);z-index:400;bottom:62px;box-shadow:0 -4px 12px rgba(28,26,24,0.06);" id="chat-input-bar">
     <label for="chat-img-input" style="padding:10px 12px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;" title="Foto toevoegen">📷</label>
     <input type="file" id="chat-img-input" accept="image/*" style="display:none;">
     <div style="flex:1;position:relative;">
