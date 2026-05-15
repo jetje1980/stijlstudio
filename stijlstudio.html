@@ -2,38 +2,855 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Stijl Studio</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Stijl Studio">
+<meta name="theme-color" content="#1C1A18">
+<meta name="description" content="Jouw persoonlijke digitale stylist. Gecureerde looks, elke dag.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400;1,6..96,700&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#1C1612;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;font-family:Georgia,serif}
-.logo{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(240,212,192,.6);margin-bottom:40px;text-align:center}
-h1{font-size:46px;font-style:italic;font-weight:300;color:white;text-align:center;line-height:1.1;margin-bottom:10px}
-h1 b{color:#C4714A;font-weight:300}
-.sub{font-size:14px;color:rgba(255,255,255,.4);text-align:center;margin-bottom:48px;line-height:1.7;max-width:260px;font-family:Arial,sans-serif}
-#codein{display:block;width:100%;max-width:290px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.18);border-radius:12px;padding:17px 16px;font-size:22px;color:white;text-align:center;outline:none;letter-spacing:.12em;margin-bottom:12px;font-family:Georgia,serif}
-#gobtn{display:block;width:100%;max-width:290px;height:54px;border-radius:100px;background:#C4714A;color:white;border:none;font-size:16px;font-weight:700;font-family:Arial,sans-serif;cursor:pointer}
-#errmsg{font-size:13px;color:#E88080;text-align:center;margin-top:12px;min-height:20px;font-family:Arial,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --noir:#1C1A18;
+  --fond:#F5F2EE;
+  --lin:#EDEAE4;
+  --sable:#C8C0B4;
+  --bois:#4A5260;
+  --ardoise:#5A6070;
+  --muted:#9A9590;
+  --border:#E0DDD8;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--fond);font-family:'Jost',sans-serif;color:var(--noir);font-optical-sizing:auto;overflow-x:hidden;}
+
+/* ── HERO ── */
+.hero{
+  min-height:100svh;
+  background:var(--noir);
+  display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+  padding:env(safe-area-inset-top,0) 0 0;
+}
+.hero-glow{
+  position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 50% at 80% 20%, rgba(200,192,180,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 60% at 10% 80%, rgba(74,82,96,0.06) 0%, transparent 60%);
+}
+
+/* Top bar */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 24px 0;position:relative;z-index:2;
+}
+.topbar-logo{
+  font-family:'Bodoni Moda',serif;font-size:14px;font-style:italic;font-weight:400;
+  color:rgba(245,242,238,0.9);letter-spacing:.02em;
+}
+.topbar-badge{
+  font-size:8px;letter-spacing:3px;text-transform:uppercase;
+  color:rgba(200,192,180,0.45);font-family:'Jost',sans-serif;
+}
+
+/* Hero body */
+.hero-body{
+  flex:1;display:flex;flex-direction:column;justify-content:center;
+  padding:48px 24px 32px;position:relative;z-index:2;
+}
+.hero-eyebrow{
+  font-size:9px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--sable);font-family:'Jost',sans-serif;font-weight:500;
+  margin-bottom:20px;
+}
+.hero-title{
+  font-family:'Bodoni Moda',serif;
+  font-size:clamp(54px,14vw,90px);
+  font-weight:400;font-style:italic;
+  color:var(--fond);line-height:.95;
+  margin-bottom:24px;
+}
+.hero-title span{
+  display:block;font-style:normal;font-size:clamp(28px,7vw,46px);
+  color:rgba(245,242,238,0.35);letter-spacing:-.01em;margin-top:8px;
+}
+.hero-desc{
+  font-size:13px;color:rgba(245,242,238,0.4);
+  line-height:1.8;max-width:300px;font-weight:300;
+  margin-bottom:40px;
+}
+
+/* Mood strip */
+.mood-strip{
+  display:flex;gap:3px;height:180px;margin:0 24px 32px;
+  border-radius:16px;overflow:hidden;
+}
+.mood-tile{
+  flex:1;min-width:0;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:10px 8px;position:relative;overflow:hidden;
+}
+.mood-tile::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(transparent 40%,rgba(28,26,24,0.7));
+}
+.mood-tile-lbl{
+  font-size:7px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(245,242,238,0.7);position:relative;z-index:1;
+  font-family:'Jost',sans-serif;
+}
+
+/* Scroll cue */
+.scroll-cue{
+  display:flex;align-items:center;gap:8px;padding:0 24px 28px;
+  font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(245,242,238,0.2);position:relative;z-index:2;
+  font-family:'Jost',sans-serif;
+}
+.scroll-line{width:28px;height:1px;background:rgba(245,242,238,0.15);}
+
+/* ── FEATURES ── */
+.features{background:var(--fond);padding:56px 24px;}
+.features-eyebrow{
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--bois);font-weight:600;margin-bottom:8px;
+}
+.features-title{
+  font-family:'Bodoni Moda',serif;font-size:34px;font-weight:400;
+  color:var(--noir);line-height:1.05;margin-bottom:40px;
+}
+.features-title em{font-style:italic;}
+
+.feature-list{display:flex;flex-direction:column;gap:1px;}
+.feature-item{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:22px 0;border-bottom:1px solid var(--border);
+}
+.feature-item:last-child{border-bottom:none;}
+.feature-num{
+  font-family:'Bodoni Moda',serif;font-size:30px;font-style:italic;
+  color:var(--sable);line-height:1;flex-shrink:0;width:32px;
+}
+.feature-body{}
+.feature-name{
+  font-size:13px;font-weight:600;color:var(--noir);margin-bottom:4px;
+  letter-spacing:.02em;
+}
+.feature-text{font-size:12px;color:var(--muted);line-height:1.7;}
+
+/* ── SCREEN STRIP ── */
+.screen-strip{
+  background:var(--noir);padding:48px 0;overflow:hidden;
+}
+.screen-strip-inner{
+  display:flex;gap:10px;padding:0 24px;
+  overflow-x:auto;scrollbar-width:none;
+}
+.screen-strip-inner::-webkit-scrollbar{display:none;}
+.screen-card{
+  flex-shrink:0;width:150px;border-radius:20px;overflow:hidden;
+  border:1px solid rgba(245,242,238,0.08);
+}
+.sc-header{padding:14px 12px 10px;background:rgba(245,242,238,0.04);}
+.sc-eyebrow{font-size:6px;letter-spacing:2px;text-transform:uppercase;color:var(--sable);margin-bottom:3px;}
+.sc-title{font-family:'Bodoni Moda',serif;font-size:14px;font-style:italic;color:var(--fond);line-height:1.1;}
+.sc-body{padding:10px 12px;}
+.sc-img{height:90px;border-radius:10px;margin-bottom:8px;}
+.sc-lbl{font-size:7px;letter-spacing:1px;text-transform:uppercase;color:rgba(245,242,238,0.25);}
+.sc-item{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 0;border-bottom:1px solid rgba(245,242,238,0.06);
+}
+.sc-item-dot{width:22px;height:22px;border-radius:6px;flex-shrink:0;}
+.sc-item-name{font-size:7px;color:rgba(245,242,238,0.45);}
+
+.strip-caption{
+  padding:20px 24px 0;
+  font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(245,242,238,0.2);font-family:'Jost',sans-serif;
+}
+
+/* ── QUOTE ── */
+.quote-section{
+  background:var(--lin);padding:56px 24px;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+.quote-mark{
+  font-family:'Bodoni Moda',serif;font-size:64px;
+  color:var(--sable);line-height:.8;margin-bottom:8px;
+}
+.quote-text{
+  font-family:'Bodoni Moda',serif;font-size:24px;font-style:italic;
+  color:var(--noir);line-height:1.35;margin-bottom:16px;
+}
+.quote-source{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);
+}
+
+/* ── LOGIN ── */
+.login-section{
+  background:var(--fond);padding:48px 24px;
+  border-top:1px solid var(--border);
+}
+.login-eyebrow{
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--bois);font-weight:600;margin-bottom:8px;
+}
+.login-title{
+  font-family:'Bodoni Moda',serif;font-size:28px;font-style:italic;
+  color:var(--noir);margin-bottom:6px;
+}
+.login-sub{
+  font-size:12px;color:var(--muted);line-height:1.7;
+  margin-bottom:24px;max-width:280px;
+}
+.login-form{display:flex;flex-direction:column;gap:10px;max-width:320px;}
+.login-row{display:flex;gap:8px;}
+#codein{
+  flex:1;background:white;
+  border:1.5px solid var(--border);border-radius:12px;
+  padding:14px 16px;font-size:16px;color:var(--noir);
+  outline:none;letter-spacing:.12em;font-family:'Jost',sans-serif;
+  transition:border-color .2s;
+}
+#codein::placeholder{color:var(--sable);letter-spacing:.04em;font-size:13px;}
+#codein:focus{border-color:var(--bois);}
+#gobtn{
+  flex-shrink:0;height:52px;padding:0 20px;
+  border-radius:12px;background:var(--noir);color:var(--fond);
+  border:none;font-size:12px;font-weight:600;font-family:'Jost',sans-serif;
+  letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;
+  white-space:nowrap;transition:background .2s;
+}
+#gobtn:active{background:var(--bois);}
+#errmsg{
+  font-size:11px;color:#C05050;min-height:16px;
+  font-family:'Jost',sans-serif;padding-left:2px;
+}
+
+/* ── FOOTER ── */
+.footer{
+  background:var(--noir);padding:28px 24px;
+  padding-bottom:calc(28px + env(safe-area-inset-bottom,0));
+  display:flex;align-items:center;justify-content:space-between;
+}
+.footer-logo{
+  font-family:'Bodoni Moda',serif;font-size:13px;font-style:italic;
+  color:rgba(245,242,238,0.5);
+}
+.footer-copy{
+  font-size:9px;letter-spacing:1px;text-transform:uppercase;
+  color:rgba(245,242,238,0.2);
+}
+
+/* ── COLLAGE ── */
+.collage{background:var(--noir);padding:40px 20px 48px;overflow:hidden;}
+.collage-eyebrow{
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:rgba(200,192,180,0.35);margin-bottom:20px;font-family:'Jost',sans-serif;
+}
+.collage-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.photo-card{
+  border-radius:14px;overflow:hidden;position:relative;
+  display:flex;flex-direction:column;justify-content:flex-end;
+}
+.photo-card::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(transparent 45%,rgba(20,18,16,0.75));
+  pointer-events:none;
+}
+.photo-card-info{position:relative;z-index:1;padding:10px 11px;}
+.photo-card-loc{
+  font-size:7px;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(245,242,238,0.4);margin-bottom:2px;font-family:'Jost',sans-serif;
+}
+.photo-card-tag{
+  font-family:'Bodoni Moda',serif;font-size:13px;font-style:italic;
+  color:rgba(245,242,238,0.88);line-height:1.2;
+}
+.photo-card.tall{aspect-ratio:9/14;}
+.photo-card.short{aspect-ratio:9/10;}
+.photo-card.sq{aspect-ratio:1/1;}
+
+/* ── MINI QUIZ ── */
+.quiz-section{background:var(--fond);padding:56px 24px 48px;border-bottom:1px solid var(--border);}
+.quiz-eyebrow{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--bois);font-weight:600;margin-bottom:8px;}
+.quiz-title{font-family:'Bodoni Moda',serif;font-size:32px;font-style:italic;color:var(--noir);line-height:1.05;margin-bottom:6px;}
+.quiz-sub{font-size:12px;color:var(--muted);margin-bottom:32px;line-height:1.7;}
+
+.quiz-step{display:none;}
+.quiz-step.active{display:block;}
+
+.quiz-progress{display:flex;gap:5px;margin-bottom:28px;}
+.quiz-pip{height:3px;flex:1;border-radius:2px;background:var(--border);transition:background .3s;}
+.quiz-pip.done{background:var(--bois);}
+.quiz-pip.active{background:var(--noir);}
+
+.quiz-q{font-size:15px;font-weight:500;color:var(--noir);margin-bottom:16px;line-height:1.4;}
+
+.quiz-options{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 16px;border-radius:14px;
+  border:1.5px solid var(--border);background:white;
+  cursor:pointer;transition:border-color .18s,background .18s;
+  -webkit-tap-highlight-color:transparent;
+}
+.quiz-opt:active,.quiz-opt.picked{border-color:var(--noir);background:var(--lin);}
+.quiz-opt-icon{font-size:22px;width:28px;text-align:center;flex-shrink:0;}
+.quiz-opt-text{font-size:13px;color:var(--noir);line-height:1.3;}
+.quiz-opt-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+
+.quiz-colors{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.quiz-color-opt{
+  border-radius:14px;overflow:hidden;border:2px solid transparent;
+  cursor:pointer;transition:border-color .18s;
+  -webkit-tap-highlight-color:transparent;
+}
+.quiz-color-opt.picked{border-color:var(--noir);}
+.quiz-color-swatch{height:64px;display:flex;gap:3px;padding:8px;}
+.quiz-color-swatch span{flex:1;border-radius:6px;}
+.quiz-color-lbl{background:white;padding:8px 10px;font-size:11px;font-weight:500;color:var(--noir);}
+
+/* Result card */
+.quiz-result{display:none;animation:fadeUp .4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.result-hero{
+  background:var(--noir);border-radius:20px;padding:28px 22px;
+  margin-bottom:16px;position:relative;overflow:hidden;
+}
+.result-hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 80% 20%,rgba(200,192,180,0.08),transparent);
+  pointer-events:none;
+}
+.result-eyebrow{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--sable);margin-bottom:10px;position:relative;}
+.result-name{font-family:'Bodoni Moda',serif;font-size:38px;font-style:italic;color:var(--fond);line-height:1;margin-bottom:8px;position:relative;}
+.result-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;position:relative;}
+.result-tag{padding:3px 10px;border-radius:20px;border:1px solid rgba(245,242,238,0.2);font-size:9px;color:rgba(245,242,238,0.65);letter-spacing:.5px;}
+.result-desc{font-size:13px;color:rgba(245,242,238,0.5);line-height:1.7;position:relative;}
+
+.result-cta{
+  background:var(--lin);border-radius:16px;padding:20px;
+  border:1px solid var(--border);margin-bottom:12px;
+}
+.result-cta-txt{font-size:13px;color:var(--ardoise);line-height:1.7;margin-bottom:14px;}
+.result-cta-btn{
+  display:block;width:100%;padding:15px;text-align:center;
+  background:var(--noir);color:var(--fond);border:none;border-radius:12px;
+  font-size:12px;font-weight:600;font-family:'Jost',sans-serif;
+  letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;
+}
+.result-retry{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;cursor:pointer;text-decoration:underline;}
+
+@media(min-width:540px){
+  .hero-title{font-size:80px;}
+  .mood-strip{height:220px;}
+  .screen-card{width:180px;}
+  .collage-grid{grid-template-columns:repeat(3,1fr);}
+}
 </style>
 </head>
 <body>
-<div class="logo">Stijl Studio &middot; Prive Beta</div>
-<h1>Jouw<br><b>stijl</b> begint<br>hier.</h1>
-<div class="sub">Je hebt een toegangscode nodig. Geen code? Stuur een berichtje naar Griette.</div>
-<input id="codein" type="text" placeholder="Jouw code" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
-<button id="gobtn">Toegang</button>
-<div id="errmsg"></div>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-glow"></div>
+
+  <div class="topbar">
+    <div class="topbar-logo">Stijl Studio</div>
+    <div class="topbar-badge">Privé Beta</div>
+  </div>
+
+  <div class="hero-body">
+    <div class="hero-eyebrow">Jouw digitale stylist</div>
+    <h1 class="hero-title">
+      Gecureerd.<br>
+      <span>Elke dag opnieuw.</span>
+    </h1>
+    <p class="hero-desc">
+      Stijl Studio combineert jouw garderobe met AI — en geeft je elke ochtend een look die bij je dag past.
+    </p>
+  </div>
+
+  <div class="mood-strip">
+    <div class="mood-tile" style="background:linear-gradient(160deg,#2A2826,#3A3634);">
+      <span class="mood-tile-lbl">Looks</span>
+    </div>
+    <div class="mood-tile" style="background:linear-gradient(160deg,#3C3A36,#2C2A28);">
+      <span class="mood-tile-lbl">Kast</span>
+    </div>
+    <div class="mood-tile" style="background:linear-gradient(160deg,#484644,#343230);">
+      <span class="mood-tile-lbl">Stijl DNA</span>
+    </div>
+    <div class="mood-tile" style="background:linear-gradient(160deg,#2E2C2A,#3E3C3A);">
+      <span class="mood-tile-lbl">Advies</span>
+    </div>
+  </div>
+
+  <div class="scroll-cue">
+    <span class="scroll-line"></span>
+    Scroll om meer te zien
+  </div>
+</section>
+
+<!-- ══ MINI QUIZ ══ -->
+<section class="quiz-section" id="quiz-section">
+  <div class="quiz-eyebrow">In 3 stappen</div>
+  <h2 class="quiz-title">Wat is jouw<br>stijltype?</h2>
+  <p class="quiz-sub">Geen aanmelding nodig. Ontdek je archetype in één minuut.</p>
+
+  <div class="quiz-progress">
+    <div class="quiz-pip active" id="pip-0"></div>
+    <div class="quiz-pip" id="pip-1"></div>
+    <div class="quiz-pip" id="pip-2"></div>
+  </div>
+
+  <!-- Stap 1: Gevoel -->
+  <div class="quiz-step active" id="qs-0">
+    <div class="quiz-q">Hoe wil je je voelen als je 's ochtends aankleedt?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-val="naturel">
+        <span class="quiz-opt-icon">🌿</span>
+        <div><div class="quiz-opt-text">Moeiteloos &amp; vrij</div><div class="quiz-opt-sub">Er gewoon goed uitzien, zonder na te denken</div></div>
+      </div>
+      <div class="quiz-opt" data-val="modern">
+        <span class="quiz-opt-icon">✦</span>
+        <div><div class="quiz-opt-text">Strak &amp; intentioneel</div><div class="quiz-opt-sub">Elke keuze bewust, niets toevallig</div></div>
+      </div>
+      <div class="quiz-opt" data-val="romantisch">
+        <span class="quiz-opt-icon">🌸</span>
+        <div><div class="quiz-opt-text">Vrouwelijk &amp; warm</div><div class="quiz-opt-sub">Zacht maar aanwezig</div></div>
+      </div>
+      <div class="quiz-opt" data-val="stoer">
+        <span class="quiz-opt-icon">⚡</span>
+        <div><div class="quiz-opt-text">Krachtig &amp; opvallend</div><div class="quiz-opt-sub">Je merkt me op voordat ik iets zeg</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stap 2: Uitdaging -->
+  <div class="quiz-step" id="qs-1">
+    <div class="quiz-q">Welke zin herken je het meest?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" data-val="a">
+        <span class="quiz-opt-icon">👗</span>
+        <div><div class="quiz-opt-text">Volle kast, maar niks aan</div><div class="quiz-opt-sub">Ik heb genoeg, maar combineer het niet goed</div></div>
+      </div>
+      <div class="quiz-opt" data-val="b">
+        <span class="quiz-opt-icon">🔄</span>
+        <div><div class="quiz-opt-text">Altijd dezelfde vijf dingen</div><div class="quiz-opt-sub">De rest hangt ongebruikt</div></div>
+      </div>
+      <div class="quiz-opt" data-val="c">
+        <span class="quiz-opt-icon">🪞</span>
+        <div><div class="quiz-opt-text">Ik herken mezelf niet in mijn kleding</div><div class="quiz-opt-sub">Het voelt niet als ik</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stap 3: Kleur -->
+  <div class="quiz-step" id="qs-2">
+    <div class="quiz-q">Welk kleurpalet spreekt je aan?</div>
+    <div class="quiz-colors">
+      <div class="quiz-color-opt" data-val="neutral">
+        <div class="quiz-color-swatch">
+          <span style="background:#E8E4DC;"></span>
+          <span style="background:#C8C0B4;"></span>
+          <span style="background:#1C1A18;"></span>
+        </div>
+        <div class="quiz-color-lbl">Neutraal</div>
+      </div>
+      <div class="quiz-color-opt" data-val="earth">
+        <div class="quiz-color-swatch">
+          <span style="background:#D4B896;"></span>
+          <span style="background:#A07850;"></span>
+          <span style="background:#6A8A4A;"></span>
+        </div>
+        <div class="quiz-color-lbl">Aarde</div>
+      </div>
+      <div class="quiz-color-opt" data-val="soft">
+        <div class="quiz-color-swatch">
+          <span style="background:#EDD8DF;"></span>
+          <span style="background:#D4A8B8;"></span>
+          <span style="background:#B8C8B0;"></span>
+        </div>
+        <div class="quiz-color-lbl">Zacht</div>
+      </div>
+      <div class="quiz-color-opt" data-val="bold">
+        <div class="quiz-color-swatch">
+          <span style="background:#1C38A0;"></span>
+          <span style="background:#C44A4A;"></span>
+          <span style="background:#1C1A18;"></span>
+        </div>
+        <div class="quiz-color-lbl">Bold</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resultaat -->
+  <div class="quiz-result" id="quiz-result">
+    <div class="result-hero">
+      <div class="result-eyebrow">Jouw stijlarchetype</div>
+      <div class="result-name" id="res-name"></div>
+      <div class="result-tags" id="res-tags"></div>
+      <div class="result-desc" id="res-desc"></div>
+    </div>
+    <div class="result-cta">
+      <div class="result-cta-txt" id="res-cta-txt"></div>
+      <button class="result-cta-btn" onclick="document.getElementById('login').scrollIntoView({behavior:'smooth'})">
+        ✦ Vraag jouw toegang aan
+      </button>
+    </div>
+    <div class="result-retry" onclick="resetQuiz()">Opnieuw doen</div>
+  </div>
+</section>
+
+<!-- ══ COLLAGE ══ -->
+<section class="collage">
+  <div class="collage-eyebrow">Street Style · Inspiratie</div>
+  <div class="collage-grid">
+
+    <!-- Monochrome neutrals — tall -->
+    <div class="photo-card tall" style="background-image:url('https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=620&fit=crop&crop=top&q=80&auto=format');background-size:cover;background-position:center top;grid-row:span 2;">
+      <div class="photo-card-info">
+        <div class="photo-card-loc">Amsterdam · 2026</div>
+        <div class="photo-card-tag">Monochroom<br>neutraal</div>
+      </div>
+    </div>
+
+    <!-- Camel coat -->
+    <div class="photo-card short" style="background-image:url('https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=450&fit=crop&crop=top&q=80&auto=format');background-size:cover;background-position:center top;">
+      <div class="photo-card-info">
+        <div class="photo-card-loc">Londen</div>
+        <div class="photo-card-tag">Camel coat</div>
+      </div>
+    </div>
+
+    <!-- Minimal editorial -->
+    <div class="photo-card short" style="background-image:url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=450&fit=crop&crop=top&q=80&auto=format');background-size:cover;background-position:center top;">
+      <div class="photo-card-info">
+        <div class="photo-card-loc">Parijs</div>
+        <div class="photo-card-tag">Minimaal<br>editorial</div>
+      </div>
+    </div>
+
+    <!-- All-black editorial — tall -->
+    <div class="photo-card tall" style="background-image:url('https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=620&fit=crop&crop=top&q=80&auto=format');background-size:cover;background-position:center top;grid-row:span 2;">
+      <div class="photo-card-info">
+        <div class="photo-card-loc">Milaan</div>
+        <div class="photo-card-tag">Editorial<br>all-black</div>
+      </div>
+    </div>
+
+    <!-- Earth tones -->
+    <div class="photo-card short" style="background-image:url('https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=450&fit=crop&crop=top&q=80&auto=format');background-size:cover;background-position:center top;">
+      <div class="photo-card-info">
+        <div class="photo-card-loc">Barcelona</div>
+        <div class="photo-card-tag">Earth tones</div>
+      </div>
+    </div>
+
+    <!-- Oversized tailoring -->
+    <div class="photo-card short" style="background-image:url('https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=400&h=450&fit=crop&crop=top&q=80&auto=format');background-size:cover;background-position:center top;">
+      <div class="photo-card-info">
+        <div class="photo-card-loc">Kopenhagen</div>
+        <div class="photo-card-tag">Oversized<br>tailoring</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ FEATURES ══ -->
+<section class="features">
+  <div class="features-eyebrow">Wat Stijl Studio doet</div>
+  <h2 class="features-title">Drie dingen.<br><em>Perfect gedaan.</em></h2>
+
+  <div class="feature-list">
+    <div class="feature-item">
+      <div class="feature-num">1</div>
+      <div class="feature-body">
+        <div class="feature-name">Look van de dag</div>
+        <div class="feature-text">Elke ochtend een gecureerde outfit op basis van het weer, je agenda en jouw smaak. Nooit meer twijfelen.</div>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-num">2</div>
+      <div class="feature-body">
+        <div class="feature-name">Digitale garderobe</div>
+        <div class="feature-text">Fotografeer je kleren één keer. Stijl Studio onthoudt ze en combineert ze voor je — altijd op basis van wat je al hebt.</div>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-num">3</div>
+      <div class="feature-body">
+        <div class="feature-name">Jouw Stijl DNA</div>
+        <div class="feature-text">Een persoonlijk stijlprofiel dat steeds beter wordt. Hoe meer je gebruikt, hoe preciezer het advies.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SCREEN STRIP ══ -->
+<section class="screen-strip">
+  <p class="strip-caption">Een kijkje in de app</p>
+  <div class="screen-strip-inner" style="margin-top:20px;">
+
+    <!-- Home -->
+    <div class="screen-card" style="background:#1C1A18;">
+      <div class="sc-header">
+        <div class="sc-eyebrow">Vrijdag · 15 mei</div>
+        <div class="sc-title">Goedemorgen,<br>Jet</div>
+      </div>
+      <div class="sc-body">
+        <div class="sc-img" style="background:linear-gradient(160deg,#D8D4CC,#B8B4AC);display:flex;align-items:flex-end;padding:8px;">
+          <div>
+            <div style="font-size:5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--sable);">✦ Look vandaag</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:10px;font-style:italic;color:white;line-height:1.2;">Casual met<br>een twist</div>
+          </div>
+        </div>
+        <div style="margin-top:8px;background:var(--bois);border-radius:8px;padding:6px 8px;text-align:center;">
+          <span style="font-size:7px;letter-spacing:1px;text-transform:uppercase;color:white;">✦ Genereer look</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kast -->
+    <div class="screen-card" style="background:#F5F2EE;">
+      <div class="sc-header" style="background:var(--lin);">
+        <div class="sc-eyebrow" style="color:var(--bois);">Garderobe</div>
+        <div class="sc-title" style="color:var(--noir);">Mijn kast</div>
+      </div>
+      <div class="sc-body">
+        <div class="sc-lbl" style="color:var(--muted);margin-bottom:6px;">Tops · 12 items</div>
+        <div class="sc-item"><div class="sc-item-dot" style="background:#E8E4DC;"></div><div class="sc-item-name" style="color:var(--ardoise);">Wit oversized tee</div></div>
+        <div class="sc-item"><div class="sc-item-dot" style="background:#D8D0C4;"></div><div class="sc-item-name" style="color:var(--ardoise);">Hemdjurk beige</div></div>
+        <div class="sc-item"><div class="sc-item-dot" style="background:#C8D0D8;"></div><div class="sc-item-name" style="color:var(--ardoise);">Blauw linnen blouse</div></div>
+      </div>
+    </div>
+
+    <!-- Stijl DNA -->
+    <div class="screen-card" style="background:#1C1A18;">
+      <div class="sc-header">
+        <div class="sc-eyebrow">Profiel</div>
+        <div class="sc-title">Stijl DNA</div>
+      </div>
+      <div class="sc-body">
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+          <span style="background:rgba(245,242,238,.08);border-radius:10px;padding:3px 7px;font-size:6.5px;color:rgba(245,242,238,.55);">Minimaliste</span>
+          <span style="background:rgba(245,242,238,.08);border-radius:10px;padding:3px 7px;font-size:6.5px;color:rgba(245,242,238,.55);">Casual chic</span>
+          <span style="background:rgba(74,82,96,.4);border-radius:10px;padding:3px 7px;font-size:6.5px;color:rgba(245,242,238,.8);">Neutrals</span>
+        </div>
+        <div class="sc-lbl" style="margin-bottom:4px;">Favoriete kleuren</div>
+        <div style="display:flex;gap:4px;">
+          <div style="width:18px;height:18px;border-radius:50%;background:#E8E4DC;"></div>
+          <div style="width:18px;height:18px;border-radius:50%;background:#C8C0B4;"></div>
+          <div style="width:18px;height:18px;border-radius:50%;background:#4A5260;"></div>
+          <div style="width:18px;height:18px;border-radius:50%;background:#1C1A18;border:1px solid rgba(255,255,255,.15);"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Looks -->
+    <div class="screen-card" style="background:#F5F2EE;">
+      <div class="sc-header" style="background:var(--lin);">
+        <div class="sc-eyebrow" style="color:var(--bois);">Mei 2026</div>
+        <div class="sc-title" style="color:var(--noir);">Recente<br>looks</div>
+      </div>
+      <div class="sc-body">
+        <div style="display:flex;gap:5px;">
+          <div style="flex:1;height:75px;border-radius:8px;background:linear-gradient(135deg,#D8D4CC,#C4C0B8);"></div>
+          <div style="flex:1;height:75px;border-radius:8px;background:linear-gradient(135deg,#D0D0D8,#B8B8C4);"></div>
+        </div>
+        <div style="margin-top:6px;font-size:7px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">24 looks deze maand</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ QUOTE ══ -->
+<section class="quote-section">
+  <div class="quote-mark">"</div>
+  <p class="quote-text">Niet op de cover — maar stijlvol op een gewone dinsdag.</p>
+  <p class="quote-source">De filosofie achter Stijl Studio</p>
+</section>
+
+<!-- ══ LOGIN ══ -->
+<section class="login-section" id="login">
+  <div class="login-eyebrow">Toegang aanvragen</div>
+  <h2 class="login-title">Welkom terug.</h2>
+  <p class="login-sub">Stijl Studio is momenteel op uitnodiging. Voer je persoonlijke code in om te beginnen.</p>
+
+  <div class="login-form">
+    <div class="login-row">
+      <input id="codein" type="text" placeholder="Jouw toegangscode"
+        autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+      <button id="gobtn">Verder</button>
+    </div>
+    <div id="errmsg"></div>
+  </div>
+
+  <p style="margin-top:24px;font-size:11px;color:var(--muted);line-height:1.7;">
+    Geen code? Stuur een berichtje via Instagram.<br>
+    <span style="color:var(--bois);font-weight:500;">@stijlstudio.app</span>
+  </p>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <span class="footer-logo">Stijl Studio</span>
+  <span class="footer-copy">© 2026 · Privé Beta</span>
+</footer>
+
 <script>
+// ── MINI QUIZ ──
+var qAnswers = {gevoel:null, uitdaging:null, kleur:null};
+var qStep = 0;
+
+var ARCHS = {
+  naturel: {
+    naam:'De Naturel',
+    kw:['Authentiek','Moeiteloos','Eerlijk'],
+    desc:'Jij wil er goed uitzien zonder er uren over na te denken. Stijl is voor jou een verlengstuk van wie je bent — niet een masker.',
+    cta:'Stijl Studio leert jouw garderobe kennen en geeft je elke ochtend een moeiteloze look die echt bij je past.'
+  },
+  modern: {
+    naam:'De Moderne',
+    kw:['Strak','Intentioneel','Precies'],
+    desc:'Minder is meer. Alles in jouw kast is er bewust. Jij zoekt niet naar meer kleding — je wil weten hoe je optimaal gebruikt wat je hebt.',
+    cta:'Stijl Studio helpt je een echte capsule wardrobe opbouwen en geeft je dagelijks een look die klopt tot in het detail.'
+  },
+  romantisch: {
+    naam:'De Romantische',
+    kw:['Vrouwelijk','Warm','Detail-minded'],
+    desc:'Je hebt aandacht voor zachtheid en fijne details. Je kleding vertelt iets — zonder te schreeuwen. Feminien maar met karakter.',
+    cta:'Stijl Studio begrijpt jouw kleurpalet en silhouetvoorkeur en combineert je garderobe op een manier die jij voelt.'
+  },
+  stoer: {
+    naam:'De Stoere',
+    kw:['Krachtig','Direct','Doelbewust'],
+    desc:'Sterke lijnen, kwaliteitsmaterialen, duidelijke keuzes. Jouw stijl heeft een heldere identiteit — je weet wat je wil, je hebt alleen niet altijd de tijd.',
+    cta:'Stijl Studio geeft jou elke dag in seconden een look die krachtig en consistent is.'
+  },
+  klassiek: {
+    naam:'De Klassieke',
+    kw:['Tijdloos','Elegant','Intentioneel'],
+    desc:'Jij kiest kwaliteit boven kwantiteit. Structuur en proportie zijn je gereedschap. Je garderobe is klein maar sterk.',
+    cta:'Stijl Studio helpt je de juiste combinaties te maken met wat je al hebt — tijdloos, elke dag.'
+  },
+  createur: {
+    naam:'De Createur',
+    kw:['Expressief','Uniek','Verrassend'],
+    desc:'Kleding is voor jou communicatie. Je stijl vertelt een verhaal voordat je iets zegt. Je bent nooit saai — soms alleen niet zeker waar te beginnen.',
+    cta:'Stijl Studio geeft je de structuur die je expressie ruimte geeft. Jouw garderobe als canvas.'
+  }
+};
+
+function pickArchetype() {
+  var g = qAnswers.gevoel, k = qAnswers.kleur;
+  if (g === 'naturel' && (k === 'earth' || k === 'neutral')) return 'naturel';
+  if (g === 'naturel' && k === 'soft') return 'romantisch';
+  if (g === 'romantisch') return 'romantisch';
+  if (g === 'modern' && k === 'bold') return 'createur';
+  if (g === 'modern' && k === 'neutral') return 'modern';
+  if (g === 'modern') return 'klassiek';
+  if (g === 'stoer' && k === 'bold') return 'stoer';
+  if (g === 'stoer') return 'modern';
+  return 'naturel';
+}
+
+function showQuizStep(n) {
+  for (var i = 0; i < 3; i++) {
+    var s = document.getElementById('qs-' + i);
+    if (s) s.classList.toggle('active', i === n);
+    var p = document.getElementById('pip-' + i);
+    if (p) { p.classList.toggle('active', i === n); p.classList.toggle('done', i < n); }
+  }
+}
+
+function quizNext(step) {
+  if (step < 2) {
+    qStep = step + 1;
+    showQuizStep(qStep);
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  document.getElementById('qs-2').classList.remove('active');
+  for (var i = 0; i < 3; i++) {
+    var p = document.getElementById('pip-' + i);
+    if (p) { p.classList.remove('active'); p.classList.add('done'); }
+  }
+  var key = pickArchetype();
+  var a = ARCHS[key];
+  document.getElementById('res-name').textContent = a.naam;
+  document.getElementById('res-tags').innerHTML = a.kw.map(function(k){ return '<span class="result-tag">'+k+'</span>'; }).join('');
+  document.getElementById('res-desc').textContent = a.desc;
+  document.getElementById('res-cta-txt').textContent = a.cta;
+  var r = document.getElementById('quiz-result');
+  r.style.display = 'block';
+  r.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function resetQuiz() {
+  qAnswers = {gevoel:null, uitdaging:null, kleur:null};
+  qStep = 0;
+  document.getElementById('quiz-result').style.display = 'none';
+  document.querySelectorAll('.quiz-opt').forEach(function(o){ o.classList.remove('picked'); });
+  document.querySelectorAll('.quiz-color-opt').forEach(function(o){ o.classList.remove('picked'); });
+  showQuizStep(0);
+}
+
+// Opt clicks — step 1 & 2
+document.querySelectorAll('#qs-0 .quiz-opt').forEach(function(opt) {
+  opt.addEventListener('click', function() {
+    document.querySelectorAll('#qs-0 .quiz-opt').forEach(function(o){ o.classList.remove('picked'); });
+    opt.classList.add('picked');
+    qAnswers.gevoel = opt.dataset.val;
+    setTimeout(function(){ quizNext(0); }, 260);
+  });
+});
+document.querySelectorAll('#qs-1 .quiz-opt').forEach(function(opt) {
+  opt.addEventListener('click', function() {
+    document.querySelectorAll('#qs-1 .quiz-opt').forEach(function(o){ o.classList.remove('picked'); });
+    opt.classList.add('picked');
+    qAnswers.uitdaging = opt.dataset.val;
+    setTimeout(function(){ quizNext(1); }, 260);
+  });
+});
+document.querySelectorAll('.quiz-color-opt').forEach(function(opt) {
+  opt.addEventListener('click', function() {
+    document.querySelectorAll('.quiz-color-opt').forEach(function(o){ o.classList.remove('picked'); });
+    opt.classList.add('picked');
+    qAnswers.kleur = opt.dataset.val;
+    setTimeout(function(){ quizNext(2); }, 260);
+  });
+});
+
 function doLogin() {
   var c = document.getElementById('codein').value.trim().toUpperCase();
   var e = document.getElementById('errmsg');
   e.textContent = '';
   if (!c) { e.textContent = 'Vul je code in.'; return; }
-  var ok = {'SS-GRIET':1,'SS-EVA25':1,'SS-INEZ25':1};
-  if (!ok[c]) { e.textContent = 'Ongeldige code.'; return; }
+  var ok = {'SS-GRIET':1,'SS-001':1,'SS-002':1,'SS-003':1,'SS-004':1,'SS-005':1,'SS-006':1,'SS-007':1,'SS-008':1,'SS-009':1,'SS-010':1};
+  if (!ok[c]) { e.textContent = 'Ongeldige code — probeer opnieuw.'; return; }
   try { localStorage.setItem('ss-code', c); } catch(x) {}
   document.getElementById('gobtn').textContent = '...';
-  window.location.href = 'griette_stylist_BETA.html';
+  if (c === 'SS-GRIET') {
+    window.location.href = 'griette.html';
+  } else {
+    var hasProfile = false;
+    try { hasProfile = !!localStorage.getItem('ss-prof-' + c); } catch(x) {}
+    window.location.href = hasProfile ? 'stylist_demo.html' : 'stijlstudio_quiz.html';
+  }
 }
 document.getElementById('gobtn').onclick = doLogin;
 document.getElementById('codein').onkeydown = function(ev) {

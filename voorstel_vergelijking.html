@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stijl Studio — USA vs UK</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Jost',sans-serif;background:#F0EDE8;color:#1A1A1A;min-height:100vh;}
+
+/* HEADER */
+.page-header{
+  background:#1A1A1A;color:white;padding:32px 28px;text-align:center;
+}
+.page-header h1{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;font-style:italic;margin-bottom:6px;}
+.page-header p{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);}
+
+/* COLUMNS */
+.compare{display:flex;gap:0;min-height:100vh;}
+.col{flex:1;padding:40px 28px;display:flex;flex-direction:column;align-items:center;}
+.col-usa{background:#FAF8F5;}
+.col-uk{background:#F0EDE8;border-left:1px solid #DDD8D0;}
+
+.col-title{
+  font-size:9px;letter-spacing:4px;text-transform:uppercase;
+  margin-bottom:6px;font-weight:600;
+}
+.col-title.usa{color:#B8906A;}
+.col-title.uk{color:#4A5260;}
+
+.col-headline{
+  font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;
+  text-align:center;line-height:1.05;margin-bottom:10px;
+}
+.col-sub{
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  text-align:center;margin-bottom:32px;
+}
+
+/* PHONE */
+.phone{
+  width:200px;border-radius:36px;overflow:hidden;
+  box-shadow:0 28px 70px rgba(0,0,0,0.14);
+  flex-shrink:0;
+}
+.phone-label{
+  text-align:center;font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  margin-top:14px;margin-bottom:32px;
+}
+
+/* KLEUR CHIPS */
+.palette{display:flex;gap:7px;margin-bottom:32px;flex-wrap:wrap;justify-content:center;}
+.chip{border-radius:50px;padding:6px 14px;font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;}
+
+/* SWATCH ROW */
+.swatches{display:flex;gap:8px;margin-bottom:32px;}
+.sw{text-align:center;}
+.sw-color{width:44px;height:44px;border-radius:50%;margin-bottom:5px;margin:0 auto 5px;}
+.sw-name{font-size:8px;color:#888;text-transform:uppercase;letter-spacing:1px;}
+
+/* TEKST DEMO */
+.text-demo{width:100%;max-width:260px;padding:20px;border-radius:14px;margin-bottom:24px;}
+
+/* DIVIDER */
+.divider{width:1px;background:#DDD8D0;align-self:stretch;display:none;}
+
+/* ── USA PHONE ── */
+.usa-header{background:#FAF8F5;padding:22px 18px 14px;}
+.usa-header-eyebrow{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:#B8906A;margin-bottom:3px;}
+.usa-header-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;color:#1A1A1A;line-height:1.1;}
+.usa-header-sub{font-size:8px;color:#999;margin-top:4px;}
+
+.usa-hero{margin:10px;border-radius:14px;overflow:hidden;background:#F0EAE0;}
+.usa-hero-img{height:150px;background:linear-gradient(160deg,#EDE0CC 0%,#D8C8B0 50%,#C8B498 100%);display:flex;align-items:flex-end;padding:12px;}
+.usa-hero-badge-label{font-size:6px;letter-spacing:2px;text-transform:uppercase;color:#B8906A;}
+.usa-hero-badge-title{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:#1A1A1A;line-height:1.2;}
+.usa-chips{display:flex;gap:4px;padding:8px 10px;flex-wrap:wrap;}
+.usa-chip{background:rgba(26,26,26,0.06);border-radius:20px;padding:3px 8px;font-size:6.5px;color:#555;}
+.usa-btn{margin:0 10px 10px;background:#1A1A1A;color:#FAF8F5;border:none;border-radius:20px;padding:7px 14px;font-size:7.5px;font-family:'Jost',sans-serif;letter-spacing:1.5px;text-transform:uppercase;width:calc(100% - 20px);}
+.usa-section-label{font-size:6.5px;letter-spacing:2px;text-transform:uppercase;color:#B8906A;padding:10px 14px 6px;}
+.usa-looks-row{display:flex;gap:6px;padding:0 10px 10px;overflow:hidden;}
+.usa-look{width:70px;flex-shrink:0;}
+.usa-look-img{height:84px;border-radius:10px;margin-bottom:4px;}
+.usa-look-name{font-size:6.5px;color:#666;line-height:1.3;padding:0 2px;}
+.usa-nav{background:#FAF8F5;border-top:1px solid #EDE8E0;padding:10px 0 14px;display:flex;justify-content:space-around;align-items:flex-end;}
+.usa-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.usa-nav-lbl{font-size:5.5px;letter-spacing:1px;text-transform:uppercase;color:#AAA;}
+.usa-nav-item.on .usa-nav-lbl{color:#1A1A1A;}
+.usa-fab{width:40px;height:40px;border-radius:50%;background:#1A1A1A;display:flex;align-items:center;justify-content:center;font-size:14px;color:#D4B080;margin-bottom:2px;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+
+/* ── UK PHONE ── */
+.uk-header{background:#1C1A18;padding:22px 18px 14px;}
+.uk-header-eyebrow{font-size:7px;letter-spacing:3px;text-transform:uppercase;color:rgba(200,185,160,0.5);margin-bottom:3px;}
+.uk-header-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;color:#F5F2EE;line-height:1.1;}
+.uk-header-sub{font-size:8px;color:rgba(245,242,238,0.3);margin-top:4px;}
+
+.uk-hero{margin:10px;border-radius:14px;overflow:hidden;background:#EDEAE4;}
+.uk-hero-img{height:150px;background:linear-gradient(160deg,#D8D4CC 0%,#C8C0B4 50%,#B8AEA0 100%);display:flex;align-items:flex-end;padding:12px;}
+.uk-hero-badge-label{font-size:6px;letter-spacing:2px;text-transform:uppercase;color:#4A5260;}
+.uk-hero-badge-title{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:#1C1A18;line-height:1.2;}
+.uk-chips{display:flex;gap:4px;padding:8px 10px;flex-wrap:wrap;}
+.uk-chip{background:rgba(28,26,24,0.07);border-radius:20px;padding:3px 8px;font-size:6.5px;color:#555;}
+.uk-btn{margin:0 10px 10px;background:#1C1A18;color:#F5F2EE;border:none;border-radius:20px;padding:7px 14px;font-size:7.5px;font-family:'Jost',sans-serif;letter-spacing:1.5px;text-transform:uppercase;width:calc(100% - 20px);}
+.uk-section-label{font-size:6.5px;letter-spacing:2px;text-transform:uppercase;color:#4A5260;padding:10px 14px 6px;}
+.uk-looks-row{display:flex;gap:6px;padding:0 10px 10px;overflow:hidden;}
+.uk-look{width:70px;flex-shrink:0;}
+.uk-look-img{height:84px;border-radius:10px;margin-bottom:4px;}
+.uk-look-name{font-size:6.5px;color:#666;line-height:1.3;padding:0 2px;}
+.uk-nav{background:#1C1A18;padding:10px 0 14px;display:flex;justify-content:space-around;align-items:flex-end;}
+.uk-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.uk-nav-lbl{font-size:5.5px;letter-spacing:1px;text-transform:uppercase;color:rgba(245,242,238,0.3);}
+.uk-nav-item.on .uk-nav-lbl{color:rgba(245,242,238,0.85);}
+.uk-fab{width:40px;height:40px;border-radius:50%;background:#F5F2EE;display:flex;align-items:center;justify-content:center;font-size:14px;color:#1C1A18;margin-bottom:2px;box-shadow:0 4px 12px rgba(0,0,0,0.3);}
+
+/* BRAND CARD */
+.brand-card{width:100%;max-width:260px;border-radius:16px;overflow:hidden;margin-bottom:24px;}
+.bc-top{padding:24px 20px;}
+.bc-eyebrow{font-size:8px;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;}
+.bc-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-style:italic;line-height:1;margin-bottom:4px;}
+.bc-sub{font-size:9px;letter-spacing:2px;text-transform:uppercase;opacity:.5;}
+.bc-bottom{padding:14px 20px;display:flex;justify-content:space-between;align-items:center;}
+.bc-btn{border:none;border-radius:20px;padding:8px 16px;font-size:8px;font-family:'Jost',sans-serif;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;}
+
+/* WOORDEN */
+.words{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:28px;}
+.word{border:1px solid currentColor;border-radius:20px;padding:5px 12px;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;}
+
+@media(max-width:600px){
+  .compare{flex-direction:column;}
+  .col-uk{border-left:none;border-top:2px solid #DDD8D0;}
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Twee richtingen</h1>
+  <p>Kies jouw Vogue &mdash; USA of UK</p>
+</div>
+
+<div class="compare">
+
+  <!-- ══════ USA ══════ -->
+  <div class="col col-usa">
+    <div class="col-title usa" style="margin-top:0;">Optie A</div>
+    <div class="col-headline" style="color:#1A1A1A;">Vogue <em style="font-style:italic;">USA</em></div>
+    <div class="col-sub" style="color:#B8906A;">Warm ivoor &middot; Champagne &middot; Licht</div>
+
+    <!-- Woorden -->
+    <div class="words" style="color:#B8906A;">
+      <span class="word">Warm</span>
+      <span class="word">Lumineus</span>
+      <span class="word">Elegant</span>
+      <span class="word">Toegankelijk</span>
+    </div>
+
+    <!-- Swatches -->
+    <div class="swatches">
+      <div class="sw"><div class="sw-color" style="background:#FAF8F5;border:1px solid #DDD;"></div><div class="sw-name">Ivoire</div></div>
+      <div class="sw"><div class="sw-color" style="background:#EDE0CC;"></div><div class="sw-name">Crème</div></div>
+      <div class="sw"><div class="sw-color" style="background:#D4B080;"></div><div class="sw-name">Or</div></div>
+      <div class="sw"><div class="sw-color" style="background:#B8906A;"></div><div class="sw-name">Champagne</div></div>
+      <div class="sw"><div class="sw-color" style="background:#1A1A1A;"></div><div class="sw-name">Noir</div></div>
+    </div>
+
+    <!-- Brand card preview -->
+    <div class="brand-card" style="background:#FAF8F5;border:1px solid #EDE8E0;">
+      <div class="bc-top">
+        <div class="bc-eyebrow" style="color:#B8906A;">Stijl Studio &middot; Privé</div>
+        <div class="bc-title" style="color:#1A1A1A;">Jouw<br>stijl.</div>
+        <div class="bc-sub" style="color:#1A1A1A;">Gecureerd &middot; Persoonlijk</div>
+      </div>
+      <div class="bc-bottom" style="background:#EDE0CC;">
+        <span style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#888;">Look van vandaag</span>
+        <button class="bc-btn" style="background:#1A1A1A;color:#FAF8F5;">Open →</button>
+      </div>
+    </div>
+
+    <!-- TekstDemo -->
+    <div class="text-demo" style="background:#FAF8F5;border:1px solid #EDE8E0;">
+      <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#B8906A;margin-bottom:6px;">Vrijdag · 15 mei</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-style:italic;color:#1A1A1A;line-height:1;margin-bottom:8px;">Casual<br>met een twist.</div>
+      <div style="font-size:10px;color:#888;line-height:1.7;margin-bottom:12px;">Hemdjurk · Witte sneakers · Rieten tas</div>
+      <div style="display:inline-flex;align-items:center;gap:6px;background:#1A1A1A;color:#FAF8F5;border-radius:20px;padding:8px 14px;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;">
+        ✦ Genereer look
+      </div>
+    </div>
+
+    <!-- Telefoon mockup -->
+    <div class="phone" style="background:#FAF8F5;">
+      <!-- Header -->
+      <div class="usa-header">
+        <div class="usa-header-eyebrow">Vrijdag · 15 mei</div>
+        <div class="usa-header-title">Goedemorgen,<br>Griette</div>
+        <div class="usa-header-sub">🌤 18° · rok-weer</div>
+      </div>
+      <!-- Hero -->
+      <div class="usa-hero">
+        <div class="usa-hero-img">
+          <div>
+            <div class="usa-hero-badge-label">✦ Look van vandaag</div>
+            <div class="usa-hero-badge-title">Casual vrijdag<br>met een twist</div>
+          </div>
+        </div>
+        <div class="usa-chips">
+          <span class="usa-chip">Hemdjurk beige</span>
+          <span class="usa-chip">Witte sneakers</span>
+        </div>
+        <button class="usa-btn">✦ Genereer mijn look</button>
+      </div>
+      <!-- Looks -->
+      <div class="usa-section-label">Recente looks</div>
+      <div class="usa-looks-row">
+        <div class="usa-look">
+          <div class="usa-look-img" style="background:linear-gradient(135deg,#EDE0CC,#D8C8B0);"></div>
+          <div class="usa-look-name">Weekend easy</div>
+        </div>
+        <div class="usa-look">
+          <div class="usa-look-img" style="background:linear-gradient(135deg,#E0E0D8,#C8C8C0);"></div>
+          <div class="usa-look-name">Meeting chic</div>
+        </div>
+        <div class="usa-look" style="opacity:.5;">
+          <div class="usa-look-img" style="background:linear-gradient(135deg,#E8D8C8,#D0C0A8);"></div>
+          <div class="usa-look-name">Avond uit</div>
+        </div>
+      </div>
+      <!-- Nav -->
+      <div class="usa-nav">
+        <div class="usa-nav-item on">
+          <span style="font-size:14px;">🏠</span>
+          <span class="usa-nav-lbl" style="color:#1A1A1A;">Home</span>
+        </div>
+        <div class="usa-nav-item">
+          <span style="font-size:14px;">✨</span>
+          <span class="usa-nav-lbl">Looks</span>
+        </div>
+        <div class="usa-nav-item">
+          <div class="usa-fab">✦</div>
+          <span class="usa-nav-lbl">Vandaag</span>
+        </div>
+        <div class="usa-nav-item">
+          <span style="font-size:14px;">👗</span>
+          <span class="usa-nav-lbl">Kast</span>
+        </div>
+        <div class="usa-nav-item">
+          <span style="font-size:14px;">⋯</span>
+          <span class="usa-nav-lbl">Meer</span>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label" style="color:#B8906A;">Optie A — licht, warm, ivoor canvas</div>
+  </div>
+
+  <!-- ══════ UK ══════ -->
+  <div class="col col-uk">
+    <div class="col-title uk" style="margin-top:0;">Optie B</div>
+    <div class="col-headline" style="color:#1C1A18;">Vogue <em style="font-style:italic;">UK</em></div>
+    <div class="col-sub" style="color:#4A5260;">Donkere header &middot; Crème body &middot; Contrast</div>
+
+    <!-- Woorden -->
+    <div class="words" style="color:#4A5260;">
+      <span class="word">Gestyled</span>
+      <span class="word">Strak</span>
+      <span class="word">Editorial</span>
+      <span class="word">Onderscheidend</span>
+    </div>
+
+    <!-- Swatches -->
+    <div class="swatches">
+      <div class="sw"><div class="sw-color" style="background:#F5F2EE;border:1px solid #DDD;"></div><div class="sw-name">Crème</div></div>
+      <div class="sw"><div class="sw-color" style="background:#EDEAE4;"></div><div class="sw-name">Lin</div></div>
+      <div class="sw"><div class="sw-color" style="background:#C8C0B4;"></div><div class="sw-name">Taupe</div></div>
+      <div class="sw"><div class="sw-color" style="background:#4A5260;"></div><div class="sw-name">Ardoise</div></div>
+      <div class="sw"><div class="sw-color" style="background:#1C1A18;"></div><div class="sw-name">Noir</div></div>
+    </div>
+
+    <!-- Brand card preview -->
+    <div class="brand-card" style="background:#1C1A18;">
+      <div class="bc-top">
+        <div class="bc-eyebrow" style="color:rgba(200,192,180,0.5);">Stijl Studio &middot; Privé</div>
+        <div class="bc-title" style="color:#F5F2EE;">Jouw<br>stijl.</div>
+        <div class="bc-sub" style="color:#F5F2EE;">Gecureerd &middot; Persoonlijk</div>
+      </div>
+      <div class="bc-bottom" style="background:#EDEAE4;">
+        <span style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#888;">Look van vandaag</span>
+        <button class="bc-btn" style="background:#1C1A18;color:#F5F2EE;">Open →</button>
+      </div>
+    </div>
+
+    <!-- Tekstdemo -->
+    <div class="text-demo" style="background:#1C1A18;">
+      <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(200,192,180,0.4);margin-bottom:6px;">Vrijdag · 15 mei</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-style:italic;color:#F5F2EE;line-height:1;margin-bottom:8px;">Casual<br>met een twist.</div>
+      <div style="font-size:10px;color:rgba(245,242,238,0.35);line-height:1.7;margin-bottom:12px;">Hemdjurk · Witte sneakers · Rieten tas</div>
+      <div style="display:inline-flex;align-items:center;gap:6px;background:#F5F2EE;color:#1C1A18;border-radius:20px;padding:8px 14px;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;">
+        ✦ Genereer look
+      </div>
+    </div>
+
+    <!-- Telefoon mockup -->
+    <div class="phone" style="background:#F5F2EE;">
+      <!-- Header -->
+      <div class="uk-header">
+        <div class="uk-header-eyebrow">Vrijdag · 15 mei</div>
+        <div class="uk-header-title">Goedemorgen,<br>Griette</div>
+        <div class="uk-header-sub">🌤 18° · rok-weer</div>
+      </div>
+      <!-- Hero -->
+      <div class="uk-hero">
+        <div class="uk-hero-img">
+          <div>
+            <div class="uk-hero-badge-label">✦ Look van vandaag</div>
+            <div class="uk-hero-badge-title">Casual vrijdag<br>met een twist</div>
+          </div>
+        </div>
+        <div class="uk-chips">
+          <span class="uk-chip">Hemdjurk beige</span>
+          <span class="uk-chip">Witte sneakers</span>
+        </div>
+        <button class="uk-btn">✦ Genereer mijn look</button>
+      </div>
+      <!-- Looks -->
+      <div class="uk-section-label">Recente looks</div>
+      <div class="uk-looks-row">
+        <div class="uk-look">
+          <div class="uk-look-img" style="background:linear-gradient(135deg,#D8D4CC,#C8C0B4);"></div>
+          <div class="uk-look-name">Weekend easy</div>
+        </div>
+        <div class="uk-look">
+          <div class="uk-look-img" style="background:linear-gradient(135deg,#DCDCE8,#C0C0CC);"></div>
+          <div class="uk-look-name">Meeting chic</div>
+        </div>
+        <div class="uk-look" style="opacity:.5;">
+          <div class="uk-look-img" style="background:linear-gradient(135deg,#E0D8D0,#C8C0B8);"></div>
+          <div class="uk-look-name">Avond uit</div>
+        </div>
+      </div>
+      <!-- Nav -->
+      <div class="uk-nav">
+        <div class="uk-nav-item on">
+          <span style="font-size:14px;">🏠</span>
+          <span class="uk-nav-lbl" style="color:rgba(245,242,238,.8);">Home</span>
+        </div>
+        <div class="uk-nav-item">
+          <span style="font-size:14px;">✨</span>
+          <span class="uk-nav-lbl">Looks</span>
+        </div>
+        <div class="uk-nav-item">
+          <div class="uk-fab">✦</div>
+          <span class="uk-nav-lbl">Vandaag</span>
+        </div>
+        <div class="uk-nav-item">
+          <span style="font-size:14px;">👗</span>
+          <span class="uk-nav-lbl">Kast</span>
+        </div>
+        <div class="uk-nav-item">
+          <span style="font-size:14px;">⋯</span>
+          <span class="uk-nav-lbl">Meer</span>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label" style="color:#4A5260;">Optie B — donker header, crème body</div>
+  </div>
+
+</div>
+
+<div style="background:#1A1A1A;padding:32px 28px;text-align:center;">
+  <p style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);">Stijl Studio &middot; 2026</p>
+</div>
+
+</body>
+</html>
