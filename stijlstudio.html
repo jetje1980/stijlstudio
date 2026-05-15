@@ -39,7 +39,7 @@ function doLogin() {
   if (!ok[c]) { e.textContent = 'Ongeldige code.'; return; }
   try { localStorage.setItem('ss-code', c); } catch(x) {}
   document.getElementById('gobtn').textContent = '...';
-  window.location.href = 'stylist_demo.html';
+  window.location.href = c === 'SS-GRIET' ? 'griette.html' : 'stylist_demo.html';
 }
 document.getElementById('gobtn').onclick = doLogin;
 document.getElementById('codein').onkeydown = function(ev) {
