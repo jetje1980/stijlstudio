@@ -363,6 +363,9 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
   <button type="button" onclick="closeMeerSheet();reuploadAllPhotos();" style="width:100%;padding:14px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:14px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--brown);">
     📤 Foto’s synchroniseren
   </button>
+  <button type="button" onclick="closeMeerSheet();restoreCloudinaryPhotos(true);" style="width:100%;padding:14px;background:var(--white);border:1.5px solid #b5232a;border-radius:14px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;color:#b5232a;">
+    📷 Foto’s herstellen
+  </button>
   <button type="button" onclick="closeMeerSheet();openCyclusLog();" style="width:100%;padding:14px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:14px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--brown);">
     🌙 Cyclus bijhouden
   </button>
@@ -1083,6 +1086,41 @@ function loadCloudinaryPhotos() {
       Object.assign(photos, map);
     }
   } catch(e) {}
+}
+
+// Herstel foto's van Cloudinary via voorspelbare URL (na domeinwisseling)
+async function restoreCloudinaryPhotos(manual) {
+  if (!manual) {
+    try { if (localStorage.getItem('griette-cloud-photos-v1')) return; } catch(e) {}
+  }
+  if (manual) showToast('📷 Foto\'s herstellen...');
+  var allIds = [];
+  for (var cat in items) {
+    (items[cat] || []).forEach(function(item) {
+      if (!item.id.startsWith('custom-')) allIds.push(item.id);
+    });
+  }
+  var restored = {};
+  var checks = allIds.map(function(id) {
+    var url = 'https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_' + id;
+    return new Promise(function(resolve) {
+      var img = new Image();
+      img.onload = function() { restored[id] = url; resolve(); };
+      img.onerror = function() { resolve(); };
+      img.src = url;
+    });
+  });
+  await Promise.all(checks);
+  if (Object.keys(restored).length > 0) {
+    Object.assign(photos, restored);
+    try { localStorage.setItem('griette-cloud-photos-v1', JSON.stringify(restored)); } catch(e) {}
+    supabaseSet('cloud-photos', restored).catch(function(){});
+    buildGarderobe();
+    buildBoards();
+    showToast('✓ ' + Object.keys(restored).length + ' foto\'s hersteld!');
+  } else if (manual) {
+    showToast('Geen foto\'s gevonden op Cloudinary');
+  }
 }
 
 // ============ DATA ============
@@ -5499,6 +5537,8 @@ openDB().then(async () => {
   setTimeout(checkMorningAdvice, 1200);
   // Then sync from Supabase (authoritative)
   loadAppDataFromSupabase();
+  // Herstel foto's automatisch als localStorage leeg is (na domeinwisseling)
+  restoreCloudinaryPhotos(false);
 }).catch(() => {
   loadAppData();
   buildGarderobe();
