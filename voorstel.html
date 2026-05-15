@@ -8,139 +8,193 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --noir:#0F0D0B;
-  --ivoire:#FAF8F4;
-  --creme:#EDE8E0;
-  --rose:#C47A8A;
-  --rose-light:#EDD8DF;
-  --or:#C9A96E;
-  --taupe:#8B7B72;
-  --muted:#B0A098;
-  --border:#E0D8D0;
+  --noir:#1A1410;
+  --fond:#FAF7F1;
+  --lin:#EDE3D2;
+  --sable:#C4A882;
+  --bois:#4E3E32;
+  --ardoise:#6B5E53;
+  --muted:#A89888;
+  --border:#E4D9C8;
 }
-body{background:#F5F0EB;font-family:'Jost',sans-serif;color:var(--noir);}
-h2{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:36px;margin-bottom:6px;}
-h3{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:22px;margin-bottom:16px;color:var(--noir);}
-.section{padding:48px 24px;border-bottom:1px solid var(--border);background:white;}
-.section:nth-child(even){background:var(--ivoire);}
-.label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--rose);font-weight:600;margin-bottom:12px;}
-.grid{display:grid;gap:16px;}
-.grid-2{grid-template-columns:1fr 1fr;}
-.grid-3{grid-template-columns:1fr 1fr 1fr;}
+body{background:var(--fond);font-family:'Jost',sans-serif;color:var(--noir);}
+h2{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:38px;margin-bottom:8px;line-height:1.1;}
+h3{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:22px;margin-bottom:16px;}
+.section{padding:56px 28px;border-bottom:1px solid var(--border);}
+.section.alt{background:white;}
+.label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--bois);font-weight:600;margin-bottom:14px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
 
-/* ── HERO ── */
-.hero{background:var(--noir);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;}
-.hero-eyebrow{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--or);margin-bottom:24px;}
-.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(52px,10vw,96px);font-weight:300;color:var(--ivoire);line-height:1;margin-bottom:12px;}
-.hero-title em{font-style:italic;color:var(--rose);}
-.hero-sub{font-size:13px;color:rgba(250,248,244,0.4);letter-spacing:2px;text-transform:uppercase;font-weight:300;}
+/* HERO */
+.hero{
+  background:linear-gradient(160deg,#2C1F14 0%,#1A1410 50%,#3D2B1A 100%);
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:60px 28px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 70% 30%,rgba(196,168,130,0.12) 0%,transparent 60%),
+             radial-gradient(ellipse at 20% 80%,rgba(160,114,78,0.08) 0%,transparent 50%);
+}
+.hero-eyebrow{font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--sable);margin-bottom:32px;position:relative;}
+.hero-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(58px,12vw,110px);font-weight:300;
+  color:var(--fond);line-height:.95;margin-bottom:16px;position:relative;
+}
+.hero-title em{font-style:italic;color:var(--sable);}
+.hero-sub{font-size:12px;color:rgba(250,247,241,0.35);letter-spacing:3px;text-transform:uppercase;font-weight:300;position:relative;}
+.hero-ref{margin-top:48px;font-size:11px;color:rgba(250,247,241,0.25);font-style:italic;position:relative;}
 
-/* ── BRAND COLOURS ── */
-.swatch-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;}
-.swatch{flex:1;min-width:100px;}
-.swatch-color{height:80px;border-radius:10px;margin-bottom:8px;}
+/* MOODBOARD STRIP */
+.mood-strip{display:flex;gap:3px;height:220px;overflow:hidden;border-radius:16px;margin-top:32px;}
+.mood-card{flex:1;border-radius:0;display:flex;flex-direction:column;justify-content:flex-end;padding:12px;min-width:0;}
+.mood-card-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(250,247,241,0.7);}
+
+/* KLEUREN */
+.swatch-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px;}
+.swatch{flex:1;min-width:80px;}
+.swatch-color{height:100px;border-radius:14px;margin-bottom:10px;}
 .swatch-name{font-size:11px;font-weight:500;color:var(--noir);}
-.swatch-hex{font-size:10px;color:var(--taupe);font-family:monospace;}
+.swatch-hex{font-size:9px;color:var(--ardoise);font-family:monospace;margin-top:1px;}
+.swatch-use{font-size:9px;color:var(--muted);margin-top:3px;line-height:1.4;}
 
-/* ── TYPOGRAPHY ── */
-.type-row{padding:16px 0;border-bottom:1px solid var(--border);}
-.type-sample{margin-bottom:4px;}
-.type-spec{font-size:10px;color:var(--taupe);font-family:monospace;}
+/* TYPOGRAFIE */
+.type-row{padding:20px 0;border-bottom:1px solid var(--border);}
+.type-spec{font-size:9px;color:var(--muted);font-family:monospace;margin-top:6px;letter-spacing:1px;}
 
-/* ── PHONE MOCKUP ── */
-.phone-wrap{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;padding:24px 0;}
-.phone{width:220px;background:var(--noir);border-radius:36px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.25);border:6px solid #1a1612;position:relative;flex-shrink:0;}
-.phone-screen{background:var(--ivoire);min-height:440px;overflow:hidden;}
-.phone-label{text-align:center;font-size:10px;color:var(--taupe);letter-spacing:2px;text-transform:uppercase;margin-top:12px;}
+/* TELEFOON MOCKUP */
+.phone-wrap{display:flex;justify-content:center;gap:32px;flex-wrap:wrap;padding:24px 0;}
+.phone{width:220px;background:#1A1410;border-radius:38px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.18),0 0 0 6px #231A12;position:relative;flex-shrink:0;}
+.phone-label{text-align:center;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:14px;}
 
-/* ── HOME SCREEN MOCKUP ── */
-.mock-header{background:var(--noir);padding:20px 16px 14px;}
-.mock-date{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,168,122,0.6);margin-bottom:4px;}
-.mock-greeting{font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;color:var(--ivoire);line-height:1.1;}
-.mock-weather{font-size:9px;color:rgba(250,248,244,0.4);margin-top:3px;}
+/* MOCKUP INHOUD */
+.m-header{padding:24px 18px 16px;background:var(--noir);}
+.m-date{font-size:7px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(196,168,130,0.5);margin-bottom:3px;}
+.m-greeting{font-family:'Cormorant Garamond',serif;font-size:21px;font-style:italic;color:var(--fond);line-height:1.1;}
+.m-sub{font-size:8px;color:rgba(250,247,241,0.3);margin-top:4px;}
 
-.mock-hero{background:linear-gradient(180deg,#2a1f18 0%,#1a1208 100%);padding:14px;margin:10px;border-radius:14px;position:relative;overflow:hidden;}
-.mock-hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='140'%3E%3Crect width='100' height='140' fill='%23362010'/%3E%3Ctext x='50' y='80' text-anchor='middle' font-size='40' fill='rgba(255,255,255,0.06)'%3E👗%3C/text%3E%3C/svg%3E") center/cover;opacity:0.6;}
-.mock-hero-inner{position:relative;z-index:1;}
-.mock-hero-label{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--or);margin-bottom:6px;}
-.mock-hero-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--ivoire);line-height:1.2;margin-bottom:10px;}
-.mock-outfit-chips{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;}
-.mock-chip{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:3px 8px;font-size:7px;color:rgba(250,248,244,0.7);}
-.mock-btn{background:var(--rose);color:white;border:none;border-radius:20px;padding:6px 14px;font-size:8px;font-family:'Jost',sans-serif;letter-spacing:1px;text-transform:uppercase;}
+.m-editorial{margin:10px;border-radius:14px;overflow:hidden;position:relative;background:var(--lin);}
+.m-ed-photo{height:160px;background:linear-gradient(135deg,#D4C5B0 0%,#C4AB8A 40%,#B09070 100%);display:flex;align-items:center;justify-content:center;position:relative;}
+.m-ed-photo::after{content:'';position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(transparent,rgba(26,20,16,0.6));}
+.m-ed-badge{position:absolute;bottom:8px;left:10px;right:10px;z-index:1;}
+.m-ed-badge-label{font-size:6px;letter-spacing:2px;text-transform:uppercase;color:var(--sable);}
+.m-ed-badge-title{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:white;line-height:1.2;}
+.m-ed-chips{display:flex;gap:4px;padding:8px 10px;flex-wrap:wrap;}
+.m-ed-chip{background:rgba(26,20,16,0.06);border-radius:20px;padding:3px 8px;font-size:6.5px;color:var(--ardoise);}
+.m-ed-btn{margin:0 10px 10px;background:var(--bois);color:white;border:none;border-radius:20px;padding:7px 14px;font-size:7.5px;font-family:'Jost',sans-serif;letter-spacing:1px;text-transform:uppercase;width:calc(100% - 20px);cursor:pointer;}
 
-.mock-section-label{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--taupe);padding:10px 14px 6px;}
-.mock-outfit-row{display:flex;gap:6px;padding:0 10px 10px;overflow:hidden;}
-.mock-outfit-card{width:78px;flex-shrink:0;background:var(--creme);border-radius:10px;overflow:hidden;}
-.mock-outfit-img{height:90px;background:linear-gradient(135deg,#e8ddd0,#d4c8b8);display:flex;align-items:center;justify-content:center;font-size:20px;}
-.mock-outfit-name{padding:4px 6px;font-size:7px;color:var(--noir);line-height:1.3;}
+.m-section-label{font-size:6.5px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 14px 6px;}
+.m-looks-row{display:flex;gap:6px;padding:0 10px 10px;overflow:hidden;}
+.m-look{width:72px;flex-shrink:0;}
+.m-look-img{height:88px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:4px;}
+.m-look-name{font-size:6.5px;color:var(--ardoise);line-height:1.3;padding:0 2px;}
 
-.mock-nav{background:var(--noir);padding:8px 0 12px;display:flex;justify-content:space-around;}
-.mock-nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;}
-.mock-nav-icon{font-size:16px;}
-.mock-nav-label{font-size:6px;letter-spacing:1px;text-transform:uppercase;color:rgba(250,248,244,0.35);}
-.mock-nav-item.active .mock-nav-label{color:var(--ivoire);}
-.mock-nav-item.active .mock-nav-icon{filter:brightness(1.3);}
+.m-nav{background:var(--noir);padding:10px 0 14px;display:flex;justify-content:space-around;align-items:flex-end;}
+.m-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.m-nav-lbl{font-size:5.5px;letter-spacing:1px;text-transform:uppercase;color:rgba(250,247,241,0.28);}
+.m-nav-item.on .m-nav-lbl{color:rgba(250,247,241,0.9);}
+.m-fab{width:40px;height:40px;border-radius:50%;background:var(--bois);display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:2px;box-shadow:0 4px 14px rgba(160,114,78,0.45);}
 
-/* ── INSTALL TILE ── */
-.install-tile{background:linear-gradient(135deg,var(--noir) 0%,#2a1a10 100%);border-radius:22px;padding:24px;color:var(--ivoire);display:flex;align-items:center;gap:20px;max-width:360px;}
-.install-icon{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,var(--rose),#8B2A4A);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;}
-.install-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;margin-bottom:2px;}
-.install-sub{font-size:10px;color:rgba(250,248,244,0.5);margin-bottom:12px;}
-.install-btn{display:inline-flex;align-items:center;gap:6px;background:var(--rose);color:white;border:none;border-radius:20px;padding:8px 16px;font-size:10px;font-family:'Jost',sans-serif;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
+/* NAV DEMO */
+.nav-demo{background:var(--noir);border-radius:20px;padding:14px 0 18px;display:flex;justify-content:space-around;align-items:flex-end;max-width:360px;}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:0 6px;}
+.nav-icon{font-size:20px;line-height:1;}
+.nav-label{font-size:7.5px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(250,247,241,0.3);}
+.nav-item.active .nav-label{color:rgba(250,247,241,0.9);}
+.nav-fab-demo{width:52px;height:52px;border-radius:50%;background:var(--bois);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:4px;box-shadow:0 6px 20px rgba(160,114,78,0.4);margin-top:-26px;}
 
-/* ── COMPONENT CARDS ── */
-.comp-card{background:var(--ivoire);border-radius:16px;padding:20px;border:1px solid var(--border);}
+/* INSTALL TILE */
+.install-tile{
+  background:linear-gradient(135deg,var(--noir) 0%,#2A1E14 100%);
+  border-radius:24px;padding:28px;color:var(--fond);
+  display:flex;align-items:center;gap:22px;max-width:380px;
+}
+.install-icon{
+  width:68px;height:68px;border-radius:18px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--sable),var(--ardoise));
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+}
+.install-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;margin-bottom:3px;}
+.install-sub{font-size:10px;color:rgba(250,247,241,0.4);margin-bottom:14px;line-height:1.5;}
+.install-btn{display:inline-flex;align-items:center;gap:7px;background:var(--bois);color:white;border:none;border-radius:20px;padding:9px 18px;font-size:10px;font-family:'Jost',sans-serif;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
 
-/* ── NAV PROPOSAL ── */
-.nav-demo{background:var(--noir);border-radius:16px;padding:12px 0 16px;display:flex;justify-content:space-around;max-width:360px;margin:0 auto;}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:0 8px;}
-.nav-icon{font-size:22px;line-height:1;}
-.nav-label{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(250,248,244,0.35);}
-.nav-item.active .nav-label{color:var(--ivoire);}
-.nav-fab{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--rose),#9A3A5A);display:flex;align-items:center;justify-content:center;font-size:20px;margin-top:-20px;box-shadow:0 4px 16px rgba(196,122,138,0.4);}
+/* COMP CARD */
+.comp-card{background:var(--fond);border-radius:16px;padding:22px;border:1px solid var(--border);}
 
-/* ── BEFORE/AFTER ── */
-.ba-wrap{display:flex;gap:12px;flex-wrap:wrap;}
-.ba-panel{flex:1;min-width:220px;background:var(--creme);border-radius:14px;overflow:hidden;}
-.ba-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px 14px;border-bottom:1px solid var(--border);}
-.ba-label.before{color:var(--taupe);}
-.ba-label.after{color:var(--rose);}
+/* BEFORE/AFTER */
+.ba-wrap{display:flex;gap:14px;flex-wrap:wrap;}
+.ba-panel{flex:1;min-width:200px;background:white;border-radius:16px;overflow:hidden;border:1px solid var(--border);}
+.ba-label{font-size:8.5px;letter-spacing:2px;text-transform:uppercase;padding:10px 14px;border-bottom:1px solid var(--border);}
+.ba-label.before{color:var(--muted);}
+.ba-label.after{color:var(--bois);}
 .ba-content{padding:14px;}
+
+/* REFERENTIE KAART */
+.ref-card{background:white;border-radius:16px;overflow:hidden;border:1px solid var(--border);display:flex;flex-direction:column;}
+.ref-img{height:120px;display:flex;align-items:center;justify-content:center;font-size:40px;}
+.ref-body{padding:14px;}
+.ref-handle{font-size:10px;font-weight:600;margin-bottom:4px;}
+.ref-desc{font-size:10px;color:var(--muted);line-height:1.6;}
 </style>
 </head>
 <body>
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-eyebrow">Brand & Layout Voorstel · 2026</div>
-  <h1 class="hero-title">Stijl<br><em>Studio</em></h1>
-  <p class="hero-sub">Jouw garderobe, gecureerd.</p>
+  <div class="hero-eyebrow">Stijl Studio · Brand &amp; Layout Voorstel · 2026</div>
+  <h1 class="hero-title">
+    <em>Effortless.</em><br>
+    Elke dag.
+  </h1>
+  <p class="hero-sub">Parisienne &middot; Editorial &middot; Jouw stijl</p>
+  <p class="hero-ref">Geïnspireerd op @mmequeenb &amp; @horty_et_mahaut</p>
 </div>
 
-<!-- MERKIDENTITEIT -->
-<div class="section">
+<!-- RICHTING -->
+<div class="section alt">
   <div class="label">01 — Merkidentiteit</div>
   <h2>De richting</h2>
-  <p style="font-size:14px;color:var(--taupe);line-height:1.8;max-width:600px;margin-bottom:32px;">
-    <em style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--noir);">"Vogue, maar voor gewone dagen."</em><br><br>
-    Niet aspirationeel op afstand — maar elegant dichtbij. De app voelt als een persoonlijke stylist die jou kent.
-    Editorial in taal en esthetiek, maar warme intentie. Geen perfecte looks, maar jóúw looks — gecureerd.
+  <p style="font-family:'Cormorant Garamond',serif;font-size:24px;font-style:italic;color:var(--noir);max-width:560px;line-height:1.5;margin-bottom:28px;">
+    "Niet Vogue op de cover — maar Vogue op een gewone dinsdag in Parijs."
   </p>
-  <div class="grid grid-3" style="gap:20px;max-width:600px;">
+  <p style="font-size:13.5px;color:var(--ardoise);line-height:1.9;max-width:580px;margin-bottom:36px;">
+    Warm, luchtig, effortless. Geen harde editorial black — maar zand, linnen, terracotta en zachte crème.
+    Zoals een Parisienne die 's ochtends haar kast opendoet en het er gewoon goed uitziet.
+    Niet perfect — <em style="font-family:'Cormorant Garamond',serif;">gepast</em>.
+  </p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:580px;">
+    <div class="ref-card">
+      <div class="ref-img" style="background:linear-gradient(135deg,#E8D8C0,#D4B896);">🇫🇷</div>
+      <div class="ref-body">
+        <div class="ref-handle">@mmequeenb</div>
+        <div class="ref-desc">Mediterrane warmte, luchtige linnen outfits, terracotta tonen, wicker tassen. Casual maar samengesteld.</div>
+      </div>
+    </div>
+    <div class="ref-card">
+      <div class="ref-img" style="background:linear-gradient(135deg,#E0DADA,#C8C0BC);">🥐</div>
+      <div class="ref-body">
+        <div class="ref-handle">@horty_et_mahaut</div>
+        <div class="ref-desc">Strakke Parijse neutrals, tailored but relaxed, bijna geen kleur — juist dat maakt het opvallend.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:28px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;max-width:580px;">
     <div class="comp-card" style="text-align:center;">
-      <div style="font-size:28px;margin-bottom:8px;">✦</div>
-      <div style="font-size:11px;font-weight:600;margin-bottom:4px;">Gecureerd</div>
-      <div style="font-size:10px;color:var(--taupe);line-height:1.5;">Alles met intentie. Geen clutter.</div>
+      <div style="font-size:11px;font-weight:500;margin-bottom:5px;letter-spacing:2px;text-transform:uppercase;font-size:9px;color:var(--bois);">Gevoel</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;">Effortless</div>
     </div>
     <div class="comp-card" style="text-align:center;">
-      <div style="font-size:28px;margin-bottom:8px;">🎭</div>
-      <div style="font-size:11px;font-weight:600;margin-bottom:4px;">Persoonlijk</div>
-      <div style="font-size:10px;color:var(--taupe);line-height:1.5;">Spreekt jou aan, niet iedereen.</div>
+      <div style="font-size:11px;font-weight:500;margin-bottom:5px;letter-spacing:2px;text-transform:uppercase;font-size:9px;color:var(--bois);">Toon</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;">Warm</div>
     </div>
     <div class="comp-card" style="text-align:center;">
-      <div style="font-size:28px;margin-bottom:8px;">🌿</div>
-      <div style="font-size:11px;font-weight:600;margin-bottom:4px;">Moeiteloos</div>
-      <div style="font-size:10px;color:var(--taupe);line-height:1.5;">Complexiteit verborgen, resultaat zichtbaar.</div>
+      <div style="font-size:11px;font-weight:500;margin-bottom:5px;letter-spacing:2px;text-transform:uppercase;font-size:9px;color:var(--bois);">Stijl</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;">Gecureerd</div>
     </div>
   </div>
 </div>
@@ -149,97 +203,114 @@ h3{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:22px;margin-
 <div class="section">
   <div class="label">02 — Kleurpalet</div>
   <h2>Kleuren</h2>
+  <p style="font-size:13px;color:var(--ardoise);margin-bottom:28px;max-width:560px;line-height:1.7;">
+    Warm, zacht en zonder fel kleur. Zo voelt linnen in de zon — of een Parisienne's garderobe.
+  </p>
+
   <div class="swatch-row">
     <div class="swatch">
-      <div class="swatch-color" style="background:#0F0D0B;"></div>
+      <div class="swatch-color" style="background:#FAF7F1;border:1px solid var(--border);"></div>
+      <div class="swatch-name">Fond</div>
+      <div class="swatch-hex">#FAF7F1</div>
+      <div class="swatch-use">Hoofdcanvas</div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#EDE3D2;"></div>
+      <div class="swatch-name">Lin</div>
+      <div class="swatch-hex">#EDE3D2</div>
+      <div class="swatch-use">Kaarten, achtergrond</div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#C4A882;"></div>
+      <div class="swatch-name">Sable</div>
+      <div class="swatch-hex">#C4A882</div>
+      <div class="swatch-use">Labels, details</div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#4E3E32;"></div>
+      <div class="swatch-name">Bois</div>
+      <div class="swatch-hex">#4E3E32</div>
+      <div class="swatch-use">Knoppen, accenten</div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#6B5E53;"></div>
+      <div class="swatch-name">Ardoise</div>
+      <div class="swatch-hex">#6B5E53</div>
+      <div class="swatch-use">Secondaire tekst</div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#1A1410;"></div>
       <div class="swatch-name">Noir</div>
-      <div class="swatch-hex">#0F0D0B</div>
-    </div>
-    <div class="swatch">
-      <div class="swatch-color" style="background:#FAF8F4;border:1px solid #E0D8D0;"></div>
-      <div class="swatch-name">Ivoire</div>
-      <div class="swatch-hex">#FAF8F4</div>
-    </div>
-    <div class="swatch">
-      <div class="swatch-color" style="background:#EDE8E0;"></div>
-      <div class="swatch-name">Crème</div>
-      <div class="swatch-hex">#EDE8E0</div>
-    </div>
-    <div class="swatch">
-      <div class="swatch-color" style="background:#C47A8A;"></div>
-      <div class="swatch-name">Rose</div>
-      <div class="swatch-hex">#C47A8A</div>
-    </div>
-    <div class="swatch">
-      <div class="swatch-color" style="background:#C9A96E;"></div>
-      <div class="swatch-name">Or</div>
-      <div class="swatch-hex">#C9A96E</div>
-    </div>
-    <div class="swatch">
-      <div class="swatch-color" style="background:#8B7B72;"></div>
-      <div class="swatch-name">Taupe</div>
-      <div class="swatch-hex">#8B7B72</div>
+      <div class="swatch-hex">#1A1410</div>
+      <div class="swatch-use">Header, nav, koppen</div>
     </div>
   </div>
-  <p style="font-size:12px;color:var(--taupe);line-height:1.7;">
-    <strong>Gebruik:</strong> Noir als primaire achtergrond (header, nav), Ivoire als canvas, Crème voor kaarten,
-    Rose voor accenten & CTAs, Or voor premium details & labels, Taupe voor secondaire tekst.
-  </p>
+
+  <!-- Kleur in gebruik -->
+  <div style="background:var(--noir);border-radius:20px;padding:24px 20px;max-width:480px;margin-top:8px;">
+    <div style="font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--sable);margin-bottom:10px;">Zo ziet het eruit</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-style:italic;color:var(--fond);margin-bottom:8px;">Jouw look vandaag.</div>
+    <div style="font-size:10px;color:rgba(250,247,241,0.4);margin-bottom:16px;">Hemdjurk · Witte sneakers · Rieten tas</div>
+    <div style="display:inline-flex;align-items:center;gap:6px;background:var(--bois);color:white;border-radius:20px;padding:8px 16px;font-size:9px;letter-spacing:1px;text-transform:uppercase;">
+      ✦ Genereer outfit
+    </div>
+  </div>
 </div>
 
 <!-- TYPOGRAFIE -->
-<div class="section">
+<div class="section alt">
   <div class="label">03 — Typografie</div>
   <h2>Lettertypes</h2>
 
   <div class="type-row">
-    <div class="type-sample" style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;font-style:italic;line-height:1;">
-      Jouw stijl begint hier.
+    <div style="font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:300;font-style:italic;line-height:.95;color:var(--noir);">
+      Jouw stijl,<br>elke dag.
     </div>
-    <div class="type-spec">Cormorant Garamond · Italic 300 · Display / Headlines</div>
+    <div class="type-spec">CORMORANT GARAMOND · Italic 300 · Display headlines</div>
   </div>
 
-  <div class="type-row" style="margin-top:20px;">
-    <div class="type-sample" style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;line-height:1.3;">
-      Vandaag's outfit — gecureerd voor jou.
+  <div class="type-row" style="margin-top:4px;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;line-height:1.3;color:var(--noir);">
+      Vandaag: casual vrijdag met een twist
     </div>
-    <div class="type-spec">Cormorant Garamond · Regular 400 · Subtitles / Cards</div>
+    <div class="type-spec">CORMORANT GARAMOND · Regular 400 · Outfit titels / subtitles</div>
   </div>
 
-  <div class="type-row" style="margin-top:20px;">
-    <div class="type-sample" style="font-family:'Jost',sans-serif;font-size:14px;font-weight:300;line-height:1.7;">
-      Upload je items, laat de stylist werken. Combinaties die écht bij jou passen.
+  <div class="type-row" style="margin-top:4px;">
+    <div style="font-family:'Jost',sans-serif;font-size:14px;font-weight:300;line-height:1.8;color:var(--ardoise);">
+      Combineer de hemdjurk met je rieten tas en witte sneakers voor een look die<br>moeiteloos van boodschappen naar terrasje gaat.
     </div>
-    <div class="type-spec">Jost · Light 300 · Body text</div>
+    <div class="type-spec">JOST · Light 300 · Body, tips, uitleg</div>
   </div>
 
-  <div class="type-row" style="margin-top:20px;">
-    <div class="type-sample" style="font-family:'Jost',sans-serif;font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--rose);">
-      Vandaag · Outfit · Stijl DNA
+  <div class="type-row" style="border-bottom:none;margin-top:4px;">
+    <div style="font-family:'Jost',sans-serif;font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--bois);">
+      Home &nbsp;·&nbsp; Looks &nbsp;·&nbsp; Vandaag &nbsp;·&nbsp; Kast &nbsp;·&nbsp; Meer
     </div>
-    <div class="type-spec">Jost · Semibold 600 · Labels / Navigation (uppercase + tracking)</div>
+    <div class="type-spec">JOST · Semibold 600 · Navigatie / labels (uppercase + tracking)</div>
   </div>
 </div>
 
 <!-- NAVIGATIE -->
 <div class="section">
   <div class="label">04 — Navigatie</div>
-  <h2>Nieuwe bottom navigation</h2>
-  <p style="font-size:13px;color:var(--taupe);margin-bottom:24px;max-width:500px;line-height:1.7;">
-    De huidige nav verbergt de meest gebruikte feature (dagadvies) achter "Meer".
-    Voorstel: centrale FAB-knop voor de dagelijkse "Wat draag ik vandaag?" actie.
+  <h2>Nieuwe bottom nav</h2>
+  <p style="font-size:13px;color:var(--ardoise);margin-bottom:28px;max-width:520px;line-height:1.7;">
+    De centrale ✦-knop vervangt het verstopte "Dagadvies". Direct toegankelijk, altijd zichtbaar.
+    Home gaat van inventaris naar outfit-inspiratie.
   </p>
 
-  <div class="ba-wrap" style="margin-bottom:32px;">
+  <div class="ba-wrap" style="margin-bottom:32px;max-width:600px;">
     <div class="ba-panel">
       <div class="ba-label before">Huidig</div>
-      <div class="ba-content" style="display:flex;justify-content:space-around;padding:14px;">
-        <div style="text-align:center;"><div style="font-size:18px;">👗</div><div style="font-size:7px;color:var(--taupe);letter-spacing:1px;text-transform:uppercase;margin-top:3px;">Kast</div></div>
-        <div style="text-align:center;"><div style="font-size:18px;">✨</div><div style="font-size:7px;color:var(--taupe);letter-spacing:1px;text-transform:uppercase;margin-top:3px;">Outfits</div></div>
-        <div style="text-align:center;"><div style="font-size:18px;">💬</div><div style="font-size:7px;color:var(--taupe);letter-spacing:1px;text-transform:uppercase;margin-top:3px;">Stylist</div></div>
-        <div style="text-align:center;"><div style="font-size:18px;">📅</div><div style="font-size:7px;color:var(--taupe);letter-spacing:1px;text-transform:uppercase;margin-top:3px;">Week</div></div>
-        <div style="text-align:center;"><div style="font-size:18px;">⋯</div><div style="font-size:7px;color:var(--taupe);letter-spacing:1px;text-transform:uppercase;margin-top:3px;">Meer</div></div>
+      <div class="ba-content" style="display:flex;justify-content:space-around;">
+        <div style="text-align:center;"><div style="font-size:16px;">👗</div><div style="font-size:6.5px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:3px;">Kast</div></div>
+        <div style="text-align:center;"><div style="font-size:16px;">✨</div><div style="font-size:6.5px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:3px;">Outfits</div></div>
+        <div style="text-align:center;"><div style="font-size:16px;">💬</div><div style="font-size:6.5px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:3px;">Stylist</div></div>
+        <div style="text-align:center;"><div style="font-size:16px;">📅</div><div style="font-size:6.5px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:3px;">Week</div></div>
+        <div style="text-align:center;"><div style="font-size:16px;">⋯</div><div style="font-size:6.5px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:3px;">Meer</div></div>
       </div>
+      <div style="font-size:10px;color:var(--muted);text-align:center;padding:8px 14px;border-top:1px solid var(--border);">Dagadvies verborgen in "Meer"</div>
     </div>
     <div class="ba-panel">
       <div class="ba-label after">Voorstel</div>
@@ -247,15 +318,15 @@ h3{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:22px;margin-
         <div class="nav-demo">
           <div class="nav-item active">
             <span class="nav-icon">🏠</span>
-            <span class="nav-label" style="color:var(--ivoire);">Home</span>
+            <span class="nav-label" style="color:rgba(250,247,241,.85);">Home</span>
           </div>
           <div class="nav-item">
             <span class="nav-icon">✨</span>
             <span class="nav-label">Looks</span>
           </div>
           <div class="nav-item">
-            <div class="nav-fab">✦</div>
-            <span class="nav-label" style="margin-top:4px;">Vandaag</span>
+            <div class="nav-fab-demo">✦</div>
+            <span class="nav-label">Vandaag</span>
           </div>
           <div class="nav-item">
             <span class="nav-icon">👗</span>
@@ -266,21 +337,19 @@ h3{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:22px;margin-
             <span class="nav-label">Meer</span>
           </div>
         </div>
-        <p style="font-size:10px;color:var(--taupe);margin-top:10px;text-align:center;line-height:1.5;">
-          Centrale ✦ knop = direct dagadvies.<br>Home toont outfits, niet de kast.
-        </p>
       </div>
+      <div style="font-size:10px;color:var(--bois);text-align:center;padding:8px 14px;border-top:1px solid var(--border);">✦ direct dagadvies, altijd zichtbaar</div>
     </div>
   </div>
 </div>
 
 <!-- HOME SCREEN MOCKUPS -->
-<div class="section">
+<div class="section alt">
   <div class="label">05 — Home Screen</div>
-  <h2>Nieuwe startpagina</h2>
-  <p style="font-size:13px;color:var(--taupe);margin-bottom:32px;max-width:500px;line-height:1.7;">
-    Bezoekers zien direct <strong>outfits</strong>, niet een inventaris.
-    Editorial gevoel, geen webshop. De kast blijft op de achtergrond.
+  <h2>Outfit-first startpagina</h2>
+  <p style="font-size:13px;color:var(--ardoise);margin-bottom:36px;max-width:520px;line-height:1.7;">
+    Als je de app laat zien, ziet niemand hoeveel items je hebt. Ze zien alleen jouw look van vandaag —
+    warm, editorial, persoonlijk.
   </p>
 
   <div class="phone-wrap">
@@ -288,106 +357,108 @@ h3{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:22px;margin-
     <!-- HUIDIG -->
     <div>
       <div class="phone">
-        <div class="phone-screen" style="background:#2e1a0e;">
-          <div style="padding:28px 16px 16px;background:#2e1a0e;">
-            <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:rgba(155,98,64,0.7);margin-bottom:4px;">Digitale Stylist</div>
-            <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:#f7f1e8;">Griette's<br><em>Garderobe</em></div>
-          </div>
-          <div style="background:#f7f1e8;padding:10px 10px 0;">
-            <div style="font-size:7px;color:#8a7060;margin-bottom:6px;">Upload foto's · Sleep items op een board</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-              <div style="background:white;border-radius:8px;overflow:hidden;border:1px solid #ede4d4;">
-                <div style="height:56px;background:#ede4d4;display:flex;align-items:center;justify-content:center;font-size:18px;">👚</div>
-                <div style="padding:4px 5px;font-size:7px;color:#2e1a0e;">Wit oversized t-shirt</div>
-              </div>
-              <div style="background:white;border-radius:8px;overflow:hidden;border:1px solid #ede4d4;">
-                <div style="height:56px;background:#ede4d4;display:flex;align-items:center;justify-content:center;font-size:18px;">👗</div>
-                <div style="padding:4px 5px;font-size:7px;color:#2e1a0e;">Hemdjurk beige</div>
-              </div>
-              <div style="background:white;border-radius:8px;overflow:hidden;border:1px solid #ede4d4;">
-                <div style="height:56px;background:#ede4d4;display:flex;align-items:center;justify-content:center;font-size:18px;">👖</div>
-                <div style="padding:4px 5px;font-size:7px;color:#2e1a0e;">Roze maxi rok</div>
-              </div>
-              <div style="background:white;border-radius:8px;overflow:hidden;border:1px solid #ede4d4;">
-                <div style="height:56px;background:#ede4d4;display:flex;align-items:center;justify-content:center;font-size:18px;">🧥</div>
-                <div style="padding:4px 5px;font-size:7px;color:#2e1a0e;">Cargo jasje</div>
-              </div>
+        <div style="background:#2e1a0e;padding:24px 16px 16px;">
+          <div style="font-size:7px;letter-spacing:2px;text-transform:uppercase;color:rgba(155,98,64,0.6);margin-bottom:3px;">Digitale Stylist</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:300;font-style:italic;color:#f7f1e8;">Griette's Garderobe</div>
+        </div>
+        <div style="background:#f5ede0;padding:10px 10px 0;">
+          <div style="font-size:7px;color:#8a7060;margin-bottom:7px;padding:2px 0;">Upload foto's · Sleep items op een board</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+            <div style="background:white;border-radius:8px;border:1px solid #e4d4c0;">
+              <div style="height:52px;background:#e8ddd0;display:flex;align-items:center;justify-content:center;font-size:16px;">👚</div>
+              <div style="padding:4px 5px;font-size:6.5px;color:#2e1a0e;">Wit oversized t-shirt</div>
             </div>
-            <div style="font-size:7px;color:#8a7060;margin-top:6px;padding-bottom:6px;">+ 48 items meer…</div>
+            <div style="background:white;border-radius:8px;border:1px solid #e4d4c0;">
+              <div style="height:52px;background:#e8ddd0;display:flex;align-items:center;justify-content:center;font-size:16px;">👗</div>
+              <div style="padding:4px 5px;font-size:6.5px;color:#2e1a0e;">Hemdjurk beige</div>
+            </div>
+            <div style="background:white;border-radius:8px;border:1px solid #e4d4c0;">
+              <div style="height:52px;background:#e8ddd0;display:flex;align-items:center;justify-content:center;font-size:16px;">👖</div>
+              <div style="padding:4px 5px;font-size:6.5px;color:#2e1a0e;">Roze maxi rok</div>
+            </div>
+            <div style="background:white;border-radius:8px;border:1px solid #e4d4c0;">
+              <div style="height:52px;background:#e8ddd0;display:flex;align-items:center;justify-content:center;font-size:16px;">🧥</div>
+              <div style="padding:4px 5px;font-size:6.5px;color:#2e1a0e;">Cargo jasje</div>
+            </div>
           </div>
+          <div style="font-size:7px;color:#9a8070;margin-top:6px;padding-bottom:8px;">+ 48 items meer…</div>
         </div>
       </div>
-      <div class="phone-label" style="color:#b5232a;">Huidig — inventaris zichtbaar</div>
+      <div class="phone-label" style="color:#c0443a;">Huidig — inventaris zichtbaar</div>
     </div>
 
-    <!-- NIEUW HOME -->
+    <!-- NIEUW -->
     <div>
       <div class="phone">
-        <div class="phone-screen" style="background:var(--ivoire);">
+        <div style="background:var(--fond);min-height:480px;">
           <!-- Header -->
-          <div class="mock-header">
-            <div class="mock-date">Vrijdag · 15 mei</div>
-            <div class="mock-greeting">Goedemorgen,<br>Griette</div>
-            <div class="mock-weather">🌤 18° · mild · perfect voor een rok</div>
+          <div class="m-header">
+            <div class="m-date">Vrijdag · 15 mei</div>
+            <div class="m-greeting">Goedemorgen,<br>Griette</div>
+            <div class="m-sub">🌤 18° · licht briesje · rok-weer</div>
           </div>
-          <!-- Hero outfit card -->
-          <div class="mock-hero">
-            <div class="mock-hero-inner">
-              <div class="mock-hero-label">✦ Jouw look vandaag</div>
-              <div class="mock-hero-title">Casual vrijdag<br>met een twist</div>
-              <div class="mock-outfit-chips">
-                <span class="mock-chip">Hemdjurk beige</span>
-                <span class="mock-chip">Witte sneakers</span>
-                <span class="mock-chip">Leonie bag</span>
+          <!-- Editorial outfit card -->
+          <div class="m-editorial">
+            <div class="m-ed-photo">
+              <div style="position:relative;z-index:0;width:100%;height:100%;background:linear-gradient(160deg,#DDD0BA 0%,#C8B090 40%,#A89070 100%);display:flex;align-items:center;justify-content:center;">
+                <div style="text-align:center;">
+                  <div style="font-size:32px;opacity:0.4;">👗</div>
+                </div>
               </div>
-              <div style="display:flex;gap:6px;align-items:center;">
-                <button class="mock-btn">✦ Genereer</button>
-                <span style="font-size:8px;color:rgba(250,248,244,0.4);">↻ Andere look</span>
+              <div class="m-ed-badge">
+                <div class="m-ed-badge-label">✦ Look van vandaag</div>
+                <div class="m-ed-badge-title">Casual vrijdag<br>met een twist</div>
               </div>
             </div>
+            <div class="m-ed-chips">
+              <span class="m-ed-chip">Hemdjurk beige</span>
+              <span class="m-ed-chip">Witte sneakers</span>
+              <span class="m-ed-chip">Rieten tas</span>
+            </div>
+            <button class="m-ed-btn">✦ Genereer mijn look</button>
           </div>
-          <!-- Looks section -->
-          <div class="mock-section-label">Recente looks</div>
-          <div class="mock-outfit-row">
-            <div class="mock-outfit-card">
-              <div class="mock-outfit-img">🌸</div>
-              <div class="mock-outfit-name">Romantic<br>Saturday</div>
+          <!-- Recente looks -->
+          <div class="m-section-label">Recente looks</div>
+          <div class="m-looks-row">
+            <div class="m-look">
+              <div class="m-look-img" style="background:linear-gradient(135deg,#E8D8C0,#D4B896);">🌿</div>
+              <div class="m-look-name">Weekend<br>easy</div>
             </div>
-            <div class="mock-outfit-card">
-              <div class="mock-outfit-img">💼</div>
-              <div class="mock-outfit-name">Power<br>Meeting</div>
+            <div class="m-look">
+              <div class="m-look-img" style="background:linear-gradient(135deg,#DCDCE8,#C0C0D0);">🧥</div>
+              <div class="m-look-name">Vergadering<br>chic</div>
             </div>
-            <div class="mock-outfit-card" style="opacity:0.5;">
-              <div class="mock-outfit-img">✨</div>
-              <div class="mock-outfit-name">Avond<br>uit</div>
+            <div class="m-look" style="opacity:0.5;">
+              <div class="m-look-img" style="background:linear-gradient(135deg,#E0C8C0,#C0A090);">🌙</div>
+              <div class="m-look-name">Avond<br>uit</div>
             </div>
           </div>
           <!-- Nav -->
-          <div class="mock-nav">
-            <div class="mock-nav-item active">
-              <span class="mock-nav-icon">🏠</span>
-              <span class="mock-nav-label" style="color:var(--ivoire);">Home</span>
+          <div class="m-nav">
+            <div class="m-nav-item on">
+              <span style="font-size:14px;">🏠</span>
+              <span class="m-nav-lbl" style="color:rgba(250,247,241,.85);">Home</span>
             </div>
-            <div class="mock-nav-item">
-              <span class="mock-nav-icon">✨</span>
-              <span class="mock-nav-label">Looks</span>
+            <div class="m-nav-item">
+              <span style="font-size:14px;">✨</span>
+              <span class="m-nav-lbl">Looks</span>
             </div>
-            <div class="mock-nav-item">
-              <div style="width:38px;height:38px;border-radius:50%;background:var(--rose);display:flex;align-items:center;justify-content:center;font-size:16px;margin-top:-14px;box-shadow:0 4px 12px rgba(196,122,138,0.5);">✦</div>
-              <span class="mock-nav-label" style="margin-top:4px;">Vandaag</span>
+            <div class="m-nav-item" style="align-items:center;">
+              <div class="m-fab">✦</div>
+              <span class="m-nav-lbl">Vandaag</span>
             </div>
-            <div class="mock-nav-item">
-              <span class="mock-nav-icon">👗</span>
-              <span class="mock-nav-label">Kast</span>
+            <div class="m-nav-item">
+              <span style="font-size:14px;">👗</span>
+              <span class="m-nav-lbl">Kast</span>
             </div>
-            <div class="mock-nav-item">
-              <span class="mock-nav-icon">⋯</span>
-              <span class="mock-nav-label">Meer</span>
+            <div class="m-nav-item">
+              <span style="font-size:14px;">⋯</span>
+              <span class="m-nav-lbl">Meer</span>
             </div>
           </div>
         </div>
       </div>
-      <div class="phone-label" style="color:var(--rose);">Voorstel — outfit first ✓</div>
+      <div class="phone-label" style="color:var(--bois);">Voorstel — outfit first ✓</div>
     </div>
 
   </div>
@@ -395,61 +466,64 @@ h3{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:22px;margin-
 
 <!-- INSTALL TILE -->
 <div class="section">
-  <div class="label">06 — App-installatie</div>
+  <div class="label">06 — App installatie</div>
   <h2>Download de app — tegel</h2>
-  <p style="font-size:13px;color:var(--taupe);margin-bottom:28px;max-width:500px;line-height:1.7;">
-    Een mooie kaart onderaan de app (en op de website) die uitlegt hoe je de app op je beginscherm zet.
-    Automatisch verborgen zodra de app al geïnstalleerd is.
+  <p style="font-size:13px;color:var(--ardoise);margin-bottom:28px;max-width:520px;line-height:1.7;">
+    Een warme, mooie tegel onderaan de app. Automatisch verborgen als de app al geïnstalleerd is.
   </p>
 
   <div class="install-tile">
     <div class="install-icon">✦</div>
     <div style="flex:1;">
       <div class="install-title">Stijl Studio</div>
-      <div class="install-sub">Voeg toe aan je beginscherm · Werkt als echte app</div>
+      <div class="install-sub">Voeg toe aan je beginscherm<br>Werkt als echte app, altijd bij de hand</div>
       <button class="install-btn">
-        <span>⬇</span> Installeer de app
+        ⬇&ensp;Installeer de app
       </button>
     </div>
   </div>
 
-  <div style="margin-top:20px;padding:16px;background:var(--creme);border-radius:12px;max-width:420px;">
-    <div style="font-size:10px;font-weight:600;margin-bottom:8px;">Hoe het werkt:</div>
-    <div style="font-size:11px;color:var(--taupe);line-height:1.8;">
+  <div style="margin-top:20px;padding:18px;background:white;border-radius:14px;max-width:420px;border:1px solid var(--border);">
+    <div style="font-size:10px;font-weight:600;margin-bottom:8px;color:var(--noir);">Hoe werkt het?</div>
+    <div style="font-size:11px;color:var(--ardoise);line-height:1.9;">
       📱 <strong>iPhone:</strong> Tik op de knop → Safari Deel-menu → "Zet op beginscherm"<br>
       🤖 <strong>Android:</strong> Tik op de knop → "Toevoegen aan startscherm"<br>
-      De tegel verdwijnt automatisch als de app al geïnstalleerd is.
+      <span style="color:var(--muted);">De tegel verdwijnt automatisch als de app al geïnstalleerd is.</span>
     </div>
   </div>
 </div>
 
 <!-- SAMENVATTING -->
-<div class="section" style="background:var(--noir);color:var(--ivoire);">
-  <div class="label" style="color:var(--or);">07 — Samenvatting</div>
-  <h2 style="color:var(--ivoire);">Wat er verandert</h2>
-  <div class="grid grid-2" style="max-width:600px;gap:16px;margin-top:20px;">
-    <div style="padding:16px;background:rgba(255,255,255,0.05);border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
-      <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--rose);margin-bottom:10px;">Layout</div>
-      <ul style="font-size:11px;color:rgba(250,248,244,0.7);line-height:2;list-style:none;">
-        <li>✦ Home toont outfits, niet kast</li>
-        <li>✦ Centrale FAB voor dagadvies</li>
-        <li>✦ Looks-tab vervangt Outfits</li>
-        <li>✦ Kast naar achtergrond</li>
+<div class="section alt" style="padding-bottom:80px;">
+  <div class="label">07 — Samenvatting</div>
+  <h2>Wat er verandert</h2>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:620px;margin-top:24px;">
+    <div style="padding:20px;background:var(--noir);border-radius:16px;">
+      <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--sable);margin-bottom:12px;">Kleur &amp; stijl</div>
+      <ul style="font-size:11.5px;color:rgba(250,247,241,0.7);line-height:2.2;list-style:none;">
+        <li>✦ Fond (warm crème) als canvas</li>
+        <li>✦ Bois (warm donker) als accent</li>
+        <li>✦ Meer lucht, minder clutter</li>
+        <li>✦ Warm — niet koud of dark</li>
       </ul>
     </div>
-    <div style="padding:16px;background:rgba(255,255,255,0.05);border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
-      <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--or);margin-bottom:10px;">Visueel</div>
-      <ul style="font-size:11px;color:rgba(250,248,244,0.7);line-height:2;list-style:none;">
-        <li>✦ Noir header, Ivoire canvas</li>
-        <li>✦ Rose CTAs (al aanwezig)</li>
-        <li>✦ Meer witruimte, minder grid</li>
+    <div style="padding:20px;background:var(--noir);border-radius:16px;">
+      <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--sable);margin-bottom:12px;">Layout</div>
+      <ul style="font-size:11.5px;color:rgba(250,247,241,0.7);line-height:2.2;list-style:none;">
+        <li>✦ Home toont outfits, niet kast</li>
+        <li>✦ ✦-knop centraal in nav</li>
+        <li>✦ Looks-tab voor je logboek</li>
         <li>✦ Install-tegel onderaan</li>
       </ul>
     </div>
   </div>
-  <div style="margin-top:24px;padding:16px;background:rgba(196,122,138,0.1);border-radius:12px;border:1px solid rgba(196,122,138,0.2);max-width:600px;">
-    <div style="font-size:12px;color:rgba(250,248,244,0.6);line-height:1.8;">
-      <strong style="color:var(--rose);">Demo-proof:</strong> Als je de app laat zien, zien mensen direct een mooie outfit-suggestie — niet je volledige garderobe. De kast blijft één tik verder.
+
+  <div style="margin-top:20px;padding:22px;background:var(--lin);border-radius:16px;max-width:620px;border-left:3px solid var(--bois);">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;margin-bottom:8px;">Demo-proof</div>
+    <div style="font-size:12.5px;color:var(--ardoise);line-height:1.8;">
+      Als je de app laat zien, zien mensen direct een mooie outfit — niet hoe vol je kast is.
+      Warm, editorial, persoonlijk. Zoals een Parisienne die haar dag plant.
     </div>
   </div>
 </div>
