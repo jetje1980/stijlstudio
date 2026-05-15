@@ -281,14 +281,19 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 .ai-dot:nth-child(2){animation-delay:0.2s;}
 .ai-dot:nth-child(3){animation-delay:0.4s;}
 @keyframes pulse{0%,100%{opacity:0.3;}50%{opacity:1;}}
+
+/* HOME TILES */
+.home-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:20px 10px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:14px;cursor:pointer;font-family:'Jost',sans-serif;color:var(--brown);transition:all 0.15s;width:100%;}
+.home-tile:active{transform:scale(0.97);background:var(--cream-dark);}
+.home-tile .tile-icon{font-size:22px;line-height:1;}
+.home-tile .tile-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;font-weight:500;}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="eyebrow">Digitale Stylist · Iconic Wardrobe</div>
+  <div class="eyebrow">Stijl Studio · Digitale Stylist</div>
   <h1>Griette's<br><em>Garderobe</em></h1>
-  <p>Upload foto's · Sleep items op een board · Maak outfits</p>
 </div>
 
 <div id="weather-banner" class="weather-loading" style="display:flex;justify-content:space-between;align-items:center;"><span>🌤 Weer ophalen...</span><span style="display:flex;align-items:center;gap:8px;"><span id="sync-indicator" style="font-size:9px;opacity:0.5;">⟳</span><button onclick="fetchWeather()" style="background:none;border:none;color:rgba(245,242,238,0.6);font-size:11px;cursor:pointer;padding:2px 6px;border:1px solid rgba(245,242,238,0.2);border-radius:8px;">↻ Weer</button></span></div>
@@ -307,7 +312,7 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 <!-- BOTTOM NAVIGATION -->
 <div class="bottom-nav" id="bottom-nav">
   <button class="bnav-item active" data-panel="garderobe" onclick="showPanelBnav('garderobe',this)">
-    <span class="bnav-icon">👗</span>Kast
+    <span class="bnav-icon">🏠</span>Home
   </button>
   <button class="bnav-item" data-panel="suggesties" onclick="showPanelBnav('suggesties',this)">
     <span class="bnav-icon">✨</span>Outfits
@@ -371,36 +376,31 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
   </button>
 </div>
 
-<!-- ===== GARDEROBE ===== -->
+<!-- ===== HOME ===== -->
 <div class="panel active" id="panel-garderobe">
-  <p class="panel-title">Garderobe</p>
-  <p class="panel-sub">Tik op een item voor een foto. Sleep items naar je outfit boards. Voeg eigen items toe via de + knop.</p>
-  <button type="button" onclick="runGarderobeCheck()" style="width:100%;padding:11px 16px;background:var(--white);color:var(--brown);border:1.5px solid var(--brown-warm);border-radius:12px;font-size:11px;font-family:'Jost',sans-serif;cursor:pointer;display:flex;align-items:center;gap:10px;margin-bottom:14px;"><span style="font-size:16px;">&#x1F9F9;</span><span style="flex:1;text-align:left;">Seizoenscheck &#x2014; wat draag je niet, wat mis je?</span><span style="font-size:11px;color:var(--muted);">&#x2192;</span></button>
 
-  <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;">
-    <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--brown);background:var(--brown);font-size:10px;cursor:pointer;color:var(--cream);font-family:'Jost',sans-serif;" onclick="setFilter('alle',this)" id="fb-alle">Alle</button>
-    <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid #b5232a;background:var(--white);font-size:10px;cursor:pointer;color:#b5232a;font-family:'Jost',sans-serif;" onclick="setFilter('ongedragen',this)" id="fb-ongd">&#9679; Ongedragen</button>
-    <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('tops',this)">Tops</button>
-    <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('bottoms',this)">Onderkleding</button>
-    <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('layers',this)">Laagjes</button>
-    <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('jurken',this)">Jurken</button>
-    <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('shoes',this)">Schoenen</button>
-    <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('bags',this)">Tassen</button>
+  <!-- Greeting row -->
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px;">
+    <div>
+      <div id="home-greeting" style="font-family:'Bodoni Moda',serif;font-size:26px;font-weight:400;color:var(--brown);line-height:1.1;font-optical-sizing:auto;">Goedemorgen</div>
+      <div id="home-date" style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-mid);margin-top:5px;font-family:'Jost',sans-serif;"></div>
+    </div>
+    <button onclick="openAddModal()" title="Item toevoegen" style="width:38px;height:38px;border-radius:50%;background:var(--brown);color:var(--cream);border:none;font-size:22px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>
   </div>
-  <!-- Daily inspiration card -->
-  <div id="daily-card" style="background:var(--brown);border-radius:14px;margin-bottom:16px;overflow:hidden;">
-    <div style="padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="openQuickOutfit()">
+
+  <!-- Vandaag card (hero) -->
+  <div id="daily-card" style="background:var(--brown);border-radius:16px;margin-bottom:16px;overflow:hidden;">
+    <div style="padding:16px 16px 12px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="openQuickOutfit()">
       <div>
         <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,168,122,0.8);margin-bottom:4px;">Vandaag</div>
-        <div id="daily-card-text" style="font-family:'Bodoni Moda',serif;font-size:18px;font-weight:400;color:var(--cream);line-height:1.2;">Wat trek je aan?</div>
+        <div id="daily-card-text" style="font-family:'Bodoni Moda',serif;font-size:20px;font-weight:400;color:var(--cream);line-height:1.2;">Wat trek je aan?</div>
         <div id="daily-card-sub" style="font-size:9px;color:rgba(245,242,238,0.5);margin-top:3px;">Tik voor een outfit van de stylist</div>
       </div>
       <div id="daily-card-weather" style="text-align:right;">
-        <div style="font-size:28px;" id="daily-weather-icon">👗</div>
+        <div style="font-size:32px;" id="daily-weather-icon">👗</div>
       </div>
     </div>
-    <!-- Quick mood selectors -->
-    <div style="padding:0 16px 10px;border-top:1px solid rgba(255,255,255,0.1);">
+    <div style="padding:0 16px 12px;border-top:1px solid rgba(255,255,255,0.1);">
       <div style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(201,168,122,0.6);margin-bottom:6px;margin-top:8px;">Mood</div>
       <div style="display:flex;gap:5px;flex-wrap:wrap;">
         <button id="dq-rok" onclick="setDailyPref('bottom','rok',this)" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.2);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.7);">Rok/jurk</button>
@@ -423,6 +423,47 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
       </div>
       <button onclick="showYesterdayQuickLog()" id="gisteren-btn" style="width:100%;margin-top:6px;padding:7px;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:8px;font-size:9px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.5);">📆 Gisteren gelogd?</button>
     </div>
+  </div>
+
+  <!-- Snelle acties 2×2 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:22px;">
+    <button class="home-tile" onclick="showPanel('suggesties',null)">
+      <span class="tile-icon">✨</span>
+      <span class="tile-label">Outfits</span>
+    </button>
+    <button class="home-tile" onclick="showPanel('boards',null)">
+      <span class="tile-icon">🗂</span>
+      <span class="tile-label">Looks</span>
+    </button>
+    <button class="home-tile" onclick="showPanel('week',null)">
+      <span class="tile-icon">📅</span>
+      <span class="tile-label">Weekplan</span>
+    </button>
+    <button class="home-tile" onclick="showPanel('chat',null)">
+      <span class="tile-icon">💬</span>
+      <span class="tile-label">Stylist</span>
+    </button>
+  </div>
+
+  <!-- Kledingkast sectie -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+    <div style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--brown-mid);font-family:'Jost',sans-serif;font-weight:500;">Mijn Kledingkast</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span id="home-stats" style="font-size:9px;color:var(--muted);font-family:'Jost',sans-serif;"></span>
+      <button onclick="runGarderobeCheck()" style="font-size:9px;color:var(--brown-mid);background:none;border:1px solid var(--cream-dark);border-radius:12px;padding:4px 10px;cursor:pointer;font-family:'Jost',sans-serif;white-space:nowrap;letter-spacing:0.3px;">🧹 Check</button>
+    </div>
+  </div>
+
+  <!-- Filter chips -->
+  <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;">
+    <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--brown);background:var(--brown);font-size:10px;cursor:pointer;color:var(--cream);font-family:'Jost',sans-serif;" onclick="setFilter('alle',this)" id="fb-alle">Alle</button>
+    <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid #b5232a;background:var(--white);font-size:10px;cursor:pointer;color:#b5232a;font-family:'Jost',sans-serif;" onclick="setFilter('ongedragen',this)" id="fb-ongd">&#9679; Ongedragen</button>
+    <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('tops',this)">Tops</button>
+    <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('bottoms',this)">Onderkleding</button>
+    <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('layers',this)">Laagjes</button>
+    <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('jurken',this)">Jurken</button>
+    <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('shoes',this)">Schoenen</button>
+    <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('bags',this)">Tassen</button>
   </div>
 
   <div id="garderobe-content"></div>
@@ -2411,7 +2452,7 @@ function showPanel(name, btn) {
     }, 100);
   }
   if (name === 'week') { loadWeekPlan(); buildWeekPlanner(); }
-  if (name === 'garderobe') setTimeout(function(){ applyGarderobeFilter(); addMorningBannerBtn(); }, 200);
+  if (name === 'garderobe') setTimeout(function(){ applyGarderobeFilter(); addMorningBannerBtn(); updateHomeGreeting(); }, 200);
   if (name === 'regels') buildOccasionManager();
   if (name === 'inspo') renderInspoGallery();
   if (name === 'chat') {
@@ -5530,7 +5571,7 @@ openDB().then(async () => {
   rebuildOccasions();
   renderInspoGallery();
   updateDailyCardWithPlan();
-  setTimeout(function(){applyGarderobeFilter();showMondayBanner();addMorningBannerBtn();},600);
+  setTimeout(function(){applyGarderobeFilter();showMondayBanner();addMorningBannerBtn();updateHomeGreeting();},600);
   setTimeout(checkUnwornItems, 500);
   setTimeout(checkSeizoenswissel, 800);
   setTimeout(checkSeizoenswissel, 2000);
@@ -10298,6 +10339,26 @@ function addMorningBannerBtn() {
 }
 
 // ============ BOTTOM NAV ============
+function updateHomeGreeting() {
+  var hr = new Date().getHours();
+  var gr = hr < 12 ? 'Goedemorgen' : hr < 17 ? 'Goedemiddag' : 'Goedenavond';
+  var el = document.getElementById('home-greeting');
+  if (el) el.textContent = gr;
+  var days = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
+  var months = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+  var d = new Date();
+  var dateEl = document.getElementById('home-date');
+  if (dateEl) dateEl.textContent = days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()];
+  var statsEl = document.getElementById('home-stats');
+  if (statsEl) {
+    try {
+      var ic = (typeof wardrobeItems !== 'undefined' ? wardrobeItems.length : 0);
+      var bc = (typeof boards !== 'undefined' ? boards.length : 0);
+      if (ic > 0) statsEl.textContent = ic + ' items · ' + bc + (bc === 1 ? ' look' : ' looks');
+    } catch(e) {}
+  }
+}
+
 function showPanelBnav(name, btn) {
   closeMeerSheet();
   showPanel(name, btn);
