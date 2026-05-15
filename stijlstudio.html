@@ -248,10 +248,40 @@ body{background:var(--fond);font-family:'Jost',sans-serif;color:var(--noir);font
   color:rgba(245,242,238,0.2);
 }
 
+/* ── COLLAGE ── */
+.collage{background:var(--noir);padding:40px 20px 48px;overflow:hidden;}
+.collage-eyebrow{
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:rgba(200,192,180,0.35);margin-bottom:20px;font-family:'Jost',sans-serif;
+}
+.collage-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.photo-card{
+  border-radius:14px;overflow:hidden;position:relative;
+  display:flex;flex-direction:column;justify-content:flex-end;
+}
+.photo-card::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(transparent 45%,rgba(20,18,16,0.75));
+  pointer-events:none;
+}
+.photo-card-info{position:relative;z-index:1;padding:10px 11px;}
+.photo-card-loc{
+  font-size:7px;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(245,242,238,0.4);margin-bottom:2px;font-family:'Jost',sans-serif;
+}
+.photo-card-tag{
+  font-family:'Bodoni Moda',serif;font-size:13px;font-style:italic;
+  color:rgba(245,242,238,0.88);line-height:1.2;
+}
+.photo-card.tall{aspect-ratio:9/14;}
+.photo-card.short{aspect-ratio:9/10;}
+.photo-card.sq{aspect-ratio:1/1;}
+
 @media(min-width:540px){
   .hero-title{font-size:80px;}
   .mood-strip{height:220px;}
   .screen-card{width:180px;}
+  .collage-grid{grid-template-columns:repeat(3,1fr);}
 }
 </style>
 </head>
@@ -295,6 +325,70 @@ body{background:var(--fond);font-family:'Jost',sans-serif;color:var(--noir);font
   <div class="scroll-cue">
     <span class="scroll-line"></span>
     Scroll om meer te zien
+  </div>
+</section>
+
+<!-- ══ COLLAGE ══ -->
+<section class="collage">
+  <div class="collage-eyebrow">Street Style · Inspiratie</div>
+  <div class="collage-grid">
+
+    <!-- Monochrome neutrals — tall -->
+    <div class="photo-card tall" style="background:
+        linear-gradient(175deg,#D8D2C8 0%,#C4BEB4 25%,#A8A49C 55%,#888480 100%);
+        grid-row:span 2;">
+      <div class="photo-card-info">
+        <div class="photo-card-loc">Amsterdam · 2026</div>
+        <div class="photo-card-tag">Monochroom<br>neutraal</div>
+      </div>
+    </div>
+
+    <!-- Camel coat -->
+    <div class="photo-card short" style="background:
+        linear-gradient(155deg,#D8C09A 0%,#C4A870 30%,#A88850 60%,#9A7840 100%);">
+      <div class="photo-card-info">
+        <div class="photo-card-loc">Londen</div>
+        <div class="photo-card-tag">Camel coat</div>
+      </div>
+    </div>
+
+    <!-- Cobalt statement -->
+    <div class="photo-card short" style="background:
+        linear-gradient(140deg,#2848B8 0%,#1C38A0 40%,#102880 70%,#0C2068 100%);">
+      <div class="photo-card-info">
+        <div class="photo-card-loc">Parijs</div>
+        <div class="photo-card-tag">Statement<br>blauw</div>
+      </div>
+    </div>
+
+    <!-- All-black editorial — tall -->
+    <div class="photo-card tall" style="background:
+        linear-gradient(165deg,#2C2A28 0%,#1E1C1A 35%,#262422 65%,#181614 100%);
+        grid-row:span 2;">
+      <div class="photo-card-info">
+        <div class="photo-card-loc">Milaan</div>
+        <div class="photo-card-tag">Editorial<br>all-black</div>
+      </div>
+    </div>
+
+    <!-- Earth tones -->
+    <div class="photo-card short" style="background:
+        linear-gradient(150deg,#B87850 0%,#A06038 40%,#885030 65%,#785040 100%);">
+      <div class="photo-card-info">
+        <div class="photo-card-loc">Barcelona</div>
+        <div class="photo-card-tag">Earth tones</div>
+      </div>
+    </div>
+
+    <!-- Denim + wit -->
+    <div class="photo-card short" style="background:
+        linear-gradient(160deg,#E8E8F2 0%,#C8D0E4 35%,#98A8C8 65%,#7888B0 100%);">
+      <div class="photo-card-info">
+        <div class="photo-card-loc">Kopenhagen</div>
+        <div class="photo-card-tag">Denim &amp; wit</div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -409,7 +503,7 @@ body{background:var(--fond);font-family:'Jost',sans-serif;color:var(--noir);font
 <!-- ══ QUOTE ══ -->
 <section class="quote-section">
   <div class="quote-mark">"</div>
-  <p class="quote-text">Niet Vogue op de cover — maar Vogue op een gewone dinsdag.</p>
+  <p class="quote-text">Niet op de cover — maar stijlvol op een gewone dinsdag.</p>
   <p class="quote-source">De filosofie achter Stijl Studio</p>
 </section>
 
