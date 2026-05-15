@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Stijl DNA Quiz</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Stijl Studio">
+<meta name="theme-color" content="#9b6240">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--br:#2e1a0e;--bw:#9b6240;--cr:#f7f1e8;--cd:#ede4d4;--tx:#1a1008;--mu:#8a7060;--wh:#fff}
@@ -612,7 +618,7 @@ function renderUitslag(prof, ar, ar2, figTip, benL, nogoL) {
   if (klH) h += '<div class="usec"><div class="usec-t">Kleuren</div><div class="usec-b"><div style="display:flex;flex-wrap:wrap;gap:7px">' + klH + '</div></div></div>';
   if (dna.sleutelitems && dna.sleutelitems.length) h += '<div class="usec"><div class="usec-t">Sleutelitems</div><div class="usec-b">' + dna.sleutelitems.map(function(i) { return chip(i, false); }).join('') + '</div></div>';
   if (nogoL && nogoL.length) h += '<div class="usec"><div class="usec-t">No-go&#39;s</div><div class="usec-b">' + nogoL.map(function(n) { return chip(n, true); }).join('') + '</div></div>';
-  h += '<a href="griette_stylist_BETA.html" class="gobtn">Naar mijn garderobe &#8594;</a>';
+  h += '<a href="stylist_demo.html" class="gobtn">Naar mijn garderobe &#8594;</a>';
   document.getElementById('step-uitslag').innerHTML = h;
 }
 

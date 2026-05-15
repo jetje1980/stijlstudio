@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#1C1612"/>
+  <!-- Clothes hanger -->
+  <path d="M256 148 C256 148 256 130 274 130 C292 130 292 148 292 148 C292 148 292 160 280 164" stroke="#C4714A" stroke-width="14" stroke-linecap="round" fill="none"/>
+  <path d="M280 164 L256 180 L100 310 C88 318 94 336 108 336 L404 336 C418 336 424 318 412 310 L256 180 Z" fill="#C4714A"/>
+  <!-- SS monogram subtle -->
+  <text x="256" y="300" font-family="Georgia, serif" font-size="52" font-style="italic" font-weight="300" fill="rgba(255,255,255,0.18)" text-anchor="middle">ss</text>
+  <!-- Bottom wordmark -->
+  <text x="256" y="400" font-family="Georgia, serif" font-size="36" font-style="italic" font-weight="300" fill="rgba(240,212,192,0.7)" text-anchor="middle">Stijl Studio</text>
+</svg>

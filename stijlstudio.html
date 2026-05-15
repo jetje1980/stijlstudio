@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stijl Studio</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Stijl Studio">
+<meta name="theme-color" content="#C4714A">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#1C1612;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;font-family:Georgia,serif}
@@ -33,7 +39,7 @@ function doLogin() {
   if (!ok[c]) { e.textContent = 'Ongeldige code.'; return; }
   try { localStorage.setItem('ss-code', c); } catch(x) {}
   document.getElementById('gobtn').textContent = '...';
-  window.location.href = 'griette_stylist_BETA.html';
+  window.location.href = 'stylist_demo.html';
 }
 document.getElementById('gobtn').onclick = doLogin;
 document.getElementById('codein').onkeydown = function(ev) {
