@@ -2472,6 +2472,10 @@ body {
 // STATE & CONSTANTS
 // ══════════════════════════════════════
 const WORKER_URL = 'https://griette-stylist.griette.workers.dev';
+const SB = 'https://osuqtfsxmquwqsbgzlqn.supabase.co';
+const SK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
+const CL_CLOUD = 'dhggari0g';
+const CL_PRESET = 'griette-photos';
 
 // Controleer login — stuur terug als er geen code is
 const _SS_CODE = (() => { try { return localStorage.getItem('ss-code'); } catch(e) { return null; } })();
@@ -2538,6 +2542,30 @@ function saveState() {
     delete toSave.photos; // photos apart opslaan (IndexedDB)
     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
   } catch(e) { console.warn('Save failed', e); }
+  schedulCloudSync();
+}
+
+let _syncTimer = null;
+function schedulCloudSync() {
+  clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(pushToCloud, 3000);
+}
+
+function pushToCloud() {
+  if (!_SS_CODE || !state.userProfile) return;
+  fetch(SB + '/rest/v1/users', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','apikey':SK,'Authorization':'Bearer '+SK,'Prefer':'return=minimal,resolution=merge-duplicates'},
+    body: JSON.stringify({
+      code: _SS_CODE,
+      naam: state.userProfile.naam,
+      style_dna: state.userProfile,
+      items: state.items,
+      worn_log: state.wornLog || {},
+      boards: state.boards || [],
+      last_seen: new Date().toISOString()
+    })
+  }).catch(function(){});
 }
 
 function loadState() {
@@ -2929,15 +2957,20 @@ function renderGarderobe() {
 
   grid.innerHTML = html;
 
-  // Load photos
+  // Load photos: IndexedDB eerst, daarna Cloudinary URL als fallback
   items.forEach(item => {
+    const el = document.getElementById('photo-' + item.id);
+    if (!el) return;
     if (state.photos[item.id]) {
       loadPhoto(item.id).then(dataUrl => {
         if (dataUrl) {
-          const el = document.getElementById('photo-' + item.id);
-          if (el) el.innerHTML = `<img src="${dataUrl}" alt="${item.name}">`;
+          el.innerHTML = `<img src="${dataUrl}" alt="${item.name}">`;
+        } else if (item.photoUrl) {
+          el.innerHTML = `<img src="${item.photoUrl}" alt="${item.name}">`;
         }
       });
+    } else if (item.photoUrl) {
+      el.innerHTML = `<img src="${item.photoUrl}" alt="${item.name}">`;
     }
   });
 }
@@ -2980,13 +3013,38 @@ function openItemModal() {
 function handlePhotoUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    itemPhotoData = e.target.result;
+  // Compress + crop to 3:4, max 600px wide
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+  img.onload = () => {
+    const W = 600, H = 800;
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    const sr = img.width / img.height, dr = W / H;
+    let sx, sy, sw, sh;
+    if (sr > dr) { sh = img.height; sw = sh * dr; sy = 0; sx = (img.width - sw) / 2; }
+    else { sw = img.width; sh = sw / dr; sx = 0; sy = (img.height - sh) / 2; }
+    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, W, H);
+    URL.revokeObjectURL(url);
+    itemPhotoData = canvas.toDataURL('image/jpeg', 0.80);
     const area = document.getElementById('item-photo-upload');
     area.innerHTML = `<img src="${itemPhotoData}" alt="foto"><input type="file" id="item-photo-input" accept="image/*" onchange="handlePhotoUpload(event)">`;
   };
-  reader.readAsDataURL(file);
+  img.src = url;
+}
+
+async function uploadPhotoToCloud(dataUrl, itemId) {
+  try {
+    const blob = await fetch(dataUrl).then(r => r.blob());
+    const fd = new FormData();
+    fd.append('file', blob);
+    fd.append('upload_preset', CL_PRESET);
+    fd.append('public_id', _SS_CODE + '_' + itemId);
+    const res = await fetch('https://api.cloudinary.com/v1_1/' + CL_CLOUD + '/image/upload', { method: 'POST', body: fd });
+    if (res.ok) { const d = await res.json(); return d.secure_url || null; }
+  } catch(e) {}
+  return null;
 }
 
 function saveItem() {
@@ -3009,7 +3067,14 @@ function saveItem() {
 
   if (itemPhotoData) {
     state.photos[id] = true;
-    savePhoto(id, itemPhotoData);
+    savePhoto(id, itemPhotoData); // lokaal IndexedDB
+    // Cloud upload (async — url opslaan zodra klaar)
+    uploadPhotoToCloud(itemPhotoData, id).then(cloudUrl => {
+      if (cloudUrl && state.items[id]) {
+        state.items[id].photoUrl = cloudUrl;
+        saveState();
+      }
+    });
   }
 
   saveState();
@@ -4138,6 +4203,26 @@ async function init() {
           stijlDNA: dna
         };
         saveState();
+      }
+    } catch(e) {}
+  }
+
+  // Nieuw apparaat: haal data op uit Supabase als er niets lokaal is
+  if (!state.userProfile) {
+    try {
+      var sbResp = await fetch(SB + '/rest/v1/users?code=eq.' + encodeURIComponent(_SS_CODE) + '&select=naam,style_dna,items,worn_log,boards&limit=1', {
+        headers: { 'apikey': SK, 'Authorization': 'Bearer ' + SK, 'x-user-code': _SS_CODE }
+      });
+      if (sbResp.ok) {
+        var sbData = await sbResp.json();
+        if (sbData && sbData[0]) {
+          var row = sbData[0];
+          if (row.style_dna) state.userProfile = row.style_dna;
+          if (row.items && Object.keys(row.items).length > 0) state.items = Object.assign({}, state.items, row.items);
+          if (row.worn_log) state.wornLog = Object.assign({}, state.wornLog, row.worn_log);
+          if (row.boards && row.boards.length > 0) state.boards = row.boards;
+          if (state.userProfile) saveState();
+        }
       }
     } catch(e) {}
   }
