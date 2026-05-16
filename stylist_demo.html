@@ -3034,13 +3034,17 @@ function handlePhotoUpload(event) {
   img.src = url;
 }
 
+function _randToken() {
+  return Array.from(crypto.getRandomValues(new Uint8Array(12))).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
 async function uploadPhotoToCloud(dataUrl, itemId) {
   try {
     const blob = await fetch(dataUrl).then(r => r.blob());
     const fd = new FormData();
     fd.append('file', blob);
     fd.append('upload_preset', CL_PRESET);
-    fd.append('public_id', _SS_CODE + '_' + itemId);
+    fd.append('public_id', _randToken() + '_' + itemId);
     const res = await fetch('https://api.cloudinary.com/v1_1/' + CL_CLOUD + '/image/upload', { method: 'POST', body: fd });
     if (res.ok) { const d = await res.json(); return d.secure_url || null; }
   } catch(e) {}

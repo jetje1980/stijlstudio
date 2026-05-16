@@ -847,15 +847,7 @@ function doLogin() {
   if (c === 'SS-GRIET') {
     window.location.href = 'griette.html';
   } else {
-    var hasProfile = false;
-    try { hasProfile = !!localStorage.getItem('ss-prof-' + c); } catch(x) {}
-    if (!hasProfile) {
-      try {
-        var demoRaw = localStorage.getItem('stylistApp_v1_' + c);
-        if (demoRaw) { var ds = JSON.parse(demoRaw); hasProfile = !!(ds && ds.userProfile); }
-      } catch(x) {}
-    }
-    window.location.href = hasProfile ? 'stylist_demo.html' : 'stijlstudio_quiz.html';
+    window.location.href = 'stylist_demo.html';
   }
 }
 document.getElementById('gobtn').onclick = doLogin;
