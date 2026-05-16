@@ -4028,6 +4028,40 @@ async function init() {
   await initPhotoDB();
   loadState();
 
+  // Bridge: if no userProfile yet, check if user completed the DNA quiz
+  if (!state.userProfile) {
+    try {
+      var quizRaw = localStorage.getItem('ss-prof-' + _SS_CODE);
+      if (quizRaw) {
+        var qp = JSON.parse(quizRaw);
+        var dna = qp.stijlDNA || {};
+        var figuurMap = {schouders_breed:'strak',heupen_breed:'taille',zandloper:'taille',gelijkmatig:'flow',slank:'strak',rondingen:'flow'};
+        var kleurMap = {'warm aardetinten':'warm','koel tot neutraal':'neutraal','hoog contrast':'kleurrijk','warm en zacht':'soft','neutraal tot koel':'neutraal'};
+        var archetypeStijlMap = {klassiek:'klassiek',createur:'kleurrijk',naturel:'boho',romantisch:'romantisch',stoer:'stoer',modern:'minimalistisch'};
+        var materiaalMap = function(mats) {
+          if (!mats || !mats.length) return 'soepel';
+          var m = mats[0];
+          if (/Zijde|Chiffon|Satijn|Kant|Viscose|Jersey|Velvet/.test(m)) return 'soepel';
+          if (/Kasjmier|Merino|Wol/.test(m)) return 'warm';
+          if (/Leer|Denim/.test(m)) return 'stevig';
+          return 'licht';
+        };
+        var stijlArr = (dna.archetypes || []).map(function(a) { return archetypeStijlMap[a] || a; }).filter(Boolean);
+        state.userProfile = {
+          naam: qp.name || 'Gebruiker',
+          silhouet: figuurMap[dna.figuur] || 'mix',
+          kleurenpalet: kleurMap[dna.kleurtemp] || 'neutraal',
+          gelegenheden: ['casual', 'werkdag'],
+          stijl: stijlArr.length ? stijlArr : ['minimalistisch'],
+          materiaal: materiaalMap(dna.materialen),
+          nogo: dna.nogo || [],
+          stijlDNA: dna
+        };
+        saveState();
+      }
+    } catch(e) {}
+  }
+
   if (!state.userProfile) {
     // Onboarding
     document.getElementById('onboarding').style.display = 'flex';
