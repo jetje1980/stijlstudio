@@ -335,6 +335,7 @@ body {
 .btn-primary:active { transform: scale(0.98); opacity: 0.9; }
 .btn-primary.rose { background: var(--accent); }
 .btn-primary:disabled { opacity: 0.4; cursor: default; }
+.ob-hint-msg { font-size: 12px; color: var(--accent); text-align: center; min-height: 18px; margin-top: 6px; }
 .btn-secondary {
   width: 100%;
   padding: 14px;
@@ -1980,6 +1981,7 @@ body {
 
   <div class="ob-footer">
     <button class="btn-primary" id="ob-next-btn">Volgende →</button>
+    <div class="ob-hint-msg" id="ob-hint-msg"></div>
     <button class="btn-secondary" id="ob-skip-btn">Overslaan</button>
   </div>
 </div><!-- /onboarding -->
@@ -2336,12 +2338,34 @@ body {
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-header">
-      <span class="modal-title">🧬 Stijl DNA</span>
+      <span class="modal-title">Mijn profiel</span>
       <button class="modal-close" onclick="closeModal('modal-dna')">✕</button>
     </div>
     <div class="modal-body">
+      <!-- Profielnaam bewerken -->
+      <div style="background:var(--cream);border-radius:12px;padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:8px">Jouw naam</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="profile-naam-inp" type="text" style="flex:1;font-family:var(--font-body);font-size:15px;border:none;border-bottom:1.5px solid var(--border-light);background:transparent;color:var(--charcoal);padding:4px 0;outline:none" placeholder="Jouw naam..." oninput="document.getElementById('naam-save-btn').style.display='inline-block'">
+          <button id="naam-save-btn" onclick="saveProfileName()" style="display:none;padding:7px 14px;background:var(--charcoal);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-body)">Opslaan</button>
+        </div>
+        <div id="naam-save-msg" style="font-size:11px;color:#5a8a60;min-height:16px;margin-top:4px"></div>
+      </div>
+      <!-- Inlogcode -->
+      <div style="background:var(--cream);border-radius:12px;padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:6px">Jouw inlogcode</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span id="profile-code-display" style="font-family:monospace;font-size:18px;font-weight:700;color:var(--charcoal);letter-spacing:.1em"></span>
+          <button onclick="copyLoginCode()" style="padding:6px 12px;border:1.5px solid var(--border-light);background:transparent;border-radius:8px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:var(--font-body)">Kopieer</button>
+        </div>
+        <div id="code-copy-msg" style="font-size:11px;color:#5a8a60;min-height:16px;margin-top:4px"></div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Bewaar deze code — dit is jouw toegang tot de app.</div>
+      </div>
+      <!-- Stijl DNA -->
       <div class="dna-profile" id="dna-profile-content" style="padding:0"></div>
-      <button class="dna-edit-btn" onclick="redoOnboarding()">✏️ Stijl DNA opnieuw instellen</button>
+      <button class="dna-edit-btn" onclick="redoOnboarding()" style="margin-top:8px">✏️ Stijl DNA opnieuw instellen</button>
+      <!-- Switch account -->
+      <button onclick="switchAccount()" style="width:100%;margin-top:10px;padding:13px;background:transparent;border:1.5px solid var(--border-light);border-radius:var(--radius-sm);font-size:14px;color:var(--text-muted);cursor:pointer;font-family:var(--font-body)">↩ Wisselen van account</button>
     </div>
   </div>
 </div>
@@ -2565,9 +2589,8 @@ function initOnboarding() {
   document.getElementById('ob-next-btn').addEventListener('click', obNext);
   document.getElementById('ob-skip-btn').addEventListener('click', obSkip);
   document.getElementById('ob-naam').addEventListener('input', () => {
-    document.getElementById('ob-next-btn').disabled = !document.getElementById('ob-naam').value.trim();
+    document.getElementById('ob-hint-msg').textContent = '';
   });
-  document.getElementById('ob-next-btn').disabled = true;
 
   // Single-select handlers
   setupObSingleSelect('ob-silhouet');
@@ -2615,8 +2638,8 @@ function setupObMultiSelect(containerId, max) {
 }
 
 function updateObNextBtn() {
-  const btn = document.getElementById('ob-next-btn');
-  btn.disabled = !isObStepValid();
+  // Button always enabled — validation shows hint message on click
+  document.getElementById('ob-hint-msg').textContent = '';
 }
 
 function isObStepValid() {
@@ -2633,8 +2656,20 @@ function isObStepValid() {
   }
 }
 
+function showObHint(msg) {
+  var el = document.getElementById('ob-hint-msg');
+  if (el) { el.textContent = msg; setTimeout(function(){ el.textContent = ''; }, 3000); }
+}
+
 function obNext() {
-  if (!isObStepValid()) return;
+  if (!isObStepValid()) {
+    var hints = ['Vul je naam in om door te gaan','Kies een silhouet','Kies een kleurpalet','Kies minimaal 1 gelegenheid','Kies minimaal 1 stijl','Kies een materiaalvoorkeur'];
+    showObHint(hints[obStep] || 'Maak een keuze om door te gaan');
+    // Scroll slide content into view
+    var slide = document.querySelector('.ob-slide.active');
+    if (slide) slide.scrollTop = 80;
+    return;
+  }
 
   // Collect data for current step
   switch(obStep) {
@@ -2796,7 +2831,7 @@ function redoOnboarding() {
   document.getElementById('ob-next-btn').textContent = 'Volgende →';
   document.getElementById('ob-next-btn').classList.remove('rose');
   document.getElementById('ob-skip-btn').style.display = 'none';
-  document.getElementById('ob-next-btn').disabled = true;
+  document.getElementById('ob-hint-msg').textContent = '';
   renderObProgress();
   document.getElementById('onboarding').style.display = 'flex';
   document.getElementById('app').classList.remove('visible');
@@ -3608,8 +3643,50 @@ function addBoard() {
 // DNA PROFIEL
 // ══════════════════════════════════════
 function openDNAModal() {
+  // Populate profile fields
+  var p = state.userProfile;
+  var inp = document.getElementById('profile-naam-inp');
+  if (inp) { inp.value = p ? p.naam : ''; document.getElementById('naam-save-btn').style.display = 'none'; document.getElementById('naam-save-msg').textContent = ''; }
+  var codeEl = document.getElementById('profile-code-display');
+  if (codeEl) { codeEl.textContent = _SS_CODE || '—'; document.getElementById('code-copy-msg').textContent = ''; }
   renderDNAProfile();
   openModal('modal-dna');
+}
+
+function saveProfileName() {
+  var inp = document.getElementById('profile-naam-inp');
+  var naam = inp ? inp.value.trim() : '';
+  if (!naam) return;
+  if (!state.userProfile) return;
+  state.userProfile.naam = naam;
+  saveState();
+  updateHeaderProfile();
+  document.getElementById('naam-save-btn').style.display = 'none';
+  document.getElementById('naam-save-msg').textContent = 'Opgeslagen ✓';
+  setTimeout(function(){ document.getElementById('naam-save-msg').textContent = ''; }, 2500);
+  // Sync to Supabase
+  fetch(SB + '/rest/v1/users', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','apikey':SK,'Authorization':'Bearer '+SK,'Prefer':'return=minimal,resolution=merge-duplicates'},
+    body: JSON.stringify({code: _SS_CODE, naam: naam, last_seen: new Date().toISOString()})
+  }).catch(function(){});
+}
+
+function copyLoginCode() {
+  var code = _SS_CODE || '';
+  if (!code) return;
+  navigator.clipboard.writeText(code).then(function(){
+    document.getElementById('code-copy-msg').textContent = 'Gekopieerd ✓';
+    setTimeout(function(){ document.getElementById('code-copy-msg').textContent = ''; }, 2000);
+  }).catch(function(){
+    document.getElementById('code-copy-msg').textContent = code;
+  });
+}
+
+function switchAccount() {
+  if (!confirm('Wil je wisselen van account? Je bent dan uitgelogd.')) return;
+  try { localStorage.removeItem('ss-code'); } catch(e) {}
+  window.location.href = 'stijlstudio.html';
 }
 
 function renderDNAProfile() {
@@ -4036,7 +4113,10 @@ async function init() {
         var qp = JSON.parse(quizRaw);
         var dna = qp.stijlDNA || {};
         var figuurMap = {schouders_breed:'strak',heupen_breed:'taille',zandloper:'taille',gelijkmatig:'flow',slank:'strak',rondingen:'flow'};
-        var kleurMap = {'warm aardetinten':'warm','koel tot neutraal':'neutraal','hoog contrast':'kleurrijk','warm en zacht':'soft','neutraal tot koel':'neutraal'};
+        var kleurMap = {
+          'warm aardetinten':'warm','koel tot neutraal':'neutraal','hoog contrast':'kleurrijk','warm en zacht':'soft','neutraal tot koel':'neutraal',
+          'warm':'warm','koel':'koel','neutraal':'neutraal','zacht':'soft'
+        };
         var archetypeStijlMap = {klassiek:'klassiek',createur:'kleurrijk',naturel:'boho',romantisch:'romantisch',stoer:'stoer',modern:'minimalistisch'};
         var materiaalMap = function(mats) {
           if (!mats || !mats.length) return 'soepel';
