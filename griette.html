@@ -10762,6 +10762,18 @@ ${wardrobeText}
 
 ${(function(){
   try {
+    var moodCtx = boards.map(function(b) {
+      if (!b.inspoResult) return '';
+      var tmp = document.createElement('div');
+      tmp.innerHTML = b.inspoResult;
+      var txt = (tmp.textContent || '').replace(/\s+/g,' ').trim().slice(0, 300);
+      return '- ' + b.label + ': ' + txt;
+    }).filter(Boolean).join('\n');
+    return moodCtx ? '\n## MOODBOARDS (eerder geanalyseerd)\n' + moodCtx + '\n' : '';
+  } catch(e) { return ''; }
+})()}
+${(function(){
+  try {
     var dag2=getCyclusDag(); var fase2=dag2?getCyclusFaseVanDag(dag2):null;
     var today2=todayStr(); var kl2=(cyclusLog[today2]&&cyclusLog[today2].klachten)||[];
     var cyclusTxt = dag2 ? '\n### CYCLUS\nDag '+dag2+' ('+fase2+')'+(kl2.length&&kl2[0]!=='geen klachten'?', klachten: '+kl2.join(', '):'')+'\n' : '';
@@ -11733,15 +11745,39 @@ async function _biChatSend(boardId, question, msgHistory, msgsDiv, sendBtn) {
   msgsDiv.appendChild(typing);
   msgsDiv.scrollTop = msgsDiv.scrollHeight;
 
-  // Build context: board name + saved look result
-  var boardCtx = 'Board: ' + board.label + '.\n';
+  // System context: garderobe + board analyse
+  var boardCtx = 'Board: "' + board.label + '".\n';
   if (board.inspoResult) {
     var tmp = document.createElement('div');
     tmp.innerHTML = board.inspoResult;
-    boardCtx += 'Moodboard analyse:\n' + (tmp.textContent || '').slice(0, 600);
+    boardCtx += 'Gegenereerde moodboard-analyse (tekst):\n' + (tmp.textContent || '').slice(0, 800);
   }
 
-  msgHistory.push({ role: 'user', content: question });
+  // First message: include actual inspo photos so Claude sees the visuals
+  var isFirst = msgHistory.length === 0;
+  var msgContent;
+  if (isFirst && board.inspo && board.inspo.length > 0) {
+    var parts = [{
+      type: 'text',
+      text: 'Dit zijn mijn ' + board.inspo.length + ' Pinterest-inspiratiefoto\'s voor het board "' + board.label + '". Analyseer de stijl, kleuren, sfeer en silhouetten visueel. ' + question
+    }];
+    board.inspo.slice(0, 6).forEach(function(photo) {
+      var mt = photo.dataUrl.startsWith('data:image/png') ? 'image/png' : 'image/jpeg';
+      parts.push({ type: 'image', source: { type: 'base64', media_type: mt, data: photo.dataUrl.split(',')[1] } });
+    });
+    msgContent = parts;
+  } else {
+    msgContent = question;
+  }
+  msgHistory.push({ role: 'user', content: msgContent });
+
+  // Always keep the first message (with photos) in the history window
+  var historyToSend;
+  if (!isFirst && msgHistory.length > 1 && Array.isArray(msgHistory[0].content)) {
+    historyToSend = [msgHistory[0]].concat(msgHistory.slice(1).slice(-6));
+  } else {
+    historyToSend = msgHistory.slice(-8);
+  }
 
   try {
     var resp = await fetch('https://griette-stylist.griette.workers.dev', {
@@ -11749,9 +11785,9 @@ async function _biChatSend(boardId, question, msgHistory, msgsDiv, sendBtn) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 800,
+        max_tokens: 900,
         system: getChatSystemPrompt() + '\n\n## Huidig moodboard\n' + boardCtx,
-        messages: msgHistory.slice(-8)
+        messages: historyToSend
       })
     });
     var data = await resp.json();
