@@ -287,6 +287,53 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 .home-tile:active{transform:scale(0.97);background:var(--cream-dark);}
 .home-tile .tile-icon{font-size:22px;line-height:1;}
 .home-tile .tile-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;font-weight:500;}
+/* ── STIJL VERKENNER ── */
+.sv-overlay{position:fixed;inset:0;background:var(--cream);z-index:600;display:flex;flex-direction:column;overflow:hidden;transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);}
+.sv-overlay.open{transform:translateY(0);}
+.sv-hdr{padding:16px 16px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--cream-dark);flex-shrink:0;}
+.sv-back{background:none;border:none;font-size:22px;cursor:pointer;color:var(--brown);padding:4px;line-height:1;}
+.sv-ttl{font-family:'Bodoni Moda',serif;font-size:20px;font-weight:400;color:var(--brown);}
+.sv-occ-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px;}
+.sv-occ-card{background:var(--white);border:1.5px solid var(--cream-dark);border-radius:14px;padding:16px 12px;text-align:center;cursor:pointer;transition:all 0.18s;-webkit-tap-highlight-color:transparent;}
+.sv-occ-card:active{transform:scale(0.96);background:var(--cream-dark);}
+.sv-occ-icon{font-size:28px;margin-bottom:6px;}
+.sv-occ-label{font-size:11px;color:var(--brown);font-weight:500;line-height:1.3;}
+.sv-occ-sub{font-size:9px;color:var(--muted);margin-top:2px;}
+.sv-swipe-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 16px;overflow:hidden;}
+.sv-card-wrap{position:relative;width:100%;max-width:360px;height:420px;}
+.sv-card{position:absolute;inset:0;border-radius:20px;overflow:hidden;background:var(--cream-dark);box-shadow:0 8px 32px rgba(28,26,24,0.18);cursor:grab;touch-action:none;user-select:none;will-change:transform;}
+.sv-card img{width:100%;height:100%;object-fit:cover;pointer-events:none;display:block;}
+.sv-card-grad{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:56px;}
+.sv-card-lbl{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(28,26,24,0.75));padding:24px 14px 14px;color:var(--cream);font-size:11px;text-align:center;pointer-events:none;}
+.sv-like-badge,.sv-nope-badge{position:absolute;top:20px;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;border:2.5px solid white;opacity:0;pointer-events:none;transition:opacity 0.05s;}
+.sv-like-badge{left:16px;background:rgba(70,160,70,0.92);color:white;transform:rotate(-12deg);}
+.sv-nope-badge{right:16px;background:rgba(190,60,60,0.92);color:white;transform:rotate(12deg);}
+.sv-card-next{position:absolute;inset:0;border-radius:20px;overflow:hidden;background:var(--cream-dark);transform:scale(0.93) translateY(14px);z-index:-1;pointer-events:none;}
+.sv-card-next img{width:100%;height:100%;object-fit:cover;display:block;}
+.sv-prog-bar{height:3px;background:var(--cream-dark);border-radius:2px;flex-shrink:0;margin:0 16px 6px;}
+.sv-prog-fill{height:100%;background:var(--brown-warm);border-radius:2px;transition:width 0.3s;}
+.sv-counter{text-align:center;font-size:10px;color:var(--muted);flex-shrink:0;margin-bottom:8px;}
+.sv-actions{display:flex;align-items:center;justify-content:center;gap:24px;padding:12px 16px 24px;flex-shrink:0;}
+.sv-btn-skip{width:56px;height:56px;border-radius:50%;background:var(--white);border:2px solid #d95555;color:#d95555;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,0.1);transition:transform 0.15s;-webkit-tap-highlight-color:transparent;}
+.sv-btn-like{width:66px;height:66px;border-radius:50%;background:var(--brown);border:none;color:var(--cream);font-size:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(155,98,64,0.4);transition:transform 0.15s;-webkit-tap-highlight-color:transparent;}
+.sv-btn-skip:active,.sv-btn-like:active{transform:scale(0.88);}
+.sv-results{flex:1;overflow-y:auto;padding:16px 16px 40px;}
+.sv-res-hdr{font-family:'Bodoni Moda',serif;font-size:22px;font-weight:400;color:var(--brown);margin-bottom:4px;}
+.sv-res-sub{font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.5;}
+.sv-liked-strip{display:flex;gap:6px;overflow-x:auto;margin-bottom:16px;padding-bottom:4px;scrollbar-width:none;}
+.sv-liked-strip::-webkit-scrollbar{display:none;}
+.sv-liked-thumb{width:58px;height:78px;border-radius:8px;overflow:hidden;flex-shrink:0;background:var(--cream-dark);}
+.sv-liked-thumb img{width:100%;height:100%;object-fit:cover;}
+.sv-res-card{background:var(--white);border-radius:12px;padding:14px;margin-bottom:12px;border:1.5px solid var(--cream-dark);}
+.sv-res-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);margin-bottom:8px;}
+.sv-res-txt{font-size:12px;color:var(--brown);line-height:1.7;}
+.sv-outfit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+.sv-outfit-item{background:var(--cream);border-radius:8px;padding:10px 8px;font-size:10px;color:var(--brown);line-height:1.4;}
+.sv-outfit-nm{font-weight:500;margin-bottom:2px;}
+.sv-outfit-cat{color:var(--muted);font-size:9px;}
+.sv-save-btn{width:100%;padding:14px;background:var(--brown);color:var(--cream);border:none;border-radius:12px;font-size:11px;font-family:'Jost',sans-serif;cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;}
+.sv-alt-btn{width:100%;padding:10px;background:transparent;border:1.5px solid var(--cream-dark);border-radius:12px;font-size:10px;font-family:'Jost',sans-serif;cursor:pointer;color:var(--muted);margin-top:8px;}
+.sv-ai-load{text-align:center;padding:24px;color:var(--muted);font-size:11px;font-style:italic;}
 </style>
 </head>
 <body>
@@ -535,6 +582,15 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
   </div>
   <p class="panel-sub">Sla outfits op per gelegenheid. Tik + om een nieuwe look te starten.</p>
   <div id="boards-sync-status" style="font-size:10px;color:var(--muted);margin-bottom:8px;"></div>
+
+  <button type="button" onclick="openStijlVerkenner()" style="width:100%;padding:13px 16px;background:var(--brown);color:var(--cream);border:none;border-radius:14px;font-size:12px;font-family:'Jost',sans-serif;cursor:pointer;display:flex;align-items:center;gap:10px;margin-bottom:14px;-webkit-tap-highlight-color:transparent;">
+    <span style="font-size:20px;flex-shrink:0;">✦</span>
+    <div style="flex:1;text-align:left;">
+      <div style="font-weight:500;letter-spacing:0.3px;">Stijl Verkenner</div>
+      <div style="font-size:10px;opacity:0.7;margin-top:1px;">swipe door inspiratie · maak een look</div>
+    </div>
+    <span style="opacity:0.7;">›</span>
+  </button>
 
   <div class="board-selector" id="board-selector"></div>
   <div id="boards-container"></div>
@@ -2376,6 +2432,10 @@ function toggleNewTag(btn) {
   btn.classList.add('active');
 }
 
+function toggleNewTagMulti(btn) {
+  btn.classList.toggle('active');
+}
+
 function updateNewItemTagVisibility() {
   const cat = document.getElementById('new-item-cat')?.value;
   const showHals = ['tops','layers'].includes(cat);
@@ -2393,11 +2453,15 @@ function confirmAddItem() {
   const id = 'custom-' + Date.now();
   if (!items[cat]) items[cat] = [];
   items[cat].push({id, name});
-  // Save tags
+  // Save tags (materiaal is multi-select, all others single)
   const newTags = {};
+  const materialen = [];
   document.querySelectorAll('.new-tag-btn.active').forEach(b => {
-    newTags[b.dataset.type] = b.dataset.val;
+    if (b.dataset.type === 'materiaal') { materialen.push(b.dataset.val); }
+    else { newTags[b.dataset.type] = b.dataset.val; }
   });
+  if (materialen.length === 1) { newTags.materiaal = materialen[0]; }
+  else if (materialen.length > 1) { newTags.materiaal = materialen[0]; newTags.materialen = materialen; }
   if (Object.keys(newTags).length > 0) itemTags[id] = newTags;
   document.getElementById('add-overlay').classList.remove('open');
   buildGarderobe();
@@ -11048,6 +11112,340 @@ var vibePrompts = {
 // ============ ITEM SWAP in outfit card ============
 
 // ============ LIKED COLOR PATTERN BOOST ============
+
+// ============ STIJL VERKENNER ============
+var SV_OCCASIONS = {
+  parijs:{label:'Weekendje weg',emoji:'✈️',sub:'stedentrip · Parijs · city',colors:['#3D4B5C','#C8A882','#8B7355','#4A4A6A','#D4B896'],photos:[
+    {id:'1490481651871-ab68de25d43d',label:'Parijse nonchalance'},
+    {id:'1551803091-e20673f15770',label:'Tijdloze elegantie'},
+    {id:'1515886657613-9f3515b0c78f',label:'Vrouwelijk & krachtig'},
+    {id:'1441984904996-e0b6ba687e04',label:'Verfijnd casual'},
+    {id:'1525507119028-ed4f651936a1',label:'Mode-week stijl'},
+    {id:'1509631179647-0177331693ae',label:'Klassiek Parijs'},
+    {id:'1539109136881-3be0616acf4b',label:'Minimalistisch chic'},
+    {id:'1581044777550-4cfa63707723',label:'Curated look'},
+    {id:'1520367745676-56196c1b4e1b',label:'City chic'},
+    {id:'1571513722275-4ad9f78e6f4a',label:'Sophisticated casual'},
+    {id:'1558769132-cb1aea458c5e',label:'Effortless stijl'},
+    {id:'1469334031218-e382a71b716b',label:'Avondlook'},
+    {id:'1502716119720-b23a93e5fe1b',label:'Klassiek feminine'},
+    {id:'1567401893414-76b7b1e5a7a5',label:'Casual chic'},
+    {id:'1548536395-0f20c8af8de3',label:'Outdoor stijl'},
+  ]},
+  avond:{label:'Avondje uit',emoji:'✨',sub:'dinner · feest · theater',colors:['#1C1A18','#8B6914','#4A3060','#2C4A2C','#8B2020'],photos:[
+    {id:'1469334031218-e382a71b716b',label:'Avond elegantie'},
+    {id:'1502716119720-b23a93e5fe1b',label:'Klassiek feminine'},
+    {id:'1558769132-cb1aea458c5e',label:'Glam look'},
+    {id:'1525507119028-ed4f651936a1',label:'Statement outfit'},
+    {id:'1515886657613-9f3515b0c78f',label:'Powerful & feminine'},
+    {id:'1490481651871-ab68de25d43d',label:'Sophisticated'},
+    {id:'1551803091-e20673f15770',label:'Tijdloze elegantie'},
+    {id:'1509631179647-0177331693ae',label:'Klassieke avondstijl'},
+    {id:'1571513722275-4ad9f78e6f4a',label:'Cocktail chic'},
+    {id:'1584370848010-d7fe6bc767ec',label:'Polished avondlook'},
+    {id:'1441984904996-e0b6ba687e04',label:'Feminine power'},
+    {id:'1520367745676-56196c1b4e1b',label:'City night out'},
+    {id:'1539109136881-3be0616acf4b',label:'Modern elegant'},
+    {id:'1541099649105-f69ad21f3246',label:'Evening casual'},
+    {id:'1503342217505-b0a15ec3261c',label:'Smart avondlook'},
+  ]},
+  werk:{label:'Zakelijk',emoji:'💼',sub:'kantoor · meeting · presentatie',colors:['#2C3E50','#4A4A4A','#3D5A4A','#4A3020','#2C2C4A'],photos:[
+    {id:'1584370848010-d7fe6bc767ec',label:'Professioneel & stijlvol'},
+    {id:'1520367745676-56196c1b4e1b',label:'Business look'},
+    {id:'1571513722275-4ad9f78e6f4a',label:'Power dressing'},
+    {id:'1441984904996-e0b6ba687e04',label:'Kantoor elegantie'},
+    {id:'1509631179647-0177331693ae',label:'Corporate chic'},
+    {id:'1551803091-e20673f15770',label:'Klassiek zakelijk'},
+    {id:'1515886657613-9f3515b0c78f',label:'Confident & polished'},
+    {id:'1490481651871-ab68de25d43d',label:'Smart casual'},
+    {id:'1539109136881-3be0616acf4b',label:'Minimalistisch zakelijk'},
+    {id:'1525507119028-ed4f651936a1',label:'Fashion meets function'},
+    {id:'1503342217505-b0a15ec3261c',label:'Smart casual kantoor'},
+    {id:'1541099649105-f69ad21f3246',label:'Zakelijke casual'},
+    {id:'1581044777550-4cfa63707723',label:'Curated workwear'},
+    {id:'1567401893414-76b7b1e5a7a5',label:'Casual Friday'},
+    {id:'1558769132-cb1aea458c5e',label:'Meeting-ready'},
+  ]},
+  casual:{label:'Casual weekend',emoji:'☀️',sub:'boodschappen · koffie · markt',colors:['#6B8E6B','#C8A882','#8B7355','#4A6B8B','#8B6B4A'],photos:[
+    {id:'1567401893414-76b7b1e5a7a5',label:'Casual chic'},
+    {id:'1503342217505-b0a15ec3261c',label:'Relaxed look'},
+    {id:'1541099649105-f69ad21f3246',label:'Weekend casual'},
+    {id:'1581044777550-4cfa63707723',label:'Effortless style'},
+    {id:'1548536395-0f20c8af8de3',label:'Outdoor casual'},
+    {id:'1552374196-1ab2a1c593e8',label:'Natural & easy'},
+    {id:'1496747611176-843222e1e57c',label:'Sporty casual'},
+    {id:'1539109136881-3be0616acf4b',label:'Minimal casual'},
+    {id:'1490481651871-ab68de25d43d',label:'Weekend stijl'},
+    {id:'1509631179647-0177331693ae',label:'Casual elegant'},
+    {id:'1515886657613-9f3515b0c78f',label:'Casual power'},
+    {id:'1571513722275-4ad9f78e6f4a',label:'Smart casual dag'},
+    {id:'1520367745676-56196c1b4e1b',label:'City casual'},
+    {id:'1525507119028-ed4f651936a1',label:'Eclectic casual'},
+    {id:'1558769132-cb1aea458c5e',label:'Bohemian inspired'},
+  ]},
+  bruiloft:{label:'Bruiloft gast',emoji:'💐',sub:'zomer · gala · cocktail',colors:['#6B4A8B','#C8826B','#4A8B6B','#8B6B20','#2C4A6B'],photos:[
+    {id:'1469334031218-e382a71b716b',label:'Bruiloft elegantie'},
+    {id:'1502716119720-b23a93e5fe1b',label:'Feminine jurk'},
+    {id:'1441984904996-e0b6ba687e04',label:'Feestelijke look'},
+    {id:'1515886657613-9f3515b0c78f',label:'Krachtig & vrouwelijk'},
+    {id:'1551803091-e20673f15770',label:'Klassiek feestelijk'},
+    {id:'1509631179647-0177331693ae',label:'Chic bruiloft gast'},
+    {id:'1490481651871-ab68de25d43d',label:'Sophisticated feest'},
+    {id:'1558769132-cb1aea458c5e',label:'Glam gast look'},
+    {id:'1525507119028-ed4f651936a1',label:'Statement dress'},
+    {id:'1584370848010-d7fe6bc767ec',label:'Polished feestlook'},
+    {id:'1520367745676-56196c1b4e1b',label:'Summer wedding'},
+    {id:'1571513722275-4ad9f78e6f4a',label:'Cocktail party'},
+    {id:'1539109136881-3be0616acf4b',label:'Modern feestlook'},
+    {id:'1581044777550-4cfa63707723',label:'Curated feest outfit'},
+    {id:'1567401893414-76b7b1e5a7a5',label:'Casual chic bruiloft'},
+  ]},
+};
+
+var _sv = { occasion:null, photos:[], current:0, liked:[], skipped:[], _drag:{active:false,startX:0,curX:0} };
+
+function openStijlVerkenner() {
+  var ov = document.getElementById('sv-overlay');
+  if (ov) ov.remove();
+  _sv.liked=[]; _sv.skipped=[]; _sv.current=0; _sv.photos=[]; _sv.occasion=null;
+  ov = document.createElement('div');
+  ov.id = 'sv-overlay';
+  ov.className = 'sv-overlay';
+  ov.innerHTML =
+    '<div class="sv-hdr">'
+    +'<button class="sv-back" onclick="closeStijlVerkenner()">←</button>'
+    +'<div class="sv-ttl">✦ Stijl Verkenner</div>'
+    +'<div style="width:36px;"></div>'
+    +'</div>'
+    +'<div id="sv-body" style="flex:1;overflow-y:auto;">'
+    +'<div style="padding:14px 16px 4px;font-size:11px;color:var(--muted);line-height:1.6;">Kies een gelegenheid. Swipe door inspiratiefoto\'s — ♥ bij wat jou aanspreekt. Ik maak daarna een look uit jouw kast.</div>'
+    +'<div class="sv-occ-grid">'
+    +Object.entries(SV_OCCASIONS).map(function(e){
+      return '<button class="sv-occ-card" onclick="startVerkenner(\''+e[0]+'\')">'
+        +'<div class="sv-occ-icon">'+e[1].emoji+'</div>'
+        +'<div class="sv-occ-label">'+e[1].label+'</div>'
+        +'<div class="sv-occ-sub">'+e[1].sub+'</div>'
+        +'</button>';
+    }).join('')
+    +'</div></div>';
+  document.body.appendChild(ov);
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ ov.classList.add('open'); }); });
+}
+
+function closeStijlVerkenner() {
+  var ov = document.getElementById('sv-overlay');
+  if (!ov) return;
+  ov.classList.remove('open');
+  setTimeout(function(){ if(ov.parentNode) ov.remove(); }, 360);
+}
+
+function startVerkenner(key) {
+  _sv.occasion = key;
+  _sv.photos = SV_OCCASIONS[key].photos.slice();
+  _sv.current = 0; _sv.liked = []; _sv.skipped = [];
+  var body = document.getElementById('sv-body');
+  body.innerHTML =
+    '<div class="sv-counter" id="sv-ctr">Foto 1 van '+_sv.photos.length+'</div>'
+    +'<div class="sv-prog-bar"><div class="sv-prog-fill" id="sv-pf" style="width:0%"></div></div>'
+    +'<div class="sv-swipe-area">'
+    +'<div class="sv-card-wrap" id="sv-wrap">'
+    +'<div class="sv-card-next" id="sv-cnext"></div>'
+    +'<div class="sv-card" id="sv-card"></div>'
+    +'</div></div>'
+    +'<div class="sv-actions">'
+    +'<button class="sv-btn-skip" onclick="svSkip()" title="Skip">✗</button>'
+    +'<button class="sv-btn-like" onclick="svLike()" title="Like">♥</button>'
+    +'</div>';
+  svRender();
+}
+
+function _svImgHtml(id, w, h, q, fallbackEmoji, fallbackBg) {
+  return '<img src="https://images.unsplash.com/photo-'+id+'?auto=format&fit=crop&w='+w+'&h='+h+'&q='+q+'" '
+    +'style="width:100%;height:100%;object-fit:cover;display:block;" loading="eager" '
+    +'onerror="this.style.display=\'none\';var g=this.nextElementSibling;if(g)g.style.display=\'flex\';">'
+    +'<div class="sv-card-grad" style="display:none;background:'+fallbackBg+';">'+fallbackEmoji+'</div>';
+}
+
+function svRender() {
+  var card = document.getElementById('sv-card');
+  var cnext = document.getElementById('sv-cnext');
+  var ctr = document.getElementById('sv-ctr');
+  var pf = document.getElementById('sv-pf');
+  if (!card) return;
+  var p = _sv.photos[_sv.current];
+  var pn = _sv.photos[_sv.current+1];
+  var occ = SV_OCCASIONS[_sv.occasion];
+  var bg = occ.colors[_sv.current % occ.colors.length] || '#4A5260';
+  var pct = Math.round((_sv.current/_sv.photos.length)*100);
+  if (pf) pf.style.width = pct+'%';
+  if (ctr) ctr.textContent = 'Foto '+(_sv.current+1)+' van '+_sv.photos.length+(_sv.liked.length?'  ·  '+_sv.liked.length+' ♥':'');
+  card.style.transform = '';
+  card.style.opacity = '1';
+  card.innerHTML = _svImgHtml(p.id,400,530,78,occ.emoji,bg)
+    +'<div class="sv-card-lbl">'+p.label+'</div>'
+    +'<div class="sv-like-badge" id="sv-lb">LOVE IT ♥</div>'
+    +'<div class="sv-nope-badge" id="sv-nb">SKIP ✗</div>';
+  if (cnext) {
+    cnext.innerHTML = pn ? _svImgHtml(pn.id,400,530,50,occ.emoji,occ.colors[(_sv.current+1)%occ.colors.length]) : '';
+  }
+  svSetupDrag(card);
+}
+
+function svSetupDrag(card) {
+  var d = _sv._drag;
+  function onStart(x) { d.active=true; d.startX=x; d.curX=0; card.style.transition='none'; }
+  function onMove(x) {
+    if (!d.active) return;
+    d.curX = x - d.startX;
+    var rot = d.curX * 0.07;
+    card.style.transform = 'translateX('+d.curX+'px) rotate('+rot+'deg)';
+    var lb=document.getElementById('sv-lb'), nb=document.getElementById('sv-nb');
+    if(lb) lb.style.opacity = Math.min(1,Math.max(0,d.curX/70));
+    if(nb) nb.style.opacity = Math.min(1,Math.max(0,-d.curX/70));
+  }
+  function onEnd() {
+    if (!d.active) return;
+    d.active = false;
+    if (d.curX > 55) { svLike(); }
+    else if (d.curX < -55) { svSkip(); }
+    else {
+      card.style.transition='transform 0.28s cubic-bezier(0.4,0,0.2,1)';
+      card.style.transform='';
+      var lb=document.getElementById('sv-lb'),nb=document.getElementById('sv-nb');
+      if(lb) lb.style.opacity=0; if(nb) nb.style.opacity=0;
+    }
+  }
+  card.ontouchstart = function(e){ onStart(e.touches[0].clientX); };
+  card.ontouchmove  = function(e){ onMove(e.touches[0].clientX); };
+  card.ontouchend   = onEnd;
+  card.onmousedown  = function(e){ onStart(e.clientX); };
+  var mmv = function(e){ onMove(e.clientX); };
+  var mup = function(){ if(d.active) onEnd(); };
+  document.addEventListener('mousemove', mmv);
+  document.addEventListener('mouseup', mup);
+  // cleanup on next render
+  card._svCleanup = function(){ document.removeEventListener('mousemove',mmv); document.removeEventListener('mouseup',mup); };
+}
+
+function svAnimateOut(dir, cb) {
+  var card = document.getElementById('sv-card');
+  if (!card) { cb(); return; }
+  if (card._svCleanup) card._svCleanup();
+  card.style.transition = 'transform 0.32s cubic-bezier(0.4,0,0.2,1),opacity 0.32s';
+  var x = dir==='like' ? 650 : -650;
+  card.style.transform = 'translateX('+x+'px) rotate('+(dir==='like'?28:-28)+'deg)';
+  card.style.opacity = '0';
+  setTimeout(cb, 330);
+}
+
+function svLike() {
+  _sv.liked.push(_sv.photos[_sv.current]);
+  svAnimateOut('like', function(){
+    _sv.current++;
+    if (_sv.current >= _sv.photos.length) { svShowResults(); } else { svRender(); }
+  });
+}
+
+function svSkip() {
+  _sv.skipped.push(_sv.photos[_sv.current]);
+  svAnimateOut('skip', function(){
+    _sv.current++;
+    if (_sv.current >= _sv.photos.length) { svShowResults(); } else { svRender(); }
+  });
+}
+
+function svShowResults() {
+  var body = document.getElementById('sv-body');
+  var occ = SV_OCCASIONS[_sv.occasion];
+  var lc = _sv.liked.length;
+  body.innerHTML =
+    '<div class="sv-results">'
+    +'<div class="sv-res-hdr">'+occ.emoji+' Jouw '+occ.label+' stijl</div>'
+    +'<div class="sv-res-sub">'+lc+' van '+_sv.photos.length+' foto\'s aangesproken'+(lc>0?' · Ik maak een look uit jouw kast':'')+' </div>'
+    +(lc>0
+      ?'<div class="sv-liked-strip">'+_sv.liked.map(function(p){
+          return '<div class="sv-liked-thumb"><img src="https://images.unsplash.com/photo-'+p.id+'?auto=format&fit=crop&w=120&h=160&q=55" onerror="this.style.display=\'none\'" loading="lazy"></div>';
+        }).join('')+'</div>'
+      :'')
+    +'<div id="sv-ai"></div>'
+    +'</div>';
+  if (lc===0) {
+    document.getElementById('sv-ai').innerHTML =
+      '<div class="sv-res-card"><div class="sv-res-lbl">Tip</div><div class="sv-res-txt">Je hebt geen foto\'s geliked. Probeer opnieuw — kies gewoon wat je ergens in aanspreekt!</div></div>'
+      +'<button class="sv-save-btn" onclick="openStijlVerkenner()">Opnieuw proberen</button>';
+    return;
+  }
+  document.getElementById('sv-ai').innerHTML = '<div class="sv-ai-load">✦ Ik analyseer jouw keuzes en zoek items in jouw kast…</div>';
+  svAnalyze();
+}
+
+async function svAnalyze() {
+  var occ = SV_OCCASIONS[_sv.occasion];
+  var likedLabels = _sv.liked.map(function(p){return p.label;}).join(', ');
+  var allItems = getAllItems();
+  var wardrobeText = allItems.slice(0,35).map(function(i){
+    var kleur = getTag(i.id,'kleur')||'';
+    var mat = getTag(i.id,'materiaal')||'';
+    return '- '+i.name+(kleur?' ('+kleur+(mat?', '+mat:'')+')':'')+' ['+i.cat+']';
+  }).join('\n');
+  var prompt = 'Je bent Griette\'s persoonlijke stylist. Ze wil een look voor: '+occ.label+' ('+occ.sub+').\n\n'
+    +'Inspiraties die haar aanspraken:\n'+likedLabels+'\n\n'
+    +'Haar garderobe:\n'+(wardrobeText||'(nog geen items toegevoegd)')+'\n\n'
+    +'Geef je antwoord als JSON met dit formaat:\n'
+    +'{"woorden":"4-6 stijlwoorden gescheiden door ·","profiel":"2-3 zinnen over haar stijlkeuze voor deze gelegenheid","outfit":[{"naam":"item naam","cat":"categorie","tip":"kort stylingtip"}],"tip":"1 concrete stylingtip"}\n'
+    +'Max 4 outfit items. Items bij voorkeur uit haar garderobe. Max 160 woorden totaal. Antwoord in het Nederlands.';
+  try {
+    var res = await fetch('https://griette-stylist.griette.workers.dev',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:550,messages:[{role:'user',content:prompt}]})
+    });
+    var data = await res.json();
+    var txt = (data.content&&data.content[0]&&data.content[0].text)||'';
+    var m = txt.match(/\{[\s\S]*\}/);
+    var result = null;
+    if (m) { try{ result=JSON.parse(m[0]); }catch(e){} }
+    svRenderResult(result, txt);
+  } catch(e) { svRenderResult(null,''); }
+}
+
+function svRenderResult(r, raw) {
+  var sec = document.getElementById('sv-ai');
+  if (!sec) return;
+  var occ = SV_OCCASIONS[_sv.occasion];
+  var html = '';
+  if (r) {
+    if (r.woorden||r.profiel) {
+      html += '<div class="sv-res-card">'
+        +'<div class="sv-res-lbl">Jouw stijl voor '+occ.label+'</div>'
+        +(r.woorden?'<div style="font-family:\'Bodoni Moda\',serif;font-size:16px;color:var(--brown-warm);font-style:italic;margin-bottom:8px;">'+r.woorden+'</div>':'')
+        +(r.profiel?'<div class="sv-res-txt">'+r.profiel+'</div>':'')
+        +'</div>';
+    }
+    if (r.outfit&&r.outfit.length) {
+      html += '<div class="sv-res-card">'
+        +'<div class="sv-res-lbl">Jouw look</div>'
+        +'<div class="sv-outfit-grid">'
+        +r.outfit.map(function(item){
+          return '<div class="sv-outfit-item">'
+            +'<div class="sv-outfit-nm">'+item.naam+'</div>'
+            +'<div class="sv-outfit-cat">'+(item.cat||'')+'</div>'
+            +(item.tip?'<div style="font-size:9px;color:var(--muted);margin-top:3px;">'+item.tip+'</div>':'')
+            +'</div>';
+        }).join('')
+        +'</div></div>';
+    }
+    if (r.tip) {
+      html += '<div class="sv-res-card"><div class="sv-res-lbl">Styling tip</div><div class="sv-res-txt">✦ '+r.tip+'</div></div>';
+    }
+  } else if (raw) {
+    html += '<div class="sv-res-card"><div class="sv-res-lbl">Jouw look voor '+occ.label+'</div><div class="sv-res-txt">'+raw.replace(/\n/g,'<br>')+'</div></div>';
+  } else {
+    html += '<div class="sv-res-card"><div class="sv-res-lbl">Tip</div><div class="sv-res-txt">Probeer opnieuw — geen resultaat ontvangen.</div></div>';
+  }
+  html += '<button class="sv-save-btn" onclick="startVerkenner(\''+_sv.occasion+'\')">Opnieuw verkennen →</button>';
+  html += '<button class="sv-alt-btn" onclick="openStijlVerkenner()">Andere gelegenheid kiezen</button>';
+  sec.innerHTML = html;
+}
 
 </script>
 <div style="display:none;gap:8px;align-items:center;position:fixed;left:0;right:0;background:var(--cream);padding:10px 12px;border-top:1px solid var(--cream-dark);z-index:400;bottom:62px;box-shadow:0 -4px 12px rgba(28,26,24,0.06);" id="chat-input-bar">
