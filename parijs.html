@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Parijs — Vriendinnen Citytrip</title>
+<meta name="description" content="Jullie Parijs citytrip. Vier vriendinnen, vier dagen, één grote voorpret.">
+<meta name="theme-color" content="#2D4A3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & VARS ──────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --vert:     #2D4A3E;
+  --terra:    #C4614A;
+  --moutarde: #D4A037;
+  --rose:     #E8C5B5;
+  --creme:    #FAF6F0;
+  --lin:      #F0EAE0;
+  --brun:     #6B4C3B;
+  --noir:     #1A1512;
+  --gris:     #7A7066;
+  --border:   #E2DAD0;
+  --card:     #FFFFFF;
+  --serif:    'Playfair Display', Georgia, serif;
+  --sans:     'Inter', system-ui, sans-serif;
+  --r:        16px;
+  --r-lg:     24px;
+  --shadow:   0 2px 20px rgba(26,21,18,0.08);
+  --shadow-lg:0 8px 40px rgba(26,21,18,0.14);
+}
+html{scroll-behavior:smooth;font-size:16px;}
+body{
+  background:var(--creme);
+  font-family:var(--sans);
+  color:var(--noir);
+  overflow-x:hidden;
+  min-height:100svh;
+  padding-bottom:80px;
+}
+h1,h2,h3{font-family:var(--serif);}
+
+/* ── NAV ──────────────────────────────────────── */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--card);
+  border-top:1px solid var(--border);
+  display:flex;
+  padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px));
+  z-index:100;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:6px 0;cursor:pointer;border:none;background:none;
+  font-family:var(--sans);font-size:10px;font-weight:500;
+  color:var(--gris);letter-spacing:.3px;text-transform:uppercase;
+  transition:color .2s;
+}
+.nav-item.active{color:var(--vert);}
+.nav-item svg{width:22px;height:22px;stroke-width:1.5;}
+.nav-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--terra);margin-top:-2px;
+  display:none;
+}
+.nav-item.has-notif .nav-dot{display:block;}
+
+/* ── SECTIONS ─────────────────────────────────── */
+.section{display:none;min-height:calc(100svh - 80px);}
+.section.active{display:block;}
+
+/* ── HERO VOORPRET ────────────────────────────── */
+.hero{
+  background:var(--vert);
+  min-height:55vw;max-height:420px;
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:32px 24px 28px;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:
+    url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80') center/cover no-repeat;
+  opacity:.35;
+}
+.hero-grain{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 30%,rgba(26,21,18,.6) 100%);
+}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.15);border-radius:20px;
+  padding:5px 12px;font-size:11px;font-weight:600;
+  color:#fff;letter-spacing:.8px;text-transform:uppercase;
+  backdrop-filter:blur(8px);width:fit-content;margin-bottom:12px;
+}
+.hero h1{
+  font-size:clamp(32px,8vw,52px);font-weight:600;
+  color:#fff;line-height:1.1;
+  text-shadow:0 2px 20px rgba(0,0,0,.3);
+}
+.hero h1 em{font-style:italic;color:var(--rose);}
+.hero-sub{
+  color:rgba(255,255,255,.75);font-size:14px;
+  margin-top:8px;font-weight:400;
+}
+
+/* ── COUNTDOWN ────────────────────────────────── */
+.countdown-block{
+  background:var(--noir);
+  color:#fff;padding:20px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.countdown-left h3{
+  font-family:var(--serif);font-size:13px;font-style:italic;
+  color:rgba(255,255,255,.55);font-weight:400;margin-bottom:4px;
+}
+.countdown-nums{display:flex;gap:12px;}
+.cd-unit{text-align:center;}
+.cd-num{
+  font-family:var(--serif);font-size:32px;font-weight:700;
+  line-height:1;color:#fff;display:block;
+}
+.cd-label{font-size:9px;font-weight:500;letter-spacing:.8px;
+  text-transform:uppercase;color:rgba(255,255,255,.45);}
+.cd-sep{font-size:28px;color:rgba(255,255,255,.2);padding-top:2px;}
+.countdown-badge{
+  background:var(--terra);border-radius:12px;
+  padding:8px 14px;text-align:center;
+}
+.countdown-badge .days-big{font-family:var(--serif);font-size:28px;font-weight:700;color:#fff;display:block;}
+.countdown-badge .days-label{font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.7);}
+
+/* ── CARDS ────────────────────────────────────── */
+.section-label{
+  font-size:10px;font-weight:600;letter-spacing:1px;
+  text-transform:uppercase;color:var(--terra);
+  padding:24px 24px 8px;
+}
+.card{
+  margin:0 16px 12px;
+  background:var(--card);border-radius:var(--r);
+  overflow:hidden;box-shadow:var(--shadow);
+}
+.card-pad{padding:16px 18px;}
+
+/* ── MISSIE VAN DE DAG ────────────────────────── */
+.missie-card{
+  margin:0 16px 12px;
+  background:linear-gradient(135deg,var(--vert) 0%,#1e3429 100%);
+  border-radius:var(--r-lg);overflow:hidden;
+  box-shadow:var(--shadow-lg);
+  position:relative;
+}
+.missie-card::before{
+  content:'';position:absolute;
+  top:-40px;right:-40px;
+  width:160px;height:160px;
+  border-radius:50%;
+  background:rgba(255,255,255,.04);
+}
+.missie-card-inner{padding:20px 20px 18px;}
+.missie-day{
+  font-size:10px;font-weight:600;letter-spacing:1px;
+  text-transform:uppercase;color:var(--rose);margin-bottom:8px;
+  display:flex;align-items:center;gap:6px;
+}
+.missie-day::before{
+  content:'';width:20px;height:1px;background:var(--rose);opacity:.5;
+}
+.missie-card h2{
+  font-family:var(--serif);font-size:20px;font-weight:600;
+  color:#fff;line-height:1.3;margin-bottom:12px;
+}
+.missie-card p{font-size:13px;color:rgba(255,255,255,.7);line-height:1.6;margin-bottom:16px;}
+.missie-actions{display:flex;gap:8px;}
+.btn{
+  padding:10px 18px;border-radius:40px;font-family:var(--sans);
+  font-size:13px;font-weight:600;cursor:pointer;border:none;
+  transition:transform .15s,box-shadow .15s;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--terra);color:#fff;}
+.btn-secondary{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);}
+.btn-outline{background:transparent;color:var(--vert);border:1.5px solid var(--vert);}
+.btn-sm{padding:8px 14px;font-size:12px;}
+.missie-streak{
+  display:flex;align-items:center;gap:6px;
+  padding:10px 20px 14px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.streak-avatars{display:flex;}
+.streak-avatar{
+  width:26px;height:26px;border-radius:50%;
+  border:2px solid var(--vert);
+  background:var(--terra);color:#fff;
+  font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  margin-right:-6px;font-family:var(--sans);
+}
+.streak-avatar:nth-child(2){background:var(--moutarde);}
+.streak-avatar:nth-child(3){background:var(--brun);}
+.streak-avatar:nth-child(4){background:var(--vert);}
+.streak-text{font-size:11px;color:rgba(255,255,255,.55);margin-left:10px;}
+.streak-fire{color:var(--terra);font-size:14px;}
+
+/* ── VRIENDINNEN ──────────────────────────────── */
+.vrienden-row{
+  display:flex;gap:8px;padding:0 16px;overflow-x:auto;
+  scrollbar-width:none;padding-bottom:4px;
+}
+.vrienden-row::-webkit-scrollbar{display:none;}
+.vriendin-chip{
+  flex-shrink:0;background:var(--card);
+  border-radius:var(--r);padding:12px 14px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  min-width:72px;box-shadow:var(--shadow);
+  cursor:pointer;transition:transform .15s;border:2px solid transparent;
+}
+.vriendin-chip.me{border-color:var(--terra);}
+.vriendin-chip:active{transform:scale(.96);}
+.v-avatar{
+  width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:16px;font-weight:700;color:#fff;
+}
+.v-name{font-size:11px;font-weight:600;color:var(--noir);}
+.v-streak{font-size:10px;color:var(--gris);}
+
+/* ── POLLS ────────────────────────────────────── */
+.poll-card .poll-q{
+  font-family:var(--serif);font-size:17px;font-weight:600;
+  color:var(--noir);margin-bottom:14px;line-height:1.4;
+}
+.poll-options{display:flex;flex-direction:column;gap:8px;}
+.poll-opt{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;
+  border:1.5px solid var(--border);cursor:pointer;
+  transition:all .2s;position:relative;overflow:hidden;
+}
+.poll-opt:hover{border-color:var(--terra);background:rgba(196,97,74,.04);}
+.poll-opt.voted{border-color:var(--vert);background:rgba(45,74,62,.06);}
+.poll-opt-bar{
+  position:absolute;left:0;top:0;bottom:0;
+  background:rgba(45,74,62,.08);border-radius:8px;
+  transition:width .5s ease;width:0;
+}
+.poll-opt-text{font-size:13px;font-weight:500;position:relative;z-index:1;}
+.poll-opt-pct{font-size:12px;color:var(--gris);margin-left:auto;position:relative;z-index:1;}
+.poll-meta{font-size:11px;color:var(--gris);margin-top:10px;}
+
+/* ── INPAKLIJST ───────────────────────────────── */
+.pack-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--lin);
+}
+.pack-item:last-child{border-bottom:none;}
+.pack-check{
+  width:22px;height:22px;border-radius:6px;
+  border:1.5px solid var(--border);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;margin-top:1px;
+}
+.pack-check.checked{background:var(--vert);border-color:var(--vert);}
+.pack-check.checked svg{display:block;}
+.pack-check svg{display:none;width:12px;height:12px;stroke:#fff;stroke-width:2.5;}
+.pack-text{flex:1;}
+.pack-label{font-size:14px;font-weight:500;color:var(--noir);}
+.pack-note{font-size:11px;color:var(--gris);margin-top:2px;font-style:italic;}
+.pack-avatars{display:flex;margin-top:4px;gap:-4px;}
+.pack-av{
+  width:16px;height:16px;border-radius:50%;
+  font-size:7px;font-weight:700;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  margin-right:-3px;border:1.5px solid #fff;
+}
+
+/* ── REISINFO HUB ─────────────────────────────── */
+.info-item{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 0;border-bottom:1px solid var(--lin);
+}
+.info-item:last-child{border-bottom:none;}
+.info-icon{
+  width:40px;height:40px;border-radius:12px;
+  background:var(--lin);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+}
+.info-body{flex:1;}
+.info-label{font-size:11px;font-weight:600;letter-spacing:.5px;
+  text-transform:uppercase;color:var(--gris);}
+.info-value{font-size:14px;font-weight:500;color:var(--noir);margin-top:1px;}
+.info-sub{font-size:11px;color:var(--gris);}
+.info-lock{
+  font-size:10px;color:var(--gris);
+  display:flex;align-items:center;gap:3px;
+}
+
+/* ── SWIPE SECTIE ─────────────────────────────── */
+.swipe-section{padding-top:0;}
+.swipe-header{
+  background:var(--vert);padding:48px 24px 24px;
+  padding-top:calc(48px + env(safe-area-inset-top,0px));
+}
+.swipe-header h2{
+  font-family:var(--serif);font-size:26px;font-weight:600;
+  color:#fff;margin-bottom:4px;
+}
+.swipe-header p{font-size:13px;color:rgba(255,255,255,.65);}
+.swipe-moment-tabs{
+  display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
+  padding:16px 24px 0;background:var(--vert);
+}
+.swipe-moment-tabs::-webkit-scrollbar{display:none;}
+.moment-tab{
+  flex-shrink:0;padding:7px 14px;border-radius:20px;
+  font-size:12px;font-weight:600;cursor:pointer;
+  border:1.5px solid rgba(255,255,255,.25);color:rgba(255,255,255,.65);
+  background:transparent;font-family:var(--sans);
+  transition:all .2s;
+}
+.moment-tab.active{background:#fff;color:var(--vert);border-color:#fff;}
+
+/* ── SWIPE CARD ───────────────────────────────── */
+.swipe-arena{
+  position:relative;height:440px;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px 16px;overflow:hidden;
+}
+.swipe-card{
+  position:absolute;
+  width:calc(100% - 32px);max-width:380px;
+  border-radius:var(--r-lg);overflow:hidden;
+  box-shadow:var(--shadow-lg);
+  cursor:grab;user-select:none;
+  transition:transform .15s;
+  touch-action:none;
+  background:var(--card);
+}
+.swipe-card:active{cursor:grabbing;}
+.swipe-card.card-2{transform:translateY(8px) scale(.96);z-index:0;}
+.swipe-card.card-3{transform:translateY(16px) scale(.92);z-index:-1;}
+.swipe-card-img{
+  height:240px;background-size:cover;background-position:center;
+  position:relative;
+}
+.swipe-overlay{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:16px;
+  background:linear-gradient(transparent,rgba(26,21,18,.7));
+}
+.swipe-tags{display:flex;gap:6px;margin-bottom:8px;}
+.swipe-tag{
+  background:rgba(255,255,255,.15);backdrop-filter:blur(8px);
+  border-radius:20px;padding:3px 10px;font-size:10px;
+  font-weight:600;color:#fff;letter-spacing:.4px;text-transform:uppercase;
+}
+.swipe-tag.prix{background:var(--vert);color:#fff;}
+.swipe-card-body{padding:16px;}
+.swipe-card-body h3{
+  font-family:var(--serif);font-size:20px;font-weight:600;
+  color:var(--noir);margin-bottom:4px;
+}
+.swipe-card-body p{font-size:13px;color:var(--gris);line-height:1.6;}
+.swipe-card-body .wijk{
+  font-size:11px;font-weight:600;letter-spacing:.5px;
+  text-transform:uppercase;color:var(--terra);margin-bottom:6px;
+}
+.swipe-group-votes{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 16px 14px;border-top:1px solid var(--lin);
+}
+.vote-pile{display:flex;}
+.vote-av{
+  width:22px;height:22px;border-radius:50%;
+  font-size:8px;font-weight:700;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  margin-right:-5px;border:2px solid #fff;font-family:var(--sans);
+}
+.vote-text{font-size:11px;color:var(--gris);margin-left:8px;}
+
+/* swipe hints */
+.swipe-hint{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  z-index:10;pointer-events:none;
+  opacity:0;transition:opacity .15s;
+  font-family:var(--serif);font-size:32px;font-weight:700;
+}
+.hint-ja{color:var(--vert);left:30%;}
+.hint-nee{color:var(--terra);left:70%;}
+.hint-droom{color:var(--moutarde);top:20%;}
+
+.swipe-buttons{
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  padding:0 24px 20px;
+}
+.swipe-btn{
+  width:56px;height:56px;border-radius:50%;border:none;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:transform .15s,box-shadow .15s;
+  font-size:24px;box-shadow:var(--shadow);
+}
+.swipe-btn:active{transform:scale(.92);}
+.swipe-btn.nee{background:#fff;color:var(--terra);}
+.swipe-btn.ja{background:#fff;color:var(--vert);}
+.swipe-btn.droom{background:var(--moutarde);color:#fff;width:64px;height:64px;font-size:28px;}
+
+/* match overlay */
+.match-overlay{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(26,21,18,.85);backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;flex-direction:column;
+  text-align:center;padding:32px;
+}
+.match-overlay.show{display:flex;}
+.match-badge{
+  font-size:64px;margin-bottom:16px;
+  animation:pop .4s cubic-bezier(.34,1.56,.64,1);
+}
+.match-overlay h2{
+  font-family:var(--serif);font-size:32px;font-weight:700;
+  color:#fff;margin-bottom:8px;
+}
+.match-overlay p{font-size:15px;color:rgba(255,255,255,.7);margin-bottom:28px;}
+.confetti-container{position:fixed;inset:0;pointer-events:none;z-index:201;}
+.confetti-piece{
+  position:absolute;width:8px;height:8px;
+  animation:confettiFall 3s ease-in forwards;
+}
+@keyframes confettiFall{
+  0%{transform:translateY(-20px) rotate(0deg);opacity:1;}
+  100%{transform:translateY(120vh) rotate(720deg);opacity:0;}
+}
+@keyframes pop{
+  0%{transform:scale(0);}
+  100%{transform:scale(1);}
+}
+
+/* ── GROEP SECTIE ─────────────────────────────── */
+.groep-header{
+  background:linear-gradient(135deg,var(--brun),#3d2418);
+  padding:48px 24px 28px;
+  padding-top:calc(48px + env(safe-area-inset-top,0px));
+}
+.groep-header h2{
+  font-family:var(--serif);font-size:26px;color:#fff;font-weight:600;
+}
+.groep-header p{font-size:13px;color:rgba(255,255,255,.6);margin-top:4px;}
+.matches-list{padding:0 16px;}
+.match-item{
+  display:flex;gap:12px;padding:14px 0;
+  border-bottom:1px solid var(--lin);align-items:center;
+}
+.match-item:last-child{border-bottom:none;}
+.match-img{
+  width:56px;height:56px;border-radius:10px;
+  background-size:cover;background-position:center;flex-shrink:0;
+}
+.match-info{flex:1;}
+.match-name{font-size:14px;font-weight:600;color:var(--noir);}
+.match-meta{font-size:11px;color:var(--gris);margin-top:2px;}
+.match-moment{
+  font-size:10px;font-weight:600;letter-spacing:.5px;
+  text-transform:uppercase;color:var(--terra);
+}
+.match-check{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--vert);display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;
+}
+.match-check svg{width:14px;height:14px;stroke:#fff;stroke-width:2.5;}
+
+/* ── MIJ SECTIE ───────────────────────────────── */
+.mij-header{
+  background:var(--creme);
+  padding:48px 24px 24px;
+  padding-top:calc(48px + env(safe-area-inset-top,0px));
+  border-bottom:1px solid var(--border);
+}
+.profile-avatar-big{
+  width:72px;height:72px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:28px;font-weight:700;color:#fff;
+  margin-bottom:12px;
+}
+.mij-header h2{font-family:var(--serif);font-size:22px;font-weight:600;}
+.mij-header p{font-size:13px;color:var(--gris);margin-top:2px;}
+.badges-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 16px;}
+.badges-row::-webkit-scrollbar{display:none;}
+.badge{
+  flex-shrink:0;background:var(--card);border-radius:12px;
+  padding:10px 14px;text-align:center;box-shadow:var(--shadow);
+  min-width:80px;
+}
+.badge-icon{font-size:22px;margin-bottom:4px;}
+.badge-name{font-size:10px;font-weight:600;color:var(--gris);letter-spacing:.3px;}
+.badge.earned .badge-name{color:var(--vert);}
+.badge.locked{opacity:.4;}
+.pref-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 0;border-bottom:1px solid var(--lin);
+}
+.pref-row:last-child{border-bottom:none;}
+.pref-label{font-size:14px;color:var(--noir);}
+.pref-val{font-size:13px;color:var(--gris);}
+.toggle{
+  width:44px;height:26px;border-radius:13px;
+  background:var(--border);position:relative;cursor:pointer;
+  transition:background .2s;border:none;
+}
+.toggle.on{background:var(--vert);}
+.toggle::after{
+  content:'';position:absolute;
+  width:20px;height:20px;border-radius:50%;
+  background:#fff;top:3px;left:3px;
+  transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.2);
+}
+.toggle.on::after{left:21px;}
+
+/* ── SPELLEN ──────────────────────────────────── */
+.spel-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:10px;padding:0 16px;
+}
+.spel-card{
+  background:var(--card);border-radius:var(--r);
+  padding:16px;box-shadow:var(--shadow);cursor:pointer;
+  transition:transform .15s;
+}
+.spel-card:active{transform:scale(.97);}
+.spel-icon{font-size:28px;margin-bottom:8px;}
+.spel-name{font-size:13px;font-weight:600;color:var(--noir);}
+.spel-meta{font-size:11px;color:var(--gris);margin-top:2px;}
+
+/* ── QUIZ MODAL ───────────────────────────────── */
+.modal{
+  display:none;position:fixed;inset:0;z-index:150;
+  background:rgba(26,21,18,.7);backdrop-filter:blur(6px);
+  align-items:flex-end;justify-content:center;
+}
+.modal.show{display:flex;}
+.modal-sheet{
+  background:var(--card);
+  border-radius:var(--r-lg) var(--r-lg) 0 0;
+  width:100%;max-width:480px;
+  padding:8px 0 0;
+  max-height:85vh;overflow-y:auto;
+}
+.modal-handle{
+  width:36px;height:4px;border-radius:2px;
+  background:var(--border);margin:0 auto 16px;
+}
+.modal-inner{padding:0 24px 32px;}
+.modal-inner h3{
+  font-family:var(--serif);font-size:22px;font-weight:600;
+  color:var(--noir);margin-bottom:8px;
+}
+.quiz-q{
+  font-size:16px;font-weight:500;color:var(--noir);
+  margin:20px 0 14px;line-height:1.5;
+}
+.quiz-options{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{
+  padding:12px 16px;border-radius:10px;
+  border:1.5px solid var(--border);cursor:pointer;
+  font-size:14px;font-weight:500;color:var(--noir);
+  transition:all .2s;background:transparent;font-family:var(--sans);
+  text-align:left;
+}
+.quiz-opt:hover{border-color:var(--terra);background:rgba(196,97,74,.04);}
+.quiz-opt.correct{border-color:var(--vert);background:rgba(45,74,62,.08);color:var(--vert);}
+.quiz-opt.wrong{border-color:var(--terra);background:rgba(196,97,74,.08);color:var(--terra);}
+.quiz-score{text-align:center;padding:20px 0;}
+.quiz-score .score-num{
+  font-family:var(--serif);font-size:48px;font-weight:700;color:var(--vert);
+}
+.quiz-score p{font-size:14px;color:var(--gris);margin-top:4px;}
+
+/* ── UPLOAD ZONE ──────────────────────────────── */
+.upload-zone{
+  border:2px dashed var(--border);border-radius:var(--r);
+  padding:24px;text-align:center;cursor:pointer;
+  transition:border-color .2s;margin:0 16px;
+}
+.upload-zone:hover{border-color:var(--terra);}
+.upload-icon{font-size:32px;margin-bottom:8px;}
+.upload-zone p{font-size:13px;color:var(--gris);}
+.upload-zone strong{color:var(--terra);}
+.lock-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(45,74,62,.1);color:var(--vert);
+  border-radius:20px;padding:3px 10px;font-size:10px;font-weight:600;
+  margin-top:8px;
+}
+
+/* ── TOAST ────────────────────────────────────── */
+.toast{
+  position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--noir);color:#fff;
+  padding:10px 18px;border-radius:20px;
+  font-size:13px;font-weight:500;
+  opacity:0;transition:all .3s;z-index:300;white-space:nowrap;
+  pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── UTIL ─────────────────────────────────────── */
+.mt-4{margin-top:4px;}
+.mt-8{margin-top:8px;}
+.pb-24{padding-bottom:24px;}
+.flex{display:flex;}
+.items-center{align-items:center;}
+.justify-between{justify-content:space-between;}
+.gap-8{gap:8px;}
+.text-gris{color:var(--gris);}
+.text-xs{font-size:11px;}
+.fw-6{font-weight:600;}
+.p-16-24{padding:16px 24px;}
+.divider{height:1px;background:var(--lin);margin:0 16px;}
+
+/* ── SCROLLBAR HIDDEN ────────────────────────── */
+.scroll-x{overflow-x:auto;scrollbar-width:none;}
+.scroll-x::-webkit-scrollbar{display:none;}
+
+/* ── EMPTY STATE ──────────────────────────────── */
+.empty-state{
+  text-align:center;padding:40px 24px;
+}
+.empty-state .emoji{font-size:40px;margin-bottom:12px;}
+.empty-state h3{font-family:var(--serif);font-size:20px;color:var(--noir);margin-bottom:6px;}
+.empty-state p{font-size:13px;color:var(--gris);line-height:1.6;}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     SECTIE 1: VOORPRET
+══════════════════════════════════════════════ -->
+<div class="section active" id="sec-voorpret">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grain"></div>
+    <div class="hero-tag">
+      <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+      Parijs · Juni 2025
+    </div>
+    <h1>Bonjour,<br><em>mes amies</em></h1>
+    <p class="hero-sub">Vier vriendinnen · Vier dagen · Één grote stad</p>
+  </div>
+
+  <!-- Countdown -->
+  <div class="countdown-block">
+    <div class="countdown-left">
+      <h3>Nog even en dan…</h3>
+      <div class="countdown-nums">
+        <div class="cd-unit">
+          <span class="cd-num" id="cd-days">14</span>
+          <span class="cd-label">dagen</span>
+        </div>
+        <span class="cd-sep">:</span>
+        <div class="cd-unit">
+          <span class="cd-num" id="cd-hours">08</span>
+          <span class="cd-label">uur</span>
+        </div>
+        <span class="cd-sep">:</span>
+        <div class="cd-unit">
+          <span class="cd-num" id="cd-mins">34</span>
+          <span class="cd-label">min</span>
+        </div>
+      </div>
+    </div>
+    <div class="countdown-badge">
+      <span class="days-big" id="cd-days-big">14</span>
+      <span class="days-label">dagen!</span>
+    </div>
+  </div>
+
+  <!-- Vriendinnen -->
+  <p class="section-label">De groep</p>
+  <div class="vrienden-row">
+    <div class="vriendin-chip me" onclick="selectVriendin('joke')">
+      <div class="v-avatar" style="background:var(--terra)">J</div>
+      <span class="v-name">Joke</span>
+      <span class="v-streak">🔥 7</span>
+    </div>
+    <div class="vriendin-chip" onclick="selectVriendin('karin')">
+      <div class="v-avatar" style="background:var(--moutarde)">K</div>
+      <span class="v-name">Karin</span>
+      <span class="v-streak">🔥 5</span>
+    </div>
+    <div class="vriendin-chip" onclick="selectVriendin('els')">
+      <div class="v-avatar" style="background:var(--brun)">E</div>
+      <span class="v-name">Els</span>
+      <span class="v-streak">🔥 7</span>
+    </div>
+    <div class="vriendin-chip" onclick="selectVriendin('marleen')">
+      <div class="v-avatar" style="background:var(--vert)">M</div>
+      <span class="v-name">Marleen</span>
+      <span class="v-streak">🔥 3</span>
+    </div>
+  </div>
+
+  <!-- Missie van de dag -->
+  <p class="section-label">Missie van de dag</p>
+  <div class="missie-card">
+    <div class="missie-card-inner">
+      <div class="missie-day">Dag 7 van 14</div>
+      <h2>Stuur de groep één ding waar jij het meest naar uitkijkt</h2>
+      <p>Mag een restaurant zijn, een straat, een gevoel. Mag ook "eindelijk mijn nieuwe jas dragen".</p>
+      <div class="missie-actions">
+        <button class="btn btn-primary btn-sm" onclick="completeMissie()">Verstuur ✨</button>
+        <button class="btn btn-secondary btn-sm" onclick="showToast('Missie bewaard voor later')">Later</button>
+      </div>
+    </div>
+    <div class="missie-streak">
+      <div class="streak-avatars">
+        <div class="streak-avatar">J</div>
+        <div class="streak-avatar">E</div>
+        <div class="streak-avatar">K</div>
+      </div>
+      <span class="streak-text">Joke, Els & Karin hebben al gedaan</span>
+      <span class="streak-fire">🔥</span>
+    </div>
+  </div>
+
+  <!-- Dagelijkse poll -->
+  <p class="section-label">Snel gestemd</p>
+  <div class="card">
+    <div class="card-pad poll-card">
+      <div class="poll-q">Hoeveel musea is écht teveel voor vier dagen Parijs?</div>
+      <div class="poll-options" id="poll-musea">
+        <div class="poll-opt" onclick="vote('musea',0,this)">
+          <div class="poll-opt-bar" style="width:25%"></div>
+          <span class="poll-opt-text">Nul. We zijn niet op schoolreis.</span>
+          <span class="poll-opt-pct">25%</span>
+        </div>
+        <div class="poll-opt" onclick="vote('musea',1,this)">
+          <div class="poll-opt-bar" style="width:50%"></div>
+          <span class="poll-opt-text">Eén, mits er een café aan vast zit</span>
+          <span class="poll-opt-pct">50%</span>
+        </div>
+        <div class="poll-opt" onclick="vote('musea',2,this)">
+          <div class="poll-opt-bar" style="width:25%"></div>
+          <span class="poll-opt-text">Twee, als we er vroeg weg kunnen</span>
+          <span class="poll-opt-pct">25%</span>
+        </div>
+        <div class="poll-opt" onclick="vote('musea',3,this)">
+          <div class="poll-opt-bar" style="width:0%"></div>
+          <span class="poll-opt-text">Drie of meer. Karin wil naar Orsay.</span>
+          <span class="poll-opt-pct">0%</span>
+        </div>
+      </div>
+      <p class="poll-meta">3 van 4 stemmen uitgebracht</p>
+    </div>
+  </div>
+
+  <!-- Reisinfo hub -->
+  <p class="section-label">Reisinfo <span style="color:var(--vert);font-size:9px;">🔒 alleen jullie vier</span></p>
+  <div class="card">
+    <div class="card-pad">
+      <div class="info-item">
+        <div class="info-icon">🏠</div>
+        <div class="info-body">
+          <div class="info-label">Airbnb adres</div>
+          <div class="info-value">12 Rue de Bretagne, Marais</div>
+          <div class="info-sub">Toegevoegd door Karin · 3 dagen geleden</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">🚄</div>
+        <div class="info-body">
+          <div class="info-label">Thalys heen</div>
+          <div class="info-value">THA 9421 · spoor 12 · 09:56</div>
+          <div class="info-sub">Rijtuig 11 · plaatsen 34–37</div>
+        </div>
+        <div class="info-lock">🔒 privé</div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">🚄</div>
+        <div class="info-body">
+          <div class="info-label">Thalys terug</div>
+          <div class="info-value">THA 9434 · <span style="color:var(--terra)">nog toevoegen</span></div>
+          <div class="info-sub">Wie heeft het ticket?</div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="showToast('Ticket toevoegen — binnenkort beschikbaar')">+ add</button>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">📋</div>
+        <div class="info-body">
+          <div class="info-label">Noodnummer Parijs</div>
+          <div class="info-value">+33 1 47 34 66 66</div>
+          <div class="info-sub">Politie: 17 · Ambulance: 15</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:0 18px 14px;">
+      <div class="upload-zone" onclick="showToast('Upload via de app zodra de trip nadert')">
+        <div class="upload-icon">🎟️</div>
+        <p><strong>Treincode / barcode uploaden</strong><br>Foto of scan van je ticket</p>
+        <div class="lock-badge">🔒 alleen zichtbaar voor de groep</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inpaklijst -->
+  <p class="section-label">Inpakken</p>
+  <div class="card">
+    <div class="card-pad" id="packlist">
+      <div class="pack-item">
+        <div class="pack-check checked" onclick="togglePack(this)">
+          <svg viewBox="0 0 12 12"><polyline points="1.5,6 5,9.5 10.5,2"/></svg>
+        </div>
+        <div class="pack-text">
+          <div class="pack-label">Dé outfit waar je je echt mooi in voelt</div>
+          <div class="pack-note">Niet de veilige. De echte.</div>
+        </div>
+      </div>
+      <div class="pack-item">
+        <div class="pack-check" onclick="togglePack(this)">
+          <svg viewBox="0 0 12 12"><polyline points="1.5,6 5,9.5 10.5,2"/></svg>
+        </div>
+        <div class="pack-text">
+          <div class="pack-label">Comfortabele schoenen</div>
+          <div class="pack-note">Je loopt 18.000 stappen per dag. Echt.</div>
+        </div>
+      </div>
+      <div class="pack-item">
+        <div class="pack-check" onclick="togglePack(this)">
+          <svg viewBox="0 0 12 12"><polyline points="1.5,6 5,9.5 10.5,2"/></svg>
+        </div>
+        <div class="pack-text">
+          <div class="pack-label">Powerbank — voor Karin</div>
+          <div class="pack-note">Karin vergeet dit altijd. Karin weet dat ze dit vergeet.</div>
+        </div>
+      </div>
+      <div class="pack-item">
+        <div class="pack-check checked" onclick="togglePack(this)">
+          <svg viewBox="0 0 12 12"><polyline points="1.5,6 5,9.5 10.5,2"/></svg>
+        </div>
+        <div class="pack-text">
+          <div class="pack-label">Reisverzekering check</div>
+          <div class="pack-note">Alle vier gecheckt ✓</div>
+        </div>
+      </div>
+      <div class="pack-item">
+        <div class="pack-check" onclick="togglePack(this)">
+          <svg viewBox="0 0 12 12"><polyline points="1.5,6 5,9.5 10.5,2"/></svg>
+        </div>
+        <div class="pack-text">
+          <div class="pack-label">Klein geldkaartje los</div>
+          <div class="pack-note">Want Franse markten zijn soms kontant only.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:8px;"></div>
+</div><!-- /sec-voorpret -->
+
+
+<!-- ══════════════════════════════════════════
+     SECTIE 2: SWIPE
+══════════════════════════════════════════════ -->
+<div class="section" id="sec-swipe">
+  <div class="swipe-header">
+    <h2>Wat willen jullie?</h2>
+    <p>Swipe rechts op wat je wil doen. DROOM = verlanglijst.</p>
+  </div>
+  <div class="swipe-moment-tabs">
+    <button class="moment-tab active" onclick="setMoment('ontbijt',this)">Ontbijt</button>
+    <button class="moment-tab" onclick="setMoment('ochtend',this)">Ochtend</button>
+    <button class="moment-tab" onclick="setMoment('lunch',this)">Lunch</button>
+    <button class="moment-tab" onclick="setMoment('middag',this)">Middag</button>
+    <button class="moment-tab" onclick="setMoment('borrel',this)">Borrel</button>
+    <button class="moment-tab" onclick="setMoment('diner',this)">Diner</button>
+    <button class="moment-tab" onclick="setMoment('avond',this)">Avond</button>
+  </div>
+
+  <div class="swipe-arena" id="swipe-arena">
+    <!-- Cards worden door JS gegenereerd -->
+  </div>
+
+  <div class="swipe-buttons">
+    <button class="swipe-btn nee" onclick="swipeCard('left')" title="Niet voor mij">
+      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <button class="swipe-btn droom" onclick="swipeCard('up')" title="DROOM!">⭐</button>
+    <button class="swipe-btn ja" onclick="swipeCard('right')" title="Wil ik!">
+      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+    </button>
+  </div>
+</div><!-- /sec-swipe -->
+
+
+<!-- ══════════════════════════════════════════
+     SECTIE 3: GROEP
+══════════════════════════════════════════════ -->
+<div class="section" id="sec-groep">
+  <div class="groep-header">
+    <h2>La Groupe</h2>
+    <p>Matches, polls en de planning tot nu toe</p>
+  </div>
+
+  <p class="section-label">Matches 🎉</p>
+  <div class="card matches-list">
+    <div class="match-item">
+      <div class="match-img" style="background-image:url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=200&q=80')"></div>
+      <div class="match-info">
+        <div class="match-moment">Diner · vr</div>
+        <div class="match-name">Café de Flore</div>
+        <div class="match-meta">Saint-Germain · €€ · Alle vier!</div>
+      </div>
+      <div class="match-check"><svg viewBox="0 0 24 24" fill="none"><polyline points="20,6 9,17 4,12"/></svg></div>
+    </div>
+    <div class="match-item">
+      <div class="match-img" style="background-image:url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&q=80')"></div>
+      <div class="match-info">
+        <div class="match-moment">Lunch · za</div>
+        <div class="match-name">Marché des Enfants Rouges</div>
+        <div class="match-meta">Le Marais · € · 3/4</div>
+      </div>
+      <div class="match-check"><svg viewBox="0 0 24 24" fill="none"><polyline points="20,6 9,17 4,12"/></svg></div>
+    </div>
+    <div class="match-item">
+      <div class="match-img" style="background-image:url('https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=200&q=80')"></div>
+      <div class="match-info">
+        <div class="match-moment">Ochtend · za</div>
+        <div class="match-name">Wandelroute Montmartre</div>
+        <div class="match-meta">Montmartre · gratis · 4/4</div>
+      </div>
+      <div class="match-check"><svg viewBox="0 0 24 24" fill="none"><polyline points="20,6 9,17 4,12"/></svg></div>
+    </div>
+  </div>
+
+  <!-- Wie beslist spel -->
+  <p class="section-label">Wie beslist? 🎲</p>
+  <div class="spel-grid">
+    <div class="spel-card" onclick="openQuiz()">
+      <div class="spel-icon">🗼</div>
+      <div class="spel-name">Parijs Quiz</div>
+      <div class="spel-meta">10 vragen · 3 min</div>
+    </div>
+    <div class="spel-card" onclick="showToast('Wie van ons — binnenkort!')">
+      <div class="spel-icon">🤔</div>
+      <div class="spel-name">Wie van ons…?</div>
+      <div class="spel-meta">Multiplayer · 5 min</div>
+    </div>
+    <div class="spel-card" onclick="showToast('Emoji raden — binnenkort!')">
+      <div class="spel-icon">🎭</div>
+      <div class="spel-name">Emoji raden</div>
+      <div class="spel-meta">Snel · 2 min</div>
+    </div>
+    <div class="spel-card" onclick="openTreinModal()">
+      <div class="spel-icon">🚄</div>
+      <div class="spel-name">Trein-modus</div>
+      <div class="spel-meta">Gesprekskaarten</div>
+    </div>
+  </div>
+
+  <!-- Open poll -->
+  <p class="section-label">Nieuws uit de groep</p>
+  <div class="card">
+    <div class="card-pad poll-card">
+      <div class="poll-q">Welke wijnbar vrijdagavond?</div>
+      <div class="poll-options">
+        <div class="poll-opt" onclick="vote2(this,'Clown Bar')">
+          <div class="poll-opt-bar" style="width:50%"></div>
+          <span class="poll-opt-text">Clown Bar — Oberkampf</span>
+          <span class="poll-opt-pct">50%</span>
+        </div>
+        <div class="poll-opt" onclick="vote2(this,'Septime Cave')">
+          <div class="poll-opt-bar" style="width:25%"></div>
+          <span class="poll-opt-text">Septime Cave — Bastille</span>
+          <span class="poll-opt-pct">25%</span>
+        </div>
+        <div class="poll-opt" onclick="vote2(this,'Au Passage')">
+          <div class="poll-opt-bar" style="width:25%"></div>
+          <span class="poll-opt-text">Au Passage — République</span>
+          <span class="poll-opt-pct">25%</span>
+        </div>
+      </div>
+      <p class="poll-meta">2 van 4 stemmen · sluit in 24u</p>
+    </div>
+  </div>
+
+  <div style="height:8px;"></div>
+</div><!-- /sec-groep -->
+
+
+<!-- ══════════════════════════════════════════
+     SECTIE 4: MIJ
+══════════════════════════════════════════════ -->
+<div class="section" id="sec-mij">
+  <div class="mij-header">
+    <div class="profile-avatar-big" style="background:var(--terra)">J</div>
+    <h2>Joke</h2>
+    <p>7 dagen streak 🔥 · 23 swipes · 4 polls beantwoord</p>
+  </div>
+
+  <p class="section-label">Badges</p>
+  <div class="badges-row">
+    <div class="badge earned">
+      <div class="badge-icon">🗺️</div>
+      <div class="badge-name">Verkenner</div>
+    </div>
+    <div class="badge earned">
+      <div class="badge-icon">🔥</div>
+      <div class="badge-name">Week streak</div>
+    </div>
+    <div class="badge locked">
+      <div class="badge-icon">📸</div>
+      <div class="badge-name">Fotograaf</div>
+    </div>
+    <div class="badge locked">
+      <div class="badge-icon">🍷</div>
+      <div class="badge-name">Wijnadviseur</div>
+    </div>
+    <div class="badge locked">
+      <div class="badge-icon">👑</div>
+      <div class="badge-name">Beslisser</div>
+    </div>
+  </div>
+
+  <p class="section-label">Mijn voorkeuren</p>
+  <div class="card">
+    <div class="card-pad">
+      <div class="pref-row">
+        <span class="pref-label">Budget per dag</span>
+        <span class="pref-val">€€ · Middenweg</span>
+      </div>
+      <div class="pref-row">
+        <span class="pref-label">Energielevel</span>
+        <span class="pref-val">Hoog — laat me lopen</span>
+      </div>
+      <div class="pref-row">
+        <span class="pref-label">Eten</span>
+        <span class="pref-val">Geen restrictions</span>
+      </div>
+      <div class="pref-row">
+        <span class="pref-label">Must-do</span>
+        <span class="pref-val">Markten, terrassen, winkelen</span>
+      </div>
+      <div class="pref-row">
+        <span class="pref-label">No-go</span>
+        <span class="pref-val">Eiffel toren in de rij</span>
+      </div>
+      <div class="pref-row">
+        <span class="pref-label">Meldingen</span>
+        <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+      </div>
+    </div>
+  </div>
+
+  <p class="section-label">Eigen suggestie toevoegen</p>
+  <div class="card" style="margin:0 16px 12px;">
+    <div class="card-pad">
+      <p style="font-size:13px;color:var(--gris);margin-bottom:12px;">Heb jij een plek gevonden die de groep moet zien? Voeg 'm toe aan de swipe-stack.</p>
+      <button class="btn btn-primary" style="width:100%" onclick="showToast('Suggestie toevoegen — binnenkort beschikbaar')">+ Voeg mijn tip toe</button>
+    </div>
+  </div>
+
+  <div style="height:8px;"></div>
+</div><!-- /sec-mij -->
+
+
+<!-- ══════════════════════════════════════════
+     BOTTOM NAV
+══════════════════════════════════════════════ -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="showSection('voorpret',this)" id="nav-voorpret">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>
+    Voorpret
+  </button>
+  <button class="nav-item has-notif" onclick="showSection('swipe',this)" id="nav-swipe">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
+    Swipe
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-item" onclick="showSection('groep',this)" id="nav-groep">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+    Groep
+  </button>
+  <button class="nav-item" onclick="showSection('mij',this)" id="nav-mij">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+    Mij
+  </button>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     MATCH OVERLAY
+══════════════════════════════════════════════ -->
+<div class="match-overlay" id="match-overlay" onclick="closeMatch()">
+  <div class="confetti-container" id="confetti"></div>
+  <div class="match-badge">🎉</div>
+  <h2>C'est un match!</h2>
+  <p id="match-text">Alle vier willen dit. Dit gaat op de planning!</p>
+  <button class="btn btn-primary" onclick="closeMatch()">Fantastique!</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     QUIZ MODAL
+══════════════════════════════════════════════ -->
+<div class="modal" id="quiz-modal" onclick="closeModalOutside(event,'quiz-modal')">
+  <div class="modal-sheet" onclick="e=>e.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-inner">
+      <h3>Parijs Quiz 🗼</h3>
+      <p style="font-size:13px;color:var(--gris);">Wie het hoogst scoort beslist vanavond waar we eten.</p>
+      <div id="quiz-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TREIN MODAL
+══════════════════════════════════════════════ -->
+<div class="modal" id="trein-modal" onclick="closeModalOutside(event,'trein-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-inner">
+      <h3>Trein-modus 🚄</h3>
+      <p style="font-size:13px;color:var(--gris);margin-bottom:20px;">Gesprekskaarten voor onderweg. Trek er eentje.</p>
+      <div id="trein-kaart" style="background:var(--vert);border-radius:16px;padding:28px 24px;text-align:center;cursor:pointer;" onclick="trekKaart()">
+        <div style="font-size:36px;margin-bottom:12px;">🃏</div>
+        <p style="font-family:var(--serif);font-size:18px;font-weight:600;color:#fff;line-height:1.4;" id="trein-vraag">Tik om een kaart te trekken</p>
+        <p style="font-size:12px;color:rgba(255,255,255,.5);margin-top:10px;">Tik voor een nieuwe kaart</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+
+<script>
+// ── DATA ──────────────────────────────────────
+const VERTREK = new Date('2025-06-20T09:56:00');
+
+const REELS = {
+  ontbijt:[
+    {id:1,titel:'Du Pain et des Idées',wijk:'Canal Saint-Martin',prijs:'€',sfeer:'Boulangerie',uur:'15 min',img:'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80',tekst:'De mooiste boulangerie van Parijs. Kom vroeg want de escargots pistache zijn om 9u al weg.',votes:['K','E','M']},
+    {id:2,titel:'Café de la Paix',wijk:'Opéra',prijs:'€€€',sfeer:'Grand Café',uur:'1u',img:'https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=600&q=80',tekst:'Belle Époque interieur. Je bestelt croissants en betaalt eigenlijk voor de ervaring.',votes:['J']},
+    {id:3,titel:'Ten Belles',wijk:'Canal Saint-Martin',prijs:'€',sfeer:'Specialty Coffee',uur:'30 min',img:'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80',tekst:'Beste koffie van Parijs zeggen de kenners. Klein, vol, helemaal het gevoel.',votes:['J','E']},
+  ],
+  ochtend:[
+    {id:4,titel:'Wandelroute Le Marais',wijk:'Le Marais',prijs:'Gratis',sfeer:'Wandelen',uur:'2u',img:'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80',tekst:'Van Place des Vosges langs de galeries naar de joodse wijk. Time to Momo route 3.',votes:['J','K','E','M']},
+    {id:5,titel:'Musée d\'Orsay',wijk:'Saint-Germain',prijs:'€€',sfeer:'Museum',uur:'2-3u',img:'https://images.unsplash.com/photo-1541479168-5f7fd8dce5d8?w=600&q=80',tekst:'Vroeg gaan = geen rij. De impressionisten-zalen zijn ongelooflijk.',votes:['K']},
+    {id:6,titel:'Père Lachaise',wijk:'20e arrondissement',prijs:'Gratis',sfeer:'Kerkhof / wandelen',uur:'1.5u',img:'https://images.unsplash.com/photo-1519181245277-cffeb31da2e3?w=600&q=80',tekst:'Ja echt. Het mooiste kerkhof ter wereld. Jim Morrison, Édith Piaf, Proust.',votes:['J','E']},
+  ],
+  lunch:[
+    {id:7,titel:'Marché des Enfants Rouges',wijk:'Le Marais',prijs:'€',sfeer:'Markt',uur:'1u',img:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80',tekst:'Oudste overdekte markt van Parijs (1615). Libanese kraam is fenomenaal.',votes:['J','K','M']},
+    {id:8,titel:'Septime',wijk:'Bastille',prijs:'€€€',sfeer:'Bistronomie',uur:'2u',img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80',tekst:'Op 1 in Parijs voor een reden. Reserveer ver van tevoren.',votes:['M']},
+    {id:9,titel:'Frenchie Bar à Vins',wijk:'Montorgueil',prijs:'€€',sfeer:'Wine bar / lunch',uur:'1.5u',img:'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=80',tekst:'Klein, rumoerig, heerlijk. De bordeaux-plank is bijzonder.',votes:['J','E']},
+  ],
+  middag:[],borrel:[],diner:[
+    {id:10,titel:'Café de Flore',wijk:'Saint-Germain',prijs:'€€€',sfeer:'Brasserie / icoon',uur:'2u',img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80',tekst:'Sartre en Beauvoir kwamen hier. Jij ook. Onvermijdelijk, terecht.',votes:['J','K','E','M']},
+  ],avond:[]
+};
+
+const QUIZ_DATA = [
+  {v:'In welk arrondissement staat de Eiffeltoren?',opties:['7e','6e','15e','1e'],goed:0},
+  {v:'Wie ontwierp de Eiffeltoren?',opties:['Gustave Eiffel','Haussmann','Le Corbusier','Viollet-le-Duc'],goed:0},
+  {v:'Wat is de bijnaam van Montmartre?',opties:['La Butte','La Colline','Le Plateau','La Haute'],goed:0},
+  {v:'Hoeveel arrondissementen heeft Parijs?',opties:['20','18','24','16'],goed:0},
+  {v:'Welke markt is de oudste overdekte markt van Parijs?',opties:['Marché des Enfants Rouges','Marché d\'Aligre','Marché Bastille','Marché Monge'],goed:0},
+];
+
+const TREIN_KAARTEN = [
+  'Wat is het moment dat je het meest naar uitkijkt — en wil je dat al hardop zeggen?',
+  'Welke vriendin in deze coupé heeft de meest onderschatte reis-hack?',
+  'Als je één dag in Parijs alleen mocht zijn, zonder de groep — wat doe je?',
+  'Wat is iets wat jij in Parijs wil proberen wat je thuis nooit zou doen?',
+  'Als het verkeerd gaat: wie regelt de oplossing? Wie staat erom te lachen?',
+  'Vertel iets over jou dat de rest misschien niet weet. Mag ook een beetje ondeugend zijn.',
+  'Wat zou jouw ideale Parijse vrouw-avond eruitzien? (Geen compromis, geen groep.)',
+  'Wat is je grootste geheim ten opzichte van de Eiffeltoren? (Eerlijk!)',
+  'Beste reis-geheugen ooit. Los van Parijs. Go.',
+  'Wat verwacht je van deze trip dat je thuis nooit hebt gezegd?',
+];
+
+// ── STATE ─────────────────────────────────────
+let currentSection = 'voorpret';
+let currentMoment = 'ontbijt';
+let swipeStack = [];
+let swipeIndex = 0;
+let quizIndex = 0;
+let quizScore = 0;
+let isDragging = false;
+let startX = 0, startY = 0, currentX = 0;
+
+// ── NAV ───────────────────────────────────────
+function showSection(name, btn) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='swipe') loadSwipeCards();
+}
+
+// ── COUNTDOWN ─────────────────────────────────
+function updateCountdown() {
+  const now = new Date();
+  const diff = VERTREK - now;
+  if(diff <= 0){
+    document.getElementById('cd-days').textContent='00';
+    document.getElementById('cd-hours').textContent='00';
+    document.getElementById('cd-mins').textContent='00';
+    document.getElementById('cd-days-big').textContent='0';
+    return;
+  }
+  const d = Math.floor(diff/86400000);
+  const h = Math.floor((diff%86400000)/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  document.getElementById('cd-days').textContent=String(d).padStart(2,'0');
+  document.getElementById('cd-hours').textContent=String(h).padStart(2,'0');
+  document.getElementById('cd-mins').textContent=String(m).padStart(2,'0');
+  document.getElementById('cd-days-big').textContent=d;
+}
+updateCountdown();
+setInterval(updateCountdown,30000);
+
+// ── MISSIE ────────────────────────────────────
+function completeMissie(){
+  showToast('Verstuurde! 🎉 +10 streak punten');
+}
+
+// ── PACK LIST ─────────────────────────────────
+function togglePack(el){
+  el.classList.toggle('checked');
+}
+
+// ── POLLS ─────────────────────────────────────
+function vote(pollId, idx, el){
+  const container = el.closest('.poll-options');
+  container.querySelectorAll('.poll-opt').forEach(o=>o.classList.remove('voted'));
+  el.classList.add('voted');
+  showToast('Stem uitgebracht ✓');
+}
+function vote2(el, naam){
+  const container = el.closest('.poll-options');
+  container.querySelectorAll('.poll-opt').forEach(o=>o.classList.remove('voted'));
+  el.classList.add('voted');
+  showToast(`Gestemd op ${naam} ✓`);
+}
+
+// ── SWIPE ─────────────────────────────────────
+function setMoment(m, btn){
+  currentMoment = m;
+  document.querySelectorAll('.moment-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  swipeIndex = 0;
+  loadSwipeCards();
+}
+
+function loadSwipeCards(){
+  const arena = document.getElementById('swipe-arena');
+  const data = REELS[currentMoment] || [];
+  swipeStack = [...data];
+  swipeIndex = 0;
+  renderSwipeStack();
+}
+
+function renderSwipeStack(){
+  const arena = document.getElementById('swipe-arena');
+  arena.innerHTML='';
+  if(swipeStack.length === 0){
+    arena.innerHTML=`<div class="empty-state"><div class="emoji">✨</div><h3>Alles geswiped!</h3><p>Kies een ander moment hierboven of wacht op nieuwe suggesties.</p></div>`;
+    return;
+  }
+  const show = swipeStack.slice(0,3);
+  show.reverse().forEach((item,i)=>{
+    const card = createSwipeCard(item, show.length-1-i);
+    arena.appendChild(card);
+  });
+  const top = arena.querySelector('.swipe-card:last-child');
+  if(top) attachSwipeGestures(top);
+}
+
+function createSwipeCard(item, stackPos){
+  const cls = ['','card-2','card-3'][stackPos]||'card-3';
+  const voteHTML = item.votes.map(v=>`<div class="vote-av" style="background:${avatarColor(v)}">${v}</div>`).join('');
+  const d = document.createElement('div');
+  d.className=`swipe-card ${cls}`;
+  d.dataset.id=item.id;
+  d.innerHTML=`
+    <div class="swipe-card-img" style="background-image:url('${item.img}')">
+      <div class="swipe-overlay">
+        <div class="swipe-tags">
+          <span class="swipe-tag">${item.sfeer}</span>
+          <span class="swipe-tag">${item.uur}</span>
+          <span class="swipe-tag prix">${item.prijs}</span>
+        </div>
+      </div>
+    </div>
+    <div class="swipe-card-body">
+      <div class="wijk">${item.wijk}</div>
+      <h3>${item.titel}</h3>
+      <p>${item.tekst}</p>
+    </div>
+    <div class="swipe-group-votes">
+      <div class="vote-pile">${voteHTML}</div>
+      <span class="vote-text">${item.votes.length > 0 ? item.votes.join(', ')+' wil${item.votes.length===1?'':'len'} dit ook' : 'Wees de eerste!'}</span>
+    </div>`;
+  return d;
+}
+
+function avatarColor(initial){
+  const map={'J':'#C4614A','K':'#D4A037','E':'#6B4C3B','M':'#2D4A3E'};
+  return map[initial]||'#888';
+}
+
+function attachSwipeGestures(card){
+  card.addEventListener('pointerdown', onDown);
+}
+
+function onDown(e){
+  isDragging=true;
+  startX=e.clientX; startY=e.clientY; currentX=0;
+  const card = e.currentTarget;
+  card.setPointerCapture(e.pointerId);
+  card.addEventListener('pointermove', onMove);
+  card.addEventListener('pointerup', onUp);
+}
+function onMove(e){
+  if(!isDragging) return;
+  currentX = e.clientX - startX;
+  const currentY = e.clientY - startY;
+  const rot = currentX * 0.08;
+  e.currentTarget.style.transform=`translateX(${currentX}px) translateY(${currentY*0.3}px) rotate(${rot}deg)`;
+  // show hints
+  const arena = document.getElementById('swipe-arena');
+  // visual threshold
+}
+function onUp(e){
+  if(!isDragging) return;
+  isDragging=false;
+  const card = e.currentTarget;
+  card.removeEventListener('pointermove', onMove);
+  card.removeEventListener('pointerup', onUp);
+  if(currentX > 80) swipeCard('right', card);
+  else if(currentX < -80) swipeCard('left', card);
+  else { card.style.transform=''; card.style.transition='transform .3s'; setTimeout(()=>card.style.transition='',300); }
+}
+
+function swipeCard(dir, card){
+  const arena = document.getElementById('swipe-arena');
+  const top = card || arena.querySelector('.swipe-card:last-child');
+  if(!top||swipeStack.length===0) return;
+  const item = swipeStack[0];
+  let tx='';
+  if(dir==='right'){tx='translateX(120vw) rotate(20deg)';showToast('Wil ik! ✓');}
+  else if(dir==='left'){tx='translateX(-120vw) rotate(-20deg)';showToast('Niet voor mij');}
+  else{tx='translateY(-120vh)';showToast('⭐ Droom!');}
+  top.style.transition='transform .35s cubic-bezier(.25,.46,.45,.94)';
+  top.style.transform=tx;
+  setTimeout(()=>{
+    swipeStack.shift();
+    // random match simulation
+    if(dir==='right' && Math.random()>.5 && swipeStack.length<3) triggerMatch(item);
+    else renderSwipeStack();
+  },350);
+}
+
+function triggerMatch(item){
+  document.getElementById('match-text').textContent=`Alle vier willen "${item.titel}". Dit gaat op de planning!`;
+  document.getElementById('match-overlay').classList.add('show');
+  spawnConfetti();
+}
+function closeMatch(){
+  document.getElementById('match-overlay').classList.remove('show');
+  document.getElementById('confetti').innerHTML='';
+  renderSwipeStack();
+}
+
+function spawnConfetti(){
+  const c = document.getElementById('confetti');
+  const colors=['#C4614A','#D4A037','#E8C5B5','#2D4A3E','#fff'];
+  for(let i=0;i<60;i++){
+    const p=document.createElement('div');
+    p.className='confetti-piece';
+    p.style.cssText=`left:${Math.random()*100}vw;top:-20px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};animation-delay:${Math.random()*1.5}s;animation-duration:${2+Math.random()*2}s;width:${4+Math.random()*8}px;height:${4+Math.random()*8}px;`;
+    c.appendChild(p);
+  }
+}
+
+// ── QUIZ ──────────────────────────────────────
+function openQuiz(){
+  quizIndex=0; quizScore=0;
+  document.getElementById('quiz-modal').classList.add('show');
+  renderQuiz();
+}
+function renderQuiz(){
+  const c = document.getElementById('quiz-content');
+  if(quizIndex>=QUIZ_DATA.length){
+    c.innerHTML=`<div class="quiz-score"><div class="score-num">${quizScore}/${QUIZ_DATA.length}</div><p>${quizScore>=4?'Echt een Parijs-kenner 🏆':'Lekker geprobeerd — meer dan genoeg voor een wijnbar! 🍷'}</p></div><button class="btn btn-primary" style="width:100%;margin-top:20px" onclick="document.getElementById('quiz-modal').classList.remove('show')">Sluiten</button>`;
+    return;
+  }
+  const q=QUIZ_DATA[quizIndex];
+  c.innerHTML=`<div class="quiz-q">Vraag ${quizIndex+1}/${QUIZ_DATA.length}: ${q.v}</div><div class="quiz-options">${q.opties.map((o,i)=>`<button class="quiz-opt" onclick="answerQuiz(${i},this)">${o}</button>`).join('')}</div>`;
+}
+function answerQuiz(idx, btn){
+  const q=QUIZ_DATA[quizIndex];
+  document.querySelectorAll('.quiz-opt').forEach(b=>b.disabled=true);
+  if(idx===q.goed){btn.classList.add('correct');quizScore++;}
+  else{btn.classList.add('wrong');document.querySelectorAll('.quiz-opt')[q.goed].classList.add('correct');}
+  setTimeout(()=>{quizIndex++;renderQuiz();},900);
+}
+
+// ── TREIN MODAL ───────────────────────────────
+function openTreinModal(){
+  document.getElementById('trein-modal').classList.add('show');
+  document.getElementById('trein-vraag').textContent='Tik om een kaart te trekken';
+}
+function trekKaart(){
+  const r=TREIN_KAARTEN[Math.floor(Math.random()*TREIN_KAARTEN.length)];
+  document.getElementById('trein-vraag').textContent=r;
+}
+
+// ── MODALS ────────────────────────────────────
+function closeModalOutside(e, id){
+  if(e.target===document.getElementById(id)) document.getElementById(id).classList.remove('show');
+}
+
+// ── VRIENDIN ──────────────────────────────────
+function selectVriendin(name){
+  showToast(`${name.charAt(0).toUpperCase()+name.slice(1)}'s profiel — binnenkort`);
+}
+
+// ── TOAST ─────────────────────────────────────
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ── INIT ──────────────────────────────────────
+loadSwipeCards();
+</script>
+</body>
+</html>
