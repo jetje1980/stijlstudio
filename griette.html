@@ -593,15 +593,6 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
   <p class="panel-sub">Sla outfits op per gelegenheid. Tik + om een nieuwe look te starten.</p>
   <div id="boards-sync-status" style="font-size:10px;color:var(--muted);margin-bottom:8px;"></div>
 
-  <button type="button" onclick="openStijlVerkenner()" style="width:100%;padding:13px 16px;background:var(--brown);color:var(--cream);border:none;border-radius:14px;font-size:12px;font-family:'Jost',sans-serif;cursor:pointer;display:flex;align-items:center;gap:10px;margin-bottom:14px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;">
-    <span style="font-size:20px;flex-shrink:0;">📌</span>
-    <div style="flex:1;text-align:left;">
-      <div style="font-weight:500;letter-spacing:0.3px;">Moodboard Maker</div>
-      <div style="font-size:10px;opacity:0.7;margin-top:1px;">upload Pinterest-inspo · ik maak een look uit jouw kast</div>
-    </div>
-    <span style="opacity:0.7;">›</span>
-  </button>
-
   <div class="board-selector" id="board-selector"></div>
   <div id="boards-container"></div>
 </div>
@@ -1991,11 +1982,11 @@ function buildBoards() {
     }; })(b.id));
 
     var inspoBtn = document.createElement('button');
-    inspoBtn.style.cssText = 'padding:8px 10px;background:transparent;border:1.5px solid var(--cream-dark);border-radius:20px;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:var(--muted);white-space:nowrap;touch-action:manipulation;';
+    inspoBtn.style.cssText = 'padding:8px 10px;background:var(--brown);color:var(--cream);border:none;border-radius:20px;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;white-space:nowrap;touch-action:manipulation;';
     var inspoCount = 0;
     try { var biData = JSON.parse(localStorage.getItem('griette-bi-' + b.id) || '{}'); inspoCount = (biData.photos || []).length; } catch(e) {}
-    inspoBtn.textContent = '\uD83D\uDCCC Inspo' + (inspoCount > 0 ? ' (' + inspoCount + ')' : '');
-    inspoBtn.title = 'Pinterest-inspiratie voor dit board';
+    inspoBtn.textContent = '\uD83D\uDCCC Moodboard' + (inspoCount > 0 ? ' (' + inspoCount + ')' : '');
+    inspoBtn.title = 'Moodboard Maker \u00B7 upload inspo \u00B7 ik stel 3 outfits voor';
     inspoBtn.addEventListener('click', (function(bid){ return function(){ openBoardInspo(bid); }; })(b.id));
 
     var btnGroup = document.createElement('div');
@@ -11526,7 +11517,7 @@ function openBoardInspo(boardId) {
   var hdr = document.createElement('div');
   hdr.className = 'bi-hdr';
   hdr.innerHTML = '<button class="bi-back" id="bi-back-btn">←</button>'
-    + '<div class="bi-ttl">📌 ' + board.label + ' · Inspo</div>'
+    + '<div class="bi-ttl">📌 Moodboard · ' + board.label + '</div>'
     + '<div style="width:36px;"></div>';
   ov.appendChild(hdr);
 
@@ -11562,7 +11553,7 @@ function _biRenderBody(boardId) {
   // Intro text
   var intro = document.createElement('div');
   intro.style.cssText = 'font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:14px;';
-  intro.textContent = 'Upload Pinterest-screenshots of andere inspo als basis voor dit board. Ik analyseer jouw stijl en stel een look voor uit je kast.';
+  intro.textContent = 'Upload Pinterest-screenshots of andere inspo. Ik analyseer de stijl en stel 3 verschillende outfits voor uit jouw kast.';
   body.appendChild(intro);
 
   // Photo grid
@@ -11617,7 +11608,7 @@ function _biRenderBody(boardId) {
   if (board.inspo.length > 0) {
     var analyzeBtn = document.createElement('button');
     analyzeBtn.className = 'bi-analyze-btn';
-    analyzeBtn.textContent = '✦ Analyseer moodboard · maak een look';
+    analyzeBtn.textContent = '✦ Maak 3 looks van deze inspo';
     analyzeBtn.addEventListener('click', function() { analyzeBoardInspo(boardId); });
     body.appendChild(analyzeBtn);
   }
@@ -11661,7 +11652,7 @@ async function analyzeBoardInspo(boardId) {
   var contentParts = [
     {
       type: 'text',
-      text: 'Je bent een persoonlijke stylist. Analyseer deze ' + photos.length + ' Pinterest-inspiratiefoto\'s voor het board "' + board.label + '".\n\nGriette\'s garderobe (selectie): ' + wardrobeSummary + '\n\nGeef:\n1. Stijlwoorden: 3-5 kernwoorden die de moodboard-stijl beschrijven\n2. Look: stel 1 concrete outfit voor met items uit de garderobe (noem exact de itemnamen)\n3. Kleurpalet: welke 2-3 kleuren passen bij deze moodboard\n4. Tip: 1 concrete stijltip voor Griette gebaseerd op deze inspo\n\nAntwoord in het Nederlands. Gebruik exact JSON:\n{"stijlwoorden":["..."],"look":{"beschrijving":"...","items":["exacte naam",...]},"kleuren":["..."],"tip":"..."}'
+      text: 'Je bent Griette\'s persoonlijke stylist. Analyseer deze ' + photos.length + ' Pinterest-inspiratiefoto\'s voor het board "' + board.label + '".\n\nGriette\'s garderobe (selectie): ' + wardrobeSummary + '\n\nStel 3 VERSCHILLENDE outfit-combinaties voor. Elke look moet een andere sfeer of aanpak hebben (bijv. casual, gekleed, of een andere kleuraccent). Gebruik items uit haar garderobe.\n\nAntwoord in het Nederlands. Gebruik exact JSON:\n{"stijlwoorden":["..."],"kleuren":["..."],"looks":[{"naam":"Look 1","sfeer":"casual","beschrijving":"...","items":["exacte naam",...]},{"naam":"Look 2","sfeer":"gekleed","beschrijving":"...","items":["exacte naam",...]},{"naam":"Look 3","sfeer":"statement","beschrijving":"...","items":["exacte naam",...]}],"tip":"..."}'
     }
   ];
 
@@ -11680,7 +11671,7 @@ async function analyzeBoardInspo(boardId) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 600,
+        max_tokens: 1400,
         messages: [{ role: 'user', content: contentParts }]
       })
     });
@@ -11704,18 +11695,23 @@ async function analyzeBoardInspo(boardId) {
         html += '<div class="bi-result-card"><div class="bi-result-lbl">Kleurpalet</div>'
           + '<div class="bi-result-val">' + result.kleuren.join(' · ') + '</div></div>';
       }
-      if (result.look && result.look.beschrijving) {
-        html += '<div class="bi-result-card"><div class="bi-result-lbl">Outfit voor ' + board.label + '</div>'
-          + '<div class="bi-result-val">' + result.look.beschrijving + '</div>';
-        if (result.look.items && result.look.items.length) {
+      var looks = result.looks || (result.look ? [result.look] : []);
+      looks.forEach(function(look, i) {
+        var accent = i === 0 ? 'var(--brown)' : i === 1 ? '#7a5c3e' : '#a0876e';
+        html += '<div class="bi-result-card" style="border-left:3px solid ' + accent + ';">'
+          + '<div class="bi-result-lbl" style="color:' + accent + ';">'
+          + (look.naam || ('Look ' + (i + 1))) + (look.sfeer ? ' · ' + look.sfeer : '') + '</div>'
+          + '<div class="bi-result-val">' + (look.beschrijving || '') + '</div>';
+        var items = look.items || [];
+        if (items.length) {
           html += '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;">'
-            + result.look.items.map(function(nm){ return '<span style="font-size:10px;padding:3px 9px;background:rgba(46,26,14,0.08);border-radius:10px;color:var(--brown);">✦ ' + nm + '</span>'; }).join('')
+            + items.map(function(nm){ return '<span style="font-size:10px;padding:3px 9px;background:rgba(46,26,14,0.08);border-radius:10px;color:var(--brown);">✦ ' + nm + '</span>'; }).join('')
             + '</div>';
         }
         html += '</div>';
-      }
+      });
       if (result.tip) {
-        html += '<div class="bi-result-card"><div class="bi-result-lbl">Styling tip</div><div class="bi-result-val">→ ' + result.tip + '</div></div>';
+        html += '<div class="bi-result-card" style="background:var(--cream-dark);"><div class="bi-result-lbl">Styling tip</div><div class="bi-result-val">→ ' + result.tip + '</div></div>';
       }
     } else {
       html = '<div class="bi-result-card"><div class="bi-result-lbl">Analyse</div><div class="bi-result-val">' + raw.replace(/\n/g,'<br>') + '</div></div>';
@@ -11728,7 +11724,7 @@ async function analyzeBoardInspo(boardId) {
     resWrap.innerHTML = '<div class="bi-result-card" style="border-color:rgba(181,35,42,0.3);"><div class="bi-result-val" style="color:#b5232a;">Analyse mislukt. Controleer je verbinding en probeer opnieuw.</div></div>';
   } finally {
     var btn = document.querySelector('.bi-analyze-btn');
-    if (btn) { btn.disabled = false; btn.textContent = '✦ Opnieuw analyseren'; }
+    if (btn) { btn.disabled = false; btn.textContent = '✦ Opnieuw · 3 nieuwe looks'; }
   }
 }
 
