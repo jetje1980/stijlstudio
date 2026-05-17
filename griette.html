@@ -11912,7 +11912,7 @@ async function analyzeBoardInspo(boardId) {
   var contentParts = [
     {
       type: 'text',
-      text: 'Je bent Griette\'s persoonlijke stylist. Analyseer deze ' + inspoPhotos.length + ' Pinterest-inspiratiefoto\'s voor het board "' + board.label + '".\n\nGriette\'s garderobe:\n' + wardrobeSummary + '\n\n⚠️ BELANGRIJK: gebruik UITSLUITEND namen die letterlijk voorkomen in de bovenstaande garderobe-lijst. Verzin GEEN items die er niet in staan. Als een categorie ontbreekt, laat die weg.\n\nStel 3 VERSCHILLENDE outfit-combinaties voor. Elke look heeft een andere sfeer. Neem per look altijd ook een tas en accessoire(s) op uit de garderobe.\n\nAntwoord in het Nederlands. Gebruik exact JSON:\n{"stijlwoorden":["..."],"kleuren":["..."],"looks":[{"naam":"Look 1","sfeer":"casual","beschrijving":"2 zinnen","items":["exacte naam uit garderobe"]},{"naam":"Look 2","sfeer":"gekleed","beschrijving":"2 zinnen","items":["..."]},{"naam":"Look 3","sfeer":"statement","beschrijving":"2 zinnen","items":["..."]}],"tip":"..."}'
+      text: 'Je bent Griette\'s persoonlijke stylist (Iconic Wardrobe). Analyseer deze ' + inspoPhotos.length + ' Pinterest-inspiratiefoto\'s voor het board "' + board.label + '".\n\nGriette\'s stijl-DNA (kort): klassiek casual, krachtig, kleurrijk, vrouwelijk. Taille altijd benadrukken. Basiskleuren: donkerblauw, bruin, zwart, gebroken-wit. Accentkleuren: felroze, paars, geel, oranje-rood. Beste materiaalcombo: soepel + stevig.\n\nGriette\'s garderobe:\n' + wardrobeSummary + '\n\n⚠️ BELANGRIJK: gebruik UITSLUITEND namen die letterlijk voorkomen in de bovenstaande garderobe-lijst. Verzin GEEN items die er niet in staan.\n\nGeef:\n1. Een persoonlijke stijlanalyse: hoe sluiten deze moodboard-foto\'s aan bij Griette\'s DNA? Wat zegt deze inspo over haar stijlrichting voor dit board? Wees specifiek en persoonlijk (2-4 zinnen).\n2. 3 verschillende outfit-combinaties, elk met een andere sfeer. Neem per look een tas en accessoire(s) op.\n\nAntwoord in het Nederlands. Gebruik exact JSON:\n{"stijlwoorden":["..."],"kleuren":["..."],"analyse":"2-4 zinnen persoonlijke stijlanalyse","looks":[{"naam":"Look 1","sfeer":"casual","beschrijving":"2 zinnen","items":["exacte naam uit garderobe"]},{"naam":"Look 2","sfeer":"gekleed","beschrijving":"2 zinnen","items":["..."]},{"naam":"Look 3","sfeer":"statement","beschrijving":"2 zinnen","items":["..."]}],"tip":"..."}'
     }
   ];
 
@@ -11947,13 +11947,19 @@ async function analyzeBoardInspo(boardId) {
 
     var html = '';
     if (result) {
+      if (result.analyse) {
+        html += '<div class="bi-result-card" style="background:var(--brown);border-color:var(--brown);">'
+          + '<div class="bi-result-lbl" style="color:rgba(245,242,238,0.6);">Stijlanalyse</div>'
+          + '<div style="font-family:\'Bodoni Moda\',serif;font-size:15px;color:var(--cream);line-height:1.7;font-style:italic;">'
+          + _biEscape(result.analyse) + '</div></div>';
+      }
       if (result.stijlwoorden && result.stijlwoorden.length) {
         html += '<div class="bi-result-card"><div class="bi-result-lbl">Moodboard stijl</div>'
-          + '<div class="bi-result-val">' + result.stijlwoorden.map(function(w){ return '<span style="display:inline-block;padding:3px 10px;background:var(--cream-dark);border-radius:10px;margin:2px;font-size:11px;">' + w + '</span>'; }).join('') + '</div></div>';
+          + '<div class="bi-result-val">' + result.stijlwoorden.map(function(w){ return '<span style="display:inline-block;padding:3px 10px;background:var(--cream-dark);border-radius:10px;margin:2px;font-size:11px;">' + _biEscape(w) + '</span>'; }).join('') + '</div></div>';
       }
       if (result.kleuren && result.kleuren.length) {
         html += '<div class="bi-result-card"><div class="bi-result-lbl">Kleurpalet</div>'
-          + '<div class="bi-result-val">' + result.kleuren.join(' · ') + '</div></div>';
+          + '<div class="bi-result-val">' + result.kleuren.map(_biEscape).join(' · ') + '</div></div>';
       }
       var looks = result.looks || (result.look ? [result.look] : []);
       looks.forEach(function(look, i) {
