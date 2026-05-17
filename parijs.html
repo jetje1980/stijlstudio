@@ -134,44 +134,6 @@ h1,h2,h3{font-family:var(--serif);}
 }
 .pk-name{font-size:15px;font-weight:600;color:#fff;}
 
-/* Step 2b — PIN invoer */
-#step-pin{display:none;width:100%;max-width:340px;text-align:center;}
-#step-pin h3{font-family:var(--serif);font-size:22px;color:#fff;margin-bottom:6px;}
-#step-pin p{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:24px;}
-.pin-avatar-big{
-  width:64px;height:64px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--serif);font-size:26px;font-weight:700;color:#fff;
-  margin:0 auto 20px;
-}
-.pin-dots{
-  display:flex;gap:14px;justify-content:center;margin-bottom:24px;
-}
-.pin-dot{
-  width:14px;height:14px;border-radius:50%;
-  border:2px solid rgba(255,255,255,.4);
-  transition:background .2s,border-color .2s;
-}
-.pin-dot.filled{background:#fff;border-color:#fff;}
-.pin-pad{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
-}
-.pin-key{
-  padding:16px;border-radius:12px;
-  background:rgba(255,255,255,.1);
-  border:1.5px solid rgba(255,255,255,.12);
-  font-family:var(--sans);font-size:20px;font-weight:500;color:#fff;
-  cursor:pointer;transition:all .15s;text-align:center;
-}
-.pin-key:active{background:rgba(255,255,255,.25);transform:scale(.94);}
-.pin-key.del{font-size:16px;}
-.pin-err{font-size:12px;color:var(--rose);margin-top:12px;min-height:18px;}
-.back-link{
-  display:inline-flex;align-items:center;gap:6px;
-  font-size:13px;color:rgba(255,255,255,.45);
-  cursor:pointer;margin-top:20px;
-}
-.back-link:hover{color:rgba(255,255,255,.7);}
 
 /* ── NAV ──────────────────────────────────────── */
 .bottom-nav{
@@ -558,34 +520,6 @@ h1,h2,h3{font-family:var(--serif);}
     </div>
   </div>
 
-  <!-- Stap 3: PIN -->
-  <div id="step-pin">
-    <div class="pin-avatar-big" id="pin-avatar"></div>
-    <h3 id="pin-naam"></h3>
-    <p>Voer jouw code in</p>
-    <div class="pin-dots">
-      <div class="pin-dot" id="d0"></div>
-      <div class="pin-dot" id="d1"></div>
-      <div class="pin-dot" id="d2"></div>
-      <div class="pin-dot" id="d3"></div>
-    </div>
-    <div class="pin-pad">
-      <button class="pin-key" onclick="pinKey('1')">1</button>
-      <button class="pin-key" onclick="pinKey('2')">2</button>
-      <button class="pin-key" onclick="pinKey('3')">3</button>
-      <button class="pin-key" onclick="pinKey('4')">4</button>
-      <button class="pin-key" onclick="pinKey('5')">5</button>
-      <button class="pin-key" onclick="pinKey('6')">6</button>
-      <button class="pin-key" onclick="pinKey('7')">7</button>
-      <button class="pin-key" onclick="pinKey('8')">8</button>
-      <button class="pin-key" onclick="pinKey('9')">9</button>
-      <button class="pin-key" style="opacity:.3" disabled></button>
-      <button class="pin-key" onclick="pinKey('0')">0</button>
-      <button class="pin-key del" onclick="pinDel()">⌫</button>
-    </div>
-    <div class="pin-err" id="pin-err"></div>
-    <div class="back-link" onclick="terug()">← Andere naam kiezen</div>
-  </div>
 </div>
 
 <!-- ══════════════════════════════════════════
@@ -995,21 +929,16 @@ h1,h2,h3{font-family:var(--serif);}
 
 <script>
 // ── CREDENTIALS ──────────────────────────────
-// Groepscode (lowercase check)
 const GROEPSCODE = 'vroegzat';
 
-// Individuele PIN per persoon
 const PROFIELEN = {
-  'Jet':  { pin:'7431', kleur:'#C4614A', initiaal:'Je' },
-  'Fred': { pin:'2856', kleur:'#D4A037', initiaal:'Fr' },
-  'Mar':  { pin:'9174', kleur:'#6B4C3B', initiaal:'Ma' },
-  'Mir':  { pin:'6318', kleur:'#2D4A3E', initiaal:'Mi' },
+  'Jet':  { kleur:'#C4614A', initiaal:'Je' },
+  'Fred': { kleur:'#D4A037', initiaal:'Fr' },
+  'Mar':  { kleur:'#6B4C3B', initiaal:'Ma' },
+  'Mir':  { kleur:'#2D4A3E', initiaal:'Mi' },
 };
 
-// ── LOGIN STATE ───────────────────────────────
-let gekozenProfiel = null;
-let pinBuffer = '';
-
+// ── LOGIN ─────────────────────────────────────
 function checkGroepscode(){
   const val = document.getElementById('groep-input').value.trim().toLowerCase();
   if(val === GROEPSCODE){
@@ -1024,67 +953,14 @@ function checkGroepscode(){
   }
 }
 
-// Enter key op groep-input
 document.getElementById('groep-input').addEventListener('keydown',e=>{
   if(e.key==='Enter') checkGroepscode();
 });
 
 function kiesProfiel(naam){
-  gekozenProfiel = naam;
-  pinBuffer = '';
-  const p = PROFIELEN[naam];
-  document.getElementById('step-profiel').style.display='none';
-  document.getElementById('step-pin').style.display='block';
-  document.getElementById('pin-naam').textContent=naam;
-  const av = document.getElementById('pin-avatar');
-  av.style.background=p.kleur;
-  av.textContent=p.initiaal;
-  updatePinDots();
-}
-
-function pinKey(c){
-  if(pinBuffer.length>=4) return;
-  pinBuffer+=c;
-  updatePinDots();
-  if(pinBuffer.length===4) setTimeout(checkPin,200);
-}
-
-function pinDel(){
-  pinBuffer=pinBuffer.slice(0,-1);
-  updatePinDots();
-  document.getElementById('pin-err').textContent='';
-}
-
-function updatePinDots(){
-  for(let i=0;i<4;i++){
-    document.getElementById('d'+i).classList.toggle('filled', i<pinBuffer.length);
-  }
-}
-
-function checkPin(){
-  const p = PROFIELEN[gekozenProfiel];
-  if(pinBuffer===p.pin){
-    // Opslaan in localStorage
-    localStorage.setItem('vz_user', gekozenProfiel);
-    localStorage.setItem('vz_groep', GROEPSCODE);
-    initialiseerApp(gekozenProfiel);
-  } else {
-    pinBuffer='';
-    updatePinDots();
-    document.getElementById('pin-err').textContent='Verkeerde code, probeer opnieuw';
-    // shake dots
-    const dots = document.querySelector('.pin-dots');
-    dots.style.animation='shake .3s';
-    setTimeout(()=>dots.style.animation='',400);
-  }
-}
-
-function terug(){
-  gekozenProfiel=null;
-  pinBuffer='';
-  document.getElementById('step-pin').style.display='none';
-  document.getElementById('step-profiel').style.display='block';
-  document.getElementById('pin-err').textContent='';
+  localStorage.setItem('vz_user', naam);
+  localStorage.setItem('vz_groep', GROEPSCODE);
+  initialiseerApp(naam);
 }
 
 function uitloggen(){
