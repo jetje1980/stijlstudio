@@ -3,1268 +3,1982 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Vroegzat — Parijs</title>
-<meta name="description" content="Vroegzat. Vier vriendinnen, vier dagen Parijs.">
-<meta name="theme-color" content="#2D4A3E">
+<title>Vroegzat — Parijs 2026</title>
+<meta name="description" content="Vroegzat. Vier vriendinnen, drie dagen Parijs.">
+<meta name="theme-color" content="#2D4F3E">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
 <style>
-/* ── RESET & VARS ──────────────────────────────── */
+/* ── RESET & VARS ─────────────────────────── */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
-  --vert:     #2D4A3E;
-  --terra:    #C4614A;
-  --moutarde: #D4A037;
-  --rose:     #E8C5B5;
-  --creme:    #FAF6F0;
-  --lin:      #F0EAE0;
-  --brun:     #6B4C3B;
-  --noir:     #1A1512;
-  --gris:     #7A7066;
-  --border:   #E2DAD0;
-  --card:     #FFFFFF;
-  --serif:    'Playfair Display', Georgia, serif;
-  --sans:     'Inter', system-ui, sans-serif;
-  --r:        16px;
-  --r-lg:     24px;
-  --shadow:   0 2px 20px rgba(26,21,18,0.08);
-  --shadow-lg:0 8px 40px rgba(26,21,18,0.14);
+  --terra:   #C26E47;
+  --mosterd: #D4A04D;
+  --vert:    #2D4F3E;
+  --rose:    #F2C1B0;
+  --creme:   #F5EFE6;
+  --zand:    #E0D5C2;
+  --ink:     #3A2E22;
+  --bruin:   #6B5848;
+  --serif:   'Cormorant Garamond', Georgia, serif;
+  --sans:    system-ui, -apple-system, sans-serif;
+  --r:       16px;
+  --r-lg:    24px;
+  --sh:      0 2px 16px rgba(58,46,34,0.10);
+  --sh-lg:   0 8px 40px rgba(58,46,34,0.18);
 }
-html{scroll-behavior:smooth;font-size:16px;}
+html{scroll-behavior:smooth;}
 body{
   background:var(--creme);
   font-family:var(--sans);
-  color:var(--noir);
+  color:var(--ink);
   overflow-x:hidden;
   min-height:100svh;
-  padding-bottom:80px;
+  padding-bottom:72px;
+  -webkit-font-smoothing:antialiased;
 }
-h1,h2,h3{font-family:var(--serif);}
+h1,h2,h3,h4{font-family:var(--serif);}
+a{color:inherit;text-decoration:none;}
+button{cursor:pointer;border:none;background:none;font-family:inherit;}
+img{display:block;width:100%;object-fit:cover;}
 
-/* ══════════════════════════════════════════════
-   LOGIN SCHERM
-══════════════════════════════════════════════ */
+/* ── LOGIN ────────────────────────────────── */
 #login-screen{
-  position:fixed;inset:0;z-index:500;
+  position:fixed;inset:0;z-index:900;
   background:var(--vert);
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  padding:40px 32px;
-  transition:opacity .4s, transform .4s;
+  padding:32px 24px;
+  gap:0;
 }
-#login-screen.hidden{
-  opacity:0;pointer-events:none;transform:scale(1.04);
-}
+#login-screen.hidden{display:none;}
 .login-logo{
-  font-family:var(--serif);font-size:42px;font-weight:700;
-  color:#fff;letter-spacing:-1px;margin-bottom:6px;
-  text-align:center;
+  font-family:var(--serif);
+  font-style:italic;
+  font-size:52px;
+  color:#fff;
+  letter-spacing:-1px;
+  margin-bottom:4px;
 }
-.login-logo em{font-style:italic;color:var(--rose);}
 .login-sub{
-  font-size:13px;color:rgba(255,255,255,.5);
-  text-align:center;margin-bottom:40px;letter-spacing:.5px;
+  font-size:11px;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.55);
+  margin-bottom:48px;
 }
-
-/* Step 1 — groepscode */
-#step-groep{width:100%;max-width:340px;}
-#step-groep label{
-  display:block;font-size:11px;font-weight:600;
-  letter-spacing:.8px;text-transform:uppercase;
-  color:rgba(255,255,255,.5);margin-bottom:10px;
+.login-step{width:100%;max-width:340px;}
+.login-step.hidden{display:none;}
+.login-label{
+  font-size:11px;letter-spacing:0.14em;text-transform:uppercase;
+  color:rgba(255,255,255,0.55);margin-bottom:10px;
 }
 .login-input{
-  width:100%;padding:14px 18px;
-  background:rgba(255,255,255,.1);
-  border:1.5px solid rgba(255,255,255,.2);
-  border-radius:12px;font-family:var(--sans);
-  font-size:16px;color:#fff;outline:none;
-  letter-spacing:.5px;
-  transition:border-color .2s;
-  -webkit-appearance:none;
+  width:100%;background:rgba(255,255,255,0.12);
+  border:1.5px solid rgba(255,255,255,0.22);
+  border-radius:12px;padding:14px 16px;
+  font-size:18px;font-family:var(--serif);
+  color:#fff;letter-spacing:2px;text-align:center;
+  outline:none;transition:border 0.2s;
 }
-.login-input::placeholder{color:rgba(255,255,255,.3);}
-.login-input:focus{border-color:rgba(255,255,255,.5);}
-.login-input.error{border-color:var(--terra);animation:shake .3s;}
-@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px)};}
-.login-err{font-size:12px;color:var(--rose);margin-top:8px;min-height:18px;}
-.btn-login{
-  width:100%;margin-top:16px;
-  padding:14px;border-radius:12px;
-  background:#fff;color:var(--vert);
-  font-family:var(--sans);font-size:15px;font-weight:600;
-  border:none;cursor:pointer;transition:opacity .2s,transform .15s;
+.login-input::placeholder{color:rgba(255,255,255,0.3);letter-spacing:0.5px;}
+.login-input:focus{border-color:rgba(255,255,255,0.6);}
+.login-input.error{border-color:#e5756a;animation:shake 0.3s ease;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.login-btn{
+  width:100%;margin-top:16px;padding:14px;
+  background:rgba(255,255,255,0.18);
+  border:1.5px solid rgba(255,255,255,0.3);
+  border-radius:12px;
+  font-size:15px;font-family:var(--serif);
+  color:#fff;letter-spacing:0.05em;
+  transition:all 0.2s;
 }
-.btn-login:active{transform:scale(.98);}
-
-/* Step 2 — wie ben jij? */
-#step-profiel{display:none;width:100%;max-width:340px;}
-#step-profiel h3{
-  font-family:var(--serif);font-size:22px;font-weight:600;
-  color:#fff;text-align:center;margin-bottom:6px;
-}
-#step-profiel p{
-  font-size:13px;color:rgba(255,255,255,.5);
-  text-align:center;margin-bottom:24px;
+.login-btn:active{background:rgba(255,255,255,0.28);}
+.login-err{
+  font-size:12px;color:#f0a898;text-align:center;
+  margin-top:10px;min-height:18px;
 }
 .profiel-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:12px;
 }
-.profiel-kaart{
-  background:rgba(255,255,255,.1);
-  border:1.5px solid rgba(255,255,255,.15);
-  border-radius:16px;padding:18px 12px;
-  text-align:center;cursor:pointer;
-  transition:all .2s;
+.profiel-card{
+  background:rgba(255,255,255,0.10);
+  border:1.5px solid rgba(255,255,255,0.18);
+  border-radius:16px;padding:20px 12px;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  transition:all 0.15s;
 }
-.profiel-kaart:hover,.profiel-kaart:active{
-  background:rgba(255,255,255,.18);
-  border-color:rgba(255,255,255,.4);
-  transform:scale(.97);
-}
-.profiel-kaart.selected{
-  background:rgba(255,255,255,.2);
-  border-color:#fff;
-}
-.pk-avatar{
+.profiel-card:active{transform:scale(0.95);background:rgba(255,255,255,0.22);}
+.profiel-avatar{
   width:52px;height:52px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  font-family:var(--serif);font-size:20px;font-weight:700;color:#fff;
-  margin:0 auto 10px;
+  font-family:var(--serif);font-size:20px;font-weight:600;
+  color:#fff;letter-spacing:1px;
 }
-.pk-name{font-size:15px;font-weight:600;color:#fff;}
+.profiel-naam{font-size:14px;color:#fff;font-family:var(--serif);font-weight:600;}
 
-
-/* ── NAV ──────────────────────────────────────── */
-.bottom-nav{
-  position:fixed;bottom:0;left:0;right:0;
-  background:var(--card);
-  border-top:1px solid var(--border);
+/* ── BOTTOM NAV ───────────────────────────── */
+#bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:rgba(245,239,230,0.95);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-top:1px solid var(--zand);
   display:flex;
-  padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px));
-  z-index:100;
+  padding-bottom:env(safe-area-inset-bottom,0px);
 }
-.nav-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
-  padding:6px 0;cursor:pointer;border:none;background:none;
-  font-family:var(--sans);font-size:10px;font-weight:500;
-  color:var(--gris);letter-spacing:.3px;text-transform:uppercase;
-  transition:color .2s;
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  gap:4px;padding:10px 0 8px;
+  color:var(--bruin);opacity:0.45;
+  font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase;
+  transition:opacity 0.15s,color 0.15s;
 }
-.nav-item.active{color:var(--vert);}
-.nav-item svg{width:22px;height:22px;stroke-width:1.5;}
-.nav-dot{
-  width:5px;height:5px;border-radius:50%;
-  background:var(--terra);margin-top:-2px;display:none;
-}
-.nav-item.has-notif .nav-dot{display:block;}
+.nav-btn.active{opacity:1;color:var(--vert);}
+.nav-icon{font-size:20px;line-height:1;}
 
-/* ── SECTIONS ─────────────────────────────────── */
-.section{display:none;min-height:calc(100svh - 80px);}
-.section.active{display:block;}
+/* ── SCREENS ──────────────────────────────── */
+.screen{display:none;animation:fadeIn 0.3s ease;}
+.screen.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── HERO ─────────────────────────────────────── */
-.hero{
-  background:var(--vert);
-  min-height:55vw;max-height:420px;
+/* ── HOME TAB ─────────────────────────────── */
+/* Stories/Reels welcome hero */
+.reel-hero{
   position:relative;overflow:hidden;
-  display:flex;flex-direction:column;justify-content:flex-end;
-  padding:32px 24px 28px;
+  background:linear-gradient(135deg,var(--vert) 0%,#1a3328 60%,var(--bruin) 100%);
+  min-height:360px;padding:0;
 }
-.hero-bg{
+.reel-stories{
+  display:flex;gap:0;overflow:hidden;
+  position:relative;height:360px;
+}
+.reel-slide{
   position:absolute;inset:0;
-  background:url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80') center/cover no-repeat;
-  opacity:.35;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:32px 24px;
+  opacity:0;transition:opacity 0.7s ease;
+  text-align:center;
 }
-.hero-grain{
-  position:absolute;inset:0;
-  background:linear-gradient(180deg,transparent 30%,rgba(26,21,18,.6) 100%);
+.reel-slide.visible{opacity:1;}
+.reel-emoji{font-size:64px;margin-bottom:16px;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));}
+.reel-title{
+  font-family:var(--serif);font-style:italic;
+  font-size:32px;color:#fff;line-height:1.2;
+  margin-bottom:8px;
+  text-shadow:0 2px 12px rgba(0,0,0,0.3);
 }
-.hero-tag{
-  display:inline-flex;align-items:center;gap:6px;
-  background:rgba(255,255,255,.15);border-radius:20px;
-  padding:5px 12px;font-size:11px;font-weight:600;
-  color:#fff;letter-spacing:.8px;text-transform:uppercase;
-  backdrop-filter:blur(8px);width:fit-content;margin-bottom:12px;
+.reel-desc{
+  font-size:14px;color:rgba(255,255,255,0.8);
+  line-height:1.5;max-width:280px;
 }
-.hero h1{
-  font-size:clamp(32px,8vw,52px);font-weight:600;
-  color:#fff;line-height:1.1;
-  text-shadow:0 2px 20px rgba(0,0,0,.3);
+.reel-dots{
+  position:absolute;top:12px;left:12px;right:12px;
+  display:flex;gap:4px;
 }
-.hero h1 em{font-style:italic;color:var(--rose);}
-.hero-sub{color:rgba(255,255,255,.75);font-size:14px;margin-top:8px;}
+.reel-dot{
+  flex:1;height:2px;border-radius:2px;
+  background:rgba(255,255,255,0.3);overflow:hidden;
+}
+.reel-dot-fill{
+  height:100%;background:#fff;
+  width:0%;transition:width 3s linear;
+}
+.reel-dot-fill.done{width:100%;transition:none;}
+.reel-dot-fill.active{width:100%;}
 
-/* ── WELKOM BANNER ────────────────────────────── */
-.welkom-banner{
-  background:var(--lin);padding:12px 24px;
-  display:flex;align-items:center;gap:10px;
-  border-bottom:1px solid var(--border);
-}
-.welkom-av{
-  width:32px;height:32px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--serif);font-size:13px;font-weight:700;color:#fff;
-  flex-shrink:0;
-}
-.welkom-tekst{font-size:13px;color:var(--gris);}
-.welkom-tekst strong{color:var(--noir);}
-.welkom-uit{
-  margin-left:auto;font-size:11px;color:var(--gris);
-  cursor:pointer;padding:4px 8px;border-radius:6px;
-  border:1px solid var(--border);background:transparent;
-  font-family:var(--sans);
-}
-
-/* ── COUNTDOWN ────────────────────────────────── */
-.countdown-block{
-  background:var(--noir);color:#fff;
-  padding:20px 24px;
+/* Countdown banner */
+.countdown-banner{
+  background:var(--ink);
+  padding:16px 20px;
   display:flex;align-items:center;justify-content:space-between;
 }
-.countdown-left h3{
-  font-family:var(--serif);font-size:13px;font-style:italic;
-  color:rgba(255,255,255,.55);font-weight:400;margin-bottom:4px;
+.countdown-label{
+  font-size:10px;letter-spacing:0.15em;text-transform:uppercase;
+  color:rgba(255,255,255,0.5);margin-bottom:4px;
 }
-.countdown-nums{display:flex;gap:12px;}
-.cd-unit{text-align:center;}
-.cd-num{font-family:var(--serif);font-size:32px;font-weight:700;line-height:1;color:#fff;display:block;}
-.cd-label{font-size:9px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.45);}
-.cd-sep{font-size:28px;color:rgba(255,255,255,.2);padding-top:2px;}
-.countdown-badge{background:var(--terra);border-radius:12px;padding:8px 14px;text-align:center;}
-.countdown-badge .days-big{font-family:var(--serif);font-size:28px;font-weight:700;color:#fff;display:block;}
-.countdown-badge .days-label{font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.7);}
+.countdown-time{
+  font-family:var(--serif);font-size:22px;font-weight:600;
+  color:#fff;letter-spacing:1px;
+}
+.countdown-sub{font-size:11px;color:rgba(255,255,255,0.45);}
+.countdown-right{text-align:right;}
+.countdown-units{display:flex;gap:12px;align-items:baseline;}
+.countdown-num{
+  font-family:var(--serif);font-size:32px;font-weight:600;color:#fff;
+}
+.countdown-unit{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:0.1em;}
 
-/* ── SECTION LABEL ────────────────────────────── */
-.section-label{
-  font-size:10px;font-weight:600;letter-spacing:1px;
-  text-transform:uppercase;color:var(--terra);
-  padding:24px 24px 8px;
+/* Section headers */
+.section-header{
+  padding:20px 20px 12px;
+  display:flex;align-items:baseline;justify-content:space-between;
+}
+.section-title{
+  font-family:var(--serif);font-size:22px;font-style:italic;color:var(--ink);
+}
+.section-link{
+  font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--terra);
 }
 
-/* ── CARDS ────────────────────────────────────── */
-.card{margin:0 16px 12px;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);}
-.card-pad{padding:16px 18px;}
+/* Weekend special block */
+.weekend-block{
+  padding:0 20px 20px;display:flex;flex-direction:column;gap:10px;
+}
+.weekend-card{
+  background:#fff;border-radius:var(--r);
+  border-left:4px solid var(--mosterd);
+  padding:14px 16px;box-shadow:var(--sh);
+  display:flex;align-items:center;gap:12px;
+}
+.weekend-icon{font-size:28px;}
+.weekend-info{}
+.weekend-card-title{
+  font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);
+  margin-bottom:2px;
+}
+.weekend-card-sub{font-size:12px;color:var(--bruin);}
 
-/* ── MISSIE ───────────────────────────────────── */
-.missie-card{
-  margin:0 16px 12px;
-  background:linear-gradient(135deg,var(--vert) 0%,#1e3429 100%);
-  border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-lg);
-  position:relative;
+/* Poll cards */
+.polls-scroll{
+  display:flex;gap:12px;padding:0 20px 20px;
+  overflow-x:auto;scroll-snap-type:x mandatory;
+  -ms-overflow-style:none;scrollbar-width:none;
 }
-.missie-card::before{
-  content:'';position:absolute;top:-40px;right:-40px;
-  width:160px;height:160px;border-radius:50%;
-  background:rgba(255,255,255,.04);
+.polls-scroll::-webkit-scrollbar{display:none;}
+.poll-card{
+  min-width:280px;scroll-snap-align:start;
+  background:#fff;border-radius:var(--r-lg);
+  padding:18px;box-shadow:var(--sh);flex-shrink:0;
 }
-.missie-card-inner{padding:20px 20px 18px;}
-.missie-day{
-  font-size:10px;font-weight:600;letter-spacing:1px;
-  text-transform:uppercase;color:var(--rose);margin-bottom:8px;
-  display:flex;align-items:center;gap:6px;
+.poll-question{
+  font-family:var(--serif);font-size:17px;font-weight:600;
+  color:var(--ink);margin-bottom:14px;line-height:1.3;
 }
-.missie-day::before{content:'';width:20px;height:1px;background:var(--rose);opacity:.5;}
-.missie-card h2{font-family:var(--serif);font-size:20px;font-weight:600;color:#fff;line-height:1.3;margin-bottom:12px;}
-.missie-card p{font-size:13px;color:rgba(255,255,255,.7);line-height:1.6;margin-bottom:16px;}
-.missie-actions{display:flex;gap:8px;}
-.btn{
-  padding:10px 18px;border-radius:40px;font-family:var(--sans);
-  font-size:13px;font-weight:600;cursor:pointer;border:none;
-  transition:transform .15s;display:inline-flex;align-items:center;gap:6px;
-}
-.btn:active{transform:scale(.97);}
-.btn-primary{background:var(--terra);color:#fff;}
-.btn-secondary{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);}
-.btn-outline{background:transparent;color:var(--vert);border:1.5px solid var(--vert);}
-.btn-sm{padding:8px 14px;font-size:12px;}
-.missie-streak{
-  display:flex;align-items:center;gap:6px;
-  padding:10px 20px 14px;border-top:1px solid rgba(255,255,255,.08);
-}
-.streak-avatars{display:flex;}
-.streak-avatar{
-  width:26px;height:26px;border-radius:50%;
-  border:2px solid var(--vert);
-  font-size:10px;font-weight:700;color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  margin-right:-6px;font-family:var(--sans);
-}
-.streak-text{font-size:11px;color:rgba(255,255,255,.55);margin-left:10px;}
-
-/* ── VRIENDINNEN ROW ──────────────────────────── */
-.vrienden-row{
-  display:flex;gap:8px;padding:0 16px;
-  overflow-x:auto;scrollbar-width:none;padding-bottom:4px;
-}
-.vrienden-row::-webkit-scrollbar{display:none;}
-.vriendin-chip{
-  flex-shrink:0;background:var(--card);
-  border-radius:var(--r);padding:12px 14px;
-  display:flex;flex-direction:column;align-items:center;gap:6px;
-  min-width:72px;box-shadow:var(--shadow);
-  cursor:pointer;transition:transform .15s;border:2px solid transparent;
-}
-.vriendin-chip.me{border-color:var(--terra);}
-.vriendin-chip:active{transform:scale(.96);}
-.v-avatar{
-  width:40px;height:40px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--serif);font-size:16px;font-weight:700;color:#fff;
-}
-.v-name{font-size:11px;font-weight:600;color:var(--noir);}
-.v-streak{font-size:10px;color:var(--gris);}
-
-/* ── POLLS ────────────────────────────────────── */
-.poll-card .poll-q{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--noir);margin-bottom:14px;line-height:1.4;}
 .poll-options{display:flex;flex-direction:column;gap:8px;}
-.poll-opt{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 12px;border-radius:10px;
-  border:1.5px solid var(--border);cursor:pointer;
-  transition:all .2s;position:relative;overflow:hidden;
+.poll-option{
+  background:var(--creme);border:1.5px solid var(--zand);
+  border-radius:10px;padding:11px 14px;
+  font-size:14px;color:var(--ink);
+  text-align:left;position:relative;overflow:hidden;
+  transition:all 0.2s;
 }
-.poll-opt:hover{border-color:var(--terra);}
-.poll-opt.voted{border-color:var(--vert);background:rgba(45,74,62,.06);}
-.poll-opt-bar{position:absolute;left:0;top:0;bottom:0;background:rgba(45,74,62,.08);border-radius:8px;transition:width .5s ease;width:0;}
-.poll-opt-text{font-size:13px;font-weight:500;position:relative;z-index:1;}
-.poll-opt-pct{font-size:12px;color:var(--gris);margin-left:auto;position:relative;z-index:1;}
-.poll-meta{font-size:11px;color:var(--gris);margin-top:10px;}
-
-/* ── INPAKLIJST ───────────────────────────────── */
-.pack-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--lin);}
-.pack-item:last-child{border-bottom:none;}
-.pack-check{
-  width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border);
-  flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:all .2s;margin-top:1px;
+.poll-option:active{transform:scale(0.98);}
+.poll-option.voted{border-color:var(--terra);background:rgba(194,110,71,0.08);}
+.poll-option.winner{border-color:var(--vert);background:rgba(45,79,62,0.10);}
+.poll-bar{
+  position:absolute;left:0;top:0;bottom:0;
+  background:rgba(45,79,62,0.12);
+  transition:width 0.5s ease;pointer-events:none;
 }
-.pack-check.checked{background:var(--vert);border-color:var(--vert);}
-.pack-check.checked svg{display:block;}
-.pack-check svg{display:none;width:12px;height:12px;stroke:#fff;stroke-width:2.5;}
-.pack-text{flex:1;}
-.pack-label{font-size:14px;font-weight:500;color:var(--noir);}
-.pack-note{font-size:11px;color:var(--gris);margin-top:2px;font-style:italic;}
+.poll-pct{float:right;font-size:12px;color:var(--bruin);font-weight:600;}
 
-/* ── REISINFO ─────────────────────────────────── */
-.info-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--lin);}
-.info-item:last-child{border-bottom:none;}
-.info-icon{width:40px;height:40px;border-radius:12px;background:var(--lin);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;}
-.info-body{flex:1;}
-.info-label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gris);}
-.info-value{font-size:14px;font-weight:500;color:var(--noir);margin-top:1px;}
-.info-sub{font-size:11px;color:var(--gris);}
-.upload-zone{border:2px dashed var(--border);border-radius:var(--r);padding:24px;text-align:center;cursor:pointer;transition:border-color .2s;margin:0 16px;}
-.upload-zone:hover{border-color:var(--terra);}
-.upload-icon{font-size:32px;margin-bottom:8px;}
-.upload-zone p{font-size:13px;color:var(--gris);}
-.upload-zone strong{color:var(--terra);}
-.lock-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(45,74,62,.1);color:var(--vert);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:600;margin-top:8px;}
+/* Activity feed */
+.feed-list{display:flex;flex-direction:column;gap:0;}
+.feed-item{
+  padding:14px 20px;
+  border-bottom:1px solid var(--zand);
+  display:flex;align-items:center;gap:12px;
+}
+.feed-avatar{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:14px;color:#fff;font-weight:600;
+}
+.feed-text{font-size:13px;color:var(--ink);line-height:1.4;flex:1;}
+.feed-text strong{font-weight:600;}
+.feed-time{font-size:11px;color:var(--bruin);flex-shrink:0;}
+.feed-emoji{font-size:16px;}
 
-/* ── SWIPE ────────────────────────────────────── */
-.swipe-header{background:var(--vert);padding:48px 24px 24px;padding-top:calc(48px + env(safe-area-inset-top,0px));}
-.swipe-header h2{font-family:var(--serif);font-size:26px;font-weight:600;color:#fff;margin-bottom:4px;}
-.swipe-header p{font-size:13px;color:rgba(255,255,255,.65);}
-.swipe-moment-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:16px 24px 0;background:var(--vert);}
-.swipe-moment-tabs::-webkit-scrollbar{display:none;}
-.moment-tab{flex-shrink:0;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid rgba(255,255,255,.25);color:rgba(255,255,255,.65);background:transparent;font-family:var(--sans);transition:all .2s;}
-.moment-tab.active{background:#fff;color:var(--vert);border-color:#fff;}
-.swipe-arena{position:relative;height:440px;display:flex;align-items:center;justify-content:center;padding:20px 16px;overflow:hidden;}
+/* ── SWIPE TAB ────────────────────────────── */
+.cat-tabs{
+  display:flex;border-bottom:1.5px solid var(--zand);
+  background:#fff;position:sticky;top:0;z-index:10;
+}
+.cat-tab{
+  flex:1;padding:14px 4px 12px;font-size:12px;
+  letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--bruin);opacity:0.55;
+  border-bottom:2.5px solid transparent;
+  margin-bottom:-1.5px;transition:all 0.2s;
+}
+.cat-tab.active{opacity:1;color:var(--vert);border-bottom-color:var(--vert);}
+
+/* Card stack area */
+.swipe-area{
+  position:relative;min-height:480px;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;overflow:hidden;
+}
+.swipe-empty{
+  text-align:center;padding:40px 20px;
+  font-family:var(--serif);font-style:italic;
+  font-size:22px;color:var(--bruin);opacity:0.5;
+}
 .swipe-card{
-  position:absolute;width:calc(100% - 32px);max-width:380px;
-  border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-lg);
-  cursor:grab;user-select:none;transition:transform .15s;touch-action:none;background:var(--card);
+  position:absolute;
+  width:calc(100% - 40px);max-width:360px;
+  background:#fff;border-radius:var(--r-lg);
+  box-shadow:var(--sh-lg);
+  overflow:hidden;
+  cursor:grab;user-select:none;
+  transition:transform 0.08s ease;
+  will-change:transform;
 }
-.swipe-card:active{cursor:grabbing;}
-.swipe-card.card-2{transform:translateY(8px) scale(.96);z-index:0;}
-.swipe-card.card-3{transform:translateY(16px) scale(.92);z-index:-1;}
-.swipe-card-img{height:240px;background-size:cover;background-position:center;position:relative;}
-.swipe-overlay{position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(transparent,rgba(26,21,18,.7));}
-.swipe-tags{display:flex;gap:6px;margin-bottom:8px;}
-.swipe-tag{background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:600;color:#fff;letter-spacing:.4px;text-transform:uppercase;}
-.swipe-tag.prix{background:var(--vert);color:#fff;}
-.swipe-card-body{padding:16px;}
-.swipe-card-body h3{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--noir);margin-bottom:4px;}
-.swipe-card-body p{font-size:13px;color:var(--gris);line-height:1.6;}
-.swipe-card-body .wijk{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--terra);margin-bottom:6px;}
-.swipe-group-votes{display:flex;align-items:center;gap:8px;padding:10px 16px 14px;border-top:1px solid var(--lin);}
-.vote-pile{display:flex;}
-.vote-av{width:22px;height:22px;border-radius:50%;font-size:8px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;margin-right:-5px;border:2px solid #fff;font-family:var(--sans);}
-.vote-text{font-size:11px;color:var(--gris);margin-left:8px;}
-.swipe-buttons{display:flex;align-items:center;justify-content:center;gap:16px;padding:0 24px 20px;}
-.swipe-btn{width:56px;height:56px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s;font-size:24px;box-shadow:var(--shadow);}
-.swipe-btn:active{transform:scale(.92);}
-.swipe-btn.nee{background:#fff;color:var(--terra);}
-.swipe-btn.ja{background:#fff;color:var(--vert);}
-.swipe-btn.droom{background:var(--moutarde);color:#fff;width:64px;height:64px;font-size:28px;}
+.swipe-card.behind{
+  transform:scale(0.96) translateY(10px);
+  z-index:1;pointer-events:none;
+}
+.swipe-card.top{z-index:2;}
+.swipe-card.flying-right{
+  transition:transform 0.35s ease,opacity 0.35s ease;
+  transform:translateX(120%) rotate(15deg)!important;opacity:0;
+}
+.swipe-card.flying-left{
+  transition:transform 0.35s ease,opacity 0.35s ease;
+  transform:translateX(-120%) rotate(-15deg)!important;opacity:0;
+}
+.swipe-card.flying-up{
+  transition:transform 0.35s ease,opacity 0.35s ease;
+  transform:translateY(-120%)!important;opacity:0;
+}
+.card-img{height:200px;position:relative;}
+.card-img img{height:100%;object-fit:cover;}
+.card-badges{
+  position:absolute;top:10px;left:10px;
+  display:flex;gap:6px;flex-wrap:wrap;
+}
+.badge{
+  background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);
+  border-radius:20px;padding:4px 9px;
+  font-size:10px;letter-spacing:0.08em;color:#fff;text-transform:uppercase;
+}
+.badge.musterd{background:rgba(212,160,77,0.9);}
+.badge.vert{background:rgba(45,79,62,0.85);}
+.badge-prijs{
+  position:absolute;top:10px;right:10px;
+  background:rgba(245,239,230,0.9);backdrop-filter:blur(4px);
+  border-radius:20px;padding:4px 9px;
+  font-size:12px;font-weight:600;color:var(--ink);
+}
+.card-body{padding:16px;}
+.card-sub{
+  font-size:10px;letter-spacing:0.13em;text-transform:uppercase;
+  color:var(--terra);margin-bottom:4px;
+}
+.card-title{
+  font-family:var(--serif);font-size:20px;font-weight:600;
+  color:var(--ink);margin-bottom:4px;line-height:1.2;
+}
+.card-wijk{font-size:12px;color:var(--bruin);margin-bottom:10px;}
+.card-meta{
+  display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;
+}
+.card-meta-item{
+  font-size:11px;color:var(--bruin);
+  display:flex;align-items:center;gap:4px;
+}
+.card-verhaal{
+  font-size:13px;color:var(--ink);line-height:1.5;
+  border-top:1px solid var(--zand);padding-top:10px;
+  -webkit-line-clamp:3;-webkit-box-orient:vertical;
+  display:-webkit-box;overflow:hidden;
+}
+.card-tip{
+  font-size:12px;color:var(--vert);font-style:italic;
+  margin-top:8px;padding:8px 10px;
+  background:rgba(45,79,62,0.07);border-radius:8px;
+}
 
-/* ── MATCH OVERLAY ────────────────────────────── */
-.match-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(26,21,18,.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:32px;}
-.match-overlay.show{display:flex;}
-.match-badge{font-size:64px;margin-bottom:16px;animation:pop .4s cubic-bezier(.34,1.56,.64,1);}
-.match-overlay h2{font-family:var(--serif);font-size:32px;font-weight:700;color:#fff;margin-bottom:8px;}
-.match-overlay p{font-size:15px;color:rgba(255,255,255,.7);margin-bottom:28px;}
-.confetti-container{position:fixed;inset:0;pointer-events:none;z-index:201;}
-.confetti-piece{position:absolute;width:8px;height:8px;animation:confettiFall 3s ease-in forwards;}
-@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(120vh) rotate(720deg);opacity:0;}}
-@keyframes pop{0%{transform:scale(0);}100%{transform:scale(1);}}
+/* Vote label overlays */
+.vote-overlay{
+  position:absolute;inset:0;display:flex;
+  align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:48px;font-weight:700;
+  border-radius:var(--r-lg);opacity:0;
+  pointer-events:none;transition:opacity 0.15s;
+  letter-spacing:2px;
+}
+.vote-overlay.like{background:rgba(45,79,62,0.25);color:var(--vert);}
+.vote-overlay.pass{background:rgba(194,110,71,0.18);color:var(--terra);}
+.vote-overlay.dream{background:rgba(212,160,77,0.22);color:var(--mosterd);}
 
-/* ── GROEP SECTIE ─────────────────────────────── */
-.groep-header{background:linear-gradient(135deg,var(--brun),#3d2418);padding:48px 24px 28px;padding-top:calc(48px + env(safe-area-inset-top,0px));}
-.groep-header h2{font-family:var(--serif);font-size:26px;color:#fff;font-weight:600;}
-.groep-header p{font-size:13px;color:rgba(255,255,255,.6);margin-top:4px;}
-.matches-list{padding:0 16px;}
-.match-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--lin);align-items:center;}
-.match-item:last-child{border-bottom:none;}
-.match-img{width:56px;height:56px;border-radius:10px;background-size:cover;background-position:center;flex-shrink:0;}
+/* Swipe action buttons */
+.swipe-btns{
+  display:flex;gap:16px;justify-content:center;
+  padding:16px 20px 20px;
+}
+.swipe-btn{
+  width:60px;height:60px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;box-shadow:var(--sh);
+  border:2px solid transparent;transition:all 0.15s;
+}
+.swipe-btn:active{transform:scale(0.9);}
+.swipe-btn.pass{background:#fff;border-color:var(--terra);}
+.swipe-btn.like{background:#fff;border-color:var(--vert);}
+.swipe-btn.dream{background:#fff;border-color:var(--mosterd);}
+
+/* Progress */
+.swipe-progress{
+  text-align:center;padding:8px 20px 0;
+  font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--bruin);
+}
+
+/* ── TOP 5 TAB ────────────────────────────── */
+.top5-header{
+  background:var(--ink);padding:20px 20px 16px;
+}
+.top5-title{
+  font-family:var(--serif);font-style:italic;font-size:28px;color:#fff;
+}
+.top5-desc{font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;}
+.top5-cats{
+  display:flex;border-bottom:1px solid var(--zand);background:#fff;
+}
+.top5-cat{
+  flex:1;padding:12px 4px;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--bruin);opacity:0.5;
+  border-bottom:2.5px solid transparent;margin-bottom:-1px;transition:all 0.2s;
+}
+.top5-cat.active{opacity:1;color:var(--vert);border-bottom-color:var(--vert);}
+.top5-list{padding:16px 20px;display:flex;flex-direction:column;gap:10px;}
+.top5-item{
+  background:#fff;border-radius:var(--r);padding:14px 16px;
+  box-shadow:var(--sh);display:flex;align-items:center;gap:12px;
+}
+.top5-rank{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--creme);border:1.5px solid var(--zand);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:14px;font-weight:600;color:var(--bruin);
+  flex-shrink:0;
+}
+.top5-rank.dream-rank{background:var(--mosterd);border-color:var(--mosterd);color:#fff;}
+.top5-item-info{flex:1;}
+.top5-item-name{
+  font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);
+}
+.top5-item-sub{font-size:11px;color:var(--bruin);}
+.top5-item-badge{font-size:16px;}
+.top5-empty{
+  text-align:center;padding:48px 20px;
+  font-family:var(--serif);font-style:italic;
+  font-size:18px;color:var(--bruin);opacity:0.5;
+}
+
+/* ── GROEP TAB ────────────────────────────── */
+.groep-header{
+  background:linear-gradient(135deg,var(--vert),#1a3328);
+  padding:24px 20px 20px;
+}
+.groep-title{
+  font-family:var(--serif);font-style:italic;font-size:28px;color:#fff;
+}
+.groep-desc{font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;}
+.match-section{padding:20px 20px 8px;}
+.match-section-title{
+  font-family:var(--serif);font-size:18px;font-style:italic;color:var(--ink);
+  margin-bottom:12px;
+}
+.match-card{
+  background:#fff;border-radius:var(--r);box-shadow:var(--sh);
+  padding:14px 16px;margin-bottom:10px;
+  display:flex;align-items:center;gap:12px;
+}
+.match-votes{
+  display:flex;gap:4px;flex-shrink:0;
+}
+.match-dot{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:600;color:#fff;
+  font-family:var(--serif);
+}
+.match-dot.empty{background:var(--zand);color:var(--bruin);}
 .match-info{flex:1;}
-.match-name{font-size:14px;font-weight:600;color:var(--noir);}
-.match-meta{font-size:11px;color:var(--gris);margin-top:2px;}
-.match-moment{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--terra);}
-.match-check{width:28px;height:28px;border-radius:50%;background:var(--vert);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.match-check svg{width:14px;height:14px;stroke:#fff;stroke-width:2.5;}
-.spel-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;}
-.spel-card{background:var(--card);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s;}
-.spel-card:active{transform:scale(.97);}
-.spel-icon{font-size:28px;margin-bottom:8px;}
-.spel-name{font-size:13px;font-weight:600;color:var(--noir);}
-.spel-meta{font-size:11px;color:var(--gris);margin-top:2px;}
+.match-name{
+  font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);
+}
+.match-sub{font-size:11px;color:var(--bruin);}
+.match-icon{font-size:22px;}
 
-/* ── MIJ SECTIE ───────────────────────────────── */
-.mij-header{background:var(--creme);padding:48px 24px 24px;padding-top:calc(48px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--border);}
-.profile-avatar-big{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:28px;font-weight:700;color:#fff;margin-bottom:12px;}
-.mij-header h2{font-family:var(--serif);font-size:22px;font-weight:600;}
-.mij-header p{font-size:13px;color:var(--gris);margin-top:2px;}
-.badges-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 16px;}
-.badges-row::-webkit-scrollbar{display:none;}
-.badge{flex-shrink:0;background:var(--card);border-radius:12px;padding:10px 14px;text-align:center;box-shadow:var(--shadow);min-width:80px;}
-.badge-icon{font-size:22px;margin-bottom:4px;}
-.badge-name{font-size:10px;font-weight:600;color:var(--gris);letter-spacing:.3px;}
-.badge.earned .badge-name{color:var(--vert);}
-.badge.locked{opacity:.4;}
-.pref-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--lin);}
-.pref-row:last-child{border-bottom:none;}
-.pref-label{font-size:14px;color:var(--noir);}
-.pref-val{font-size:13px;color:var(--gris);}
-.toggle{width:44px;height:26px;border-radius:13px;background:var(--border);position:relative;cursor:pointer;transition:background .2s;border:none;}
-.toggle.on{background:var(--vert);}
-.toggle::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.2);}
-.toggle.on::after{left:21px;}
+/* Alarm block */
+.alarm-block{
+  margin:0 20px 20px;background:rgba(194,110,71,0.10);
+  border:1.5px solid rgba(194,110,71,0.25);
+  border-radius:var(--r);padding:16px;
+}
+.alarm-title{
+  font-family:var(--serif);font-size:16px;font-weight:600;
+  color:var(--terra);margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.alarm-item{
+  padding:8px 0;border-bottom:1px solid rgba(194,110,71,0.15);
+  font-size:13px;color:var(--ink);
+  display:flex;align-items:center;gap:8px;
+}
+.alarm-item:last-child{border-bottom:none;}
+.alarm-item-icon{font-size:16px;}
 
-/* ── MODALS ───────────────────────────────────── */
-.modal{display:none;position:fixed;inset:0;z-index:150;background:rgba(26,21,18,.7);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;}
-.modal.show{display:flex;}
-.modal-sheet{background:var(--card);border-radius:var(--r-lg) var(--r-lg) 0 0;width:100%;max-width:480px;padding:8px 0 0;max-height:85vh;overflow-y:auto;}
-.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 16px;}
-.modal-inner{padding:0 24px 32px;}
-.modal-inner h3{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--noir);margin-bottom:8px;}
-.quiz-q{font-size:16px;font-weight:500;color:var(--noir);margin:20px 0 14px;line-height:1.5;}
-.quiz-options{display:flex;flex-direction:column;gap:8px;}
-.quiz-opt{padding:12px 16px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;font-size:14px;font-weight:500;color:var(--noir);transition:all .2s;background:transparent;font-family:var(--sans);text-align:left;}
-.quiz-opt:hover{border-color:var(--terra);}
-.quiz-opt.correct{border-color:var(--vert);background:rgba(45,74,62,.08);color:var(--vert);}
-.quiz-opt.wrong{border-color:var(--terra);background:rgba(196,97,74,.08);color:var(--terra);}
-.quiz-score{text-align:center;padding:20px 0;}
-.quiz-score .score-num{font-family:var(--serif);font-size:48px;font-weight:700;color:var(--vert);}
-.quiz-score p{font-size:14px;color:var(--gris);margin-top:4px;}
+/* ── CARD ADD ─────────────────────────────── */
+.add-fab{
+  position:fixed;bottom:88px;right:20px;z-index:100;
+  width:52px;height:52px;border-radius:50%;
+  background:var(--terra);box-shadow:0 4px 16px rgba(194,110,71,0.4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;color:#fff;transition:transform 0.15s;
+}
+.add-fab:active{transform:scale(0.92);}
+.add-fab.hidden{display:none;}
 
-/* ── TOAST ────────────────────────────────────── */
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--noir);color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:500;opacity:0;transition:all .3s;z-index:300;white-space:nowrap;pointer-events:none;}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+/* Modal */
+.modal-overlay{
+  position:fixed;inset:0;z-index:400;
+  background:rgba(58,46,34,0.5);
+  display:flex;align-items:flex-end;justify-content:center;
+}
+.modal-overlay.hidden{display:none;}
+.modal-sheet{
+  background:#fff;border-radius:24px 24px 0 0;
+  width:100%;max-width:480px;
+  padding:20px 20px 40px;
+  max-height:85vh;overflow-y:auto;
+}
+.modal-handle{
+  width:36px;height:4px;border-radius:2px;
+  background:var(--zand);margin:0 auto 20px;
+}
+.modal-title{
+  font-family:var(--serif);font-size:22px;font-weight:600;
+  margin-bottom:20px;color:var(--ink);
+}
+.form-group{margin-bottom:16px;}
+.form-label{
+  font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--bruin);margin-bottom:6px;display:block;
+}
+.form-input,.form-select,.form-textarea{
+  width:100%;background:var(--creme);
+  border:1.5px solid var(--zand);border-radius:10px;
+  padding:12px 14px;font-size:15px;font-family:inherit;
+  color:var(--ink);outline:none;transition:border 0.2s;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--vert);}
+.form-textarea{min-height:80px;resize:vertical;}
+.form-submit{
+  width:100%;padding:14px;background:var(--vert);
+  border-radius:12px;color:#fff;
+  font-size:15px;font-family:var(--serif);font-weight:600;
+  letter-spacing:0.05em;transition:opacity 0.2s;
+}
+.form-submit:active{opacity:0.8;}
 
-/* ── EMPTY STATE ──────────────────────────────── */
-.empty-state{text-align:center;padding:40px 24px;}
-.empty-state .emoji{font-size:40px;margin-bottom:12px;}
-.empty-state h3{font-family:var(--serif);font-size:20px;color:var(--noir);margin-bottom:6px;}
-.empty-state p{font-size:13px;color:var(--gris);line-height:1.6;}
+/* Confetti */
+.confetti-piece{
+  position:fixed;pointer-events:none;z-index:999;
+  width:10px;height:10px;border-radius:2px;
+  animation:confettiDrop 1.5s ease-in forwards;
+}
+@keyframes confettiDrop{
+  0%{transform:translateY(-20px) rotate(0deg);opacity:1;}
+  100%{transform:translateY(100vh) rotate(720deg);opacity:0;}
+}
+
+/* ── UTIL ─────────────────────────────────── */
+.hidden{display:none!important;}
+.p20{padding:0 20px;}
+.mt8{margin-top:8px;}
+.gap12{gap:12px;}
+
+/* Welkom banner (after login) */
+.welkom-bar{
+  background:var(--ink);padding:12px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.welkom-bar-left{display:flex;align-items:center;gap:10px;}
+.welkom-avatar{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:13px;color:#fff;font-weight:600;
+}
+.welkom-naam{
+  font-family:var(--serif);font-size:15px;color:#fff;
+}
+.welkom-sub{font-size:10px;color:rgba(255,255,255,0.45);}
+.uitloggen-btn{
+  font-size:11px;letter-spacing:0.08em;text-transform:uppercase;
+  color:rgba(255,255,255,0.4);padding:6px 10px;
+  border:1px solid rgba(255,255,255,0.15);border-radius:8px;
+}
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════
-     LOGIN SCHERM
-══════════════════════════════════════════════ -->
+<!-- ═══════════════ LOGIN ═══════════════ -->
 <div id="login-screen">
-  <div class="login-logo">Vroeg<em>zat</em></div>
-  <div class="login-sub">Parijs · Jullie trip · Jullie app</div>
+  <div class="login-logo">Vroegzat</div>
+  <div class="login-sub">Parijs · 26–28 juni 2026</div>
 
-  <!-- Stap 1: groepscode -->
-  <div id="step-groep">
-    <label for="groep-input">Groepscode</label>
-    <input id="groep-input" class="login-input" type="text" placeholder="voer de groepscode in" autocomplete="off" autocapitalize="none" spellcheck="false">
+  <!-- Step 1: groepscode -->
+  <div class="login-step" id="step-groep">
+    <div class="login-label">Groepscode</div>
+    <input class="login-input" id="groep-input" type="text"
+      placeholder="voer de code in" autocomplete="off" autocapitalize="none"
+      onkeydown="if(event.key==='Enter')checkGroepscode()">
+    <button class="login-btn" onclick="checkGroepscode()">Verder →</button>
     <div class="login-err" id="groep-err"></div>
-    <button class="btn-login" onclick="checkGroepscode()">Verder →</button>
   </div>
 
-  <!-- Stap 2: wie ben jij? -->
-  <div id="step-profiel">
-    <h3>Wie ben jij?</h3>
-    <p>Kies je profiel</p>
+  <!-- Step 2: profiel -->
+  <div class="login-step hidden" id="step-profiel">
+    <div class="login-label" style="margin-bottom:14px;">Wie ben jij?</div>
     <div class="profiel-grid">
-      <div class="profiel-kaart" onclick="kiesProfiel('Jet')">
-        <div class="pk-avatar" style="background:#C4614A">Je</div>
-        <div class="pk-name">Jet</div>
-      </div>
-      <div class="profiel-kaart" onclick="kiesProfiel('Fred')">
-        <div class="pk-avatar" style="background:#D4A037">Fr</div>
-        <div class="pk-name">Fred</div>
-      </div>
-      <div class="profiel-kaart" onclick="kiesProfiel('Mar')">
-        <div class="pk-avatar" style="background:#6B4C3B">Ma</div>
-        <div class="pk-name">Mar</div>
-      </div>
-      <div class="profiel-kaart" onclick="kiesProfiel('Mir')">
-        <div class="pk-avatar" style="background:#2D4A3E">Mi</div>
-        <div class="pk-name">Mir</div>
-      </div>
+      <button class="profiel-card" onclick="kiesProfiel('Griette')">
+        <div class="profiel-avatar" style="background:#C26E47;">Gr</div>
+        <div class="profiel-naam">Griette</div>
+      </button>
+      <button class="profiel-card" onclick="kiesProfiel('Frederike')">
+        <div class="profiel-avatar" style="background:#D4A04D;">Fr</div>
+        <div class="profiel-naam">Frederike</div>
+      </button>
+      <button class="profiel-card" onclick="kiesProfiel('Miriam')">
+        <div class="profiel-avatar" style="background:#2D4F3E;">Mi</div>
+        <div class="profiel-naam">Miriam</div>
+      </button>
+      <button class="profiel-card" onclick="kiesProfiel('Marlinde')">
+        <div class="profiel-avatar" style="background:#6B5848;">Ma</div>
+        <div class="profiel-naam">Marlinde</div>
+      </button>
     </div>
   </div>
-
 </div>
 
-<!-- ══════════════════════════════════════════
-     APP (verborgen tot ingelogd)
-══════════════════════════════════════════════ -->
+<!-- ═══════════════ APP ═══════════════ -->
+<div id="app" class="hidden">
 
-<!-- ── WELKOM BANNER ── -->
-<div class="welkom-banner" id="welkom-banner" style="display:none">
-  <div class="welkom-av" id="welkom-av"></div>
-  <span class="welkom-tekst">Bonjour, <strong id="welkom-naam"></strong> 👋</span>
-  <button class="welkom-uit" onclick="uitloggen()">Uitloggen</button>
-</div>
-
-<!-- ══════════════════════════════════════════
-     SECTIE 1: VOORPRET
-══════════════════════════════════════════════ -->
-<div class="section active" id="sec-voorpret">
-  <div class="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-grain"></div>
-    <div class="hero-tag">
-      <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-      Parijs · Juni 2025
-    </div>
-    <h1>Bonjour,<br><em>mes amies</em></h1>
-    <p class="hero-sub">Vier vriendinnen · Vier dagen · Één grote stad</p>
-  </div>
-
-  <div class="countdown-block">
-    <div class="countdown-left">
-      <h3>Nog even en dan…</h3>
-      <div class="countdown-nums">
-        <div class="cd-unit"><span class="cd-num" id="cd-days">14</span><span class="cd-label">dagen</span></div>
-        <span class="cd-sep">:</span>
-        <div class="cd-unit"><span class="cd-num" id="cd-hours">08</span><span class="cd-label">uur</span></div>
-        <span class="cd-sep">:</span>
-        <div class="cd-unit"><span class="cd-num" id="cd-mins">34</span><span class="cd-label">min</span></div>
-      </div>
-    </div>
-    <div class="countdown-badge">
-      <span class="days-big" id="cd-days-big">14</span>
-      <span class="days-label">dagen!</span>
-    </div>
-  </div>
-
-  <p class="section-label">De groep</p>
-  <div class="vrienden-row" id="vrienden-row">
-    <!-- Gegenereerd door JS -->
-  </div>
-
-  <p class="section-label">Missie van de dag</p>
-  <div class="missie-card">
-    <div class="missie-card-inner">
-      <div class="missie-day">Dag 7 van 14</div>
-      <h2>Stuur de groep één ding waar jij het meest naar uitkijkt</h2>
-      <p>Mag een restaurant zijn, een straat, een gevoel. Mag ook "eindelijk mijn nieuwe jas dragen".</p>
-      <div class="missie-actions">
-        <button class="btn btn-primary btn-sm" onclick="completeMissie()">Verstuur ✨</button>
-        <button class="btn btn-secondary btn-sm" onclick="showToast('Missie bewaard voor later')">Later</button>
-      </div>
-    </div>
-    <div class="missie-streak">
-      <div class="streak-avatars">
-        <div class="streak-avatar" style="background:#C4614A">Je</div>
-        <div class="streak-avatar" style="background:#D4A037">Fr</div>
-        <div class="streak-avatar" style="background:#6B4C3B">Ma</div>
-      </div>
-      <span class="streak-text">Jet, Fred & Mar hebben al gedaan 🔥</span>
-    </div>
-  </div>
-
-  <p class="section-label">Snel gestemd</p>
-  <div class="card">
-    <div class="card-pad poll-card">
-      <div class="poll-q">Hoeveel musea is écht teveel voor vier dagen Parijs?</div>
-      <div class="poll-options">
-        <div class="poll-opt" onclick="vote(this)">
-          <div class="poll-opt-bar" style="width:25%"></div>
-          <span class="poll-opt-text">Nul. We zijn niet op schoolreis.</span>
-          <span class="poll-opt-pct">25%</span>
-        </div>
-        <div class="poll-opt" onclick="vote(this)">
-          <div class="poll-opt-bar" style="width:50%"></div>
-          <span class="poll-opt-text">Eén, mits er een café aan vast zit</span>
-          <span class="poll-opt-pct">50%</span>
-        </div>
-        <div class="poll-opt" onclick="vote(this)">
-          <div class="poll-opt-bar" style="width:25%"></div>
-          <span class="poll-opt-text">Twee, als we er vroeg weg kunnen</span>
-          <span class="poll-opt-pct">25%</span>
-        </div>
-        <div class="poll-opt" onclick="vote(this)">
-          <div class="poll-opt-bar" style="width:0%"></div>
-          <span class="poll-opt-text">Drie of meer. Mir wil naar Orsay.</span>
-          <span class="poll-opt-pct">0%</span>
-        </div>
-      </div>
-      <p class="poll-meta">3 van 4 stemmen uitgebracht</p>
-    </div>
-  </div>
-
-  <p class="section-label">Reisinfo <span style="color:var(--vert);font-size:9px;">🔒 alleen jullie vier</span></p>
-  <div class="card">
-    <div class="card-pad">
-      <div class="info-item">
-        <div class="info-icon">🏠</div>
-        <div class="info-body">
-          <div class="info-label">Airbnb adres</div>
-          <div class="info-value">12 Rue de Bretagne, Le Marais</div>
-          <div class="info-sub">Toegevoegd door Jet · 3 dagen geleden</div>
-        </div>
-      </div>
-      <div class="info-item">
-        <div class="info-icon">🚄</div>
-        <div class="info-body">
-          <div class="info-label">Thalys heen</div>
-          <div class="info-value">THA 9421 · spoor 12 · 09:56</div>
-          <div class="info-sub">Rijtuig 11 · plaatsen 34–37</div>
-        </div>
-      </div>
-      <div class="info-item">
-        <div class="info-icon">🚄</div>
-        <div class="info-body">
-          <div class="info-label">Thalys terug</div>
-          <div class="info-value" style="color:var(--terra)">Nog toevoegen — wie heeft het ticket?</div>
-        </div>
-        <button class="btn btn-outline btn-sm" onclick="showToast('Ticket toevoegen — binnenkort beschikbaar')">+ add</button>
-      </div>
-      <div class="info-item">
-        <div class="info-icon">📋</div>
-        <div class="info-body">
-          <div class="info-label">Noodnummer Parijs</div>
-          <div class="info-value">Politie: 17 · Ambulance: 15</div>
-          <div class="info-sub">Ambassade NL: +33 1 40 62 33 00</div>
-        </div>
-      </div>
-    </div>
-    <div style="padding:0 18px 14px;">
-      <div class="upload-zone" onclick="showToast('Ticket uploaden — binnenkort beschikbaar')">
-        <div class="upload-icon">🎟️</div>
-        <p><strong>Treincode / barcode uploaden</strong><br>Foto of scan van je ticket</p>
-        <div class="lock-badge">🔒 alleen zichtbaar voor de groep</div>
-      </div>
-    </div>
-  </div>
-
-  <p class="section-label">Inpakken</p>
-  <div class="card">
-    <div class="card-pad">
-      <div class="pack-item">
-        <div class="pack-check checked" onclick="togglePack(this)"><svg viewBox="0 0 12 12"><polyline points="1.5,6 5,9.5 10.5,2"/></svg></div>
-        <div class="pack-text">
-          <div class="pack-label">Dé outfit waar je je echt mooi in voelt</div>
-          <div class="pack-note">Niet de veilige. De echte.</div>
-        </div>
-      </div>
-      <div class="pack-item">
-        <div class="pack-check" onclick="togglePack(this)"><svg viewBox="0 0 12 12"><polyline points="1.5,6 5,9.5 10.5,2"/></svg></div>
-        <div class="pack-text">
-          <div class="pack-label">Comfortabele schoenen</div>
-          <div class="pack-note">Je loopt 18.000 stappen per dag. Echt.</div>
-        </div>
-      </div>
-      <div class="pack-item">
-        <div class="pack-check" onclick="togglePack(this)"><svg viewBox="0 0 12 12"><polyline points="1.5,6 5,9.5 10.5,2"/></svg></div>
-        <div class="pack-text">
-          <div class="pack-label">Powerbank — voor Fred</div>
-          <div class="pack-note">Fred vergeet dit altijd. Fred weet dat ze dit vergeet.</div>
-        </div>
-      </div>
-      <div class="pack-item">
-        <div class="pack-check checked" onclick="togglePack(this)"><svg viewBox="0 0 12 12"><polyline points="1.5,6 5,9.5 10.5,2"/></svg></div>
-        <div class="pack-text">
-          <div class="pack-label">Reisverzekering check</div>
-          <div class="pack-note">Alle vier gecheckt ✓</div>
-        </div>
-      </div>
-      <div class="pack-item">
-        <div class="pack-check" onclick="togglePack(this)"><svg viewBox="0 0 12 12"><polyline points="1.5,6 5,9.5 10.5,2"/></svg></div>
-        <div class="pack-text">
-          <div class="pack-label">Klein geldkaartje los</div>
-          <div class="pack-note">Franse markten zijn soms kontant only.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div style="height:8px;"></div>
-</div>
-
-<!-- ══════════════════════════════════════════
-     SECTIE 2: SWIPE
-══════════════════════════════════════════════ -->
-<div class="section" id="sec-swipe">
-  <div class="swipe-header">
-    <h2>Wat willen jullie?</h2>
-    <p>Swipe rechts op wat je wil doen. DROOM = verlanglijst.</p>
-  </div>
-  <div class="swipe-moment-tabs">
-    <button class="moment-tab active" onclick="setMoment('ontbijt',this)">Ontbijt</button>
-    <button class="moment-tab" onclick="setMoment('ochtend',this)">Ochtend</button>
-    <button class="moment-tab" onclick="setMoment('lunch',this)">Lunch</button>
-    <button class="moment-tab" onclick="setMoment('middag',this)">Middag</button>
-    <button class="moment-tab" onclick="setMoment('borrel',this)">Borrel</button>
-    <button class="moment-tab" onclick="setMoment('diner',this)">Diner</button>
-    <button class="moment-tab" onclick="setMoment('avond',this)">Avond</button>
-  </div>
-  <div class="swipe-arena" id="swipe-arena"></div>
-  <div class="swipe-buttons">
-    <button class="swipe-btn nee" onclick="swipeCard('left')" title="Niet voor mij">
-      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+  <!-- Bottom nav -->
+  <nav id="bottom-nav">
+    <button class="nav-btn active" data-tab="home" onclick="switchTab('home')">
+      <span class="nav-icon">🏠</span>Home
     </button>
-    <button class="swipe-btn droom" onclick="swipeCard('up')" title="DROOM!">⭐</button>
-    <button class="swipe-btn ja" onclick="swipeCard('right')" title="Wil ik!">
-      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+    <button class="nav-btn" data-tab="swipe" onclick="switchTab('swipe')">
+      <span class="nav-icon">🃏</span>Swipe
     </button>
-  </div>
-</div>
+    <button class="nav-btn" data-tab="top5" onclick="switchTab('top5')">
+      <span class="nav-icon">⭐</span>Mijn Top 5
+    </button>
+    <button class="nav-btn" data-tab="groep" onclick="switchTab('groep')">
+      <span class="nav-icon">💛</span>Groep
+    </button>
+  </nav>
 
-<!-- ══════════════════════════════════════════
-     SECTIE 3: GROEP
-══════════════════════════════════════════════ -->
-<div class="section" id="sec-groep">
-  <div class="groep-header">
-    <h2>La Groupe</h2>
-    <p>Matches, polls en de planning tot nu toe</p>
-  </div>
-  <p class="section-label">Matches 🎉</p>
-  <div class="card matches-list">
-    <div class="match-item">
-      <div class="match-img" style="background-image:url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=200&q=80')"></div>
-      <div class="match-info">
-        <div class="match-moment">Diner · vr</div>
-        <div class="match-name">Café de Flore</div>
-        <div class="match-meta">Saint-Germain · €€ · Alle vier!</div>
-      </div>
-      <div class="match-check"><svg viewBox="0 0 24 24" fill="none"><polyline points="20,6 9,17 4,12"/></svg></div>
-    </div>
-    <div class="match-item">
-      <div class="match-img" style="background-image:url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&q=80')"></div>
-      <div class="match-info">
-        <div class="match-moment">Lunch · za</div>
-        <div class="match-name">Marché des Enfants Rouges</div>
-        <div class="match-meta">Le Marais · € · 3/4</div>
-      </div>
-      <div class="match-check"><svg viewBox="0 0 24 24" fill="none"><polyline points="20,6 9,17 4,12"/></svg></div>
-    </div>
-    <div class="match-item">
-      <div class="match-img" style="background-image:url('https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=200&q=80')"></div>
-      <div class="match-info">
-        <div class="match-moment">Ochtend · za</div>
-        <div class="match-name">Wandelroute Montmartre</div>
-        <div class="match-meta">Montmartre · gratis · 4/4</div>
-      </div>
-      <div class="match-check"><svg viewBox="0 0 24 24" fill="none"><polyline points="20,6 9,17 4,12"/></svg></div>
-    </div>
-  </div>
+  <!-- FAB add -->
+  <button class="add-fab" id="add-fab" onclick="openAddModal()">+</button>
 
-  <p class="section-label">Wie beslist? 🎲</p>
-  <div class="spel-grid">
-    <div class="spel-card" onclick="openQuiz()">
-      <div class="spel-icon">🗼</div>
-      <div class="spel-name">Parijs Quiz</div>
-      <div class="spel-meta">10 vragen · 3 min</div>
-    </div>
-    <div class="spel-card" onclick="showToast('Wie van ons — binnenkort!')">
-      <div class="spel-icon">🤔</div>
-      <div class="spel-name">Wie van ons…?</div>
-      <div class="spel-meta">Multiplayer · 5 min</div>
-    </div>
-    <div class="spel-card" onclick="showToast('Emoji raden — binnenkort!')">
-      <div class="spel-icon">🎭</div>
-      <div class="spel-name">Emoji raden</div>
-      <div class="spel-meta">Snel · 2 min</div>
-    </div>
-    <div class="spel-card" onclick="openTreinModal()">
-      <div class="spel-icon">🚄</div>
-      <div class="spel-name">Trein-modus</div>
-      <div class="spel-meta">Gesprekskaarten</div>
-    </div>
-  </div>
-
-  <p class="section-label">Nieuws uit de groep</p>
-  <div class="card">
-    <div class="card-pad poll-card">
-      <div class="poll-q">Welke wijnbar vrijdagavond?</div>
-      <div class="poll-options">
-        <div class="poll-opt" onclick="vote(this)">
-          <div class="poll-opt-bar" style="width:50%"></div>
-          <span class="poll-opt-text">Clown Bar — Oberkampf</span>
-          <span class="poll-opt-pct">50%</span>
-        </div>
-        <div class="poll-opt" onclick="vote(this)">
-          <div class="poll-opt-bar" style="width:25%"></div>
-          <span class="poll-opt-text">Septime Cave — Bastille</span>
-          <span class="poll-opt-pct">25%</span>
-        </div>
-        <div class="poll-opt" onclick="vote(this)">
-          <div class="poll-opt-bar" style="width:25%"></div>
-          <span class="poll-opt-text">Au Passage — République</span>
-          <span class="poll-opt-pct">25%</span>
+  <!-- ─── HOME ─── -->
+  <div class="screen active" id="tab-home">
+    <!-- Welkom bar -->
+    <div class="welkom-bar">
+      <div class="welkom-bar-left">
+        <div class="welkom-avatar" id="welkom-avatar"></div>
+        <div>
+          <div class="welkom-naam" id="welkom-naam"></div>
+          <div class="welkom-sub">Vroegzat — Parijs 2026</div>
         </div>
       </div>
-      <p class="poll-meta">2 van 4 stemmen · sluit in 24u</p>
+      <button class="uitloggen-btn" onclick="uitloggen()">Uitloggen</button>
+    </div>
+
+    <!-- Reel hero -->
+    <div class="reel-hero">
+      <div class="reel-dots" id="reel-dots"></div>
+      <div class="reel-stories" id="reel-stories"></div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="countdown-banner">
+      <div>
+        <div class="countdown-label">Vertrek Eurostar 08:10</div>
+        <div class="countdown-sub">26 juni 2026 — Amsterdam CS</div>
+      </div>
+      <div class="countdown-units" id="countdown-units">
+        <div style="text-align:center">
+          <div class="countdown-num" id="cd-d">—</div>
+          <div class="countdown-unit">dagen</div>
+        </div>
+        <div style="text-align:center">
+          <div class="countdown-num" id="cd-h">—</div>
+          <div class="countdown-unit">uur</div>
+        </div>
+        <div style="text-align:center">
+          <div class="countdown-num" id="cd-m">—</div>
+          <div class="countdown-unit">min</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekend specials -->
+    <div class="section-header">
+      <div class="section-title">Weekend Specials 🎉</div>
+    </div>
+    <div class="weekend-block">
+      <div class="weekend-card">
+        <div class="weekend-icon">🎭</div>
+        <div class="weekend-info">
+          <div class="weekend-card-title">Marché aux Puces de Saint-Ouen</div>
+          <div class="weekend-card-sub">Za & zo · Europa's grootste vlooienmarkt · Clignancourt</div>
+        </div>
+      </div>
+      <div class="weekend-card">
+        <div class="weekend-icon">🌸</div>
+        <div class="weekend-info">
+          <div class="weekend-card-title">Marché d'Aligre</div>
+          <div class="weekend-card-sub">Elke ochtend · Verse bloemen & lokale producten · 12e</div>
+        </div>
+      </div>
+      <div class="weekend-card">
+        <div class="weekend-icon">🎪</div>
+        <div class="weekend-info">
+          <div class="weekend-card-title">Berges de Seine</div>
+          <div class="weekend-card-sub">Weekend activiteiten langs de Seine · Gratis</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Polls -->
+    <div class="section-header">
+      <div class="section-title">Poll van de week</div>
+    </div>
+    <div class="polls-scroll" id="polls-container"></div>
+
+    <!-- Activity feed -->
+    <div class="section-header">
+      <div class="section-title">Activiteit 👀</div>
+    </div>
+    <div class="feed-list" id="feed-list"></div>
+
+    <div style="height:20px;"></div>
+  </div>
+
+  <!-- ─── SWIPE ─── -->
+  <div class="screen" id="tab-swipe">
+    <div class="cat-tabs" id="swipe-cat-tabs">
+      <button class="cat-tab active" data-cat="overdag" onclick="setCat('overdag')">Overdag</button>
+      <button class="cat-tab" data-cat="eten" onclick="setCat('eten')">Eten</button>
+      <button class="cat-tab" data-cat="avond" onclick="setCat('avond')">Avond</button>
+    </div>
+    <div class="swipe-progress" id="swipe-progress"></div>
+    <div class="swipe-area" id="swipe-area"></div>
+    <div class="swipe-btns">
+      <button class="swipe-btn pass" onclick="doVote('pass')" title="Nee">✕</button>
+      <button class="swipe-btn dream" onclick="doVote('dream')" title="Droomstek">✦</button>
+      <button class="swipe-btn like" onclick="doVote('like')" title="Ja!">♥</button>
     </div>
   </div>
-  <div style="height:8px;"></div>
-</div>
 
-<!-- ══════════════════════════════════════════
-     SECTIE 4: MIJ
-══════════════════════════════════════════════ -->
-<div class="section" id="sec-mij">
-  <div class="mij-header">
-    <div class="profile-avatar-big" id="mij-avatar"></div>
-    <h2 id="mij-naam">—</h2>
-    <p>7 dagen streak 🔥 · 23 swipes · 4 polls beantwoord</p>
-  </div>
-  <p class="section-label">Badges</p>
-  <div class="badges-row">
-    <div class="badge earned"><div class="badge-icon">🗺️</div><div class="badge-name">Verkenner</div></div>
-    <div class="badge earned"><div class="badge-icon">🔥</div><div class="badge-name">Week streak</div></div>
-    <div class="badge locked"><div class="badge-icon">📸</div><div class="badge-name">Fotograaf</div></div>
-    <div class="badge locked"><div class="badge-icon">🍷</div><div class="badge-name">Wijnadviseur</div></div>
-    <div class="badge locked"><div class="badge-icon">👑</div><div class="badge-name">Beslisser</div></div>
-  </div>
-  <p class="section-label">Mijn voorkeuren</p>
-  <div class="card">
-    <div class="card-pad">
-      <div class="pref-row"><span class="pref-label">Budget per dag</span><span class="pref-val">€€ · Middenweg</span></div>
-      <div class="pref-row"><span class="pref-label">Energielevel</span><span class="pref-val">Hoog — laat me lopen</span></div>
-      <div class="pref-row"><span class="pref-label">Eten</span><span class="pref-val">Geen restrictions</span></div>
-      <div class="pref-row"><span class="pref-label">Must-do</span><span class="pref-val">Markten, terrassen, winkelen</span></div>
-      <div class="pref-row"><span class="pref-label">Meldingen</span><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+  <!-- ─── TOP 5 ─── -->
+  <div class="screen" id="tab-top5">
+    <div class="top5-header">
+      <div class="top5-title">Mijn top 5</div>
+      <div class="top5-desc" id="top5-desc"></div>
     </div>
-  </div>
-  <p class="section-label">Eigen suggestie toevoegen</p>
-  <div class="card" style="margin:0 16px 12px;">
-    <div class="card-pad">
-      <p style="font-size:13px;color:var(--gris);margin-bottom:12px;">Heb jij een plek gevonden die de groep moet zien?</p>
-      <button class="btn btn-primary" style="width:100%" onclick="showToast('Suggestie toevoegen — binnenkort beschikbaar')">+ Voeg mijn tip toe</button>
+    <div class="top5-cats" id="top5-cat-tabs">
+      <button class="top5-cat active" data-cat="overdag" onclick="setTop5Cat('overdag')">Overdag</button>
+      <button class="top5-cat" data-cat="eten" onclick="setTop5Cat('eten')">Eten</button>
+      <button class="top5-cat" data-cat="avond" onclick="setTop5Cat('avond')">Avond</button>
     </div>
+    <div class="top5-list" id="top5-list"></div>
   </div>
-  <div style="height:8px;"></div>
-</div>
 
-<!-- ══════════════════════════════════════════
-     BOTTOM NAV
-══════════════════════════════════════════════ -->
-<nav class="bottom-nav" id="bottom-nav" style="display:none">
-  <button class="nav-item active" onclick="showSection('voorpret',this)">
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>
-    Voorpret
-  </button>
-  <button class="nav-item has-notif" onclick="showSection('swipe',this)">
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
-    Swipe
-    <div class="nav-dot"></div>
-  </button>
-  <button class="nav-item" onclick="showSection('groep',this)">
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
-    Groep
-  </button>
-  <button class="nav-item" onclick="showSection('mij',this)">
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
-    Mij
-  </button>
-</nav>
+  <!-- ─── GROEP ─── -->
+  <div class="screen" id="tab-groep">
+    <div class="groep-header">
+      <div class="groep-title">Groepsmatches</div>
+      <div class="groep-desc">Wat wil iedereen doen?</div>
+    </div>
 
-<!-- MATCH OVERLAY -->
-<div class="match-overlay" id="match-overlay" onclick="closeMatch()">
-  <div class="confetti-container" id="confetti"></div>
-  <div class="match-badge">🎉</div>
-  <h2>C'est un match!</h2>
-  <p id="match-text">Alle vier willen dit. Dit gaat op de planning!</p>
-  <button class="btn btn-primary" onclick="closeMatch()">Fantastique!</button>
-</div>
+    <!-- Reservering alarm -->
+    <div class="alarm-block">
+      <div class="alarm-title">📋 Reserveren vereist</div>
+      <div id="alarm-list"></div>
+    </div>
 
-<!-- QUIZ MODAL -->
-<div class="modal" id="quiz-modal" onclick="closeModalOutside(event,'quiz-modal')">
+    <div class="match-section">
+      <div class="match-section-title">✓ Alle vier enthousiast</div>
+      <div id="match-4"></div>
+    </div>
+    <div class="match-section">
+      <div class="match-section-title">Bijna — 3 van 4</div>
+      <div id="match-3"></div>
+    </div>
+    <div class="match-section">
+      <div class="match-section-title">Helft — 2 van 4</div>
+      <div id="match-2"></div>
+    </div>
+    <div style="height:20px;"></div>
+  </div>
+
+</div><!-- end #app -->
+
+<!-- ─── ADD MODAL ─── -->
+<div class="modal-overlay hidden" id="add-modal">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <div class="modal-inner">
-      <h3>Parijs Quiz 🗼</h3>
-      <p style="font-size:13px;color:var(--gris);">Wie het hoogst scoort beslist vanavond waar we eten.</p>
-      <div id="quiz-content"></div>
+    <div class="modal-title">Tip toevoegen</div>
+    <div class="form-group">
+      <label class="form-label">Naam</label>
+      <input class="form-input" id="add-naam" placeholder="Restaurant, winkel, plek…">
     </div>
+    <div class="form-group">
+      <label class="form-label">Categorie</label>
+      <select class="form-select" id="add-cat">
+        <option value="overdag">Overdag</option>
+        <option value="eten">Eten</option>
+        <option value="avond">Avond</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Wijk</label>
+      <input class="form-input" id="add-wijk" placeholder="Le Marais, Saint-Germain…">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Jouw tip</label>
+      <textarea class="form-textarea" id="add-verhaal" placeholder="Waarom moet iedereen hier naartoe?"></textarea>
+    </div>
+    <button class="form-submit" onclick="submitAdd()">Toevoegen ✓</button>
+    <button onclick="closeAddModal()" style="width:100%;margin-top:12px;padding:12px;font-size:14px;color:var(--bruin);">Annuleren</button>
   </div>
 </div>
-
-<!-- TREIN MODAL -->
-<div class="modal" id="trein-modal" onclick="closeModalOutside(event,'trein-modal')">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-inner">
-      <h3>Trein-modus 🚄</h3>
-      <p style="font-size:13px;color:var(--gris);margin-bottom:20px;">Gesprekskaarten voor onderweg. Trek er eentje.</p>
-      <div style="background:var(--vert);border-radius:16px;padding:28px 24px;text-align:center;cursor:pointer;" onclick="trekKaart()">
-        <div style="font-size:36px;margin-bottom:12px;">🃏</div>
-        <p style="font-family:var(--serif);font-size:18px;font-weight:600;color:#fff;line-height:1.4;" id="trein-vraag">Tik om een kaart te trekken</p>
-        <p style="font-size:12px;color:rgba(255,255,255,.5);margin-top:10px;">Tik voor een nieuwe kaart</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
 
 <script>
-// ── CREDENTIALS ──────────────────────────────
+'use strict';
+// ══════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════
 const GROEPSCODE = 'vroegzat';
 
 const PROFIELEN = {
-  'Jet':  { kleur:'#C4614A', initiaal:'Je' },
-  'Fred': { kleur:'#D4A037', initiaal:'Fr' },
-  'Mar':  { kleur:'#6B4C3B', initiaal:'Ma' },
-  'Mir':  { kleur:'#2D4A3E', initiaal:'Mi' },
+  Griette:   { kleur:'#C26E47', initiaal:'Gr' },
+  Frederike: { kleur:'#D4A04D', initiaal:'Fr' },
+  Miriam:    { kleur:'#2D4F3E', initiaal:'Mi' },
+  Marlinde:  { kleur:'#6B5848', initiaal:'Ma' },
 };
 
-// ── LOGIN ─────────────────────────────────────
-function checkGroepscode(){
+const ITEMS = [
+  // ── OVERDAG ──────────────────────────────
+  {
+    id:'sezane-marais', cat:'overdag', sub:'Shopping',
+    naam:'Sézane — L\'Appartement Marais',
+    wijk:'4e — Le Marais', adres:'1 Rue Saint-Fiacre',
+    prijs:'€€–€€€', duur:'1–2u', tijden:'di–za 11–19:30, zo 11:30–19:30',
+    reserveren:false, must_van:'griette', weekend_special:false,
+    verhaal:'Het iconische Parijse modehuis heeft haar meest betoverende winkel in het hart van Le Marais. Wit gepleisterde muren, verse bloemen, de geur van kaarsen — shopping als kunstvorm.',
+    tip:'Kom op dinsdag of woensdag voor de rust. Weekend is énorm druk.',
+    img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
+  },
+  {
+    id:'merci-marais', cat:'overdag', sub:'Concept store',
+    naam:'Merci',
+    wijk:'3e — Haut Marais', adres:'111 Boulevard Beaumarchais',
+    prijs:'€€–€€€€', duur:'1–2u', tijden:'ma–za 10–19:30',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'De coolste concept store van Parijs, alle winst gaat naar goed doel. Mode, interieur, design boeken en een fantastisch café in de kelder met gerecyclede meubels.',
+    tip:'Het café in de kelder heeft de beste lunch van de buurt — gegrilde groenten, kwark, verse kruiden.',
+    img:'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=600&q=80',
+  },
+  {
+    id:'jardins-palais-royal', cat:'overdag', sub:'Tuin & architectuur',
+    naam:'Jardins du Palais-Royal',
+    wijk:'1e — Louvre', adres:'Place du Palais-Royal',
+    prijs:'Gratis', duur:'45min–1u', tijden:'altijd open',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'Verborgen achter de arcade van het Palais-Royal: symmetrische tuinen, de gestreepte zuilen van Buren, kleine galerijen vol antiquairs en haute couture. Eén van de mooiste plekken van Parijs.',
+    tip:'Zoek de antiekzaaltjes onder de arcades — echte schatten voor echte prijzen.',
+    img:'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80',
+  },
+  {
+    id:'musee-orangerie', cat:'overdag', sub:'Museum',
+    naam:'Musée de l\'Orangerie',
+    wijk:'1e — Tuileries', adres:'Jardin des Tuileries',
+    prijs:'€12,50', duur:'1,5–2u', tijden:'wo–ma 9–18u',
+    reserveren:true, must_van:null, weekend_special:false,
+    verhaal:'Monet\'s Waterlelies in de ovale zalen — één van de meest meditieve ervaringen die Parijs te bieden heeft. Daarna de Walther Collection: Cézanne, Matisse, Picasso, Modigliani.',
+    tip:'Online ticket met tijdslot kopen — de rij buiten is lang maar binnenin is het rustig.',
+    img:'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=600&q=80',
+  },
+  {
+    id:'musee-rodin', cat:'overdag', sub:'Museum & tuin',
+    naam:'Musée Rodin',
+    wijk:'7e — Invalides', adres:'77 Rue de Varenne',
+    prijs:'€13', duur:'1,5–2u', tijden:'di–zo 10–17:30u',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'Een van de prachtigste musea van Parijs: de beelden in de tuin zijn even indrukwekkend als de collectie binnen. De Denker, De Kus, Poort der Hel — allemaal hier.',
+    tip:'Lunch in de museumtuin als het mooi weer is — broodjes en koffie terwijl je naar Rodin kijkt.',
+    img:'https://images.unsplash.com/photo-1558008258-3256797b43f3?w=600&q=80',
+  },
+  {
+    id:'galeries-lafayette', cat:'overdag', sub:'Shopping',
+    naam:'Galeries Lafayette Haussmann',
+    wijk:'9e — Grands Boulevards', adres:'40 Boulevard Haussmann',
+    prijs:'€–€€€€', duur:'2–3u', tijden:'ma–za 9:30–20u, zo 11–20u',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'Niet alleen winkelen — het koepelplafond alleen is al de moeite waard. Ga naar de gratis dakbar voor een spectaculair uitzicht over de daken van Parijs.',
+    tip:'Het dak is gratis toegankelijk via de lift op het 6e verdiep. Het mooiste uitzicht voor niks.',
+    img:'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80',
+  },
+  {
+    id:'viaduc-des-arts', cat:'overdag', sub:'Architectuur & atelier',
+    naam:'Viaduc des Arts',
+    wijk:'12e — Bastille', adres:'Avenue Daumesnil',
+    prijs:'Gratis', duur:'1u', tijden:'altijd open',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'Onder de oude spoorwegbogen van de Promenade Plantée: ateliers van meubelmakers, juweliers, restaurateurs. Daarboven: een groene wandelpromenade hoog boven de stad.',
+    tip:'Combineer met een wandeling op de Promenade Plantée — 4,5km groen op voormalig spoor.',
+    img:'https://images.unsplash.com/photo-1491557345352-5929e343eb89?w=600&q=80',
+  },
+  {
+    id:'puces-saint-ouen', cat:'overdag', sub:'Markt',
+    naam:'Marché aux Puces de Saint-Ouen',
+    wijk:'18e — Clignancourt', adres:'Avenue de la Porte de Clignancourt',
+    prijs:'Gratis entree', duur:'3–4u', tijden:'za–zo–ma 9–18u',
+    reserveren:false, must_van:null, weekend_special:true,
+    verhaal:'Europa\'s grootste vlooienmarkt met meer dan 2.000 handelaren. Vintage mode, antiek, kunst, meubels. Karl Lagerfeld en Coco Chanel kwamen hier. Jij ook.',
+    tip:'Ga vroeg (vóór 10u) voor de beste vondsten. Onderhandelen is normaal en verwacht.',
+    img:'https://images.unsplash.com/photo-1551818255-e6e10975bc17?w=600&q=80',
+  },
+  {
+    id:'centre-pompidou', cat:'overdag', sub:'Museum',
+    naam:'Centre Pompidou',
+    wijk:'4e — Beaubourg', adres:'Place Georges-Pompidou',
+    prijs:'€15', duur:'2–3u', tijden:'wo–ma 11–21u',
+    reserveren:true, must_van:null, weekend_special:false,
+    verhaal:'Het omgekeerde gebouw — buizen, leidingen, roltrappen aan de buitenkant — huisvest Europa\'s grootste museum voor moderne kunst. Matisse, Kandinsky, Frida Kahlo.',
+    tip:'Dinsdags gesloten. Woensdagavond is minder druk. Het uitzicht vanaf de roltrappen is gratis.',
+    img:'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600&q=80',
+  },
+  {
+    id:'rue-montorgueil', cat:'overdag', sub:'Wandelen',
+    naam:'Rue Montorgueil',
+    wijk:'2e — Les Halles', adres:'Rue Montorgueil',
+    prijs:'€–€€', duur:'1u', tijden:'ochtend is het best',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'De levendigste marktstraat van Parijs — oestermannen, kaasspecialiteiten, patisseries naast couture-winkeltjes. Hier kocht Monet zijn inkt. Nu koop jij hier macarons.',
+    tip:'Stophier bij Stohrer, de oudste patisserie van Parijs (1730). Het baba au rhum is legendarisch.',
+    img:'https://images.unsplash.com/photo-1509017174183-0b7e0278f1ec?w=600&q=80',
+  },
+  {
+    id:'canal-saint-martin', cat:'overdag', sub:'Wandelen',
+    naam:'Canal Saint-Martin',
+    wijk:'10e — République', adres:'Canal Saint-Martin',
+    prijs:'Gratis', duur:'1,5u', tijden:'altijd open',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'Het hippe hart van het nieuwe Parijs — café\'s met houten banken buiten, vintage winkeltjes, kunstgalerijen in voormalige ateliers. Een wandeling langs het kanaal is pure levensvreugde.',
+    tip:'Zondag is de kade autovrij — dan is het absolute heaven. Picknick meenemen.',
+    img:'https://images.unsplash.com/photo-1550340499-a6c60fc8287c?w=600&q=80',
+  },
+  {
+    id:'sainte-chapelle', cat:'overdag', sub:'Architectuur',
+    naam:'Sainte-Chapelle',
+    wijk:'1e — Île de la Cité', adres:'8 Boulevard du Palais',
+    prijs:'€13', duur:'45min', tijden:'dagelijks 9–17u',
+    reserveren:true, must_van:null, weekend_special:false,
+    verhaal:'1.113 glas-in-lood ramen schieten omhoog als een kathedraal van licht. Gebouwd in 1248, en nog altijd adembenemend. Eén van de mooiste gotische kapellen ter wereld.',
+    tip:'Combineer met de Conciergerie ernaast (€9 of gecombineerd kaartje). Vroeg gaan — snel vol.',
+    img:'https://images.unsplash.com/photo-1567942712661-82b9b407abbf?w=600&q=80',
+  },
+  {
+    id:'belleville-buttes', cat:'overdag', sub:'Wijk & uitzicht',
+    naam:'Parc des Buttes-Chaumont',
+    wijk:'19e — Belleville', adres:'1 Rue Botzaris',
+    prijs:'Gratis', duur:'2u', tijden:'altijd open',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'Het best bewaarde geheim van Parijs: een romantisch bergpark met rotsen, een meer, hangende bruggen en een tempel op een eiland. Favoriete plek van echte Parijzenaars.',
+    tip:'Rosa Bonheur aan het meer is de hipste openluchtbar. Perfect voor een late namiddag rosé.',
+    img:'https://images.unsplash.com/photo-1499856871958-5b9357976b82?w=600&q=80',
+  },
+  {
+    id:'le-marais-walk', cat:'overdag', sub:'Wijk',
+    naam:'Le Marais — vrije verkenning',
+    wijk:'3e–4e — Le Marais', adres:'Place des Vosges als startpunt',
+    prijs:'Gratis', duur:'2–3u', tijden:'altijd',
+    reserveren:false, must_van:'griette', weekend_special:false,
+    verhaal:'Van de Place des Vosges door de nauwe steegjes langs galerijen, hôtels particuliers, en hippe winkeltjes. Het Joodse kwartier, de LGBT+-bar rue des Archives, de coolste vintage winkels.',
+    tip:'Start bij Place des Vosges (de oudste geplaveide plein van Parijs). Einde bij Café de la Mairie.',
+    img:'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80',
+  },
+  {
+    id:'montmartre-walk', cat:'overdag', sub:'Wijk & uitzicht',
+    naam:'Montmartre — Sacré-Cœur & omgeving',
+    wijk:'18e — Montmartre', adres:'Sacré-Cœur, Place du Tertre',
+    prijs:'Gratis', duur:'2–3u', tijden:'altijd',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'Klim de heuvel voor het mooiste panorama over Parijs, dwaal door de schildersbuurt, zoek de wijnranken op de Rue des Saules. Bohemiaans, romantisch, en op bepaalde momenten bijna sprookjesachtig.',
+    tip:'Vermijd Place du Tertre overdag (toeristische schilderijen). Ga vroeg in de ochtend of bij zonsondergang.',
+    img:'https://images.unsplash.com/photo-1541625602330-2277a4c46182?w=600&q=80',
+  },
+
+  // ── ETEN ─────────────────────────────────
+  {
+    id:'breizh-cafe', cat:'eten', sub:'Lunch / crêperie',
+    naam:'Breizh Café',
+    wijk:'3e — Haut Marais', adres:'109 Rue Vieille-du-Temple',
+    prijs:'€€', duur:'1–1,5u', tijden:'wo–ma 11:30–22:30u',
+    reserveren:true, must_van:null, weekend_special:false,
+    verhaal:'De beste galettes (boekweit-crêpes) buiten Bretagne, gevuld met biologische ingrediënten. Japanse invloed in de presentatie, Bretonse ziel in elke hap. Wachtrij maar waard.',
+    tip:'Reserveer — of ga vlak als het opent om 11:30u. Probeer de galette complète en de caramel au beurre salé.',
+    img:'https://images.unsplash.com/photo-1519864600265-abb23a62cf47?w=600&q=80',
+  },
+  {
+    id:'septime', cat:'eten', sub:'Diner',
+    naam:'Septime',
+    wijk:'11e — Bastille', adres:'80 Rue de Charonne',
+    prijs:'€€€€', duur:'2,5–3u', tijden:'ma–vr lunch & diner, za alleen diner',
+    reserveren:true, must_van:null, weekend_special:false,
+    verhaal:'Consequent in de top-50 beste restaurants ter wereld. Seizoensgebonden Neobistro-keuken in een prachtig sober interieur. Bertrand Grébaut kookt met de groenten als ster.',
+    tip:'Reservering 2–3 maanden vooruit noodzakelijk. Probeer de lunch (€60) vs. diner (€110+) als budget meespeelt.',
+    img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80',
+  },
+  {
+    id:'du-pain-des-idees', cat:'eten', sub:'Ontbijt / bakkerij',
+    naam:'Du Pain et des Idées',
+    wijk:'10e — Canal Saint-Martin', adres:'34 Rue Yves Toudic',
+    prijs:'€', duur:'20min', tijden:'ma–vr 6:45–20u (za–zo gesloten)',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'Naar vote de allerbeste bakker van Parijs. De "pain des amis" (een ronde zuurdesembrood), de escargots au chocolat, de croissants die bijna te mooi zijn om op te eten.',
+    tip:'Let op: gesloten in het weekend! Ga op vrijdagochtend als warm en vers brood aanwezig is.',
+    img:'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80',
+  },
+  {
+    id:'chez-jeannette', cat:'eten', sub:'Lunch / bistro',
+    naam:'Chez Jeannette',
+    wijk:'10e — République', adres:'47 Rue du Faubourg Saint-Denis',
+    prijs:'€€', duur:'1–1,5u', tijden:'dagelijks 8–minacht',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'Een tijdloze Parijse bistro die niet probeerde hip te worden maar het toch is geworden. Origineel interieur uit de jaren \'50, goed eten voor redelijke prijzen. Soort Parijs dat je zoekt.',
+    tip:'De plat du jour is altijd de beste waarde. Bestelling aan de toog voor snelheid.',
+    img:'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=600&q=80',
+  },
+  {
+    id:'clown-bar', cat:'eten', sub:'Diner',
+    naam:'Clown Bar',
+    wijk:'11e — Oberkampf', adres:'114 Rue Amelot',
+    prijs:'€€€', duur:'1,5–2u', tijden:'wo–zo diner, do–za ook lunch',
+    reserveren:true, must_van:null, weekend_special:false,
+    verhaal:'In de historische bistro naast Cirque d\'Hiver — prachtige Art Nouveau tegeltableaus — serveert chef Sota Atsumi avontuurlijke neobistrokeuken. Beroemd om de animelle (zwezerik).',
+    tip:'Reserveer 1–2 weken vooruit. Vraag de sommelier om begeleiding — de wijnkaart is bijzonder.',
+    img:'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80',
+  },
+  {
+    id:'comptoir-du-relais', cat:'eten', sub:'Lunch / bistro',
+    naam:'Comptoir du Relais',
+    wijk:'6e — Saint-Germain', adres:'9 Carrefour de l\'Odéon',
+    prijs:'€€€', duur:'1,5u', tijden:'dagelijks midi & soir',
+    reserveren:true, must_van:null, weekend_special:false,
+    verhaal:'Yves Camdeborde\'s legendarische neobistro — de originele. Kleine, hectische bar, perfect bistro-eten, een terras op een oud Parijse kruispunt. Biefstuk tartaar, pâté en wijn.',
+    tip:'Reserveer voor de avond. Lunch aan de bar is ook mogelijk zonder reservering (wacht dan buiten).',
+    img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80',
+  },
+  {
+    id:'cafe-de-flore', cat:'eten', sub:'Ontbijt / koffie',
+    naam:'Café de Flore',
+    wijk:'6e — Saint-Germain-des-Prés', adres:'172 Boulevard Saint-Germain',
+    prijs:'€€€', duur:'1u', tijden:'dagelijks 7:30–1:30u',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'Sartre, Simone de Beauvoir, Picasso, Hemingway — allemaal vaste klanten. Nu nog steeds een van de mooiste terrassen van Parijs. Veel te duur, absoluut de moeite waard.',
+    tip:'Ga voor ontbijt om 8u — duurder dan de buurtbakker maar de sfeer is onbetaalbaar.',
+    img:'https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=600&q=80',
+  },
+  {
+    id:'marche-couvert-enfants-rouges', cat:'eten', sub:'Lunch / markt',
+    naam:'Marché des Enfants Rouges',
+    wijk:'3e — Haut Marais', adres:'39 Rue de Bretagne',
+    prijs:'€–€€', duur:'1u', tijden:'di–za 8:30–14:30u, zo 8:30–14u',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'De oudste overdekte markt van Parijs (1615) — nu een mengelmoes van foodkraampjes: Marokkaans, Japans, Libanees, verse oesters. Lunchen aan een klaptafel tussen echte marktgangers.',
+    tip:'Kom voor 12u want daarna is het moorddruk. De Marokkaanse tajine is een instituut.',
+    img:'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=600&q=80',
+  },
+  {
+    id:'frenchie', cat:'eten', sub:'Diner',
+    naam:'Frenchie',
+    wijk:'2e — Sentier', adres:'5 Rue du Nil',
+    prijs:'€€€€', duur:'2,5u', tijden:'ma–vr diner, za lunch & diner',
+    reserveren:true, must_van:null, weekend_special:false,
+    verhaal:'Gregory Marchand\'s restaurant dat een beweging in gang zette. Authentieke bistrokeuken met internationale technieken in een sober interieur. De Rue du Nil is zijn mini-food-universe.',
+    tip:'Reserveer 2–3 maanden vooruit. De Frenchie Bar à Vins ernaast heeft geen reservering — kleinere gerechten, grote wijn.',
+    img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80',
+  },
+  {
+    id:'verjus', cat:'eten', sub:'Diner',
+    naam:'Verjus',
+    wijk:'1e — Palais-Royal', adres:'47 Rue de Montpensier',
+    prijs:'€€€', duur:'2u', tijden:'di–za diner',
+    reserveren:true, must_van:null, weekend_special:false,
+    verhaal:'Twee Amerikanen in een oud herenhuis naast het Palais-Royal: chef Braden Perkins maakt prachtig kalme, verfijnde keuken. Een van de liefste restaurants van Parijs.',
+    tip:'Het souterrain is een wijnbar zonder reservering. Wijnavond alternatief voor de formele bovenverdieping.',
+    img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80',
+  },
+  {
+    id:'pink-mamma', cat:'eten', sub:'Diner',
+    naam:'Pink Mamma',
+    wijk:'9e — South Pigalle', adres:'20 Bis Rue de Douai',
+    prijs:'€€€', duur:'2u', tijden:'ma–zo lunch & diner',
+    reserveren:true, must_van:null, weekend_special:false,
+    verhaal:'Vijf verdiepingen Italiaans van Big Mamma Group: pasta, pizza, een dak-rooftop bar en een interieur zo fotogeniek dat je de camera niet neer kunt leggen. Instagram-heaven en toch echt lekker.',
+    tip:'Reserveer ver vooruit of loop vroeg aan voor een waiting-list spot. Vraag naar de dagverse pasta.',
+    img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80',
+  },
+  {
+    id:'bouillon-julien', cat:'eten', sub:'Diner / bistro',
+    naam:'Bouillon Julien',
+    wijk:'10e — Grands Boulevards', adres:'16 Rue du Faubourg Saint-Denis',
+    prijs:'€', duur:'1–1,5u', tijden:'dagelijks 12–24u',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'Art Nouveau décor uit 1906, traditionele bistro-gerechten voor fractie van de normale Parijse prijs. Steak tartaar €9,70. Oesters. Rum baba. Geen reservering — wachtrij maar supersnel.',
+    tip:'Rij begint 30min voor opening. Neem de oesters, de pâté en de île flottante. Alles is goed.',
+    img:'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=600&q=80',
+  },
+  {
+    id:'cafe-charlot', cat:'eten', sub:'Ontbijt / brunch',
+    naam:'Café Charlot',
+    wijk:'3e — Haut Marais', adres:'38 Rue de Bretagne',
+    prijs:'€€', duur:'1–1,5u', tijden:'dagelijks 7–24u',
+    reserveren:false, must_van:null, weekend_special:true,
+    verhaal:'Hoekbrasserie in het hart van de Marais die het weekend-brunch-ritueel uitvond. Hoge plafonds, Art Deco details, een terras vol lokale bewoners. Zo Parijs als het wordt.',
+    tip:'Weekend ochtend is fantastisch maar druk. Doordeweeks kalmer. Oeuf cocotte is perfect.',
+    img:'https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=600&q=80',
+  },
+  {
+    id:'chez-omar', cat:'eten', sub:'Diner',
+    naam:'Chez Omar',
+    wijk:'3e — Arts-et-Métiers', adres:'47 Rue de Bretagne',
+    prijs:'€€', duur:'1,5u', tijden:'ma–za 12–14:30u, 19:30–23:30u',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'Beroemde couscous-restaurant waar je Karl Lagerfeld naast een dakloze kon zien zitten. Geen reserveringen, cash only, en de beste couscous royal van Parijs.',
+    tip:'Wachtrij is normaal maar ze werken snel. Kom vroeg of na 21:30u. Cash meenemen!',
+    img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80',
+  },
+
+  // ── AVOND ─────────────────────────────────
+  {
+    id:'charlie-bird', cat:'avond', sub:'Cocktailbar',
+    naam:'Le Syndicat',
+    wijk:'10e — Strasbourg-Saint-Denis', adres:'51 Rue du Faubourg Saint-Denis',
+    prijs:'€€€', duur:'2u', tijden:'wo–zo 18–2u',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'Beste cocktailbar van Parijs — énig gemaakt uitsluitend met Franse sterke dranken (geen Scotch, geen Bourbon). Inventief, technisch perfect, geserveerd in een voormalige vakbondsruimte.',
+    tip:'Kom vroeg (18–20u) voor een plek aan de bar. Later wordt het heel druk. Vraag naar de specialiteiten van de week.',
+    img:'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&q=80',
+  },
+  {
+    id:'combat', cat:'avond', sub:'Wijnbar',
+    naam:'Combat',
+    wijk:'10e — Colonel Fabien', adres:'63 Rue de Belleville',
+    prijs:'€€', duur:'2–3u', tijden:'di–za 18–1u',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'De coolste wijnbar van het nieuwe Parijs: natuurwijn van kleine producenten, uitgelichte keuze per week, drankjes geserveerd door mensen die écht weten waarover ze praten. Kleine hapjes.',
+    tip:'Vraag om advies — de carte verandert wekelijks. Het is een enthousiaste cult-plek geworden.',
+    img:'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=80',
+  },
+  {
+    id:'caveau-de-la-huchette', cat:'avond', sub:'Jazzclub',
+    naam:'Caveau de la Huchette',
+    wijk:'5e — Latin Quarter', adres:'5 Rue de la Huchette',
+    prijs:'€13–17', duur:'3u+', tijden:'dagelijks 21:30–2:30u',
+    reserveren:false, must_van:null, weekend_special:true,
+    verhaal:'Jazzclub in een kelder uit de 14e eeuw — hier kwamen Dizzy Gillespie en Memphis Slim. Swing, bebop en blues live, dansende Parijzenaars, geschiedenis voel je in de muren.',
+    tip:'Kom niet later dan 22:30u als je wil dansen. Kom eerder als je een plek wil zitten om te kijken.',
+    img:'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&q=80',
+  },
+  {
+    id:'aux-deux-amis', cat:'avond', sub:'Wijnbar / bistro',
+    naam:'Aux Deux Amis',
+    wijk:'11e — Oberkampf', adres:'45 Rue Oberkampf',
+    prijs:'€€', duur:'2u', tijden:'di–za 18:30–2u',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'De emblematische neobistro van Parijs — altijd propvol, altijd levendig. Staan aan de toog met een glas natuurwijn en een klein bordje is hier de perfecte avond.',
+    tip:'Geen reserveringen. Kom vroeg (voor 19:30u) voor een stoel. Anders: bar is ook prima.',
+    img:'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=80',
+  },
+  {
+    id:'moonshiner', cat:'avond', sub:'Speakeasy',
+    naam:'Moonshiner',
+    wijk:'12e — Bastille', adres:'Achterin Da Vito pizza, 5 Rue Sedaine',
+    prijs:'€€€', duur:'2u', tijden:'ma–za 18–2u',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'De meest filmische bar van Parijs: ga naar de achterkamer van een Italiaans restaurant, door de koelkast-deur — en je staat in een prachtige prohibition-era speakeasy.',
+    tip:'Loop de pizzeria in, ga naar achter, duw de koelkastdeur open. Dat is hij. Je weet het als je het ziet.',
+    img:'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&q=80',
+  },
+  {
+    id:'glass', cat:'avond', sub:'Bar',
+    naam:'Glass',
+    wijk:'9e — South Pigalle', adres:'7 Rue de Rochechouart',
+    prijs:'€€€', duur:'2–3u', tijden:'di–zo 18–2u',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'SoPi (South Pigalle) werd hip door plekken als Glass — een smalle bar met perfecte muziek, creatieve cocktails en een coole, niet-snobistische sfeer. Altijd een mix van locals.',
+    tip:'Dinsdag is hun cocktail-experimenteer-avond. Vraag de barman voor een aanrader buiten de kaart.',
+    img:'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&q=80',
+  },
+  {
+    id:'perchoir', cat:'avond', sub:'Rooftop',
+    naam:'Le Perchoir Marais',
+    wijk:'11e — Oberkampf', adres:'14 Rue Crespin du Gast',
+    prijs:'€€€', duur:'2–3u', tijden:'ma–zo 18–2u (zomer)',
+    reserveren:true, must_van:null, weekend_special:false,
+    verhaal:'Eén van de hipste rooftop bars van Parijs met een spectaculair 360° uitzicht. Lange avonden in de zomer, goede cocktails, het gevoel dat je boven de stad zweeft.',
+    tip:'Reserveer online voor een tafeltje. Weekend is propvol. Beste licht voor het gouden uurtje rond 20u.',
+    img:'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&q=80',
+  },
+  {
+    id:'rosa-bonheur', cat:'avond', sub:'Openlucht / danscafé',
+    naam:'Rosa Bonheur',
+    wijk:'19e — Buttes-Chaumont', adres:'2 Allée de la Cascade, Parc des Buttes-Chaumont',
+    prijs:'€€', duur:'3u+', tijden:'do–zo 18–minacht',
+    reserveren:false, must_van:null, weekend_special:true,
+    verhaal:'Open-air party in het park — een danscafé op een terras boven het meer van Buttes-Chaumont. Disco, funk, soul, reggae. Parijzenaars aller leeftijden. De leukste avond van je verblijf.',
+    tip:'Alleen donderdag t/m zondag. Neem metro 5 naar Buttes-Chaumont en volg het geluid. RSVP niet nodig.',
+    img:'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&q=80',
+  },
+  {
+    id:'experimental-cocktail', cat:'avond', sub:'Cocktailbar',
+    naam:'Experimental Cocktail Club',
+    wijk:'1e — Châtelet-Les Halles', adres:'37 Rue Saint-Sauveur',
+    prijs:'€€€', duur:'2u', tijden:'dagelijks 18–2u',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'De cocktailbar die de Parijse cocktailscene revolutioneerde in 2007. Kleine, schemerige ruimte, perfecte drinks, niemand die doet of ze beter zijn dan jij. Een klassieker geworden.',
+    tip:'Het ECC-team heeft ook Curio Parlor (voor Negroni-lovers) en Beef Club restaurant ernaast.',
+    img:'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&q=80',
+  },
+  {
+    id:'wandering-whalers', cat:'avond', sub:'Wijnbar',
+    naam:'Wandering Whalers (Bar à Huîtres)',
+    wijk:'2e — Sentier', adres:'5 Rue du Nil',
+    prijs:'€€', duur:'1,5u', tijden:'do–za 18–23u',
+    reserveren:false, must_van:null, weekend_special:false,
+    verhaal:'Intieme oesterbar in de buurt van Frenchie — oesters, champagne, naturel wijn en goede muziek. Het Parijse avondleven op zijn puurst: simpel, perfect, onvergetelijk.',
+    tip:'Kleine ruimte, snel vol. Kom direct bij opening. Vraag naar de oesters van de week.',
+    img:'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=80',
+  },
+];
+
+// Mock votes van de andere 3 profielen (realistisch pre-seeded)
+const MOCK_VOTES = {
+  Frederike: {
+    'sezane-marais':'dream','merci-marais':'like','jardins-palais-royal':'like',
+    'musee-orangerie':'like','galeries-lafayette':'pass','viaduc-des-arts':'like',
+    'puces-saint-ouen':'dream','canal-saint-martin':'dream','sainte-chapelle':'like',
+    'belleville-buttes':'like','le-marais-walk':'like','montmartre-walk':'like',
+    'breizh-cafe':'dream','septime':'like','du-pain-des-idees':'like',
+    'chez-jeannette':'like','clown-bar':'like','marche-couvert-enfants-rouges':'dream',
+    'frenchie':'like','verjus':'like','pink-mamma':'dream','bouillon-julien':'like',
+    'cafe-charlot':'like','chez-omar':'like',
+    'combat':'like','caveau-de-la-huchette':'dream','aux-deux-amis':'like',
+    'moonshiner':'dream','glass':'like','perchoir':'like','rosa-bonheur':'dream',
+    'experimental-cocktail':'like',
+  },
+  Miriam: {
+    'sezane-marais':'like','jardins-palais-royal':'dream','musee-orangerie':'dream',
+    'musee-rodin':'dream','galeries-lafayette':'pass','viaduc-des-arts':'dream',
+    'puces-saint-ouen':'like','centre-pompidou':'like','canal-saint-martin':'like',
+    'sainte-chapelle':'dream','belleville-buttes':'dream','le-marais-walk':'dream',
+    'montmartre-walk':'like',
+    'breizh-cafe':'like','du-pain-des-idees':'like','chez-jeannette':'like',
+    'comptoir-du-relais':'like','cafe-de-flore':'pass','marche-couvert-enfants-rouges':'like',
+    'verjus':'like','bouillon-julien':'dream','cafe-charlot':'like','chez-omar':'like',
+    'charlie-bird':'like','combat':'dream','caveau-de-la-huchette':'like',
+    'aux-deux-amis':'dream','moonshiner':'like','rosa-bonheur':'dream',
+  },
+  Marlinde: {
+    'sezane-marais':'like','merci-marais':'dream','jardins-palais-royal':'like',
+    'musee-orangerie':'like','galeries-lafayette':'like','puces-saint-ouen':'like',
+    'rue-montorgueil':'dream','canal-saint-martin':'like','belleville-buttes':'like',
+    'le-marais-walk':'like','montmartre-walk':'dream',
+    'breizh-cafe':'like','septime':'like','du-pain-des-idees':'dream',
+    'chez-jeannette':'like','cafe-de-flore':'dream','marche-couvert-enfants-rouges':'like',
+    'frenchie':'like','pink-mamma':'like','bouillon-julien':'like',
+    'cafe-charlot':'dream','chez-omar':'dream',
+    'combat':'like','caveau-de-la-huchette':'dream','aux-deux-amis':'like',
+    'moonshiner':'like','glass':'like','perchoir':'dream','rosa-bonheur':'like',
+    'experimental-cocktail':'like','wandering-whalers':'dream',
+  },
+};
+
+// Polls data
+const POLLS = [
+  {
+    id:'avond1',
+    vraag:'Hoe eindigen we onze eerste avond in Parijs?',
+    opties:[
+      {label:'🍷 Wijnbar met naturel wijn',votes:2},
+      {label:'🎷 Jazzclub Caveau de la Huchette',votes:1},
+      {label:'🌙 Rooftop cocktails',votes:0},
+    ]
+  },
+  {
+    id:'ochtend1',
+    vraag:'Hoe beginnen we dag 2?',
+    opties:[
+      {label:'☕ Croissant bij Du Pain et des Idées',votes:2},
+      {label:'🥐 Brunch Café Charlot Marais',votes:1},
+      {label:'🏃 Vroeg wandelen Canal Saint-Martin',votes:1},
+    ]
+  },
+  {
+    id:'shopping1',
+    vraag:'Welke shopdag-prioriteit?',
+    opties:[
+      {label:'💛 Sézane & Marais vintage',votes:3},
+      {label:'🛍️ Galeries Lafayette & Grands Boulevards',votes:1},
+      {label:'🎪 Puces de Saint-Ouen vlooienmarkt',votes:2},
+    ]
+  },
+];
+
+// Reel slides
+const REEL_SLIDES = [
+  { emoji:'🗼', title:'Bonjour Vroegzat!', desc:'Drie dagen Parijs met de vier mooiste vrouwen van de wereld. En dan — lekker vroeg zat.' },
+  { emoji:'🥂', title:'26 – 28 juni 2026', desc:'Eurostar 08:10 vanuit Amsterdam CS. Kom op tijd.' },
+  { emoji:'💛', title:'Swipe je favorieten', desc:'Like, pass of droom — en zie wat jullie allemaal willen doen.' },
+  { emoji:'🗺️', title:'45 hotspots klaar', desc:'Van Sézane tot speakeasy. Van galette tot naturel wijn. Van zonsopgang tot... vroegzat.' },
+];
+
+// Activity feed (mock)
+const FEED_ITEMS_INIT = [
+  { user:'Frederike', kleur:'#D4A04D', initiaal:'Fr', actie:'liket', item:'Marché aux Puces de Saint-Ouen', emoji:'❤️', tijd:'2u' },
+  { user:'Miriam', kleur:'#2D4F3E', initiaal:'Mi', actie:'droomt van', item:'Jardins du Palais-Royal', emoji:'✦', tijd:'4u' },
+  { user:'Marlinde', kleur:'#6B5848', initiaal:'Ma', actie:'liket', item:'Sézane — L\'Appartement Marais', emoji:'❤️', tijd:'6u' },
+  { user:'Frederike', kleur:'#D4A04D', initiaal:'Fr', actie:'droomt van', item:'Breizh Café', emoji:'✦', tijd:'8u' },
+  { user:'Miriam', kleur:'#2D4F3E', initiaal:'Mi', actie:'liket', item:'Caveau de la Huchette', emoji:'❤️', tijd:'1d' },
+];
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let activeUser = null;
+let activeTab = 'home';
+let swipeCat = 'overdag';
+let top5Cat = 'overdag';
+let swipeIndex = {};   // per cat: index into filtered list
+let userSwipes = {};   // {itemId: 'like'|'pass'|'dream'}
+let pollVotes = {};    // {pollId: optionIndex}
+let reelInterval = null;
+let reelIdx = 0;
+let dragState = null;
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('vz_user');
+  const code = localStorage.getItem('vz_groep');
+  if (saved && code === GROEPSCODE && PROFIELEN[saved]) {
+    initialiseerApp(saved);
+  }
+  document.getElementById('groep-input').focus();
+});
+
+function checkGroepscode() {
   const val = document.getElementById('groep-input').value.trim().toLowerCase();
-  if(val === GROEPSCODE){
-    document.getElementById('step-groep').style.display='none';
-    document.getElementById('step-profiel').style.display='block';
-    document.getElementById('groep-err').textContent='';
+  const inp = document.getElementById('groep-input');
+  const err = document.getElementById('groep-err');
+  if (val === GROEPSCODE) {
+    document.getElementById('step-groep').classList.add('hidden');
+    document.getElementById('step-profiel').classList.remove('hidden');
+    err.textContent = '';
   } else {
-    const inp = document.getElementById('groep-input');
     inp.classList.add('error');
-    document.getElementById('groep-err').textContent='Onjuiste code. Probeer opnieuw.';
-    setTimeout(()=>inp.classList.remove('error'),400);
+    err.textContent = 'Onjuiste code — probeer opnieuw';
+    setTimeout(() => inp.classList.remove('error'), 400);
   }
 }
 
-document.getElementById('groep-input').addEventListener('keydown',e=>{
-  if(e.key==='Enter') checkGroepscode();
-});
-
-function kiesProfiel(naam){
+function kiesProfiel(naam) {
   localStorage.setItem('vz_user', naam);
   localStorage.setItem('vz_groep', GROEPSCODE);
   initialiseerApp(naam);
 }
 
-function uitloggen(){
+function uitloggen() {
   localStorage.removeItem('vz_user');
   localStorage.removeItem('vz_groep');
   location.reload();
 }
 
-// ── APP INITIALISATIE ─────────────────────────
-function initialiseerApp(naam){
-  // Verberg login, toon app
-  const ls = document.getElementById('login-screen');
-  ls.classList.add('hidden');
-  setTimeout(()=>ls.style.display='none',400);
-
+function initialiseerApp(naam) {
+  activeUser = naam;
   const p = PROFIELEN[naam];
 
-  // Welkom banner
-  const banner = document.getElementById('welkom-banner');
-  banner.style.display='flex';
-  const av = document.getElementById('welkom-av');
-  av.style.background=p.kleur;
-  av.textContent=p.initiaal;
-  document.getElementById('welkom-naam').textContent=naam;
+  // Load saved swipes
+  const saved = localStorage.getItem('vz_swipes_' + naam);
+  userSwipes = saved ? JSON.parse(saved) : {};
 
-  // Mij sectie
-  const mijAv = document.getElementById('mij-avatar');
-  mijAv.style.background=p.kleur;
-  mijAv.textContent=p.initiaal;
-  document.getElementById('mij-naam').textContent=naam;
+  // Load saved polls
+  const savedPolls = localStorage.getItem('vz_polls_' + naam);
+  pollVotes = savedPolls ? JSON.parse(savedPolls) : {};
 
-  // Vriendinnen row (highlight ingelogde gebruiker)
-  renderVrienden(naam);
+  // Load custom items
+  const customItems = localStorage.getItem('vz_custom_items');
+  if (customItems) {
+    const cItems = JSON.parse(customItems);
+    cItems.forEach(ci => { if (!ITEMS.find(i => i.id === ci.id)) ITEMS.push(ci); });
+  }
 
-  // Nav tonen
-  document.getElementById('bottom-nav').style.display='flex';
+  // Show app, hide login
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
 
-  // Swipe laden
-  loadSwipeCards();
+  // Welkom bar
+  document.getElementById('welkom-avatar').style.background = p.kleur;
+  document.getElementById('welkom-avatar').textContent = p.initiaal;
+  document.getElementById('welkom-naam').textContent = naam;
 
-  // Countdown
-  updateCountdown();
+  // Init swipe indices
+  ['overdag','eten','avond'].forEach(cat => {
+    const unswiped = ITEMS.filter(i => i.cat === cat && !userSwipes[i.id]);
+    swipeIndex[cat] = 0;
+  });
+
+  renderAll();
+  startReel();
+  startCountdown();
 }
 
-// ── AUTO-LOGIN ────────────────────────────────
-(function(){
-  const opgeslagen = localStorage.getItem('vz_user');
-  const groep = localStorage.getItem('vz_groep');
-  if(opgeslagen && groep===GROEPSCODE && PROFIELEN[opgeslagen]){
-    initialiseerApp(opgeslagen);
-  }
-})();
+function renderAll() {
+  renderHome();
+  renderSwipe();
+  renderTop5();
+  renderGroep();
+}
 
-// ── VRIENDEN ROW ──────────────────────────────
-function renderVrienden(ingelogd){
-  const row = document.getElementById('vrienden-row');
-  row.innerHTML='';
-  const namen=['Jet','Fred','Mar','Mir'];
-  const streaks={Jet:7,Fred:5,Mar:7,Mir:3};
-  namen.forEach(n=>{
-    const p=PROFIELEN[n];
-    const chip=document.createElement('div');
-    chip.className='vriendin-chip'+(n===ingelogd?' me':'');
-    chip.innerHTML=`<div class="v-avatar" style="background:${p.kleur}">${p.initiaal}</div><span class="v-name">${n}</span><span class="v-streak">🔥 ${streaks[n]}</span>`;
-    row.appendChild(chip);
+// ══════════════════════════════════════════
+// TAB SWITCHING
+// ══════════════════════════════════════════
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  // FAB only on swipe
+  document.getElementById('add-fab').classList.toggle('hidden', tab !== 'swipe');
+  if (tab === 'swipe') renderSwipe();
+  if (tab === 'top5') renderTop5();
+  if (tab === 'groep') renderGroep();
+}
+
+// ══════════════════════════════════════════
+// HOME
+// ══════════════════════════════════════════
+function renderHome() {
+  renderPolls();
+  renderFeed();
+}
+
+function startReel() {
+  const container = document.getElementById('reel-stories');
+  const dotsContainer = document.getElementById('reel-dots');
+  container.innerHTML = '';
+  dotsContainer.innerHTML = '';
+
+  REEL_SLIDES.forEach((slide, i) => {
+    const el = document.createElement('div');
+    el.className = 'reel-slide' + (i === 0 ? ' visible' : '');
+    el.innerHTML = `<div class="reel-emoji">${slide.emoji}</div>
+      <div class="reel-title">${slide.title}</div>
+      <div class="reel-desc">${slide.desc}</div>`;
+    container.appendChild(el);
+
+    const dot = document.createElement('div');
+    dot.className = 'reel-dot';
+    const fill = document.createElement('div');
+    fill.className = 'reel-dot-fill' + (i === 0 ? ' active' : '');
+    dot.appendChild(fill);
+    dotsContainer.appendChild(dot);
+  });
+
+  reelIdx = 0;
+  animateReelDot(0);
+  reelInterval = setInterval(() => {
+    advanceReel();
+  }, 3500);
+}
+
+function animateReelDot(i) {
+  const fills = document.querySelectorAll('.reel-dot-fill');
+  if (!fills[i]) return;
+  fills[i].style.width = '100%';
+  fills[i].style.transition = 'width 3s linear';
+}
+
+function advanceReel() {
+  const slides = document.querySelectorAll('.reel-slide');
+  const fills = document.querySelectorAll('.reel-dot-fill');
+  slides[reelIdx].classList.remove('visible');
+  fills[reelIdx].classList.add('done');
+  reelIdx = (reelIdx + 1) % REEL_SLIDES.length;
+  if (reelIdx === 0) {
+    fills.forEach(f => { f.classList.remove('done','active'); f.style.width='0%'; f.style.transition='none'; });
+  }
+  slides[reelIdx].classList.add('visible');
+  animateReelDot(reelIdx);
+}
+
+function startCountdown() {
+  const target = new Date('2026-06-26T08:10:00');
+  function update() {
+    const now = new Date();
+    const diff = target - now;
+    if (diff <= 0) {
+      document.getElementById('cd-d').textContent = '0';
+      document.getElementById('cd-h').textContent = '0';
+      document.getElementById('cd-m').textContent = '0';
+      return;
+    }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    document.getElementById('cd-d').textContent = d;
+    document.getElementById('cd-h').textContent = h;
+    document.getElementById('cd-m').textContent = m;
+  }
+  update();
+  setInterval(update, 60000);
+}
+
+function renderPolls() {
+  const container = document.getElementById('polls-container');
+  container.innerHTML = '';
+  POLLS.forEach(poll => {
+    const voted = pollVotes[poll.id] !== undefined;
+    const total = poll.opties.reduce((s, o) => s + o.votes, 0) + (voted ? 0 : 0);
+    const myVote = pollVotes[poll.id];
+    const totalVotes = poll.opties.reduce((s, o) => s + o.votes, 0);
+    const winnerIdx = poll.opties.reduce((best, o, i) => o.votes > poll.opties[best].votes ? i : best, 0);
+
+    const card = document.createElement('div');
+    card.className = 'poll-card';
+    card.innerHTML = `<div class="poll-question">${poll.vraag}</div>
+      <div class="poll-options">
+        ${poll.opties.map((o, i) => {
+          const pct = totalVotes > 0 ? Math.round((o.votes / totalVotes) * 100) : 0;
+          const isVoted = myVote === i;
+          const isWinner = voted && i === winnerIdx;
+          return `<button class="poll-option${isVoted?' voted':''}${isWinner?' winner':''}"
+            onclick="votePoll('${poll.id}',${i})"
+            ${voted ? 'disabled' : ''}>
+            ${voted ? `<div class="poll-bar" style="width:${pct}%"></div>` : ''}
+            ${o.label}
+            ${voted ? `<span class="poll-pct">${pct}%</span>` : ''}
+          </button>`;
+        }).join('')}
+      </div>`;
+    container.appendChild(card);
   });
 }
 
-// ── DATA ──────────────────────────────────────
-const VERTREK = new Date('2025-06-20T09:56:00');
-
-const REELS = {
-  ontbijt:[
-    {id:1,titel:'Du Pain et des Idées',wijk:'Canal Saint-Martin',prijs:'€',sfeer:'Boulangerie',uur:'15 min',img:'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80',tekst:'De mooiste boulangerie van Parijs. Kom vroeg want de escargots pistache zijn om 9u al weg.',votes:['Ma','Mi']},
-    {id:2,titel:'Café de la Paix',wijk:'Opéra',prijs:'€€€',sfeer:'Grand Café',uur:'1u',img:'https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=600&q=80',tekst:'Belle Époque interieur. Je bestelt croissants en betaalt eigenlijk voor de ervaring.',votes:['Je']},
-    {id:3,titel:'Ten Belles',wijk:'Canal Saint-Martin',prijs:'€',sfeer:'Specialty Coffee',uur:'30 min',img:'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80',tekst:'Beste koffie van Parijs zeggen de kenners. Klein, vol, helemaal het gevoel.',votes:['Je','Fr']},
-  ],
-  ochtend:[
-    {id:4,titel:'Wandelroute Le Marais',wijk:'Le Marais',prijs:'Gratis',sfeer:'Wandelen',uur:'2u',img:'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80',tekst:'Van Place des Vosges langs de galeries naar de joodse wijk. Time to Momo route 3.',votes:['Je','Fr','Ma','Mi']},
-    {id:5,titel:'Musée d\'Orsay',wijk:'Saint-Germain',prijs:'€€',sfeer:'Museum',uur:'2-3u',img:'https://images.unsplash.com/photo-1541479168-5f7fd8dce5d8?w=600&q=80',tekst:'Vroeg gaan = geen rij. De impressionisten-zalen zijn ongelooflijk.',votes:['Mi']},
-    {id:6,titel:'Père Lachaise',wijk:'20e arrondissement',prijs:'Gratis',sfeer:'Wandelen',uur:'1.5u',img:'https://images.unsplash.com/photo-1519181245277-cffeb31da2e3?w=600&q=80',tekst:'Het mooiste kerkhof ter wereld. Jim Morrison, Édith Piaf, Proust.',votes:['Je','Fr']},
-  ],
-  lunch:[
-    {id:7,titel:'Marché des Enfants Rouges',wijk:'Le Marais',prijs:'€',sfeer:'Markt',uur:'1u',img:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80',tekst:'Oudste overdekte markt van Parijs (1615). Libanese kraam is fenomenaal.',votes:['Je','Fr','Mi']},
-    {id:8,titel:'Septime',wijk:'Bastille',prijs:'€€€',sfeer:'Bistronomie',uur:'2u',img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80',tekst:'Op 1 in Parijs voor een reden. Reserveer ver van tevoren.',votes:['Ma']},
-    {id:9,titel:'Frenchie Bar à Vins',wijk:'Montorgueil',prijs:'€€',sfeer:'Wine bar',uur:'1.5u',img:'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=80',tekst:'Klein, rumoerig, heerlijk. De bordeaux-plank is bijzonder.',votes:['Je','Fr']},
-  ],
-  middag:[],borrel:[],diner:[
-    {id:10,titel:'Café de Flore',wijk:'Saint-Germain',prijs:'€€€',sfeer:'Brasserie',uur:'2u',img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80',tekst:'Sartre en Beauvoir kwamen hier. Jij ook. Onvermijdelijk, terecht.',votes:['Je','Fr','Ma','Mi']},
-  ],avond:[]
-};
-
-const QUIZ_DATA=[
-  {v:'In welk arrondissement staat de Eiffeltoren?',opties:['7e','6e','15e','1e'],goed:0},
-  {v:'Wie ontwierp de Eiffeltoren?',opties:['Gustave Eiffel','Haussmann','Le Corbusier','Viollet-le-Duc'],goed:0},
-  {v:'Wat is de bijnaam van Montmartre?',opties:['La Butte','La Colline','Le Plateau','La Haute'],goed:0},
-  {v:'Hoeveel arrondissementen heeft Parijs?',opties:['20','18','24','16'],goed:0},
-  {v:'Welke markt is de oudste overdekte markt van Parijs?',opties:['Marché des Enfants Rouges','Marché d\'Aligre','Marché Bastille','Marché Monge'],goed:0},
-];
-
-const TREIN_KAARTEN=[
-  'Wat is het moment dat je het meest naar uitkijkt — en wil je dat al hardop zeggen?',
-  'Welke vriendin in deze coupé heeft de meest onderschatte reis-hack?',
-  'Als je één dag in Parijs alleen mocht zijn, zonder de groep — wat doe je?',
-  'Wat is iets wat jij in Parijs wil proberen wat je thuis nooit zou doen?',
-  'Als het verkeerd gaat: wie regelt de oplossing? Wie staat erom te lachen?',
-  'Vertel iets over jou dat de rest misschien niet weet. Mag ook een beetje ondeugend zijn.',
-  'Wat zou jouw ideale Parijse vrouw-avond eruitzien? (Geen compromis, geen groep.)',
-  'Beste reis-geheugen ooit. Los van Parijs. Go.',
-  'Wat verwacht je van deze trip dat je thuis nooit hebt gezegd?',
-];
-
-// ── STATE ─────────────────────────────────────
-let currentMoment='ontbijt';
-let swipeStack=[];
-let isDragging=false;
-let startX=0,startY=0,currentX=0;
-let quizIndex=0,quizScore=0;
-
-// ── NAV ───────────────────────────────────────
-function showSection(name,btn){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('sec-'+name).classList.add('active');
-  btn.classList.add('active');
-  if(name==='swipe') loadSwipeCards();
+function votePoll(pollId, optionIdx) {
+  if (pollVotes[pollId] !== undefined) return;
+  pollVotes[pollId] = optionIdx;
+  const poll = POLLS.find(p => p.id === pollId);
+  if (poll) poll.opties[optionIdx].votes++;
+  localStorage.setItem('vz_polls_' + activeUser, JSON.stringify(pollVotes));
+  renderPolls();
 }
 
-// ── COUNTDOWN ─────────────────────────────────
-function updateCountdown(){
-  const diff=VERTREK-new Date();
-  if(diff<=0){['cd-days','cd-hours','cd-mins'].forEach(id=>document.getElementById(id).textContent='00');document.getElementById('cd-days-big').textContent='0';return;}
-  const d=Math.floor(diff/86400000);
-  const h=Math.floor((diff%86400000)/3600000);
-  const m=Math.floor((diff%3600000)/60000);
-  document.getElementById('cd-days').textContent=String(d).padStart(2,'0');
-  document.getElementById('cd-hours').textContent=String(h).padStart(2,'0');
-  document.getElementById('cd-mins').textContent=String(m).padStart(2,'0');
-  document.getElementById('cd-days-big').textContent=d;
-}
-setInterval(updateCountdown,30000);
+function renderFeed() {
+  const container = document.getElementById('feed-list');
+  // Add recent own swipes to feed
+  const myRecent = Object.entries(userSwipes).slice(-3).reverse().map(([id, vote]) => {
+    const item = ITEMS.find(i => i.id === id);
+    if (!item) return null;
+    const p = PROFIELEN[activeUser];
+    return { user: activeUser, kleur: p.kleur, initiaal: p.initiaal,
+      actie: vote === 'dream' ? 'droomt van' : vote === 'like' ? 'liket' : 'passed',
+      item: item.naam, emoji: vote === 'dream' ? '✦' : vote === 'like' ? '❤️' : '✕', tijd: 'net' };
+  }).filter(Boolean);
 
-// ── MISSIE ────────────────────────────────────
-function completeMissie(){showToast('Verstuurd! 🎉 +10 streak punten');}
-
-// ── PACK ──────────────────────────────────────
-function togglePack(el){el.classList.toggle('checked');}
-
-// ── POLLS ─────────────────────────────────────
-function vote(el){
-  el.closest('.poll-options').querySelectorAll('.poll-opt').forEach(o=>o.classList.remove('voted'));
-  el.classList.add('voted');
-  showToast('Stem uitgebracht ✓');
+  const allFeed = [...myRecent, ...FEED_ITEMS_INIT];
+  container.innerHTML = allFeed.map(f => `
+    <div class="feed-item">
+      <div class="feed-avatar" style="background:${f.kleur}">${f.initiaal}</div>
+      <div class="feed-text"><strong>${f.user}</strong> ${f.actie} <strong>${f.item}</strong></div>
+      <div>
+        <div class="feed-emoji">${f.emoji}</div>
+        <div class="feed-time">${f.tijd}</div>
+      </div>
+    </div>`).join('');
 }
 
-// ── SWIPE ─────────────────────────────────────
-function setMoment(m,btn){
-  currentMoment=m;
-  document.querySelectorAll('.moment-tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  loadSwipeCards();
+// ══════════════════════════════════════════
+// SWIPE
+// ══════════════════════════════════════════
+function setCat(cat) {
+  swipeCat = cat;
+  document.querySelectorAll('.cat-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.cat === cat);
+  });
+  renderSwipe();
 }
 
-function loadSwipeCards(){
-  swipeStack=[...(REELS[currentMoment]||[])];
-  renderSwipeStack();
+function getSwipeQueue(cat) {
+  return ITEMS.filter(i => i.cat === cat && !userSwipes[i.id]);
 }
 
-function renderSwipeStack(){
-  const arena=document.getElementById('swipe-arena');
-  arena.innerHTML='';
-  if(!swipeStack.length){
-    arena.innerHTML='<div class="empty-state"><div class="emoji">✨</div><h3>Alles geswiped!</h3><p>Kies een ander moment of wacht op nieuwe suggesties.</p></div>';
+function renderSwipe() {
+  const queue = getSwipeQueue(swipeCat);
+  const area = document.getElementById('swipe-area');
+  const progress = document.getElementById('swipe-progress');
+  const total = ITEMS.filter(i => i.cat === swipeCat).length;
+  const done = total - queue.length;
+
+  progress.textContent = `${done} van ${total} geswiped`;
+
+  area.innerHTML = '';
+  if (queue.length === 0) {
+    area.innerHTML = `<div class="swipe-empty">Alles geswiped! ✓<br><small>Ga naar Mijn Top 5</small></div>`;
     return;
   }
-  swipeStack.slice(0,3).reverse().forEach((item,i)=>{
-    const card=createSwipeCard(item,2-i);
-    arena.appendChild(card);
+
+  // Render top 2 cards (current + behind)
+  const toRender = queue.slice(0, 2).reverse();
+  toRender.forEach((item, idx) => {
+    const isTop = idx === toRender.length - 1;
+    const card = buildSwipeCard(item, isTop);
+    area.appendChild(card);
   });
-  const top=arena.querySelector('.swipe-card:last-child');
-  if(top) attachSwipeGestures(top);
+
+  if (area.querySelector('.swipe-card.top')) {
+    initDrag(area.querySelector('.swipe-card.top'));
+  }
 }
 
-function avatarColor(init){
-  const map={Je:'#C4614A',Fr:'#D4A037',Ma:'#6B4C3B',Mi:'#2D4A3E'};
-  return map[init]||'#888';
+function buildSwipeCard(item, isTop) {
+  const card = document.createElement('div');
+  card.className = 'swipe-card ' + (isTop ? 'top' : 'behind');
+  card.dataset.id = item.id;
+
+  const badges = [];
+  if (item.must_van) badges.push(`<span class="badge musterd">⭐ Must van ${item.must_van}</span>`);
+  if (item.weekend_special) badges.push(`<span class="badge vert">🎉 Weekend special</span>`);
+  if (item.reserveren) badges.push(`<span class="badge">📋 Reservering</span>`);
+
+  card.innerHTML = `
+    <div class="card-img">
+      <img src="${item.img}" alt="${item.naam}" loading="lazy">
+      ${badges.length ? `<div class="card-badges">${badges.join('')}</div>` : ''}
+      <div class="badge-prijs">${item.prijs}</div>
+    </div>
+    <div class="card-body">
+      <div class="card-sub">${item.sub}</div>
+      <div class="card-title">${item.naam}</div>
+      <div class="card-wijk">📍 ${item.wijk}</div>
+      <div class="card-meta">
+        <span class="card-meta-item">⏱ ${item.duur}</span>
+        ${item.tijden ? `<span class="card-meta-item">🕐 ${item.tijden}</span>` : ''}
+      </div>
+      <div class="card-verhaal">${item.verhaal}</div>
+      ${item.tip ? `<div class="card-tip">💡 ${item.tip}</div>` : ''}
+    </div>
+    <div class="vote-overlay like">Ja!</div>
+    <div class="vote-overlay pass">Nee</div>
+    <div class="vote-overlay dream">✦ Droom</div>
+  `;
+  return card;
 }
 
-function createSwipeCard(item,pos){
-  const cls=['','card-2','card-3'][pos]||'card-3';
-  const voteHTML=item.votes.map(v=>`<div class="vote-av" style="background:${avatarColor(v)}">${v}</div>`).join('');
-  const d=document.createElement('div');
-  d.className=`swipe-card ${cls}`;
-  d.innerHTML=`
-    <div class="swipe-card-img" style="background-image:url('${item.img}')">
-      <div class="swipe-overlay"><div class="swipe-tags"><span class="swipe-tag">${item.sfeer}</span><span class="swipe-tag">${item.uur}</span><span class="swipe-tag prix">${item.prijs}</span></div></div>
-    </div>
-    <div class="swipe-card-body">
-      <div class="wijk">${item.wijk}</div>
-      <h3>${item.titel}</h3>
-      <p>${item.tekst}</p>
-    </div>
-    <div class="swipe-group-votes">
-      <div class="vote-pile">${voteHTML}</div>
-      <span class="vote-text">${item.votes.length?item.votes.join(', ')+' wil'+(item.votes.length===1?'':'len')+' dit ook':'Wees de eerste!'}</span>
+function doVote(vote) {
+  const card = document.getElementById('swipe-area').querySelector('.swipe-card.top');
+  if (!card) return;
+  const itemId = card.dataset.id;
+  animateCardOut(card, vote);
+  setTimeout(() => {
+    saveVote(itemId, vote);
+    renderSwipe();
+    renderFeed();
+  }, 370);
+}
+
+function saveVote(itemId, vote) {
+  userSwipes[itemId] = vote;
+  localStorage.setItem('vz_swipes_' + activeUser, JSON.stringify(userSwipes));
+  if (vote === 'like' || vote === 'dream') spawnConfetti();
+}
+
+function animateCardOut(card, vote) {
+  const overlays = card.querySelectorAll('.vote-overlay');
+  overlays.forEach(o => {
+    if (o.classList.contains(vote)) o.style.opacity = '1';
+  });
+  setTimeout(() => {
+    if (vote === 'like') card.classList.add('flying-right');
+    else if (vote === 'pass') card.classList.add('flying-left');
+    else card.classList.add('flying-up');
+  }, 80);
+}
+
+// Drag / swipe gestures
+function initDrag(card) {
+  let startX, startY, currentX = 0;
+  dragState = { card, startX: 0, startY: 0, dragging: false };
+
+  function onStart(e) {
+    const pt = e.touches ? e.touches[0] : e;
+    dragState.startX = pt.clientX;
+    dragState.startY = pt.clientY;
+    dragState.dragging = true;
+    card.style.transition = 'none';
+  }
+
+  function onMove(e) {
+    if (!dragState.dragging) return;
+    const pt = e.touches ? e.touches[0] : e;
+    const dx = pt.clientX - dragState.startX;
+    const dy = pt.clientY - dragState.startY;
+    const rot = dx * 0.08;
+    card.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`;
+    currentX = dx;
+
+    const likeO = card.querySelector('.vote-overlay.like');
+    const passO = card.querySelector('.vote-overlay.pass');
+    const dreamO = card.querySelector('.vote-overlay.dream');
+
+    if (Math.abs(dy) > 60 && dy < 0) {
+      dreamO.style.opacity = Math.min(1, Math.abs(dy) / 80);
+      likeO.style.opacity = 0; passO.style.opacity = 0;
+    } else if (dx > 40) {
+      likeO.style.opacity = Math.min(1, (dx - 40) / 60);
+      passO.style.opacity = 0; dreamO.style.opacity = 0;
+    } else if (dx < -40) {
+      passO.style.opacity = Math.min(1, (Math.abs(dx) - 40) / 60);
+      likeO.style.opacity = 0; dreamO.style.opacity = 0;
+    } else {
+      likeO.style.opacity = 0; passO.style.opacity = 0; dreamO.style.opacity = 0;
+    }
+  }
+
+  function onEnd(e) {
+    if (!dragState.dragging) return;
+    dragState.dragging = false;
+    const pt = e.changedTouches ? e.changedTouches[0] : e;
+    const dx = pt.clientX - dragState.startX;
+    const dy = pt.clientY - dragState.startY;
+    card.style.transition = '';
+
+    if (Math.abs(dy) > 80 && dy < 0) {
+      doVote('dream');
+    } else if (dx > 80) {
+      doVote('like');
+    } else if (dx < -80) {
+      doVote('pass');
+    } else {
+      card.style.transform = '';
+      card.querySelectorAll('.vote-overlay').forEach(o => o.style.opacity = 0);
+    }
+  }
+
+  card.addEventListener('mousedown', onStart);
+  card.addEventListener('touchstart', onStart, { passive: true });
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('touchmove', onMove, { passive: true });
+  document.addEventListener('mouseup', onEnd);
+  document.addEventListener('touchend', onEnd);
+}
+
+// ══════════════════════════════════════════
+// TOP 5
+// ══════════════════════════════════════════
+function setTop5Cat(cat) {
+  top5Cat = cat;
+  document.querySelectorAll('.top5-cat').forEach(t => {
+    t.classList.toggle('active', t.dataset.cat === cat);
+  });
+  renderTop5();
+}
+
+function renderTop5() {
+  const p = PROFIELEN[activeUser];
+  document.getElementById('top5-desc').textContent =
+    activeUser + '\'s favorieten per categorie';
+
+  const list = document.getElementById('top5-list');
+  const liked = ITEMS.filter(i => i.cat === top5Cat && (userSwipes[i.id] === 'like' || userSwipes[i.id] === 'dream'))
+    .sort((a, b) => {
+      if (userSwipes[b.id] === 'dream' && userSwipes[a.id] !== 'dream') return 1;
+      if (userSwipes[a.id] === 'dream' && userSwipes[b.id] !== 'dream') return -1;
+      return 0;
+    })
+    .slice(0, 5);
+
+  if (liked.length === 0) {
+    list.innerHTML = `<div class="top5-empty">Swipe eerst wat items in de ${top5Cat}-categorie ❤️</div>`;
+    return;
+  }
+
+  list.innerHTML = liked.map((item, i) => {
+    const isDream = userSwipes[item.id] === 'dream';
+    return `<div class="top5-item">
+      <div class="top5-rank${isDream ? ' dream-rank' : ''}">${isDream ? '✦' : i+1}</div>
+      <div class="top5-item-info">
+        <div class="top5-item-name">${item.naam}</div>
+        <div class="top5-item-sub">${item.wijk} · ${item.prijs}</div>
+      </div>
+      <div class="top5-item-badge">${isDream ? '⭐' : '❤️'}</div>
     </div>`;
-  return d;
+  }).join('');
 }
 
-function attachSwipeGestures(card){
-  card.addEventListener('pointerdown',e=>{
-    isDragging=true;startX=e.clientX;startY=e.clientY;currentX=0;
-    card.setPointerCapture(e.pointerId);
-    card.addEventListener('pointermove',onMove);
-    card.addEventListener('pointerup',onUp);
+// ══════════════════════════════════════════
+// GROEP
+// ══════════════════════════════════════════
+function renderGroep() {
+  // Build combined votes
+  const allVotes = { ...MOCK_VOTES };
+  allVotes[activeUser] = userSwipes;
+
+  // Count votes per item
+  const voteCounts = {};
+  const voters = {};
+  ITEMS.forEach(item => {
+    let count = 0;
+    const votersFor = [];
+    Object.entries(allVotes).forEach(([user, votes]) => {
+      if (votes[item.id] === 'like' || votes[item.id] === 'dream') {
+        count++;
+        votersFor.push(user);
+      }
+    });
+    voteCounts[item.id] = count;
+    voters[item.id] = votersFor;
   });
-}
-function onMove(e){
-  if(!isDragging)return;
-  currentX=e.clientX-startX;
-  const rot=currentX*.08;
-  e.currentTarget.style.transform=`translateX(${currentX}px) translateY(${(e.clientY-startY)*.3}px) rotate(${rot}deg)`;
-}
-function onUp(e){
-  if(!isDragging)return;
-  isDragging=false;
-  const card=e.currentTarget;
-  card.removeEventListener('pointermove',onMove);
-  card.removeEventListener('pointerup',onUp);
-  if(currentX>80) swipeCard('right',card);
-  else if(currentX<-80) swipeCard('left',card);
-  else{card.style.transition='transform .3s';card.style.transform='';setTimeout(()=>card.style.transition='',300);}
+
+  // Sort matches
+  const match4 = ITEMS.filter(i => voteCounts[i.id] === 4);
+  const match3 = ITEMS.filter(i => voteCounts[i.id] === 3);
+  const match2 = ITEMS.filter(i => voteCounts[i.id] === 2);
+
+  // Alarm (reservering vereist)
+  const alarmItems = ITEMS.filter(i =>
+    i.reserveren && (voteCounts[i.id] >= 2)
+  );
+  const alarmList = document.getElementById('alarm-list');
+  alarmList.innerHTML = alarmItems.length === 0
+    ? '<div class="alarm-item">✓ Geen urgente reserveringen</div>'
+    : alarmItems.map(i => `
+        <div class="alarm-item">
+          <span class="alarm-item-icon">📋</span>
+          <strong>${i.naam}</strong> — ${voteCounts[i.id]}/4 enthousiast
+        </div>`).join('');
+
+  function renderMatchSection(items, containerId) {
+    const el = document.getElementById(containerId);
+    if (items.length === 0) {
+      el.innerHTML = '<div style="padding:8px 0;font-size:13px;color:var(--bruin);opacity:0.5;">Nog geen matches hier</div>';
+      return;
+    }
+    el.innerHTML = items.map(item => {
+      const p = PROFIELEN;
+      const dotsHtml = Object.keys(PROFIELEN).map(user => {
+        const v = allVotes[user]?.[item.id];
+        const hasVote = v === 'like' || v === 'dream';
+        const prof = PROFIELEN[user];
+        return `<div class="match-dot${hasVote ? '' : ' empty'}"
+          style="${hasVote ? `background:${prof.kleur}` : ''}"
+          title="${user}">${hasVote ? prof.initiaal : '·'}</div>`;
+      }).join('');
+      return `<div class="match-card">
+        <div class="match-votes">${dotsHtml}</div>
+        <div class="match-info">
+          <div class="match-name">${item.naam}</div>
+          <div class="match-sub">${item.wijk} · ${item.prijs}</div>
+        </div>
+        <div class="match-icon">${item.reserveren ? '📋' : item.weekend_special ? '🎉' : item.must_van ? '⭐' : '❤️'}</div>
+      </div>`;
+    }).join('');
+  }
+
+  renderMatchSection(match4, 'match-4');
+  renderMatchSection(match3, 'match-3');
+  renderMatchSection(match2, 'match-2');
 }
 
-function swipeCard(dir,card){
-  const arena=document.getElementById('swipe-arena');
-  const top=card||arena.querySelector('.swipe-card:last-child');
-  if(!top||!swipeStack.length)return;
-  const item=swipeStack[0];
-  const tx=dir==='right'?'translateX(120vw) rotate(20deg)':dir==='left'?'translateX(-120vw) rotate(-20deg)':'translateY(-120vh)';
-  showToast(dir==='right'?'Wil ik! ✓':dir==='left'?'Niet voor mij':'⭐ Droom!');
-  top.style.transition='transform .35s cubic-bezier(.25,.46,.45,.94)';
-  top.style.transform=tx;
-  setTimeout(()=>{
-    swipeStack.shift();
-    if(dir==='right'&&Math.random()>.5&&swipeStack.length<3) triggerMatch(item);
-    else renderSwipeStack();
-  },350);
+// ══════════════════════════════════════════
+// ADD ITEM MODAL
+// ══════════════════════════════════════════
+function openAddModal() {
+  document.getElementById('add-modal').classList.remove('hidden');
 }
 
-function triggerMatch(item){
-  document.getElementById('match-text').textContent=`Alle vier willen "${item.titel}". Dit gaat op de planning!`;
-  document.getElementById('match-overlay').classList.add('show');
+function closeAddModal() {
+  document.getElementById('add-modal').classList.add('hidden');
+  document.getElementById('add-naam').value = '';
+  document.getElementById('add-wijk').value = '';
+  document.getElementById('add-verhaal').value = '';
+}
+
+function submitAdd() {
+  const naam = document.getElementById('add-naam').value.trim();
+  const cat = document.getElementById('add-cat').value;
+  const wijk = document.getElementById('add-wijk').value.trim();
+  const verhaal = document.getElementById('add-verhaal').value.trim();
+  if (!naam) { document.getElementById('add-naam').focus(); return; }
+
+  const newItem = {
+    id: 'custom-' + Date.now(),
+    cat, sub: 'Tip van ' + activeUser,
+    naam, wijk: wijk || 'Parijs', adres: '',
+    prijs: '?', duur: '?', tijden: '',
+    reserveren: false, must_van: null, weekend_special: false,
+    verhaal: verhaal || 'Persoonlijke aanbeveling.',
+    tip: '', img: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80',
+  };
+  ITEMS.push(newItem);
+
+  const custom = JSON.parse(localStorage.getItem('vz_custom_items') || '[]');
+  custom.push(newItem);
+  localStorage.setItem('vz_custom_items', JSON.stringify(custom));
+
+  closeAddModal();
+  switchTab('swipe');
+  setCat(cat);
   spawnConfetti();
 }
-function closeMatch(){
-  document.getElementById('match-overlay').classList.remove('show');
-  document.getElementById('confetti').innerHTML='';
-  renderSwipeStack();
-}
-function spawnConfetti(){
-  const c=document.getElementById('confetti');
-  const cols=['#C4614A','#D4A037','#E8C5B5','#2D4A3E','#fff'];
-  for(let i=0;i<60;i++){
-    const p=document.createElement('div');
-    p.className='confetti-piece';
-    p.style.cssText=`left:${Math.random()*100}vw;top:-20px;background:${cols[Math.floor(Math.random()*cols.length)]};border-radius:${Math.random()>.5?'50%':'2px'};animation-delay:${Math.random()*1.5}s;animation-duration:${2+Math.random()*2}s;width:${4+Math.random()*8}px;height:${4+Math.random()*8}px;`;
-    c.appendChild(p);
+
+// ══════════════════════════════════════════
+// CONFETTI
+// ══════════════════════════════════════════
+const CONFETTI_COLORS = ['#C26E47','#D4A04D','#2D4F3E','#F2C1B0','#6B5848'];
+function spawnConfetti() {
+  for (let i = 0; i < 18; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.cssText = `
+        left:${20 + Math.random() * 60}%;
+        top:${-10}px;
+        background:${CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)]};
+        transform:rotate(${Math.random() * 360}deg);
+        animation-delay:${Math.random() * 0.3}s;
+        animation-duration:${1 + Math.random() * 0.8}s;
+        width:${8 + Math.random() * 8}px;
+        height:${8 + Math.random() * 8}px;
+        border-radius:${Math.random() > 0.5 ? '50%' : '2px'};
+      `;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2500);
+    }, i * 40);
   }
-}
-
-// ── QUIZ ──────────────────────────────────────
-function openQuiz(){quizIndex=0;quizScore=0;document.getElementById('quiz-modal').classList.add('show');renderQuiz();}
-function renderQuiz(){
-  const c=document.getElementById('quiz-content');
-  if(quizIndex>=QUIZ_DATA.length){
-    c.innerHTML=`<div class="quiz-score"><div class="score-num">${quizScore}/${QUIZ_DATA.length}</div><p>${quizScore>=4?'Echt een Parijs-kenner 🏆':'Lekker geprobeerd — meer dan genoeg voor een wijnbar! 🍷'}</p></div><button class="btn btn-primary" style="width:100%;margin-top:20px" onclick="document.getElementById('quiz-modal').classList.remove('show')">Sluiten</button>`;
-    return;
-  }
-  const q=QUIZ_DATA[quizIndex];
-  c.innerHTML=`<div class="quiz-q">Vraag ${quizIndex+1}/${QUIZ_DATA.length}: ${q.v}</div><div class="quiz-options">${q.opties.map((o,i)=>`<button class="quiz-opt" onclick="answerQuiz(${i},this)">${o}</button>`).join('')}</div>`;
-}
-function answerQuiz(idx,btn){
-  const q=QUIZ_DATA[quizIndex];
-  document.querySelectorAll('.quiz-opt').forEach(b=>b.disabled=true);
-  if(idx===q.goed){btn.classList.add('correct');quizScore++;}
-  else{btn.classList.add('wrong');document.querySelectorAll('.quiz-opt')[q.goed].classList.add('correct');}
-  setTimeout(()=>{quizIndex++;renderQuiz();},900);
-}
-
-// ── TREIN ──────────────────────────────────────
-function openTreinModal(){document.getElementById('trein-modal').classList.add('show');document.getElementById('trein-vraag').textContent='Tik om een kaart te trekken';}
-function trekKaart(){document.getElementById('trein-vraag').textContent=TREIN_KAARTEN[Math.floor(Math.random()*TREIN_KAARTEN.length)];}
-
-// ── MODALS ─────────────────────────────────────
-function closeModalOutside(e,id){if(e.target===document.getElementById(id))document.getElementById(id).classList.remove('show');}
-
-// ── TOAST ──────────────────────────────────────
-let toastTimer;
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
 }
 </script>
 </body>
