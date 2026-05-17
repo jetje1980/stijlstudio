@@ -237,6 +237,111 @@ h1,h2,h3,h4{font-family:var(--serif);}
 
 /* SCROLL FIXES */
 .scroll-content{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+/* ── REISINFO / INPAKLIJST collapsibles ── */
+.collapsible{margin:12px 16px;border-radius:var(--r-lg);background:#fff;border:1px solid var(--zand);box-shadow:var(--shadow);overflow:hidden;}
+.collapsible-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;}
+.collapsible-title{font-family:var(--serif);font-style:italic;font-size:1.1rem;}
+.collapsible-arrow{font-size:1rem;transition:transform 0.2s;color:var(--bruin);}
+.collapsible-body{display:none;padding:0 16px 16px;}
+.collapsible.open .collapsible-arrow{transform:rotate(180deg);}
+.collapsible.open .collapsible-body{display:block;}
+.info-row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--zand);font-size:0.85rem;align-items:flex-start;}
+.info-row:last-child{border-bottom:none;}
+.info-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+.info-label{font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--bruin);margin-bottom:2px;}
+.info-val{font-size:0.85rem;}
+.pack-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--zand);cursor:pointer;}
+.pack-item:last-child{border-bottom:none;}
+.pack-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--zand);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.pack-item.checked .pack-check{background:var(--vert);border-color:var(--vert);color:#fff;}
+.pack-item.checked .pack-label{text-decoration:line-through;color:#aaa;}
+.pack-label{font-size:0.9rem;flex:1;}
+.pack-note{font-size:0.75rem;color:var(--terra);margin-top:1px;}
+
+/* ── MISSIE VAN DE DAG ── */
+.missie-block{margin:12px 16px;border-radius:var(--r-lg);background:linear-gradient(135deg,var(--vert),#1a3328);padding:18px;color:#fff;}
+.missie-label{font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rose);margin-bottom:6px;}
+.missie-title{font-family:var(--serif);font-style:italic;font-size:1.3rem;margin-bottom:6px;}
+.missie-desc{font-size:0.8rem;opacity:0.8;line-height:1.4;}
+.missie-done-btn{margin-top:12px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:7px 18px;color:#fff;font-size:0.8rem;cursor:pointer;}
+.missie-done-btn.done{background:var(--terra);border-color:var(--terra);}
+.streak-row{display:flex;gap:12px;margin-top:10px;}
+.streak-av{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.streak-circle{width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:0.75rem;color:#fff;font-weight:600;}
+.streak-fire{font-size:0.75rem;text-align:center;}
+
+/* ── SPELLEN TAB ── */
+.spellen-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:16px;}
+.spel-card{background:#fff;border-radius:var(--r-lg);border:1px solid var(--zand);box-shadow:var(--shadow);padding:20px 16px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.spel-card:active{transform:scale(0.96);}
+.spel-emoji{font-size:2.4rem;margin-bottom:10px;}
+.spel-naam{font-family:var(--serif);font-style:italic;font-size:1.05rem;color:var(--ink);margin-bottom:4px;}
+.spel-desc{font-size:0.7rem;color:var(--bruin);line-height:1.3;}
+
+/* ── GAME OVERLAY (full-screen) ── */
+.game-overlay{position:fixed;inset:0;z-index:600;background:var(--creme);display:none;flex-direction:column;overflow:hidden;}
+.game-overlay.show{display:flex;}
+.game-header{display:flex;align-items:center;gap:12px;padding:16px;background:#fff;border-bottom:1px solid var(--zand);}
+.game-back{font-size:1.2rem;cursor:pointer;padding:4px 8px;color:var(--terra);}
+.game-title{font-family:var(--serif);font-style:italic;font-size:1.3rem;flex:1;}
+.game-body{flex:1;overflow-y:auto;padding:20px;}
+
+/* Quiz */
+.quiz-q-num{font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--bruin);margin-bottom:8px;}
+.quiz-question{font-family:var(--serif);font-size:1.3rem;line-height:1.3;margin-bottom:20px;}
+.quiz-options{display:flex;flex-direction:column;gap:10px;}
+.quiz-opt{padding:13px 16px;border-radius:var(--r);border:2px solid var(--zand);background:#fff;font-size:0.9rem;cursor:pointer;text-align:left;transition:all 0.2s;}
+.quiz-opt.correct{background:#dcfce7;border-color:#22c55e;color:#166534;}
+.quiz-opt.wrong{background:#fee2e2;border-color:#ef4444;color:#991b1b;}
+.quiz-opt:disabled{cursor:default;}
+.quiz-feedback{margin-top:12px;font-size:0.85rem;color:var(--bruin);min-height:24px;}
+.quiz-next-btn{margin-top:16px;width:100%;padding:13px;background:var(--vert);color:#fff;border:none;border-radius:var(--r);font-size:0.95rem;cursor:pointer;}
+.quiz-score-screen{text-align:center;padding:32px 20px;}
+.quiz-score-big{font-family:var(--serif);font-size:4rem;color:var(--terra);}
+.quiz-score-label{font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--bruin);margin:4px 0 16px;}
+.quiz-prize{font-size:0.9rem;background:rgba(45,79,62,0.1);border-radius:var(--r);padding:12px;color:var(--vert);line-height:1.5;}
+
+/* Trein-modus */
+.trein-tabs{display:flex;border-bottom:1px solid var(--zand);background:#fff;}
+.trein-tab{flex:1;padding:11px 4px;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--bruin);border-bottom:2px solid transparent;cursor:pointer;transition:all 0.2s;}
+.trein-tab.active{color:var(--terra);border-bottom-color:var(--terra);}
+.trein-card-wrap{min-height:280px;display:flex;align-items:center;justify-content:center;padding:20px;}
+.trein-card{background:#fff;border-radius:var(--r-lg);box-shadow:var(--shadow-lg);padding:28px 22px;max-width:340px;width:100%;text-align:center;}
+.trein-card-emoji{font-size:2.5rem;margin-bottom:12px;}
+.trein-card-text{font-family:var(--serif);font-style:italic;font-size:1.25rem;line-height:1.35;color:var(--ink);}
+.trein-card-num{font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--bruin);margin-top:12px;}
+.trein-nav{display:flex;gap:12px;padding:0 20px 20px;justify-content:center;}
+.trein-btn{padding:11px 28px;border-radius:30px;border:2px solid var(--zand);background:#fff;font-size:0.9rem;cursor:pointer;color:var(--bruin);}
+.trein-btn.primary{background:var(--terra);border-color:var(--terra);color:#fff;}
+
+/* Wie zei dat */
+.wzd-statement{background:#fff;border-radius:var(--r-lg);box-shadow:var(--shadow-lg);padding:28px 22px;text-align:center;margin-bottom:20px;}
+.wzd-quote{font-family:var(--serif);font-style:italic;font-size:1.3rem;line-height:1.4;color:var(--ink);margin-bottom:6px;}
+.wzd-attribution{font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--bruin);}
+.wzd-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.wzd-opt{padding:14px 8px;border-radius:var(--r);border:2px solid var(--zand);background:#fff;cursor:pointer;text-align:center;transition:all 0.2s;}
+.wzd-opt .mini-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:0.85rem;color:#fff;font-weight:600;margin:0 auto 6px;}
+.wzd-opt .opt-name{font-size:0.8rem;}
+.wzd-opt.correct{border-color:#22c55e;background:#dcfce7;}
+.wzd-opt.wrong{border-color:#ef4444;background:#fee2e2;}
+.wzd-score{text-align:center;font-size:0.85rem;color:var(--bruin);}
+
+/* Hoofd-spel */
+.hoofd-setup{text-align:center;padding:20px;}
+.hoofd-category-btns{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+.hoofd-cat-btn{padding:14px;border-radius:var(--r);border:2px solid var(--zand);background:#fff;font-size:0.95rem;cursor:pointer;transition:all 0.15s;}
+.hoofd-cat-btn:active{background:var(--terra);color:#fff;border-color:var(--terra);}
+.hoofd-play-screen{display:none;flex-direction:column;height:100%;align-items:center;justify-content:space-between;padding:20px;}
+.hoofd-play-screen.show{display:flex;}
+.hoofd-word{font-family:var(--serif);font-style:italic;font-size:3.5rem;text-align:center;color:var(--ink);line-height:1.1;margin:auto 0;}
+.hoofd-timer{font-size:3rem;font-weight:700;font-family:var(--serif);color:var(--terra);}
+.hoofd-btns{display:flex;gap:16px;width:100%;}
+.hoofd-btn{flex:1;padding:18px;border-radius:var(--r);border:none;font-size:1rem;font-weight:600;cursor:pointer;}
+.hoofd-btn.pass{background:#fee2e2;color:#991b1b;}
+.hoofd-btn.correct{background:#dcfce7;color:#166534;}
+.hoofd-result{text-align:center;padding:20px;}
+.hoofd-result-num{font-family:var(--serif);font-size:4rem;color:var(--terra);}
 </style>
 </head>
 <body>
@@ -437,6 +542,40 @@ h1,h2,h3,h4{font-family:var(--serif);}
       </div>
     </div>
 
+    <!-- MISSIE VAN DE DAG -->
+    <div class="missie-block" id="missie-block">
+      <div class="missie-label">✦ Missie van de dag</div>
+      <div class="missie-title" id="missie-title">Laden…</div>
+      <div class="missie-desc" id="missie-desc"></div>
+      <button class="missie-done-btn" id="missie-btn" onclick="toggleMissie()">✓ Gedaan!</button>
+      <div class="streak-row" id="streak-row"></div>
+    </div>
+
+    <!-- REISINFO -->
+    <div class="collapsible" id="reisinfo-coll">
+      <div class="collapsible-head" onclick="toggleCollapsible('reisinfo-coll')">
+        <div class="collapsible-title">🔒 Reisinfo — alleen voor ons</div>
+        <div class="collapsible-arrow">▾</div>
+      </div>
+      <div class="collapsible-body">
+        <div class="info-row"><div class="info-icon">🏠</div><div><div class="info-label">Verblijf</div><div class="info-val">Rue du Temple, 75003 Parijs (Le Marais)<br><small style="color:var(--bruin)">Check-in: vr 26/6 vanaf 15u · Check-out: zo 28/6 voor 11u</small></div></div></div>
+        <div class="info-row"><div class="info-icon">🚂</div><div><div class="info-label">Eurostar heen</div><div class="info-val">Vr 26 juni · Amsterdam CS 08:10 → Paris Gare du Nord 11:56<br><small style="color:var(--bruin)">Instappen uiterlijk 07:40 · Paspoort of ID mee!</small></div></div></div>
+        <div class="info-row"><div class="info-icon">🚂</div><div><div class="info-label">Eurostar terug</div><div class="info-val">Zo 28 juni · Paris Gare du Nord 16:25 → Amsterdam CS 20:03<br><small style="color:var(--bruin)">Aanwezig uiterlijk 15:55</small></div></div></div>
+        <div class="info-row"><div class="info-icon">🚇</div><div><div class="info-label">Metro vanuit Gare du Nord</div><div class="info-val">Lijn 5 → Bastille (5 stops, ~14 min) · OV-kaart werkt niet! Navigo-kaart of los kaartje €2,15</div></div></div>
+        <div class="info-row"><div class="info-icon">🆘</div><div><div class="info-label">Noodnummers</div><div class="info-val">112 Europese noodhulp · 15 SAMU (ambulance) · 17 Politie · 18 Brandweer<br>Ambassade NL Parijs: +33 1 40 62 33 00</div></div></div>
+        <div class="info-row"><div class="info-icon">💳</div><div><div class="info-label">Handig weten</div><div class="info-val">Meeste plekken accepteren pin. Puces de Saint-Ouen = cash. Airbnb-sleutelcode via host WhatsApp.</div></div></div>
+      </div>
+    </div>
+
+    <!-- INPAKLIJST -->
+    <div class="collapsible" id="inpak-coll">
+      <div class="collapsible-head" onclick="toggleCollapsible('inpak-coll')">
+        <div class="collapsible-title">🧳 Inpaklijst</div>
+        <div class="collapsible-arrow">▾</div>
+      </div>
+      <div class="collapsible-body" id="inpak-body"></div>
+    </div>
+
     <!-- ALARM -->
     <div class="alarm-banner">🔔 <strong>Vergeet niet te reserveren:</strong> Chez Janou, Bouillon Racine, Baja Bikes, Les Follivores tickets, Atelier des Lumières, Louvre tijdslot</div>
 
@@ -509,6 +648,34 @@ h1,h2,h3,h4{font-family:var(--serif);}
     <button class="add-btn" onclick="openModal()">＋ Voeg activiteit toe</button>
   </section>
 
+  <!-- SPELLEN -->
+  <section id="sec-spellen" class="section">
+    <div class="page-header"><div class="page-logo">Spellen</div></div>
+    <div style="padding:4px 16px 0;font-size:0.75rem;color:var(--bruin);">Voor in de trein, na het diner, of gewoon omdat het kan</div>
+    <div class="spellen-grid">
+      <div class="spel-card" onclick="openGame('quiz')">
+        <div class="spel-emoji">🗺️</div>
+        <div class="spel-naam">Parijs Quiz</div>
+        <div class="spel-desc">Wie weet het meest? Hoogste score beslist het diner.</div>
+      </div>
+      <div class="spel-card" onclick="openGame('trein')">
+        <div class="spel-emoji">🚂</div>
+        <div class="spel-naam">Treinkaarten</div>
+        <div class="spel-desc">Nostalgisch · ondeugend · reflectief</div>
+      </div>
+      <div class="spel-card" onclick="openGame('wzd')">
+        <div class="spel-emoji">🤔</div>
+        <div class="spel-naam">Wie zei dat?</div>
+        <div class="spel-desc">Raad wie welke uitspraak deed</div>
+      </div>
+      <div class="spel-card" onclick="openGame('hoofd')">
+        <div class="spel-emoji">📱</div>
+        <div class="spel-naam">Hoofd-spel</div>
+        <div class="spel-desc">Telefoon op voorhoofd, raad het woord</div>
+      </div>
+    </div>
+  </section>
+
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <button class="nav-btn active" onclick="switchTab('home',this)">
@@ -527,7 +694,91 @@ h1,h2,h3,h4{font-family:var(--serif);}
       <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
       Groep
     </button>
+    <button class="nav-btn" onclick="switchTab('spellen',this)">
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2M12 12v4M10 14h4"/></svg>
+      Spellen
+    </button>
   </nav>
+</div>
+
+<!-- QUIZ OVERLAY -->
+<div class="game-overlay" id="game-quiz">
+  <div class="game-header">
+    <button class="game-back" onclick="closeGame('quiz')">← Terug</button>
+    <div class="game-title">Parijs Quiz</div>
+    <div id="quiz-score-badge" style="font-size:0.75rem;color:var(--bruin);"></div>
+  </div>
+  <div class="game-body" id="quiz-body"></div>
+</div>
+
+<!-- TREIN OVERLAY -->
+<div class="game-overlay" id="game-trein">
+  <div class="game-header">
+    <button class="game-back" onclick="closeGame('trein')">← Terug</button>
+    <div class="game-title">Treinkaarten</div>
+  </div>
+  <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+    <div class="trein-tabs">
+      <button class="trein-tab active" data-mood="nostalgisch" onclick="setTreinMood('nostalgisch',this)">Nostalgisch</button>
+      <button class="trein-tab" data-mood="ondeugend" onclick="setTreinMood('ondeugend',this)">Ondeugend</button>
+      <button class="trein-tab" data-mood="reflectief" onclick="setTreinMood('reflectief',this)">Reflectief</button>
+    </div>
+    <div class="trein-card-wrap"><div class="trein-card" id="trein-card">
+      <div class="trein-card-emoji" id="trein-emoji"></div>
+      <div class="trein-card-text" id="trein-text"></div>
+      <div class="trein-card-num" id="trein-num"></div>
+    </div></div>
+    <div class="trein-nav">
+      <button class="trein-btn" onclick="treinPrev()">← Vorige</button>
+      <button class="trein-btn primary" onclick="treinNext()">Volgende →</button>
+    </div>
+  </div>
+</div>
+
+<!-- WIE ZEI DAT OVERLAY -->
+<div class="game-overlay" id="game-wzd">
+  <div class="game-header">
+    <button class="game-back" onclick="closeGame('wzd')">← Terug</button>
+    <div class="game-title">Wie zei dat?</div>
+    <div id="wzd-score-badge" style="font-size:0.75rem;color:var(--bruin);"></div>
+  </div>
+  <div class="game-body" id="wzd-body"></div>
+</div>
+
+<!-- HOOFD-SPEL OVERLAY -->
+<div class="game-overlay" id="game-hoofd">
+  <div class="game-header">
+    <button class="game-back" onclick="closeGame('hoofd')">← Terug</button>
+    <div class="game-title">Hoofd-spel</div>
+    <div id="hoofd-score-badge" style="font-size:0.75rem;color:var(--bruin);"></div>
+  </div>
+  <div class="game-body" id="hoofd-body">
+    <div class="hoofd-setup" id="hoofd-setup">
+      <div style="font-family:var(--serif);font-size:1.3rem;margin-bottom:8px;">Kies categorie</div>
+      <div style="font-size:0.85rem;color:var(--bruin);margin-bottom:4px;">Houd je telefoon op je voorhoofd. Vrienden geven aanwijzingen — jij raadt het woord.</div>
+      <div style="font-size:0.8rem;color:var(--bruin);margin-bottom:16px;">⬇️ Kantelen = Pas · ⬆️ Kantelen = Goed</div>
+      <div class="hoofd-category-btns">
+        <button class="hoofd-cat-btn" onclick="startHoofd('parijs')">🗼 Parijs & Frankrijk</button>
+        <button class="hoofd-cat-btn" onclick="startHoofd('eten')">🥐 Eten & Drinken</button>
+        <button class="hoofd-cat-btn" onclick="startHoofd('vriendinnen')">💛 Vriendinnen-dingen</button>
+        <button class="hoofd-cat-btn" onclick="startHoofd('mix')">🎲 Mix alles</button>
+      </div>
+    </div>
+    <div class="hoofd-play-screen" id="hoofd-play">
+      <div class="hoofd-timer" id="hoofd-timer">60</div>
+      <div class="hoofd-word" id="hoofd-word"></div>
+      <div class="hoofd-btns">
+        <button class="hoofd-btn pass" onclick="hoofdVote(false)">✕ Pas</button>
+        <button class="hoofd-btn correct" onclick="hoofdVote(true)">✓ Goed!</button>
+      </div>
+    </div>
+    <div class="hoofd-result" id="hoofd-result" style="display:none;">
+      <div style="font-size:2rem;margin-bottom:8px;">🎉</div>
+      <div class="hoofd-result-num" id="hoofd-result-num"></div>
+      <div style="font-size:0.8rem;color:var(--bruin);margin-top:4px;">goed geraden!</div>
+      <button onclick="resetHoofd()" style="margin-top:20px;padding:12px 28px;background:var(--terra);color:#fff;border:none;border-radius:20px;font-size:0.9rem;cursor:pointer;">Nog een ronde</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -586,6 +837,7 @@ const ITEMS_BASE = [
   {id:'pavillon-puebla',cat:'avond',sub:'Bar / Dansen',naam:'Pavillon Puebla',wijk:'19e — Buttes-Chaumont',prijs:'€€',duur:'avond',tijden:'~17–01 in zomer',drukte:'cool maar niet exclusief',reserveren:false,must_van:null,weekend_special:false,verhaal:'Open-air bar in Buttes-Chaumont. Cocktails, Corsicaans bier. Zomeravond-perfectie.',tip:'Vroeg komen (18:00) voor goede tafel.',img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80'},
   {id:'podium-fiertes',cat:'avond',sub:'Concert',naam:'Podium des Fiertés (gratis)',wijk:'Place de la Nation',prijs:'gratis',duur:'tot 21:30',tijden:'ZATERDAG 27/6, 17–21:30',drukte:'tienduizenden, party',reserveren:false,must_van:null,weekend_special:true,verhaal:'Gratis openluchtconcert na de Pride mars. Nicky Doll, Kalika, queer artists.',tip:'Eindpunt van de mars.',img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80'},
   {id:'solidays',cat:'avond',sub:'Festival',naam:'Solidays festival',wijk:'16e — Longchamp',prijs:'€60–70 dagticket',duur:'hele dag',tijden:'26–28 juni, hele weekend',drukte:'tienduizenden',reserveren:true,must_van:null,weekend_special:true,verhaal:'Festival voor solidariteit (anti-AIDS). Bigflo & Oli, Gims, Orelsan.',tip:'Één dag is genoeg. Zondag is relaxste. Tickets vooraf via solidays.org.',img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80'},
+  {id:'cargo-container-bar',cat:'avond',sub:'Open-air bar',naam:'Cargo Container Bar',wijk:'12e — Port de Bercy Aval',prijs:'€€',duur:'avond',tijden:'do–zo 17–01 (zomer)',drukte:'druk weekend',reserveren:false,must_van:null,weekend_special:true,verhaal:'Open-air feestbar op de kades van de Seine in shipping containers. Terras met uitzicht op de Bibliothèque nationale. ZATERDAG 27 juni = "Disc\'o Cargo" — discoavond. Perfect slot van dag 2.',tip:'Zaterdag = Disc\'o Cargo night (house/disco). Kom rond 19u voor goede plek. Iovine\'s Napolitaanse pizza ter plekke.',img:'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&q=80'},
 ];
 
 const MOCK_VOTES = {
@@ -600,6 +852,7 @@ const MOCK_VOTES = {
     'chez-janou':'like','le-mary-celeste':'like','septime-cave':'like',
     'little-red-door':'dream','bisou':'like','perchoir':'like',
     'les-follivores':'like','podium-fiertes':'like','badaboum':'like',
+    'cargo-container-bar':'dream',
   },
   miriam: {
     'mouffetard':'dream','montmartre':'like','canal-saint-martin':'dream',
@@ -625,6 +878,7 @@ const MOCK_VOTES = {
     'little-red-door':'like','bisou':'like','perchoir':'dream',
     'rosa-bal-musette':'dream','les-follivores':'dream','pulse-pride':'like',
     'badaboum':'like','podium-fiertes':'dream','solidays':'like',
+    'cargo-container-bar':'like',
   }
 };
 
@@ -738,6 +992,8 @@ function initApp() {
   buildSwipeStack();
   renderTop5();
   renderGroep();
+  renderMissie();
+  renderInpaklijst();
   document.getElementById('swipe-user-badge').textContent = PROFILES[currentUser].naam;
 }
 
@@ -1185,6 +1441,336 @@ function submitAdd() {
   ['add-naam','add-sub','add-wijk','add-prijs','add-tijden','add-verhaal'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('add-cat').value = '';
   document.getElementById('add-reserveer').checked = false;
+}
+
+// ── COLLAPSIBLES ─────────────────────────────────
+function toggleCollapsible(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// ── MISSIE VAN DE DAG ────────────────────────────
+const MISSIES = [
+  // indexed by day offset from trip start (0=vr26, 1=za27, 2=zo28)
+  { title:'Proef een croissant bij Du Pain et des Idées', desc:'De oudste bakkerstechniek van Parijs. Zoek de winkel op Rue Yves Toudic vóór 12u — na die tijd zijn ze uitverkocht.', emoji:'🥐' },
+  { title:'Vind één parel op de Puces de Saint-Ouen', desc:'Eén vintage vondst. Mag een ring zijn, een sjaal, een poster. Foto in de groep!', emoji:'💫' },
+  { title:'Aperitivo op een terras voor de trein', desc:'Laatste glas wijn in de zon voor je instappt. Toast op de mooiste drie dagen.', emoji:'🥂' },
+];
+const TRIP_START = new Date('2026-06-26T00:00:00');
+
+function renderMissie() {
+  const now = new Date();
+  const dayOffset = Math.floor((now - TRIP_START) / 86400000);
+  const idx = Math.max(0, Math.min(2, dayOffset));
+  const missie = MISSIES[idx];
+  document.getElementById('missie-title').textContent = missie.title;
+  document.getElementById('missie-desc').textContent = missie.desc;
+  const key = 'vz_missie_' + currentUser + '_' + idx;
+  const done = localStorage.getItem(key) === '1';
+  const btn = document.getElementById('missie-btn');
+  btn.textContent = done ? '✓ Missie volbracht!' : '✓ Gedaan!';
+  btn.classList.toggle('done', done);
+  renderStreaks(idx);
+}
+
+function toggleMissie() {
+  const now = new Date();
+  const dayOffset = Math.max(0, Math.min(2, Math.floor((now - TRIP_START) / 86400000)));
+  const key = 'vz_missie_' + currentUser + '_' + dayOffset;
+  const was = localStorage.getItem(key) === '1';
+  localStorage.setItem(key, was ? '0' : '1');
+  renderMissie();
+  if (!was) showToast('Missie volbracht! 🎉');
+}
+
+function renderStreaks(dayIdx) {
+  const row = document.getElementById('streak-row');
+  const html = Object.entries(PROFILES).map(([k, p]) => {
+    const done = localStorage.getItem('vz_missie_' + k + '_' + dayIdx) === '1';
+    return `<div class="streak-av">
+      <div class="streak-circle" style="background:${done ? p.color : 'transparent'};border-color:${done ? p.color : 'rgba(255,255,255,0.3)'};">${p.init}</div>
+      <div class="streak-fire">${done ? '🔥' : '·'}</div>
+    </div>`;
+  }).join('');
+  row.innerHTML = html;
+}
+
+// ── INPAKLIJST ────────────────────────────────────
+const PACKLIST = [
+  { label:'Paspoort of ID-kaart', note:'Eurostar vereist dit!' },
+  { label:'Eurostar e-ticket (screenshot!)' },
+  { label:'Kleding voor 3 dagen + 1 extra' },
+  { label:'Comfortabele schoenen (veel lopen!)' },
+  { label:'Smarte avondschoenen' },
+  { label:'Regenjas of opvouwbaar jasje' },
+  { label:'Zonnebril + zonnebrand' },
+  { label:'Powerbank 🔋', note:'Je weet wie je bent, Karin 😂' },
+  { label:'Oordoppen + slaapmasker' },
+  { label:'Toilettas + medicijnen' },
+  { label:'Contant geld (Puces = cash)' },
+  { label:'Pinpas (meld je bank vooraf!)' },
+  { label:'Reserveringsbevestigingen' },
+  { label:'WhatsApp-chat met reisinfo gepind' },
+  { label:'Iets om in de trein te doen' },
+];
+
+function renderInpaklijst() {
+  const key = 'vz_pack_' + currentUser;
+  const checked = JSON.parse(localStorage.getItem(key) || '[]');
+  const body = document.getElementById('inpak-body');
+  body.innerHTML = PACKLIST.map((item, i) => {
+    const done = checked.includes(i);
+    return `<div class="pack-item${done ? ' checked' : ''}" onclick="togglePack(${i})">
+      <div class="pack-check">${done ? '✓' : ''}</div>
+      <div>
+        <div class="pack-label">${item.label}</div>
+        ${item.note ? `<div class="pack-note">${item.note}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('') + `<div style="margin-top:8px;font-size:0.75rem;color:var(--bruin);">${checked.length}/${PACKLIST.length} ingepakt</div>`;
+}
+
+function togglePack(idx) {
+  const key = 'vz_pack_' + currentUser;
+  let checked = JSON.parse(localStorage.getItem(key) || '[]');
+  if (checked.includes(idx)) checked = checked.filter(i => i !== idx);
+  else checked.push(idx);
+  localStorage.setItem(key, JSON.stringify(checked));
+  renderInpaklijst();
+}
+
+// ── PARIJS QUIZ ───────────────────────────────────
+const QUIZ_VRAGEN = [
+  { vraag:'In welk jaar opende de Eiffeltoren?', opties:['1876','1889','1900','1912'], correct:1, uitleg:'De Eiffeltoren opende op 31 maart 1889 voor de Wereldtentoonstelling.' },
+  { vraag:'In welk museum hangen Monet\'s Waterlelies in speciale ovale zalen?', opties:['Louvre','Orsay','Orangerie','Pompidou'], correct:2, uitleg:'Het Musée de l\'Orangerie werd speciaal voor de Waterlelies gebouwd.' },
+  { vraag:'Welke wijk staat bekend als centrum van de Joodse buurt en queer scene?', opties:['Montmartre','Saint-Germain','Le Marais','Bastille'], correct:2, uitleg:'Le Marais (3e–4e arrondissement) is het hart van beide gemeenschappen.' },
+  { vraag:'Hoe heet de beroemdste bakker van Parijs op het Canal Saint-Martin?', opties:['Poilâne','Du Pain et des Idées','Stohrer','Eric Kayser'], correct:1, uitleg:'Du Pain et des Idées is iconisch, maar gesloten in het weekend!' },
+  { vraag:'Hoeveel arrondissementen heeft Parijs?', opties:['18','20','22','24'], correct:1, uitleg:'Parijs is verdeeld in 20 arrondissementen, spiraalvormig genummerd.' },
+  { vraag:'Op welk eiland in de Seine staat Notre-Dame?', opties:['Île Saint-Louis','Île de la Cité','Île aux Cygnes','Île Vert'], correct:1, uitleg:'Île de la Cité is het historische hart van Parijs.' },
+  { vraag:'Wat is de goedkoopste manier om in Parijs te reizen?', opties:['Taxi','Vélib\' fiets','Metro','Trottinette'], correct:2, uitleg:'De metro kost €2,15 per rit of €16,90 voor 10-rittenkaart.' },
+  { vraag:'Welk Parijse museum is gevestigd in een oud treinstation?', opties:['Louvre','Pompidou','Musée d\'Orsay','Palais de Tokyo'], correct:2, uitleg:'Gare d\'Orsay werd in 1986 omgebouwd tot museum.' },
+  { vraag:'Wat betekent "Bouillon" in de context van Parijs-restaurants?', opties:['Soep','Goedkope volksrestaurant','Wijnkelder','Brouwerij'], correct:1, uitleg:'Bouillons zijn traditionele volksbistro\'s met lage prijzen, zoals Bouillon Racine.' },
+  { vraag:'Welke dag is Sézane in het Marais óók op zondag open?', opties:['Niet op zondag','Alleen zondagochtend','Wel — 11:30–19:30','Alleen met afspraak'], correct:2, uitleg:'Sézane L\'Appartement Marais is een van de weinige zondagopties!' },
+];
+
+let quizIdx = 0, quizScore = 0, quizAnswered = false;
+
+function renderQuiz() {
+  const body = document.getElementById('quiz-body');
+  document.getElementById('quiz-score-badge').textContent = `${quizScore}/${quizIdx}`;
+  if (quizIdx >= QUIZ_VRAGEN.length) {
+    body.innerHTML = `<div class="quiz-score-screen">
+      <div class="quiz-score-big">${quizScore}/${QUIZ_VRAGEN.length}</div>
+      <div class="quiz-score-label">Eindscore</div>
+      <div class="quiz-prize">${quizScore >= 8 ? '🏆 Briljant! Jij beslist het diner vanavond.' : quizScore >= 6 ? '👏 Goed gespeeld! Bijna.' : '😅 Meer wijn? Dan gaat het beter.'}</div>
+      <button onclick="resetQuiz()" style="margin-top:20px;padding:12px 28px;background:var(--terra);color:#fff;border:none;border-radius:20px;font-size:0.9rem;cursor:pointer;">Opnieuw spelen</button>
+    </div>`;
+    return;
+  }
+  const v = QUIZ_VRAGEN[quizIdx];
+  quizAnswered = false;
+  body.innerHTML = `<div class="quiz-q-num">Vraag ${quizIdx + 1} van ${QUIZ_VRAGEN.length}</div>
+    <div class="quiz-question">${v.vraag}</div>
+    <div class="quiz-options">
+      ${v.opties.map((o,i) => `<button class="quiz-opt" onclick="answerQuiz(${i})">${o}</button>`).join('')}
+    </div>
+    <div class="quiz-feedback" id="quiz-feedback"></div>`;
+}
+
+function answerQuiz(idx) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const v = QUIZ_VRAGEN[quizIdx];
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach((o, i) => {
+    o.disabled = true;
+    if (i === v.correct) o.classList.add('correct');
+    else if (i === idx) o.classList.add('wrong');
+  });
+  const fb = document.getElementById('quiz-feedback');
+  if (idx === v.correct) { quizScore++; fb.textContent = '✓ ' + v.uitleg; }
+  else fb.textContent = '✗ ' + v.uitleg;
+  document.getElementById('quiz-score-badge').textContent = `${quizScore}/${quizIdx + 1}`;
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'quiz-next-btn';
+  nextBtn.textContent = quizIdx + 1 < QUIZ_VRAGEN.length ? 'Volgende →' : 'Resultaat bekijken';
+  nextBtn.onclick = () => { quizIdx++; renderQuiz(); };
+  document.getElementById('quiz-body').appendChild(nextBtn);
+}
+
+function resetQuiz() { quizIdx = 0; quizScore = 0; renderQuiz(); }
+
+// ── TREIN-MODUS ───────────────────────────────────
+const TREIN_KAARTEN = {
+  nostalgisch:[
+    { emoji:'💭', text:'Wat is jouw mooiste vakantieherinnering van onze vriendschap?' },
+    { emoji:'📸', text:'Als je één dag uit je 25e opnieuw mocht beleven — welke was dat?' },
+    { emoji:'🎵', text:'Welk nummer brengt jou meteen terug naar een specifieke periode in je leven?' },
+    { emoji:'😂', text:'Wat is het grappigste wat je ooit met één van ons hebt meegemaakt?' },
+    { emoji:'🌍', text:'Welke vakantie vóór deze had je absoluut nooit willen missen?' },
+  ],
+  ondeugend:[
+    { emoji:'🤫', text:'Wat heb je stiekem gedaan waarvan je hoopt dat niemand het ooit weet?' },
+    { emoji:'🎭', text:'Met welke beroemdheid zou jij een avond willen stappen in Parijs?' },
+    { emoji:'💸', text:'Wat is het duurste wat je ooit hebt gekocht en meteen spijt van had?' },
+    { emoji:'💋', text:'Wat is het meest impulsieve wat je ooit hebt gedaan — en deed je het opnieuw?' },
+    { emoji:'🥂', text:'Vertel iets wat je al lang wilt zeggen maar nooit de kans voor kreeg.' },
+  ],
+  reflectief:[
+    { emoji:'🌱', text:'Wat heeft het afgelopen jaar jou het meest veranderd?' },
+    { emoji:'🍽️', text:'Als jij een restaurant in Parijs opende — hoe heette het en wat serveer je?' },
+    { emoji:'✨', text:'Wat is het beste advies dat iemand jou ooit heeft gegeven?' },
+    { emoji:'🗺️', text:'Waar stond je op je 30e dat je nooit had verwacht? Klopt het?' },
+    { emoji:'🔮', text:'Wat wil je de komende 5 jaar écht anders aanpakken?' },
+  ],
+};
+let treinMood = 'nostalgisch', treinIdx = 0;
+
+function setTreinMood(mood, el) {
+  treinMood = mood;
+  treinIdx = 0;
+  document.querySelectorAll('.trein-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderTreinKaart();
+}
+function treinNext() { const cards = TREIN_KAARTEN[treinMood]; treinIdx = (treinIdx + 1) % cards.length; renderTreinKaart(); }
+function treinPrev() { const cards = TREIN_KAARTEN[treinMood]; treinIdx = (treinIdx - 1 + cards.length) % cards.length; renderTreinKaart(); }
+function renderTreinKaart() {
+  const cards = TREIN_KAARTEN[treinMood];
+  const card = cards[treinIdx];
+  document.getElementById('trein-emoji').textContent = card.emoji;
+  document.getElementById('trein-text').textContent = card.text;
+  document.getElementById('trein-num').textContent = `${treinIdx + 1} / ${cards.length}`;
+}
+
+// ── WIE ZEI DAT ───────────────────────────────────
+const WZD_VRAGEN = [
+  { quote:'"Ik slaap het liefst zo dicht mogelijk bij de badkamer."', antwoord:'griette', hint:'Ochtendmens.' },
+  { quote:'"Ik heb de Google Maps-route al drie keer gecheckt."', antwoord:'frederike', hint:'Voorbereiding is alles.' },
+  { quote:'"Als er wijn is, ben ik er."', antwoord:'miriam', hint:'Prioriteiten.' },
+  { quote:'"Ik ga zeker iets kopen op de vlooienmarkt dat ik thuis nooit gebruik."', antwoord:'marlinde', hint:'Impuls-shopper.' },
+  { quote:'"Ik hoop dat we ook gewoon een beetje níksdoen."', antwoord:'griette', hint:'Even niets.' },
+  { quote:'"Mijn telefoon-batterij is altijd het eerst leeg."', antwoord:'marlinde', hint:'Vandaar de powerbank-grap.' },
+  { quote:'"Stap 1 bij aankomst: terrasje."', antwoord:'miriam', hint:'Direct goed.' },
+  { quote:'"Ik pak altijd te veel in maar kom thuis met exact hetzelfde."', antwoord:'frederike', hint:'Systematisch.' },
+  { quote:'"Ik heb al bij het weer gekeken voor alle drie de dagen."', antwoord:'frederike', hint:'Voorbereiding.' },
+  { quote:'"Ik neem een foto van elke macarondoos die ik zie."', antwoord:'griette', hint:'Esthetisch.' },
+];
+let wzdIdx = 0, wzdScore = 0, wzdAnswered = false;
+
+function renderWzd() {
+  const body = document.getElementById('wzd-body');
+  document.getElementById('wzd-score-badge').textContent = `${wzdScore}/${wzdIdx}`;
+  if (wzdIdx >= WZD_VRAGEN.length) {
+    body.innerHTML = `<div style="text-align:center;padding:32px 16px;">
+      <div style="font-size:3rem;margin-bottom:8px;">🎭</div>
+      <div style="font-family:var(--serif);font-size:2rem;color:var(--terra);">${wzdScore}/${WZD_VRAGEN.length}</div>
+      <div style="font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--bruin);margin:8px 0 16px;">Eindscore</div>
+      <div style="font-size:0.9rem;color:var(--ink);">${wzdScore >= 8 ? '🏆 Jij kent je vriendinnen inside out!' : wzdScore >= 5 ? '😊 Aardig goed! Je luistert.' : '🤔 Meer aandacht volgende keer?'}</div>
+      <button onclick="resetWzd()" style="margin-top:20px;padding:12px 28px;background:var(--terra);color:#fff;border:none;border-radius:20px;font-size:0.9rem;cursor:pointer;">Opnieuw</button>
+    </div>`;
+    return;
+  }
+  const v = WZD_VRAGEN[wzdIdx];
+  wzdAnswered = false;
+  const optsHtml = Object.entries(PROFILES).map(([k, p]) => `
+    <button class="wzd-opt" onclick="answerWzd('${k}')">
+      <div class="mini-av" style="background:${p.color};">${p.init}</div>
+      <div class="opt-name">${p.naam}</div>
+    </button>`).join('');
+  body.innerHTML = `<div class="wzd-statement">
+    <div class="wzd-quote">${v.quote}</div>
+    <div class="wzd-attribution">Wie zei dit?</div>
+  </div>
+  <div class="wzd-options">${optsHtml}</div>
+  <div class="wzd-score" id="wzd-feedback"></div>`;
+}
+
+function answerWzd(chosen) {
+  if (wzdAnswered) return;
+  wzdAnswered = true;
+  const v = WZD_VRAGEN[wzdIdx];
+  document.querySelectorAll('.wzd-opt').forEach(o => {
+    o.disabled = true;
+    if (o.querySelector('.opt-name').textContent === PROFILES[v.antwoord].naam) o.classList.add('correct');
+    else if (o.querySelector('.opt-name').textContent === PROFILES[chosen]?.naam && chosen !== v.antwoord) o.classList.add('wrong');
+  });
+  const fb = document.getElementById('wzd-feedback');
+  if (chosen === v.antwoord) { wzdScore++; fb.textContent = '✓ Goed! ' + v.hint; }
+  else fb.textContent = `✗ Het was ${PROFILES[v.antwoord].naam}. ${v.hint}`;
+  document.getElementById('wzd-score-badge').textContent = `${wzdScore}/${wzdIdx + 1}`;
+  setTimeout(() => { wzdIdx++; renderWzd(); }, 1800);
+}
+
+function resetWzd() { wzdIdx = 0; wzdScore = 0; renderWzd(); }
+
+// ── HOOFD-SPEL ────────────────────────────────────
+const HOOFD_WORDS = {
+  parijs:['Eiffeltoren','Croissant','Louvre','Baguette','Macaron','Chanel','Seine','Montmartre','Champagne','Escargot','Beret','Bisous','Madeleine','Crêpe','Soufflé','Bordeaux','Notre-Dame','Arc de Triomphe','Versailles','Moulin Rouge'],
+  eten:['Couscous','Tartaar','Bouillabaisse','Crème brûlée','Foie gras','Camembert','Brie','Pastis','Calvados','Pissaladière','Ratatouille','Profiterole','Mille-feuille','Quiche','Tapenade','Pâté','Chablis','Rosé','Beaujolais','Champagne'],
+  vriendinnen:['Vroeg opstaan','Reserveren','Selfie','Rolkoffer','Paspoort','Zonnebril','Weg kwijt','Wijn bestellen','Rekening splitsen','Terrasje','Uitslapen','Paskamer','Vliegangst','Snoepzak','Oordoppen','Hotel upgrade','Last-minute','Mapje uitprinten','Groepsfoto','Vrijgezellenfeest'],
+  mix:[], // filled below
+};
+HOOFD_WORDS.mix = [...HOOFD_WORDS.parijs, ...HOOFD_WORDS.eten, ...HOOFD_WORDS.vriendinnen].sort(() => Math.random() - 0.5);
+
+let hoofdWords = [], hoofdWordIdx = 0, hoofdCorrect = 0, hoofdTimer = null;
+
+function startHoofd(cat) {
+  hoofdWords = [...HOOFD_WORDS[cat]].sort(() => Math.random() - 0.5);
+  hoofdWordIdx = 0;
+  hoofdCorrect = 0;
+  document.getElementById('hoofd-setup').style.display = 'none';
+  const play = document.getElementById('hoofd-play');
+  play.classList.add('show');
+  document.getElementById('hoofd-result').style.display = 'none';
+  document.getElementById('hoofd-word').textContent = hoofdWords[0];
+  startHoofdTimer();
+}
+
+function startHoofdTimer() {
+  let t = 60;
+  document.getElementById('hoofd-timer').textContent = t;
+  hoofdTimer = setInterval(() => {
+    t--;
+    document.getElementById('hoofd-timer').textContent = t;
+    if (t <= 0) { clearInterval(hoofdTimer); showHoofdResult(); }
+  }, 1000);
+}
+
+function hoofdVote(correct) {
+  if (correct) hoofdCorrect++;
+  hoofdWordIdx++;
+  if (hoofdWordIdx >= hoofdWords.length) { clearInterval(hoofdTimer); showHoofdResult(); return; }
+  document.getElementById('hoofd-word').textContent = hoofdWords[hoofdWordIdx];
+  document.getElementById('hoofd-score-badge').textContent = hoofdCorrect + ' goed';
+}
+
+function showHoofdResult() {
+  document.getElementById('hoofd-play').classList.remove('show');
+  document.getElementById('hoofd-result').style.display = 'block';
+  document.getElementById('hoofd-result-num').textContent = hoofdCorrect;
+  document.getElementById('hoofd-score-badge').textContent = '';
+}
+
+function resetHoofd() {
+  document.getElementById('hoofd-setup').style.display = 'block';
+  document.getElementById('hoofd-play').classList.remove('show');
+  document.getElementById('hoofd-result').style.display = 'none';
+  document.getElementById('hoofd-score-badge').textContent = '';
+}
+
+// ── GAME OPEN / CLOSE ────────────────────────────
+function openGame(name) {
+  const el = document.getElementById('game-' + name);
+  el.classList.add('show');
+  if (name === 'quiz') { quizIdx = 0; quizScore = 0; renderQuiz(); }
+  if (name === 'trein') { treinMood = 'nostalgisch'; treinIdx = 0; renderTreinKaart(); }
+  if (name === 'wzd') { wzdIdx = 0; wzdScore = 0; renderWzd(); }
+  if (name === 'hoofd') { resetHoofd(); }
+}
+
+function closeGame(name) {
+  document.getElementById('game-' + name).classList.remove('show');
+  if (name === 'hoofd' && hoofdTimer) clearInterval(hoofdTimer);
 }
 
 // ── TABS ──────────────────────────────────────────
