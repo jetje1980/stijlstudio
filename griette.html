@@ -11657,7 +11657,7 @@ function _biRenderBody(boardId) {
   }
 }
 
-function _biEscape(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function _biEscape(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function _biFindItemByName(name) {
   if (!name) return null;
@@ -11684,14 +11684,25 @@ function _biAddLookToBoard(boardId, lookName, itemNames) {
   var board = boards.find(function(b){ return b.id === boardId; });
   if (!board) return false;
   var itemIds = itemNames.map(function(nm){ var f = _biFindItemByName(nm); return f ? f.id : null; }).filter(Boolean);
-  if (!itemIds.length) { showToast('Geen items herkend uit de kast'); return false; }
+  if (!itemIds.length) {
+    showToast('Geen items herkend — open het board en voeg items handmatig toe');
+    // Still create an empty outfit so user can build it manually
+    outfitCounter++;
+    var outfit = { id: 'outfit-' + outfitCounter, name: lookName, items: [] };
+    board.outfits.push(outfit);
+    saveAppData();
+    buildBoards();
+    activeBoardId = boardId;
+    return true;
+  }
+  var missed = itemNames.length - itemIds.length;
   outfitCounter++;
   var outfit = { id: 'outfit-' + outfitCounter, name: lookName, items: itemIds };
   board.outfits.push(outfit);
   saveAppData();
   buildBoards();
   activeBoardId = boardId;
-  showToast('✓ ' + lookName + ' toegevoegd aan ' + board.label);
+  showToast('✓ ' + lookName + ' opgeslagen' + (missed > 0 ? ' (' + missed + ' item' + (missed > 1 ? 's' : '') + ' niet herkend)' : ''));
   return true;
 }
 
@@ -11704,7 +11715,12 @@ function _biRenderResult(boardId, html, resWrap) {
     if (!btn) return;
     var lookName = card.dataset.lookName || 'Look';
     var itemNames = [];
-    try { itemNames = JSON.parse(card.dataset.lookItems || '[]'); } catch(e) {}
+    try {
+      var raw = card.dataset.lookItems || '[]';
+      // Decode any remaining HTML entities (for results cached before escaping fix)
+      raw = raw.replace(/&quot;/g,'"').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+      itemNames = JSON.parse(raw);
+    } catch(e) {}
     btn.addEventListener('click', function() {
       if (btn.classList.contains('saved')) return;
       var ok = _biAddLookToBoard(boardId, lookName, itemNames);
@@ -11812,7 +11828,7 @@ async function analyzeBoardInspo(boardId) {
   var contentParts = [
     {
       type: 'text',
-      text: 'Je bent Griette\'s persoonlijke stylist. Analyseer deze ' + inspoPhotos.length + ' Pinterest-inspiratiefoto\'s voor het board "' + board.label + '".\n\nGriette\'s garderobe:\n' + wardrobeSummary + '\n\nStel 3 VERSCHILLENDE outfit-combinaties voor. Elke look heeft een andere sfeer. Neem per look altijd ook een tas en accessoire(s) op uit de garderobe. Gebruik exact dezelfde itemnamen als in de garderobe.\n\nAntwoord in het Nederlands. Gebruik exact JSON:\n{"stijlwoorden":["..."],"kleuren":["..."],"looks":[{"naam":"Look 1","sfeer":"casual","beschrijving":"2 zinnen","items":["exacte naam incl tas en accessoire"]},{"naam":"Look 2","sfeer":"gekleed","beschrijving":"2 zinnen","items":["..."]},{"naam":"Look 3","sfeer":"statement","beschrijving":"2 zinnen","items":["..."]}],"tip":"..."}'
+      text: 'Je bent Griette\'s persoonlijke stylist. Analyseer deze ' + inspoPhotos.length + ' Pinterest-inspiratiefoto\'s voor het board "' + board.label + '".\n\nGriette\'s garderobe:\n' + wardrobeSummary + '\n\n⚠️ BELANGRIJK: gebruik UITSLUITEND namen die letterlijk voorkomen in de bovenstaande garderobe-lijst. Verzin GEEN items die er niet in staan. Als een categorie ontbreekt, laat die weg.\n\nStel 3 VERSCHILLENDE outfit-combinaties voor. Elke look heeft een andere sfeer. Neem per look altijd ook een tas en accessoire(s) op uit de garderobe.\n\nAntwoord in het Nederlands. Gebruik exact JSON:\n{"stijlwoorden":["..."],"kleuren":["..."],"looks":[{"naam":"Look 1","sfeer":"casual","beschrijving":"2 zinnen","items":["exacte naam uit garderobe"]},{"naam":"Look 2","sfeer":"gekleed","beschrijving":"2 zinnen","items":["..."]},{"naam":"Look 3","sfeer":"statement","beschrijving":"2 zinnen","items":["..."]}],"tip":"..."}'
     }
   ];
 
