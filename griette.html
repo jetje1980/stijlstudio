@@ -344,6 +344,12 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 .bi-result-card{background:var(--white);border:1.5px solid var(--cream-dark);border-radius:14px;padding:14px;margin-bottom:12px;}
 .bi-result-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-mid);margin-bottom:6px;}
 .bi-result-val{font-size:12px;color:var(--brown);line-height:1.6;}
+.bi-item-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;padding:2px 8px 2px 2px;background:rgba(46,26,14,0.06);border-radius:10px;color:var(--brown);margin:2px;vertical-align:middle;}
+.bi-item-chip-photo{width:22px;height:26px;border-radius:5px;overflow:hidden;background:var(--cream-dark);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted);}
+.bi-item-chip-photo img{width:100%;height:100%;object-fit:cover;}
+.bi-export-bar{display:flex;gap:8px;margin-top:14px;padding-bottom:20px;}
+.bi-export-btn{flex:1;padding:11px 10px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:11px;font-family:Jost,sans-serif;cursor:pointer;color:var(--brown);touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+@media print{body>*{display:none!important;}#bi-overlay{display:flex!important;position:static!important;transform:none!important;}.bi-back,.bi-upload-tile,.bi-analyze-btn,.bi-export-bar{display:none!important;}}
 </style>
 </head>
 <body>
@@ -11618,9 +11624,103 @@ function _biRenderBody(boardId) {
     var resWrap = document.createElement('div');
     resWrap.style.cssText = 'margin-top:16px;';
     resWrap.id = 'bi-result-' + boardId;
-    resWrap.innerHTML = board.inspoResult;
     body.appendChild(resWrap);
+    _biRenderResult(boardId, board.inspoResult, resWrap);
   }
+}
+
+function _biEscape(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function _biFindItemByName(name) {
+  if (!name) return null;
+  var lower = name.toLowerCase().trim();
+  var all = getAllItems();
+  var exact = all.find(function(it){ return it.name.toLowerCase() === lower; });
+  if (exact) return exact;
+  var startsWith = all.find(function(it){ return lower.startsWith(it.name.toLowerCase().split(' ').slice(0,2).join(' ')); });
+  if (startsWith) return startsWith;
+  return all.find(function(it){ return it.name.toLowerCase().split(' ').some(function(w){ return w.length > 3 && lower.includes(w); }); });
+}
+
+function _biApplyItemPhotos(container) {
+  container.querySelectorAll('[data-item-id]').forEach(function(el) {
+    var id = el.dataset.itemId;
+    var ph = el.querySelector('.bi-item-chip-photo');
+    if (!ph || !id) return;
+    var url = photos[id];
+    if (url) ph.innerHTML = '<img src="' + url + '" alt="">';
+  });
+}
+
+function _biRenderResult(boardId, html, resWrap) {
+  resWrap.innerHTML = html;
+  _biApplyItemPhotos(resWrap);
+  var bar = document.createElement('div');
+  bar.className = 'bi-export-bar';
+  var imgBtn = document.createElement('button');
+  imgBtn.className = 'bi-export-btn';
+  imgBtn.textContent = '📷 Bewaar als afbeelding';
+  imgBtn.addEventListener('click', function(){ biExportImage(boardId); });
+  var printBtn = document.createElement('button');
+  printBtn.className = 'bi-export-btn';
+  printBtn.textContent = '🖨️ PDF / Afdrukken';
+  printBtn.addEventListener('click', function(){ window.print(); });
+  bar.appendChild(imgBtn);
+  bar.appendChild(printBtn);
+  resWrap.appendChild(bar);
+}
+
+function biExportImage(boardId) {
+  var board = boards.find(function(b){ return b.id === boardId; });
+  if (!board || !board.inspo || !board.inspo.length) { showToast('Geen inspo foto\'s om te exporteren'); return; }
+  var inspoPhotos = board.inspo;
+  var n = inspoPhotos.length;
+  var cols = n <= 1 ? 1 : n <= 4 ? 2 : 3;
+  var rows = Math.ceil(n / cols);
+  var cellW = 360, cellH = Math.round(cellW * 4 / 3), pad = 14, headerH = 72;
+  var cw = cols * cellW + (cols + 1) * pad;
+  var ch = headerH + rows * cellH + (rows + 1) * pad;
+  var canvas = document.createElement('canvas');
+  canvas.width = cw; canvas.height = ch;
+  var ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#f5f0ea';
+  ctx.fillRect(0, 0, cw, ch);
+  ctx.fillStyle = '#2e1a0e';
+  ctx.font = 'bold 26px Georgia, serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('✦ Moodboard · ' + (board.label || ''), cw / 2, 46);
+  var loaded = 0;
+  function finish() {
+    try {
+      canvas.toBlob(function(blob) {
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'moodboard-' + (board.label || 'board').replace(/\s+/g,'-').toLowerCase() + '.jpg';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+      }, 'image/jpeg', 0.92);
+    } catch(e) { window.open(canvas.toDataURL('image/jpeg', 0.92), '_blank'); }
+  }
+  inspoPhotos.forEach(function(photo, i) {
+    var img = new Image();
+    img.onload = function() {
+      var col = i % cols, row = Math.floor(i / cols);
+      var x = pad + col * (cellW + pad), y = headerH + row * (cellH + pad), r = 10;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(x+r,y); ctx.lineTo(x+cellW-r,y); ctx.arcTo(x+cellW,y,x+cellW,y+r,r);
+      ctx.lineTo(x+cellW,y+cellH-r); ctx.arcTo(x+cellW,y+cellH,x+cellW-r,y+cellH,r);
+      ctx.lineTo(x+r,y+cellH); ctx.arcTo(x,y+cellH,x,y+cellH-r,r);
+      ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r); ctx.closePath(); ctx.clip();
+      var sc = Math.max(cellW/img.width, cellH/img.height);
+      ctx.drawImage(img, (img.width-cellW/sc)/2, (img.height-cellH/sc)/2, cellW/sc, cellH/sc, x, y, cellW, cellH);
+      ctx.restore();
+      if (++loaded === n) finish();
+    };
+    img.onerror = function(){ if (++loaded === n) finish(); };
+    img.src = photo.dataUrl;
+  });
 }
 
 async function analyzeBoardInspo(boardId) {
@@ -11640,23 +11740,27 @@ async function analyzeBoardInspo(boardId) {
   }
   resWrap.innerHTML = '<div class="sv-ai-load">✦ Inspo wordt geanalyseerd...</div>';
 
-  // Build wardrobe summary
-  var allItems = getAllItems();
-  var wardrobeSummary = allItems.slice(0, 40).map(function(it) {
-    var t = (itemTags[it.id] || {});
-    return it.naam + (t.kleur ? ' (' + t.kleur + ')' : '') + (it.cat ? ' [' + it.cat + ']' : '');
-  }).join(', ');
+  // Build wardrobe summary per category
+  var _catLabels = {tops:'Tops',bottoms:'Rokken & Broeken',layers:'Laagjes',jurken:'Jurken',bags:'Tassen',shoes:'Schoenen',accessories:'Accessoires',overig:'Overig'};
+  var wardrobeSummary = Object.entries(items).map(function(entry) {
+    var cat = entry[0], list = entry[1];
+    if (!list || !list.length) return '';
+    return (_catLabels[cat] || cat) + ': ' + list.map(function(it) {
+      var t = itemTags[it.id] || defaultTags[it.id] || {};
+      return it.name + (t.kleur ? ' (' + t.kleur + ')' : '');
+    }).join(', ');
+  }).filter(Boolean).join('\n');
 
-  // Build image_url array for Claude (up to 6 photos)
-  var photos = board.inspo.slice(0, 6);
+  // Build image array for Claude (up to 6 photos)
+  var inspoPhotos = board.inspo.slice(0, 6);
   var contentParts = [
     {
       type: 'text',
-      text: 'Je bent Griette\'s persoonlijke stylist. Analyseer deze ' + photos.length + ' Pinterest-inspiratiefoto\'s voor het board "' + board.label + '".\n\nGriette\'s garderobe (selectie): ' + wardrobeSummary + '\n\nStel 3 VERSCHILLENDE outfit-combinaties voor. Elke look moet een andere sfeer of aanpak hebben (bijv. casual, gekleed, of een andere kleuraccent). Gebruik items uit haar garderobe.\n\nAntwoord in het Nederlands. Gebruik exact JSON:\n{"stijlwoorden":["..."],"kleuren":["..."],"looks":[{"naam":"Look 1","sfeer":"casual","beschrijving":"...","items":["exacte naam",...]},{"naam":"Look 2","sfeer":"gekleed","beschrijving":"...","items":["exacte naam",...]},{"naam":"Look 3","sfeer":"statement","beschrijving":"...","items":["exacte naam",...]}],"tip":"..."}'
+      text: 'Je bent Griette\'s persoonlijke stylist. Analyseer deze ' + inspoPhotos.length + ' Pinterest-inspiratiefoto\'s voor het board "' + board.label + '".\n\nGriette\'s garderobe:\n' + wardrobeSummary + '\n\nStel 3 VERSCHILLENDE outfit-combinaties voor. Elke look heeft een andere sfeer. Neem per look altijd ook een tas en accessoire(s) op uit de garderobe. Gebruik exact dezelfde itemnamen als in de garderobe.\n\nAntwoord in het Nederlands. Gebruik exact JSON:\n{"stijlwoorden":["..."],"kleuren":["..."],"looks":[{"naam":"Look 1","sfeer":"casual","beschrijving":"2 zinnen","items":["exacte naam incl tas en accessoire"]},{"naam":"Look 2","sfeer":"gekleed","beschrijving":"2 zinnen","items":["..."]},{"naam":"Look 3","sfeer":"statement","beschrijving":"2 zinnen","items":["..."]}],"tip":"..."}'
     }
   ];
 
-  photos.forEach(function(photo) {
+  inspoPhotos.forEach(function(photo) {
     var mediaType = photo.dataUrl.startsWith('data:image/png') ? 'image/png' : 'image/jpeg';
     var base64Data = photo.dataUrl.split(',')[1];
     contentParts.push({
@@ -11700,13 +11804,17 @@ async function analyzeBoardInspo(boardId) {
         var accent = i === 0 ? 'var(--brown)' : i === 1 ? '#7a5c3e' : '#a0876e';
         html += '<div class="bi-result-card" style="border-left:3px solid ' + accent + ';">'
           + '<div class="bi-result-lbl" style="color:' + accent + ';">'
-          + (look.naam || ('Look ' + (i + 1))) + (look.sfeer ? ' · ' + look.sfeer : '') + '</div>'
-          + '<div class="bi-result-val">' + (look.beschrijving || '') + '</div>';
-        var items = look.items || [];
-        if (items.length) {
-          html += '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;">'
-            + items.map(function(nm){ return '<span style="font-size:10px;padding:3px 9px;background:rgba(46,26,14,0.08);border-radius:10px;color:var(--brown);">✦ ' + nm + '</span>'; }).join('')
-            + '</div>';
+          + _biEscape(look.naam || ('Look ' + (i + 1))) + (look.sfeer ? ' · ' + _biEscape(look.sfeer) : '') + '</div>'
+          + '<div class="bi-result-val">' + _biEscape(look.beschrijving || '') + '</div>';
+        var lookItems = look.items || [];
+        if (lookItems.length) {
+          html += '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;">';
+          lookItems.forEach(function(nm) {
+            var found = _biFindItemByName(nm);
+            var idAttr = found ? ' data-item-id="' + found.id + '"' : '';
+            html += '<span class="bi-item-chip"' + idAttr + '><span class="bi-item-chip-photo">·</span>' + _biEscape(nm) + '</span>';
+          });
+          html += '</div>';
         }
         html += '</div>';
       });
@@ -11719,7 +11827,7 @@ async function analyzeBoardInspo(boardId) {
 
     board.inspoResult = html;
     saveBoardInspo(boardId);
-    resWrap.innerHTML = html;
+    _biRenderResult(boardId, html, resWrap);
   } catch(e) {
     resWrap.innerHTML = '<div class="bi-result-card" style="border-color:rgba(181,35,42,0.3);"><div class="bi-result-val" style="color:#b5232a;">Analyse mislukt. Controleer je verbinding en probeer opnieuw.</div></div>';
   } finally {
