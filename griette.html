@@ -344,6 +344,11 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 .bi-result-card{background:var(--white);border:1.5px solid var(--cream-dark);border-radius:14px;padding:14px;margin-bottom:12px;}
 .bi-result-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-mid);margin-bottom:6px;}
 .bi-result-val{font-size:12px;color:var(--brown);line-height:1.6;}
+.chat-chip-bar{overflow-x:auto;display:flex;gap:6px;padding:0 0 12px;margin-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.chat-chip-bar::-webkit-scrollbar{display:none;}
+.chat-chip{flex-shrink:0;padding:8px 14px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:20px;font-size:11px;font-family:Jost,sans-serif;cursor:pointer;color:var(--brown);white-space:nowrap;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+.chat-chip.featured{background:var(--brown);color:var(--cream);border-color:var(--brown);}
+.chat-chip:active{opacity:0.75;}
 .bi-item-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;padding:2px 8px 2px 2px;background:rgba(46,26,14,0.06);border-radius:10px;color:var(--brown);margin:2px;vertical-align:middle;}
 .bi-add-look-btn{width:100%;margin-top:10px;padding:9px 12px;background:var(--brown);color:var(--cream);border:none;border-radius:10px;font-size:11px;font-family:Jost,sans-serif;cursor:pointer;letter-spacing:0.3px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 .bi-add-look-btn.saved{background:var(--cream-dark);color:var(--muted);cursor:default;}
@@ -1014,9 +1019,20 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 
 <!-- CHAT PANEL -->
 <div class="panel" id="panel-chat">
-  <p class="panel-title">Chat met je Stylist</p>
-  <p class="panel-sub">Stel vragen over je garderobe, combinaties of stijl. Ik ken jouw stijlrapport en garderobe.</p>
-  <div id="chat-messages" style="display:flex;flex-direction:column;gap:12px;margin-bottom:120px;min-height:200px;padding-bottom:10px;"></div>
+  <p class="panel-title">💬 Stylist</p>
+  <p class="panel-sub">Je persoonlijke stylist kent je garderobe, stijlrapport en draagpatronen volledig.</p>
+  <div class="chat-chip-bar">
+    <button type="button" class="chat-chip featured" onclick="sendQuickPrompt('Geef me een uitgebreide stijlanalyse: wat werkt goed in mijn kast, welke combinaties benut ik te weinig, wat mist er, en geef 3 concrete dingen die ik morgen al anders kan doen.')">✦ Stijlanalyse</button>
+    <button type="button" class="chat-chip" onclick="sendQuickPrompt('Stel een complete outfit voor voor vandaag — geef de exacte items, waarom ze werken qua kleur en silhouet, en een stylingtip.')">Outfit nu</button>
+    <button type="button" class="chat-chip" onclick="sendQuickPrompt('Analyseer mijn garderobe: welke gaps zijn er? Wat zou mijn kast completer, veelzijdiger en meer op mijn DNA maken? Wees concreet.')">Wat mist er?</button>
+    <button type="button" class="chat-chip" onclick="sendQuickPrompt('Geef me uitgebreid kleuradvies: welke kleuren zet ik te weinig in, welke kleurcombinaties passen het beste bij mijn profiel, en geef 3 concrete outfit-ideeën met kleur die ik nu al kan maken.')">Kleuradvies</button>
+    <button type="button" class="chat-chip" onclick="sendQuickPrompt('Plan mijn outfit voor de komende 5 dagen. Varieer in stijl, gebruik verschillende items en zorg dat het past bij mijn DNA. Geef voor elke dag concrete items.')">Week plannen</button>
+    <button type="button" class="chat-chip" onclick="sendQuickPrompt('Geef me een stijluitdaging voor deze week: een combinatie of look die ik nog niet geprobeerd heb maar die perfect bij mijn DNA past. Leg uit hoe en waarom.')">Stijluitdaging</button>
+    <button type="button" class="chat-chip" onclick="sendQuickPrompt('Hoe maak ik mijn kast capsule-waardiger? Welke items zijn de meest veelzijdige basisstukken en hoe combineer ik ze maximaal?')">Capsule</button>
+    <button type="button" class="chat-chip" onclick="sendQuickPrompt('Geef me feedback op mijn huidige garderobe: wat is overbodige of zelden te combineren items, en wat zou ik misschien weg kunnen doen?')">Garderobe audit</button>
+    <button type="button" class="chat-chip" onclick="sendQuickPrompt('Geef me tips hoe ik me kan kleden op basis van mijn cyclusfase en energie van dit moment.')">Cyclus & stijl</button>
+  </div>
+  <div id="chat-messages" style="display:flex;flex-direction:column;gap:12px;margin-bottom:130px;min-height:200px;padding-bottom:10px;"></div>
 </div>
 
 <!-- SHOP PANEL -->
@@ -2555,7 +2571,7 @@ function showPanel(name, btn) {
       if (chatCont && chatCont.children.length === 0) {
         var hr2 = new Date().getHours();
         var gr2 = hr2 < 12 ? 'Goedemorgen' : hr2 < 17 ? 'Goedemiddag' : 'Goedenavond';
-        appendChatMessage('assistant', '❖ ' + gr2 + ' Griette! Ik ben je persoonlijke stylist. Ik ken je garderobe en stijlrapport volledig.\n\nStel een vraag over combinaties, een outfit voor vandaag, of advies voor een gelegenheid.');
+        appendChatMessage('assistant', '✦ ' + gr2 + ' Griette! Ik ben je persoonlijke stylist — ik ken je garderobe, stijlrapport van Iconic Wardrobe en je draagpatronen volledig.\n\nGeef me een opdracht of stel een vraag. Gebruik de snelkoppelingen hierboven voor stijlanalyse, outfits, kleuradvies en meer.');
         chatInitialized = true;
       }
       var inp = document.getElementById('chat-input');
@@ -6709,7 +6725,7 @@ async function sendChatWithImage(base64Data, mediaType) {
   try {
     var res = await fetch('https://griette-stylist.griette.workers.dev', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 600, system: getChatSystemPrompt(), messages: chatHistory.slice(-6) })
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, system: getChatSystemPrompt(), messages: chatHistory.slice(-8) })
     });
     var data = await res.json();
     var reply = (data.content||[]).map(function(b){ return b.text||''; }).join('').trim();
@@ -10781,6 +10797,16 @@ function removeChatTyping() {
   if (el) el.remove();
 }
 
+function sendQuickPrompt(text) {
+  if (!document.getElementById('panel-chat').classList.contains('active')) {
+    showPanel('chat', null);
+  }
+  setTimeout(function() {
+    var input = document.getElementById('chat-input');
+    if (input) { input.value = text; sendChat(); }
+  }, 120);
+}
+
 async function sendChat() {
   var input = document.getElementById('chat-input');
   if (!input) return;
@@ -10793,7 +10819,7 @@ async function sendChat() {
     chatInitialized = true;
     var container = document.getElementById('chat-messages');
     if (container && container.children.length === 0) {
-      appendChatMessage('assistant', '✦ Hey Griette! Ik ben je persoonlijke stylist. Ik ken je volledige garderobe en stijlrapport van Iconic Wardrobe.\n\nWat kan ik voor je doen? Denk aan: een outfit voor vandaag, feedback op een keuze, of plannen voor een gelegenheid.');
+      appendChatMessage('assistant', '✦ Hoi Griette! Ik ken je garderobe, stijlrapport (Iconic Wardrobe) en je draagpatronen volledig.\n\nStel me een vraag, geef me een opdracht, of kies een snelkoppeling hierboven. Ik kan:\n\n**Analyseren** — je stijl, kleuren, gaps, patronen\n**Plannen** — outfits voor vandaag, de week, een reis\n**Adviseren** — combinaties, wat te kopen, wat weg kan\n**Uitdagen** — nieuwe looks die je nog niet geprobeerd hebt');
     }
   }
 
@@ -10829,7 +10855,7 @@ async function sendChat() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 800,
+        max_tokens: 1400,
         system: getChatSystemPrompt(),
         messages: recentHistory
       })
