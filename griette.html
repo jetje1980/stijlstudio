@@ -345,6 +345,8 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 .bi-result-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-mid);margin-bottom:6px;}
 .bi-result-val{font-size:12px;color:var(--brown);line-height:1.6;}
 .bi-item-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;padding:2px 8px 2px 2px;background:rgba(46,26,14,0.06);border-radius:10px;color:var(--brown);margin:2px;vertical-align:middle;}
+.bi-add-look-btn{width:100%;margin-top:10px;padding:9px 12px;background:var(--brown);color:var(--cream);border:none;border-radius:10px;font-size:11px;font-family:Jost,sans-serif;cursor:pointer;letter-spacing:0.3px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+.bi-add-look-btn.saved{background:var(--cream-dark);color:var(--muted);cursor:default;}
 .bi-item-chip-photo{width:22px;height:26px;border-radius:5px;overflow:hidden;background:var(--cream-dark);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted);}
 .bi-item-chip-photo img{width:100%;height:100%;object-fit:cover;}
 .bi-export-bar{display:flex;gap:8px;margin-top:14px;padding-bottom:20px;}
@@ -11652,9 +11654,37 @@ function _biApplyItemPhotos(container) {
   });
 }
 
+function _biAddLookToBoard(boardId, lookName, itemNames) {
+  var board = boards.find(function(b){ return b.id === boardId; });
+  if (!board) return false;
+  var itemIds = itemNames.map(function(nm){ var f = _biFindItemByName(nm); return f ? f.id : null; }).filter(Boolean);
+  if (!itemIds.length) { showToast('Geen items herkend uit de kast'); return false; }
+  outfitCounter++;
+  var outfit = { id: 'outfit-' + outfitCounter, name: lookName, items: itemIds };
+  board.outfits.push(outfit);
+  saveAppData();
+  buildBoards();
+  activeBoardId = boardId;
+  showToast('✓ ' + lookName + ' toegevoegd aan ' + board.label);
+  return true;
+}
+
 function _biRenderResult(boardId, html, resWrap) {
   resWrap.innerHTML = html;
   _biApplyItemPhotos(resWrap);
+  // Wire up "Zet op board" buttons
+  resWrap.querySelectorAll('[data-look-items]').forEach(function(card) {
+    var btn = card.querySelector('.bi-add-look-btn');
+    if (!btn) return;
+    var lookName = card.dataset.lookName || 'Look';
+    var itemNames = [];
+    try { itemNames = JSON.parse(card.dataset.lookItems || '[]'); } catch(e) {}
+    btn.addEventListener('click', function() {
+      if (btn.classList.contains('saved')) return;
+      var ok = _biAddLookToBoard(boardId, lookName, itemNames);
+      if (ok) { btn.textContent = '✓ Opgeslagen'; btn.classList.add('saved'); }
+    });
+  });
   var bar = document.createElement('div');
   bar.className = 'bi-export-bar';
   var imgBtn = document.createElement('button');
@@ -11802,11 +11832,13 @@ async function analyzeBoardInspo(boardId) {
       var looks = result.looks || (result.look ? [result.look] : []);
       looks.forEach(function(look, i) {
         var accent = i === 0 ? 'var(--brown)' : i === 1 ? '#7a5c3e' : '#a0876e';
-        html += '<div class="bi-result-card" style="border-left:3px solid ' + accent + ';">'
-          + '<div class="bi-result-lbl" style="color:' + accent + ';">'
-          + _biEscape(look.naam || ('Look ' + (i + 1))) + (look.sfeer ? ' · ' + _biEscape(look.sfeer) : '') + '</div>'
-          + '<div class="bi-result-val">' + _biEscape(look.beschrijving || '') + '</div>';
+        var lookName = look.naam || ('Look ' + (i + 1));
         var lookItems = look.items || [];
+        var itemsAttr = _biEscape(JSON.stringify(lookItems));
+        html += '<div class="bi-result-card" data-look-name="' + _biEscape(lookName) + '" data-look-items="' + itemsAttr + '" style="border-left:3px solid ' + accent + ';">'
+          + '<div class="bi-result-lbl" style="color:' + accent + ';">'
+          + _biEscape(lookName) + (look.sfeer ? ' · ' + _biEscape(look.sfeer) : '') + '</div>'
+          + '<div class="bi-result-val">' + _biEscape(look.beschrijving || '') + '</div>';
         if (lookItems.length) {
           html += '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;">';
           lookItems.forEach(function(nm) {
@@ -11816,6 +11848,7 @@ async function analyzeBoardInspo(boardId) {
           });
           html += '</div>';
         }
+        html += '<button class="bi-add-look-btn">＋ Zet outfit op board</button>';
         html += '</div>';
       });
       if (result.tip) {
