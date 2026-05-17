@@ -39,8 +39,8 @@ body{background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);min
 .bnav-item .bnav-icon{font-size:20px;line-height:1;}
 .bnav-item::after{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:#8090A0;border-radius:0 0 2px 2px;opacity:0;transition:opacity 0.18s;}
 .bnav-item.active::after{opacity:1;}
-.meer-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--cream);border-radius:20px 20px 0 0;z-index:400;padding:16px 16px calc(80px + env(safe-area-inset-bottom,0));transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);max-height:80vh;overflow-y:auto;}
-.meer-sheet.open{transform:translateY(0);}
+.meer-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--cream);border-radius:20px 20px 0 0;z-index:400;padding:16px 16px calc(80px + env(safe-area-inset-bottom,0));transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.meer-sheet.open{transform:translateY(0);pointer-events:auto;}
 .meer-sheet-backdrop{position:fixed;inset:0;background:rgba(28,26,24,0.5);z-index:390;display:none;}
 .meer-sheet-backdrop.open{display:block;}
 
@@ -334,6 +334,23 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 .sv-save-btn{width:100%;padding:14px;background:var(--brown);color:var(--cream);border:none;border-radius:12px;font-size:11px;font-family:'Jost',sans-serif;cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;}
 .sv-alt-btn{width:100%;padding:10px;background:transparent;border:1.5px solid var(--cream-dark);border-radius:12px;font-size:10px;font-family:'Jost',sans-serif;cursor:pointer;color:var(--muted);margin-top:8px;}
 .sv-ai-load{text-align:center;padding:24px;color:var(--muted);font-size:11px;font-style:italic;}
+/* ── BOARD INSPO MOODBOARD ── */
+.bi-overlay{position:fixed;inset:0;background:var(--cream);z-index:600;display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);}
+.bi-overlay.open{transform:translateY(0);}
+.bi-hdr{padding:16px 16px 12px;display:flex;align-items:center;justify-content:space-between;background:var(--brown);flex-shrink:0;}
+.bi-back{background:none;border:none;font-size:22px;cursor:pointer;color:var(--cream);padding:4px;line-height:1;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.bi-ttl{font-family:'Bodoni Moda',serif;font-size:19px;font-weight:400;color:var(--cream);}
+.bi-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;}
+.bi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px;}
+.bi-photo{position:relative;aspect-ratio:3/4;border-radius:10px;overflow:hidden;background:var(--cream-dark);}
+.bi-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+.bi-photo-del{position:absolute;top:5px;right:5px;background:rgba(28,26,24,0.7);color:white;border:none;border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
+.bi-upload-tile{aspect-ratio:3/4;border-radius:10px;border:2px dashed var(--cream-dark);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:6px;background:var(--white);touch-action:manipulation;}
+.bi-upload-tile:active{background:var(--cream-dark);}
+.bi-analyze-btn{width:100%;padding:14px;background:var(--brown);color:var(--cream);border:none;border-radius:12px;font-size:12px;font-family:'Jost',sans-serif;cursor:pointer;letter-spacing:0.5px;margin-top:4px;touch-action:manipulation;}
+.bi-result-card{background:var(--white);border:1.5px solid var(--cream-dark);border-radius:14px;padding:14px;margin-bottom:12px;}
+.bi-result-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-mid);margin-bottom:6px;}
+.bi-result-val{font-size:12px;color:var(--brown);line-height:1.6;}
 </style>
 </head>
 <body>
@@ -382,31 +399,31 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 
   <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-mid);font-family:’Jost’,sans-serif;font-weight:500;margin-bottom:10px;padding:0 2px;">Verkennen</div>
 
-  <button type="button" onclick="showPanelFromMeer(‘week’)" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;">
+  <button type="button" data-meer-panel="week" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
     <span style="font-size:18px;flex-shrink:0;">📅</span><span style="flex:1;">Weekplan</span><span style="color:var(--muted);">›</span>
   </button>
-  <button type="button" onclick="showPanelFromMeer(‘inspo’)" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;">
+  <button type="button" data-meer-panel="inspo" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
     <span style="font-size:18px;flex-shrink:0;">✦</span><span style="flex:1;">Inspo Scan <span style="color:var(--muted);font-size:10px;">— analyseer een outfit of foto</span></span><span style="color:var(--muted);">›</span>
   </button>
-  <button type="button" onclick="showPanelFromMeer(‘regels’)" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;">
+  <button type="button" data-meer-panel="regels" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
     <span style="font-size:18px;flex-shrink:0;">🧬</span><span style="flex:1;">Stijl DNA <span style="color:var(--muted);font-size:10px;">— jouw stijlprofiel & kleurenstrategie</span></span><span style="color:var(--muted);">›</span>
   </button>
-  <button type="button" onclick="closeMeerSheet();showInzichten();" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;">
+  <button type="button" data-meer-action="inzichten" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
     <span style="font-size:18px;flex-shrink:0;">🧠</span><span style="flex:1;">Stijlpatronen <span style="color:var(--muted);font-size:10px;">— wat draag je het meest?</span></span><span style="color:var(--muted);">›</span>
   </button>
-  <button type="button" onclick="showPanelFromMeer(‘shop’)" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;">
+  <button type="button" data-meer-panel="shop" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
     <span style="font-size:18px;flex-shrink:0;">🛍</span><span style="flex:1;">Shopping <span style="color:var(--muted);font-size:10px;">— wat ontbreekt in jouw kast?</span></span><span style="color:var(--muted);">›</span>
   </button>
 
   <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-mid);font-family:’Jost’,sans-serif;font-weight:500;margin:16px 0 10px;padding:0 2px;">Bijhouden</div>
 
-  <button type="button" onclick="closeMeerSheet();showOutfitCalendar();" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;">
+  <button type="button" data-meer-action="outfitcal" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
     <span style="font-size:18px;flex-shrink:0;">🗓</span><span style="flex:1;">Outfitgeschiedenis <span style="color:var(--muted);font-size:10px;">— wat droeg je wanneer?</span></span><span style="color:var(--muted);">›</span>
   </button>
-  <button type="button" onclick="closeMeerSheet();openYesterdayLog();" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;">
+  <button type="button" data-meer-action="yesterday" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
     <span style="font-size:18px;flex-shrink:0;">📆</span><span style="flex:1;">Gisteren loggen <span style="color:var(--muted);font-size:10px;">— wat droeg je?</span></span><span style="color:var(--muted);">›</span>
   </button>
-  <button type="button" onclick="closeMeerSheet();openCyclusTracker();" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;">
+  <button type="button" data-meer-action="cyclus" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
     <span style="font-size:18px;flex-shrink:0;">🧡</span><span style="flex:1;">Cyclus <span style="color:var(--muted);font-size:10px;">— fases & outfit tips</span></span><span style="color:var(--muted);">›</span>
   </button>
 
@@ -1980,6 +1997,14 @@ function buildBoards() {
       showCapsuleOverzicht(bid);
     }; })(b.id));
 
+    var inspoBtn = document.createElement('button');
+    inspoBtn.style.cssText = 'padding:8px 10px;background:transparent;border:1.5px solid var(--cream-dark);border-radius:20px;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:var(--muted);white-space:nowrap;touch-action:manipulation;';
+    var inspoCount = 0;
+    try { var biData = JSON.parse(localStorage.getItem('griette-bi-' + b.id) || '{}'); inspoCount = (biData.photos || []).length; } catch(e) {}
+    inspoBtn.textContent = '\uD83D\uDCCC Inspo' + (inspoCount > 0 ? ' (' + inspoCount + ')' : '');
+    inspoBtn.title = 'Pinterest-inspiratie voor dit board';
+    inspoBtn.addEventListener('click', (function(bid){ return function(){ openBoardInspo(bid); }; })(b.id));
+
     var btnGroup = document.createElement('div');
     btnGroup.style.cssText = 'display:flex;gap:6px;align-items:center;flex-wrap:wrap;';
     var delBoardBtn = document.createElement('button');
@@ -1997,6 +2022,7 @@ function buildBoards() {
     }; })(b.id, b.label));
     btnGroup.appendChild(genBtn);
     btnGroup.appendChild(fromItemBtn);
+    btnGroup.appendChild(inspoBtn);
     btnGroup.appendChild(capsuleBtn);
     btnGroup.appendChild(delBoardBtn);
     btnGroup.appendChild(addBtn);
@@ -2496,9 +2522,13 @@ function closeAddIfOutside(e) {
 
 // ============ PANELS ============
 function showPanel(name, btn) {
+  try {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('panel-' + name).classList.add('active');
+  var targetPanel = document.getElementById('panel-' + name);
+  if (!targetPanel) { console.warn('Panel not found: panel-' + name); return; }
+  targetPanel.classList.add('active');
+  window.scrollTo(0, 0);
   if (btn) btn.classList.add('active');
   // Sync bottom nav
   document.querySelectorAll('.bnav-item[data-panel]').forEach(function(b){
@@ -2562,6 +2592,7 @@ function showPanel(name, btn) {
   if (name === 'boards') {
     loadBoardsAndRender();
   }
+  } catch(e) { console.error('showPanel error:', e); }
 }
 
 // ============ BOARDS LOADER ============
@@ -5577,6 +5608,26 @@ function generatePaklijst(board) {
     resultDiv.innerHTML = '<div style="color:#b5232a;">Genereren mislukt. Probeer opnieuw.</div>';
   });
 }
+
+// Wire meer-sheet buttons via addEventListener (mobile-safe, avoids iOS inline-onclick issues)
+document.querySelectorAll('.meer-nav-btn').forEach(function(btn) {
+  var panel = btn.getAttribute('data-meer-panel');
+  var action = btn.getAttribute('data-meer-action');
+  btn.addEventListener('click', function() {
+    closeMeerSheet();
+    if (panel) {
+      showPanel(panel, null);
+    } else if (action === 'inzichten') {
+      showInzichten();
+    } else if (action === 'outfitcal') {
+      showOutfitCalendar();
+    } else if (action === 'yesterday') {
+      openYesterdayLog();
+    } else if (action === 'cyclus') {
+      openCyclusTracker();
+    }
+  });
+});
 
 // Wire ALL tabs via addEventListener (mobile-safe)
 document.querySelectorAll('.tab').forEach(function(btn) {
@@ -11445,6 +11496,270 @@ function svRenderResult(r, raw) {
   html += '<button class="sv-save-btn" onclick="startVerkenner(\''+_sv.occasion+'\')">Opnieuw verkennen →</button>';
   html += '<button class="sv-alt-btn" onclick="openStijlVerkenner()">Andere gelegenheid kiezen</button>';
   sec.innerHTML = html;
+}
+
+// ============ BOARD INSPO MOODBOARD ============
+function _biCompressImage(file, cb) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var MAX = 600;
+      var w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        var scale = Math.min(MAX/w, MAX/h);
+        w = Math.round(w * scale); h = Math.round(h * scale);
+      }
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      cb(canvas.toDataURL('image/jpeg', 0.62));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveBoardInspo(boardId) {
+  var board = boards.find(function(b){ return b.id === boardId; });
+  if (!board) return;
+  try { localStorage.setItem('griette-bi-' + boardId, JSON.stringify({ photos: board.inspo || [], result: board.inspoResult || '' })); } catch(e) {}
+}
+
+function loadBoardInspo(boardId) {
+  var board = boards.find(function(b){ return b.id === boardId; });
+  if (!board) return;
+  try {
+    var s = localStorage.getItem('griette-bi-' + boardId);
+    if (s) {
+      var d = JSON.parse(s);
+      board.inspo = d.photos || [];
+      board.inspoResult = d.result || '';
+    }
+  } catch(e) {}
+  if (!board.inspo) board.inspo = [];
+}
+
+function openBoardInspo(boardId) {
+  var board = boards.find(function(b){ return b.id === boardId; });
+  if (!board) return;
+  loadBoardInspo(boardId);
+
+  var existing = document.getElementById('bi-overlay');
+  if (existing) existing.remove();
+
+  var ov = document.createElement('div');
+  ov.id = 'bi-overlay';
+  ov.className = 'bi-overlay';
+
+  var hdr = document.createElement('div');
+  hdr.className = 'bi-hdr';
+  hdr.innerHTML = '<button class="bi-back" id="bi-back-btn">←</button>'
+    + '<div class="bi-ttl">📌 ' + board.label + ' · Inspo</div>'
+    + '<div style="width:36px;"></div>';
+  ov.appendChild(hdr);
+
+  var body = document.createElement('div');
+  body.className = 'bi-body';
+  body.id = 'bi-body-' + boardId;
+  ov.appendChild(body);
+
+  document.body.appendChild(ov);
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ ov.classList.add('open'); }); });
+
+  hdr.querySelector('#bi-back-btn').addEventListener('click', function() { closeBoardInspo(); });
+
+  _biRenderBody(boardId);
+}
+
+function closeBoardInspo() {
+  var ov = document.getElementById('bi-overlay');
+  if (!ov) return;
+  ov.classList.remove('open');
+  setTimeout(function(){ if(ov.parentNode) ov.remove(); }, 370);
+}
+
+function _biRenderBody(boardId) {
+  var board = boards.find(function(b){ return b.id === boardId; });
+  if (!board) return;
+  if (!board.inspo) board.inspo = [];
+
+  var body = document.getElementById('bi-body-' + boardId);
+  if (!body) return;
+  body.innerHTML = '';
+
+  // Intro text
+  var intro = document.createElement('div');
+  intro.style.cssText = 'font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:14px;';
+  intro.textContent = 'Upload Pinterest-screenshots of andere inspo als basis voor dit board. Ik analyseer jouw stijl en stel een look voor uit je kast.';
+  body.appendChild(intro);
+
+  // Photo grid
+  var grid = document.createElement('div');
+  grid.className = 'bi-grid';
+
+  board.inspo.forEach(function(photo, idx) {
+    var tile = document.createElement('div');
+    tile.className = 'bi-photo';
+    tile.innerHTML = '<img src="' + photo.dataUrl + '" alt="inspo">'
+      + '<button class="bi-photo-del" data-idx="' + idx + '" title="Verwijder">&times;</button>';
+    tile.querySelector('.bi-photo-del').addEventListener('click', (function(i){ return function() {
+      board.inspo.splice(i, 1);
+      saveBoardInspo(boardId);
+      buildBoards();
+      _biRenderBody(boardId);
+    }; })(idx));
+    grid.appendChild(tile);
+  });
+
+  // Upload tile
+  var uploadTile = document.createElement('label');
+  uploadTile.className = 'bi-upload-tile';
+  uploadTile.innerHTML = '<span style="font-size:28px;">📌</span><span style="font-size:10px;color:var(--muted);text-align:center;letter-spacing:0.5px;">Voeg inspo toe</span>';
+  var fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  fileInput.multiple = true;
+  fileInput.style.display = 'none';
+  fileInput.addEventListener('change', function() {
+    var files = Array.from(fileInput.files);
+    if (!files.length) return;
+    var pending = files.length;
+    files.forEach(function(file) {
+      _biCompressImage(file, function(dataUrl) {
+        board.inspo.push({ id: Date.now() + '_' + Math.random().toString(36).slice(2), dataUrl: dataUrl });
+        pending--;
+        if (pending === 0) {
+          saveBoardInspo(boardId);
+          buildBoards();
+          _biRenderBody(boardId);
+        }
+      });
+    });
+    fileInput.value = '';
+  });
+  uploadTile.appendChild(fileInput);
+  grid.appendChild(uploadTile);
+  body.appendChild(grid);
+
+  // Analysis section
+  if (board.inspo.length > 0) {
+    var analyzeBtn = document.createElement('button');
+    analyzeBtn.className = 'bi-analyze-btn';
+    analyzeBtn.textContent = '✦ Analyseer moodboard · maak een look';
+    analyzeBtn.addEventListener('click', function() { analyzeBoardInspo(boardId); });
+    body.appendChild(analyzeBtn);
+  }
+
+  // Show previous analysis result
+  if (board.inspoResult) {
+    var resWrap = document.createElement('div');
+    resWrap.style.cssText = 'margin-top:16px;';
+    resWrap.id = 'bi-result-' + boardId;
+    resWrap.innerHTML = board.inspoResult;
+    body.appendChild(resWrap);
+  }
+}
+
+async function analyzeBoardInspo(boardId) {
+  var board = boards.find(function(b){ return b.id === boardId; });
+  if (!board || !board.inspo || !board.inspo.length) return;
+
+  var analyzeBtn = document.querySelector('.bi-analyze-btn');
+  if (analyzeBtn) { analyzeBtn.disabled = true; analyzeBtn.textContent = 'Analyseren...'; }
+
+  var resWrap = document.getElementById('bi-result-' + boardId);
+  if (!resWrap) {
+    resWrap = document.createElement('div');
+    resWrap.id = 'bi-result-' + boardId;
+    resWrap.style.cssText = 'margin-top:16px;';
+    var body = document.getElementById('bi-body-' + boardId);
+    if (body) body.appendChild(resWrap);
+  }
+  resWrap.innerHTML = '<div class="sv-ai-load">✦ Inspo wordt geanalyseerd...</div>';
+
+  // Build wardrobe summary
+  var allItems = getAllItems();
+  var wardrobeSummary = allItems.slice(0, 40).map(function(it) {
+    var t = (itemTags[it.id] || {});
+    return it.naam + (t.kleur ? ' (' + t.kleur + ')' : '') + (it.cat ? ' [' + it.cat + ']' : '');
+  }).join(', ');
+
+  // Build image_url array for Claude (up to 6 photos)
+  var photos = board.inspo.slice(0, 6);
+  var contentParts = [
+    {
+      type: 'text',
+      text: 'Je bent een persoonlijke stylist. Analyseer deze ' + photos.length + ' Pinterest-inspiratiefoto\'s voor het board "' + board.label + '".\n\nGriette\'s garderobe (selectie): ' + wardrobeSummary + '\n\nGeef:\n1. Stijlwoorden: 3-5 kernwoorden die de moodboard-stijl beschrijven\n2. Look: stel 1 concrete outfit voor met items uit de garderobe (noem exact de itemnamen)\n3. Kleurpalet: welke 2-3 kleuren passen bij deze moodboard\n4. Tip: 1 concrete stijltip voor Griette gebaseerd op deze inspo\n\nAntwoord in het Nederlands. Gebruik exact JSON:\n{"stijlwoorden":["..."],"look":{"beschrijving":"...","items":["exacte naam",...]},"kleuren":["..."],"tip":"..."}'
+    }
+  ];
+
+  photos.forEach(function(photo) {
+    var mediaType = photo.dataUrl.startsWith('data:image/png') ? 'image/png' : 'image/jpeg';
+    var base64Data = photo.dataUrl.split(',')[1];
+    contentParts.push({
+      type: 'image',
+      source: { type: 'base64', media_type: mediaType, data: base64Data }
+    });
+  });
+
+  try {
+    var resp = await fetch('https://griette-stylist.griette.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 600,
+        messages: [{ role: 'user', content: contentParts }]
+      })
+    });
+    if (!resp.ok) throw new Error('API error ' + resp.status);
+    var data = await resp.json();
+    var raw = (data.content && data.content[0] && data.content[0].text) || '';
+
+    var result = null;
+    try {
+      var jsonMatch = raw.match(/\{[\s\S]*\}/);
+      if (jsonMatch) result = JSON.parse(jsonMatch[0]);
+    } catch(e) {}
+
+    var html = '';
+    if (result) {
+      if (result.stijlwoorden && result.stijlwoorden.length) {
+        html += '<div class="bi-result-card"><div class="bi-result-lbl">Moodboard stijl</div>'
+          + '<div class="bi-result-val">' + result.stijlwoorden.map(function(w){ return '<span style="display:inline-block;padding:3px 10px;background:var(--cream-dark);border-radius:10px;margin:2px;font-size:11px;">' + w + '</span>'; }).join('') + '</div></div>';
+      }
+      if (result.kleuren && result.kleuren.length) {
+        html += '<div class="bi-result-card"><div class="bi-result-lbl">Kleurpalet</div>'
+          + '<div class="bi-result-val">' + result.kleuren.join(' · ') + '</div></div>';
+      }
+      if (result.look && result.look.beschrijving) {
+        html += '<div class="bi-result-card"><div class="bi-result-lbl">Outfit voor ' + board.label + '</div>'
+          + '<div class="bi-result-val">' + result.look.beschrijving + '</div>';
+        if (result.look.items && result.look.items.length) {
+          html += '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;">'
+            + result.look.items.map(function(nm){ return '<span style="font-size:10px;padding:3px 9px;background:rgba(46,26,14,0.08);border-radius:10px;color:var(--brown);">✦ ' + nm + '</span>'; }).join('')
+            + '</div>';
+        }
+        html += '</div>';
+      }
+      if (result.tip) {
+        html += '<div class="bi-result-card"><div class="bi-result-lbl">Styling tip</div><div class="bi-result-val">→ ' + result.tip + '</div></div>';
+      }
+    } else {
+      html = '<div class="bi-result-card"><div class="bi-result-lbl">Analyse</div><div class="bi-result-val">' + raw.replace(/\n/g,'<br>') + '</div></div>';
+    }
+
+    board.inspoResult = html;
+    saveBoardInspo(boardId);
+    resWrap.innerHTML = html;
+  } catch(e) {
+    resWrap.innerHTML = '<div class="bi-result-card" style="border-color:rgba(181,35,42,0.3);"><div class="bi-result-val" style="color:#b5232a;">Analyse mislukt. Controleer je verbinding en probeer opnieuw.</div></div>';
+  } finally {
+    var btn = document.querySelector('.bi-analyze-btn');
+    if (btn) { btn.disabled = false; btn.textContent = '✦ Opnieuw analyseren'; }
+  }
 }
 
 </script>
