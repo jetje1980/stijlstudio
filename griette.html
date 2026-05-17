@@ -349,6 +349,14 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 .chat-chip{flex-shrink:0;padding:8px 14px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:20px;font-size:11px;font-family:Jost,sans-serif;cursor:pointer;color:var(--brown);white-space:nowrap;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 .chat-chip.featured{background:var(--brown);color:var(--cream);border-color:var(--brown);}
 .chat-chip:active{opacity:0.75;}
+.bi-chat-section{margin-top:18px;border-top:1.5px solid var(--cream-dark);padding-top:14px;}
+.bi-chat-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-mid);margin-bottom:10px;}
+.bi-chat-msgs{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.bi-chat-msg-u{align-self:flex-end;background:var(--brown);color:var(--cream);padding:8px 12px;border-radius:14px 14px 4px 14px;font-size:12px;max-width:85%;line-height:1.5;}
+.bi-chat-msg-a{align-self:flex-start;background:var(--white);color:var(--brown);padding:8px 12px;border-radius:14px 14px 14px 4px;font-size:12px;max-width:90%;line-height:1.6;border:1.5px solid var(--cream-dark);}
+.bi-chat-input-row{display:flex;gap:6px;align-items:center;}
+.bi-chat-inp{flex:1;padding:10px 12px;border:1.5px solid var(--cream-dark);border-radius:12px;font-size:13px;font-family:Jost,sans-serif;background:var(--white);outline:none;color:var(--brown);}
+.bi-chat-send{padding:10px 14px;background:var(--brown);color:var(--cream);border:none;border-radius:12px;font-size:16px;cursor:pointer;flex-shrink:0;touch-action:manipulation;}
 .bi-item-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;padding:2px 8px 2px 2px;background:rgba(46,26,14,0.06);border-radius:10px;color:var(--brown);margin:2px;vertical-align:middle;}
 .bi-add-look-btn{width:100%;margin-top:10px;padding:9px 12px;background:var(--brown);color:var(--cream);border:none;border-radius:10px;font-size:11px;font-family:Jost,sans-serif;cursor:pointer;letter-spacing:0.3px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 .bi-add-look-btn.saved{background:var(--cream-dark);color:var(--muted);cursor:default;}
@@ -11706,6 +11714,59 @@ function _biAddLookToBoard(boardId, lookName, itemNames) {
   return true;
 }
 
+async function _biChatSend(boardId, question, msgHistory, msgsDiv, sendBtn) {
+  var board = boards.find(function(b){ return b.id === boardId; });
+  if (!board) return;
+  sendBtn.disabled = true;
+
+  // User bubble
+  var uDiv = document.createElement('div');
+  uDiv.className = 'bi-chat-msg-u';
+  uDiv.textContent = question;
+  msgsDiv.appendChild(uDiv);
+  msgsDiv.scrollTop = msgsDiv.scrollHeight;
+
+  // Typing indicator
+  var typing = document.createElement('div');
+  typing.className = 'bi-chat-msg-a';
+  typing.innerHTML = '<span style="opacity:0.5;">···</span>';
+  msgsDiv.appendChild(typing);
+  msgsDiv.scrollTop = msgsDiv.scrollHeight;
+
+  // Build context: board name + saved look result
+  var boardCtx = 'Board: ' + board.label + '.\n';
+  if (board.inspoResult) {
+    var tmp = document.createElement('div');
+    tmp.innerHTML = board.inspoResult;
+    boardCtx += 'Moodboard analyse:\n' + (tmp.textContent || '').slice(0, 600);
+  }
+
+  msgHistory.push({ role: 'user', content: question });
+
+  try {
+    var resp = await fetch('https://griette-stylist.griette.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 800,
+        system: getChatSystemPrompt() + '\n\n## Huidig moodboard\n' + boardCtx,
+        messages: msgHistory.slice(-8)
+      })
+    });
+    var data = await resp.json();
+    var reply = (data.content || []).map(function(b){ return b.text || ''; }).join('') || 'Geen antwoord ontvangen.';
+    typing.className = 'bi-chat-msg-a';
+    typing.innerHTML = reply.replace(/\n/g,'<br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    msgHistory.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    typing.className = 'bi-chat-msg-a';
+    typing.textContent = 'Geen verbinding — probeer opnieuw.';
+  }
+  sendBtn.disabled = false;
+  msgsDiv.scrollTop = msgsDiv.scrollHeight;
+}
+
 function _biRenderResult(boardId, html, resWrap) {
   resWrap.innerHTML = html;
   _biApplyItemPhotos(resWrap);
@@ -11740,6 +11801,29 @@ function _biRenderResult(boardId, html, resWrap) {
   bar.appendChild(imgBtn);
   bar.appendChild(printBtn);
   resWrap.appendChild(bar);
+
+  // Inline stylist chat
+  var chatSec = document.createElement('div');
+  chatSec.className = 'bi-chat-section';
+  chatSec.innerHTML = '<div class="bi-chat-lbl">💬 Vraag je stylist</div>'
+    + '<div class="bi-chat-msgs" id="bi-chat-msgs-' + boardId + '"></div>'
+    + '<div class="bi-chat-input-row">'
+    + '<input class="bi-chat-inp" id="bi-chat-inp-' + boardId + '" type="text" placeholder="Stel een vraag over deze looks..." autocomplete="off">'
+    + '<button class="bi-chat-send" id="bi-chat-send-' + boardId + '">→</button>'
+    + '</div>';
+  resWrap.appendChild(chatSec);
+
+  var inp = chatSec.querySelector('#bi-chat-inp-' + boardId);
+  var sendBtn = chatSec.querySelector('#bi-chat-send-' + boardId);
+  var msgHistory = [];
+  function doSend() {
+    var q = inp.value.trim();
+    if (!q) return;
+    inp.value = '';
+    _biChatSend(boardId, q, msgHistory, chatSec.querySelector('#bi-chat-msgs-' + boardId), sendBtn);
+  }
+  sendBtn.addEventListener('click', doSend);
+  inp.addEventListener('keydown', function(e){ if (e.key === 'Enter') doSend(); });
 }
 
 function biExportImage(boardId) {
