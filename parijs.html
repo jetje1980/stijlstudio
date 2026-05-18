@@ -658,20 +658,17 @@ h1,h2,h3,h4{font-family:var(--serif);}
   </section>
 
   <!-- TOP5 -->
+  <!-- PROGRAMMA -->
   <section id="sec-top5" class="section">
-    <div class="page-header"><div class="page-logo">Mijn Top 5</div></div>
-    <div class="top5-tabs swipe-tabs" id="top5-cat-tabs" style="-webkit-overflow-scrolling:touch;">
-      <button class="stab active" onclick="switchTop5Tab('ontbijt',this)">Ontbijt</button>
-      <button class="stab" onclick="switchTop5Tab('koffie',this)">Koffie</button>
-      <button class="stab" onclick="switchTop5Tab('lunch',this)">Lunch</button>
-      <button class="stab" onclick="switchTop5Tab('diner',this)">Diner</button>
-      <button class="stab" onclick="switchTop5Tab('borrel',this)">Borrel</button>
-      <button class="stab" onclick="switchTop5Tab('wandelen',this)">Wandelen</button>
-      <button class="stab" onclick="switchTop5Tab('activiteit',this)">Activiteit</button>
-      <button class="stab" onclick="switchTop5Tab('uitgaan',this)">Uitgaan</button>
-      <button class="stab" onclick="switchTop5Tab('markt',this)">Markten</button>
+    <div class="page-header">
+      <div class="page-logo">Programma</div>
     </div>
-    <div id="top5-content"></div>
+    <div class="swipe-tabs" id="prog-day-tabs" style="-webkit-overflow-scrolling:touch;">
+      <button class="stab active" onclick="switchProgDay('vr26',this)">Vr 26 juni</button>
+      <button class="stab" onclick="switchProgDay('za27',this)">Za 27 juni</button>
+      <button class="stab" onclick="switchProgDay('zo28',this)">Zo 28 juni</button>
+    </div>
+    <div id="prog-content" style="padding:12px 16px 32px;"></div>
   </section>
 
   <!-- GROEP -->
@@ -742,8 +739,8 @@ h1,h2,h3,h4{font-family:var(--serif);}
       Swipe
     </button>
     <button class="nav-btn" onclick="switchTab('top5',this)">
-      <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      Top 5
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>
+      Plan
     </button>
     <button class="nav-btn" onclick="switchTab('groep',this)">
       <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
@@ -847,6 +844,30 @@ const PROFILES = {
 
 // ── DATA ──────────────────────────────────────────
 const ITEMS_BASE = [
+  // ── ONTBIJT ──
+  {id:'du-pain-idees',cat:'ontbijt',sub:'Bakkerij',naam:'Du Pain et des Idées',wijk:'10e — Canal Saint-Martin',prijs:'€',duur:'20 min',tijden:'ma–vr 7–20 · GESLOTEN za+zo!',reserveren:false,must_van:'griette',verhaal:'Dé meest befaamde bakkerij van Parijs — croissants zo goed dat ze voor 12u uitverkocht zijn. 150-jaar-oude baktechniek, vlakbij Canal Saint-Martin.',tip:'Neem ook een "escargot pistache-chocolade". Alleen open op weekdagen — plan voor de treinreis!',img:'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80'},
+  {id:'ten-belles',cat:'ontbijt',sub:'Koffie + ontbijt',naam:'Ten Belles',wijk:'10e — Canal Saint-Martin',prijs:'€',duur:'30 min',tijden:'8–17 ma–vr, 9–17 za+zo',reserveren:false,must_van:null,verhaal:'Pionier van de third-wave koffierevolutie in Parijs. Heerlijke toast, goede avocado. Perfect combineren met Du Pain et des Idées — koffie hier, croissant van de bakker.',tip:'Combineer: croissant du Pain, koffie Ten Belles. Beste Canal Saint-Martin ochtend.',img:'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80'},
+  {id:'claus-breakfast',cat:'ontbijt',sub:'Scandi ontbijt',naam:'Claus — Le Petit Déjeuner',wijk:'2e — Opéra',prijs:'€€',duur:'45 min',tijden:'7:30–18 ma–vr, 9–18 za+zo',reserveren:false,must_van:null,verhaal:'Kwaliteitsontbijt in Scandi-stijl: granola, versgeperst sap, verse yoghurt. Rustig, licht, geen haast. Perfect voor de zaterdagochtend als je daarna de stad in gaat.',tip:'Kom voor 9u voor de rust. De granola met mango is verslavend.',img:'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=600&q=80'},
+  {id:'rose-bakery-breakfast',cat:'ontbijt',sub:'Gezonde lunch/brunch',naam:'Rose Bakery',wijk:'3e — Marais',prijs:'€€',duur:'1u',tijden:'9–16 di–zo',reserveren:false,must_van:null,verhaal:'Brits-Parijs gezond ontbijt instituut. Quiches, granola, verse salades, brownies. Kalm, licht, goed licht. Precies het soort plek dat je na drie croissants nodig hebt.',tip:'Kom voor 13u — raakt snel vol. Neem de quiche van de dag en een brownie.',img:'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=600&q=80'},
+  // ── KOFFIE ──
+  {id:'cafe-de-flore',cat:'koffie',sub:'Iconisch terras',naam:'Café de Flore',wijk:'6e — Saint-Germain',prijs:'€€€',duur:'30–45 min',tijden:'7–1:30 dagelijks',reserveren:false,must_van:'griette',verhaal:'Simone de Beauvoir en Sartre schreven hier hun beste werk. Terrasse met verwarmde lampen. Koffie is €7 — maar je betaalt voor het gevoel van écht Parijs.',tip:'Buiten zitten, camera klaar, een koffie en een croissant. Dit is Parijs.',img:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80'},
+  {id:'merci-cafe',cat:'koffie',sub:'Concept store café',naam:'Merci Café',wijk:'3e — Marais',prijs:'€€',duur:'30 min',tijden:'10–19 ma–za',reserveren:false,must_van:null,verhaal:'Koffie in het mooiste concept store van Parijs, tussen vintage lampen en designobjecten. Stap na je koffie de winkel in — erg gevaarlijk voor de portemonnee.',tip:'Op de begane grond van Merci, Boulevard Beaumarchais. Neem koffie en dwaal.',img:'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80'},
+  {id:'telescope-coffee',cat:'koffie',sub:'Specialty coffee',naam:'Telescope',wijk:'1e — Palais-Royal',prijs:'€',duur:'20 min',tijden:'8–17 ma–vr, 9:30–17 za',reserveren:false,must_van:null,verhaal:'Beste specialty coffee van Parijs in een minuscule, stijlvolle zaak. 2 minuten van het Palais-Royal. Geen wifi, geen laptops — alleen heel goede koffie en mensen die er van houden.',tip:'Combineer met korte wandeling door Jardin du Palais Royal daarna.',img:'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80'},
+  {id:'cafe-pli',cat:'koffie',sub:'Bijzonder café',naam:'Café Pli',wijk:'10e — Canal',prijs:'€–€€',duur:'45 min',tijden:'~9–18 di–zo',reserveren:false,must_van:'griette',verhaal:'Schrijf een kaart aan je toekomstige zelf — het café stuurt hem terug op jouw gekozen datum. Met vier vriendinnen samen een kaart schrijven voor over een jaar is onbetaalbaar.',tip:'Wees specifiek: over een jaar, wat verwacht je van jezelf? Van ons? Neem de tijd.',img:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80'},
+  // ── BORREL (extra) ──
+  {id:'comptoir-general',cat:'borrel',sub:'Geheim bar',naam:'Comptoir Général',wijk:'10e — Canal Saint-Martin',prijs:'€€',duur:'2u',tijden:'18–2 vr+za, 11–2 zo',reserveren:false,must_van:null,verhaal:'Verborgen achter een zwarte deur — na 5 minuten lopen kom je in een koloniaal-tropisch universum. Uniek, sfeervol, altijd goed gesprek. Niemand van onze vrienden kent dit.',tip:'Zwarte deur aan Quai de Jemmapes. Geen bord. Gewoon binnenlopen en je ogen uitkijken.',img:'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=80'},
+  {id:'bar-hemingway',cat:'borrel',sub:'Legendarische bar',naam:'Bar Hemingway — Hôtel Ritz',wijk:'1e — Place Vendôme',prijs:'€€€€',duur:'1u',tijden:'18–2 dagelijks',reserveren:false,must_van:null,verhaal:'Hemingway bevrijdde deze bar eigenhanden in 1944. Eén klassieke cocktail als herinnering — dit is het soort ding waar je tien jaar later nog over vertelt.',tip:'Smart casual vereist. Eén cocktail €22–28. De "Serendipity" is de signature.',img:'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=80'},
+  // ── UITGAAN (extra) ──
+  {id:'pavillon-puebla',cat:'uitgaan',sub:'Open-air bar',naam:'Pavillon Puebla',wijk:'19e — Buttes-Chaumont',prijs:'€€',duur:'avond',tijden:'17–01 in zomer',reserveren:false,must_van:null,verhaal:'Open-air bar in het mooiste park van Parijs dat toeristen nooit vinden. Cocktails, Corsicaans bier. Zomeravond-perfectie met lokaal publiek.',tip:'Vroeg komen (18:00) voor goede tafel. Metro Botzaris. Minder bekend dan rooftops.',img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80'},
+  // ── LUNCH (extra) ──
+  {id:'marche-enfants-rouges',cat:'lunch',sub:'Markthal',naam:"Marché des Enfants Rouges",wijk:'3e — Marais (500m van airbnb!)',prijs:'€–€€',duur:'1u',tijden:'di–zo 8:30–19, vr+za tot 20',reserveren:false,must_van:'griette',verhaal:'Oudste overdekte markthal van Parijs (1615!). Japanse, Marokkaanse, Libanese kramen om te lunchen aan lange tafels. Zaterdagochtend de leukste sfeer.',tip:'Zaterdag drukst maar ook leukst. De Libanese borden of Japanse bento zijn top.',img:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80'},
+  {id:'hank-burger',cat:'lunch',sub:'Vegan burger',naam:'Hank Burger',wijk:'11e — Bastille',prijs:'€–€€',duur:'45 min',tijden:'11–22 dagelijks',reserveren:false,must_van:null,verhaal:'Beste plant-based burger van Parijs — ook de vleeseters in de groep worden hier bekeerd. Dichtbij de airbnb, eerlijk geprijsd, goede friet.',tip:'Probeer de BBQ Smoky. Friet + mayo is hier écht goed.',img:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80'},
+  // ── ACTIVITEITEN (extra) ──
+  {id:'shakespeare-co',cat:'activiteit',sub:'Iconische boekwinkel',naam:"Shakespeare & Company",wijk:'5e — Seine-oever',prijs:'gratis (boeken kopen)',duur:'45 min',tijden:'10–22 dagelijks',reserveren:false,must_van:null,verhaal:'Meest fotografeerde boekwinkel ter wereld. Overvolle planken tot het plafond, katten die slapen, briefjes van schrijvers op de muren. Koop iets kleins — elk boek heeft een stempel.',tip:'Doordeweeks minder druk. De kleine tuin achter heeft uitzicht op Notre-Dame.',img:'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=600&q=80'},
+  {id:'palais-royal',cat:'activiteit',sub:'Verborgen tuin',naam:'Jardin du Palais Royal',wijk:'1e',prijs:'gratis',duur:'1u',tijden:'hele dag',reserveren:false,must_van:null,verhaal:'Verborgen tuin achter het Louvre die de toeristen overslaan. De locals zitten hier in de zon. Bijzondere kleine winkeltjes in de arcade. Rustig en mooi.',tip:'Loop door de arcade langs de winkeltjes. Telescope koffie is 2 minuten.',img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80'},
+  // ── WANDELEN (extra) ──
+  {id:'wandeling-saint-germain',cat:'wandelen',sub:'Literaire wandeling',naam:'Saint-Germain des Prés',wijk:'6e',prijs:'gratis',duur:'2u',tijden:'hele dag · ochtend rustiger',reserveren:false,must_van:null,verhaal:'Sartre, Beauvoir, Baldwin schreven hier. Café de Flore, Les Deux Magots, Shakespeare & Company. De meest intellectuele wandeling die je in Parijs kan doen.',tip:'Café de Flore → Les Deux Magots → Shakespeare & Company → Seine.',img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80'},
+  {id:'wandeling-montmartre-early',cat:'wandelen',sub:'Ochtendwandeling',naam:'Montmartre vóór 9u',wijk:'18e',prijs:'gratis',duur:'2u',tijden:'VOOR 9u of NA 17u — tussendoor is het een mensensoep',reserveren:false,must_van:'griette',verhaal:'Voor 9u is Montmartre magisch stil — koffiebars die openen, katten op trappen, schilders die hun ezel opzetten. Na 11u zijn er 50.000 toeristen.',tip:'Koffie bij La Maison Rose. Daal af via Rue Lepic. Neem de trap bij Sacré-Cœur.',img:'https://images.unsplash.com/photo-1560969184-10fe8719e047?w=600&q=80'},
   {id:'sezane-marais',cat:'markt',sub:'Shopping',naam:'Sézane L\'Appartement Marais',wijk:'4e — Le Marais',prijs:'€€–€€€',duur:'1–2u',tijden:'di–za 11–19:30, zo 11:30–19:30',drukte:'druk in weekend',reserveren:false,must_van:'griette',weekend_special:false,verhaal:'Vrouwelijke Parijse essentials. Vlakbij de airbnb — en de enige Sézane die op zondag open is.',tip:'Ga zondag om 11:30 voor de kortste rij. Paspoort mee bij €100+ voor BTW-teruggave.',img:'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80'},
   {id:'sezane-17',cat:'markt',sub:'Shopping',naam:'Sézane Le Grand Appartement (17e)',wijk:'17e — Batignolles',prijs:'€€–€€€',duur:'1–2u',tijden:'di–vr 11:30–20, za 11–20',drukte:'rustiger dan Marais',reserveren:false,must_van:null,weekend_special:false,verhaal:'Grootste Sézane van Parijs. Veel meer ruimte, meer paskamers.',tip:'Combineer met Parc Monceau of Marché de Batignolles.',img:'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80'},
   {id:'galeries-lafayette',cat:'activiteit',sub:'Shopping',naam:'Galeries Lafayette',wijk:'9e — Haussmann',prijs:'€–€€€',duur:'1–2u',tijden:'ma–za 10–20:30, zo 11–20',drukte:'zeer druk in weekend',reserveren:false,must_van:null,weekend_special:false,verhaal:'De art-nouveau koepel uit 1912 is het echte cadeau, ook als je niets koopt. Gratis dakterras.',tip:'Ga voor de koepel rond openingstijd. Daktrappen via rolltrappen achterin.',img:'https://images.unsplash.com/photo-1541427468627-a89a96e5ca1d?w=600&q=80'},
@@ -1041,7 +1062,7 @@ function initApp() {
   initCountdown();
   initFeed();
   buildSwipeStack();
-  renderTop5();
+  renderProgramma();
   renderGroep();
   renderMissie();
   renderInpaklijst();
@@ -1376,6 +1397,108 @@ function startConfetti() {
 }
 function stopConfetti() {
   if (confettiAnim) cancelAnimationFrame(confettiAnim);
+}
+
+// ── PROGRAMMA ─────────────────────────────────────
+const PROGRAMMA = {
+  vr26:[
+    {time:'08:10',type:'fixed',icon:'🚂',label:'Vertrek',naam:'Eurostar Amsterdam CS → Paris Gare du Nord',detail:'Instappen uiterlijk 07:40 · Paspoort verplicht · Perron A'},
+    {time:'11:56',type:'fixed',icon:'🗼',label:'Aankomst Parijs',naam:'Gare du Nord — welkom in Parijs!',detail:'Metro lijn 5 richting Place d\'Italie → uitstappen Bastille (5 stops, 14 min) · €2,15 los kaartje'},
+    {time:'12:30',type:'open',icon:'🥗',label:'Lunch',cat:'lunch',hint:'Swipe lunch →'},
+    {time:'14:00',type:'open',icon:'🚶',label:'Eerste verkenning',cat:'wandelen',hint:'Swipe wandelingen →'},
+    {time:'15:00',type:'fixed',icon:'🏠',label:'Check-in',naam:'Airbnb Rue du Temple 3e — Le Marais',detail:'Check-in vanaf 15:00 · Sleutelcode via host · Koffers ophalen indien vroeg'},
+    {time:'17:00',type:'open',icon:'🥂',label:'Eerste borrel Parijs',cat:'borrel',hint:'Swipe borrel →'},
+    {time:'19:30',type:'open',icon:'🍽️',label:'Eerste diner',cat:'diner',hint:'Swipe diner →'},
+    {time:'22:00',type:'open',icon:'🌙',label:'Avond: hoe ver?',cat:'uitgaan',hint:'Swipe avond →'},
+  ],
+  za27:[
+    {time:'09:00',type:'open',icon:'☕',label:'Zaterdagontbijt',cat:'ontbijt',hint:'Swipe ontbijt →'},
+    {time:'10:30',type:'open',icon:'🛍️',label:'Markt of winkelen',cat:'markt',hint:'Swipe markten →'},
+    {time:'13:00',type:'open',icon:'🥗',label:'Zaterdaglunch',cat:'lunch',hint:'Swipe lunch →'},
+    {time:'15:00',type:'open',icon:'🎨',label:'Zaterdagmiddag',cat:'activiteit',hint:'Swipe activiteiten →'},
+    {time:'17:30',type:'open',icon:'🍸',label:'Zaterdagborrel',cat:'borrel',hint:'Swipe borrel →'},
+    {time:'20:00',type:'open',icon:'🍽️',label:'Zaterdagdiner',cat:'diner',hint:'Swipe diner →'},
+    {time:'22:30',type:'open',icon:'💃',label:'Zaterdagnacht',cat:'uitgaan',hint:'Swipe avond →'},
+  ],
+  zo28:[
+    {time:'09:00',type:'open',icon:'☕',label:'Laatste ochtend Parijs',cat:'ontbijt',hint:'Swipe ontbijt →'},
+    {time:'11:00',type:'fixed',icon:'🏠',label:'Check-out',naam:'Airbnb uitchecken voor 11:00',detail:'Koffers laten staan bij host · Bevestig dit even vooraf'},
+    {time:'11:30',type:'open',icon:'🚶',label:'Laatste uren',cat:'activiteit',hint:'Swipe activiteiten →'},
+    {time:'13:00',type:'open',icon:'🥗',label:'Afscheidslunch',cat:'lunch',hint:'Swipe lunch →'},
+    {time:'15:55',type:'fixed',icon:'📋',label:'Aanwezig Gare du Nord',naam:'Check-in Eurostar op Gare du Nord',detail:'Trein 16:25 → Amsterdam CS 20:03 · PASPOORT MEE! · Uiterlijk 15:45'},
+    {time:'16:25',type:'fixed',icon:'🚂',label:'Vertrek naar huis',naam:'Eurostar Paris → Amsterdam CS',detail:'À bientôt, Parijs — tot de volgende keer 🥂'},
+  ]
+};
+let progDay = 'vr26';
+
+function switchProgDay(day, el) {
+  progDay = day;
+  document.querySelectorAll('#prog-day-tabs .stab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderProgramma();
+}
+
+function renderProgramma() {
+  const container = document.getElementById('prog-content');
+  if (!container) return;
+  const items = PROGRAMMA[progDay] || [];
+  const doneKey = 'vz_prog_done_' + currentUser;
+  const done = JSON.parse(localStorage.getItem(doneKey) || '{}');
+
+  container.innerHTML = items.map((slot, idx) => {
+    const slotKey = progDay + '_' + idx;
+    const isDone = done[slotKey];
+    if (slot.type === 'fixed') {
+      return `<div style="display:flex;gap:12px;margin-bottom:16px;align-items:flex-start;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+          <div style="font-size:1.2rem;line-height:1;">${slot.icon}</div>
+          <div style="width:1px;flex:1;background:var(--bd);margin-top:4px;min-height:24px;"></div>
+        </div>
+        <div style="flex:1;padding-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <span style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);">${slot.time}</span>
+            <span style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);">${slot.label}</span>
+          </div>
+          <div style="font-family:var(--serif);font-style:italic;font-size:1.05rem;color:var(--t1);margin-bottom:4px;">${slot.naam}</div>
+          ${slot.detail ? `<div style="font-size:0.78rem;color:var(--t2);line-height:1.5;">${slot.detail}</div>` : ''}
+        </div>
+      </div>`;
+    } else {
+      const mySwipedItems = ITEMS.filter(it => it.cat === slot.cat && (swipes[it.id] === 'like' || swipes[it.id] === 'dream')).slice(0,3);
+      const swipeChips = mySwipedItems.length > 0
+        ? mySwipedItems.map(it => `<span onclick="switchTab('swipe',null);switchSwipeTabById('${slot.cat}')" style="display:inline-block;background:var(--gold2);color:var(--gold);border:1px solid rgba(201,169,110,0.25);border-radius:12px;padding:3px 10px;font-size:0.7rem;cursor:pointer;margin:2px;">${it.naam}</span>`).join('')
+        : `<span onclick="switchTab('swipe',null);switchSwipeTabById('${slot.cat}')" style="display:inline-block;background:#2a2a2a;color:var(--t2);border:1px solid var(--bd);border-radius:12px;padding:3px 10px;font-size:0.7rem;cursor:pointer;">${slot.hint}</span>`;
+      return `<div style="display:flex;gap:12px;margin-bottom:16px;align-items:flex-start;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+          <div style="font-size:1.2rem;line-height:1;">${slot.icon}</div>
+          <div style="width:1px;flex:1;background:var(--bd);margin-top:4px;min-height:24px;"></div>
+        </div>
+        <div style="flex:1;padding-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <span style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);">${slot.time}</span>
+            <span style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);">${slot.label}</span>
+          </div>
+          <div style="flex-wrap:wrap;display:flex;gap:4px;margin-bottom:6px;">${swipeChips}</div>
+          <button onclick="toggleProgDone('${slotKey}')" style="font-size:0.7rem;padding:4px 12px;border-radius:12px;border:1px solid ${isDone ? 'var(--gold)' : 'var(--bd)'};background:${isDone ? 'var(--gold2)' : 'transparent'};color:${isDone ? 'var(--gold)' : 'var(--t3)'};cursor:pointer;">
+            ${isDone ? '✓ Gedaan' : '○ Markeer als gedaan'}
+          </button>
+        </div>
+      </div>`;
+    }
+  }).join('');
+}
+
+function toggleProgDone(slotKey) {
+  const k = 'vz_prog_done_' + currentUser;
+  const done = JSON.parse(localStorage.getItem(k) || '{}');
+  done[slotKey] = !done[slotKey];
+  localStorage.setItem(k, JSON.stringify(done));
+  renderProgramma();
+}
+
+function switchSwipeTabById(cat) {
+  const btn = document.querySelector(`#swipe-cat-tabs .stab[onclick*="'${cat}'"]`);
+  if (btn) { swipeTab = cat; document.querySelectorAll('#swipe-cat-tabs .stab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); buildSwipeStack(); }
 }
 
 // ── TOP 5 ─────────────────────────────────────────
@@ -1865,8 +1988,8 @@ function switchTab(name, el) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('sec-' + name).classList.add('active');
   el.classList.add('active');
-  if (name === 'groep') renderGroep();
-  if (name === 'top5') renderTop5();
+  if (name === 'groep') { renderGroep(); }
+  if (name === 'top5') { renderProgramma(); }
   if (name === 'swipe') buildSwipeStack();
 }
 
