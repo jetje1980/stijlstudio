@@ -1563,7 +1563,7 @@ function sluitIntroBanner() {
   localStorage.setItem('vz_home_gezien_' + currentUser, '1');
 }
 function kopieerUitnodiging() {
-  const tekst = `Hey meiden! 🗼\n\nIk heb iets gemaakt voor onze Parijs-trip — een appje waar we samen het programma bouwen.\nIk heb alvast de reisinfo en een eerste lijstje ingevuld, maar het echte programma maken we SAMEN.\n\nGa naar: https://www.stijlstudio.app/parijs.html\nCode: VROEGZAT\n\nEerst even je eigen voorkeuren invullen (9 vragjes, duurt 3 min), dan kan je swipen.\nFred, jij hebt al de airbnb geboekt — staat er al in!\nMarlinde, jij kan als eerste want jij hebt het bedacht 😘\n\nXG`;
+  const tekst = `Hey meiden! 🗼\n\nIk heb iets gemaakt voor onze Parijs-trip — een appje waar we samen het programma bouwen.\nIk heb alvast de reisinfo en een eerste lijstje ingevuld, maar het echte programma maken we SAMEN.\n\nGa naar: https://www.stijlstudio.app/parijs.html\nCode: VROEGZAT\n\nEerst even je eigen voorkeuren invullen (10 vragjes, duurt 3 min), dan kan je swipen.\nFred, jij hebt al de airbnb geboekt — staat er al in!\nMarlinde, jij kan als eerste want jij hebt het bedacht 😘\n\nXG`;
   navigator.clipboard.writeText(tekst).then(() => showToast('✓ Uitnodiging gekopieerd!')).catch(() => {
     prompt('Kopieer deze tekst:', tekst);
   });
@@ -1653,7 +1653,7 @@ function selectProfile(name) {
   const p = PROFILES[name];
   const t = WELKOM_TEKSTEN[name] || {groet:'Welkom, ' + p.naam + ' 👋', sub:'Jouw voorkeuren bepalen mee hoe het programma eruitziet.', knop:'Beginnen →'};
   const welkomAv = document.getElementById('welkom-avatar');
-  const welkomPhoto = getUserPhoto(user);
+  const welkomPhoto = getUserPhoto(name);
   if (welkomPhoto) {
     welkomAv.innerHTML = `<img src="${welkomPhoto}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="${p.naam}">`;
     welkomAv.style.background = 'none';
