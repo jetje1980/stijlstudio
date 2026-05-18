@@ -143,7 +143,7 @@ h1,h2,h3,h4{font-family:var(--serif);}
 @keyframes fly-up{to{transform:translateY(-120%) scale(1.1);opacity:0;}}
 
 .card-hero{height:220px;background-size:cover;background-position:center;position:relative;flex-shrink:0;}
-.card-hero-grad{position:absolute;inset:0;background:linear-gradient(135deg,var(--terra) 0%,var(--mosterd) 100%);opacity:0.85;}
+.card-hero-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 60%,transparent 100%);}
 .card-badges{position:absolute;top:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;}
 .badge{font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;border-radius:20px;padding:3px 8px;font-weight:700;}
 .badge-must{background:var(--mosterd);color:#fff;}
@@ -260,21 +260,24 @@ h1,h2,h3,h4{font-family:var(--serif);}
 .info-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
 .info-label{font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--bruin);margin-bottom:2px;}
 .info-val{font-size:0.85rem;}
-.pack-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--zand);cursor:pointer;}
+.pack-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd);cursor:pointer;}
 .pack-item:last-child{border-bottom:none;}
-.pack-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--zand);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
-.pack-item.checked .pack-check{background:var(--vert);border-color:var(--vert);color:#fff;}
-.pack-item.checked .pack-label{text-decoration:line-through;color:#aaa;}
-.pack-label{font-size:0.9rem;flex:1;}
-.pack-note{font-size:0.75rem;color:var(--terra);margin-top:1px;}
+.pack-check{width:22px;height:22px;border-radius:6px;border:1px solid var(--bd2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s;margin-top:1px;}
+.pack-item.checked .pack-check{background:var(--gold);border-color:var(--gold);color:#000;}
+.pack-item.checked .pack-label{text-decoration:line-through;color:var(--t3);}
+.pack-label{font-size:0.9rem;flex:1;line-height:1.3;}
+.pack-note{font-size:0.72rem;color:var(--t2);margin-top:2px;line-height:1.35;}
 
 /* ── MISSIE VAN DE DAG ── */
-.missie-block{margin:12px 16px;border-radius:var(--r-lg);background:linear-gradient(135deg,var(--vert),#1a3328);padding:18px;color:#fff;}
-.missie-label{font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--rose);margin-bottom:6px;}
-.missie-title{font-family:var(--serif);font-style:italic;font-size:1.3rem;margin-bottom:6px;}
-.missie-desc{font-size:0.8rem;opacity:0.8;line-height:1.4;}
-.missie-done-btn{margin-top:12px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:7px 18px;color:#fff;font-size:0.8rem;cursor:pointer;}
-.missie-done-btn.done{background:var(--terra);border-color:var(--terra);}
+.missie-block{margin:12px 16px;border-radius:var(--r-lg);background:linear-gradient(135deg,#1a1410,#0a0a0a);border:1px solid rgba(201,169,110,0.2);padding:20px;color:#fff;position:relative;overflow:hidden;}
+.missie-block::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent);}
+.missie-label{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.missie-title{font-family:var(--serif);font-style:italic;font-size:1.4rem;margin-bottom:8px;line-height:1.2;}
+.missie-context{font-size:0.75rem;color:rgba(240,237,232,0.6);line-height:1.6;margin-bottom:4px;}
+.missie-desc{font-size:0.82rem;opacity:0.85;line-height:1.55;margin-bottom:4px;}
+.missie-tip{font-size:0.75rem;color:var(--gold);margin-top:8px;font-style:italic;line-height:1.4;}
+.missie-done-btn{margin-top:14px;background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.3);border-radius:20px;padding:8px 20px;color:var(--gold);font-size:0.78rem;cursor:pointer;letter-spacing:0.08em;}
+.missie-done-btn.done{background:var(--gold);color:#000;border-color:var(--gold);font-weight:700;}
 .streak-row{display:flex;gap:12px;margin-top:10px;}
 .streak-av{display:flex;flex-direction:column;align-items:center;gap:4px;}
 .streak-circle{width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:0.75rem;color:#fff;font-weight:600;}
@@ -553,9 +556,11 @@ h1,h2,h3,h4{font-family:var(--serif);}
 
     <!-- MISSIE VAN DE DAG -->
     <div class="missie-block" id="missie-block">
-      <div class="missie-label">✦ Missie van de dag</div>
+      <div class="missie-label">✦ <span>Missie van de dag</span></div>
       <div class="missie-title" id="missie-title">Laden…</div>
+      <div class="missie-context" id="missie-context"></div>
       <div class="missie-desc" id="missie-desc"></div>
+      <div class="missie-tip" id="missie-tip"></div>
       <button class="missie-done-btn" id="missie-btn" onclick="toggleMissie()">✓ Gedaan!</button>
       <div class="streak-row" id="streak-row"></div>
     </div>
@@ -680,7 +685,7 @@ h1,h2,h3,h4{font-family:var(--serif);}
       <div class="spel-card" onclick="openGame('trein')">
         <div class="spel-emoji">🚂</div>
         <div class="spel-naam">Treinkaarten</div>
-        <div class="spel-desc">Nostalgisch · ondeugend · reflectief</div>
+        <div class="spel-desc">Nostalgisch · verleidelijk · reflectief</div>
       </div>
       <div class="spel-card" onclick="openGame('wzd')">
         <div class="spel-emoji">🤔</div>
@@ -739,7 +744,7 @@ h1,h2,h3,h4{font-family:var(--serif);}
   <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
     <div class="trein-tabs">
       <button class="trein-tab active" data-mood="nostalgisch" onclick="setTreinMood('nostalgisch',this)">Nostalgisch</button>
-      <button class="trein-tab" data-mood="ondeugend" onclick="setTreinMood('ondeugend',this)">Ondeugend</button>
+      <button class="trein-tab" data-mood="verleidelijk" onclick="setTreinMood('verleidelijk',this)">Verleidelijk</button>
       <button class="trein-tab" data-mood="reflectief" onclick="setTreinMood('reflectief',this)">Reflectief</button>
     </div>
     <div class="trein-card-wrap"><div class="trein-card" id="trein-card">
@@ -1159,24 +1164,34 @@ function makeCard(item, zOffset) {
   if (item.reserveren) badges.push(`<span class="badge badge-reserveer">📋 Reserveer</span>`);
   if (item.added) badges.push(`<span class="badge badge-added">+ Toegevoegd</span>`);
 
+  const bron = item.must_van ? `Via ${item.must_van.charAt(0).toUpperCase()+item.must_van.slice(1)}` : null;
+  const verhaalText = item.verhaal || item.voor_ons || '';
+
   el.innerHTML = `
-    <div class="card-hero" style="background-image:url('${item.img || ''}')">
+    <div class="card-hero" style="background-image:url('${item.img || ''}');filter:grayscale(20%);">
       <div class="card-hero-grad"></div>
-      <div class="card-badges">${badges.join('')}<span class="badge badge-cat">${item.sub}</span></div>
+      <div class="card-badges">
+        ${badges.join('')}
+        <span class="badge badge-cat">${item.sub}</span>
+        ${bron ? `<span class="badge" style="background:var(--gold2);color:var(--gold);border:1px solid rgba(201,169,110,0.3);">${bron}</span>` : ''}
+      </div>
+      <div style="position:absolute;bottom:14px;left:16px;right:16px;">
+        <div style="font-family:var(--serif);font-style:italic;font-size:1.4rem;color:#fff;line-height:1.1;text-shadow:0 2px 8px rgba(0,0,0,0.5);">${item.naam}</div>
+        <div style="font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.75);margin-top:4px;">${item.wijk}</div>
+      </div>
       <div class="card-like-overlay" id="ov-${item.id}"></div>
     </div>
-    <div class="card-body">
-      <div class="card-naam">${item.naam}</div>
-      <div class="card-meta">
-        <span class="card-meta-pill">📍 ${item.wijk}</span>
+    <div class="card-body" style="padding:12px 16px 10px;">
+      <div class="card-meta" style="margin-bottom:${verhaalText ? '10px' : '0'};">
         <span class="card-meta-pill">💶 ${item.prijs}</span>
         ${item.duur ? `<span class="card-meta-pill">⏱ ${item.duur}</span>` : ''}
-        ${item.drukte ? `<span class="card-meta-pill">👥 ${item.drukte}</span>` : ''}
+        ${item.tijden ? `<span class="card-meta-pill">🕐 ${item.tijden.substring(0,28)}</span>` : ''}
+        ${item.reserveren ? `<span class="card-meta-pill" style="color:#e88;border-color:rgba(220,100,100,0.3);">📋 Reserveer</span>` : ''}
       </div>
-      ${item.verhaal ? `<p style="font-size:0.82rem;color:var(--bruin);margin-top:8px;line-height:1.5;">${item.verhaal.substring(0,120)}${item.verhaal.length>120?'…':''}</p>` : ''}
-      ${item.tip ? `<p style="font-size:0.78rem;color:var(--vert);margin-top:4px;font-style:italic;">💡 ${item.tip.substring(0,100)}${item.tip.length>100?'…':''}</p>` : ''}
+      ${verhaalText ? `<div style="font-size:0.82rem;color:var(--t2);line-height:1.55;border-left:2px solid var(--gold);padding-left:10px;font-style:italic;">${verhaalText.substring(0,150)}${verhaalText.length>150?'…':''}</div>` : ''}
+      ${item.tip ? `<div style="font-size:0.75rem;color:var(--gold);margin-top:8px;line-height:1.4;">💡 ${item.tip.substring(0,110)}${item.tip.length>110?'…':''}</div>` : ''}
     </div>
-    ${otherVotesHtml ? `<div class="card-votes">${otherVotesHtml}</div>` : ''}
+    ${otherVotesHtml ? `<div class="card-votes" style="border-top:1px solid var(--bd);padding-top:8px;">${otherVotesHtml}</div>` : ''}
   `;
   return el;
 }
@@ -1469,10 +1484,27 @@ function toggleCollapsible(id) {
 
 // ── MISSIE VAN DE DAG ────────────────────────────
 const MISSIES = [
-  // indexed by day offset from trip start (0=vr26, 1=za27, 2=zo28)
-  { title:'Proef een croissant bij Du Pain et des Idées', desc:'De oudste bakkerstechniek van Parijs. Zoek de winkel op Rue Yves Toudic vóór 12u — na die tijd zijn ze uitverkocht.', emoji:'🥐' },
-  { title:'Vind één parel op de Puces de Saint-Ouen', desc:'Eén vintage vondst. Mag een ring zijn, een sjaal, een poster. Foto in de groep!', emoji:'💫' },
-  { title:'Aperitivo op een terras voor de trein', desc:'Laatste glas wijn in de zon voor je instappt. Toast op de mooiste drie dagen.', emoji:'🥂' },
+  {
+    title: 'Proef een croissant bij Du Pain et des Idées',
+    context: 'Rue Yves Toudic 34 · 10e · 10 minuten van Canal Saint-Martin',
+    desc: 'Dé meest befaamde bakker van Parijs bakt zijn croissants met een 150 jaar oude techniek. Ze zijn zo goed dat ze bijna altijd voor 12u uitverkocht zijn — neem dus geen risico.',
+    tip: '💡 Neem ook een "escargot pistache-chocolade" — die is reden genoeg om naar Parijs te gaan. Alleen doordeweeks open.',
+    emoji: '🥐'
+  },
+  {
+    title: 'Scoor één vondst op de Puces de Vanves',
+    context: 'Avenue Georges Lafenestre · 14e · za+zo 7–14u · metro Porte de Vanves',
+    desc: 'De lievere kleine broer van Saint-Ouen. 380 verkopers, alles te overzien in een ochtend. Eén ding kopen dat je thuis aan Parijs herinnert — geen toerist maar een Parijse vrouw.',
+    tip: '💡 Cash meenemen. Begin om 9u (niet te vroeg, niet te laat). Begin bieden op 60% van de vraagprijs — dat is gewoon hoe het werkt.',
+    emoji: '💫'
+  },
+  {
+    title: 'Eén laatste glas wijn op een Parijs terras',
+    context: 'Kies zelf waar — ons liefst dichtbij Gare du Nord',
+    desc: 'Voor de trein (16:25!) één laatste keer in de zon zitten, wijn in de hand, Parijs om je heen. Proosten op drie dagen samen. Neem de tijd — maar mis de trein niet.',
+    tip: '💡 Aanwezig zijn op Gare du Nord om 15:55. Trein 16:25 → Amsterdam 20:03. Paspoort verplicht!',
+    emoji: '🥂'
+  },
 ];
 const TRIP_START = new Date('2026-06-26T00:00:00');
 
@@ -1483,6 +1515,10 @@ function renderMissie() {
   const missie = MISSIES[idx];
   document.getElementById('missie-title').textContent = missie.title;
   document.getElementById('missie-desc').textContent = missie.desc;
+  const ctxEl = document.getElementById('missie-context');
+  if (ctxEl) ctxEl.textContent = missie.context || '';
+  const tipEl = document.getElementById('missie-tip');
+  if (tipEl) tipEl.textContent = missie.tip || '';
   const key = 'vz_missie_' + currentUser + '_' + idx;
   const done = localStorage.getItem(key) === '1';
   const btn = document.getElementById('missie-btn');
@@ -1515,21 +1551,20 @@ function renderStreaks(dayIdx) {
 
 // ── INPAKLIJST ────────────────────────────────────
 const PACKLIST = [
-  { label:'Paspoort of ID-kaart', note:'Eurostar vereist dit!' },
-  { label:'Eurostar e-ticket (screenshot!)' },
-  { label:'Kleding voor 3 dagen + 1 extra' },
-  { label:'Comfortabele schoenen (veel lopen!)' },
-  { label:'Smarte avondschoenen' },
-  { label:'Regenjas of opvouwbaar jasje' },
-  { label:'Zonnebril + zonnebrand' },
-  { label:'Powerbank 🔋', note:'Je weet wie je bent, Karin 😂' },
-  { label:'Oordoppen + slaapmasker' },
-  { label:'Toilettas + medicijnen' },
-  { label:'Contant geld (Puces = cash)' },
-  { label:'Pinpas (meld je bank vooraf!)' },
-  { label:'Reserveringsbevestigingen' },
-  { label:'WhatsApp-chat met reisinfo gepind' },
-  { label:'Iets om in de trein te doen' },
+  { label:'Paspoort', note:'Eurostar vereist reisdocument — geen rijbewijs!' },
+  { label:'Eurostar e-ticket', note:'Screenshot in je fotorol — geen wifi nodig' },
+  { label:'Kleding voor 3 dagen + 1 extra', note:'Lente Parijs: 18–25°C, kans op bui' },
+  { label:'Wandelschoenen (veel lopen!)', note:'We lopen makkelijk 15–20km per dag' },
+  { label:'Avondschoenen', note:'Eén chique paar voor restaurants + bars' },
+  { label:'Licht jasje of regenjas' },
+  { label:'Zonnebril + zonnebrand SPF 30+' },
+  { label:'Powerbank', note:'In Parijs is er altijd een moment dat je hem nodig hebt' },
+  { label:'Oordoppen' },
+  { label:'Toilettas + medicijnen + pijnstillers' },
+  { label:'Contant geld €50–80', note:'Puces de Vanves = cash, tips geven' },
+  { label:'Pinpas + bank even bellen', note:'Blokkade voorkomen bij buitenlandse transacties' },
+  { label:'Reserveringsbevestigingen', note:'Screenshot alle boekingen offline beschikbaar' },
+  { label:'Goed boek of podcast voor de trein', note:'Eurostar Amsterdam→Parijs = 3,5u' },
 ];
 
 function renderInpaklijst() {
@@ -1627,7 +1662,7 @@ const TREIN_KAARTEN = {
     { emoji:'😂', text:'Wat is het grappigste wat je ooit met één van ons hebt meegemaakt?' },
     { emoji:'🌍', text:'Welke vakantie vóór deze had je absoluut nooit willen missen?' },
   ],
-  ondeugend:[
+  verleidelijk:[
     { emoji:'🤫', text:'Wat heb je stiekem gedaan waarvan je hoopt dat niemand het ooit weet?' },
     { emoji:'🎭', text:'Met welke beroemdheid zou jij een avond willen stappen in Parijs?' },
     { emoji:'💸', text:'Wat is het duurste wat je ooit hebt gekocht en meteen spijt van had?' },
