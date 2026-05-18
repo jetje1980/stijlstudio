@@ -392,6 +392,14 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
   </div>
 </div>
 
+<!-- WELKOM SCHERM -->
+<div id="welkom-screen" style="display:none;position:fixed;inset:0;z-index:950;background:#F0E8E2;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
+  <div id="welkom-avatar" style="width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-weight:800;font-size:1.6rem;color:#fff;margin:0 auto 20px;"></div>
+  <div id="welkom-naam" style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:800;font-size:2.2rem;color:#0A0A0A;letter-spacing:-0.02em;margin-bottom:8px;"></div>
+  <div style="font-size:0.95rem;color:#6B6560;line-height:1.6;max-width:280px;margin:0 auto 32px;">Jouw voorkeuren bepalen mee hoe het programma eruitziet.</div>
+  <button onclick="startApp()" style="padding:14px 36px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Beginnen →</button>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -1123,6 +1131,16 @@ function selectProfile(name) {
   swipes = JSON.parse(localStorage.getItem('vz_swipes_' + name) || '{}');
   top5Favs = JSON.parse(localStorage.getItem('vz_top5favs_' + name) || '{}');
   save();
+  const p = PROFILES[name];
+  const ws = document.getElementById('welkom-screen');
+  document.getElementById('welkom-avatar').style.background = p.color;
+  document.getElementById('welkom-avatar').textContent = p.init;
+  document.getElementById('welkom-naam').textContent = 'Welkom, ' + p.naam + ' 👋';
+  document.getElementById('login-screen').classList.add('hidden');
+  ws.style.display = 'flex';
+}
+function startApp() {
+  document.getElementById('welkom-screen').style.display = 'none';
   initApp();
 }
 function uitloggen() {
