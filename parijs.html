@@ -484,7 +484,16 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     </div>
     <div class="modal-field">
       <label>Verhaal / tip</label>
-      <textarea id="add-verhaal" rows="3" placeholder="Waarom wil je dit?"></textarea>
+      <input id="add-hook" type="text" maxlength="50" placeholder="De haak — één zin, schrijf zoals je 't appt (max 50 tekens)" oninput="document.getElementById('add-hook-count').textContent=this.value.length+'/50'">
+      <div style="font-size:0.65rem;color:var(--t3);margin-top:2px;margin-bottom:8px;" id="add-hook-count">0/50</div>
+      <label style="font-size:0.75rem;font-weight:600;color:var(--t2);display:block;margin-bottom:6px;">Type</label>
+      <div style="display:flex;gap:8px;margin-bottom:12px;" id="add-type-chips">
+        <button onclick="selectAddType(this,'ervaring')" class="chip-btn">🪄 Ervaring</button>
+        <button onclick="selectAddType(this,'plek')" class="chip-btn">📍 Plek</button>
+        <button onclick="selectAddType(this,'moment')" class="chip-btn">⏰ Moment</button>
+      </div>
+      <label style="font-size:0.75rem;font-weight:600;color:var(--t2);display:block;margin-bottom:6px;">Het verhaal</label>
+      <textarea id="add-verhaal" rows="3" placeholder="2–4 zinnen: wat maakt dit bijzonder? Schrijf zoals Griette het aan de groep zou appen."></textarea>
     </div>
     <div class="modal-field">
       <label class="modal-check">
@@ -757,6 +766,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <button class="stab" onclick="switchSwipeTab('activiteit',this)">Activiteit</button>
       <button class="stab" onclick="switchSwipeTab('uitgaan',this)">Uitgaan</button>
       <button class="stab" onclick="switchSwipeTab('markt',this)">Markten</button>
+      <button class="stab" onclick="switchSwipeTab('verborgen',this)" style="background:rgba(168,159,232,0.25);color:#7A72C4;">✨ Verborgen</button>
     </div>
     <!-- SWIPE MODUS KEUZE (eenmalig) -->
     <div id="swipe-mode-modal" style="display:none;position:fixed;inset:0;z-index:650;background:rgba(10,10,10,0.35);align-items:flex-end;">
@@ -1250,7 +1260,7 @@ const ITEMS_BASE = [
   {id:'cafe-de-flore',cat:'koffie',sub:'Iconisch terras',naam:'Café de Flore',wijk:'6e — Saint-Germain',prijs:'€€€',duur:'30–45 min',tijden:'7–1:30 dagelijks',reserveren:false,must_van:'griette',verhaal:'Simone de Beauvoir en Sartre schreven hier hun beste werk. Terrasse met verwarmde lampen. Koffie is €7 — maar je betaalt voor het gevoel van écht Parijs.',tip:'Buiten zitten, camera klaar, een koffie en een croissant. Dit is Parijs.',img:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80'},
   {id:'merci-cafe',cat:'koffie',sub:'Concept store café',naam:'Merci Café',wijk:'3e — Marais',prijs:'€€',duur:'30 min',tijden:'10–19 ma–za',reserveren:false,must_van:null,verhaal:'Koffie in het mooiste concept store van Parijs, tussen vintage lampen en designobjecten. Stap na je koffie de winkel in — erg gevaarlijk voor de portemonnee.',tip:'Op de begane grond van Merci, Boulevard Beaumarchais. Neem koffie en dwaal.',img:'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80'},
   {id:'telescope-coffee',cat:'koffie',sub:'Specialty coffee',naam:'Telescope',wijk:'1e — Palais-Royal',prijs:'€',duur:'20 min',tijden:'8–17 ma–vr, 9:30–17 za',reserveren:false,must_van:null,verhaal:'Beste specialty coffee van Parijs in een minuscule, stijlvolle zaak. 2 minuten van het Palais-Royal. Geen wifi, geen laptops — alleen heel goede koffie en mensen die er van houden.',tip:'Combineer met korte wandeling door Jardin du Palais Royal daarna.',img:'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80'},
-  {id:'cafe-pli',cat:'koffie',sub:'Bijzonder café',naam:'Café Pli',wijk:'10e — Canal',prijs:'€–€€',duur:'45 min',tijden:'~9–18 di–zo',reserveren:false,must_van:'griette',verhaal:'Schrijf een kaart aan je toekomstige zelf — het café stuurt hem terug op jouw gekozen datum. Met vier vriendinnen samen een kaart schrijven voor over een jaar is onbetaalbaar.',tip:'Wees specifiek: over een jaar, wat verwacht je van jezelf? Van ons? Neem de tijd.',img:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80'},
+  {id:'cafe-pli',cat:'koffie',sub:'Bijzonder café',naam:'Café Pli',wijk:'11e — Faubourg du Temple',prijs:'€–€€',duur:'1u',tijden:'di–zo ~9–18 · reserveer een uur',reserveren:false,must_van:'griette',verhaal:'Een concept uit Korea: je schrijft, terwijl je koffie of thee drinkt, een brief aan jezelf die je op de gekozen datum terugkrijgt. 1 jaar: €15, 5 jaar: €25, 20 jaar: €45 — stationery en drank inbegrepen. Hoe gaaf is het om over 20 jaar — wij zijn dan 66 — een brief uit Parijs 2026 te krijgen?',tip:'Wees specifiek: wat verwacht je van jezelf over 5 jaar? Van ons? Neem de tijd. Je kan ook een brief aan een vriendin schrijven die over 5 jaar arriveert.',img:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80'},
   // ── BORREL (extra) ──
   {id:'comptoir-general',cat:'borrel',sub:'Geheim bar',naam:'Comptoir Général',wijk:'10e — Canal Saint-Martin',prijs:'€€',duur:'2u',tijden:'18–2 vr+za, 11–2 zo',reserveren:false,must_van:null,verhaal:'Verborgen achter een zwarte deur — na 5 minuten lopen kom je in een koloniaal-tropisch universum. Uniek, sfeervol, altijd goed gesprek. Niemand van onze vrienden kent dit.',tip:'Zwarte deur aan Quai de Jemmapes. Geen bord. Gewoon binnenlopen en je ogen uitkijken.',img:'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=80'},
   {id:'bar-hemingway',cat:'borrel',sub:'Legendarische bar',naam:'Bar Hemingway — Hôtel Ritz',wijk:'1e — Place Vendôme',prijs:'€€€€',duur:'1u',tijden:'18–2 dagelijks',reserveren:false,must_van:null,verhaal:'Hemingway bevrijdde deze bar eigenhanden in 1944. Eén klassieke cocktail als herinnering — dit is het soort ding waar je tien jaar later nog over vertelt.',tip:'Smart casual vereist. Eén cocktail €22–28. De "Serendipity" is de signature.',img:'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=80'},
@@ -1288,7 +1298,6 @@ const ITEMS_BASE = [
   {id:'vaartocht-seine',cat:'activiteit',sub:'Activiteit',naam:'Vaartocht op de Seine',wijk:'Diverse vertrekplekken',prijs:'€15–20 pp',duur:'1u',tijden:'hele dag, avond mooist',drukte:'druk middag',reserveren:false,must_van:null,weekend_special:false,verhaal:'Avondvaart in juni: om 20:30 nog licht, gevels gloeien oranje.',tip:'Vedettes du Pont Neuf is intiemer. Aperitief op het dek = ja.',img:'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80'},
   {id:'laduree',cat:'koffie',sub:'Snack',naam:'Ladurée macarons',wijk:'Rue Royale (of Marais)',prijs:'€€',duur:'20 min',tijden:'doorlopend',drukte:'altijd druk',reserveren:false,must_van:null,weekend_special:false,verhaal:'Klassieker. 6 macarons in mooi doosje. Pistache en roos zijn de iconen.',tip:'Originele filiaal op Rue Royale is mooier dan Champs-Élysées.',img:'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80'},
   {id:'benedict-paris',cat:'ontbijt',sub:'Brunch',naam:'Benedict Paris',wijk:'3e — Marais',prijs:'€€',duur:'1u',tijden:'8–16, weekends druk',drukte:'rij in weekend',reserveren:true,must_van:'griette',weekend_special:false,verhaal:'NY-style eggs benedict in vele varianten. Voor de zaterdag-brunch-vibe.',tip:'Reserveer via hun site een dag vooraf. Klassieke Benedict + iets met avocado.',img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80'},
-  {id:'cafe-pli',cat:'koffie',sub:'Lunch',naam:'Café Pli',wijk:'3e — Belleville',prijs:'€–€€',duur:'1u',tijden:'~9–18',drukte:'rustig hipster',reserveren:false,must_van:'griette',weekend_special:false,verhaal:'Schrijf een kaart aan je toekomstige zelf, café stuurt hem terug op gekozen datum.',tip:'Schrijf je kaart voor over 1 jaar. Goede afsluiter van een ochtendwandeling.',img:'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80'},
   {id:'bouillon-racine',cat:'lunch',sub:'Lunch / Diner',naam:'Bouillon Racine',wijk:'6e — Odéon',prijs:'€ (lunch €17,50)',duur:'1,5u',tijden:'lunch 12–15, diner 19–23',drukte:'altijd druk',reserveren:true,must_van:null,weekend_special:false,verhaal:'Art-nouveau juweeltje uit 1906. Escargots, magret, crème brûlée. Lunch bizar goedkoop.',tip:'RESERVEREN, vooral lunch op zondag. Bel direct.',img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80'},
   {id:'miznon',cat:'lunch',sub:'Lunch',naam:'Miznon (pita)',wijk:'4e — Marais',prijs:'€',duur:'30 min',tijden:'12–23',drukte:'kort wachten',reserveren:false,must_van:'griette',weekend_special:false,verhaal:'Israëlische pita\'s als wereldwondertjes. Geroosterde bloemkool-pita is legendarisch.',tip:'Take-away en eet op Place des Vosges. Groene chili-saus is heet maar essentieel.',img:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80'},
   {id:'as-du-fallafel',cat:'lunch',sub:'Lunch',naam:'L\'As du Fallafel',wijk:'4e — Marais',prijs:'€',duur:'30 min',tijden:'zo–do 11–24, vr 11–17 (za gesloten!)',drukte:'lange rij = ervaring',reserveren:false,must_van:'griette',weekend_special:false,verhaal:'DE falafel van Marais sinds 1979. Order to-go is sneller.',tip:'Bestel "spécial". GESLOTEN zaterdag (kosher).',img:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80'},
@@ -1306,7 +1315,72 @@ const ITEMS_BASE = [
   {id:'pavillon-puebla',cat:'uitgaan',sub:'Bar / Dansen',naam:'Pavillon Puebla',wijk:'19e — Buttes-Chaumont',prijs:'€€',duur:'avond',tijden:'~17–01 in zomer',drukte:'cool maar niet exclusief',reserveren:false,must_van:null,weekend_special:false,verhaal:'Open-air bar in Buttes-Chaumont. Cocktails, Corsicaans bier. Zomeravond-perfectie.',tip:'Vroeg komen (18:00) voor goede tafel.',img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80'},
   {id:'solidays',cat:'activiteit',sub:'Festival',naam:'Solidays festival',wijk:'16e — Longchamp',prijs:'€60–70 dagticket',duur:'hele dag',tijden:'26–28 juni, hele weekend',drukte:'tienduizenden',reserveren:true,must_van:null,weekend_special:true,verhaal:'Festival voor solidariteit (anti-AIDS). Bigflo & Oli, Gims, Orelsan.',tip:'Één dag is genoeg. Zondag is relaxste. Tickets vooraf via solidays.org.',img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80'},
   {id:'cargo-container-bar',cat:'borrel',sub:'Open-air bar',naam:'Cargo Container Bar',wijk:'12e — Port de Bercy Aval',prijs:'€€',duur:'avond',tijden:'do–zo 17–01 (zomer)',drukte:'druk weekend',reserveren:false,must_van:null,weekend_special:true,verhaal:'Open-air feestbar op de kades van de Seine in shipping containers. Terras met uitzicht op de Bibliothèque nationale. ZATERDAG 27 juni = "Disc\'o Cargo" — discoavond. Perfect slot van dag 2.',tip:'Zaterdag = Disc\'o Cargo night (house/disco). Kom rond 19u voor goede plek. Iovine\'s Napolitaanse pizza ter plekke.',img:'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&q=80'},
+  {id:'musee-vie-romantique',cat:'activiteit',sub:'Verborgen museum',naam:'Musée de la Vie Romantique',wijk:'9e — Pigalle',prijs:'gratis',duur:'1u',tijden:'di–zo 10–18',drukte:'altijd rustig',reserveren:false,must_van:null,weekend_special:false,verhaal:'Schilderijtjes van George Sand, kleine tuinsalon achter het huis. Niemand weet dat dit gratis is. Theesalon in de tuin is onbetaalbaar voor een zomerse ochtend.',tip:'Combineer met Buvette in Pigalle. Terrastje in de tuin bij goed weer — altijd doen.',img:'https://images.unsplash.com/photo-1541427468627-a89a96e5ca1d?w=600&q=80'},
+  {id:'square-vert-galant',cat:'wandelen',sub:'Verborgen plek',naam:'Square du Vert-Galant',wijk:'1e — Île de la Cité',prijs:'gratis',duur:'30 min',tijden:'hele dag',drukte:'altijd rustig',reserveren:false,must_van:null,weekend_special:false,verhaal:'Het puntje van Île de la Cité — laagste punt van Parijs, omringd door de Seine. Beste picknickplek van de stad, vijf minuten van Notre-Dame. Toeristen lopen eraan voorbij.',tip:'Wijn + stokbrood + kaas van Rue Mouffetard. Kom rond zonsondergang voor oranje licht.',img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80'},
 ];
+
+// hook (≤50 chars, punchy), type (ervaring/plek/moment), verborgen
+const ITEM_ENRICHMENT = {
+  'du-pain-idees':          {hook:'Om 12u uitverkocht — plan vroeg',          type:'moment'},
+  'ten-belles':             {hook:'Third-wave koffie + croissant van Du Pain', type:'plek'},
+  'claus-breakfast':        {hook:'Scandi ontbijt, rustig, zonder haast',       type:'plek'},
+  'rose-bakery-breakfast':  {hook:'Quiche van de dag + brownie — klaar',        type:'plek'},
+  'cafe-de-flore':          {hook:'Sartre schreef hier. Jij drinkt koffie.',    type:'plek'},
+  'merci-cafe':             {hook:'Koffie tussen design — gevaarlijk',           type:'plek'},
+  'telescope-coffee':       {hook:'Minuscule specialty bar, 2 min Palais-Royal',type:'plek'},
+  'cafe-pli':               {hook:'Brief aan jezelf voor 2046 ✉️',              type:'ervaring', verborgen:true},
+  'comptoir-general':       {hook:'Zwarte deur → tropisch universum',           type:'ervaring', verborgen:true},
+  'bar-hemingway':          {hook:'Hemingway bevrijdde deze bar in 1944',       type:'plek'},
+  'pavillon-puebla':        {hook:'Bar in park dat toeristen nooit vinden',     type:'moment',   verborgen:true},
+  'marche-enfants-rouges':  {hook:'Oudste markthal 1615, Japan + Libanon',      type:'moment'},
+  'hank-burger':            {hook:'Plant-based die vleeseters bekeert',         type:'plek'},
+  'shakespeare-co':         {hook:'Katten, briefjes op muren, stempel in elk boek',type:'plek'},
+  'palais-royal':           {hook:'Tuin achter Louvre — toeristen slaan over',  type:'plek',     verborgen:true},
+  'wandeling-saint-germain':{hook:'Sartre + Beauvoir + Baldwin — alles hier',   type:'plek'},
+  'wandeling-montmartre-early':{hook:'Magisch stil voor 9u, 50K toeristen daarna',type:'moment'},
+  'sezane-marais':          {hook:'Enige Sézane die op zondag open is',         type:'plek'},
+  'sezane-17':              {hook:'Grootst + rustigst, geen wachtrij',          type:'plek'},
+  'galeries-lafayette':     {hook:'Art-nouveau koepel 1912, gratis dak',        type:'plek'},
+  'puces-saint-ouen':       {hook:'7 hectare, 2000 verkopers, cash mee',        type:'plek'},
+  'puces-vanves':           {hook:'380 verkopers, behapbaar in een ochtend',    type:'moment'},
+  'brocante-aligre':        {hook:'40 stalletjes, 500m van jullie airbnb',      type:'moment'},
+  'mouffetard':             {hook:'Kaas-jacht op oudste straat van Parijs',     type:'moment'},
+  'montmartre':             {hook:'Mensensoep 11–17u, magie voor 9 of na 17',   type:'moment'},
+  'le-marais':              {hook:'Za 27/6 autovrij door Pride — straatfeest',  type:'moment'},
+  'canal-saint-martin':     {hook:'Picknicken aan het water, bootjes door sluis',type:'moment'},
+  'coulee-verte':           {hook:'High Line van Parijs, 4m boven de stad',     type:'plek',     verborgen:true},
+  'arenes-lutece':          {hook:'Romeins amfitheater verstopt achter poort',  type:'plek',     verborgen:true},
+  'pere-lachaise':          {hook:'Morrison + Piaf + Wilde — mooi, niet morbide',type:'plek'},
+  'orsay':                  {hook:'Impressionisten in oud treinstation',         type:'plek'},
+  'louvre':                 {hook:'Sla Mona Lisa over, Galerie d\'Apollon niet', type:'plek'},
+  'atelier-lumieres':       {hook:'Klimt als lichtprojectie — 1u, bij regen',   type:'ervaring', verborgen:true},
+  'baja-highlights':        {hook:'NL gids langs iconen, dag 1-aanrader',        type:'ervaring'},
+  'baja-hidden':            {hook:'Backstreets waar Parijzenaars wonen',         type:'ervaring'},
+  'baja-night':             {hook:'Eiffeltoren sprankelt elk uur 5 minuten',    type:'moment'},
+  'baja-prive':             {hook:'Alleen jullie 4, eigen route, eigen tempo',   type:'ervaring'},
+  'vaartocht-seine':        {hook:'Om 20:30 nog licht, gevels gloeien oranje',  type:'moment'},
+  'laduree':                {hook:'6 macarons in mooi doosje — doe het gewoon', type:'plek'},
+  'benedict-paris':         {hook:'NY-style eggs benedict, 12 varianten',       type:'plek'},
+  'bouillon-racine':        {hook:'1906 art-nouveau, lunch voor €17,50',        type:'plek'},
+  'miznon':                 {hook:'Ottolenghi\'s broertje — geroosterde bloemkool',type:'plek'},
+  'as-du-fallafel':         {hook:'DE falafel van Marais, rij = ervaring',       type:'plek'},
+  'balls':                  {hook:'Gehaktballen in dozijn varianten, naast Atelier',type:'plek'},
+  'clamato':                {hook:'Oesters + ceviche, zustertent van Septime',   type:'plek'},
+  'buvette':                {hook:'Croque-monsieur is signature — kleine borden', type:'plek'},
+  'chez-janou':             {hook:'80+ pastis, chocolademousse-bak op tafel',   type:'ervaring'},
+  'le-mary-celeste':        {hook:'Diner + daarna hangen aan de bar',           type:'moment'},
+  'septime-cave':           {hook:'200 wijnen, om 17:30 komen of geluk',        type:'moment'},
+  'little-red-door':        {hook:'Wereldwijd top-50 cocktailbars, intiem',     type:'plek'},
+  'bisou':                  {hook:'Geen menu — vertel barman wat je lekker vindt',type:'ervaring'},
+  'perchoir':               {hook:'Rooftop, 360° uitzicht, 20:30 voor sunset',  type:'moment'},
+  'rosa-bal-musette':       {hook:'Bal-musette dansen op drijvend ponton',      type:'ervaring'},
+  'badaboum':               {hook:'Loopafstand van airbnb, dansen tot 5u',       type:'ervaring'},
+  'solidays':               {hook:'Festival solidariteit — Bigflo & Oli',        type:'ervaring'},
+  'cargo-container-bar':    {hook:'Za = Disc\'o Cargo — discoavond aan de Seine',type:'moment'},
+  'musee-vie-romantique':   {hook:'Gratis, theesalon in de tuin — niemand hier', type:'plek',     verborgen:true},
+  'square-vert-galant':     {hook:'Puntje van Île de la Cité, beste picknick',  type:'plek',     verborgen:true},
+};
+ITEMS_BASE.forEach(it => Object.assign(it, ITEM_ENRICHMENT[it.id] || {}));
 
 const MOCK_VOTES = {
   frederike: {
@@ -1512,8 +1586,15 @@ function selectProfile(name) {
   save();
   const p = PROFILES[name];
   const t = WELKOM_TEKSTEN[name] || {groet:'Welkom, ' + p.naam + ' 👋', sub:'Jouw voorkeuren bepalen mee hoe het programma eruitziet.', knop:'Beginnen →'};
-  document.getElementById('welkom-avatar').style.background = p.color;
-  document.getElementById('welkom-avatar').textContent = p.init;
+  const welkomAv = document.getElementById('welkom-avatar');
+  const welkomPhoto = getUserPhoto(user);
+  if (welkomPhoto) {
+    welkomAv.innerHTML = `<img src="${welkomPhoto}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="${p.naam}">`;
+    welkomAv.style.background = 'none';
+  } else {
+    welkomAv.style.background = p.color;
+    welkomAv.textContent = p.init;
+  }
   document.getElementById('welkom-naam').textContent = t.groet;
   document.getElementById('welkom-sub').textContent = t.sub;
   document.getElementById('welkom-btn').textContent = t.knop;
@@ -1845,9 +1926,9 @@ function applySwipeMode() {
 }
 
 function renderOverzicht() {
-  const catItems = ITEMS.filter(it => it.cat === swipeTab && !swipes[it.id]);
+  const catItems = ITEMS.filter(it => (swipeTab === 'verborgen' ? it.verborgen : it.cat === swipeTab) && !swipes[it.id]);
   const label = document.getElementById('overzicht-label');
-  if (label) label.textContent = catItems.length + ' opties in ' + swipeTab;
+  if (label) label.textContent = catItems.length + ' opties' + (swipeTab === 'verborgen' ? ' — Verborgen Parijs' : ' in ' + swipeTab);
   const list = document.getElementById('overzicht-list');
   if (!list) return;
   list.innerHTML = catItems.map(item => {
@@ -1886,7 +1967,7 @@ let dragStartX = 0, dragStartY = 0, isDragging = false;
 
 function buildSwipeStack() {
   const stack = document.getElementById('swipe-stack');
-  const catItems = ITEMS.filter(it => it.cat === swipeTab && !swipes[it.id]);
+  const catItems = ITEMS.filter(it => (swipeTab === 'verborgen' ? it.verborgen : it.cat === swipeTab) && !swipes[it.id]);
   stack.innerHTML = '';
   const catLabels = {ontbijt:'ontbijt',koffie:'koffie',lunch:'lunch',diner:'diner',borrel:'borrel',wandelen:'wandel',activiteit:'activiteit',uitgaan:'avond',markt:'markt'};
   if (catItems.length === 0) {
@@ -1919,7 +2000,7 @@ function makeCard(item, zOffset) {
     if (!v) return '';
     const p = PROFILES[u];
     const icon = v === 'like' ? '♥' : '★';
-    return `<div class="vote-chip"><div class="mini-av" style="background:${p.color};">${p.init}</div>${p.naam.split('').slice(0,4).join('')}.. ${icon}</div>`;
+    return `<div class="vote-chip">${avatarImg(u, 18)}<span>${p.naam.split('').slice(0,4).join('')}.. ${icon}</span></div>`;
   }).filter(Boolean).join('');
 
   const badges = [];
@@ -1934,28 +2015,32 @@ function makeCard(item, zOffset) {
   const bron = item.must_van ? `Via ${PROFILES[item.must_van]?.naam || item.must_van}` : null;
   const verhaalText = item.verhaal || item.voor_ons || '';
 
+  const typeIcon = {ervaring:'🪄', plek:'📍', moment:'⏰'}[item.type] || '';
+
   el.innerHTML = `
     <div class="card-hero" style="background-image:url('${item.img || ''}');filter:grayscale(20%);">
       <div class="card-hero-grad"></div>
       <div class="card-badges">
         ${badges.join('')}
-        <span class="badge badge-cat">${item.sub}</span>
+        <span class="badge badge-cat">${typeIcon ? typeIcon + ' ' : ''}${item.sub}</span>
         ${bron ? `<span class="badge" style="background:var(--gold2);color:var(--gold);border:1px solid rgba(201,169,110,0.3);">${bron}</span>` : ''}
+        ${item.verborgen ? `<span class="badge" style="background:rgba(168,159,232,0.2);color:#A89FE8;border:1px solid rgba(168,159,232,0.3);">✨ Verborgen</span>` : ''}
       </div>
       <div style="position:absolute;bottom:14px;left:16px;right:16px;">
         <div style="font-family:var(--serif);font-style:italic;font-size:1.4rem;color:#fff;line-height:1.1;text-shadow:0 2px 8px rgba(0,0,0,0.5);">${item.naam}</div>
-        <div style="font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.75);margin-top:4px;">${item.wijk}</div>
+        ${item.hook ? `<div style="font-size:0.8rem;font-weight:700;color:#fff;margin-top:5px;text-shadow:0 1px 6px rgba(0,0,0,0.6);letter-spacing:0.01em;">${item.hook}</div>` : `<div style="font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.75);margin-top:4px;">${item.wijk}</div>`}
       </div>
       <div class="card-like-overlay" id="ov-${item.id}"></div>
     </div>
     <div class="card-body" style="padding:12px 16px 10px;">
+      ${item.hook ? `<div style="font-size:0.7rem;color:var(--t3);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:7px;">${item.wijk}</div>` : ''}
       <div class="card-meta" style="margin-bottom:${verhaalText ? '10px' : '0'};">
         <span class="card-meta-pill">💶 ${item.prijs}</span>
         ${item.duur ? `<span class="card-meta-pill">⏱ ${item.duur}</span>` : ''}
         ${item.tijden ? `<span class="card-meta-pill">🕐 ${item.tijden.substring(0,28)}</span>` : ''}
         ${item.reserveren ? `<span class="card-meta-pill" style="color:#e88;border-color:rgba(220,100,100,0.3);">📋 Reserveer</span>` : ''}
       </div>
-      ${verhaalText ? `<div style="font-size:0.82rem;color:var(--t2);line-height:1.55;border-left:2px solid var(--gold);padding-left:10px;font-style:italic;">${verhaalText.substring(0,150)}${verhaalText.length>150?'…':''}</div>` : ''}
+      ${verhaalText ? `<div style="font-size:0.82rem;color:var(--t2);line-height:1.55;border-left:2px solid var(--gold);padding-left:10px;font-style:italic;">${verhaalText.substring(0,180)}${verhaalText.length>180?'…':''}</div>` : ''}
       ${item.tip ? `<div style="font-size:0.75rem;color:var(--gold);margin-top:8px;line-height:1.4;">💡 ${item.tip.substring(0,110)}${item.tip.length>110?'…':''}</div>` : ''}
     </div>
     ${otherVotesHtml ? `<div class="card-votes" style="border-top:1px solid var(--bd);padding-top:8px;">${otherVotesHtml}</div>` : ''}
@@ -2050,7 +2135,7 @@ function switchSwipeTab(tab, el) {
 }
 
 function resetSwipeTab() {
-  const catItems = ITEMS.filter(it => it.cat === swipeTab);
+  const catItems = ITEMS.filter(it => swipeTab === 'verborgen' ? it.verborgen : it.cat === swipeTab);
   catItems.forEach(it => { delete swipes[it.id]; });
   save();
   buildSwipeStack();
@@ -2213,7 +2298,8 @@ function renderProgramma() {
             <span style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);">${slot.time}</span>
             <span style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);">${slot.label}</span>
           </div>
-          <div style="font-family:var(--serif);font-style:italic;font-size:1.05rem;color:var(--t1);margin-bottom:4px;">${slot.naam}</div>
+          <div style="font-family:var(--serif);font-style:italic;font-size:1.05rem;color:var(--t1);margin-bottom:2px;">${slot.naam}</div>
+          ${(() => { const it = ITEMS.find(x => x.naam === slot.naam || x.id === slot.id); return it?.hook ? `<div style="font-size:0.72rem;font-weight:600;color:var(--gold);margin-bottom:4px;">${it.hook}</div>` : ''; })()}
           ${slot.detail ? `<div style="font-size:0.78rem;color:var(--t2);line-height:1.5;">${slot.detail}</div>` : ''}
         </div>
       </div>`;
@@ -2609,6 +2695,11 @@ function wisselslaap(user) {
 // ── MODAL ─────────────────────────────────────────
 function openModal() { document.getElementById('add-modal').classList.add('show'); }
 function closeModal() { document.getElementById('add-modal').classList.remove('show'); }
+function selectAddType(el, t) {
+  addType = t;
+  document.querySelectorAll('#add-type-chips .chip-btn').forEach(b => b.classList.remove('chip-sel'));
+  el.classList.add('chip-sel');
+}
 function submitAdd() {
   const naam = document.getElementById('add-naam').value.trim();
   const cat = document.getElementById('add-cat').value;
@@ -2625,6 +2716,8 @@ function submitAdd() {
     reserveren: document.getElementById('add-reserveer').checked,
     must_van: null,
     weekend_special: false,
+    hook: document.getElementById('add-hook').value || '',
+    type: addType || null,
     verhaal: document.getElementById('add-verhaal').value || '',
     tip: '',
     added: true,
@@ -2638,7 +2731,9 @@ function submitAdd() {
   renderGroep();
   showToast(`"${naam}" toegevoegd! 🗺️`);
   // Reset form
-  ['add-naam','add-sub','add-wijk','add-prijs','add-tijden','add-verhaal'].forEach(id => document.getElementById(id).value = '');
+  ['add-naam','add-sub','add-wijk','add-prijs','add-tijden','add-verhaal','add-hook'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  addType = null;
+  document.querySelectorAll('#add-type-chips .chip-btn').forEach(b => b.classList.remove('chip-sel'));
   document.getElementById('add-cat').value = '';
   document.getElementById('add-reserveer').checked = false;
 }
@@ -3235,45 +3330,39 @@ const BROCANTES_VAST = [
 ];
 
 let bronSelected = {type:null, personas:['iedereen']};
+let addType = null;
+
+const BRONNEN_SEED = [
+  {door:'griette',  handle:'Lijstje dec \'25', type:'Activiteiten', why:'Bouillon Racine, Miznon, Du Pain et des Idées, Café Pli, Sézane — de basis van ons programma. Griette deelde dit in december.'},
+  {door:'frederike',handle:'Buurvrouw-tips',   type:'Activiteiten', why:'Rue Mouffetard, Coulée Verte, Arènes de Lutèce — via haar buurvrouw die jaren in Parijs woonde. Toegevoegd april 2026.'},
+  {door:'miriam',   handle:'Collega-tips',      type:'Restaurants',  why:'Restaurants via haar netwerk — Clamato, Septime La Cave. Miriam regelt de reserveringen.'},
+  {door:'marlinde', handle:'Parijs-idee 🌴',    type:'Bestemming',   why:'Stelde Parijs voor op 2 mei 2025 vanuit Penang. Bevestigde de dates op 4 april 2026: "even dubbel checken 🤓".'},
+];
 
 function initInspiratie() {
   const grid = document.getElementById('bronnen-grid');
   if (!grid) return;
-  grid.innerHTML = BRONNEN_VAST.map(b => {
-    const p = b.door ? PROFILES[b.door] : null;
-    const attr = p ? `<div style="display:flex;align-items:center;gap:5px;margin-top:8px;">
-      <div style="width:16px;height:16px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-size:0.5rem;color:#fff;font-style:italic;font-weight:700;flex-shrink:0;">${p.init}</div>
-      <div style="font-size:0.62rem;color:var(--t3);">${p.naam}</div>
-    </div>` : '';
-    return `<a href="https://www.instagram.com/${b.handle}" target="_blank" rel="noopener" style="text-decoration:none;">
+  grid.innerHTML = BRONNEN_VAST.map(b => `
+    <a href="https://www.instagram.com/${b.handle}" target="_blank" rel="noopener" style="text-decoration:none;">
       <div style="background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:14px 12px;cursor:pointer;transition:all 0.2s;height:100%;box-sizing:border-box;">
         <div style="font-size:1.6rem;margin-bottom:6px;">${b.emoji}</div>
         <div style="font-size:0.75rem;font-weight:700;color:#0A0A0A;margin-bottom:2px;">@${b.handle}</div>
         <div style="display:inline-block;background:rgba(168,159,232,0.15);color:#A89FE8;border-radius:8px;padding:2px 7px;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px;">${b.type}</div>
         <div style="font-size:0.72rem;color:#6B6560;line-height:1.4;">${b.omschr}</div>
-        ${attr}
       </div>
-    </a>`;
-  }).join('');
+    </a>`).join('');
 
   const bg = document.getElementById('brocante-grid');
-  if (bg) bg.innerHTML = BROCANTES_VAST.map(br => {
-    const p = br.door ? PROFILES[br.door] : null;
-    const attr = p ? `<div style="display:flex;align-items:center;gap:5px;margin-top:6px;">
-      <div style="width:14px;height:14px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-size:0.45rem;color:#fff;font-style:italic;font-weight:700;flex-shrink:0;">${p.init}</div>
-      <div style="font-size:0.62rem;color:var(--t3);">${p.naam}</div>
-    </div>` : '';
-    return `<div style="background:rgba(10,10,10,0.04);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:8px;border-left:3px solid var(--gold);">
+  if (bg) bg.innerHTML = BROCANTES_VAST.map(br => `
+    <div style="background:rgba(10,10,10,0.04);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:8px;border-left:3px solid var(--gold);">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
-        <div style="flex:1;">
+        <div>
           <div style="font-weight:700;font-size:0.88rem;color:#0A0A0A;margin-bottom:2px;">${br.naam}</div>
           <div style="font-size:0.72rem;color:#6B6560;">${br.info} · ${br.adres}</div>
-          ${attr}
         </div>
         ${br.badge ? `<div style="font-size:0.7rem;color:var(--gold);flex-shrink:0;">${br.badge}</div>` : ''}
       </div>
-    </div>`;
-  }).join('') + `<div style="padding:6px 0;"><a href="https://www.brocabrac.fr" target="_blank" rel="noopener" style="font-size:0.75rem;color:var(--gold);text-decoration:none;">Pop-ups check op brocabrac.fr →</a></div>`;
+    </div>`).join('') + `<div style="padding:6px 0;"><a href="https://www.brocabrac.fr" target="_blank" rel="noopener" style="font-size:0.75rem;color:var(--gold);text-decoration:none;">Pop-ups check op brocabrac.fr →</a></div>`;
 
   renderCommunityBronnen();
 }
@@ -3283,13 +3372,22 @@ function renderCommunityBronnen() {
   const el = document.getElementById('community-bronnen-lege-state');
   const grid = document.getElementById('community-grid');
   if (!el || !grid) return;
-  if (community.length === 0) {
-    el.textContent = 'Nog geen bronnen toegevoegd. Voeg jouw favoriet toe ↓';
-    grid.innerHTML = '';
-    return;
-  }
   el.textContent = '';
-  grid.innerHTML = community.map((b,i) => {
+
+  const seedHtml = BRONNEN_SEED.map(b => {
+    const p = PROFILES[b.door] || {};
+    return `<div style="background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:14px 12px;">
+      <div style="font-size:0.75rem;font-weight:700;color:#0A0A0A;margin-bottom:2px;">${b.handle}</div>
+      <div style="display:inline-block;background:rgba(168,159,232,0.15);color:#A89FE8;border-radius:8px;padding:2px 7px;font-size:0.58rem;text-transform:uppercase;margin-bottom:5px;">${b.type}</div>
+      <div style="font-size:0.72rem;color:#6B6560;line-height:1.4;margin-bottom:6px;">${b.why}</div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        ${avatarImg(b.door, 20)}
+        <div style="font-size:0.65rem;color:var(--t3);">${p.naam||b.door}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const userHtml = community.map((b,i) => {
     const p = PROFILES[b.door] || {};
     const isOwn = b.door === currentUser;
     return `<div style="background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:14px 12px;position:relative;">
@@ -3298,11 +3396,18 @@ function renderCommunityBronnen() {
       <div style="display:inline-block;background:rgba(168,159,232,0.15);color:#A89FE8;border-radius:8px;padding:2px 7px;font-size:0.58rem;text-transform:uppercase;margin-bottom:5px;">${b.type}</div>
       <div style="font-size:0.72rem;color:#6B6560;line-height:1.4;margin-bottom:6px;">${b.why}</div>
       <div style="display:flex;align-items:center;gap:6px;">
-        <div style="width:18px;height:18px;border-radius:50%;background:${p.color||'#aaa'};display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:#fff;font-style:italic;font-weight:700;">${p.init||'?'}</div>
-        <div style="font-size:0.65rem;color:var(--t3);">door ${p.naam||b.door}</div>
+        ${avatarImg(b.door, 20)}
+        <div style="font-size:0.65rem;color:var(--t3);">+ ${p.naam||b.door}</div>
       </div>
     </div>`;
   }).join('');
+
+  if (community.length === 0 && seedHtml === '') {
+    el.textContent = 'Nog geen bronnen toegevoegd. Voeg jouw favoriet toe ↓';
+    grid.innerHTML = '';
+    return;
+  }
+  grid.innerHTML = seedHtml + userHtml;
 }
 
 function openBronModal() {
