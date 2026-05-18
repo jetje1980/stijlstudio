@@ -403,6 +403,17 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
   <button onclick="startApp()" style="padding:14px 36px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Beginnen →</button>
 </div>
 
+<!-- VOORKEUR CHECK -->
+<div id="voorkeur-screen" style="display:none;position:fixed;inset:0;z-index:960;background:#F0E8E2;flex-direction:column;">
+  <div style="padding:20px 24px 12px;display:flex;align-items:center;gap:12px;">
+    <div style="flex:1;height:3px;background:rgba(10,10,10,0.08);border-radius:2px;overflow:hidden;">
+      <div id="vk-bar" style="height:100%;background:#A89FE8;border-radius:2px;transition:width 0.4s;width:0%"></div>
+    </div>
+    <div id="vk-counter" style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:#6B6560;white-space:nowrap;flex-shrink:0;">1 / 9</div>
+  </div>
+  <div id="vk-body" style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:24px 24px 40px;overflow-y:auto;"></div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -465,6 +476,31 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
   </div>
 </div>
 
+<!-- EVENT TOEVOEGEN MODAL -->
+<div id="event-modal" style="display:none;position:fixed;inset:0;z-index:700;background:rgba(10,10,10,0.3);align-items:flex-end;">
+  <div style="background:#F0E8E2;border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-height:80vh;overflow-y:auto;">
+    <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.4rem;margin-bottom:16px;color:#0A0A0A;">Evenement toevoegen</div>
+    <div class="modal-field">
+      <label>Emoji</label>
+      <input id="ev-emoji" type="text" placeholder="🎉" maxlength="4" style="font-size:1.3rem;text-align:center;max-width:80px;">
+    </div>
+    <div class="modal-field">
+      <label>Naam *</label>
+      <input id="ev-naam" type="text" placeholder="bijv. Outdoor cinema in Buttes-Chaumont">
+    </div>
+    <div class="modal-field">
+      <label>Wanneer & waar</label>
+      <input id="ev-wanneer" type="text" placeholder="bijv. Za 27/6 · 21u · Parc des Buttes-Chaumont">
+    </div>
+    <div class="modal-field">
+      <label>Prijs</label>
+      <input id="ev-prijs" type="text" placeholder="bijv. gratis of €5 pp">
+    </div>
+    <button class="modal-submit" onclick="submitEventAdd()">Toevoegen ✓</button>
+    <button class="modal-cancel" onclick="closeEventModal()">Annuleren</button>
+  </div>
+</div>
+
 <!-- APP -->
 <div id="app">
   <!-- HOME -->
@@ -494,6 +530,12 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <button onclick="sluitIntroBanner()" style="position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.1rem;cursor:pointer;color:#6B6560;line-height:1;">×</button>
       <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:0.85rem;color:#0A0A0A;margin-bottom:4px;">👋 Dit is jullie gedeelde Parijs-app</div>
       <div style="font-size:0.8rem;color:#6B6560;line-height:1.5;padding-right:16px;">Griette heeft de basis ingevuld. Jij vult aan, swipt mee en stemt. Het programma is van jullie samen.</div>
+    </div>
+
+    <!-- VOORKEUR BANNER (als niet iedereen heeft ingevuld) -->
+    <div id="voorkeur-home-banner" style="display:none;margin:12px 20px 0;padding:14px 16px;background:rgba(212,120,90,0.08);border-left:3px solid #D4785A;border-radius:0 var(--r-lg) var(--r-lg) 0;">
+      <div style="font-weight:700;font-size:0.82rem;color:#0A0A0A;margin-bottom:6px;">📋 Niet iedereen heeft ingevuld</div>
+      <div id="voorkeur-home-status" style="font-size:0.75rem;color:#6B6560;line-height:1.8;flex-wrap:wrap;display:flex;gap:4px;"></div>
     </div>
 
     <!-- STORIES -->
@@ -558,7 +600,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     <!-- WEEKEND EVENTS -->
     <div class="home-section-title">Wat speelt dit weekend</div>
     <div class="home-section-sub">26–28 juni 2026 in Parijs</div>
-    <div class="weekend-chips">
+    <div class="weekend-chips" id="weekend-chips-list">
       <div class="weekend-chip" onclick="showToast('🛍️ Puces de Vanves: za+zo 7–14u, 380 verkopers. Aligre: za+zo 7:30–13:30, 500m van airbnb!')">
         <div class="chip-emoji">🛍️</div>
         <div class="chip-info">
@@ -592,6 +634,10 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
         <div class="chip-badge">Weekend</div>
       </div>
     </div>
+    <div id="custom-event-chips"></div>
+    <button onclick="openEventModal()" style="display:flex;align-items:center;gap:8px;margin:2px 20px 12px;padding:10px 0;border:none;background:none;cursor:pointer;font-size:0.82rem;color:#A89FE8;width:calc(100% - 40px);border-top:1px dashed rgba(168,159,232,0.35);">
+      <span style="font-size:1.1rem;line-height:1;">＋</span> Voeg evenement toe
+    </button>
 
     <!-- POLLS -->
     <div class="home-section-title" style="margin-top:8px;">Stem mee</div>
@@ -679,6 +725,12 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <button class="stab" onclick="switchSwipeTab('activiteit',this)">Activiteit</button>
       <button class="stab" onclick="switchSwipeTab('uitgaan',this)">Uitgaan</button>
       <button class="stab" onclick="switchSwipeTab('markt',this)">Markten</button>
+    </div>
+    <!-- VOORKEUR NUDGE -->
+    <div id="voorkeur-nudge" style="display:none;margin:8px 20px 0;padding:12px 14px;background:rgba(168,159,232,0.1);border-radius:var(--r-lg);border:1px solid rgba(168,159,232,0.2);">
+      <div style="font-weight:700;font-size:0.82rem;color:#0A0A0A;margin-bottom:3px;">💡 Nog niet ingevuld</div>
+      <div style="font-size:0.75rem;color:#6B6560;line-height:1.5;margin-bottom:10px;">Vul je voorkeuren in — dat helpt Griette het programma op jullie af te stemmen.</div>
+      <button onclick="showVoorkeurScherm()" style="padding:8px 18px;border:none;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;">Invullen →</button>
     </div>
     <div class="swipe-stack" id="swipe-stack">
       <div class="empty-stack"><p>Alle kaarten geswiped! 🎉</p><p style="font-size:0.75rem;color:#aaa;">Check je Top 5</p></div>
@@ -1175,7 +1227,12 @@ function selectProfile(name) {
 }
 function startApp() {
   document.getElementById('welkom-screen').style.display = 'none';
-  initApp();
+  const hasVoorkeur = localStorage.getItem('vz_voorkeur_' + currentUser);
+  if (!hasVoorkeur) {
+    showVoorkeurScherm();
+  } else {
+    initApp();
+  }
 }
 function uitloggen() {
   localStorage.removeItem('vz_user');
@@ -1199,6 +1256,9 @@ function initApp() {
   renderMissie();
   renderInpaklijst();
   document.getElementById('swipe-user-badge').textContent = PROFILES[currentUser].naam;
+  initHomeVoorkeurBanner();
+  updateVoorkeurNudge();
+  initWeekendEvents();
   setTimeout(initMap, 100);
 }
 
@@ -2406,7 +2466,162 @@ function switchTab(name, el) {
   if (name === 'groep') { renderGroep(); }
   if (name === 'top5') { renderProgramma(); }
   if (name === 'spellen') { renderHerinneringen(); }
-  if (name === 'swipe') buildSwipeStack();
+  if (name === 'swipe') { buildSwipeStack(); updateVoorkeurNudge(); }
+}
+
+// ── VOORKEUR CHECK ───────────────────────────────
+const VOORKEUR_VRAGEN = [
+  { emoji:'🥐', vraag:'Hoe begin jij een goede dag in Parijs?', opties:['Lange ochtend met koffie en croissant','Snel opstaan — direct de stad in','Uitslapen tot ik er klaar voor ben'] },
+  { emoji:'🛍️', vraag:'Shopping in Parijs voor jou?', opties:['Heel beperkt — meer kijken dan kopen','Eén of twee dingen, bewust kiezen','Dagje shoppen, ik heb budget apart!'] },
+  { emoji:'🍽️', vraag:'Hoe gaan we eten?', opties:['Altijd reserveren, de beste plekken','Mix van goed eten en spontane vondsten','Eten waar het leven ons naartoe brengt'] },
+  { emoji:'🚶‍♀️', vraag:'Actief of ontspannen?', opties:['Lopen, fietsen — zoveel mogelijk zien','Mix van beweging en rustige momenten','Ik kom voor de terrassen, eerlijk gezegd'] },
+  { emoji:'🎨', vraag:'Cultuur en musea?', opties:['Ja! Eén of twee musea graag','Als het uitkomt, prima','Geen musea — ik ben er voor het leven'] },
+  { emoji:'🌙', vraag:'Vrijdagavond na aankomst?', opties:['Direct de stad in, lange avond','Lekker diner, dan zien we wel','Rustig aanloopje — vroeg naar bed'] },
+  { emoji:'💃', vraag:'Zaterdagnacht?', opties:['Dansen tot we er niet meer bij kunnen','Leuk diner + bar, dan zien we wel','Dat was vroeger — nu slaap ik graag uit'] },
+  { emoji:'💸', vraag:'Budget dit weekend:', opties:['Bewust en selectief','Normaal, maar niet overdreven','Dit is een uitje — ik geef me over'] },
+  { emoji:'✨', vraag:'Eén ding dat dit weekend voor jou perfect maakt:', opties:['Dat we écht even niets hoeven','Een onvergetelijke avond met z\'n vieren','Eén moment dat ik 10 jaar nog onthoud'] },
+];
+
+let vkIdx = 0;
+let vkAnswers = [];
+
+function showVoorkeurScherm() {
+  vkIdx = 0;
+  vkAnswers = [];
+  const screen = document.getElementById('voorkeur-screen');
+  screen.style.display = 'flex';
+  renderVoorkeurVraag();
+}
+
+function renderVoorkeurVraag() {
+  const v = VOORKEUR_VRAGEN[vkIdx];
+  const pct = Math.round((vkIdx / VOORKEUR_VRAGEN.length) * 100);
+  document.getElementById('vk-bar').style.width = pct + '%';
+  document.getElementById('vk-counter').textContent = (vkIdx + 1) + ' / ' + VOORKEUR_VRAGEN.length;
+  document.getElementById('vk-body').innerHTML = `
+    <div style="font-size:3rem;text-align:center;margin-bottom:20px;">${v.emoji}</div>
+    <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.35rem;text-align:center;line-height:1.3;color:#0A0A0A;margin-bottom:28px;">${v.vraag}</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      ${v.opties.map((opt, i) => `
+        <button onclick="answerVoorkeur(${i})" style="padding:14px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;text-align:left;color:#0A0A0A;transition:all 0.15s;line-height:1.4;">${opt}</button>
+      `).join('')}
+    </div>
+  `;
+}
+
+function answerVoorkeur(optIdx) {
+  vkAnswers.push(optIdx);
+  vkIdx++;
+  if (vkIdx >= VOORKEUR_VRAGEN.length) {
+    finishVoorkeur();
+  } else {
+    renderVoorkeurVraag();
+  }
+}
+
+function finishVoorkeur() {
+  localStorage.setItem('vz_voorkeur_' + currentUser, JSON.stringify(vkAnswers));
+  document.getElementById('vk-bar').style.width = '100%';
+  document.getElementById('vk-counter').textContent = '✓';
+  const allUsers = ['griette','frederike','miriam','marlinde'];
+  const statusHtml = allUsers.map(u => {
+    const done = u === 'griette' || !!localStorage.getItem('vz_voorkeur_' + u);
+    const p = PROFILES[u];
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(10,10,10,0.06);">
+      <div style="width:36px;height:36px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.85rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>
+      <div style="flex:1;font-size:0.88rem;color:#0A0A0A;">${p.naam}</div>
+      <div style="font-size:0.75rem;font-weight:${done ? '600' : '400'};color:${done ? '#7A9E82' : '#9A948E'};">${done ? '✓ Ingevuld' : 'Nog niet'}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('vk-body').innerHTML = `
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="font-size:3rem;margin-bottom:12px;">🎉</div>
+      <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:800;font-size:1.8rem;color:#0A0A0A;margin-bottom:6px;">Merci, ${PROFILES[currentUser].naam}!</div>
+      <div style="font-size:0.88rem;color:#6B6560;line-height:1.5;max-width:280px;margin:0 auto;">Griette kan nu het programma beter op jullie afstemmen.</div>
+    </div>
+    <div style="margin-bottom:24px;">
+      <div style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:#A89FE8;margin-bottom:8px;">Wie heeft er ingevuld?</div>
+      ${statusHtml}
+    </div>
+    <button onclick="gaVanVoorkeurNaarApp()" style="width:100%;padding:14px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Start je Parijs-avontuur →</button>
+  `;
+}
+
+function gaVanVoorkeurNaarApp() {
+  document.getElementById('voorkeur-screen').style.display = 'none';
+  initApp();
+}
+
+function initHomeVoorkeurBanner() {
+  const allUsers = ['griette','frederike','miriam','marlinde'];
+  const missing = allUsers.filter(u => u !== 'griette' && !localStorage.getItem('vz_voorkeur_' + u));
+  const banner = document.getElementById('voorkeur-home-banner');
+  if (!banner) return;
+  if (missing.length === 0) { banner.style.display = 'none'; return; }
+  const statusEl = document.getElementById('voorkeur-home-status');
+  statusEl.innerHTML = allUsers.map(u => {
+    const done = u === 'griette' || !!localStorage.getItem('vz_voorkeur_' + u);
+    const p = PROFILES[u];
+    return `<span style="display:inline-flex;align-items:center;gap:4px;margin-right:8px;">
+      <span style="width:20px;height:20px;border-radius:50%;background:${done ? p.color : 'rgba(10,10,10,0.1)'};display:inline-flex;align-items:center;justify-content:center;font-size:0.55rem;color:${done?'#fff':'#9A948E'};font-style:italic;font-weight:700;">${p.init}</span>
+      <span style="color:${done ? '#0A0A0A' : '#9A948E'};font-size:0.75rem;">${done ? '✓' : '○'} ${p.naam}</span>
+    </span>`;
+  }).join('');
+  banner.style.display = 'block';
+}
+
+function updateVoorkeurNudge() {
+  const nudge = document.getElementById('voorkeur-nudge');
+  if (!nudge) return;
+  nudge.style.display = localStorage.getItem('vz_voorkeur_' + currentUser) ? 'none' : 'block';
+}
+
+// ── WEEKEND EVENTS ───────────────────────────────
+let customWeekendEvents = [];
+
+function initWeekendEvents() {
+  customWeekendEvents = JSON.parse(localStorage.getItem('vz_weekend_events') || '[]');
+  renderCustomEvents();
+}
+
+function renderCustomEvents() {
+  const container = document.getElementById('custom-event-chips');
+  if (!container) return;
+  container.innerHTML = customWeekendEvents.map(ev => {
+    const esc = s => (s || '').replace(/'/g, "\\'");
+    return `<div class="weekend-chip" onclick="showToast('${esc(ev.emoji)} ${esc(ev.naam)} · ${esc(ev.wanneer)} ${ev.prijs ? '· ' + esc(ev.prijs) : ''} · door ${esc(ev.door)}')">
+      <div class="chip-emoji">${ev.emoji || '🎉'}</div>
+      <div class="chip-info">
+        <div class="chip-name">${ev.naam}</div>
+        <div class="chip-desc">${ev.wanneer || ''} ${ev.prijs ? '· ' + ev.prijs : ''} <span style="color:#D4785A;">· door ${ev.door}</span></div>
+      </div>
+      <div class="chip-badge" style="background:rgba(168,159,232,0.15);color:#A89FE8;">+Jij</div>
+    </div>`;
+  }).join('');
+}
+
+function openEventModal() {
+  document.getElementById('event-modal').style.display = 'flex';
+}
+function closeEventModal() {
+  document.getElementById('event-modal').style.display = 'none';
+}
+function submitEventAdd() {
+  const naam = document.getElementById('ev-naam').value.trim();
+  if (!naam) { showToast('Geef je evenement een naam'); return; }
+  const ev = {
+    emoji: document.getElementById('ev-emoji').value.trim() || '🎉',
+    naam,
+    wanneer: document.getElementById('ev-wanneer').value.trim(),
+    prijs: document.getElementById('ev-prijs').value.trim(),
+    door: PROFILES[currentUser].naam,
+  };
+  customWeekendEvents.push(ev);
+  localStorage.setItem('vz_weekend_events', JSON.stringify(customWeekendEvents));
+  closeEventModal();
+  renderCustomEvents();
+  showToast(`"${naam}" toegevoegd! 🎉`);
+  ['ev-emoji','ev-naam','ev-wanneer','ev-prijs'].forEach(id => document.getElementById(id).value = '');
 }
 
 // ── BOOT ─────────────────────────────────────────
