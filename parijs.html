@@ -542,7 +542,10 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     <!-- HEADER (after reel) -->
     <div class="page-header">
       <div class="page-logo">Vroegzat ✦</div>
-      <button class="uitlog-btn" onclick="uitloggen()">Uitloggen</button>
+      <div style="display:flex;gap:12px;align-items:center;">
+        <button class="uitlog-btn" onclick="herbeginVoorkeur()" id="herbegin-btn" style="color:#A89FE8;">✏️ Voorkeuren</button>
+        <button class="uitlog-btn" onclick="uitloggen()">Uitloggen</button>
+      </div>
     </div>
 
     <!-- INTRO BANNER (eenmalig) -->
@@ -1529,6 +1532,13 @@ function startApp() {
 function uitloggen() {
   localStorage.removeItem('vz_user');
   location.reload();
+}
+function herbeginVoorkeur() {
+  localStorage.removeItem('vz_voorkeur_' + currentUser);
+  vkIdx = 0;
+  vkAnswers = [];
+  vkSelected = [];
+  showVoorkeurScherm();
 }
 
 // ── INIT APP ──────────────────────────────────────
