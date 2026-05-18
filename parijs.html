@@ -6,6 +6,7 @@
 <title>Vroegzat — Parijs 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,500;1,9..40,700;1,9..40,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
@@ -372,7 +373,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     <div class="login-label" style="text-align:center;margin-bottom:12px;">Wie ben jij?</div>
     <div class="profile-grid">
       <div class="profile-card" onclick="selectProfile('griette')">
-        <div class="avatar" style="background:#C07058;">Gr</div>
+        <div class="avatar" style="background:#D4785A;">Gr</div>
         <div class="profile-name">Griette</div>
       </div>
       <div class="profile-card" onclick="selectProfile('frederike')">
@@ -492,6 +493,11 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       </div>
       <div class="countdown-badge" id="cd-badge">– – dagen</div>
     </div>
+
+    <!-- MAP -->
+    <div class="home-section-title" style="margin-top:8px;">Onze plekken op de kaart</div>
+    <div class="home-section-sub">Tap een pin voor meer info</div>
+    <div id="paris-map" style="height:300px;margin:0 20px 16px;border-radius:var(--r-lg);overflow:hidden;"></div>
 
     <!-- WEATHER -->
     <div style="margin:0 16px 4px;display:flex;gap:10px;">
@@ -900,10 +906,11 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
   <div class="game-body" id="parijs-missie-body"></div>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 // ── PROFILES ──────────────────────────────────────
 const PROFILES = {
-  griette:   {naam:'Griette',  init:'Gr', color:'#C07058'},
+  griette:   {naam:'Griette',  init:'Gr', color:'#D4785A'},
   frederike: {naam:'Frederike',init:'Fr', color:'#7A9E82'},
   miriam:    {naam:'Miriam',   init:'Mi', color:'#7A8EAD'},
   marlinde:  {naam:'Marlinde', init:'Ma', color:'#AD7A9E'},
@@ -1134,6 +1141,84 @@ function initApp() {
   renderMissie();
   renderInpaklijst();
   document.getElementById('swipe-user-badge').textContent = PROFILES[currentUser].naam;
+  setTimeout(initMap, 100);
+}
+
+// ── MAP ───────────────────────────────────────────
+function initMap() {
+  const el = document.getElementById('paris-map');
+  if (!el || el._mapInit) return;
+  el._mapInit = true;
+
+  const map = L.map('paris-map', {
+    center: [48.860, 2.348],
+    zoom: 13,
+    zoomControl: false,
+    scrollWheelZoom: false,
+    attributionControl: false
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd', maxZoom: 19
+  }).addTo(map);
+
+  L.control.zoom({position: 'bottomright'}).addTo(map);
+
+  const pin = (color, size) => L.divIcon({
+    className: '',
+    html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};border:2.5px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,0.22);"></div>`,
+    iconSize: [size, size], iconAnchor: [size/2, size/2], popupAnchor: [0, -size/2-2]
+  });
+
+  const popStyle = 'font-family:DM Sans,sans-serif;font-size:13px;line-height:1.4;';
+
+  // Special locations
+  L.marker([48.861, 2.354], {icon: pin('#0A0A0A', 16)}).addTo(map)
+    .bindPopup(`<div style="${popStyle}"><strong>🏠 Ons Airbnb</strong><br><span style="color:#6B6560;font-size:11px;">Rue du Temple, Le Marais</span></div>`);
+  L.marker([48.881, 2.355], {icon: pin('#0A0A0A', 13)}).addTo(map)
+    .bindPopup(`<div style="${popStyle}"><strong>🚂 Gare du Nord</strong><br><span style="color:#6B6560;font-size:11px;">Eurostar aankomst · Lijn 5 → Bastille</span></div>`);
+
+  const CAT_COLOR = {
+    ontbijt:'#D4785A', koffie:'#AD7A9E', lunch:'#7A9E82', diner:'#D4785A',
+    borrel:'#7A8EAD', wandelen:'#7A9E82', activiteit:'#A89FE8',
+    uitgaan:'#AD7A9E', markt:'#D4785A'
+  };
+
+  const COORDS = {
+    'du-pain-idees':           [48.870, 2.363],
+    'ten-belles':              [48.869, 2.362],
+    'claus-breakfast':         [48.869, 2.335],
+    'rose-bakery-breakfast':   [48.861, 2.354],
+    'cafe-de-flore':           [48.854, 2.332],
+    'merci-cafe':              [48.860, 2.360],
+    'telescope-coffee':        [48.864, 2.337],
+    'cafe-pli':                [48.868, 2.363],
+    'comptoir-general':        [48.869, 2.362],
+    'bar-hemingway':           [48.868, 2.330],
+    'pavillon-puebla':         [48.879, 2.377],
+    'marche-enfants-rouges':   [48.862, 2.359],
+    'hank-burger':             [48.855, 2.372],
+    'shakespeare-co':          [48.853, 2.347],
+    'palais-royal':            [48.864, 2.337],
+    'wandeling-saint-germain': [48.854, 2.333],
+    'wandeling-montmartre-early': [48.885, 2.342],
+    'sezane-marais':           [48.856, 2.357],
+    'sezane-17':               [48.885, 2.312],
+    'galeries-lafayette':      [48.874, 2.332],
+    'puces-saint-ouen':        [48.899, 2.347],
+    'puces-vanves':            [48.831, 2.304],
+    'brocante-aligre':         [48.850, 2.375],
+    'mouffetard':              [48.844, 2.351],
+    'montmartre':              [48.884, 2.341],
+  };
+
+  ITEMS.forEach(item => {
+    const c = COORDS[item.id];
+    if (!c) return;
+    const color = CAT_COLOR[item.cat] || '#A89FE8';
+    L.marker(c, {icon: pin(color, 10)}).addTo(map)
+      .bindPopup(`<div style="${popStyle}"><strong>${item.naam}</strong><br><span style="color:#6B6560;font-size:11px;">${item.wijk} · ${item.prijs}</span></div>`);
+  });
 }
 
 // ── REEL ──────────────────────────────────────────
