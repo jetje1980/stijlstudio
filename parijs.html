@@ -363,7 +363,8 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-logo">Vroegzat</div>
-  <div class="login-sub">Parijs · 26–28 juni 2026</div>
+  <div class="login-sub">Jullie naam, jullie verhaal.</div>
+  <div style="font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:#9A948E;margin-bottom:6px;">Parijs · 26–28 juni 2026</div>
   <div id="step1" class="login-step">
     <div>
       <div class="login-label">Groepscode</div>
@@ -399,8 +400,8 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 <div id="welkom-screen" style="display:none;position:fixed;inset:0;z-index:950;background:#F0E8E2;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
   <div id="welkom-avatar" style="width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-weight:800;font-size:1.6rem;color:#fff;margin:0 auto 20px;"></div>
   <div id="welkom-naam" style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:800;font-size:2.2rem;color:#0A0A0A;letter-spacing:-0.02em;margin-bottom:8px;"></div>
-  <div style="font-size:0.95rem;color:#6B6560;line-height:1.6;max-width:280px;margin:0 auto 32px;">Jouw voorkeuren bepalen mee hoe het programma eruitziet.</div>
-  <button onclick="startApp()" style="padding:14px 36px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Beginnen →</button>
+  <div id="welkom-sub" style="font-size:0.92rem;color:#6B6560;line-height:1.6;max-width:300px;margin:0 auto 32px;"></div>
+  <button id="welkom-btn" onclick="startApp()" style="padding:14px 36px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Beginnen →</button>
 </div>
 
 <!-- VOORKEUR CHECK -->
@@ -1212,18 +1213,43 @@ function checkCode() {
 }
 document.getElementById('code-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkCode(); });
 
+const WELKOM_TEKSTEN = {
+  frederike: {
+    groet: 'Welkom, Fred 👋',
+    sub: 'Jij hebt de Airbnb geboekt en de tips van je buurvrouw toegevoegd — de trip staat al half. Nu het programma er nog bij.',
+    knop: 'Aan de slag →',
+  },
+  griette: {
+    groet: 'Hey G 🥳',
+    sub: 'Jouw lijstje van december is de basis geworden. Nu swipen de anderen mee — en dan zien we waar jullie het over eens zijn.',
+    knop: 'Swipen maar →',
+  },
+  marlinde: {
+    groet: 'Marlinde! 😘',
+    sub: 'Jij stelde Parijs voor, jij bevestigde de dates vanuit Penang — en nu ben je er bijna. Vul snel je voorkeuren in zodat het programma ook voor jou klopt.',
+    knop: 'Even invullen →',
+  },
+  miriam: {
+    groet: 'Hoi Miriam 😊',
+    sub: 'Jij weet altijd waar je moet eten. Vul je voorkeuren in — de app wacht op jouw restauranttip.',
+    knop: 'Beginnen →',
+  },
+};
+
 function selectProfile(name) {
   currentUser = name;
   swipes = JSON.parse(localStorage.getItem('vz_swipes_' + name) || '{}');
   top5Favs = JSON.parse(localStorage.getItem('vz_top5favs_' + name) || '{}');
   save();
   const p = PROFILES[name];
-  const ws = document.getElementById('welkom-screen');
+  const t = WELKOM_TEKSTEN[name] || {groet:'Welkom, ' + p.naam + ' 👋', sub:'Jouw voorkeuren bepalen mee hoe het programma eruitziet.', knop:'Beginnen →'};
   document.getElementById('welkom-avatar').style.background = p.color;
   document.getElementById('welkom-avatar').textContent = p.init;
-  document.getElementById('welkom-naam').textContent = 'Welkom, ' + p.naam + ' 👋';
+  document.getElementById('welkom-naam').textContent = t.groet;
+  document.getElementById('welkom-sub').textContent = t.sub;
+  document.getElementById('welkom-btn').textContent = t.knop;
   document.getElementById('login-screen').classList.add('hidden');
-  ws.style.display = 'flex';
+  document.getElementById('welkom-screen').style.display = 'flex';
 }
 function startApp() {
   document.getElementById('welkom-screen').style.display = 'none';
