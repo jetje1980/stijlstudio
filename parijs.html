@@ -736,6 +736,31 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <button class="stab" onclick="switchSwipeTab('uitgaan',this)">Uitgaan</button>
       <button class="stab" onclick="switchSwipeTab('markt',this)">Markten</button>
     </div>
+    <!-- SWIPE MODUS KEUZE (eenmalig) -->
+    <div id="swipe-mode-modal" style="display:none;position:fixed;inset:0;z-index:650;background:rgba(10,10,10,0.35);align-items:flex-end;">
+      <div style="background:#F0E8E2;border-radius:20px 20px 0 0;padding:28px 24px 40px;width:100%;">
+        <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:800;font-size:1.4rem;color:#0A0A0A;margin-bottom:6px;">Hoe wil jij swipen?</div>
+        <div style="font-size:0.82rem;color:#6B6560;margin-bottom:20px;line-height:1.5;">Kies je stijl — we onthouden dit voor de volgende keer.</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button onclick="setSwipeMode('direct')" style="padding:16px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:#0A0A0A;font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;text-align:left;color:#F0E8E2;font-weight:600;">
+            🔥 Direct swipen<br><span style="font-size:0.75rem;font-weight:400;opacity:0.7;">Kaartje voor kaartje — ik snap het snel genoeg</span>
+          </button>
+          <button onclick="setSwipeMode('lezen')" style="padding:16px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;text-align:left;color:#0A0A0A;font-weight:600;">
+            📋 Eerst overzicht<br><span style="font-size:0.75rem;font-weight:400;color:#6B6560;">Ik wil eerst zien wat er in de stack zit</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- OVERZICHT MODUS (browse voor swipen) -->
+    <div id="swipe-overzicht" style="display:none;padding:12px 20px 80px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:#6B6560;" id="overzicht-label">Overzicht</div>
+        <button onclick="sluitOverzicht()" style="padding:8px 16px;border:none;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;">Oké, swipen →</button>
+      </div>
+      <div id="overzicht-list"></div>
+    </div>
+
     <!-- VOORKEUR NUDGE -->
     <div id="voorkeur-nudge" style="display:none;margin:8px 20px 0;padding:12px 14px;background:rgba(168,159,232,0.1);border-radius:var(--r-lg);border:1px solid rgba(168,159,232,0.2);">
       <div style="font-weight:700;font-size:0.82rem;color:#0A0A0A;margin-bottom:3px;">💡 Nog niet ingevuld</div>
@@ -1543,6 +1568,82 @@ function initFeed() {
   }).join('');
 }
 
+// ── SWIPE MODE ────────────────────────────────────
+let swipeMode = null; // 'direct' | 'lezen'
+
+function checkSwipeMode() {
+  const saved = localStorage.getItem('vz_swipe_mode_' + currentUser);
+  if (saved) {
+    swipeMode = saved;
+    applySwipeMode();
+  } else {
+    document.getElementById('swipe-mode-modal').style.display = 'flex';
+  }
+}
+
+function setSwipeMode(mode) {
+  swipeMode = mode;
+  localStorage.setItem('vz_swipe_mode_' + currentUser, mode);
+  document.getElementById('swipe-mode-modal').style.display = 'none';
+  applySwipeMode();
+}
+
+function applySwipeMode() {
+  const overzicht = document.getElementById('swipe-overzicht');
+  const stack = document.getElementById('swipe-stack');
+  const btns = document.querySelector('.swipe-btns');
+  const hint = document.querySelector('.swipe-hint');
+  if (swipeMode === 'lezen') {
+    overzicht.style.display = 'block';
+    stack.style.display = 'none';
+    if (btns) btns.style.display = 'none';
+    if (hint) hint.style.display = 'none';
+    renderOverzicht();
+  } else {
+    overzicht.style.display = 'none';
+    stack.style.display = '';
+    if (btns) btns.style.display = '';
+    if (hint) hint.style.display = '';
+    buildSwipeStack();
+  }
+}
+
+function renderOverzicht() {
+  const catItems = ITEMS.filter(it => it.cat === swipeTab && !swipes[it.id]);
+  const label = document.getElementById('overzicht-label');
+  if (label) label.textContent = catItems.length + ' opties in ' + swipeTab;
+  const list = document.getElementById('overzicht-list');
+  if (!list) return;
+  list.innerHTML = catItems.map(item => {
+    const votes = getAllVotes(item.id);
+    const pos = countPositive(votes);
+    const votersHtml = Object.entries(votes).filter(([,v]) => v).map(([u,v]) => {
+      const p = PROFILES[u];
+      return `<span style="font-size:0.65rem;color:${p.color};">${p.init}${v==='dream'?'★':'♥'}</span>`;
+    }).join(' ');
+    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(10,10,10,0.07);">
+      <div style="width:52px;height:52px;border-radius:10px;background-image:url('${item.img||''}');background-size:cover;flex-shrink:0;"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:0.95rem;color:#0A0A0A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.naam}</div>
+        <div style="font-size:0.68rem;color:#6B6560;margin-top:2px;">${item.wijk} · ${item.prijs}</div>
+        ${votersHtml ? `<div style="margin-top:3px;">${votersHtml}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('') || `<div style="padding:20px;color:#9A948E;font-size:0.85rem;text-align:center;">Alles geswiped ✓</div>`;
+}
+
+function sluitOverzicht() {
+  const overzicht = document.getElementById('swipe-overzicht');
+  const stack = document.getElementById('swipe-stack');
+  const btns = document.querySelector('.swipe-btns');
+  const hint = document.querySelector('.swipe-hint');
+  overzicht.style.display = 'none';
+  stack.style.display = '';
+  if (btns) btns.style.display = '';
+  if (hint) hint.style.display = '';
+  buildSwipeStack();
+}
+
 // ── SWIPE ─────────────────────────────────────────
 let currentCardEl = null;
 let dragStartX = 0, dragStartY = 0, isDragging = false;
@@ -1709,7 +1810,7 @@ function switchSwipeTab(tab, el) {
   swipeTab = tab;
   document.querySelectorAll('#swipe-cat-tabs .stab').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
-  buildSwipeStack();
+  if (swipeMode === 'lezen') { renderOverzicht(); } else { buildSwipeStack(); }
 }
 
 function resetSwipeTab() {
@@ -2519,7 +2620,7 @@ function switchTab(name, el) {
   if (name === 'groep') { renderGroep(); }
   if (name === 'top5') { renderProgramma(); }
   if (name === 'spellen') { renderHerinneringen(); }
-  if (name === 'swipe') { buildSwipeStack(); updateVoorkeurNudge(); }
+  if (name === 'swipe') { updateVoorkeurNudge(); checkSwipeMode(); }
 }
 
 // ── VOORKEUR CHECK ───────────────────────────────
