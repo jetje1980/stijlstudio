@@ -637,8 +637,14 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <div class="collapsible-body" id="inpak-body"></div>
     </div>
 
+    <!-- UITNODIGING -->
+    <div style="margin:0 20px 4px;padding:16px 0;border-top:1px solid rgba(10,10,10,0.08);display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <div style="font-size:0.82rem;color:#6B6560;line-height:1.4;">Nog niet iedereen erbij?</div>
+      <button onclick="kopieerUitnodiging()" style="flex-shrink:0;padding:9px 18px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;">📤 Kopieer uitnodiging</button>
+    </div>
+
     <!-- ALARM -->
-    <div class="alarm-banner">🔔 <strong>Vergeet niet te reserveren:</strong> Chez Janou, Bouillon Racine, Baja Bikes, Les Follivores tickets, Atelier des Lumières, Louvre tijdslot</div>
+    <div class="alarm-banner">🔔 <strong>Vergeet niet te reserveren:</strong> Chez Janou, Bouillon Racine, Baja Bikes, Atelier des Lumières, Louvre tijdslot</div>
 
     <!-- FEED -->
     <div class="home-section-title" style="margin-top:8px;">Activiteit</div>
@@ -1100,6 +1106,12 @@ function getAllVotes(itemId) {
 }
 function countPositive(votes) {
   return Object.values(votes).filter(v => v === 'like' || v === 'dream').length;
+}
+function kopieerUitnodiging() {
+  const tekst = `Hey meiden 🗼 Ik heb iets leuks gemaakt voor onze Parijs-trip — een plek waar we samen het programma bouwen. Ik heb de praktische info alvast ingevuld, maar het programma maken we écht samen.\n\nGa naar https://jetje1980.github.io/stijlstudio/parijs.html\nCode: VROEGZAT\n\nEerst je eigen voorkeuren invullen, dan beginnen we met swipen. XG`;
+  navigator.clipboard.writeText(tekst).then(() => showToast('✓ Uitnodiging gekopieerd!')).catch(() => {
+    prompt('Kopieer deze tekst:', tekst);
+  });
 }
 function showToast(msg) {
   const t = document.getElementById('toast');
