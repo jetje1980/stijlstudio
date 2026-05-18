@@ -1497,7 +1497,7 @@ function sluitIntroBanner() {
   localStorage.setItem('vz_home_gezien_' + currentUser, '1');
 }
 function kopieerUitnodiging() {
-  const tekst = `Hey meiden! 🗼\n\nIk heb iets gemaakt voor onze Parijs-trip — een appje waar we samen het programma bouwen.\nIk heb alvast de reisinfo en een eerste lijstje ingevuld, maar het echte programma maken we SAMEN.\n\nGa naar: https://jetje1980.github.io/stijlstudio/parijs.html\nCode: VROEGZAT\n\nEerst even je eigen voorkeuren invullen (9 vragjes, duurt 3 min), dan kan je swipen.\nFred, jij hebt al de airbnb geboekt — staat er al in!\nMarlinde, jij kan als eerste want jij hebt het bedacht 😘\n\nXG`;
+  const tekst = `Hey meiden! 🗼\n\nIk heb iets gemaakt voor onze Parijs-trip — een appje waar we samen het programma bouwen.\nIk heb alvast de reisinfo en een eerste lijstje ingevuld, maar het echte programma maken we SAMEN.\n\nGa naar: https://www.stijlstudio.app/parijs.html\nCode: VROEGZAT\n\nEerst even je eigen voorkeuren invullen (9 vragjes, duurt 3 min), dan kan je swipen.\nFred, jij hebt al de airbnb geboekt — staat er al in!\nMarlinde, jij kan als eerste want jij hebt het bedacht 😘\n\nXG`;
   navigator.clipboard.writeText(tekst).then(() => showToast('✓ Uitnodiging gekopieerd!')).catch(() => {
     prompt('Kopieer deze tekst:', tekst);
   });
