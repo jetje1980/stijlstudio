@@ -364,7 +364,14 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 <div id="login-screen">
   <div class="login-logo">Vroegzat</div>
   <div class="login-sub">Jullie naam, jullie verhaal.</div>
-  <div style="font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:#9A948E;margin-bottom:6px;">Parijs · 26–28 juni 2026</div>
+  <div style="display:flex;gap:10px;justify-content:center;margin:10px 0;">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:34px;height:34px;border-radius:50%;background:#7A9E82;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.75rem;color:#fff;font-weight:700;">Fr</div><div style="font-size:0.55rem;color:#9A948E;">Frederike</div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:34px;height:34px;border-radius:50%;background:#D4785A;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.75rem;color:#fff;font-weight:700;">Gr</div><div style="font-size:0.55rem;color:#9A948E;">Griette</div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:34px;height:34px;border-radius:50%;background:#AD7A9E;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.75rem;color:#fff;font-weight:700;">Ma</div><div style="font-size:0.55rem;color:#9A948E;">Marlinde</div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:34px;height:34px;border-radius:50%;background:#7A8EAD;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.75rem;color:#fff;font-weight:700;">Mi</div><div style="font-size:0.55rem;color:#9A948E;">Miriam</div></div>
+  </div>
+  <div style="font-size:0.6rem;letter-spacing:0.12em;color:#9A948E;margin-bottom:8px;">Jullie trip. Jullie programma.</div>
+  <div class="login-divider"></div>
   <div id="step1" class="login-step">
     <div>
       <div class="login-label">Groepscode</div>
@@ -1218,7 +1225,7 @@ function sluitIntroBanner() {
   localStorage.setItem('vz_home_gezien_' + currentUser, '1');
 }
 function kopieerUitnodiging() {
-  const tekst = `Hey meiden 🗼 Ik heb iets leuks gemaakt voor onze Parijs-trip — een plek waar we samen het programma bouwen. Ik heb de praktische info alvast ingevuld, maar het programma maken we écht samen.\n\nGa naar https://jetje1980.github.io/stijlstudio/parijs.html\nCode: VROEGZAT\n\nEerst je eigen voorkeuren invullen, dan beginnen we met swipen. XG`;
+  const tekst = `Hey meiden! 🗼\n\nIk heb iets gemaakt voor onze Parijs-trip — een appje waar we samen het programma bouwen.\nIk heb alvast de reisinfo en een eerste lijstje ingevuld, maar het echte programma maken we SAMEN.\n\nGa naar: https://jetje1980.github.io/stijlstudio/parijs.html\nCode: VROEGZAT\n\nEerst even je eigen voorkeuren invullen (9 vragjes, duurt 3 min), dan kan je swipen.\nFred, jij hebt al de airbnb geboekt — staat er al in!\nMarlinde, jij kan als eerste want jij hebt het bedacht 😘\n\nXG`;
   navigator.clipboard.writeText(tekst).then(() => showToast('✓ Uitnodiging gekopieerd!')).catch(() => {
     prompt('Kopieer deze tekst:', tekst);
   });
@@ -2358,6 +2365,7 @@ const PACKLIST = [
   { label:'Pinpas + bank even bellen', note:'Blokkade voorkomen bij buitenlandse transacties' },
   { label:'Reserveringsbevestigingen', note:'Screenshot alle boekingen offline beschikbaar' },
   { label:'Goed boek of podcast voor de trein', note:'Eurostar Amsterdam→Parijs = 3,5u' },
+  { label:'ORS (oral rehydration salts)', note:'Winnaar van elke kater. Eén per persoon. Verplicht.' },
 ];
 
 function renderInpaklijst() {
