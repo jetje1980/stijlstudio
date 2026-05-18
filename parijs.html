@@ -489,6 +489,13 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <button class="uitlog-btn" onclick="uitloggen()">Uitloggen</button>
     </div>
 
+    <!-- INTRO BANNER (eenmalig) -->
+    <div id="intro-banner" style="display:none;margin:12px 20px 0;padding:14px 16px;background:rgba(168,159,232,0.12);border-radius:var(--r-lg);position:relative;">
+      <button onclick="sluitIntroBanner()" style="position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.1rem;cursor:pointer;color:#6B6560;line-height:1;">×</button>
+      <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:0.85rem;color:#0A0A0A;margin-bottom:4px;">👋 Dit is jullie gedeelde Parijs-app</div>
+      <div style="font-size:0.8rem;color:#6B6560;line-height:1.5;padding-right:16px;">Griette heeft de basis ingevuld. Jij vult aan, swipt mee en stemt. Het programma is van jullie samen.</div>
+    </div>
+
     <!-- STORIES -->
     <div class="stories-row" id="stories-row"></div>
 
@@ -1112,6 +1119,16 @@ function getAllVotes(itemId) {
 function countPositive(votes) {
   return Object.values(votes).filter(v => v === 'like' || v === 'dream').length;
 }
+function initIntroBanner() {
+  const key = 'vz_home_gezien_' + currentUser;
+  if (!localStorage.getItem(key)) {
+    document.getElementById('intro-banner').style.display = 'block';
+  }
+}
+function sluitIntroBanner() {
+  document.getElementById('intro-banner').style.display = 'none';
+  localStorage.setItem('vz_home_gezien_' + currentUser, '1');
+}
 function kopieerUitnodiging() {
   const tekst = `Hey meiden 🗼 Ik heb iets leuks gemaakt voor onze Parijs-trip — een plek waar we samen het programma bouwen. Ik heb de praktische info alvast ingevuld, maar het programma maken we écht samen.\n\nGa naar https://jetje1980.github.io/stijlstudio/parijs.html\nCode: VROEGZAT\n\nEerst je eigen voorkeuren invullen, dan beginnen we met swipen. XG`;
   navigator.clipboard.writeText(tekst).then(() => showToast('✓ Uitnodiging gekopieerd!')).catch(() => {
@@ -1170,6 +1187,7 @@ function initApp() {
   ITEMS = [...addedItems.map(it => ({...it, added:true})), ...ITEMS_BASE];
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('app').classList.add('visible');
+  initIntroBanner();
   initReel();
   initStories();
   initCountdown();
