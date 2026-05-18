@@ -117,6 +117,9 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 .poll-result{font-size:0.75rem;color:#6B6560;margin-top:8px;display:none;}
 .poll-bar{height:4px;background:rgba(10,10,10,0.08);border-radius:2px;overflow:hidden;margin-top:4px;}
 .poll-bar-fill{height:100%;background:#A89FE8;border-radius:2px;transition:width 0.5s;}
+.poll-voters{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.poll-voter-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-style:italic;font-size:0.6rem;color:#fff;font-weight:700;}
+.poll-voter-av.pending{background:rgba(10,10,10,0.1)!important;color:#9A948E;}
 
 .feed-block{padding:0 20px 16px;}
 .feed-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(10,10,10,0.06);}
@@ -577,28 +580,30 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     <div class="poll-block" id="poll1">
       <div class="poll-q">Zaterdagochtend: Sézane of brocante Vanves?</div>
       <div class="poll-options">
-        <div class="poll-opt" onclick="vote('poll1',0,this)">Sézane 🛍️</div>
-        <div class="poll-opt" onclick="vote('poll1',1,this)">Vanves brocante 🔍</div>
+        <div class="poll-opt" id="poll1-opt0" onclick="vote('poll1',0,this)">Sézane 🛍️</div>
+        <div class="poll-opt" id="poll1-opt1" onclick="vote('poll1',1,this)">Vanves brocante 🔍</div>
       </div>
       <div class="poll-result" id="poll1-result">
-        <div>Sézane: <span id="poll1-pct0">55</span>%</div>
-        <div class="poll-bar"><div class="poll-bar-fill" id="poll1-bar0" style="width:55%"></div></div>
-        <div style="margin-top:4px;">Vanves: <span id="poll1-pct1">45</span>%</div>
-        <div class="poll-bar"><div class="poll-bar-fill" id="poll1-bar1" style="width:45%;"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span>Sézane</span><span id="poll1-pct0">–</span></div>
+        <div class="poll-bar"><div class="poll-bar-fill" id="poll1-bar0" style="width:0%"></div></div>
+        <div style="display:flex;justify-content:space-between;margin:6px 0 2px;"><span>Vanves</span><span id="poll1-pct1">–</span></div>
+        <div class="poll-bar"><div class="poll-bar-fill" id="poll1-bar1" style="width:0%"></div></div>
       </div>
+      <div class="poll-voters" id="poll1-voters"></div>
     </div>
     <div class="poll-block" id="poll2" style="margin-top:0;">
       <div class="poll-q">Vrijdagavond: feesten of rustig aanloopje?</div>
       <div class="poll-options">
-        <div class="poll-opt" onclick="vote('poll2',0,this)">Feesten! 💃</div>
-        <div class="poll-opt" onclick="vote('poll2',1,this)">Rustig aanloopje 🍷</div>
+        <div class="poll-opt" id="poll2-opt0" onclick="vote('poll2',0,this)">Feesten! 💃</div>
+        <div class="poll-opt" id="poll2-opt1" onclick="vote('poll2',1,this)">Rustig aanloopje 🍷</div>
       </div>
       <div class="poll-result" id="poll2-result">
-        <div>Feesten: <span id="poll2-pct0">75</span>%</div>
-        <div class="poll-bar"><div class="poll-bar-fill" id="poll2-bar0" style="width:75%"></div></div>
-        <div style="margin-top:4px;">Rustig: <span id="poll2-pct1">25</span>%</div>
-        <div class="poll-bar"><div class="poll-bar-fill" id="poll2-bar1" style="width:25%;"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span>Feesten</span><span id="poll2-pct0">–</span></div>
+        <div class="poll-bar"><div class="poll-bar-fill" id="poll2-bar0" style="width:0%"></div></div>
+        <div style="display:flex;justify-content:space-between;margin:6px 0 2px;"><span>Rustig</span><span id="poll2-pct1">–</span></div>
+        <div class="poll-bar"><div class="poll-bar-fill" id="poll2-bar1" style="width:0%"></div></div>
       </div>
+      <div class="poll-voters" id="poll2-voters"></div>
     </div>
 
     <!-- MISSIE VAN DE DAG -->
@@ -1168,6 +1173,7 @@ function initApp() {
   initReel();
   initStories();
   initCountdown();
+  initPolls();
   initFeed();
   buildSwipeStack();
   renderProgramma();
@@ -1329,12 +1335,66 @@ function initCountdown() {
 
 // ── POLLS ─────────────────────────────────────────
 const pollState = {poll1: null, poll2: null};
+const POLL_DEFS = {
+  poll1: {labels:['Sézane 🛍️','Vanves brocante 🔍'], votes:{griette:0,frederike:1,miriam:null,marlinde:null}},
+  poll2: {labels:['Feesten! 💃','Rustig aanloopje 🍷'], votes:{griette:0,frederike:null,miriam:1,marlinde:null}},
+};
 function vote(pollId, optIdx, el) {
-  if (pollState[pollId] !== null) return;
-  pollState[pollId] = optIdx;
-  el.classList.add('selected');
-  document.getElementById(pollId + '-result').style.display = 'block';
+  if (POLL_DEFS[pollId].votes[currentUser] !== null) return;
+  POLL_DEFS[pollId].votes[currentUser] = optIdx;
+  localStorage.setItem('vz_poll_' + pollId + '_' + currentUser, optIdx);
+  renderPoll(pollId);
   showToast('Stem opgeslagen! 🗳️');
+}
+function renderPoll(pollId) {
+  const def = POLL_DEFS[pollId];
+  const myVote = def.votes[currentUser];
+  const allUsers = ['frederike','griette','marlinde','miriam'];
+
+  // Restore from localStorage
+  allUsers.forEach(u => {
+    const stored = localStorage.getItem('vz_poll_' + pollId + '_' + u);
+    if (stored !== null && def.votes[u] === null) def.votes[u] = parseInt(stored);
+  });
+
+  const voted = allUsers.filter(u => def.votes[u] !== null);
+  const hasMyVote = myVote !== null || def.votes[currentUser] !== null;
+
+  // Options: highlight my vote
+  allUsers.forEach((u,i) => {
+    const optCount = Object.keys(def.votes).length;
+    for (let o = 0; o < 2; o++) {
+      const el = document.getElementById(pollId + '-opt' + o);
+      if (el) el.classList.toggle('selected', hasMyVote && def.votes[currentUser] === o);
+    }
+  });
+
+  // Results: only show after own vote
+  const resEl = document.getElementById(pollId + '-result');
+  if (hasMyVote) {
+    resEl.style.display = 'block';
+    const counts = [0, 0];
+    voted.forEach(u => { if (def.votes[u] !== null) counts[def.votes[u]]++; });
+    const total = counts[0] + counts[1] || 1;
+    for (let o = 0; o < 2; o++) {
+      const pct = Math.round(counts[o] / total * 100);
+      document.getElementById(pollId + '-pct' + o).textContent = pct + '%';
+      document.getElementById(pollId + '-bar' + o).style.width = pct + '%';
+    }
+  } else {
+    resEl.style.display = 'none';
+  }
+
+  // Voter avatars
+  const votersEl = document.getElementById(pollId + '-voters');
+  votersEl.innerHTML = allUsers.map(u => {
+    const p = PROFILES[u];
+    const hasVoted = def.votes[u] !== null;
+    return `<div class="poll-voter-av ${hasVoted ? '' : 'pending'}" style="background:${hasVoted ? p.color : ''}" title="${p.naam}${hasVoted ? ' heeft gestemd' : ' nog niet gestemd'}">${p.init}</div>`;
+  }).join('') + `<span style="font-size:0.68rem;color:#6B6560;margin-left:4px;">${voted.length} van 4 gestemd</span>`;
+}
+function initPolls() {
+  ['poll1','poll2'].forEach(id => renderPoll(id));
 }
 
 // ── FEED ──────────────────────────────────────────
