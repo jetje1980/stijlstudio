@@ -578,7 +578,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 
     <!-- COUNTDOWN -->
     <div class="countdown-block">
-      <div class="countdown-label">⏱ Countdown tot Eurostar vertrek</div>
+      <div class="countdown-label" id="cd-label">⏱ Countdown tot vertrek</div>
       <div class="countdown-nums">
         <div class="count-unit"><div class="count-num" id="cd-d">--</div><div class="count-lbl">Dagen</div></div>
         <div class="count-sep">:</div>
@@ -587,6 +587,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
         <div class="count-unit"><div class="count-num" id="cd-m">--</div><div class="count-lbl">Min</div></div>
       </div>
       <div class="countdown-badge" id="cd-badge">– – dagen</div>
+      <div id="cd-trein-info" style="margin-top:10px;"></div>
     </div>
 
     <!-- MISSIE VAN DE DAG -->
@@ -635,40 +636,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     <!-- WEEKEND EVENTS -->
     <div class="home-section-title">Wat speelt dit weekend</div>
     <div class="home-section-sub">26–28 juni 2026 in Parijs</div>
-    <div class="weekend-chips" id="weekend-chips-list">
-      <div class="weekend-chip" onclick="showToast('🛍️ Puces de Vanves: za+zo 7–14u, 380 verkopers. Aligre: za+zo 7:30–13:30, 500m van airbnb!')">
-        <div class="chip-emoji">🛍️</div>
-        <div class="chip-info">
-          <div class="chip-name">Brocantes & Vlooienmarkten</div>
-          <div class="chip-desc">Za + zo · Vanves, Aligre (500m!), Saint-Ouen</div>
-        </div>
-        <div class="chip-badge">Weekend</div>
-      </div>
-      <div class="weekend-chip" onclick="showToast('🎵 Solidays: heel weekend Hippodrome Longchamp. Bigflo & Oli, Gims, Orelsan! €60–70 dagticket')">
-        <div class="chip-emoji">🎵</div>
-        <div class="chip-info">
-          <div class="chip-name">Solidays Festival</div>
-          <div class="chip-desc">26–28/6 · Hippodrome Longchamp · €60–70</div>
-        </div>
-        <div class="chip-badge">Weekend</div>
-      </div>
-      <div class="weekend-chip" onclick="showToast('💃 Cargo Disc\'o Cargo: za 27/6 vanaf 19u, Port de Bercy. Open-air disco op de Seine-kade!')">
-        <div class="chip-emoji">💃</div>
-        <div class="chip-info">
-          <div class="chip-name">Disc'o Cargo — open-air disco</div>
-          <div class="chip-desc">Za 27/6 · Port de Bercy · gratis entree</div>
-        </div>
-        <div class="chip-badge">Weekend</div>
-      </div>
-      <div class="weekend-chip" onclick="showToast('🥂 Rosa Bonheur guinguette: za vanaf 13u, zo vanaf 19u. Dansen op de Seine, bal-musette, pizza!')">
-        <div class="chip-emoji">🥂</div>
-        <div class="chip-info">
-          <div class="chip-name">Rosa Bonheur guinguette</div>
-          <div class="chip-desc">Za+zo · Port des Invalides · gratis entree</div>
-        </div>
-        <div class="chip-badge">Weekend</div>
-      </div>
-    </div>
+    <div id="weekend-blok"></div>
     <div id="custom-event-chips"></div>
     <button onclick="openEventModal()" style="display:flex;align-items:center;gap:8px;margin:2px 20px 12px;padding:10px 0;border:none;background:none;cursor:pointer;font-size:0.82rem;color:#A89FE8;width:calc(100% - 40px);border-top:1px dashed rgba(168,159,232,0.35);">
       <span style="font-size:1.1rem;line-height:1;">＋</span> Voeg evenement toe
@@ -722,9 +690,43 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       </div>
       <div class="collapsible-body">
         <div class="info-row"><div class="info-icon">🏠</div><div style="flex:1;"><div class="info-label">Verblijf <span style="color:#7A9E82;font-weight:600;">· geboekt door Frederike</span></div><div class="info-val">Rue du Temple, 75003 Parijs (Le Marais)<br><small style="color:var(--bruin)">Check-in: vr 26/6 vanaf 15u · Check-out: zo 28/6 voor 11u</small></div></div></div>
-        <div class="info-row"><div class="info-icon">🚂</div><div style="flex:1;"><div class="info-label">Eurostar heen <span style="color:#D4785A;font-weight:600;">· door Griette</span></div><div class="info-val">Vr 26 juni · Amsterdam CS 08:10 → Paris Gare du Nord 11:56<br><small style="color:var(--bruin)">Instappen uiterlijk 07:40 · Paspoort of ID mee!</small></div></div></div>
-        <div class="info-row"><div class="info-icon">🚂</div><div style="flex:1;"><div class="info-label">Eurostar terug <span style="color:#D4785A;font-weight:600;">· door Griette</span></div><div class="info-val">Zo 28 juni · Paris Gare du Nord 16:25 → Amsterdam CS 20:03<br><small style="color:var(--bruin)">Aanwezig uiterlijk 15:55</small></div></div></div>
-        <div class="info-row"><div class="info-icon">🚇</div><div style="flex:1;"><div class="info-label">Metro vanuit Gare du Nord <span style="color:#D4785A;font-weight:600;">· door Griette</span></div><div class="info-val">Lijn 5 → Bastille (5 stops, ~14 min) · OV-kaart werkt niet! Navigo-kaart of los kaartje €2,15</div></div></div>
+        <!-- 3-segment treinreis -->
+        <div style="margin:4px 0 8px;padding:14px;background:rgba(10,10,10,0.04);border-radius:var(--r-lg);">
+          <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--t2);margin-bottom:10px;">🚂 Treinreis vrijdag 26 juni</div>
+          <!-- Segment 1: Houten → Amsterdam CS -->
+          <div style="margin-bottom:12px;">
+            <div style="font-size:0.68rem;font-weight:700;color:#0A0A0A;margin-bottom:6px;letter-spacing:0.05em;">Segment 1 — naar Amsterdam CS</div>
+            <div id="trein-seg1-personen" style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;"></div>
+            <div style="font-size:0.65rem;color:#7A9E82;font-weight:600;margin-bottom:4px;">🤝 Allemaal samen op de IC vanaf Utrecht!</div>
+            <a id="trein-9292-link" href="#" target="_blank" rel="noopener"
+               style="display:inline-block;font-size:0.7rem;color:#A89FE8;text-decoration:none;padding:5px 10px;border:1px solid rgba(168,159,232,0.4);border-radius:20px;">
+              🔍 Controleer op 9292.nl →
+            </a>
+          </div>
+          <!-- Segment 2: Eurostar -->
+          <div style="border-top:1px solid rgba(10,10,10,0.08);padding-top:10px;margin-bottom:10px;">
+            <div style="font-size:0.68rem;font-weight:700;color:#0A0A0A;margin-bottom:4px;letter-spacing:0.05em;">Segment 2 — Eurostar 🇫🇷</div>
+            <div style="font-size:0.82rem;color:#0A0A0A;font-weight:600;">08:10 Amsterdam CS → 11:56 Paris Gare du Nord</div>
+            <div style="font-size:0.7rem;color:#D4785A;margin-top:3px;">⏰ Boarding-poort sluit: 07:40 · Paspoort of ID mee!</div>
+          </div>
+          <!-- Segment 3: Aankomst Paris -->
+          <div style="border-top:1px solid rgba(10,10,10,0.08);padding-top:10px;">
+            <div style="font-size:0.68rem;font-weight:700;color:#0A0A0A;margin-bottom:4px;letter-spacing:0.05em;">Segment 3 — Aankomst & doorreis</div>
+            <div style="font-size:0.78rem;color:#0A0A0A;">🇫🇷 11:56 Paris Gare du Nord</div>
+            <div style="font-size:0.72rem;color:#6B6560;margin-top:3px;">→ 🚇 Metro lijn 5 → Bastille (5 stops, ~14 min)</div>
+            <div style="font-size:0.72rem;color:#6B6560;">→ 🚶 6 min lopen naar Airbnb Rue du Temple</div>
+            <div style="font-size:0.7rem;color:#7A9E82;margin-top:4px;font-weight:600;">⏰ Verwachte aankomst Airbnb: ~12:45</div>
+            <div style="font-size:0.65rem;color:var(--t2);margin-top:3px;">Check-in vanaf 15:00 · OV-kaart werkt niet in Parijs! Navigo of los kaartje €2,15</div>
+          </div>
+        </div>
+        <!-- Eurostar terug -->
+        <div style="margin:0 0 8px;padding:14px;background:rgba(10,10,10,0.04);border-radius:var(--r-lg);">
+          <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--t2);margin-bottom:8px;">🚂 Terugreis zondag 28 juni</div>
+          <div style="font-size:0.82rem;color:#0A0A0A;font-weight:600;">16:25 Paris Gare du Nord → 20:03 Amsterdam CS</div>
+          <div style="font-size:0.7rem;color:#D4785A;margin-top:3px;">⏰ Aanwezig uiterlijk 15:55 op Gare du Nord</div>
+          <div style="font-size:0.72rem;color:#6B6560;margin-top:6px;">Aankomst 20:03 Amsterdam CS → IC Utrecht ~20:38 → Sprinter Houten ~21:16</div>
+        </div>
+        <div class="info-row"><div class="info-icon">🆘</div><div style="flex:1;"><div class="info-label">Noodnummers</div><div class="info-val">112 Europese noodhulp · 15 SAMU (ambulance) · 17 Politie · 18 Brandweer<br>Ambassade NL Parijs: +33 1 40 62 33 00</div></div></div>
         <div class="info-row"><div class="info-icon">🆘</div><div style="flex:1;"><div class="info-label">Noodnummers</div><div class="info-val">112 Europese noodhulp · 15 SAMU (ambulance) · 17 Politie · 18 Brandweer<br>Ambassade NL Parijs: +33 1 40 62 33 00</div></div></div>
         <div class="info-row"><div class="info-icon">💳</div><div style="flex:1;"><div class="info-label">Handig weten</div><div class="info-val">Meeste plekken accepteren pin. Puces de Saint-Ouen = cash. Airbnb-sleutelcode via host WhatsApp.</div></div></div>
       </div>
@@ -1634,6 +1636,7 @@ function initApp() {
   initReel();
   initStories();
   initCountdown();
+  renderWeekendBlok();
   initPolls();
   initFeed();
   buildSwipeStack();
@@ -1781,17 +1784,53 @@ function initStories() {
   }).join('');
 }
 
+// ── TREINDATA ──────────────────────────────────────
+const TREIN_DATA = {
+  frederike: {station:'Houten centrum',   vertrek:'06:21', ns:'houten-centrum',      target:'2026-06-26T06:21:00'},
+  griette:   {station:'Houten Castellum', vertrek:'06:23', ns:'houten-castellum',    target:'2026-06-26T06:23:00'},
+  marlinde:  {station:'Houten centrum',   vertrek:'06:21', ns:'houten-centrum',      target:'2026-06-26T06:21:00'},
+  miriam:    {station:'Utrecht CS',       vertrek:'06:38', ns:'utrecht-centraal',    target:'2026-06-26T06:38:00'},
+};
+
 // ── COUNTDOWN ─────────────────────────────────────
 function initCountdown() {
+  const td = TREIN_DATA[currentUser] || {station:'Amsterdam CS', vertrek:'07:40', ns:'amsterdam-centraal', target:'2026-06-26T07:40:00'};
+
+  const lbl = document.getElementById('cd-label');
+  if (lbl) lbl.textContent = `⏱ Jouw trein · ${td.station} om ${td.vertrek}`;
+
+  const infoEl = document.getElementById('cd-trein-info');
+  if (infoEl) infoEl.innerHTML = `<a href="https://9292.nl/reisadvies/${td.ns}/amsterdam-centraal/vertrek/2026-06-26T0600" target="_blank" rel="noopener" style="font-size:0.7rem;color:#A89FE8;text-decoration:none;">🔍 Controleer tijden op 9292.nl →</a>`;
+
+  // Populate reisinfo segment 1 per-person rows
+  const seg1 = document.getElementById('trein-seg1-personen');
+  if (seg1) {
+    seg1.innerHTML = Object.entries(TREIN_DATA).map(([u, t]) => {
+      const p = PROFILES[u];
+      const isCurrent = u === currentUser;
+      return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;${isCurrent ? 'background:rgba(168,159,232,0.1);border-radius:8px;padding:5px 8px;margin:-1px -4px;' : ''}">
+        ${avatarImg(u, 22)}
+        <div style="flex:1;">
+          <span style="font-size:0.75rem;font-weight:${isCurrent?'700':'500'};color:#0A0A0A;">${p.naam}</span>
+          <span style="font-size:0.7rem;color:#6B6560;margin-left:6px;">${t.station} · ${t.vertrek}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // 9292 link for current user in reisinfo
+  const link9292 = document.getElementById('trein-9292-link');
+  if (link9292) link9292.href = `https://9292.nl/reisadvies/${td.ns}/amsterdam-centraal/vertrek/2026-06-26T0600`;
+
   function tick() {
-    const target = new Date('2026-06-26T08:10:00');
+    const target = new Date(td.target);
     const now = new Date();
     const diff = target - now;
     if (diff <= 0) {
       document.getElementById('cd-d').textContent = '0';
       document.getElementById('cd-h').textContent = '00';
       document.getElementById('cd-m').textContent = '00';
-      document.getElementById('cd-badge').textContent = 'Het is zover! 🎉';
+      document.getElementById('cd-badge').textContent = 'Op weg naar Parijs! 🚂';
       return;
     }
     const d = Math.floor(diff / 86400000);
@@ -1800,10 +1839,64 @@ function initCountdown() {
     document.getElementById('cd-d').textContent = d;
     document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
     document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
-    document.getElementById('cd-badge').textContent = `Nog ${d} dagen`;
+    document.getElementById('cd-badge').textContent = `Nog ${d} dagen tot Parijs`;
   }
   tick();
   setInterval(tick, 30000);
+}
+
+// ── WEEKEND BLOK ──────────────────────────────────
+const WEEKEND_EVENTS = {
+  vlooien: [
+    {naam:"Marché d'Aligre", emoji:'🛒', hook:'500m van Airbnb · za + zo 9–13u', tijden:'Za + zo 09:00–13:30', prijs:'gratis', tip:'Koffie bij Le Penty erna. Zaterdag = brocante + versmarkt samen.', metro:'Ledru-Rollin (lijn 8)'},
+    {naam:'Puces de Vanves', emoji:'🪞', hook:'Charmantste vlooienmarkt — sluit om 14u!', tijden:'Za + zo 07:00–14:00', prijs:'gratis', tip:'Cash mee. 380 verkopers. Vroeg = koopjes, laat = gezelligheid.', metro:'Porte de Vanves (lijn 13)'},
+    {naam:'Puces de Saint-Ouen', emoji:'🏛️', hook:'7 hectare, 2000 verkopers — hele dag', tijden:'Vr–ma 10:00–18:00', prijs:'gratis entree', tip:'Vermijd eerste 100m vanaf metro. Eet bij Ma Cocotte. Cash handig.', metro:'Garibaldi (lijn 13)'},
+    {naam:'Marché Bastille', emoji:'🥬', hook:'Verse markt met de beste kazen van Parijs', tijden:'Zo 07:00–14:30', prijs:'gratis', tip:'Ideaal voor picknick-inkopen richting Père-Lachaise.', metro:'Bastille (lijn 1/5/8)'},
+  ],
+  muziek: [
+    {naam:'Solidays Festival', emoji:'🎵', hook:'Orelsan, Gims, BigFlo & Oli op een renbaan', tijden:'26–28 juni — heel weekend', prijs:'€60–70 dagticket', tip:'Zondag het rustiger. Tickets via solidays.org.', metro:'Hippodrome de Longchamp (lijn 10)'},
+    {naam:'Pride Paris — Marais autovrij', emoji:'🌈', hook:'Za 27/6: Rue du Temple autovrij straatfeest', tijden:'Za 27 juni — hele dag', prijs:'gratis', tip:'Jullie airbnb ligt IN het autovrije gebied. Gewoon naar buiten stappen!', metro:'Saint-Paul (lijn 1)'},
+  ],
+  drinken: [
+    {naam:"Disc'o Cargo", emoji:'💃', hook:"Saturday Night Fever aan de Seine", tijden:'Za 19u+ (ook vr + zo)', prijs:'gratis entree', tip:'Iovine\'s Napolitaanse pizza ter plekke. Za = disco/house, zo = chill electro.', metro:'Cour Saint-Émilion (lijn 14)'},
+    {naam:'Rosa Bonheur guinguette', emoji:'🥂', hook:'Bal-musette dansen op drijvend ponton', tijden:'Za 13u · zo ook', prijs:'gratis entree', tip:'Pizza van de houtoven. Wals, Madison, tango. Geen reservering.', metro:'Invalides (lijn 8/13)'},
+    {naam:'Pavillon Puebla', emoji:'🌿', hook:'Bar in park dat toeristen nooit vinden', tijden:'17u–01u dagelijks (zomer)', prijs:'€€', tip:'Kom om 18u voor goede plek. Corsicaans bier. Locals, geen toeristen.', metro:'Botzaris (lijn 7bis)'},
+  ],
+};
+let weekendTab = 'vlooien';
+function renderWeekendBlok() {
+  const el = document.getElementById('weekend-blok');
+  if (!el) return;
+  const cats = [
+    {key:'vlooien', label:'🛍️ Vlooien'},
+    {key:'muziek',  label:'🎵 Muziek'},
+    {key:'drinken', label:'🥂 Drinken'},
+  ];
+  const items = WEEKEND_EVENTS[weekendTab] || [];
+  el.innerHTML = `
+    <div style="display:flex;gap:6px;padding:0 20px 12px;overflow-x:auto;scrollbar-width:none;">
+      ${cats.map(c => `
+        <button onclick="weekendTab='${c.key}';renderWeekendBlok();" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid ${weekendTab===c.key?'#0A0A0A':'rgba(10,10,10,0.15)'};background:${weekendTab===c.key?'#0A0A0A':'transparent'};color:${weekendTab===c.key?'#F0E8E2':'#6B6560'};font-size:0.75rem;font-weight:600;cursor:pointer;letter-spacing:0.04em;">${c.label}</button>
+      `).join('')}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0;padding:0 20px 4px;">
+      ${items.map(ev => `
+        <div style="padding:12px 0;border-top:1px solid rgba(10,10,10,0.08);" onclick="showToast('${ev.emoji} ${ev.naam}: ${ev.tip}')">
+          <div style="display:flex;align-items:flex-start;gap:10px;">
+            <div style="font-size:1.5rem;flex-shrink:0;line-height:1.2;">${ev.emoji}</div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:0.9rem;color:#0A0A0A;">${ev.naam}</div>
+              <div style="font-size:0.75rem;color:#6B6560;margin-top:1px;font-style:italic;">${ev.hook}</div>
+              <div style="display:flex;gap:8px;margin-top:5px;flex-wrap:wrap;">
+                <span style="font-size:0.65rem;color:var(--t2);">⏰ ${ev.tijden}</span>
+                <span style="font-size:0.65rem;color:var(--t2);">💶 ${ev.prijs}</span>
+                <span style="font-size:0.65rem;color:var(--t2);">🚇 ${ev.metro}</span>
+              </div>
+            </div>
+            <div style="font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;background:#A89FE8;color:#fff;border-radius:10px;padding:2px 8px;flex-shrink:0;align-self:flex-start;">Weekend</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
 }
 
 // ── POLLS ─────────────────────────────────────────
