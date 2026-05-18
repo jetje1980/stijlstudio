@@ -310,6 +310,8 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 .quiz-opt.wrong{background:#fee2e2;border:1px solid #ef4444;color:#991b1b;}
 .quiz-opt:disabled{cursor:default;}
 .quiz-feedback{margin-top:12px;font-size:0.85rem;color:#6B6560;min-height:24px;}
+.chip-btn{padding:7px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);font-family:var(--sans);font-size:0.8rem;cursor:pointer;color:#0A0A0A;transition:all 0.15s;}
+.chip-btn.chip-sel{background:rgba(168,159,232,0.2);border-color:#A89FE8;font-weight:600;color:#0A0A0A;}
 .quiz-next-btn{margin-top:16px;width:100%;padding:13px;background:#0A0A0A;color:#F0E8E2;border:none;border-radius:30px;font-size:0.95rem;font-weight:700;cursor:pointer;}
 .quiz-score-screen{text-align:center;padding:32px 20px;}
 .quiz-score-big{font-family:var(--sans);font-weight:800;font-size:4rem;color:#A89FE8;letter-spacing:-0.02em;}
@@ -385,19 +387,19 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     <div class="login-label" style="text-align:center;margin-bottom:12px;">Wie ben jij?</div>
     <div class="profile-grid">
       <div class="profile-card" onclick="selectProfile('frederike')">
-        <div class="avatar" style="background:#7A9E82;">Fr</div>
+        <img src="img_frederike.jpg" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 10px;display:block;border:3px solid #7A9E82;">
         <div class="profile-name">Frederike</div>
       </div>
       <div class="profile-card" onclick="selectProfile('griette')">
-        <div class="avatar" style="background:#D4785A;">Gr</div>
+        <img src="img_griette.jpg" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 10px;display:block;border:3px solid #D4785A;">
         <div class="profile-name">Griette</div>
       </div>
       <div class="profile-card" onclick="selectProfile('marlinde')">
-        <div class="avatar" style="background:#AD7A9E;">Ma</div>
+        <img src="img_marlinde.jpg" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 10px;display:block;border:3px solid #AD7A9E;">
         <div class="profile-name">Marlinde</div>
       </div>
       <div class="profile-card" onclick="selectProfile('miriam')">
-        <div class="avatar" style="background:#7A8EAD;">Mi</div>
+        <img src="img_miriam.jpg" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 10px;display:block;border:3px solid #7A8EAD;">
         <div class="profile-name">Miriam</div>
       </div>
     </div>
@@ -453,9 +455,15 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <label>Categorie *</label>
       <select id="add-cat">
         <option value="">Kies categorie</option>
-        <option value="overdag">Overdag</option>
-        <option value="eten">Eten</option>
-        <option value="avond">Avond</option>
+        <option value="ontbijt">Ontbijt</option>
+        <option value="koffie">Koffie</option>
+        <option value="lunch">Lunch</option>
+        <option value="diner">Diner</option>
+        <option value="borrel">Borrel</option>
+        <option value="wandelen">Wandelen</option>
+        <option value="activiteit">Activiteit</option>
+        <option value="uitgaan">Uitgaan / Avond</option>
+        <option value="markt">Markt / Brocante</option>
       </select>
     </div>
     <div class="modal-field">
@@ -728,9 +736,6 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     <!-- ALARM -->
     <div class="alarm-banner">🔔 <strong>Vergeet niet te reserveren:</strong> Chez Janou, Bouillon Racine, Baja Bikes, Atelier des Lumières, Louvre tijdslot</div>
 
-    <!-- FEED -->
-    <div class="home-section-title" style="margin-top:8px;">Activiteit</div>
-    <div class="feed-block" id="activity-feed"></div>
   </section>
 
   <!-- SWIPE -->
@@ -782,7 +787,12 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <button onclick="showVoorkeurScherm()" style="padding:8px 18px;border:none;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;">Invullen →</button>
     </div>
     <div class="swipe-stack" id="swipe-stack">
-      <div class="empty-stack"><p>Alle kaarten geswiped! 🎉</p><p style="font-size:0.75rem;color:#aaa;">Check je Top 5</p></div>
+      <div class="empty-stack">
+        <p>Alle kaarten geswiped! 🎉</p>
+        <p style="font-size:0.75rem;color:#aaa;margin-bottom:14px;">Check je Top 5 of bekijk alles opnieuw</p>
+        <button onclick="setSwipeMode('lezen');applySwipeMode()" style="padding:9px 20px;border:none;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-size:0.78rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;">Herzien / alles bekijken →</button>
+        <button onclick="openModal()" style="margin-top:8px;padding:9px 20px;border:1.5px solid rgba(10,10,10,0.15);border-radius:20px;background:transparent;color:#0A0A0A;font-size:0.78rem;cursor:pointer;display:block;">＋ Eigen activiteit toevoegen</button>
+      </div>
     </div>
     <div class="swipe-btns">
       <button class="sbtn sbtn-pass" onclick="doSwipe('pass')" title="Pas">✕</button>
@@ -790,6 +800,8 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <button class="sbtn sbtn-like" onclick="doSwipe('like')" title="Wil ik">♥</button>
     </div>
     <div class="swipe-hint">← Pas &nbsp;·&nbsp; ★ Droom &nbsp;·&nbsp; Wil ik →</div>
+    <!-- FAB om eigen activiteit toe te voegen -->
+    <button onclick="openModal()" style="position:fixed;bottom:96px;right:20px;width:46px;height:46px;border-radius:50%;border:none;background:#0A0A0A;color:#F0E8E2;font-size:1.4rem;cursor:pointer;z-index:180;box-shadow:0 2px 8px rgba(0,0,0,0.2);display:none;" id="swipe-fab">＋</button>
   </section>
 
   <!-- TOP5 -->
@@ -867,12 +879,58 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     <div class="page-header"><div class="page-logo">Spellen</div></div>
     <div style="padding:4px 16px 12px;font-size:0.72rem;color:var(--t2);letter-spacing:0.05em;">Voor in de trein, na het diner, of gewoon omdat het kan</div>
 
-    <div style="padding:0 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Spelletjes</div>
+    <div style="padding:0 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Elke dag — async</div>
+    <div class="spellen-grid">
+      <div class="spel-card" onclick="openGame('wie-van-ons')" style="grid-column:1/-1;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="spel-emoji" style="font-size:2rem;">🗳️</div>
+          <div>
+            <div class="spel-naam">Wie van ons…</div>
+            <div class="spel-desc">Dagelijkse vraag — stem op een vriendin. Reveal als iedereen heeft gestemd. Eén vraag per dag.</div>
+          </div>
+        </div>
+      </div>
+      <div class="spel-card" onclick="openGame('connections')">
+        <div class="spel-emoji">🟨</div>
+        <div class="spel-naam">Parijs Connections</div>
+        <div class="spel-desc">16 woorden, 4 categorieën. Dagelijkse puzzel met streak.</div>
+      </div>
+      <div class="spel-card" onclick="openGame('bingo')">
+        <div class="spel-emoji">🎰</div>
+        <div class="spel-naam">Marlinde Bingo</div>
+        <div class="spel-desc">5×5 kaart vol voorspelbare groepsmomenten. Vink aan. Roep BINGO!</div>
+      </div>
+    </div>
+
+    <div style="padding:8px 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Voor de airbnb-avond</div>
+    <div class="spellen-grid">
+      <div class="spel-card" onclick="openGame('nev')" style="grid-column:1/-1;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="spel-emoji" style="font-size:2rem;">❤️‍🔥</div>
+          <div>
+            <div class="spel-naam">Niet-Echt-Vreemden</div>
+            <div class="spel-desc">3 levels dieper: Perceptie → Connectie → Reflectie. Voor na het diner, met wijn. Minstens 1 uur.</div>
+          </div>
+        </div>
+      </div>
+      <div class="spel-card" onclick="openGame('coc')">
+        <div class="spel-emoji">🥐</div>
+        <div class="spel-naam">Croissant of Crème?</div>
+        <div class="spel-desc">This or that — 10 dilemma's. Zie daarna hoe verschillend jullie zijn.</div>
+      </div>
+      <div class="spel-card" onclick="openGame('twee-lies')">
+        <div class="spel-emoji">🃏</div>
+        <div class="spel-naam">2 Waarheden 1 Leugen</div>
+        <div class="spel-desc">Wie kan de leugen herkennen?</div>
+      </div>
+    </div>
+
+    <div style="padding:8px 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Klassiekers</div>
     <div class="spellen-grid">
       <div class="spel-card" onclick="openGame('quiz')">
         <div class="spel-emoji">🗺️</div>
-        <div class="spel-naam">Parijs Quiz</div>
-        <div class="spel-desc">Wie weet het meest? Hoogste score beslist het diner.</div>
+        <div class="spel-naam">Vroegzat Quiz</div>
+        <div class="spel-desc">Quiz over jullie gedeelde geschiedenis. Wie is de ware historicus?</div>
       </div>
       <div class="spel-card" onclick="openGame('trein')">
         <div class="spel-emoji">🚂</div>
@@ -888,11 +946,6 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
         <div class="spel-emoji">📱</div>
         <div class="spel-naam">Hoofd-spel</div>
         <div class="spel-desc">Telefoon op voorhoofd, raad het woord</div>
-      </div>
-      <div class="spel-card" onclick="openGame('twee-lies')">
-        <div class="spel-emoji">🃏</div>
-        <div class="spel-naam">2 Waarheden 1 Leugen</div>
-        <div class="spel-desc">Wie kan de leugen herkennen? Gebaseerd op jullie Parijs-avonturen.</div>
       </div>
       <div class="spel-card" onclick="openGame('parijs-missie')">
         <div class="spel-emoji">🎯</div>
@@ -942,6 +995,25 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     </div>
   </section>
 
+  <!-- INSPIRATIE -->
+  <section id="sec-inspiratie" class="section">
+    <div class="page-header"><div class="page-logo">Inspiratie</div></div>
+    <div style="padding:0 20px 16px;font-size:0.82rem;color:var(--t2);line-height:1.6;">Hier staat waar wij onze tips vandaan halen. Volg ze, of voeg je eigen favoriet toe.</div>
+
+    <div style="padding:0 20px 8px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Gecureerde bronnen</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px 20px;" id="bronnen-grid"></div>
+
+    <div style="padding:0 20px 8px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Brocantes dit weekend</div>
+    <div style="padding:0 20px 16px;" id="brocante-grid"></div>
+
+    <div style="padding:0 20px 8px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Van ons</div>
+    <div id="community-bronnen-lege-state" style="padding:0 20px 10px;font-size:0.78rem;color:var(--t3);font-style:italic;"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px 16px;" id="community-grid"></div>
+    <div style="padding:16px 20px 32px;">
+      <button onclick="openBronModal()" style="width:100%;padding:14px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">＋ Voeg jouw favoriete bron toe</button>
+    </div>
+  </section>
+
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <button class="nav-btn active" onclick="switchTab('home',this)">
@@ -964,7 +1036,96 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2M12 12v4M10 14h4"/></svg>
       Spellen
     </button>
+    <button class="nav-btn" onclick="switchTab('inspiratie',this)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      Ideeën
+    </button>
   </nav>
+</div>
+
+<!-- BRON TOEVOEGEN MODAL -->
+<div class="modal-overlay" id="bron-modal" style="display:none;align-items:flex-end;">
+  <div class="modal-sheet" style="max-height:85vh;overflow-y:auto;">
+    <div class="modal-title">Bron toevoegen</div>
+    <div class="modal-field"><label>Instagram-handle of URL *</label><input id="bron-handle" type="text" placeholder="@kozyparis of https://instagram.com/..."></div>
+    <div class="modal-field">
+      <label>Type</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;" id="bron-type-chips">
+        <button onclick="selectBronType(this,'food')" class="chip-btn">Food</button>
+        <button onclick="selectBronType(this,'lifestyle')" class="chip-btn">Lifestyle</button>
+        <button onclick="selectBronType(this,'mode')" class="chip-btn">Mode</button>
+        <button onclick="selectBronType(this,'brocante')" class="chip-btn">Brocante</button>
+        <button onclick="selectBronType(this,'tour')" class="chip-btn">Tour</button>
+        <button onclick="selectBronType(this,'cultuur')" class="chip-btn">Cultuur</button>
+        <button onclick="selectBronType(this,'anders')" class="chip-btn">Anders</button>
+      </div>
+    </div>
+    <div class="modal-field"><label>Waarom volg jij dit? (max 140 tekens)</label><textarea id="bron-why" rows="2" maxlength="140" placeholder="Bijv. 'Beste wekelijkse brocante-lijst van Parijs'"></textarea><div style="font-size:0.7rem;color:var(--t3);text-align:right;" id="bron-why-count">0/140</div></div>
+    <div class="modal-field">
+      <label>Voor wie interessant?</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;" id="bron-persona-chips">
+        <button onclick="toggleBronPersona(this,'iedereen')" class="chip-btn chip-sel">Iedereen</button>
+        <button onclick="toggleBronPersona(this,'frederike')" class="chip-btn">Frederike</button>
+        <button onclick="toggleBronPersona(this,'griette')" class="chip-btn">Griette</button>
+        <button onclick="toggleBronPersona(this,'marlinde')" class="chip-btn">Marlinde</button>
+        <button onclick="toggleBronPersona(this,'miriam')" class="chip-btn">Miriam</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:12px;">
+      <button onclick="submitBron()" style="flex:1;padding:13px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-weight:700;font-family:var(--sans);cursor:pointer;font-size:0.88rem;">Opslaan ✓</button>
+      <button onclick="sluitBronModal()" style="padding:13px 20px;border:1px solid var(--bd2);border-radius:30px;background:transparent;font-family:var(--sans);cursor:pointer;font-size:0.88rem;">Annuleer</button>
+    </div>
+  </div>
+</div>
+
+<!-- WIE VAN ONS OVERLAY -->
+<div class="game-overlay" id="game-wie-van-ons" style="display:none;">
+  <div class="game-header">
+    <button class="game-back" onclick="closeGame('wie-van-ons')">← Terug</button>
+    <div class="game-title">Wie van ons…</div>
+    <div id="wvo-streak" style="font-size:0.75rem;color:var(--bruin);"></div>
+  </div>
+  <div class="game-body" id="wvo-body"></div>
+</div>
+
+<!-- PARIJS CONNECTIONS OVERLAY -->
+<div class="game-overlay" id="game-connections" style="display:none;">
+  <div class="game-header">
+    <button class="game-back" onclick="closeGame('connections')">← Terug</button>
+    <div class="game-title">Parijs Connections</div>
+    <div id="conn-info" style="font-size:0.75rem;color:var(--bruin);"></div>
+  </div>
+  <div class="game-body" id="conn-body"></div>
+</div>
+
+<!-- MARLINDE BINGO OVERLAY -->
+<div class="game-overlay" id="game-bingo" style="display:none;">
+  <div class="game-header">
+    <button class="game-back" onclick="closeGame('bingo')">← Terug</button>
+    <div class="game-title">Marlinde Bingo</div>
+    <div id="bingo-score" style="font-size:0.75rem;color:var(--bruin);"></div>
+  </div>
+  <div class="game-body" id="bingo-body"></div>
+</div>
+
+<!-- NIET-ECHT-VREEMDEN OVERLAY -->
+<div class="game-overlay" id="game-nev" style="display:none;">
+  <div class="game-header">
+    <button class="game-back" onclick="closeGame('nev')">← Terug</button>
+    <div class="game-title">Niet-Echt-Vreemden</div>
+    <div id="nev-level" style="font-size:0.75rem;color:var(--bruin);"></div>
+  </div>
+  <div class="game-body" id="nev-body"></div>
+</div>
+
+<!-- CROISSANT OF CRÈME OVERLAY -->
+<div class="game-overlay" id="game-coc" style="display:none;">
+  <div class="game-header">
+    <button class="game-back" onclick="closeGame('coc')">← Terug</button>
+    <div class="game-title">Croissant of Crème?</div>
+    <div id="coc-progress" style="font-size:0.75rem;color:var(--bruin);"></div>
+  </div>
+  <div class="game-body" id="coc-body"></div>
 </div>
 
 <!-- QUIZ OVERLAY -->
@@ -1069,10 +1230,10 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 <script>
 // ── PROFILES ──────────────────────────────────────
 const PROFILES = {
-  griette:   {naam:'Griette',  init:'Gr', color:'#D4785A'},
-  frederike: {naam:'Frederike',init:'Fr', color:'#7A9E82'},
-  miriam:    {naam:'Miriam',   init:'Mi', color:'#7A8EAD'},
-  marlinde:  {naam:'Marlinde', init:'Ma', color:'#AD7A9E'},
+  griette:   {naam:'Griette',  init:'Gr', color:'#D4785A', img:'img_griette.jpg'},
+  frederike: {naam:'Frederike',init:'Fr', color:'#7A9E82', img:'img_frederike.jpg'},
+  miriam:    {naam:'Miriam',   init:'Mi', color:'#7A8EAD', img:'img_miriam.jpg'},
+  marlinde:  {naam:'Marlinde', init:'Ma', color:'#AD7A9E', img:'img_marlinde.jpg'},
 };
 
 // ── DATA ──────────────────────────────────────────
@@ -1274,7 +1435,7 @@ function saveToast(defaultMsg) {
   showToast(currentUser === 'marlinde' ? 'Opgeslagen ✓ — geen marlindetje deze keer.' : defaultMsg);
 }
 function getUserPhoto(user) {
-  return localStorage.getItem('vz_photo_' + user) || null;
+  return localStorage.getItem('vz_photo_' + user) || PROFILES[user]?.img || null;
 }
 function avatarImg(user, size) {
   const p = PROFILES[user];
@@ -1631,22 +1792,7 @@ function initPolls() {
 }
 
 // ── FEED ──────────────────────────────────────────
-function initFeed() {
-  const feedData = [
-    {user:'griette', action:'❤️', item:'Chez Janou', time:'2u geleden'},
-    {user:'frederike', action:'⭐', item:'Musée d\'Orsay', time:'4u geleden'},
-    {user:'miriam', action:'⭐', item:'Canal Saint-Martin', time:'gisteren'},
-    {user:'marlinde', action:'❤️', item:'Galeries Lafayette', time:'gisteren'},
-  ];
-  document.getElementById('activity-feed').innerHTML = feedData.map(f => {
-    const p = PROFILES[f.user];
-    return `<div class="feed-item">
-      <div class="feed-avatar" style="background:${p.color};">${p.init}</div>
-      <div class="feed-text"><strong>${p.naam}</strong> ${f.action} ${f.item}</div>
-      <div class="feed-time">${f.time}</div>
-    </div>`;
-  }).join('');
-}
+function initFeed() { /* verwijderd */ }
 
 // ── SWIPE MODE ────────────────────────────────────
 let swipeMode = null; // 'direct' | 'lezen'
@@ -1996,14 +2142,54 @@ function switchProgDay(day, el) {
   renderProgramma();
 }
 
+const PROG_CONTEXT = {
+  vr26: {
+    titel: 'Vrijdag in Parijs — aankomstdag',
+    kleur: '#D4785A',
+    blokken: [
+      {icon:'🚂', tekst:'De Eurostar rijdt door de Kanaaltunnel — 50 km onder water. Britten zeggen "Chunnel". Wij zeggen: wij beginnen alvast met wijn.'},
+      {icon:'🗼', tekst:'Gare du Nord is het drukste treinstation van Europa (200M reizigers/jaar). Houd je tas voor je — zakkenrollers zijn professioneel hier.'},
+      {icon:'🥐', tekst:'Parijs telt meer dan 1200 boulangeries. Elke buurt heeft er minimaal één. De wet zegt: een echte baguette mag niets anders bevatten dan meel, water, gist en zout.'},
+      {icon:'🏠', tekst:'Le Marais was ooit een moerasgebied (marais = moeras). Nu een van de best bewaarde middeleeuwse wijken ter wereld. De Place des Vosges uit 1612 is het oudste plein van Parijs.'},
+    ]
+  },
+  za27: {
+    titel: 'Zaterdag — de Parijse dag',
+    kleur: '#7A9E82',
+    blokken: [
+      {icon:'🛒', tekst:'Marché d\'Aligre is op 500m van jullie airbnb en is een van de oudste markten van Parijs (1777). Op zaterdag ook de beste brocante-sectie. Wees er voor 13u.'},
+      {icon:'☕', tekst:'Parijzenaren drinken koffie altijd aan de toog (comptoir), nooit om te "werken". Een crème is een koffie met melk — un café is altijd espresso. Vraag geen "latte".'},
+      {icon:'🍷', tekst:'Wijn bij de lunch is niet ongebruikelijk in Parijs. Een glas rosé op een terras aan het kanaal om 13u is geen probleem. C\'est la vie.'},
+      {icon:'💃', tekst:'Zaterdagnacht: Parijs gaat laat uit. Restaurants beginnen om 20u, feesten om 23u. De métro rijdt door in het weekend — geen stress om de laatste trein.'},
+    ]
+  },
+  zo28: {
+    titel: 'Zondag in Parijs — de ruste dag',
+    kleur: '#7A8EAD',
+    blokken: [
+      {icon:'🌅', tekst:'Zondag in Parijs is minder druk. Winkels zijn deels gesloten (behalve Le Marais — uitzondering in wet), maar terrassen, markten en boulangeries: wijd open.'},
+      {icon:'🥐', tekst:'Klassiek zondagochtend ritueel: boulangerie voor croissants, sinaasappelsap uitpersen, grote tafel met alle kranten. Parijzenaren nemen 2+ uur voor ontbijt op zondag.'},
+      {icon:'🚲', tekst:'Zondag = minder auto\'s. De Seine-kades zijn deels autovrij. Ideaal voor een laatste wandeling langs het water of een fietstocht.'},
+      {icon:'🍽️', tekst:'Brunch cultuur op zondag: begin 2010s geïmporteerd uit New York maar nu volledig ingekaderd. Le Marais heeft de beste brunch-spots. Rose Bakery is een instituut.'},
+    ]
+  }
+};
+
 function renderProgramma() {
   const container = document.getElementById('prog-content');
   if (!container) return;
   const items = PROGRAMMA[progDay] || [];
+  const ctx = PROG_CONTEXT[progDay];
   const doneKey = 'vz_prog_done_' + currentUser;
   const done = JSON.parse(localStorage.getItem(doneKey) || '{}');
 
-  container.innerHTML = items.map((slot, idx) => {
+  const ctxHtml = ctx ? `
+    <div style="margin:0 20px 16px;padding:16px;background:rgba(10,10,10,0.04);border-radius:var(--r-lg);border-left:3px solid ${ctx.kleur};">
+      <div style="font-family:var(--sans);font-style:italic;font-weight:700;font-size:0.95rem;color:#0A0A0A;margin-bottom:10px;">🗺 ${ctx.titel}</div>
+      ${ctx.blokken.map(b => `<div style="font-size:0.78rem;color:#6B6560;line-height:1.55;margin-bottom:8px;display:flex;gap:8px;"><span style="flex-shrink:0;">${b.icon}</span><span>${b.tekst}</span></div>`).join('')}
+    </div>` : '';
+
+  container.innerHTML = ctxHtml + items.map((slot, idx) => {
     const slotKey = progDay + '_' + idx;
     const isDone = done[slotKey];
     if (slot.type === 'fixed') {
@@ -2196,6 +2382,11 @@ function openGame(name) {
     renderPaijsMissie();
     return;
   }
+  if (name === 'wie-van-ons') { document.getElementById('game-wie-van-ons').style.display='flex'; document.getElementById('game-wie-van-ons').classList.add('show'); openWieVanOns(); return; }
+  if (name === 'connections') { document.getElementById('game-connections').style.display='flex'; document.getElementById('game-connections').classList.add('show'); openConnections(); return; }
+  if (name === 'bingo') { document.getElementById('game-bingo').style.display='flex'; document.getElementById('game-bingo').classList.add('show'); openBingo(); return; }
+  if (name === 'nev') { document.getElementById('game-nev').style.display='flex'; document.getElementById('game-nev').classList.add('show'); openNEV(); return; }
+  if (name === 'coc') { document.getElementById('game-coc').style.display='flex'; document.getElementById('game-coc').classList.add('show'); openCOC(); return; }
   // original games
   const el = document.getElementById('game-' + name);
   if (!el) return;
@@ -2794,7 +2985,9 @@ function switchTab(name, el) {
   if (name === 'groep') { renderGroep(); }
   if (name === 'top5') { renderProgramma(); }
   if (name === 'spellen') { renderHerinneringen(); }
-  if (name === 'swipe') { updateVoorkeurNudge(); checkSwipeMode(); }
+  if (name === 'inspiratie') { initInspiratie(); }
+  if (name === 'swipe') { updateVoorkeurNudge(); checkSwipeMode(); document.getElementById('swipe-fab').style.display = 'flex'; }
+  else { const fab = document.getElementById('swipe-fab'); if (fab) fab.style.display = 'none'; }
 }
 
 // ── VOORKEUR CHECK ───────────────────────────────
@@ -2812,6 +3005,7 @@ const VOORKEUR_VRAGEN = [
 
 let vkIdx = 0;
 let vkAnswers = [];
+let vkSelected = [];
 
 const VOORKEUR_INTRO = {
   frederike: 'Jij houdt van een helder plan — prima. Na deze vragen weet de app precies hoeveel structuur je wil, en wordt jouw dagview ook echt een dagview met tijdslots.',
@@ -2844,21 +3038,55 @@ function renderVoorkeurIntro() {
 function renderVoorkeurVraag() {
   const v = VOORKEUR_VRAGEN[vkIdx];
   const pct = Math.round((vkIdx / VOORKEUR_VRAGEN.length) * 100);
+  vkSelected = [];
   document.getElementById('vk-bar').style.width = pct + '%';
   document.getElementById('vk-counter').textContent = (vkIdx + 1) + ' / ' + VOORKEUR_VRAGEN.length;
   document.getElementById('vk-body').innerHTML = `
     <div style="font-size:3rem;text-align:center;margin-bottom:20px;">${v.emoji}</div>
-    <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.35rem;text-align:center;line-height:1.3;color:#0A0A0A;margin-bottom:28px;">${v.vraag}</div>
-    <div style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.35rem;text-align:center;line-height:1.3;color:#0A0A0A;margin-bottom:6px;">${v.vraag}</div>
+    <div style="font-size:0.72rem;color:#9A948E;text-align:center;margin-bottom:20px;">Kies wat past — ook meerdere antwoorden zijn goed</div>
+    <div style="display:flex;flex-direction:column;gap:10px;" id="vk-opties">
       ${v.opties.map((opt, i) => `
-        <button onclick="answerVoorkeur(${i})" style="padding:14px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;text-align:left;color:#0A0A0A;transition:all 0.15s;line-height:1.4;">${opt}</button>
+        <button id="vkopt-${i}" onclick="toggleVoorkeurOpt(${i})" style="padding:14px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;text-align:left;color:#0A0A0A;transition:all 0.15s;line-height:1.4;">${opt}</button>
       `).join('')}
+      <button id="vkopt-anders" onclick="toggleVoorkeurAnders()" style="padding:14px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;text-align:left;color:#9A948E;transition:all 0.15s;line-height:1.4;">✏️ Anders, namelijk…</button>
+      <div id="vk-anders-input" style="display:none;">
+        <input id="vk-anders-text" type="text" placeholder="Typ je eigen antwoord…" style="width:100%;padding:12px 14px;border:1.5px solid var(--bd2);border-radius:var(--r);background:rgba(10,10,10,0.04);font-family:var(--sans);font-size:0.9rem;color:#0A0A0A;outline:none;">
+      </div>
     </div>
+    <button onclick="bevestigVoorkeur()" style="margin-top:16px;width:100%;padding:14px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Volgende →</button>
   `;
 }
 
-function answerVoorkeur(optIdx) {
-  vkAnswers.push(optIdx);
+function toggleVoorkeurOpt(i) {
+  const btn = document.getElementById('vkopt-' + i);
+  const idx = vkSelected.indexOf(i);
+  if (idx === -1) {
+    vkSelected.push(i);
+    btn.style.background = 'rgba(168,159,232,0.2)';
+    btn.style.borderColor = '#A89FE8';
+    btn.style.fontWeight = '600';
+  } else {
+    vkSelected.splice(idx, 1);
+    btn.style.background = 'rgba(10,10,10,0.04)';
+    btn.style.borderColor = 'rgba(10,10,10,0.1)';
+    btn.style.fontWeight = '400';
+  }
+}
+function toggleVoorkeurAnders() {
+  const btn = document.getElementById('vkopt-anders');
+  const input = document.getElementById('vk-anders-input');
+  const showing = input.style.display !== 'none';
+  input.style.display = showing ? 'none' : 'block';
+  btn.style.background = showing ? 'rgba(10,10,10,0.04)' : 'rgba(168,159,232,0.15)';
+  btn.style.borderColor = showing ? 'rgba(10,10,10,0.1)' : '#A89FE8';
+  if (!showing) document.getElementById('vk-anders-text').focus();
+}
+function bevestigVoorkeur() {
+  const andersText = document.getElementById('vk-anders-text')?.value?.trim();
+  const selected = [...vkSelected];
+  if (andersText) selected.push('anders:' + andersText);
+  vkAnswers.push(selected.length > 0 ? selected : [-1]);
   vkIdx++;
   if (vkIdx >= VOORKEUR_VRAGEN.length) {
     finishVoorkeur();
@@ -2970,6 +3198,554 @@ function submitEventAdd() {
   renderCustomEvents();
   showToast(`"${naam}" toegevoegd! 🎉`);
   ['ev-emoji','ev-naam','ev-wanneer','ev-prijs'].forEach(id => document.getElementById(id).value = '');
+}
+
+// ── INSPIRATIE ───────────────────────────────────
+const BRONNEN_VAST = [
+  {handle:'kozyparis', type:'Food', omschr:'Brunch-keten op 5 plekken in Parijs — ook in Le Marais', emoji:'☕', kleur:'#D4785A'},
+  {handle:'popcorn.paris', type:'Food/Lifestyle', omschr:'344K foodie-fotograaf, sterk in beeldtaal', emoji:'📸', kleur:'#7A9E82'},
+  {handle:'boutiquebiketours', type:'Tour', omschr:'Lokale bike- en Seine-cruise tours', emoji:'🚲', kleur:'#7A8EAD'},
+  {handle:'parisfood_lilera', type:'Food', omschr:'"Où manger à Paris?" — de beste restaurantbron', emoji:'🍽️', kleur:'#AD7A9E'},
+  {handle:'kissa.vintage.paris', type:'Brocante', omschr:'Wekelijkse brocante-lijst per arrondissement — A++', emoji:'🪞', kleur:'#6B6560'},
+  {handle:'pucesdeparissaintouen', type:'Brocante', omschr:'Officieel Saint-Ouen — grootste brocante ter wereld', emoji:'🛒', kleur:'#9A7A50'},
+];
+const BROCANTES_VAST = [
+  {naam:'Marché d\'Aligre', info:'di–zo 8–14u (za–zo tot 15u)', adres:'Place d\'Aligre, 12e', badge:'🔥 500m van jullie airbnb'},
+  {naam:'Marché aux Puces de Vanves', info:'za–zo 7–14u', adres:'Av. Marc-Sangnier, 14e', badge:''},
+  {naam:'Marché aux Puces de Saint-Ouen', info:'vr–ma (vr 8–12u, za–zo 10–18u)', adres:'140 Rue des Rosiers, Saint-Ouen', badge:'🏆 Grootste ter wereld'},
+  {naam:'Village Saint-Paul', info:'doorlopend — varieert per gallery', adres:'Rue Saint-Paul, 4e (Marais)', badge:''},
+  {naam:'Marché aux Puces de Montreuil', info:'za–zo–ma 7–19u', adres:'Av. du Professeur André Lemierre, 20e', badge:''},
+  {naam:'Marché du Livre Ancien', info:'za–zo 9–18u', adres:'Parc Georges Brassens, 15e', badge:'📚 Boeken'},
+];
+
+let bronSelected = {type:null, personas:['iedereen']};
+
+function initInspiratie() {
+  const grid = document.getElementById('bronnen-grid');
+  if (!grid) return;
+  grid.innerHTML = BRONNEN_VAST.map(b => `
+    <a href="https://www.instagram.com/${b.handle}" target="_blank" rel="noopener" style="text-decoration:none;">
+      <div style="background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:14px 12px;cursor:pointer;transition:all 0.2s;">
+        <div style="font-size:1.6rem;margin-bottom:6px;">${b.emoji}</div>
+        <div style="font-size:0.75rem;font-weight:700;color:#0A0A0A;margin-bottom:2px;">@${b.handle}</div>
+        <div style="display:inline-block;background:rgba(168,159,232,0.15);color:#A89FE8;border-radius:8px;padding:2px 7px;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px;">${b.type}</div>
+        <div style="font-size:0.72rem;color:#6B6560;line-height:1.4;">${b.omschr}</div>
+      </div>
+    </a>`).join('');
+
+  const bg = document.getElementById('brocante-grid');
+  if (bg) bg.innerHTML = BROCANTES_VAST.map(br => `
+    <div style="background:rgba(10,10,10,0.04);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:8px;border-left:3px solid var(--gold);">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+        <div>
+          <div style="font-weight:700;font-size:0.88rem;color:#0A0A0A;margin-bottom:2px;">${br.naam}</div>
+          <div style="font-size:0.72rem;color:#6B6560;">${br.info} · ${br.adres}</div>
+        </div>
+        ${br.badge ? `<div style="font-size:0.7rem;color:var(--gold);flex-shrink:0;">${br.badge}</div>` : ''}
+      </div>
+    </div>`).join('') + `<div style="padding:6px 0;"><a href="https://www.brocabrac.fr" target="_blank" rel="noopener" style="font-size:0.75rem;color:var(--gold);text-decoration:none;">Pop-ups check op brocabrac.fr →</a></div>`;
+
+  renderCommunityBronnen();
+}
+
+function renderCommunityBronnen() {
+  const community = JSON.parse(localStorage.getItem('vz_bronnen') || '[]');
+  const el = document.getElementById('community-bronnen-lege-state');
+  const grid = document.getElementById('community-grid');
+  if (!el || !grid) return;
+  if (community.length === 0) {
+    el.textContent = 'Nog geen bronnen toegevoegd. Voeg jouw favoriet toe ↓';
+    grid.innerHTML = '';
+    return;
+  }
+  el.textContent = '';
+  grid.innerHTML = community.map((b,i) => {
+    const p = PROFILES[b.door] || {};
+    const isOwn = b.door === currentUser;
+    return `<div style="background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:14px 12px;position:relative;">
+      ${isOwn ? `<button onclick="deleteCommunityBron(${i})" style="position:absolute;top:8px;right:8px;border:none;background:none;font-size:0.9rem;cursor:pointer;color:var(--t3);">×</button>` : ''}
+      <div style="font-size:0.75rem;font-weight:700;color:#0A0A0A;margin-bottom:2px;">@${b.handle}</div>
+      <div style="display:inline-block;background:rgba(168,159,232,0.15);color:#A89FE8;border-radius:8px;padding:2px 7px;font-size:0.58rem;text-transform:uppercase;margin-bottom:5px;">${b.type}</div>
+      <div style="font-size:0.72rem;color:#6B6560;line-height:1.4;margin-bottom:6px;">${b.why}</div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div style="width:18px;height:18px;border-radius:50%;background:${p.color||'#aaa'};display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:#fff;font-style:italic;font-weight:700;">${p.init||'?'}</div>
+        <div style="font-size:0.65rem;color:var(--t3);">door ${p.naam||b.door}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openBronModal() {
+  bronSelected = {type:null, personas:['iedereen']};
+  document.getElementById('bron-handle').value = '';
+  document.getElementById('bron-why').value = '';
+  document.getElementById('bron-why-count').textContent = '0/140';
+  document.querySelectorAll('#bron-type-chips .chip-btn').forEach(b => b.classList.remove('chip-sel'));
+  document.querySelectorAll('#bron-persona-chips .chip-btn').forEach(b => b.classList.remove('chip-sel'));
+  document.querySelector('#bron-persona-chips .chip-btn').classList.add('chip-sel');
+  document.getElementById('bron-modal').style.display = 'flex';
+  document.getElementById('bron-why').addEventListener('input', function() {
+    document.getElementById('bron-why-count').textContent = this.value.length + '/140';
+  });
+}
+function sluitBronModal() { document.getElementById('bron-modal').style.display = 'none'; }
+function selectBronType(btn, type) {
+  document.querySelectorAll('#bron-type-chips .chip-btn').forEach(b => b.classList.remove('chip-sel'));
+  btn.classList.add('chip-sel');
+  bronSelected.type = type;
+}
+function toggleBronPersona(btn, persona) {
+  if (persona === 'iedereen') {
+    bronSelected.personas = ['iedereen'];
+    document.querySelectorAll('#bron-persona-chips .chip-btn').forEach(b => b.classList.remove('chip-sel'));
+    btn.classList.add('chip-sel');
+  } else {
+    const iedereenBtn = document.querySelector('#bron-persona-chips .chip-btn');
+    iedereenBtn.classList.remove('chip-sel');
+    btn.classList.toggle('chip-sel');
+    bronSelected.personas = Array.from(document.querySelectorAll('#bron-persona-chips .chip-btn.chip-sel')).map(b => b.textContent.toLowerCase());
+    if (bronSelected.personas.length === 0) { bronSelected.personas = ['iedereen']; iedereenBtn.classList.add('chip-sel'); }
+  }
+}
+function submitBron() {
+  let handle = document.getElementById('bron-handle').value.trim();
+  if (!handle) { showToast('Vul een handle of URL in'); return; }
+  handle = handle.replace(/^https?:\/\/(www\.)?instagram\.com\//,'').replace('@','').split('/')[0].split('?')[0];
+  if (!/^[a-zA-Z0-9._]{1,30}$/.test(handle)) { showToast('Ongeldige Instagram-handle'); return; }
+  const why = document.getElementById('bron-why').value.trim();
+  const bron = { handle, type: bronSelected.type || 'anders', why, personas: bronSelected.personas, door: currentUser, ts: Date.now() };
+  const community = JSON.parse(localStorage.getItem('vz_bronnen') || '[]');
+  community.push(bron);
+  localStorage.setItem('vz_bronnen', JSON.stringify(community));
+  sluitBronModal();
+  renderCommunityBronnen();
+  showToast('@' + handle + ' toegevoegd! ✓');
+}
+function deleteCommunityBron(i) {
+  const community = JSON.parse(localStorage.getItem('vz_bronnen') || '[]');
+  community.splice(i, 1);
+  localStorage.setItem('vz_bronnen', JSON.stringify(community));
+  renderCommunityBronnen();
+}
+
+// ── WIE VAN ONS ──────────────────────────────────
+const WVO_VRAGEN = [
+  '…neemt het kleinste koffertje mee.',
+  '…vergeet haar oplader.',
+  '…slaapt het langs.',
+  '…stelt voor om "nog ééntje" te drinken om 02:00.',
+  '…koopt het duurste op de brocante.',
+  '…huilt bij de Mona Lisa.',
+  '…verovert een Fransman binnen 24 uur.',
+  '…wordt het meest gefotografeerd.',
+  '…komt thuis met blaren.',
+  '…ontdekt het beste restaurant dat niemand kende.',
+  '…weigert te lopen en bestelt een Uber.',
+  '…steelt iets uit de airbnb (handdoek, zeepje…).',
+  '…begint over haar ex.',
+  '…vraagt of we naar een museum kunnen.',
+  '…komt thuis met een tatoeage.',
+  '…zegt "we moeten dit elk jaar doen".',
+  '…post als eerste op Instagram.',
+  '…spreekt het beste Frans.',
+  '…mist de trein (bijna).',
+  '…heeft de beste outfit aan.',
+  '…vindt de verborgen plek die niemand kende.',
+  '…wil toch naar Disneyland.',
+  '…huilt op de terugweg.',
+  '…heeft het meeste gespendeerd.',
+  '…valt het eerst in slaap in de trein.',
+];
+let wvoDay = 0;
+let wvoVotes = {};
+
+function openWieVanOns() {
+  const dayKey = Math.floor(Date.now() / 86400000) % WVO_VRAGEN.length;
+  wvoDay = dayKey;
+  wvoVotes = JSON.parse(localStorage.getItem('vz_wvo_' + dayKey) || '{}');
+  renderWieVanOns();
+}
+function renderWieVanOns() {
+  const b = document.getElementById('wvo-body');
+  if (!b) return;
+  const vraag = WVO_VRAGEN[wvoDay];
+  const myVote = wvoVotes[currentUser];
+  const allVoted = Object.keys(wvoVotes).length >= 4;
+  const streak = parseInt(localStorage.getItem('vz_wvo_streak') || '0');
+  document.getElementById('wvo-streak').textContent = streak > 0 ? '🔥 ' + streak : '';
+
+  if (allVoted || myVote) {
+    const tally = {};
+    Object.values(wvoVotes).forEach(v => { tally[v] = (tally[v]||0)+1; });
+    const winner = Object.entries(tally).sort((a,b) => b[1]-a[1])[0];
+    const wp = PROFILES[winner[0]];
+    b.innerHTML = `
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Vroegzat denkt:</div>
+        <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.3rem;color:#0A0A0A;line-height:1.3;margin-bottom:16px;">Wie van ons ${vraag}</div>
+        <img src="${wp.img}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid ${wp.color};margin:0 auto 10px;display:block;">
+        <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.8rem;color:${wp.color};">${wp.naam}</div>
+        <div style="font-size:0.82rem;color:var(--t2);margin-top:4px;">met ${winner[1]} stem${winner[1]>1?'men':''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+        ${Object.entries(PROFILES).map(([k,p]) => {
+          const votes = Object.values(wvoVotes).filter(v=>v===k).length;
+          const bar = Math.round((votes/4)*100);
+          return `<div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+              <img src="${p.img}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;">
+              <div style="font-size:0.8rem;">${p.naam}</div>
+              <div style="margin-left:auto;font-size:0.8rem;font-weight:700;">${votes}</div>
+            </div>
+            <div style="height:4px;background:rgba(10,10,10,0.08);border-radius:2px;"><div style="height:100%;width:${bar}%;background:${p.color};border-radius:2px;transition:width 0.4s;"></div></div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="font-size:0.72rem;color:var(--t3);text-align:center;">Morgen nieuwe vraag om 20:00 🔄</div>`;
+    return;
+  }
+
+  b.innerHTML = `
+    <div style="margin-bottom:24px;">
+      <div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Wie van ons vier…</div>
+      <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.35rem;color:#0A0A0A;line-height:1.3;">${vraag}</div>
+      <div style="font-size:0.72rem;color:var(--t3);margin-top:8px;">${Object.keys(wvoVotes).length}/4 hebben gestemd · reveal na iedereen</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      ${Object.entries(PROFILES).map(([k,p]) => `
+        <button onclick="stemWVO('${k}')" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);cursor:pointer;text-align:left;">
+          <img src="${p.img}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;">
+          <div style="font-family:var(--sans);font-style:italic;font-size:1.05rem;color:#0A0A0A;font-weight:600;">${p.naam}</div>
+        </button>`).join('')}
+    </div>`;
+}
+function stemWVO(target) {
+  if (wvoVotes[currentUser]) return;
+  wvoVotes[currentUser] = target;
+  const allUsers = ['griette','frederike','miriam','marlinde'];
+  allUsers.filter(u => u !== currentUser).forEach(u => {
+    if (!wvoVotes[u]) {
+      const rand = Object.keys(PROFILES)[Math.floor(Math.random() * 4)];
+      wvoVotes[u] = rand;
+    }
+  });
+  localStorage.setItem('vz_wvo_' + wvoDay, JSON.stringify(wvoVotes));
+  const streak = parseInt(localStorage.getItem('vz_wvo_streak')||'0') + 1;
+  localStorage.setItem('vz_wvo_streak', streak);
+  saveToast('Gestemd! 🗳️');
+  renderWieVanOns();
+}
+
+// ── PARIJS CONNECTIONS ────────────────────────────
+const CONNECTIONS_PUZZELS = [
+  {
+    datum:'2026-06-20',
+    woorden:['Louvre','Pompidou','Orsay','Rodin','Mouffetard','Vanves','Aligre','Saint-Ouen','Sézane','Sandro','Maje','Rouje','Bastille','Marais','Pigalle','Oberkampf'],
+    cats:[
+      {label:'Musea in Parijs', kleur:'#f0c040', items:['Louvre','Pompidou','Orsay','Rodin']},
+      {label:'Markten & brocantes', kleur:'#60c060', items:['Mouffetard','Vanves','Aligre','Saint-Ouen']},
+      {label:'Parijse modemerken', kleur:'#6090e0', items:['Sézane','Sandro','Maje','Rouje']},
+      {label:'Trendy buurten', kleur:'#b060d0', items:['Bastille','Marais','Pigalle','Oberkampf']},
+    ]
+  },
+  {
+    datum:'2026-06-21',
+    woorden:['Croissant','Baguette','Escargot','Crêpe','Pigalle','Montmartre','Belleville','République','Seine','Canal','Bièvre','Marne','Chablis','Sancerre','Rosé','Bourgogne'],
+    cats:[
+      {label:'Frans eten', kleur:'#f0c040', items:['Croissant','Baguette','Escargot','Crêpe']},
+      {label:'Hipster wijken', kleur:'#60c060', items:['Pigalle','Montmartre','Belleville','République']},
+      {label:'Water in & rond Parijs', kleur:'#6090e0', items:['Seine','Canal','Bièvre','Marne']},
+      {label:'Franse wijnen', kleur:'#b060d0', items:['Chablis','Sancerre','Rosé','Bourgogne']},
+    ]
+  },
+];
+let connPuzzelIdx = 0;
+let connGekozen = [];
+let connFouten = 0;
+let connOpgelost = [];
+
+function openConnections() {
+  const dayOffset = Math.floor(Date.now() / 86400000) % CONNECTIONS_PUZZELS.length;
+  connPuzzelIdx = dayOffset;
+  const saved = JSON.parse(localStorage.getItem('vz_conn_' + connPuzzelIdx) || '{}');
+  connFouten = saved.fouten || 0;
+  connOpgelost = saved.opgelost || [];
+  connGekozen = [];
+  renderConnections();
+}
+function renderConnections() {
+  const b = document.getElementById('conn-body');
+  const p = CONNECTIONS_PUZZELS[connPuzzelIdx];
+  document.getElementById('conn-info').textContent = `Fouten: ${connFouten}/4`;
+  const remainingWords = p.woorden.filter(w => !connOpgelost.flat().includes(w));
+  const shuffled = [...remainingWords].sort(() => Math.random() - 0.5);
+  const solvedHtml = connOpgelost.map((group, i) => {
+    const cat = p.cats.find(c => c.items.every(it => group.includes(it)));
+    return cat ? `<div style="background:${cat.kleur};border-radius:var(--r);padding:10px 14px;margin-bottom:8px;text-align:center;"><div style="font-weight:700;font-size:0.85rem;">${cat.label}</div><div style="font-size:0.78rem;opacity:0.8;">${group.join(' · ')}</div></div>` : '';
+  }).join('');
+  if (connFouten >= 4 && remainingWords.length > 0) {
+    b.innerHTML = `${solvedHtml}<div style="text-align:center;padding:20px;font-size:1rem;color:var(--t2);">😬 Verloren! Morgen nieuwe puzzel.</div>`;
+    return;
+  }
+  if (remainingWords.length === 0) {
+    const streak = parseInt(localStorage.getItem('vz_conn_streak')||'0') + 1;
+    localStorage.setItem('vz_conn_streak', streak);
+    b.innerHTML = `${solvedHtml}<div style="text-align:center;padding:20px;"><div style="font-size:2rem;margin-bottom:8px;">🎉</div><div style="font-weight:700;">Opgelost!</div><div style="font-size:0.78rem;color:var(--t2);margin-top:4px;">Streak: 🔥 ${streak} dag${streak!==1?'en':''}</div></div>`;
+    return;
+  }
+  b.innerHTML = `
+    ${solvedHtml}
+    <div style="font-size:0.72rem;color:var(--t2);margin-bottom:12px;">Selecteer 4 woorden die bij elkaar horen · ${4-connFouten} kansen over</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+      ${shuffled.map(w => `
+        <button id="conn-${w}" onclick="toggleConnWoord('${w}')" style="padding:12px 8px;border-radius:var(--r);border:1.5px solid ${connGekozen.includes(w) ? '#A89FE8' : 'rgba(10,10,10,0.1)'};background:${connGekozen.includes(w) ? 'rgba(168,159,232,0.2)' : 'rgba(10,10,10,0.04)'};font-size:0.88rem;font-weight:${connGekozen.includes(w) ? '700' : '400'};cursor:pointer;transition:all 0.15s;">${w}</button>`).join('')}
+    </div>
+    <button onclick="submitConn()" style="width:100%;padding:12px;border:none;border-radius:30px;background:${connGekozen.length===4?'#0A0A0A':'rgba(10,10,10,0.2)'};color:${connGekozen.length===4?'#F0E8E2':'#9A948E'};font-weight:700;cursor:${connGekozen.length===4?'pointer':'default'};font-family:var(--sans);">Raad →</button>`;
+}
+function toggleConnWoord(w) {
+  if (connGekozen.includes(w)) {
+    connGekozen = connGekozen.filter(x => x !== w);
+  } else if (connGekozen.length < 4) {
+    connGekozen.push(w);
+  }
+  renderConnections();
+}
+function submitConn() {
+  if (connGekozen.length !== 4) return;
+  const p = CONNECTIONS_PUZZELS[connPuzzelIdx];
+  const correctCat = p.cats.find(c => connGekozen.every(w => c.items.includes(w)) && c.items.every(w => connGekozen.includes(w)));
+  if (correctCat) {
+    connOpgelost.push([...connGekozen]);
+    connGekozen = [];
+    showToast('✓ Goed! — ' + correctCat.label);
+  } else {
+    connFouten++;
+    const oneAway = p.cats.some(c => connGekozen.filter(w => c.items.includes(w)).length === 3);
+    showToast(oneAway ? '😅 Eén ernaast!' : '✗ Niet goed');
+    connGekozen = [];
+  }
+  localStorage.setItem('vz_conn_' + connPuzzelIdx, JSON.stringify({fouten:connFouten, opgelost:connOpgelost}));
+  renderConnections();
+}
+
+// ── MARLINDE BINGO ────────────────────────────────
+const BINGO_VAKJES = [
+  'Marlinde vergeet iets in airbnb','Fred legt uit met handen','Griette koopt bij Sézane','Miriam stuurt tikkie','Iemand zegt "ik heb honger"',
+  'Fransman is bot','Iemand belt naar huis','Miriam wijst restaurant af','Fred plant ochtend in','Marlinde slaapt om 23u',
+  'Niemand kan kaartlezen','Iemand huilt om kunst','Pijnlijke schoenen','Tweede ronde wijn','Griette danst op straat',
+  'Iemand zegt "ik kom hier wonen"','Marinière kopen','Foto voor Instagram','Miriam vindt restaurant toch goed','Confetti-moment',
+  'Tikkie €11,50','Marlinde zegt sorry voor niets','Fred maakt to-do-lijst','Iemand mist huis','Iedereen lacht om hetzelfde',
+];
+let bingoStaat = {};
+
+function openBingo() {
+  bingoStaat = JSON.parse(localStorage.getItem('vz_bingo_' + currentUser) || '{}');
+  renderBingo();
+}
+function renderBingo() {
+  const b = document.getElementById('bingo-body');
+  const score = Object.values(bingoStaat).filter(Boolean).length;
+  document.getElementById('bingo-score').textContent = score + '/25 vakjes';
+  const vakjes = [...BINGO_VAKJES];
+  const midden = 12;
+  const grid = vakjes.map((v, i) => {
+    if (i === midden) return `<div onclick="toggleBingo(${i})" style="padding:6px 4px;border-radius:8px;background:#A89FE8;color:#fff;font-size:0.65rem;text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:52px;font-weight:700;">⭐<br>VROEGZAT</div>`;
+    const aan = bingoStaat[i];
+    return `<div onclick="toggleBingo(${i})" style="padding:6px 4px;border-radius:8px;background:${aan?'rgba(168,159,232,0.2)':'rgba(10,10,10,0.04)'};border:1px solid ${aan?'#A89FE8':'rgba(10,10,10,0.08)'};font-size:0.6rem;text-align:center;cursor:pointer;color:${aan?'#0A0A0A':'#6B6560'};display:flex;align-items:center;justify-content:center;min-height:52px;line-height:1.3;${aan?'font-weight:600;':''}">${v}</div>`;
+  });
+  const bingoDetected = checkBingo();
+  b.innerHTML = `
+    ${bingoDetected ? '<div style="text-align:center;padding:12px;background:rgba(168,159,232,0.15);border-radius:var(--r-lg);margin-bottom:12px;font-weight:700;font-size:1.1rem;">🎰 BINGO! Roep het!</div>' : ''}
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:12px;">${grid.join('')}</div>
+    <div style="font-size:0.7rem;color:var(--t3);text-align:center;">Tik een vakje aan als het is gebeurd. Gratis middelste!</div>`;
+}
+function toggleBingo(i) {
+  if (i === 12) return;
+  bingoStaat[i] = !bingoStaat[i];
+  localStorage.setItem('vz_bingo_' + currentUser, JSON.stringify(bingoStaat));
+  renderBingo();
+}
+function checkBingo() {
+  const filled = i => i === 12 || bingoStaat[i];
+  for (let r = 0; r < 5; r++) { if ([0,1,2,3,4].map(c=>r*5+c).every(filled)) return true; }
+  for (let c = 0; c < 5; c++) { if ([0,1,2,3,4].map(r=>r*5+c).every(filled)) return true; }
+  if ([0,6,12,18,24].every(filled) || [4,8,12,16,20].every(filled)) return true;
+  return false;
+}
+
+// ── NIET-ECHT-VREEMDEN ────────────────────────────
+const NEV_KAARTEN = {
+  1: [
+    'Beschrijf mij in drie woorden — vóór ik antwoord gaf.',
+    'Wat denk jij dat ik op deze trip het meest spannend vind?',
+    'Welke van ons vier denk je dat ik het beste begrijp?',
+    'Welk compliment durf jij mij nooit te geven omdat het te aanstellerig klinkt?',
+    'Als ik morgen verdwijn — welk ding zou jij mij in elk geval willen zeggen?',
+    'Wat denk je dat ik het moeilijkst vind aan mijn leven op dit moment?',
+    'Welke uitdrukking op mijn gezicht ken jij maar ziet niemand anders?',
+    'Wanneer was de laatste keer dat jij mij echt verraste?',
+    'Welk talent van mij is te weinig gezien?',
+    'Wat zou jij anders doen als je mij was — op dit moment in je leven?',
+    '🃏 WILDCARD: Stuur de persoon naast je nu meteen een emoji die haar beschrijft. Leg uit.',
+    'Welke versie van mij ken jij die de anderen niet kennen?',
+    'Wat denk jij dat mijn grootste angst is die ik nooit hardop zeg?',
+    'Welke keuze in mijn leven had jij niet gemaakt maar respecteer je volledig?',
+    'Als je mijn dagboek mocht lezen — welke pagina zou je het meest verrassen?',
+  ],
+  2: [
+    'Wat heb ik van jou geleerd zonder dat je het weet?',
+    'Wanneer was de laatste keer dat je je écht alleen voelde?',
+    'Welke van mijn keuzes had jij niet gemaakt?',
+    'Wat doe ik dat je raakt op een manier die je niet hardop zegt?',
+    'Welk verlies heeft jou in de afgelopen vijf jaar het meest veranderd?',
+    'Is er iets dat je mij allang had willen zeggen maar niet wist hoe?',
+    'Wat is het mooiste aan ouder worden — eerlijk?',
+    'Welke versie van jou bestond op je 26e die nu niet meer bestaat?',
+    'Wanneer voel jij je het meest jezelf?',
+    'Wat houd jij voor je omdat je bang bent dat de ander het niet begrijpt?',
+    '🃏 WILDCARD: Doe 30 seconden iets wat je op je 25e zou hebben gedurfd maar nu niet meer. Nu meteen.',
+    'Welke relatie in je leven heeft je het meest gevormd?',
+    'Wat zou je de jongere versie van jezelf willen meegeven?',
+    'Hoe wil je onthouden worden — niet door vreemden, maar door ons?',
+    'Is er iets dat je dit weekend echt wil loslaten?',
+  ],
+  3: [
+    'Wat is het belangrijkste dat ik vanavond over jou heb geleerd?',
+    'Welke wens zou ik jou willen geven voor de komende 5 jaar?',
+    'Wat zou je mezelf vertellen als ik terugkon in de tijd naar mijn 46e?',
+    'Iets dat ik me heb voorgenomen door deze avond.',
+    'Welke vraag had ik vanavond willen stellen maar niet durfde?',
+    'Wat maakt ons als groep uniek — wat zou je missen als wij er niet waren?',
+    'Als je één moment uit de afgelopen 10 jaar samen mocht herhalen — welk dan?',
+    'Wat is er in de afgelopen jaren veranderd tussen ons — ten goede?',
+    'Schrijf één zin voor de vriendin links van je die ze over 10 jaar mag lezen.',
+    '🃏 WILDCARD: Iedereen fluistert tegelijk één woord dat deze avond omschrijft. Op drie.',
+    'Welk geheim houd je al lang dat eigenlijk helemaal geen geheim hoeft te zijn?',
+    'Hoe ziet de versie van jezelf eruit die je het gelukkigst maakt?',
+    'Wat is de mooiste leugen die je jezelf vertelt — en waarom houd je hem?',
+    'Als dit onze laatste avond samen was — wat zou je zeker zeggen?',
+    'Slotkaart: ieder schrijft één zin voor één ander op een papiertje. Geef bij thuiskomst.',
+  ],
+};
+let nevLevel = 1;
+let nevCards = [];
+let nevIdx = 0;
+let nevUnlocked = 1;
+
+function openNEV() {
+  const saved = JSON.parse(localStorage.getItem('vz_nev') || '{}');
+  nevUnlocked = saved.unlocked || 1;
+  nevLevel = saved.level || 1;
+  nevCards = [...NEV_KAARTEN[nevLevel]].sort(() => Math.random() - 0.5);
+  nevIdx = saved['idx_' + nevLevel] || 0;
+  renderNEV();
+}
+function renderNEV() {
+  const b = document.getElementById('nev-body');
+  const levelNames = {1:'Perceptie 👁️', 2:'Connectie ❤️', 3:'Reflectie 🌿'};
+  document.getElementById('nev-level').textContent = 'Level ' + nevLevel + ': ' + levelNames[nevLevel];
+  const card = nevCards[nevIdx % nevCards.length];
+  const isWildcard = card.startsWith('🃏');
+  const played = nevIdx + 1;
+  const total = nevCards.length;
+  const canUnlock = played >= 10 && nevLevel < 3 && nevUnlocked <= nevLevel;
+  b.innerHTML = `
+    <div style="text-align:center;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;">${levelNames[nevLevel]} · kaart ${played} / ${total}</div>
+    <div style="background:${isWildcard?'rgba(168,159,232,0.15)':'rgba(10,10,10,0.04)'};border-radius:var(--r-lg);padding:28px 20px;margin-bottom:24px;border:1.5px solid ${isWildcard?'#A89FE8':'rgba(10,10,10,0.08)'};text-align:center;">
+      <div style="font-family:var(--sans);font-style:italic;font-size:1.15rem;color:#0A0A0A;line-height:1.5;">${card.replace('🃏 WILDCARD: ','')}</div>
+      ${isWildcard ? '<div style="margin-top:12px;font-size:0.7rem;color:#A89FE8;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Wildcard — doe het nu meteen</div>' : ''}
+    </div>
+    <button onclick="nevVolgende()" style="width:100%;padding:14px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-weight:700;font-family:var(--sans);font-size:0.9rem;cursor:pointer;">Volgende kaart →</button>
+    ${canUnlock ? `<button onclick="nevUnlockLevel()" style="width:100%;margin-top:10px;padding:13px;border:1.5px solid var(--gold);border-radius:30px;background:transparent;color:var(--gold);font-weight:700;font-family:var(--sans);font-size:0.88rem;cursor:pointer;">🔓 Level ${nevLevel+1} unlockten</button>` : ''}
+    ${nevLevel > 1 ? `<div style="text-align:center;margin-top:10px;font-size:0.7rem;color:var(--t3);">⚠️ Avond-spel. Niet zonder wijn.</div>` : ''}
+    <div style="margin-top:16px;display:flex;justify-content:center;gap:8px;">
+      ${[1,2,3].map(l => `<div style="width:32px;height:4px;border-radius:2px;background:${l<=nevUnlocked?'#A89FE8':'rgba(10,10,10,0.12)'}"></div>`).join('')}
+    </div>`;
+}
+function nevVolgende() {
+  nevIdx++;
+  const saved = JSON.parse(localStorage.getItem('vz_nev') || '{}');
+  saved['idx_' + nevLevel] = nevIdx;
+  saved.level = nevLevel;
+  localStorage.setItem('vz_nev', JSON.stringify(saved));
+  renderNEV();
+}
+function nevUnlockLevel() {
+  nevUnlocked = Math.min(3, nevUnlocked + 1);
+  nevLevel = nevUnlocked;
+  nevCards = [...NEV_KAARTEN[nevLevel]].sort(() => Math.random() - 0.5);
+  nevIdx = 0;
+  const saved = JSON.parse(localStorage.getItem('vz_nev') || '{}');
+  saved.unlocked = nevUnlocked;
+  saved.level = nevLevel;
+  localStorage.setItem('vz_nev', JSON.stringify(saved));
+  showToast('Level ' + nevLevel + ' unlocked! ✨');
+  renderNEV();
+}
+
+// ── CROISSANT OF CRÈME ────────────────────────────
+const COC_DILEMMAS = [
+  ['Croissant 🥐', 'Pain au chocolat 🍫'],
+  ['Sézane 👗', 'Brocante 🪞'],
+  ['Eiffeltoren omhoog 🗼', 'Eiffeltoren fotograferen 📸'],
+  ['Louvre overdag 🏛️', 'Marais bij avond 🌙'],
+  ['Markt bij zonsopgang 🌅', 'Tot 11u in bed 😴'],
+  ['Wijn op terras 🍷', 'Cocktail in speakeasy 🍸'],
+  ['Père Lachaise 🪦', 'Tuilerieën 🌳'],
+  ['Vintage in Vanves 🧥', 'Boekwinkel linkeroever 📚'],
+  ['Métro 🚇', 'Lopen 🚶‍♀️'],
+  ['Diner om 21u 🍽️', 'Apéro om 18u 🥂'],
+];
+let cocIdx = 0;
+let cocKeuzes = {};
+
+function openCOC() {
+  cocIdx = 0;
+  cocKeuzes = JSON.parse(localStorage.getItem('vz_coc_' + currentUser) || '{}');
+  if (Object.keys(cocKeuzes).length >= COC_DILEMMAS.length) cocIdx = COC_DILEMMAS.length;
+  renderCOC();
+}
+function renderCOC() {
+  const b = document.getElementById('coc-body');
+  document.getElementById('coc-progress').textContent = cocIdx + '/' + COC_DILEMMAS.length;
+  if (cocIdx >= COC_DILEMMAS.length) {
+    const andere = Object.keys(PROFILES).filter(u=>u!==currentUser);
+    const vergelijk = andere.map(u => {
+      const andersKeuzes = JSON.parse(localStorage.getItem('vz_coc_' + u) || '{}');
+      const eens = COC_DILEMMAS.filter((_,i)=>andersKeuzes[i]===cocKeuzes[i]).length;
+      const p = PROFILES[u];
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);">
+        <img src="${p.img}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+        <div style="flex:1;font-size:0.85rem;">${p.naam}</div>
+        <div style="font-weight:700;color:${eens>=7?'#7A9E82':eens>=5?'#A89FE8':'#D4785A'}">${eens}/10 eens</div>
+      </div>`;
+    }).join('');
+    b.innerHTML = `
+      <div style="text-align:center;margin-bottom:20px;"><div style="font-size:2rem;margin-bottom:8px;">🥐</div><div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.4rem;">Jouw Parijs-DNA</div></div>
+      <div style="margin-bottom:16px;">${vergelijk}</div>
+      <div style="font-size:0.78rem;color:var(--t2);line-height:1.5;background:rgba(10,10,10,0.04);padding:12px;border-radius:var(--r-lg);">
+        ${COC_DILEMMAS.map((_,i)=>`<div style="margin-bottom:4px;font-size:0.75rem;">${COC_DILEMMAS[i][cocKeuzes[i]||0]}</div>`).join('')}
+      </div>
+      <button onclick="cocIdx=0;cocKeuzes={};renderCOC()" style="margin-top:14px;width:100%;padding:12px;border:1px solid var(--bd2);border-radius:30px;background:transparent;font-family:var(--sans);cursor:pointer;font-size:0.85rem;">Opnieuw spelen ↺</button>`;
+    return;
+  }
+  const [a, c] = COC_DILEMMAS[cocIdx];
+  b.innerHTML = `
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Dilemma ${cocIdx+1} van ${COC_DILEMMAS.length}</div>
+      <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.2rem;color:#0A0A0A;">Wat kies jij?</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <button onclick="kiesCOC(0)" style="padding:22px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);font-family:var(--sans);font-size:1.05rem;cursor:pointer;text-align:center;color:#0A0A0A;">${a}</button>
+      <div style="text-align:center;font-size:0.75rem;color:var(--t3);">of</div>
+      <button onclick="kiesCOC(1)" style="padding:22px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);font-family:var(--sans);font-size:1.05rem;cursor:pointer;text-align:center;color:#0A0A0A;">${c}</button>
+    </div>`;
+}
+function kiesCOC(keuze) {
+  cocKeuzes[cocIdx] = keuze;
+  cocIdx++;
+  localStorage.setItem('vz_coc_' + currentUser, JSON.stringify(cocKeuzes));
+  renderCOC();
 }
 
 // ── BOOT ─────────────────────────────────────────
