@@ -988,8 +988,14 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     <div style="padding:0 20px 8px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Brocantes dit weekend</div>
     <div style="padding:0 20px 16px;" id="brocante-grid"></div>
 
-    <div style="padding:0 20px 8px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Tips van jullie</div>
-    <div id="must-van-items" style="margin-bottom:4px;"></div>
+    <div style="padding:0 20px 8px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Alle ideeën</div>
+    <div style="display:flex;gap:8px;padding:0 20px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch;">
+      <button onclick="filterIdeeen('alle',this)" class="ideeen-filter active" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid #0A0A0A;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;">Alle</button>
+      <button onclick="filterIdeeen('eten',this)" class="ideeen-filter" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;">🍽️ Eten</button>
+      <button onclick="filterIdeeen('doen',this)" class="ideeen-filter" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;">🎨 Doen</button>
+      <button onclick="filterIdeeen('shoppen',this)" class="ideeen-filter" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;">🛍️ Shoppen</button>
+    </div>
+    <div id="ideeen-grid" style="padding:0 0 8px;"></div>
 
     <div style="padding:0 20px 8px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Van ons</div>
     <div id="community-bronnen-lege-state" style="padding:0 20px 10px;font-size:0.78rem;color:var(--t3);font-style:italic;"></div>
@@ -1033,6 +1039,57 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
   <div class="modal-sheet" style="max-height:90vh;overflow-y:auto;padding:20px;">
     <div id="vibe-modal-body"></div>
     <button onclick="document.getElementById('vibe-modal').style.display='none'" style="margin-top:16px;width:100%;padding:13px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Sluiten</button>
+  </div>
+</div>
+
+<!-- PLAN TOEVOEGEN SHEET -->
+<div class="modal-overlay" id="plan-add-sheet" style="display:none;align-items:flex-end;" onclick="if(event.target===this)closePlanAddSheet()">
+  <div class="modal-sheet" style="max-height:85vh;overflow-y:auto;padding:0;">
+    <div style="padding:20px 20px 0;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.2rem;">Voeg toe aan <span id="plan-add-day-label">je dag</span></div>
+      <button onclick="closePlanAddSheet()" style="border:none;background:none;font-size:1.4rem;cursor:pointer;color:var(--t3);">×</button>
+    </div>
+    <div style="display:flex;gap:0;padding:12px 20px 0;border-bottom:1px solid rgba(10,10,10,0.08);">
+      <button onclick="switchPlanAddTab('plekken',this)" class="padd-tab active" style="padding:8px 14px;border:none;background:none;font-family:var(--sans);font-size:0.78rem;font-weight:700;cursor:pointer;color:#0A0A0A;border-bottom:2px solid #0A0A0A;">Plekken</button>
+      <button onclick="switchPlanAddTab('belevingen',this)" class="padd-tab" style="padding:8px 14px;border:none;background:none;font-family:var(--sans);font-size:0.78rem;font-weight:600;cursor:pointer;color:#9A948E;border-bottom:2px solid transparent;">Belevingen</button>
+      <button onclick="switchPlanAddTab('eigen',this)" class="padd-tab" style="padding:8px 14px;border:none;background:none;font-family:var(--sans);font-size:0.78rem;font-weight:600;cursor:pointer;color:#9A948E;border-bottom:2px solid transparent;">Eigen</button>
+    </div>
+    <div id="padd-plekken" style="padding:12px 0 80px;">
+      <div style="display:flex;gap:8px;padding:0 20px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;" id="padd-cat-bar">
+        <button onclick="filterPaddCat('alle',this)" class="padd-cat active" style="flex-shrink:0;padding:5px 12px;border-radius:20px;border:1.5px solid #0A0A0A;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.7rem;font-weight:600;cursor:pointer;">Alle</button>
+        <button onclick="filterPaddCat('eten',this)" class="padd-cat" style="flex-shrink:0;padding:5px 12px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.7rem;cursor:pointer;">🍽️ Eten</button>
+        <button onclick="filterPaddCat('doen',this)" class="padd-cat" style="flex-shrink:0;padding:5px 12px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.7rem;cursor:pointer;">🎨 Doen</button>
+        <button onclick="filterPaddCat('shoppen',this)" class="padd-cat" style="flex-shrink:0;padding:5px 12px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.7rem;cursor:pointer;">🛍️ Shoppen</button>
+      </div>
+      <div id="padd-items-list"></div>
+    </div>
+    <div id="padd-belevingen" style="display:none;padding:12px 0 80px;">
+      <div id="padd-vibes-list"></div>
+    </div>
+    <div id="padd-eigen" style="display:none;padding:16px 20px 80px;">
+      <div style="font-size:0.78rem;color:#6B6560;margin-bottom:14px;">Voeg een eigen activiteit toe — slaap, vrije tijd, reistijd, wat dan ook.</div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:0.72rem;font-weight:700;color:#0A0A0A;display:block;margin-bottom:6px;">Activiteit</label>
+        <input id="eigen-naam" type="text" placeholder="Bijv. Chillen bij AirBnB" style="width:100%;padding:12px 14px;border:1.5px solid rgba(10,10,10,0.15);border-radius:var(--r-lg);font-family:var(--sans);font-size:0.9rem;background:#fff;box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:0.72rem;font-weight:700;color:#0A0A0A;display:block;margin-bottom:6px;">Icoon</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;" id="eigen-icon-picker">
+          <button onclick="selectEigenIcon(this,'🏠')" class="icon-pick active" style="width:40px;height:40px;border-radius:10px;border:1.5px solid #0A0A0A;background:rgba(10,10,10,0.07);font-size:1.3rem;cursor:pointer;">🏠</button>
+          <button onclick="selectEigenIcon(this,'😴')" class="icon-pick" style="width:40px;height:40px;border-radius:10px;border:1.5px solid transparent;background:rgba(10,10,10,0.04);font-size:1.3rem;cursor:pointer;">😴</button>
+          <button onclick="selectEigenIcon(this,'🚶')" class="icon-pick" style="width:40px;height:40px;border-radius:10px;border:1.5px solid transparent;background:rgba(10,10,10,0.04);font-size:1.3rem;cursor:pointer;">🚶</button>
+          <button onclick="selectEigenIcon(this,'🛍️')" class="icon-pick" style="width:40px;height:40px;border-radius:10px;border:1.5px solid transparent;background:rgba(10,10,10,0.04);font-size:1.3rem;cursor:pointer;">🛍️</button>
+          <button onclick="selectEigenIcon(this,'☕')" class="icon-pick" style="width:40px;height:40px;border-radius:10px;border:1.5px solid transparent;background:rgba(10,10,10,0.04);font-size:1.3rem;cursor:pointer;">☕</button>
+          <button onclick="selectEigenIcon(this,'🍽️')" class="icon-pick" style="width:40px;height:40px;border-radius:10px;border:1.5px solid transparent;background:rgba(10,10,10,0.04);font-size:1.3rem;cursor:pointer;">🍽️</button>
+          <button onclick="selectEigenIcon(this,'🍷')" class="icon-pick" style="width:40px;height:40px;border-radius:10px;border:1.5px solid transparent;background:rgba(10,10,10,0.04);font-size:1.3rem;cursor:pointer;">🍷</button>
+          <button onclick="selectEigenIcon(this,'🌿')" class="icon-pick" style="width:40px;height:40px;border-radius:10px;border:1.5px solid transparent;background:rgba(10,10,10,0.04);font-size:1.3rem;cursor:pointer;">🌿</button>
+        </div>
+      </div>
+      <button onclick="addEigenActivity()" style="width:100%;padding:13px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">＋ Toevoegen aan dag</button>
+    </div>
+    <div style="position:sticky;bottom:0;background:#F0E8E2;padding:12px 20px;border-top:1px solid rgba(10,10,10,0.08);" id="padd-sticky-close">
+      <button onclick="closePlanAddSheet()" style="width:100%;padding:13px;border:none;border-radius:30px;background:rgba(10,10,10,0.08);color:#0A0A0A;font-family:var(--sans);font-size:0.88rem;font-weight:700;cursor:pointer;">Klaar</button>
+    </div>
   </div>
 </div>
 
@@ -1298,9 +1355,18 @@ const ITEMS_BASE = [
   {id:'musee-vie-romantique',cat:'activiteit',sub:'Verborgen museum',naam:'Musée de la Vie Romantique',wijk:'9e — Pigalle',prijs:'gratis',duur:'1u',tijden:'di–zo 10–18',drukte:'altijd rustig',reserveren:false,must_van:null,weekend_special:false,verhaal:'Schilderijtjes van George Sand, kleine tuinsalon achter het huis. Niemand weet dat dit gratis is. Theesalon in de tuin is onbetaalbaar voor een zomerse ochtend.',tip:'Combineer met Buvette in Pigalle. Terrastje in de tuin bij goed weer — altijd doen.',img:'https://images.unsplash.com/photo-1541427468627-a89a96e5ca1d?w=600&q=80'},
   {id:'square-vert-galant',cat:'wandelen',sub:'Verborgen plek',naam:'Square du Vert-Galant',wijk:'1e — Île de la Cité',prijs:'gratis',duur:'30 min',tijden:'hele dag',drukte:'altijd rustig',reserveren:false,must_van:null,weekend_special:false,verhaal:'Het puntje van Île de la Cité — laagste punt van Parijs, omringd door de Seine. Beste picknickplek van de stad, vijf minuten van Notre-Dame. Toeristen lopen eraan voorbij.',tip:'Wijn + stokbrood + kaas van Rue Mouffetard. Kom rond zonsondergang voor oranje licht.',img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80'},
   {id:'place-des-vosges',cat:'wandelen',sub:'Plein / Park',naam:'Place des Vosges',wijk:'4e — Le Marais',prijs:'gratis',duur:'30–60 min',tijden:'hele dag',drukte:'toeristen in zomer',reserveren:false,must_van:null,weekend_special:false,verhaal:'Oudste plein van Parijs (1612). Symmetrische arcade rondom een grasveld. Victor Hugo woonde hier op nummer 6. Op een zomerse ochtend kun je onder de galerijen koffie halen en rustig zitten zonder dat het voelt als toeristenattratie.',tip:'Vroeg gaan — vóór 10u is het leeg en mooi. Haal koffie bij Carette op de hoek.',img:'https://images.unsplash.com/photo-1549144511-f099e773c147?w=600&q=80'},
-  {id:'stella-suzie',cat:'shopping',sub:'Boetiek',naam:'Stella & Suzie',wijk:'3e — Haut Marais',prijs:'€€–€€€',duur:'30–45 min',tijden:'ma–za 11–19, zo 12–18',drukte:'rustig',reserveren:false,must_van:null,weekend_special:false,verhaal:'Californisch-boho boetiek verstopt in het Haut Marais. Linnen, kleuren, vloeiende vormen. Niet fast fashion — de soort winkel die je onthoudt.',tip:'Wijk door het Haut Marais — er zijn hier tientallen kleine boetiekjes naast elkaar.',img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80'},
   {id:'le-peloton-cafe',cat:'koffie',sub:'Specialty koffie',naam:'Le Peloton Café',wijk:'4e — Le Marais',prijs:'€',duur:'30–45 min',tijden:'ma–vr 8–18, za+zo 9–18',drukte:'rustig',reserveren:false,must_van:null,weekend_special:false,verhaal:'Specialty koffie in Le Marais, gedecoreerd rond de wielrennende tijger. Lichte ruimte, rustige sfeer. Eigenlijk het beste adres voor een ochtend espresso als je toch door het Marais loopt.',tip:'Combineer met een wandeling door het Haut Marais.',img:'https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=600&q=80'},
   {id:'sequoia-rooftop',cat:'borrel',sub:'Rooftop bar',naam:'Sequoia Rooftop Bar',wijk:'13e — Bibliothèque',prijs:'€€–€€€',duur:'1–2u',tijden:'vr 18–1, za 16–1, zo 16–23',drukte:'chic maar toegankelijk',reserveren:false,must_van:null,weekend_special:true,verhaal:'Rooftop boven het Sequoia hotel aan de Seine — uitzicht op de rivier en de stad. Minder bekend dan Le Perchoir maar net zo sfeervol. Cocktails van niveau, terras met kussens, kaarsjes bij zonsondergang.',tip:'Zaterdag 16u voor de beste plek en het mooiste licht. Geen dresscode maar je gaat er netjes naartoe.',img:'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&q=80'},
+  {id:'la-maison-rose',cat:'borrel',sub:'Iconisch roze café',naam:'La Maison Rose',wijk:'18e — Montmartre',prijs:'€€',duur:'1u',tijden:'12–22 di–zo',reserveren:false,must_van:'griette',weekend_special:false,verhaal:'Iconisch roze cafeetje aan Rue de l\'Abreuvoir — Picasso hing hier vroeger rond. Organische wijnen, een dagelijks wisselend huisgemaakt menu. Voelt als lunchen bij je Franse grand-mère.',tip:'Reserveer vooraf voor diner. Wijn + klein bord perfect als borrel-stop in Montmartre.',img:'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&q=80'},
+  {id:'zingen-saint-medard',cat:'activiteit',sub:'Petit Bal Musette',naam:'Zingen bij Saint-Médard',wijk:'5e — Rue Mouffetard',prijs:'gratis',duur:'2–3u',tijden:'ZO 28 JUNI · 11:00–14:00',reserveren:false,must_van:'griette',weekend_special:true,verhaal:'Elke zondagochtend speelt een accordeonist traditionele chansons op Square Saint-Médard. Tekstblaadjes worden uitgedeeld — iedereen zingt mee op de kasseien. Edith Piaf, la Vie en Rose. Lokale Parijzenaars en toeristen door elkaar. Gratis, echt, onvergetelijk.',tip:'Zondag 28 juni — perfect als afsluiter voor vertrek. 11:00 voor goede plek, lunch daarna op Rue Mouffetard.',img:'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=600&q=80'},
+  {id:'chez-julien',cat:'diner',sub:'Gossip Girl bistro',naam:'Chez Julien',wijk:'4e — Île Saint-Louis',prijs:'€€€',duur:'2u',tijden:'12–23 dagelijks',reserveren:true,must_van:null,weekend_special:false,verhaal:'Real-life Gossip Girl filmlocatie — Blair en Serena aten hier in seizoen 4. Iconische gevel aan de Seine, klassieke Franse brasserie. Spectaculair mooi interieur, legendarische chocolademousse.',tip:'Reserveer vooraf. Vraag om een tafel bij het raam met Seinezicht.',img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80'},
+  {id:'buly-1803',cat:'shoppen',sub:'Parfumerie',naam:'Officine Universelle Buly 1803',wijk:'3e — Le Marais',prijs:'€€€',duur:'30–45 min',tijden:'10–19:30 ma–za, 11–19 zo',reserveren:false,must_van:null,weekend_special:false,verhaal:'Apotheker-esthetiek in een parfumerie uit 1803. Handgeschreven etiketten, gepersonaliseerde haarborstels, lippenbalsem, parfum. Viraal voor een reden — stop lang niet voordat je een fortuin hebt uitgegeven.',tip:'Kom vroeg — wachtrij in het weekend. Budget: minstens €40 als je binnenloopt.',img:'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80'},
+  {id:'stella-suzie',cat:'shoppen',sub:'Boho boutique',naam:'Stella & Suzie',wijk:'4e — Le Marais',prijs:'€€',duur:'30 min',tijden:'11–19:30 ma–za, 12–19 zo',reserveren:false,must_van:null,weekend_special:false,verhaal:'Cali-boho meisjesboutique met riemen, tasjes en kleine accessoires. Klein, vrolijk, niet-Instagram. De beste riem die je ooit koopt voor €35.',tip:'Riemen en kleine tasjes zijn de sterren. Vlakbij Rue des Rosiers.',img:'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80'},
+  {id:'i-love-you-wall',cat:'activiteit',sub:'Street art',naam:'I Love You Wall',wijk:'18e — Montmartre (Abbesses)',prijs:'gratis',duur:'15 min',tijden:'altijd',reserveren:false,must_van:null,weekend_special:false,verhaal:'"Je t\'aime" in 311 talen op één muur — Square Jehan-Rictus. Gemaakt door Frédéric Baron en Claire Kito. Simpel, ontroerend, gratis.',tip:'30 meter van Abbesses metro. Vroeg in de ochtend voor minder drukte.',img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80'},
+  {id:'place-du-tertre',cat:'activiteit',sub:'Kunstenaarsplein',naam:'Place du Tertre',wijk:'18e — Montmartre',prijs:'gratis',duur:'30–45 min',tijden:'altijd (ochtend rustiger)',reserveren:false,must_van:null,weekend_special:false,verhaal:'Idyllisch kunstenaarsplein waar al eeuwenlang schilders exposeren. Picasso en Modigliani hielden hier atelier. Ga vroeg voor de sfeer zonder masse.',tip:'Loop het plein om voordat je stopt. De portretschilders aan de rand zijn beter.',img:'https://images.unsplash.com/photo-1551009175-15bdf9dcb580?w=600&q=80'},
+  {id:'vintage-marais',cat:'shoppen',sub:'Vintage winkels',naam:'Vintage winkels Le Marais',wijk:'3e / 4e — Le Marais',prijs:'€–€€€',duur:'1–2u',tijden:'11–19 ma–za, 12–18 zo (meeste dicht ma)',reserveren:false,must_van:null,weekend_special:false,verhaal:'The Room (@theroom.fr), Revoir Vintage, Bimbo Vintage Club — de beste vintage concentratie van Parijs. Van 80s designer tot betaalbaar streetwear. Alles vlakbij de airbnb.',tip:'The Room voor designerstukken. Bimbo is groter en goedkoper. Start bij Rue du Roi de Sicile.',img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80'},
+  {id:'baja-bikes',cat:'activiteit',sub:'Fietsverhuur',naam:'Baja Bikes — Paris fietsroute',wijk:'Le Marais + heel Parijs',prijs:'€34–39 pp',duur:'3–4u',tijden:'dagelijks 9–18',reserveren:true,must_van:null,weekend_special:false,verhaal:'Beste fietsverhuur van Parijs — zelf rijden door het Marais en Canal Saint-Martin, of begeleide tour langs de Seine en Notre-Dame. Fantastische manier om de stad te zien.',tip:'3+ dagen vooraf reserveren. bajabikes.eu — zaterdag het populairst dus vroeg boeken.',img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80'},
+  {id:'meert',cat:'koffie',sub:'Historische patisserie',naam:'Meert — La Gaufre',wijk:'2e — Opéra',prijs:'€€',duur:'20 min',tijden:'10–19 ma–za, 10–18 zo',reserveren:false,must_van:null,weekend_special:false,verhaal:'Icoonste gaufre-bakker van Parijs, geopend in 1761. Charles de Gaulle at hier. Wafel met vanille-boterroom — één van die dingen die je één keer per leven moet doen.',tip:'Neem de vanille-gaufre en verder niks. Staat op elke Parijse bucketlist.',img:'https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=600&q=80'},
 ];
 
 // hook (≤50 chars, punchy), type (ervaring/plek/moment), verborgen
@@ -1363,6 +1429,16 @@ const ITEM_ENRICHMENT = {
   'cargo-container-bar':    {hook:'Za = Disc\'o Cargo — discoavond aan de Seine',type:'moment'},
   'musee-vie-romantique':   {hook:'Gratis, theesalon in de tuin — niemand hier', type:'plek',     verborgen:true},
   'square-vert-galant':     {hook:'Puntje van Île de la Cité, beste picknick',  type:'plek',     verborgen:true},
+  'la-maison-rose':    {hook:'Roze café van Picasso, organische wijn', type:'sfeer'},
+  'zingen-saint-medard':{hook:'Gratis · accordeon · iedereen zingt mee', type:'moment'},
+  'chez-julien':       {hook:'Gossip Girl seizoen 4 · chocolademousse', type:'plek'},
+  'buly-1803':         {hook:'Apotheker parfumerie 1803 · viraal', type:'shoppen'},
+  'stella-suzie':      {hook:'Boho riemen + tasjes · €35 perfecte riem', type:'shoppen'},
+  'i-love-you-wall':   {hook:'"Je t\'aime" in 311 talen · gratis', type:'moment'},
+  'place-du-tertre':   {hook:'Kunstenaarsplein · Picasso atelier vroeger', type:'plek'},
+  'vintage-marais':    {hook:'The Room · Revoir Vintage · Bimbo Vintage', type:'shoppen'},
+  'baja-bikes':        {hook:'Fietstour Seine + Marais · €34–39 pp', type:'activiteit'},
+  'meert':             {hook:'Gaufre uit 1761 · De Gaulle at hier', type:'plek'},
 };
 ITEMS_BASE.forEach(it => Object.assign(it, ITEM_ENRICHMENT[it.id] || {}));
 
@@ -2458,15 +2534,22 @@ function renderProgramma() {
     container.innerHTML = ctxHtml + fixedHtml + `<div style="padding:24px 0 16px;text-align:center;">
       <div style="font-size:2.5rem;margin-bottom:10px;">✨</div>
       <div style="font-size:0.88rem;color:#6B6560;line-height:1.6;margin-bottom:18px;">Kies belevingen bij <strong>Belevingen</strong><br>om jouw dag te vullen</div>
-      <button onclick="switchTab('swipe',document.querySelectorAll('.nav-btn')[1])" style="padding:11px 24px;border:none;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;">Naar Belevingen →</button>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <button onclick="switchTab('swipe',document.querySelectorAll('.nav-btn')[1])" style="padding:11px 20px;border:none;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;">✨ Belevingen</button>
+        <button onclick="openPlanAddSheet()" style="padding:11px 20px;border:1.5px solid rgba(10,10,10,0.15);border-radius:20px;background:transparent;color:#0A0A0A;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;">＋ Losse plek</button>
+      </div>
     </div>`;
     return;
   }
 
   const vibeHtml = `<div style="margin-bottom:16px;">
     <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Jouw belevingen</div>
-    ${dayVibes.map((entry, idx) => renderVibePlanBlock(entry, idx, progDay)).join('')}
-    <button onclick="switchTab('swipe',document.querySelectorAll('.nav-btn')[1])" style="margin-top:6px;width:100%;padding:10px;border:1.5px dashed rgba(168,159,232,0.4);border-radius:var(--r-lg);background:rgba(168,159,232,0.05);color:#A89FE8;font-family:var(--sans);font-size:0.78rem;font-weight:600;cursor:pointer;">＋ Meer belevingen toevoegen</button>
+    ${dayVibes.map((entry, idx) => {
+      if (entry.type === 'item') return renderItemPlanBlock(entry, idx, progDay);
+      if (entry.type === 'custom') return renderCustomPlanBlock(entry, idx, progDay);
+      return renderVibePlanBlock(entry, idx, progDay);
+    }).join('')}
+    <button onclick="openPlanAddSheet()" style="margin-top:6px;width:100%;padding:10px;border:1.5px dashed rgba(168,159,232,0.4);border-radius:var(--r-lg);background:rgba(168,159,232,0.05);color:#A89FE8;font-family:var(--sans);font-size:0.78rem;font-weight:600;cursor:pointer;">＋ Voeg toe — plek, beleving of eigen</button>
   </div>`;
 
   container.innerHTML = ctxHtml + fixedHtml + vibeHtml;
@@ -3370,6 +3453,116 @@ function renderBelevingen(filter) {
   updateBelBadge();
 }
 
+// ── PLAN ADD SHEET ────────────────────────────────
+let planAddSheetDay = progDay;
+let paddCatFilter = 'alle';
+let paddActiveTab = 'plekken';
+let eigenIconSelected = '🏠';
+
+function openPlanAddSheet() {
+  planAddSheetDay = progDay;
+  const el = document.getElementById('plan-add-sheet');
+  const lbl = document.getElementById('plan-add-day-label');
+  if (lbl) lbl.textContent = {vr26:'vrijdag',za27:'zaterdag',zo28:'zondag'}[planAddSheetDay] || planAddSheetDay;
+  renderPaddItems('alle');
+  renderPaddVibes();
+  if (el) el.style.display = 'flex';
+}
+function closePlanAddSheet() {
+  const el = document.getElementById('plan-add-sheet');
+  if (el) el.style.display = 'none';
+  renderProgramma();
+}
+function switchPlanAddTab(tab, el) {
+  paddActiveTab = tab;
+  ['plekken','belevingen','eigen'].forEach(t => {
+    const div = document.getElementById('padd-' + t);
+    if (div) div.style.display = t === tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.padd-tab').forEach(b => {
+    b.style.color = '#9A948E'; b.style.borderBottomColor = 'transparent'; b.style.fontWeight = '600';
+  });
+  if (el) { el.style.color = '#0A0A0A'; el.style.borderBottomColor = '#0A0A0A'; el.style.fontWeight = '700'; }
+}
+function filterPaddCat(cat, el) {
+  paddCatFilter = cat;
+  document.querySelectorAll('.padd-cat').forEach(b => {
+    b.style.background = 'transparent'; b.style.borderColor = 'rgba(10,10,10,0.15)'; b.style.color = '#6B6560';
+  });
+  if (el) { el.style.background = '#0A0A0A'; el.style.borderColor = '#0A0A0A'; el.style.color = '#F0E8E2'; }
+  renderPaddItems(cat);
+}
+function renderPaddItems(filter) {
+  const list = document.getElementById('padd-items-list');
+  if (!list) return;
+  const plan = getPlanVibes();
+  const alreadyAdded = new Set((plan[planAddSheetDay]||[]).filter(e=>e.type==='item').map(e=>e.id));
+  let items;
+  if (filter === 'eten') items = ITEMS.filter(it => ETEN_CATS.includes(it.cat));
+  else if (filter === 'doen') items = ITEMS.filter(it => DOEN_CATS.includes(it.cat));
+  else if (filter === 'shoppen') items = ITEMS.filter(it => SHOPPEN_CATS.includes(it.cat));
+  else items = ITEMS;
+  const CAT_ICON = {koffie:'☕',ontbijt:'🥐',diner:'🍽️',borrel:'🍷',activiteit:'🎨',wandelen:'🚶',markt:'🛍️',lunch:'🥗',uitgaan:'💃',shoppen:'🛍️',verborgen:'✨'};
+  list.innerHTML = items.map(it => {
+    const added = alreadyAdded.has(it.id);
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 20px;border-bottom:1px solid rgba(10,10,10,0.06);${added?'opacity:0.5;':''}">
+      <div style="font-size:1.1rem;flex-shrink:0;">${CAT_ICON[it.cat]||'📍'}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:0.82rem;font-weight:700;color:#0A0A0A;">${it.naam}</div>
+        <div style="font-size:0.68rem;color:#6B6560;">${it.wijk} · ${it.prijs||''}</div>
+      </div>
+      <button onclick="addItemToPlan('${it.id}')" ${added?'disabled':''} style="flex-shrink:0;padding:6px 12px;border-radius:12px;border:1.5px solid ${added?'rgba(10,10,10,0.1)':'#A89FE8'};background:${added?'transparent':'rgba(168,159,232,0.12)'};color:${added?'#9A948E':'#A89FE8'};font-size:0.75rem;font-weight:600;cursor:${added?'default':'pointer'};">${added?'✓ Toegevoegd':'＋ Voeg toe'}</button>
+    </div>`;
+  }).join('');
+}
+function renderPaddVibes() {
+  const list = document.getElementById('padd-vibes-list');
+  if (!list) return;
+  const selected = getSelectedVibeIds();
+  const DAY_LABEL = {ochtend:'🌅',middag:'☀️',avond:'🌙',zaterdag:'🗓',zondag:'☁️'};
+  list.innerHTML = VIBES.map(v => {
+    const on = selected.has(v.id);
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 20px;border-bottom:1px solid rgba(10,10,10,0.06);">
+      <div style="font-size:1.1rem;flex-shrink:0;">${DAY_LABEL[v.dagdeel]||'✨'}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:0.82rem;font-weight:700;color:#0A0A0A;">${v.naam}</div>
+        <div style="font-size:0.68rem;color:#6B6560;">${v.wijk} · ${v.duur}</div>
+      </div>
+      <button onclick="toggleVibeLike(event,'${v.id}')" style="flex-shrink:0;padding:6px 12px;border-radius:12px;border:1.5px solid ${on?'#A89FE8':'rgba(10,10,10,0.15)'};background:${on?'rgba(168,159,232,0.12)':'transparent'};color:${on?'#A89FE8':'#6B6560'};font-size:0.75rem;font-weight:600;cursor:pointer;">${on?'♥ Ingepland':'♡ Inplannen'}</button>
+    </div>`;
+  }).join('');
+}
+function addItemToPlan(id) {
+  const plan = getPlanVibes();
+  if (!plan[planAddSheetDay]) plan[planAddSheetDay] = [];
+  const already = plan[planAddSheetDay].some(e => e.type === 'item' && e.id === id);
+  if (!already) {
+    plan[planAddSheetDay].push({type:'item', id});
+    savePlanVibes(plan);
+    const it = ITEMS.find(x => x.id === id);
+    showToast((it ? it.naam : 'Item') + ' toegevoegd aan je dag');
+  }
+  renderPaddItems(paddCatFilter);
+}
+function selectEigenIcon(el, icon) {
+  eigenIconSelected = icon;
+  document.querySelectorAll('.icon-pick').forEach(b => {
+    b.style.borderColor = 'transparent'; b.style.background = 'rgba(10,10,10,0.04)';
+  });
+  if (el) { el.style.borderColor = '#0A0A0A'; el.style.background = 'rgba(10,10,10,0.07)'; }
+}
+function addEigenActivity() {
+  const naam = (document.getElementById('eigen-naam')||{}).value?.trim();
+  if (!naam) { showToast('Vul een naam in'); return; }
+  const plan = getPlanVibes();
+  if (!plan[planAddSheetDay]) plan[planAddSheetDay] = [];
+  plan[planAddSheetDay].push({type:'custom', naam, icon: eigenIconSelected});
+  savePlanVibes(plan);
+  document.getElementById('eigen-naam').value = '';
+  showToast(naam + ' toegevoegd');
+  closePlanAddSheet();
+}
+
 // ── PLAN VIBE BLOCKS ──────────────────────────────
 function moveVibeUp(day, idx) {
   const plan = getPlanVibes();
@@ -3402,6 +3595,52 @@ function toggleVibeStop(day, vibeIdx, stopIdx) {
   if (!plan[day][vibeIdx].stops_on) plan[day][vibeIdx].stops_on = [true,true,true];
   plan[day][vibeIdx].stops_on[stopIdx] = plan[day][vibeIdx].stops_on[stopIdx] === false ? true : false;
   savePlanVibes(plan); renderProgramma();
+}
+
+function renderItemPlanBlock(entry, idx, day) {
+  const it = ITEMS.find(x => x.id === entry.id);
+  if (!it) return '';
+  const CAT_ICON = {koffie:'☕',ontbijt:'🥐',diner:'🍽️',borrel:'🍷',activiteit:'🎨',wandelen:'🚶',markt:'🛍️',lunch:'🥗',uitgaan:'💃',shoppen:'🛍️',verborgen:'✨'};
+  const plan = getPlanVibes();
+  const dayArr = plan[day] || [];
+  const canUp = idx > 0, canDown = idx < dayArr.length - 1;
+  const DAY_NAMES = {vr26:'Vr 26',za27:'Za 27',zo28:'Zo 28'};
+  return `<div style="background:#fff;border-radius:var(--r-lg);border:1px solid rgba(10,10,10,0.08);padding:12px 14px;margin-bottom:10px;">
+    <div style="display:flex;align-items:flex-start;gap:10px;">
+      <div style="width:36px;height:36px;border-radius:10px;background:rgba(10,10,10,0.06);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">${CAT_ICON[it.cat]||'📍'}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:0.88rem;font-weight:700;color:#0A0A0A;line-height:1.3;">${it.naam}</div>
+        <div style="font-size:0.7rem;color:#6B6560;margin-top:2px;">${it.wijk}</div>
+        ${it.tijden ? `<div style="font-size:0.68rem;color:#9A948E;margin-top:2px;">🕐 ${it.tijden}</div>` : ''}
+        ${it.tip ? `<div style="font-size:0.7rem;color:#6B6560;font-style:italic;margin-top:4px;line-height:1.4;">"${it.tip}"</div>` : ''}
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center;">
+      ${canUp ? `<button onclick="moveVibeUp('${day}',${idx})" style="padding:5px 10px;border-radius:12px;border:1px solid rgba(10,10,10,0.12);background:transparent;font-size:0.7rem;cursor:pointer;">↑</button>` : ''}
+      ${canDown ? `<button onclick="moveVibeDown('${day}',${idx})" style="padding:5px 10px;border-radius:12px;border:1px solid rgba(10,10,10,0.12);background:transparent;font-size:0.7rem;cursor:pointer;">↓</button>` : ''}
+      ${Object.entries(DAY_NAMES).filter(([d])=>d!==day).map(([d,lbl])=>`<button onclick="moveVibeToDay('${day}',${idx},'${d}')" style="padding:5px 10px;border-radius:12px;border:1px solid rgba(10,10,10,0.12);background:transparent;font-size:0.7rem;cursor:pointer;">→ ${lbl}</button>`).join('')}
+      <button onclick="removeVibeFromPlan('${day}',${idx})" style="margin-left:auto;padding:5px 12px;border-radius:12px;border:1px solid rgba(168,159,232,0.3);background:rgba(168,159,232,0.1);color:#A89FE8;font-size:0.7rem;cursor:pointer;">✕ Verwijder</button>
+    </div>
+  </div>`;
+}
+
+function renderCustomPlanBlock(entry, idx, day) {
+  const plan = getPlanVibes();
+  const dayArr = plan[day] || [];
+  const canUp = idx > 0, canDown = idx < dayArr.length - 1;
+  const DAY_NAMES = {vr26:'Vr 26',za27:'Za 27',zo28:'Zo 28'};
+  return `<div style="background:#fff;border-radius:var(--r-lg);border:1.5px dashed rgba(10,10,10,0.12);padding:12px 14px;margin-bottom:10px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="font-size:1.3rem;flex-shrink:0;">${entry.icon||'📌'}</div>
+      <div style="flex:1;font-size:0.88rem;font-weight:700;color:#0A0A0A;">${entry.naam}</div>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+      ${canUp ? `<button onclick="moveVibeUp('${day}',${idx})" style="padding:5px 10px;border-radius:12px;border:1px solid rgba(10,10,10,0.12);background:transparent;font-size:0.7rem;cursor:pointer;">↑</button>` : ''}
+      ${canDown ? `<button onclick="moveVibeDown('${day}',${idx})" style="padding:5px 10px;border-radius:12px;border:1px solid rgba(10,10,10,0.12);background:transparent;font-size:0.7rem;cursor:pointer;">↓</button>` : ''}
+      ${Object.entries(DAY_NAMES).filter(([d])=>d!==day).map(([d,lbl])=>`<button onclick="moveVibeToDay('${day}',${idx},'${d}')" style="padding:5px 10px;border-radius:12px;border:1px solid rgba(10,10,10,0.12);background:transparent;font-size:0.7rem;cursor:pointer;">→ ${lbl}</button>`).join('')}
+      <button onclick="removeVibeFromPlan('${day}',${idx})" style="margin-left:auto;padding:5px 12px;border-radius:12px;border:1px solid rgba(168,159,232,0.3);background:rgba(168,159,232,0.1);color:#A89FE8;font-size:0.7rem;cursor:pointer;">✕ Verwijder</button>
+    </div>
+  </div>`;
 }
 
 function renderVibePlanBlock(entry, idx, day) {
@@ -3946,7 +4185,7 @@ function initInspiratie() {
     </div>`).join('') + `<div style="padding:6px 0;"><a href="https://www.brocabrac.fr" target="_blank" rel="noopener" style="font-size:0.75rem;color:var(--gold);text-decoration:none;">Pop-ups check op brocabrac.fr →</a></div>`;
 
   renderCommunityBronnen();
-  renderMustVanItems();
+  renderIdeeenGrid(ideeenActiveFilter || 'alle');
 }
 
 function renderMustVanItems() {
@@ -3974,6 +4213,57 @@ function renderMustVanItems() {
           </div>
         </div>
         <button onclick="quickLikeTip('${it.id}',this)" style="flex-shrink:0;padding:6px 10px;border-radius:12px;border:1.5px solid ${liked?'#A89FE8':'rgba(10,10,10,0.15)'};background:${liked?'rgba(168,159,232,0.15)':'transparent'};color:${liked?'#A89FE8':'#9A948E'};font-size:0.82rem;cursor:pointer;margin-top:2px;">${liked?'♥':'♡'}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let ideeenActiveFilter = 'alle';
+const ETEN_CATS = ['ontbijt','koffie','lunch','diner','borrel'];
+const DOEN_CATS = ['activiteit','wandelen','uitgaan'];
+const SHOPPEN_CATS = ['shoppen','markt'];
+
+function filterIdeeen(cat, el) {
+  ideeenActiveFilter = cat;
+  document.querySelectorAll('.ideeen-filter').forEach(b => {
+    b.style.background = 'transparent'; b.style.borderColor = 'rgba(10,10,10,0.15)'; b.style.color = '#6B6560';
+  });
+  if (el) { el.style.background = '#0A0A0A'; el.style.borderColor = '#0A0A0A'; el.style.color = '#F0E8E2'; }
+  renderIdeeenGrid(cat);
+}
+
+function renderIdeeenGrid(filter) {
+  const grid = document.getElementById('ideeen-grid');
+  if (!grid) return;
+  let items;
+  if (filter === 'eten') items = ITEMS.filter(it => ETEN_CATS.includes(it.cat));
+  else if (filter === 'doen') items = ITEMS.filter(it => DOEN_CATS.includes(it.cat));
+  else if (filter === 'shoppen') items = ITEMS.filter(it => SHOPPEN_CATS.includes(it.cat));
+  else items = ITEMS;
+  const CAT_ICON = {koffie:'☕',ontbijt:'🥐',diner:'🍽️',borrel:'🍷',activiteit:'🎨',wandelen:'🚶',markt:'🛍️',lunch:'🥗',uitgaan:'💃',shoppen:'🛍️',verborgen:'✨'};
+  const CAT_LABEL = {koffie:'Koffie',ontbijt:'Ontbijt',diner:'Diner',borrel:'Borrel',activiteit:'Activiteit',wandelen:'Wandelen',markt:'Markt',lunch:'Lunch',uitgaan:'Avond',shoppen:'Shoppen',verborgen:'Verborgen'};
+  grid.innerHTML = items.map(it => {
+    const liked = swipes[it.id] === 'like' || swipes[it.id] === 'dream';
+    const p = it.must_van ? PROFILES[it.must_van] : null;
+    const hook = it.hook || it.tip || '';
+    const vibe = VIBES.find(v => v.stops.some(s => s.naam === it.naam));
+    return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 20px;border-bottom:1px solid rgba(10,10,10,0.06);">
+      <div style="width:36px;height:36px;border-radius:10px;background:rgba(10,10,10,0.06);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">${CAT_ICON[it.cat]||'📍'}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;">
+          <div style="flex:1;">
+            <div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;line-height:1.3;">${it.naam}</div>
+            <div style="font-size:0.7rem;color:#6B6560;margin-top:1px;">${it.wijk}</div>
+          </div>
+          <button onclick="quickLikeTip('${it.id}',this)" style="flex-shrink:0;padding:5px 9px;border-radius:12px;border:1.5px solid ${liked?'#A89FE8':'rgba(10,10,10,0.15)'};background:${liked?'rgba(168,159,232,0.15)':'transparent'};color:${liked?'#A89FE8':'#9A948E'};font-size:0.82rem;cursor:pointer;">${liked?'♥':'♡'}</button>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:5px;">
+          <span style="font-size:0.62rem;padding:2px 7px;border-radius:8px;background:rgba(10,10,10,0.07);color:#6B6560;">${CAT_LABEL[it.cat]||it.cat}</span>
+          ${it.prijs ? `<span style="font-size:0.62rem;color:#9A948E;">${it.prijs}</span>` : ''}
+          ${p ? `<span style="display:inline-flex;align-items:center;gap:3px;">${avatarImg(it.must_van,14)}<span style="font-size:0.6rem;color:#9A948E;">tip van ${p.naam}</span></span>` : ''}
+          ${vibe ? `<span onclick="openVibeDetail('${vibe.id}')" style="font-size:0.62rem;padding:2px 7px;border-radius:8px;background:rgba(168,159,232,0.12);color:#A89FE8;cursor:pointer;">✨ ${vibe.naam}</span>` : ''}
+        </div>
+        ${hook ? `<div style="font-size:0.7rem;color:#6B6560;margin-top:4px;font-style:italic;">"${hook}"</div>` : ''}
       </div>
     </div>`;
   }).join('');
