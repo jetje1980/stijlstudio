@@ -499,6 +499,9 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <label class="modal-check">
         <input type="checkbox" id="add-reserveer"> Reservering nodig
       </label>
+      <label class="modal-check" style="margin-top:8px;">
+        <input type="checkbox" id="add-verborgen"> ✨ Verborgen Parijs — toeristen kennen dit niet
+      </label>
     </div>
     <button class="modal-submit" onclick="submitAdd()">Toevoegen ✓</button>
     <button class="modal-cancel" onclick="closeModal()">Annuleren</button>
@@ -508,7 +511,20 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 <!-- EVENT TOEVOEGEN MODAL -->
 <div id="event-modal" style="display:none;position:fixed;inset:0;z-index:700;background:rgba(10,10,10,0.3);align-items:flex-end;">
   <div style="background:#F0E8E2;border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-height:80vh;overflow-y:auto;">
-    <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.4rem;margin-bottom:16px;color:#0A0A0A;">Evenement toevoegen</div>
+    <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.4rem;margin-bottom:4px;color:#0A0A0A;">Evenement toevoegen</div>
+    <div style="font-size:0.72rem;color:#6B6560;margin-bottom:14px;">Iets gevonden dat dit weekend speelt? Zet het hier.</div>
+
+    <!-- Bron-tips -->
+    <div style="background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:14px;">
+      <div style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--t2);margin-bottom:8px;">🔍 Handige bronnen om te checken</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        <a href="https://www.sortiraparis.com/nl/wat-te-doen-in-parijs/agenda-weekend" target="_blank" rel="noopener" style="font-size:0.7rem;color:#A89FE8;text-decoration:none;padding:4px 10px;border:1px solid rgba(168,159,232,0.4);border-radius:14px;">Sortiraparis →</a>
+        <a href="https://www.timeout.com/paris/things-to-do/this-weekend-in-paris" target="_blank" rel="noopener" style="font-size:0.7rem;color:#A89FE8;text-decoration:none;padding:4px 10px;border:1px solid rgba(168,159,232,0.4);border-radius:14px;">Time Out Paris →</a>
+        <a href="https://www.jds.fr/paris/agenda-week-end-p1" target="_blank" rel="noopener" style="font-size:0.7rem;color:#A89FE8;text-decoration:none;padding:4px 10px;border:1px solid rgba(168,159,232,0.4);border-radius:14px;">JDS Paris →</a>
+        <a href="https://www.evous.fr/Paris,1165948.html" target="_blank" rel="noopener" style="font-size:0.7rem;color:#A89FE8;text-decoration:none;padding:4px 10px;border:1px solid rgba(168,159,232,0.4);border-radius:14px;">Evous →</a>
+      </div>
+    </div>
+
     <div class="modal-field">
       <label>Emoji</label>
       <input id="ev-emoji" type="text" placeholder="🎉" maxlength="4" style="font-size:1.3rem;text-align:center;max-width:80px;">
@@ -2906,6 +2922,7 @@ function submitAdd() {
     hook: document.getElementById('add-hook').value || '',
     type: addType || null,
     verhaal: document.getElementById('add-verhaal').value || '',
+    verborgen: document.getElementById('add-verborgen').checked || false,
     tip: '',
     added: true,
     added_by: PROFILES[currentUser].naam,
@@ -2923,6 +2940,7 @@ function submitAdd() {
   document.querySelectorAll('#add-type-chips .chip-btn').forEach(b => b.classList.remove('chip-sel'));
   document.getElementById('add-cat').value = '';
   document.getElementById('add-reserveer').checked = false;
+  document.getElementById('add-verborgen').checked = false;
 }
 
 // ── COLLAPSIBLES ─────────────────────────────────
