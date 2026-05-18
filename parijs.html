@@ -817,6 +817,23 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       </div>
     </div>
 
+    <!-- WIE SLAAPT WAAR -->
+    <div style="margin:0 20px;padding:16px 0;border-top:1px solid rgba(10,10,10,0.08);">
+      <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.1rem;color:#0A0A0A;margin-bottom:12px;">🛏️ Wie slaapt waar?</div>
+      <div id="slaap-indeling" style="display:flex;flex-direction:column;gap:8px;">
+        <div style="font-size:0.78rem;color:#6B6560;line-height:1.5;margin-bottom:8px;">Airbnb Rue du Temple · 3e · Le Marais<br>2 slaapkamers · 1 bank (uitvouwbaar)</div>
+        <div id="slaap-kamer1" style="padding:12px 14px;border-radius:var(--r-lg);background:rgba(10,10,10,0.05);font-size:0.85rem;">
+          <div style="font-weight:700;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:#6B6560;margin-bottom:8px;">Kamer 1 — tweepersoons</div>
+          <div id="slaap-k1-inhoud" style="display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+        <div id="slaap-kamer2" style="padding:12px 14px;border-radius:var(--r-lg);background:rgba(10,10,10,0.05);font-size:0.85rem;">
+          <div style="font-weight:700;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:#6B6560;margin-bottom:8px;">Kamer 2 — tweepersoons</div>
+          <div id="slaap-k2-inhoud" style="display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+        <div style="font-size:0.72rem;color:#9A948E;line-height:1.5;padding:8px 0;font-style:italic;">Tap je naam om te wisselen tussen kamers</div>
+      </div>
+    </div>
+
     <div class="groep-section-head" style="display:flex;align-items:center;gap:8px;">Jullie matches <span style="font-size:0.7rem;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;">3+ stemmen</span></div>
     <div class="groep-sub">Hier verschijnen jullie gedeelde favorieten</div>
     <div class="groep-matches" id="groep-matches"></div>
@@ -2192,6 +2209,7 @@ function toggleFav(id) {
 
 // ── GROEP ─────────────────────────────────────────
 function renderGroep() {
+  renderSlaapIndeling();
   const matchDiv = document.getElementById('groep-matches');
   const nearDiv = document.getElementById('groep-near');
   const allProfiles = ['griette','frederike','miriam','marlinde'];
@@ -2238,6 +2256,52 @@ function renderGroep() {
       <span class="near-badge">Nog ${needed} nodig</span>
     </div>`;
   }).join('') + `</div>` : `<div style="padding:16px;color:var(--bruin);font-size:0.85rem;">Geen bijna-matches nog.</div>`;
+}
+
+// ── WIE SLAAPT WAAR ──────────────────────────────
+const SLAAP_DEFAULT = {kamer1:['griette','frederike'], kamer2:['miriam','marlinde']};
+
+function renderSlaapIndeling() {
+  const k = 'vz_slaap';
+  const indeling = JSON.parse(localStorage.getItem(k) || JSON.stringify(SLAAP_DEFAULT));
+  const renderKamer = (id, mensen) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = mensen.map(u => {
+      const p = PROFILES[u];
+      const isMarlindeKamer = mensen.includes('marlinde') && u !== 'marlinde';
+      const warning = isMarlindeKamer ? ' <span title="Je bent gewaarschuwd" style="cursor:help;">⚠️</span>' : '';
+      return `<div onclick="wisselslaap('${u}')" style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:var(--r);cursor:pointer;background:rgba(10,10,10,0.04);transition:background 0.15s;" title="Tap om te wisselen">
+        <div style="width:28px;height:28px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.65rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>
+        <div style="font-size:0.85rem;color:#0A0A0A;">${p.naam}${warning}</div>
+        <div style="margin-left:auto;font-size:0.65rem;color:#A89FE8;">↔</div>
+      </div>`;
+    }).join('');
+    const disclaimer = mensen.includes('marlinde') ? `<div style="margin-top:8px;font-size:0.7rem;color:#9A948E;font-style:italic;">⚠️ Wie dit kiest: je bent gewaarschuwd.</div>` : '';
+    el.innerHTML += disclaimer;
+  };
+  renderKamer('slaap-k1-inhoud', indeling.kamer1);
+  renderKamer('slaap-k2-inhoud', indeling.kamer2);
+}
+
+function wisselslaap(user) {
+  const k = 'vz_slaap';
+  const indeling = JSON.parse(localStorage.getItem(k) || JSON.stringify(SLAAP_DEFAULT));
+  const inK1 = indeling.kamer1.includes(user);
+  if (inK1) {
+    indeling.kamer1 = indeling.kamer1.filter(u => u !== user);
+    const partner = indeling.kamer2[0] || null;
+    if (partner) { indeling.kamer2 = indeling.kamer2.filter(u => u !== partner); indeling.kamer1.push(partner); }
+    indeling.kamer2.push(user);
+  } else {
+    indeling.kamer2 = indeling.kamer2.filter(u => u !== user);
+    const partner = indeling.kamer1[0] || null;
+    if (partner) { indeling.kamer1 = indeling.kamer1.filter(u => u !== partner); indeling.kamer2.push(partner); }
+    indeling.kamer1.push(user);
+  }
+  localStorage.setItem(k, JSON.stringify(indeling));
+  renderSlaapIndeling();
+  showToast('Indeling gewijzigd ↔');
 }
 
 // ── MODAL ─────────────────────────────────────────
