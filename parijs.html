@@ -3338,13 +3338,13 @@ function submitEventAdd() {
 
 // ── INSPIRATIE ───────────────────────────────────
 const BRONNEN_VAST = [
-  {handle:'kozyparis', type:'Food', omschr:'Brunch-keten op 5 plekken in Parijs — ook in Le Marais', emoji:'☕', kleur:'#D4785A', door:'griette'},
-  {handle:'popcorn.paris', type:'Food/Lifestyle', omschr:'344K foodie-fotograaf, sterk in beeldtaal', emoji:'📸', kleur:'#7A9E82', door:'miriam'},
-  {handle:'boutiquebiketours', type:'Tour', omschr:'Lokale bike- en Seine-cruise tours', emoji:'🚲', kleur:'#7A8EAD', door:'griette'},
-  {handle:'parisfood_lilera', type:'Food', omschr:'"Où manger à Paris?" — de beste restaurantbron', emoji:'🍽️', kleur:'#AD7A9E', door:'miriam'},
-  {handle:'kissa.vintage.paris', type:'Brocante', omschr:'Wekelijkse brocante-lijst per arrondissement — A++', emoji:'🪞', kleur:'#6B6560', door:'frederike'},
-  {handle:'pucesdeparissaintouen', type:'Brocante', omschr:'Officieel Saint-Ouen — grootste brocante ter wereld', emoji:'🛒', kleur:'#9A7A50', door:'marlinde'},
-  {handle:'sortiraparis.com', url:'https://www.sortiraparis.com/nl', type:'Website', omschr:'Beste Parijs-agenda: events, tijdelijke expo\'s, geheime tips — ook in het Nederlands', emoji:'🗓️', kleur:'#C47A5A', door:null},
+  {handle:'kozyparis', type:'Food', omschr:'Brunch-keten op 5 plekken in Parijs — ook in Le Marais', emoji:'☕', kleur:'#D4785A', door:'griette', img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80'},
+  {handle:'popcorn.paris', type:'Food/Lifestyle', omschr:'344K foodie-fotograaf, sterk in beeldtaal', emoji:'📸', kleur:'#7A9E82', door:'miriam', img:'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80'},
+  {handle:'boutiquebiketours', type:'Tour', omschr:'Lokale bike- en Seine-cruise tours', emoji:'🚲', kleur:'#7A8EAD', door:'griette', img:'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=600&q=80'},
+  {handle:'parisfood_lilera', type:'Food', omschr:'"Où manger à Paris?" — de beste restaurantbron', emoji:'🍽️', kleur:'#AD7A9E', door:'miriam', img:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80'},
+  {handle:'kissa.vintage.paris', type:'Brocante', omschr:'Wekelijkse brocante-lijst per arrondissement — A++', emoji:'🪞', kleur:'#6B6560', door:'frederike', img:'https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=600&q=80'},
+  {handle:'pucesdeparissaintouen', type:'Brocante', omschr:'Officieel Saint-Ouen — grootste brocante ter wereld', emoji:'🛒', kleur:'#9A7A50', door:'marlinde', img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80'},
+  {handle:'sortiraparis.com', url:'https://www.sortiraparis.com/nl', type:'Website', omschr:'Beste Parijs-agenda: events, tijdelijke expo\'s, geheime tips — ook in het Nederlands', emoji:'🗓️', kleur:'#C47A5A', door:null, img:'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80'},
 ];
 const BROCANTES_VAST = [
   {naam:'Marché d\'Aligre', info:'di–zo 8–14u (za–zo tot 15u)', adres:'Place d\'Aligre, 12e', badge:'🔥 500m van jullie airbnb', door:'miriam'},
@@ -3370,11 +3370,18 @@ function initInspiratie() {
   if (!grid) return;
   grid.innerHTML = BRONNEN_VAST.map(b => `
     <a href="${b.url || 'https://www.instagram.com/' + b.handle}" target="_blank" rel="noopener" style="text-decoration:none;">
-      <div style="background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:14px 12px;cursor:pointer;transition:all 0.2s;height:100%;box-sizing:border-box;">
-        <div style="font-size:1.6rem;margin-bottom:6px;">${b.emoji}</div>
-        <div style="font-size:0.75rem;font-weight:700;color:#0A0A0A;margin-bottom:2px;">${b.url ? b.handle : '@' + b.handle}</div>
-        <div style="display:inline-block;background:rgba(168,159,232,0.15);color:#A89FE8;border-radius:8px;padding:2px 7px;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px;">${b.type}</div>
-        <div style="font-size:0.72rem;color:#6B6560;line-height:1.4;">${b.omschr}</div>
+      <div style="border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:transform 0.2s;height:100%;box-sizing:border-box;background:#f5f0eb;display:flex;flex-direction:column;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+        <div style="position:relative;height:110px;overflow:hidden;flex-shrink:0;">
+          <img src="${b.img}" alt="${b.handle}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy">
+          <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.55) 100%);"></div>
+          <div style="position:absolute;bottom:8px;left:10px;right:10px;">
+            <div style="font-size:0.72rem;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.6);line-height:1.2;">${b.url ? b.handle : '@' + b.handle}</div>
+          </div>
+          <div style="position:absolute;top:7px;right:8px;background:rgba(0,0,0,0.45);border-radius:6px;padding:2px 6px;font-size:0.55rem;letter-spacing:0.07em;text-transform:uppercase;color:rgba(255,255,255,0.9);">${b.type}</div>
+        </div>
+        <div style="padding:10px 11px 12px;flex:1;">
+          <div style="font-size:0.7rem;color:#4a4540;line-height:1.45;">${b.omschr}</div>
+        </div>
       </div>
     </a>`).join('');
 
