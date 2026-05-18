@@ -621,6 +621,17 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     </div>
 
     <!-- MAP -->
+    <div id="upcoming-strip" style="display:none;margin:8px 16px 4px;background:#0A0A0A;border-radius:var(--r-lg);padding:12px 14px;cursor:pointer;" onclick="switchTab('top5',document.querySelectorAll('.nav-btn')[2])">
+      <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(240,232,226,0.5);margin-bottom:3px;">Straks op het programma</div>
+      <div id="upcoming-content" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div style="flex:1;">
+          <div id="upcoming-name" style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:0.95rem;color:#F0E8E2;line-height:1.2;"></div>
+          <div id="upcoming-meta" style="font-size:0.7rem;color:rgba(240,232,226,0.6);margin-top:2px;"></div>
+        </div>
+        <div id="upcoming-time" style="font-size:0.75rem;color:var(--gold);font-weight:700;flex-shrink:0;text-align:right;"></div>
+      </div>
+    </div>
+
     <div class="home-section-title" style="margin-top:8px;">Onze plekken op de kaart</div>
     <div class="home-section-sub">Tap een pin voor meer info</div>
     <div id="paris-map" style="height:300px;margin:0 20px 8px;border-radius:var(--r-lg);overflow:hidden;"></div>
@@ -1042,6 +1053,16 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
   </div>
 </div>
 
+<!-- CONTEXT INTRO MODAL -->
+<div class="modal-overlay" id="context-intro-modal" style="display:none;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:#F0E8E2;border-radius:20px;padding:24px 22px;max-width:340px;width:100%;position:relative;">
+    <div style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Wat is dit eigenlijk?</div>
+    <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.1rem;color:#0A0A0A;margin-bottom:10px;" id="context-intro-title"></div>
+    <div style="font-size:0.85rem;color:#3A3530;line-height:1.6;" id="context-intro-body"></div>
+    <button onclick="document.getElementById('context-intro-modal').style.display='none'" style="margin-top:16px;width:100%;padding:11px;border:none;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.85rem;font-weight:700;cursor:pointer;">Duidelijk</button>
+  </div>
+</div>
+
 <!-- PLAN TOEVOEGEN SHEET -->
 <div class="modal-overlay" id="plan-add-sheet" style="display:none;align-items:flex-end;" onclick="if(event.target===this)closePlanAddSheet()">
   <div class="modal-sheet" style="max-height:85vh;overflow-y:auto;padding:0;">
@@ -1375,24 +1396,24 @@ const ITEMS_BASE = [
 
 // hook (≤50 chars, punchy), type (ervaring/plek/moment), verborgen
 const ITEM_ENRICHMENT = {
-  'du-pain-idees':          {hook:'Om 12u uitverkocht — plan vroeg',          type:'moment'},
+  'du-pain-idees':          {hook:'Om 12u uitverkocht — plan vroeg',          type:'moment', context_intro:'Dé bakkerij van Canal Saint-Martin — croissants en escargots die voor 12u uitverkocht zijn. Meer dan 150 jaar oud, alleen open op weekdagen. Als je ooit één Parijse bakker kiest, is het deze.'},
   'ten-belles':             {hook:'Third-wave koffie + croissant van Du Pain', type:'plek'},
   'claus-breakfast':        {hook:'Scandi ontbijt, rustig, zonder haast',       type:'plek'},
   'rose-bakery-breakfast':  {hook:'Quiche van de dag + brownie — klaar',        type:'plek'},
-  'cafe-de-flore':          {hook:'Sartre schreef hier. Jij drinkt koffie.',    type:'plek'},
+  'cafe-de-flore':          {hook:'Sartre schreef hier. Jij drinkt koffie.',    type:'plek', context_intro:'Sartre en Simone de Beauvoir schreven hier hun beste werk. Verwarmde terras, sterk licht, mensen die poseren. €7 koffie — maar je betaalt voor het gevoel van écht Parijs.'},
   'merci-cafe':             {hook:'Koffie tussen design — gevaarlijk',           type:'plek'},
   'telescope-coffee':       {hook:'Minuscule specialty bar, 2 min Palais-Royal',type:'plek'},
-  'cafe-pli':               {hook:'Brief aan jezelf voor 2046 ✉️',              type:'ervaring', verborgen:true},
+  'cafe-pli':               {hook:'Brief aan jezelf voor 2046 ✉️',              type:'ervaring', verborgen:true, context_intro:'Schrijf een brief aan jezelf die je pas over 1, 5 of 20 jaar terugkrijgt. Stationery en koffie inbegrepen. Over 20 jaar ontvangen we post uit Parijs 2026 — als we dan 66 zijn.'},
   'comptoir-general':       {hook:'Zwarte deur → tropisch universum',           type:'ervaring', verborgen:true},
   'bar-hemingway':          {hook:'Hemingway bevrijdde deze bar in 1944',       type:'plek'},
   'pavillon-puebla':        {hook:'Bar in park dat toeristen nooit vinden',     type:'moment',   verborgen:true},
-  'marche-enfants-rouges':  {hook:'Oudste markthal 1615, Japan + Libanon',      type:'moment'},
+  'marche-enfants-rouges':  {hook:'Oudste markthal 1615, Japan + Libanon',      type:'moment', context_intro:'Oudste overdekte markthal van Parijs (1615) — Japanse, Marokkaanse en Libanese kraampjes waar je aan lange tafels samen luncht. Zaterdag is het drukst maar ook het leukst.'},
   'hank-burger':            {hook:'Plant-based die vleeseters bekeert',         type:'plek'},
-  'shakespeare-co':         {hook:'Katten, briefjes op muren, stempel in elk boek',type:'plek'},
+  'shakespeare-co':         {hook:'Katten, briefjes op muren, stempel in elk boek',type:'plek', context_intro:'Meest fotografeerde boekwinkel ter wereld. Overvolle planken, slapende katten, briefjes van schrijvers. 30 meter van Notre-Dame. Koop iets kleins — elk boek heeft een stempel.'},
   'palais-royal':           {hook:'Tuin achter Louvre — toeristen slaan over',  type:'plek',     verborgen:true},
   'wandeling-saint-germain':{hook:'Sartre + Beauvoir + Baldwin — alles hier',   type:'plek'},
-  'wandeling-montmartre-early':{hook:'Magisch stil voor 9u, 50K toeristen daarna',type:'moment'},
-  'sezane-marais':          {hook:'Enige Sézane die op zondag open is',         type:'plek'},
+  'wandeling-montmartre-early':{hook:'Magisch stil voor 9u, 50K toeristen daarna',type:'moment', context_intro:'De heuvel boven Parijs, ooit een apart dorp. Sacré-Cœur, schilders op Place du Tertre, het roze café van Picasso. Voor 9u magisch stil — erna een mensensoep van 50.000 toeristen.'},
+  'sezane-marais':          {hook:'Enige Sézane die op zondag open is',         type:'plek', context_intro:'Sézane is hét Parijse vrouwenmerk van deze generatie — blazers, rokken, stoffen tassen. Het Marais-filiaal is de mooiste vestiging en de enige die op zondag open is.'},
   'sezane-17':              {hook:'Grootst + rustigst, geen wachtrij',          type:'plek'},
   'galeries-lafayette':     {hook:'Art-nouveau koepel 1912, gratis dak',        type:'plek'},
   'puces-saint-ouen':       {hook:'7 hectare, 2000 verkopers, cash mee',        type:'plek'},
@@ -1402,12 +1423,12 @@ const ITEM_ENRICHMENT = {
   'montmartre':             {hook:'Mensensoep 11–17u, magie voor 9 of na 17',   type:'moment'},
   'le-marais':              {hook:'Za 27/6 autovrij door Pride — straatfeest',  type:'moment'},
   'canal-saint-martin':     {hook:'Picknicken aan het water, bootjes door sluis',type:'moment'},
-  'coulee-verte':           {hook:'High Line van Parijs, 4m boven de stad',     type:'plek',     verborgen:true},
+  'coulee-verte':           {hook:'High Line van Parijs, 4m boven de stad',     type:'plek',     verborgen:true, context_intro:'Verhoogde wandelpromenade op een oude spoorbaan, 4 meter boven de straten. Feitelijk de eerste High Line ter wereld (1993, vóór New York). Rustiger dan de Seine-oever.'},
   'arenes-lutece':          {hook:'Romeins amfitheater verstopt achter poort',  type:'plek',     verborgen:true},
-  'pere-lachaise':          {hook:'Morrison + Piaf + Wilde — mooi, niet morbide',type:'plek'},
+  'pere-lachaise':          {hook:'Morrison + Piaf + Wilde — mooi, niet morbide',type:'plek', context_intro:'Grootste begraafplaats van Parijs, maar eigenlijk een park. Jim Morrison, Édith Piaf, Oscar Wilde en Chopin liggen hier. Geen morbide sfeer — eerder een stille stadstuin.'},
   'orsay':                  {hook:'Impressionisten in oud treinstation',         type:'plek'},
   'louvre':                 {hook:'Sla Mona Lisa over, Galerie d\'Apollon niet', type:'plek'},
-  'atelier-lumieres':       {hook:'Klimt als lichtprojectie — 1u, bij regen',   type:'ervaring', verborgen:true},
+  'atelier-lumieres':       {hook:'Klimt als lichtprojectie — 1u, bij regen',   type:'ervaring', verborgen:true, context_intro:'Digitale kunstinstallatie in een voormalige gieterij: Klimt, Van Gogh en Chagall als meeslepende lichtprojecties op muren en vloer. Eén uur, overweldigend, perfect bij regen.'},
   'baja-highlights':        {hook:'NL gids langs iconen, dag 1-aanrader',        type:'ervaring'},
   'baja-hidden':            {hook:'Backstreets waar Parijzenaars wonen',         type:'ervaring'},
   'baja-night':             {hook:'Eiffeltoren sprankelt elk uur 5 minuten',    type:'moment'},
@@ -1415,7 +1436,7 @@ const ITEM_ENRICHMENT = {
   'vaartocht-seine':        {hook:'Om 20:30 nog licht, gevels gloeien oranje',  type:'moment'},
   'laduree':                {hook:'6 macarons in mooi doosje — doe het gewoon', type:'plek'},
   'benedict-paris':         {hook:'NY-style eggs benedict, 12 varianten',       type:'plek'},
-  'bouillon-racine':        {hook:'1906 art-nouveau, lunch voor €17,50',        type:'plek'},
+  'bouillon-racine':        {hook:'1906 art-nouveau, lunch voor €17,50',        type:'plek', context_intro:'Art-nouveau brasserie uit 1906, ooit een goedkope arbeiderseettent. Escargots, crème brûlée, klassieke Franse brasserie — maar verrassend betaalbaar. Absoluut het mooiste interieur voor €17,50 lunch.'},
   'miznon':                 {hook:'Ottolenghi\'s broertje — geroosterde bloemkool',type:'plek'},
   'as-du-fallafel':         {hook:'DE falafel van Marais, rij = ervaring',       type:'plek'},
   'balls':                  {hook:'Gehaktballen in dozijn varianten, naast Atelier',type:'plek'},
@@ -1438,7 +1459,7 @@ const ITEM_ENRICHMENT = {
   'chez-julien':       {hook:'Gossip Girl seizoen 4 · chocolademousse', type:'plek'},
   'buly-1803':         {hook:'Apotheker parfumerie 1803 · viraal', type:'shoppen'},
   'stella-suzie':      {hook:'Boho riemen + tasjes · €35 perfecte riem', type:'shoppen'},
-  'i-love-you-wall':   {hook:'"Je t\'aime" in 311 talen · gratis', type:'moment'},
+  'i-love-you-wall':   {hook:'"Je t\'aime" in 311 talen · gratis', type:'moment', context_intro:'"Je t\'aime" in 311 talen op één muur op Square Jehan-Rictus in Montmartre. Gemaakt door twee kunstenaars op Valentijnsdag 2000. Simpel, ontroerend, gratis.'},
   'place-du-tertre':   {hook:'Kunstenaarsplein · Picasso atelier vroeger', type:'plek'},
   'vintage-marais':    {hook:'The Room · Revoir Vintage · Bimbo Vintage', type:'shoppen'},
   'baja-bikes':        {hook:'Fietstour Seine + Marais · €34–39 pp', type:'activiteit'},
@@ -4259,7 +4280,10 @@ function renderIdeeenGrid(filter) {
       <div style="flex:1;min-width:0;">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;">
           <div style="flex:1;">
-            <div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;line-height:1.3;">${it.naam}</div>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;line-height:1.3;">${it.naam}</div>
+              ${(ITEM_ENRICHMENT[it.id]||{}).context_intro ? `<button onclick="event.stopPropagation();showContextIntro('${it.id}')" style="flex-shrink:0;width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(10,10,10,0.2);background:transparent;color:#6B6560;font-size:0.62rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;">ⓘ</button>` : ''}
+            </div>
             <div style="font-size:0.7rem;color:#6B6560;margin-top:1px;">${it.wijk}</div>
           </div>
           <button onclick="quickLikeTip('${it.id}',this)" style="flex-shrink:0;padding:5px 9px;border-radius:12px;border:1.5px solid ${liked?'#A89FE8':'rgba(10,10,10,0.15)'};background:${liked?'rgba(168,159,232,0.15)':'transparent'};color:${liked?'#A89FE8':'#9A948E'};font-size:0.82rem;cursor:pointer;">${liked?'♥':'♡'}</button>
@@ -4274,6 +4298,19 @@ function renderIdeeenGrid(filter) {
       </div>
     </div>`;
   }).join('');
+}
+
+function showContextIntro(id) {
+  const it = ITEMS.find(x => x.id === id);
+  const enrich = ITEM_ENRICHMENT[id] || {};
+  if (!enrich.context_intro) return;
+  const modal = document.getElementById('context-intro-modal');
+  const title = document.getElementById('context-intro-title');
+  const body = document.getElementById('context-intro-body');
+  if (!modal || !title || !body) return;
+  title.textContent = it ? it.naam : id;
+  body.textContent = enrich.context_intro;
+  modal.style.display = 'flex';
 }
 
 function quickLikeTip(id, btn) {
