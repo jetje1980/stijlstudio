@@ -703,7 +703,9 @@ h1,h2,h3,h4{font-family:var(--serif);}
   <!-- SPELLEN -->
   <section id="sec-spellen" class="section">
     <div class="page-header"><div class="page-logo">Spellen</div></div>
-    <div style="padding:4px 16px 0;font-size:0.75rem;color:var(--bruin);">Voor in de trein, na het diner, of gewoon omdat het kan</div>
+    <div style="padding:4px 16px 12px;font-size:0.72rem;color:var(--t2);letter-spacing:0.05em;">Voor in de trein, na het diner, of gewoon omdat het kan</div>
+
+    <div style="padding:0 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Spelletjes</div>
     <div class="spellen-grid">
       <div class="spel-card" onclick="openGame('quiz')">
         <div class="spel-emoji">🗺️</div>
@@ -725,6 +727,55 @@ h1,h2,h3,h4{font-family:var(--serif);}
         <div class="spel-naam">Hoofd-spel</div>
         <div class="spel-desc">Telefoon op voorhoofd, raad het woord</div>
       </div>
+      <div class="spel-card" onclick="openGame('twee-lies')">
+        <div class="spel-emoji">🃏</div>
+        <div class="spel-naam">2 Waarheden 1 Leugen</div>
+        <div class="spel-desc">Wie kan de leugen herkennen? Gebaseerd op jullie Parijs-avonturen.</div>
+      </div>
+      <div class="spel-card" onclick="openGame('parijs-missie')">
+        <div class="spel-emoji">🎯</div>
+        <div class="spel-naam">Parijs Missies</div>
+        <div class="spel-desc">Dagelijkse uitdagingen in de stad. Wie durft?</div>
+      </div>
+    </div>
+
+    <div style="padding:16px 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Herinneringen</div>
+    <div style="padding:0 16px 8px;font-size:0.78rem;color:var(--t2);line-height:1.5;">Voeg hier je hoogtepunten toe per dag. Aan het eind van elke dag een korte terugblik.</div>
+
+    <div class="swipe-tabs" id="herin-day-tabs" style="-webkit-overflow-scrolling:touch;">
+      <button class="stab active" onclick="switchHerindag('vr26',this)">Vr 26 juni</button>
+      <button class="stab" onclick="switchHerindag('za27',this)">Za 27 juni</button>
+      <button class="stab" onclick="switchHerindag('zo28',this)">Zo 28 juni</button>
+    </div>
+    <div id="herin-content" style="padding:16px;"></div>
+
+    <div style="padding:0 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-top:8px;">Muziek voor de reis</div>
+    <div style="display:flex;gap:10px;padding:8px 16px 24px;overflow-x:auto;scrollbar-width:none;">
+      <a href="https://www.youtube.com/results?search_query=paris+cafe+jazz+playlist" target="_blank" style="flex:0 0 140px;background:#1e1e1e;border:1px solid var(--bd);border-radius:var(--r-lg);padding:14px 12px;text-decoration:none;display:block;">
+        <div style="font-size:1.8rem;margin-bottom:8px;">🎹</div>
+        <div style="font-family:var(--serif);font-style:italic;font-size:0.9rem;color:var(--t1);margin-bottom:3px;">Café de Flore</div>
+        <div style="font-size:0.68rem;color:var(--t2);">Piano jazz · Parijs</div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=chanson+francaise+playlist" target="_blank" style="flex:0 0 140px;background:#1e1e1e;border:1px solid var(--bd);border-radius:var(--r-lg);padding:14px 12px;text-decoration:none;display:block;">
+        <div style="font-size:1.8rem;margin-bottom:8px;">🎶</div>
+        <div style="font-family:var(--serif);font-style:italic;font-size:0.9rem;color:var(--t1);margin-bottom:3px;">Chanson Française</div>
+        <div style="font-size:0.68rem;color:var(--t2);">Piaf · Barbara · Gainsbourg</div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=paris+electro+night+playlist" target="_blank" style="flex:0 0 140px;background:#1e1e1e;border:1px solid var(--bd);border-radius:var(--r-lg);padding:14px 12px;text-decoration:none;display:block;">
+        <div style="font-size:1.8rem;margin-bottom:8px;">🌙</div>
+        <div style="font-family:var(--serif);font-style:italic;font-size:0.9rem;color:var(--t1);margin-bottom:3px;">Late Night Marais</div>
+        <div style="font-size:0.68rem;color:var(--t2);">Électro · House · Paris nuit</div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=apero+french+bossa+nova+playlist" target="_blank" style="flex:0 0 140px;background:#1e1e1e;border:1px solid var(--bd);border-radius:var(--r-lg);padding:14px 12px;text-decoration:none;display:block;">
+        <div style="font-size:1.8rem;margin-bottom:8px;">🥂</div>
+        <div style="font-family:var(--serif);font-style:italic;font-size:0.9rem;color:var(--t1);margin-bottom:3px;">Apéritif Hour</div>
+        <div style="font-size:0.68rem;color:var(--t2);">Bossa Nova · 18u · terrasse</div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=amelie+soundtrack+yann+tiersen" target="_blank" style="flex:0 0 140px;background:#1e1e1e;border:1px solid var(--bd);border-radius:var(--r-lg);padding:14px 12px;text-decoration:none;display:block;">
+        <div style="font-size:1.8rem;margin-bottom:8px;">🎬</div>
+        <div style="font-family:var(--serif);font-style:italic;font-size:0.9rem;color:var(--t1);margin-bottom:3px;">Amélie Soundtrack</div>
+        <div style="font-size:0.68rem;color:var(--t2);">Yann Tiersen · nostalgie</div>
+      </a>
     </div>
   </section>
 
@@ -831,6 +882,24 @@ h1,h2,h3,h4{font-family:var(--serif);}
       <button onclick="resetHoofd()" style="margin-top:20px;padding:12px 28px;background:var(--terra);color:#fff;border:none;border-radius:20px;font-size:0.9rem;cursor:pointer;">Nog een ronde</button>
     </div>
   </div>
+</div>
+
+<!-- 2 WAARHEDEN 1 LEUGEN OVERLAY -->
+<div class="game-overlay" id="game-twee-lies" style="display:none;">
+  <div class="game-header">
+    <button class="game-back" onclick="closeGame('twee-lies')">← Terug</button>
+    <div class="game-title">2 Waarheden 1 Leugen</div>
+  </div>
+  <div class="game-body" id="twee-lies-body"></div>
+</div>
+
+<!-- PARIJS MISSIES OVERLAY -->
+<div class="game-overlay" id="game-parijs-missie" style="display:none;">
+  <div class="game-header">
+    <button class="game-back" onclick="closeGame('parijs-missie')">← Terug</button>
+    <div class="game-title">Parijs Missies</div>
+  </div>
+  <div class="game-body" id="parijs-missie-body"></div>
 </div>
 
 <script>
@@ -1501,6 +1570,165 @@ function switchSwipeTabById(cat) {
   if (btn) { swipeTab = cat; document.querySelectorAll('#swipe-cat-tabs .stab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); buildSwipeStack(); }
 }
 
+// ── HERINNERINGEN ─────────────────────────────────
+let herinDay = 'vr26';
+const HERIN_VRAGEN = {
+  vr26: ['Wat was het eerste moment dat je dacht: ja, dit is Parijs?', 'Beste smaak van vandaag?', 'Eén ding dat je verraste vandaag.'],
+  za27: ['Mooiste ding dat je zag op de markt?', 'Beste gesprek van vandaag — over wat?', 'Als je dit moment in één woord moest samenvatten?'],
+  zo28: ['Wat neem je mee naar huis (niet uit een winkel)?', 'Beste moment van de hele trip?', 'Wat wil je volgend jaar ook doen?'],
+};
+function switchHerindag(day, el) {
+  herinDay = day;
+  document.querySelectorAll('#herin-day-tabs .stab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderHerinneringen();
+}
+function renderHerinneringen() {
+  const c = document.getElementById('herin-content');
+  if (!c) return;
+  const k = 'vz_herin_' + currentUser + '_' + herinDay;
+  const saved = JSON.parse(localStorage.getItem(k) || '{}');
+  const vragen = HERIN_VRAGEN[herinDay] || [];
+  c.innerHTML = `
+    <div style="font-size:0.75rem;color:var(--t2);margin-bottom:12px;line-height:1.5;">
+      Noteer hier je persoonlijke hoogtepunten van ${herinDay === 'vr26' ? 'vrijdag' : herinDay === 'za27' ? 'zaterdag' : 'zondag'}.
+    </div>
+    ${vragen.map((v,i) => `
+      <div style="margin-bottom:14px;">
+        <div style="font-size:0.72rem;color:var(--gold);margin-bottom:6px;font-style:italic;">${v}</div>
+        <textarea id="herin-q${i}" rows="2" placeholder="Jouw antwoord…"
+          style="width:100%;background:#1e1e1e;border:1px solid var(--bd);border-radius:var(--r);padding:10px 12px;color:var(--t1);font-size:0.85rem;font-family:var(--sans);resize:vertical;outline:none;"
+          onchange="saveHerin(${i},this.value)">${saved['q'+i]||''}</textarea>
+      </div>
+    `).join('')}
+    <div style="margin-bottom:14px;">
+      <div style="font-size:0.72rem;color:var(--gold);margin-bottom:6px;font-style:italic;">Vrije notitie — foto omschrijving, grappig moment, anything:</div>
+      <textarea id="herin-vrij" rows="3" placeholder="Schrijf hier alles wat je wil onthouden…"
+        style="width:100%;background:#1e1e1e;border:1px solid var(--bd);border-radius:var(--r);padding:10px 12px;color:var(--t1);font-size:0.85rem;font-family:var(--sans);resize:vertical;outline:none;"
+        onchange="saveHerin('vrij',this.value)">${saved['qvrij']||''}</textarea>
+    </div>
+    <button onclick="saveAllHerin()" style="width:100%;padding:12px;background:var(--gold);color:#000;border:none;border-radius:var(--r);font-weight:700;font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;">Opslaan ✓</button>
+  `;
+}
+function saveHerin(key, val) {
+  const k = 'vz_herin_' + currentUser + '_' + herinDay;
+  const saved = JSON.parse(localStorage.getItem(k) || '{}');
+  saved['q'+key] = val;
+  localStorage.setItem(k, JSON.stringify(saved));
+}
+function saveAllHerin() {
+  const c = document.getElementById('herin-content');
+  const k = 'vz_herin_' + currentUser + '_' + herinDay;
+  const saved = {};
+  c.querySelectorAll('textarea').forEach((ta, i) => {
+    saved['q'+(ta.id === 'herin-vrij' ? 'vrij' : i)] = ta.value;
+  });
+  localStorage.setItem(k, JSON.stringify(saved));
+  showToast('Opgeslagen ✓');
+}
+
+// ── NIEUWE SPELLEN ─────────────────────────────────
+const TWEE_LIES_DATA = [
+  {naam:'Griette',items:['Ik heb ooit een bekende Fransman aangesproken op straat.','Ik heb Parijs al meer dan 10 keer bezocht.','Ik ken de tekst van La Vie en Rose uit mijn hoofd.'],leugen:1},
+  {naam:'Frederike',items:['Ik heb ooit in een Parijs restaurant per ongeluk iets heel duur besteld.','Ik spreek vloeiend Frans.','Ik ben één keer met de verkeerde metro gegaan en een uur te laat aangekomen.'],leugen:1},
+  {naam:'Miriam',items:['Ik heb ooit een brocante-vondst verkocht voor meer dan ik betaalde.','Ik ben ooit door een Parijzenaar voor Frans aangezien.','Ik heb alle films van Amélie meerdere keren gezien.'],leugen:2},
+  {naam:'Marlinde',items:['Ik kan croissant maken.','Ik ben één keer blijven slapen in Parijs omdat ik de trein miste.','Ik heb ooit gedanst op een Parijs terras.'],leugen:0},
+];
+const PARIJS_MISSIES = [
+  {titel:'Spreek iemand aan in het Frans',desc:'Vraag de weg, bestel je koffie, of zeg gewoon "bonjour, belle journée!". Eén volledige zin in het Frans telt.', punten:1},
+  {titel:'Maak een foto die eruitziet als een postkaart',desc:'Geen selfie. Parijs als onderwerp. Architectuur, bloemen, water, marktjes — jij bepaalt. Delen in de groep.', punten:2},
+  {titel:'Proef iets wat je normaal nooit zou bestellen',desc:'Escargots? Steak tartare? Dat rare dessert op de kaart? Eén hap telt.', punten:3},
+  {titel:'Vind de stilste plek van de dag',desc:'Ergens zitten waar bijna niemand anders is. Minstens 3 minuten. Foto als bewijs.', punten:2},
+  {titel:'Koop één ding voor iemand thuis',desc:'Iets kleins, iets dat ze nooit zelf zouden kopen maar perfect bij ze past.', punten:1},
+  {titel:'Zeg één compliment aan een vreemde',desc:'Een compliment aan een voorbijganger, garçon, of winkelier die je echt meent.', punten:2},
+  {titel:'Loop minstens 30 minuten zonder GPS',desc:'Scherm weg, lopen, kijken, verdwalen mag. Gewoon lopen en zien waar je uitkomt.', punten:3},
+];
+let twoLiesIdx = 0;
+let twoLiesGuess = null;
+let missiesGedaan = {};
+
+function openGame(name) {
+  if (name === 'twee-lies') {
+    document.getElementById('game-twee-lies').style.display = 'flex';
+    document.getElementById('game-twee-lies').classList.add('show');
+    twoLiesIdx = 0; twoLiesGuess = null;
+    renderTweeWaarheden();
+    return;
+  }
+  if (name === 'parijs-missie') {
+    document.getElementById('game-parijs-missie').style.display = 'flex';
+    document.getElementById('game-parijs-missie').classList.add('show');
+    renderPaijsMissie();
+    return;
+  }
+  // original games
+  const el = document.getElementById('game-' + name);
+  if (!el) return;
+  el.classList.add('show');
+  el.style.display = 'flex';
+  if (name === 'quiz') { quizIdx = 0; quizScore = 0; renderQuiz(); }
+  if (name === 'trein') { treinMood = 'nostalgisch'; treinIdx = 0; renderTreinKaart(); }
+  if (name === 'wzd') { wzdIdx = 0; wzdScore = 0; renderWzd(); }
+  if (name === 'hoofd') { resetHoofd(); }
+}
+function renderTweeWaarheden() {
+  const d = TWEE_LIES_DATA[twoLiesIdx % TWEE_LIES_DATA.length];
+  const b = document.getElementById('twee-lies-body');
+  b.innerHTML = `
+    <div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">${twoLiesIdx+1} / ${TWEE_LIES_DATA.length}</div>
+    <div style="font-family:var(--serif);font-style:italic;font-size:1.3rem;margin-bottom:6px;">Over ${d.naam}</div>
+    <div style="font-size:0.78rem;color:var(--t2);margin-bottom:20px;">Welke is de leugen?</div>
+    ${d.items.map((item,i)=>`
+      <div onclick="guessTweeWaar(${i},${d.leugen})" style="padding:14px 16px;margin-bottom:10px;border-radius:var(--r);border:1px solid ${twoLiesGuess===null ? 'var(--bd)' : i===d.leugen ? '#22c55e' : twoLiesGuess===i ? '#ef4444' : 'var(--bd)'};background:${twoLiesGuess===null ? '#1e1e1e' : i===d.leugen ? 'rgba(34,197,94,0.1)' : twoLiesGuess===i ? 'rgba(239,68,68,0.1)' : '#1e1e1e'};cursor:${twoLiesGuess===null ? 'pointer' : 'default'};font-size:0.9rem;color:var(--t1);line-height:1.4;">
+        ${item} ${twoLiesGuess!==null && i===d.leugen ? ' ← LEUGEN' : ''}
+      </div>
+    `).join('')}
+    ${twoLiesGuess !== null ? `<button onclick="nextTweeWaar()" style="width:100%;padding:12px;background:var(--gold);color:#000;border:none;border-radius:var(--r);font-weight:700;cursor:pointer;margin-top:8px;">Volgende →</button>` : ''}
+  `;
+}
+function guessTweeWaar(guess, correct) {
+  if (twoLiesGuess !== null) return;
+  twoLiesGuess = guess;
+  showToast(guess === correct ? '✓ Goed!' : '✗ Mis!');
+  renderTweeWaarheden();
+}
+function nextTweeWaar() {
+  twoLiesIdx++; twoLiesGuess = null;
+  if (twoLiesIdx >= TWEE_LIES_DATA.length) { showToast('Alle rondes gespeeld!'); closeGame('twee-lies'); return; }
+  renderTweeWaarheden();
+}
+function renderPaijsMissie() {
+  const k = 'vz_parijs_missies';
+  missiesGedaan = JSON.parse(localStorage.getItem(k) || '{}');
+  const b = document.getElementById('parijs-missie-body');
+  const punten = Object.values(missiesGedaan).reduce((s,v)=>v?s+v:s,0);
+  b.innerHTML = `
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-family:var(--serif);font-style:italic;font-size:2rem;color:var(--gold);">${punten} ★</div>
+      <div style="font-size:0.65rem;color:var(--t2);letter-spacing:0.1em;text-transform:uppercase;">Jouw punten</div>
+    </div>
+    ${PARIJS_MISSIES.map((m,i)=>`
+      <div style="background:${missiesGedaan[i] ? 'var(--gold2)' : '#1e1e1e'};border:1px solid ${missiesGedaan[i] ? 'rgba(201,169,110,0.3)' : 'var(--bd)'};border-radius:var(--r-lg);padding:14px 16px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+          <div style="flex:1;">
+            <div style="font-family:var(--serif);font-style:italic;font-size:1rem;color:var(--t1);margin-bottom:4px;">${m.titel}</div>
+            <div style="font-size:0.78rem;color:var(--t2);line-height:1.4;">${m.desc}</div>
+          </div>
+          <div style="font-size:0.65rem;color:var(--gold);letter-spacing:0.08em;flex-shrink:0;">${m.punten}★</div>
+        </div>
+        ${!missiesGedaan[i] ? `<button onclick="completeMissie(${i},${m.punten})" style="margin-top:10px;padding:7px 16px;border-radius:12px;border:1px solid var(--bd);background:transparent;color:var(--t2);font-size:0.75rem;cursor:pointer;">○ Gedaan!</button>` : `<div style="margin-top:8px;font-size:0.75rem;color:var(--gold);">✓ Gedaan · ${m.punten} punt${m.punten>1?'en':''}</div>`}
+      </div>
+    `).join('')}
+  `;
+}
+function completeMissie(i, punten) {
+  const k = 'vz_parijs_missies';
+  missiesGedaan[i] = punten;
+  localStorage.setItem(k, JSON.stringify(missiesGedaan));
+  showToast(`+${punten} punt${punten>1?'en':''}! 🎯`);
+  renderPaijsMissie();
+}
+
 // ── TOP 5 ─────────────────────────────────────────
 function switchTop5Tab(tab, el) {
   top5Tab = tab;
@@ -1968,17 +2196,9 @@ function resetHoofd() {
 }
 
 // ── GAME OPEN / CLOSE ────────────────────────────
-function openGame(name) {
-  const el = document.getElementById('game-' + name);
-  el.classList.add('show');
-  if (name === 'quiz') { quizIdx = 0; quizScore = 0; renderQuiz(); }
-  if (name === 'trein') { treinMood = 'nostalgisch'; treinIdx = 0; renderTreinKaart(); }
-  if (name === 'wzd') { wzdIdx = 0; wzdScore = 0; renderWzd(); }
-  if (name === 'hoofd') { resetHoofd(); }
-}
-
 function closeGame(name) {
-  document.getElementById('game-' + name).classList.remove('show');
+  const el = document.getElementById('game-' + name);
+  if (el) { el.classList.remove('show'); el.style.display = 'none'; }
   if (name === 'hoofd' && hoofdTimer) clearInterval(hoofdTimer);
 }
 
@@ -1990,6 +2210,7 @@ function switchTab(name, el) {
   el.classList.add('active');
   if (name === 'groep') { renderGroep(); }
   if (name === 'top5') { renderProgramma(); }
+  if (name === 'spellen') { renderHerinneringen(); }
   if (name === 'swipe') buildSwipeStack();
 }
 
