@@ -774,71 +774,22 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
   <!-- SWIPE -->
   <section id="sec-swipe" class="section">
     <div class="page-header" style="padding-bottom:0;">
-      <div class="page-logo">Swipe</div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <button onclick="resetSwipeModeChoice()" title="Wissel swipe-modus" style="border:none;background:none;font-size:1rem;cursor:pointer;color:var(--t3);padding:4px;">⇄</button>
-        <div id="swipe-user-badge" style="font-size:0.7rem;color:var(--bruin);"></div>
-      </div>
+      <div class="page-logo">Belevingen</div>
+      <div id="bel-badge" onclick="switchTab('top5',document.querySelector('[onclick*=top5]'))" style="font-size:0.72rem;color:#A89FE8;font-weight:700;cursor:pointer;padding:4px 0;min-width:40px;text-align:right;"></div>
     </div>
-    <div class="swipe-tabs" id="swipe-cat-tabs" style="-webkit-overflow-scrolling:touch;">
-      <button class="stab active" onclick="switchSwipeTab('ontbijt',this)">Ontbijt</button>
-      <button class="stab" onclick="switchSwipeTab('koffie',this)">Koffie</button>
-      <button class="stab" onclick="switchSwipeTab('lunch',this)">Lunch</button>
-      <button class="stab" onclick="switchSwipeTab('diner',this)">Diner</button>
-      <button class="stab" onclick="switchSwipeTab('borrel',this)">Borrel</button>
-      <button class="stab" onclick="switchSwipeTab('wandelen',this)">Wandelen</button>
-      <button class="stab" onclick="switchSwipeTab('activiteit',this)">Activiteit</button>
-      <button class="stab" onclick="switchSwipeTab('uitgaan',this)">Uitgaan</button>
-      <button class="stab" onclick="switchSwipeTab('markt',this)">Markten</button>
-      <button class="stab" onclick="switchSwipeTab('verborgen',this)" style="background:rgba(168,159,232,0.25);color:#7A72C4;">✨ Verborgen</button>
+    <div style="padding:2px 20px 10px;font-size:0.8rem;color:var(--t2);line-height:1.5;">Klik ♥ op belevingen die bij jou passen — ze vormen automatisch jouw programma.</div>
+    <div style="display:flex;gap:8px;padding:0 20px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch;">
+      <button onclick="filterBel('all',this)" class="bel-filter active" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid #0A0A0A;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">Alle</button>
+      <button onclick="filterBel('ochtend',this)" class="bel-filter" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">🌅 Ochtend</button>
+      <button onclick="filterBel('middag',this)" class="bel-filter" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">☀️ Middag</button>
+      <button onclick="filterBel('avond',this)" class="bel-filter" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">🌙 Avond</button>
+      <button onclick="filterBel('zaterdag',this)" class="bel-filter" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">🗓 Za-special</button>
+      <button onclick="filterBel('zondag',this)" class="bel-filter" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">☁️ Zo-rustig</button>
     </div>
-    <!-- SWIPE MODUS KEUZE (eenmalig) -->
-    <div id="swipe-mode-modal" style="display:none;position:fixed;inset:0;z-index:650;background:rgba(10,10,10,0.35);align-items:flex-end;">
-      <div style="background:#F0E8E2;border-radius:20px 20px 0 0;padding:28px 24px 40px;width:100%;">
-        <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:800;font-size:1.4rem;color:#0A0A0A;margin-bottom:6px;">Hoe wil jij swipen?</div>
-        <div style="font-size:0.82rem;color:#6B6560;margin-bottom:20px;line-height:1.5;">Kies je stijl — we onthouden dit voor de volgende keer.</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <button onclick="setSwipeMode('direct')" style="padding:16px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:#0A0A0A;font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;text-align:left;color:#F0E8E2;font-weight:600;">
-            🔥 Direct swipen<br><span style="font-size:0.75rem;font-weight:400;opacity:0.7;">Kaartje voor kaartje — ik snap het snel genoeg</span>
-          </button>
-          <button onclick="setSwipeMode('lezen')" style="padding:16px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;text-align:left;color:#0A0A0A;font-weight:600;">
-            📋 Eerst overzicht<br><span style="font-size:0.75rem;font-weight:400;color:#6B6560;">Ik wil eerst zien wat er in de stack zit</span>
-          </button>
-        </div>
-      </div>
+    <div id="bel-grid" style="padding:0 16px 120px;display:flex;flex-direction:column;gap:14px;"></div>
+    <div id="bel-cta-bar" style="display:none;position:fixed;bottom:72px;left:0;right:0;z-index:100;padding:0 16px 4px;">
+      <button onclick="switchTab('top5',document.querySelector('[onclick*=top5]'))" style="width:100%;padding:14px;border:none;border-radius:30px;background:#A89FE8;color:#fff;font-family:var(--sans);font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;box-shadow:0 4px 20px rgba(168,159,232,0.45);"><span id="bel-cta-text">→ Bekijk jouw programma</span></button>
     </div>
-
-    <!-- OVERZICHT MODUS (browse voor swipen) -->
-    <div id="swipe-overzicht" style="display:none;padding:12px 20px 80px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:#6B6560;" id="overzicht-label">Overzicht</div>
-        <button onclick="sluitOverzicht()" style="padding:8px 16px;border:none;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;">Oké, swipen →</button>
-      </div>
-      <div id="overzicht-list"></div>
-    </div>
-
-    <!-- VOORKEUR NUDGE -->
-    <div id="voorkeur-nudge" style="display:none;margin:8px 20px 0;padding:12px 14px;background:rgba(168,159,232,0.1);border-radius:var(--r-lg);border:1px solid rgba(168,159,232,0.2);">
-      <div style="font-weight:700;font-size:0.82rem;color:#0A0A0A;margin-bottom:3px;">💡 Nog niet ingevuld</div>
-      <div style="font-size:0.75rem;color:#6B6560;line-height:1.5;margin-bottom:10px;">Vul je voorkeuren in — dat helpt Griette het programma op jullie af te stemmen.</div>
-      <button onclick="showVoorkeurScherm()" style="padding:8px 18px;border:none;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;">Invullen →</button>
-    </div>
-    <div class="swipe-stack" id="swipe-stack">
-      <div class="empty-stack">
-        <p>Alle kaarten geswiped! 🎉</p>
-        <p style="font-size:0.75rem;color:#aaa;margin-bottom:14px;">Check je Top 5 of bekijk alles opnieuw</p>
-        <button onclick="setSwipeMode('lezen');applySwipeMode()" style="padding:9px 20px;border:none;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-size:0.78rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;">Herzien / alles bekijken →</button>
-        <button onclick="openModal()" style="margin-top:8px;padding:9px 20px;border:1.5px solid rgba(10,10,10,0.15);border-radius:20px;background:transparent;color:#0A0A0A;font-size:0.78rem;cursor:pointer;display:block;">＋ Eigen activiteit toevoegen</button>
-      </div>
-    </div>
-    <div class="swipe-btns">
-      <button class="sbtn sbtn-pass" onclick="doSwipe('pass')" title="Pas">✕</button>
-      <button class="sbtn sbtn-dream" onclick="doSwipe('dream')" title="Droom">★</button>
-      <button class="sbtn sbtn-like" onclick="doSwipe('like')" title="Wil ik">♥</button>
-    </div>
-    <div class="swipe-hint">← Pas &nbsp;·&nbsp; ★ Droom &nbsp;·&nbsp; Wil ik →</div>
-    <!-- FAB om eigen activiteit toe te voegen -->
-    <button onclick="openModal()" style="position:fixed;bottom:96px;right:20px;width:46px;height:46px;border-radius:50%;border:none;background:#0A0A0A;color:#F0E8E2;font-size:1.4rem;cursor:pointer;z-index:180;box-shadow:0 2px 8px rgba(0,0,0,0.2);display:none;" id="swipe-fab">＋</button>
   </section>
 
   <!-- TOP5 -->
@@ -1054,27 +1005,15 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     <div style="padding:0 20px 8px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Brocantes dit weekend</div>
     <div style="padding:0 20px 16px;" id="brocante-grid"></div>
 
+    <div style="padding:0 20px 8px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Tips van jullie</div>
+    <div id="must-van-items" style="margin-bottom:4px;"></div>
+
     <div style="padding:0 20px 8px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Van ons</div>
     <div id="community-bronnen-lege-state" style="padding:0 20px 10px;font-size:0.78rem;color:var(--t3);font-style:italic;"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px 16px;" id="community-grid"></div>
     <div style="padding:16px 20px 32px;">
       <button onclick="openBronModal()" style="width:100%;padding:14px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">＋ Voeg jouw favoriete bron toe</button>
     </div>
-  </section>
-
-  <!-- VROEGZAT VIBES -->
-  <section id="sec-vibes" class="section">
-    <div class="page-header"><div class="page-logo">Vibes</div></div>
-    <div style="padding:0 20px 12px;font-size:0.82rem;color:var(--t2);line-height:1.6;">11 belevingen, elk met eigen karakter. Geen schema — gewoon wat past bij het moment.</div>
-    <div style="display:flex;gap:8px;padding:0 20px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;" id="vibes-filter-bar">
-      <button onclick="filterVibes('all',this)" class="vibes-filter-btn active" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid #0A0A0A;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">Alle</button>
-      <button onclick="filterVibes('ochtend',this)" class="vibes-filter-btn" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">🌅 Ochtend</button>
-      <button onclick="filterVibes('middag',this)" class="vibes-filter-btn" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">☀️ Middag</button>
-      <button onclick="filterVibes('avond',this)" class="vibes-filter-btn" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">🌙 Avond</button>
-      <button onclick="filterVibes('zaterdag',this)" class="vibes-filter-btn" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">Za-special</button>
-      <button onclick="filterVibes('zondag',this)" class="vibes-filter-btn" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">Zo-rustig</button>
-    </div>
-    <div id="vibes-grid" style="padding:0 16px 100px;display:flex;flex-direction:column;gap:14px;"></div>
   </section>
 
   <!-- BOTTOM NAV -->
@@ -1084,8 +1023,8 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       Home
     </button>
     <button class="nav-btn" onclick="switchTab('swipe',this)">
-      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M8 12h8M15 9l3 3-3 3"/></svg>
-      Swipe
+      <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+      Beleef
     </button>
     <button class="nav-btn" onclick="switchTab('top5',this)">
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>
@@ -1102,10 +1041,6 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     <button class="nav-btn" onclick="switchTab('inspiratie',this)">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
       Ideeën
-    </button>
-    <button class="nav-btn" onclick="switchTab('vibes',this)">
-      <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
-      Vibes
     </button>
   </nav>
 </div>
@@ -1851,7 +1786,7 @@ const TREIN_DATA = {
   frederike: {station:'Houten centrum',   vertrek:'06:21', ns:'houten-centrum',      target:'2026-06-26T06:21:00'},
   griette:   {station:'Houten Castellum', vertrek:'06:23', ns:'houten-castellum',    target:'2026-06-26T06:23:00'},
   marlinde:  {station:'Houten centrum',   vertrek:'06:21', ns:'houten-centrum',      target:'2026-06-26T06:21:00'},
-  miriam:    {station:'Houten centrum',   vertrek:'06:21', ns:'houten-centrum',      target:'2026-06-26T06:21:00'},
+  miriam:    {station:'Utrecht CS',        vertrek:'06:38', ns:'utrecht-centraal',    target:'2026-06-26T06:38:00'},
 };
 
 // ── COUNTDOWN ─────────────────────────────────────
@@ -2518,59 +2453,40 @@ const PROG_CONTEXT = {
 function renderProgramma() {
   const container = document.getElementById('prog-content');
   if (!container) return;
-  const items = PROGRAMMA[progDay] || [];
+  const plan = getPlanVibes();
+  const dayVibes = plan[progDay] || [];
+  const fixedSlots = (PROGRAMMA[progDay] || []).filter(s => s.type === 'fixed');
   const ctx = PROG_CONTEXT[progDay];
-  const doneKey = 'vz_prog_done_' + currentUser;
-  const done = JSON.parse(localStorage.getItem(doneKey) || '{}');
 
-  const ctxHtml = ctx ? `
-    <div style="margin:0 20px 16px;padding:16px;background:rgba(10,10,10,0.04);border-radius:var(--r-lg);border-left:3px solid ${ctx.kleur};">
-      <div style="font-family:var(--sans);font-style:italic;font-weight:700;font-size:0.95rem;color:#0A0A0A;margin-bottom:10px;">🗺 ${ctx.titel}</div>
-      ${ctx.blokken.map(b => `<div style="font-size:0.78rem;color:#6B6560;line-height:1.55;margin-bottom:8px;display:flex;gap:8px;"><span style="flex-shrink:0;">${b.icon}</span><span>${b.tekst}</span></div>`).join('')}
-    </div>` : '';
+  const ctxHtml = ctx ? `<div style="margin-bottom:16px;padding:14px 16px;background:rgba(10,10,10,0.04);border-radius:var(--r-lg);border-left:3px solid ${ctx.kleur};">
+    <div style="font-family:var(--sans);font-style:italic;font-weight:700;font-size:0.92rem;color:#0A0A0A;margin-bottom:8px;">🗺 ${ctx.titel}</div>
+    ${ctx.blokken.map(b=>`<div style="font-size:0.75rem;color:#6B6560;line-height:1.5;margin-bottom:6px;display:flex;gap:8px;"><span style="flex-shrink:0;">${b.icon}</span><span>${b.tekst}</span></div>`).join('')}
+  </div>` : '';
 
-  container.innerHTML = ctxHtml + items.map((slot, idx) => {
-    const slotKey = progDay + '_' + idx;
-    const isDone = done[slotKey];
-    if (slot.type === 'fixed') {
-      return `<div style="display:flex;gap:12px;margin-bottom:16px;align-items:flex-start;">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
-          <div style="font-size:1.2rem;line-height:1;">${slot.icon}</div>
-          <div style="width:1px;flex:1;background:var(--bd);margin-top:4px;min-height:24px;"></div>
-        </div>
-        <div style="flex:1;padding-bottom:8px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
-            <span style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);">${slot.time}</span>
-            <span style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);">${slot.label}</span>
-          </div>
-          <div style="font-family:var(--serif);font-style:italic;font-size:1.05rem;color:var(--t1);margin-bottom:2px;">${slot.naam}</div>
-          ${(() => { const it = ITEMS.find(x => x.naam === slot.naam || x.id === slot.id); return it?.hook ? `<div style="font-size:0.72rem;font-weight:600;color:var(--gold);margin-bottom:4px;">${it.hook}</div>` : ''; })()}
-          ${slot.detail ? `<div style="font-size:0.78rem;color:var(--t2);line-height:1.5;">${slot.detail}</div>` : ''}
-        </div>
-      </div>`;
-    } else {
-      const mySwipedItems = ITEMS.filter(it => it.cat === slot.cat && (swipes[it.id] === 'like' || swipes[it.id] === 'dream')).slice(0,3);
-      const swipeChips = mySwipedItems.length > 0
-        ? mySwipedItems.map(it => `<span onclick="switchTab('swipe',null);switchSwipeTabById('${slot.cat}')" style="display:inline-block;background:var(--gold2);color:var(--gold);border:1px solid rgba(201,169,110,0.25);border-radius:12px;padding:3px 10px;font-size:0.7rem;cursor:pointer;margin:2px;">${it.naam}</span>`).join('')
-        : `<span onclick="switchTab('swipe',null);switchSwipeTabById('${slot.cat}')" style="display:inline-block;background:rgba(168,159,232,0.15);color:#A89FE8;border-radius:12px;padding:3px 10px;font-size:0.7rem;cursor:pointer;">${slot.hint}</span>`;
-      return `<div style="display:flex;gap:12px;margin-bottom:16px;align-items:flex-start;">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
-          <div style="font-size:1.2rem;line-height:1;">${slot.icon}</div>
-          <div style="width:1px;flex:1;background:var(--bd);margin-top:4px;min-height:24px;"></div>
-        </div>
-        <div style="flex:1;padding-bottom:8px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
-            <span style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);">${slot.time}</span>
-            <span style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3);">${slot.label}</span>
-          </div>
-          <div style="flex-wrap:wrap;display:flex;gap:4px;margin-bottom:6px;">${swipeChips}</div>
-          <button onclick="toggleProgDone('${slotKey}')" style="font-size:0.7rem;padding:4px 12px;border-radius:12px;border:1px solid ${isDone ? 'var(--gold)' : 'var(--bd)'};background:${isDone ? 'var(--gold2)' : 'transparent'};color:${isDone ? 'var(--gold)' : 'var(--t3)'};cursor:pointer;">
-            ${isDone ? '✓ Gedaan' : '○ Markeer als gedaan'}
-          </button>
-        </div>
-      </div>`;
-    }
-  }).join('');
+  const fixedHtml = fixedSlots.length ? `<div style="margin-bottom:16px;">
+    <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Vaste tijden</div>
+    ${fixedSlots.map(slot=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
+      <span style="font-size:0.65rem;color:var(--gold);font-weight:700;flex-shrink:0;min-width:36px;margin-top:2px;">${slot.time}</span>
+      <div style="flex:1;"><div style="font-size:0.85rem;color:#0A0A0A;font-weight:600;">${slot.icon} ${slot.naam}</div>${slot.detail?`<div style="font-size:0.7rem;color:#6B6560;margin-top:2px;line-height:1.4;">${slot.detail}</div>`:''}</div>
+    </div>`).join('')}
+  </div>` : '';
+
+  if (dayVibes.length === 0) {
+    container.innerHTML = ctxHtml + fixedHtml + `<div style="padding:24px 0 16px;text-align:center;">
+      <div style="font-size:2.5rem;margin-bottom:10px;">✨</div>
+      <div style="font-size:0.88rem;color:#6B6560;line-height:1.6;margin-bottom:18px;">Kies belevingen bij <strong>Belevingen</strong><br>om jouw dag te vullen</div>
+      <button onclick="switchTab('swipe',document.querySelectorAll('.nav-btn')[1])" style="padding:11px 24px;border:none;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;">Naar Belevingen →</button>
+    </div>`;
+    return;
+  }
+
+  const vibeHtml = `<div style="margin-bottom:16px;">
+    <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Jouw belevingen</div>
+    ${dayVibes.map((entry, idx) => renderVibePlanBlock(entry, idx, progDay)).join('')}
+    <button onclick="switchTab('swipe',document.querySelectorAll('.nav-btn')[1])" style="margin-top:6px;width:100%;padding:10px;border:1.5px dashed rgba(168,159,232,0.4);border-radius:var(--r-lg);background:rgba(168,159,232,0.05);color:#A89FE8;font-family:var(--sans);font-size:0.78rem;font-weight:600;cursor:pointer;">＋ Meer belevingen toevoegen</button>
+  </div>`;
+
+  container.innerHTML = ctxHtml + fixedHtml + vibeHtml;
 }
 
 function toggleProgDone(slotKey) {
@@ -3368,14 +3284,179 @@ function switchTab(name, el) {
   if (name === 'top5') { renderProgramma(); }
   if (name === 'spellen') { renderHerinneringen(); }
   if (name === 'inspiratie') { initInspiratie(); }
-  if (name === 'vibes') { renderVibes('all'); }
-  const fab = document.getElementById('swipe-fab');
-  if (name === 'swipe') {
-    updateVoorkeurNudge(); checkSwipeMode();
-    if (fab) fab.style.display = 'flex';
+  if (name === 'swipe') { renderBelevingen(belActiveFilter || 'all'); }
+}
+
+// ── BELEVINGEN (vibes selector in swipe tab) ──────
+let belActiveFilter = 'all';
+
+function getPlanVibes() {
+  return JSON.parse(localStorage.getItem('vz_planVibes_' + currentUser) || '{"vr26":[],"za27":[],"zo28":[]}');
+}
+function savePlanVibes(plan) {
+  localStorage.setItem('vz_planVibes_' + currentUser, JSON.stringify(plan));
+}
+function getSelectedVibeIds() {
+  const plan = getPlanVibes();
+  return new Set([...plan.vr26, ...plan.za27, ...plan.zo28].map(e => e.id));
+}
+
+function toggleVibeLike(event, id) {
+  event.stopPropagation();
+  const plan = getPlanVibes();
+  const selected = getSelectedVibeIds();
+  if (selected.has(id)) {
+    ['vr26','za27','zo28'].forEach(d => { plan[d] = plan[d].filter(e => e.id !== id); });
   } else {
-    if (fab) fab.style.display = 'none';
+    const v = VIBES.find(x => x.id === id);
+    let day;
+    if (v.dagdeel === 'zaterdag') day = 'za27';
+    else if (v.dagdeel === 'zondag') day = 'zo28';
+    else {
+      const counts = {vr26:plan.vr26.length, za27:plan.za27.length, zo28:plan.zo28.length};
+      day = Object.entries(counts).sort((a,b) => a[1]-b[1])[0][0];
+    }
+    plan[day].push({id, stops_on:[true,true,true]});
+    v.stops.forEach(s => {
+      const it = ITEMS.find(x => x.naam === s.naam);
+      if (it && !swipes[it.id]) swipes[it.id] = 'like';
+    });
+    save();
   }
+  savePlanVibes(plan);
+  renderBelevingen(belActiveFilter);
+}
+
+function updateBelBadge() {
+  const n = getSelectedVibeIds().size;
+  const badge = document.getElementById('bel-badge');
+  const cta = document.getElementById('bel-cta-bar');
+  const ctaTxt = document.getElementById('bel-cta-text');
+  if (badge) badge.textContent = n > 0 ? n + ' ♥' : '';
+  if (cta) cta.style.display = n > 0 ? 'block' : 'none';
+  if (ctaTxt) ctaTxt.textContent = '→ Bekijk jouw programma (' + n + ' ' + (n===1?'beleving':'belevingen') + ')';
+}
+
+function filterBel(dagdeel, el) {
+  belActiveFilter = dagdeel;
+  document.querySelectorAll('.bel-filter').forEach(b => {
+    b.style.background = 'transparent'; b.style.borderColor = 'rgba(10,10,10,0.15)'; b.style.color = '#6B6560';
+  });
+  if (el) { el.style.background = '#0A0A0A'; el.style.borderColor = '#0A0A0A'; el.style.color = '#F0E8E2'; }
+  renderBelevingen(dagdeel);
+}
+
+function renderBelevingen(filter) {
+  belActiveFilter = filter || 'all';
+  const grid = document.getElementById('bel-grid');
+  if (!grid) return;
+  const selected = getSelectedVibeIds();
+  const filtered = belActiveFilter === 'all' ? VIBES : VIBES.filter(v => v.dagdeel === belActiveFilter);
+  const DAY_LABEL = {ochtend:'🌅 Ochtend',middag:'☀️ Middag',avond:'🌙 Avond',zaterdag:'🗓 Za-special',zondag:'☁️ Zo-rustig'};
+  const PLAN_DAY = {vr26:'Vr 26 juni',za27:'Za 27 juni',zo28:'Zo 28 juni'};
+  const plan = getPlanVibes();
+  const vibeDay = {};
+  ['vr26','za27','zo28'].forEach(d => plan[d].forEach(e => { vibeDay[e.id] = d; }));
+  grid.innerHTML = filtered.map(v => {
+    const isOn = selected.has(v.id);
+    const dayAssigned = vibeDay[v.id];
+    return `<div style="border-radius:var(--r-lg);overflow:hidden;background:#fff;box-shadow:${isOn?'0 0 0 2px #A89FE8,0 4px 16px rgba(168,159,232,0.25)':'0 2px 12px rgba(10,10,10,0.08)'};position:relative;transition:box-shadow 0.2s;">
+      <div onclick="openVibeDetail('${v.id}')" style="cursor:pointer;">
+        <div style="height:150px;background-image:url('${v.img}');background-size:cover;background-position:center;position:relative;">
+          <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,10,10,0) 40%,rgba(10,10,10,0.65));"></div>
+          <div style="position:absolute;top:10px;left:12px;display:flex;gap:5px;">
+            <span style="background:rgba(10,10,10,0.55);color:#F0E8E2;font-size:0.62rem;padding:3px 8px;border-radius:12px;font-weight:600;">${DAY_LABEL[v.dagdeel]||v.dagdeel}</span>
+            <span style="background:rgba(10,10,10,0.55);color:#F0E8E2;font-size:0.62rem;padding:3px 8px;border-radius:12px;">${v.duur}</span>
+          </div>
+          <div style="position:absolute;bottom:10px;left:12px;right:50px;">
+            <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.1rem;color:#F0E8E2;line-height:1.2;">${v.emojis} ${v.naam}</div>
+            <div style="font-size:0.68rem;color:rgba(240,232,226,0.8);margin-top:2px;">${v.wijk}</div>
+          </div>
+        </div>
+        <div style="padding:10px 14px 8px;">
+          <div style="font-size:0.8rem;color:#3A3530;line-height:1.5;">"${v.zin}"</div>
+          ${isOn && dayAssigned ? `<div style="font-size:0.68rem;color:#A89FE8;font-weight:600;margin-top:6px;">✓ Ingepland op ${PLAN_DAY[dayAssigned]}</div>` : ''}
+        </div>
+      </div>
+      <div style="padding:0 14px 12px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:0.68rem;color:#9A948E;">${v.stops.length} stops · <span style="cursor:pointer;color:#A89FE8;" onclick="openVibeDetail('${v.id}')">Bekijk route →</span></div>
+        <button onclick="toggleVibeLike(event,'${v.id}')" style="padding:8px 16px;border-radius:20px;border:1.5px solid ${isOn?'#A89FE8':'rgba(10,10,10,0.15)'};background:${isOn?'rgba(168,159,232,0.15)':'transparent'};color:${isOn?'#A89FE8':'#6B6560'};font-size:0.82rem;font-weight:700;cursor:pointer;transition:all 0.15s;">${isOn?'♥ Ingepland':'♡ Inplannen'}</button>
+      </div>
+    </div>`;
+  }).join('');
+  updateBelBadge();
+}
+
+// ── PLAN VIBE BLOCKS ──────────────────────────────
+function moveVibeUp(day, idx) {
+  const plan = getPlanVibes();
+  if (idx === 0) return;
+  [plan[day][idx-1], plan[day][idx]] = [plan[day][idx], plan[day][idx-1]];
+  savePlanVibes(plan); renderProgramma();
+}
+function moveVibeDown(day, idx) {
+  const plan = getPlanVibes();
+  if (idx >= plan[day].length - 1) return;
+  [plan[day][idx], plan[day][idx+1]] = [plan[day][idx+1], plan[day][idx]];
+  savePlanVibes(plan); renderProgramma();
+}
+function moveVibeToDay(fromDay, idx, toDay) {
+  const plan = getPlanVibes();
+  const [entry] = plan[fromDay].splice(idx, 1);
+  plan[toDay].push(entry);
+  savePlanVibes(plan); renderProgramma();
+  const names = {vr26:'Vr 26',za27:'Za 27',zo28:'Zo 28'};
+  showToast('Beleving verplaatst naar ' + names[toDay]);
+}
+function removeVibeFromPlan(day, idx) {
+  const plan = getPlanVibes();
+  plan[day].splice(idx, 1);
+  savePlanVibes(plan); renderProgramma(); renderBelevingen(belActiveFilter);
+}
+function toggleVibeStop(day, vibeIdx, stopIdx) {
+  const plan = getPlanVibes();
+  if (!plan[day][vibeIdx]) return;
+  if (!plan[day][vibeIdx].stops_on) plan[day][vibeIdx].stops_on = [true,true,true];
+  plan[day][vibeIdx].stops_on[stopIdx] = plan[day][vibeIdx].stops_on[stopIdx] === false ? true : false;
+  savePlanVibes(plan); renderProgramma();
+}
+
+function renderVibePlanBlock(entry, idx, day) {
+  const v = VIBES.find(x => x.id === entry.id);
+  if (!v) return '';
+  const dagEmoji = {ochtend:'🌅',middag:'☀️',avond:'🌙',zaterdag:'🗓',zondag:'☁️'}[v.dagdeel]||'';
+  const plan = getPlanVibes();
+  const dayArr = plan[day] || [];
+  const canUp = idx > 0, canDown = idx < dayArr.length - 1;
+  const DAY_NAMES = {vr26:'Vr 26',za27:'Za 27',zo28:'Zo 28'};
+  const stopsOn = entry.stops_on || [true,true,true];
+  return `<div style="background:#fff;border-radius:var(--r-lg);overflow:hidden;box-shadow:0 2px 8px rgba(10,10,10,0.07);margin-bottom:10px;">
+    <div onclick="openVibeDetail('${v.id}')" style="height:80px;background-image:url('${v.img}');background-size:cover;background-position:center;position:relative;cursor:pointer;">
+      <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(10,10,10,0.65) 0%,rgba(10,10,10,0.15) 100%);"></div>
+      <div style="position:absolute;left:12px;right:12px;top:50%;transform:translateY(-50%);">
+        <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1rem;color:#F0E8E2;line-height:1.2;">${dagEmoji} ${v.naam}</div>
+        <div style="font-size:0.65rem;color:rgba(240,232,226,0.75);margin-top:2px;">${v.wijk} · ${v.duur}</div>
+      </div>
+    </div>
+    <div style="padding:10px 12px 12px;">
+      ${v.stops.map((s,si) => {
+        const on = stopsOn[si] !== false;
+        return `<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid rgba(10,10,10,0.05);">
+          <div onclick="toggleVibeStop('${day}',${idx},${si})" style="width:18px;height:18px;border-radius:4px;border:1.5px solid ${on?'#A89FE8':'rgba(10,10,10,0.15)'};background:${on?'rgba(168,159,232,0.2)':'transparent'};flex-shrink:0;cursor:pointer;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:#A89FE8;">${on?'✓':''}</div>
+          <div style="flex:1;">
+            <div style="font-size:0.78rem;font-weight:600;color:${on?'#0A0A0A':'#9A948E'};text-decoration:${on?'none':'line-through'};line-height:1.3;">${s.naam}</div>
+            <div style="font-size:0.68rem;color:#6B6560;line-height:1.4;">${s.actie}</div>
+          </div>
+        </div>`;
+      }).join('')}
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center;">
+        ${canUp ? `<button onclick="moveVibeUp('${day}',${idx})" style="padding:5px 10px;border-radius:12px;border:1px solid rgba(10,10,10,0.12);background:transparent;font-size:0.7rem;cursor:pointer;">↑</button>` : ''}
+        ${canDown ? `<button onclick="moveVibeDown('${day}',${idx})" style="padding:5px 10px;border-radius:12px;border:1px solid rgba(10,10,10,0.12);background:transparent;font-size:0.7rem;cursor:pointer;">↓</button>` : ''}
+        ${Object.entries(DAY_NAMES).filter(([d])=>d!==day).map(([d,lbl])=>`<button onclick="moveVibeToDay('${day}',${idx},'${d}')" style="padding:5px 10px;border-radius:12px;border:1px solid rgba(10,10,10,0.12);background:transparent;font-size:0.7rem;cursor:pointer;">→ ${lbl}</button>`).join('')}
+        <button onclick="removeVibeFromPlan('${day}',${idx})" style="margin-left:auto;padding:5px 12px;border-radius:12px;border:1px solid rgba(168,159,232,0.3);background:rgba(168,159,232,0.1);color:#A89FE8;font-size:0.7rem;cursor:pointer;">✕ Verwijder</button>
+      </div>
+    </div>
+  </div>`;
 }
 
 // ── VROEGZAT VIBES ────────────────────────────────
@@ -3586,13 +3667,6 @@ function openVibeDetail(id) {
           </div>
         </div>
       `).join('')}
-      <div style="margin-top:16px;padding:12px 14px;background:rgba(10,10,10,0.04);border-radius:var(--r-lg);display:flex;align-items:center;gap:10px;">
-        <div style="width:32px;height:32px;border-radius:50%;background:${p.color||'#ccc'};display:flex;align-items:center;justify-content:center;font-size:0.8rem;color:#fff;font-weight:700;font-style:italic;font-family:var(--sans);">${p.init||'?'}</div>
-        <div>
-          <div style="font-size:0.72rem;font-weight:700;color:#0A0A0A;">${p.naam||v.attributie}</div>
-          <div style="font-size:0.68rem;color:#9A948E;">Samengesteld deze vibe</div>
-        </div>
-      </div>
     </div>
   `;
   modal.style.display = 'flex';
@@ -3889,6 +3963,34 @@ function initInspiratie() {
     </div>`).join('') + `<div style="padding:6px 0;"><a href="https://www.brocabrac.fr" target="_blank" rel="noopener" style="font-size:0.75rem;color:var(--gold);text-decoration:none;">Pop-ups check op brocabrac.fr →</a></div>`;
 
   renderCommunityBronnen();
+  renderMustVanItems();
+}
+
+function renderMustVanItems() {
+  const div = document.getElementById('must-van-items');
+  if (!div) return;
+  const allUsers = ['griette','frederike','miriam','marlinde'];
+  const CAT_ICON = {koffie:'☕',ontbijt:'🥐',diner:'🍽️',borrel:'🍷',activiteit:'🎨',wandelen:'🚶',markt:'🛍️',lunch:'🥗',uitgaan:'💃'};
+  div.innerHTML = allUsers.map(u => {
+    const p = PROFILES[u];
+    const items = ITEMS.filter(it => it.must_van === u);
+    if (!items.length) return '';
+    return `<div style="margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:0 20px;">
+        ${avatarImg(u, 26)}
+        <div style="font-size:0.75rem;font-weight:700;color:#0A0A0A;">${p.naam}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;padding:0 20px;">
+        ${items.map(it => `<div style="background:rgba(10,10,10,0.04);border-radius:var(--r-lg);padding:10px 12px;display:flex;align-items:flex-start;gap:10px;">
+          <div style="font-size:1.1rem;flex-shrink:0;">${CAT_ICON[it.cat]||'📍'}</div>
+          <div style="flex:1;">
+            <div style="font-size:0.82rem;font-weight:700;color:#0A0A0A;margin-bottom:2px;">${it.naam}</div>
+            <div style="font-size:0.7rem;color:#6B6560;line-height:1.4;">${it.wijk}${it.hook ? ' · ' + it.hook : ''}</div>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function renderCommunityBronnen() {
