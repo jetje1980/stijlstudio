@@ -828,23 +828,6 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       </div>
     </div>
 
-    <!-- WIE SLAAPT WAAR -->
-    <div style="margin:0 20px;padding:16px 0;border-top:1px solid rgba(10,10,10,0.08);">
-      <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.1rem;color:#0A0A0A;margin-bottom:12px;">🛏️ Wie slaapt waar?</div>
-      <div id="slaap-indeling" style="display:flex;flex-direction:column;gap:8px;">
-        <div style="font-size:0.78rem;color:#6B6560;line-height:1.5;margin-bottom:8px;">Airbnb Rue du Temple · 3e · Le Marais<br>2 slaapkamers · 1 bank (uitvouwbaar)</div>
-        <div id="slaap-kamer1" style="padding:12px 14px;border-radius:var(--r-lg);background:rgba(10,10,10,0.05);font-size:0.85rem;">
-          <div style="font-weight:700;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:#6B6560;margin-bottom:8px;">Kamer 1 — tweepersoons</div>
-          <div id="slaap-k1-inhoud" style="display:flex;flex-direction:column;gap:6px;"></div>
-        </div>
-        <div id="slaap-kamer2" style="padding:12px 14px;border-radius:var(--r-lg);background:rgba(10,10,10,0.05);font-size:0.85rem;">
-          <div style="font-weight:700;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:#6B6560;margin-bottom:8px;">Kamer 2 — tweepersoons</div>
-          <div id="slaap-k2-inhoud" style="display:flex;flex-direction:column;gap:6px;"></div>
-        </div>
-        <div style="font-size:0.72rem;color:#9A948E;line-height:1.5;padding:8px 0;font-style:italic;">Tap je naam om te wisselen tussen kamers</div>
-      </div>
-    </div>
-
     <!-- MUST-HAVES PER PERSOON -->
     <div style="margin:0 20px 16px;padding:16px 0;border-top:1px solid rgba(10,10,10,0.08);">
       <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.1rem;color:#0A0A0A;margin-bottom:4px;">💌 Dit mag niet missen</div>
@@ -1786,7 +1769,7 @@ const TREIN_DATA = {
   frederike: {station:'Houten centrum',   vertrek:'06:21', ns:'houten-centrum',      target:'2026-06-26T06:21:00'},
   griette:   {station:'Houten Castellum', vertrek:'06:23', ns:'houten-castellum',    target:'2026-06-26T06:23:00'},
   marlinde:  {station:'Houten centrum',   vertrek:'06:21', ns:'houten-centrum',      target:'2026-06-26T06:21:00'},
-  miriam:    {station:'Utrecht CS',        vertrek:'06:38', ns:'utrecht-centraal',    target:'2026-06-26T06:38:00'},
+  miriam:    {station:'Houten centrum',    vertrek:'06:21', ns:'houten-centrum',      target:'2026-06-26T06:21:00'},
 };
 
 // ── COUNTDOWN ─────────────────────────────────────
@@ -3969,28 +3952,42 @@ function initInspiratie() {
 function renderMustVanItems() {
   const div = document.getElementById('must-van-items');
   if (!div) return;
-  const allUsers = ['griette','frederike','miriam','marlinde'];
   const CAT_ICON = {koffie:'☕',ontbijt:'🥐',diner:'🍽️',borrel:'🍷',activiteit:'🎨',wandelen:'🚶',markt:'🛍️',lunch:'🥗',uitgaan:'💃'};
-  div.innerHTML = allUsers.map(u => {
-    const p = PROFILES[u];
-    const items = ITEMS.filter(it => it.must_van === u);
-    if (!items.length) return '';
-    return `<div style="margin-bottom:14px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:0 20px;">
-        ${avatarImg(u, 26)}
-        <div style="font-size:0.75rem;font-weight:700;color:#0A0A0A;">${p.naam}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px;padding:0 20px;">
-        ${items.map(it => `<div style="background:rgba(10,10,10,0.04);border-radius:var(--r-lg);padding:10px 12px;display:flex;align-items:flex-start;gap:10px;">
-          <div style="font-size:1.1rem;flex-shrink:0;">${CAT_ICON[it.cat]||'📍'}</div>
-          <div style="flex:1;">
-            <div style="font-size:0.82rem;font-weight:700;color:#0A0A0A;margin-bottom:2px;">${it.naam}</div>
-            <div style="font-size:0.7rem;color:#6B6560;line-height:1.4;">${it.wijk}${it.hook ? ' · ' + it.hook : ''}</div>
+  const CAT_DAGDEEL = {ontbijt:'ochtend',koffie:'ochtend',lunch:'middag',markt:'middag',activiteit:'middag',wandelen:'middag',diner:'avond',borrel:'avond',uitgaan:'avond'};
+  const allTips = ITEMS.filter(it => it.must_van).sort((a,b) => a.must_van.localeCompare(b.must_van));
+  if (!allTips.length) { div.innerHTML = ''; return; }
+  div.innerHTML = allTips.map(it => {
+    const p = PROFILES[it.must_van] || {};
+    const vibe = VIBES.find(v => v.stops.some(s => s.naam === it.naam));
+    const liked = swipes[it.id] === 'like';
+    const suggestDagdeel = CAT_DAGDEEL[it.cat];
+    const suggestVibe = !vibe && suggestDagdeel ? VIBES.find(v => v.dagdeel === suggestDagdeel) : null;
+    return `<div style="background:rgba(10,10,10,0.04);border-radius:var(--r-lg);padding:12px 14px;margin:0 20px 8px;">
+      <div style="display:flex;align-items:flex-start;gap:10px;">
+        <div style="font-size:1.1rem;flex-shrink:0;margin-top:1px;">${CAT_ICON[it.cat]||'📍'}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;margin-bottom:2px;">${it.naam}</div>
+          <div style="font-size:0.7rem;color:#6B6560;line-height:1.4;">${it.wijk}${it.hook?' · '+it.hook:''}</div>
+          <div style="margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            ${avatarImg(it.must_van, 18)}<span style="font-size:0.65rem;color:#9A948E;">tip van ${p.naam||it.must_van}</span>
+            ${vibe ? `<span onclick="openVibeDetail('${vibe.id}')" style="padding:2px 8px;border-radius:10px;background:rgba(168,159,232,0.15);color:#A89FE8;font-size:0.62rem;font-weight:600;cursor:pointer;">✨ in: ${vibe.naam}</span>` : suggestVibe ? `<span onclick="openVibeDetail('${suggestVibe.id}')" style="padding:2px 8px;border-radius:10px;background:rgba(10,10,10,0.07);color:#6B6560;font-size:0.62rem;cursor:pointer;">past bij: ${suggestVibe.naam} →</span>` : ''}
           </div>
-        </div>`).join('')}
+        </div>
+        <button onclick="quickLikeTip('${it.id}',this)" style="flex-shrink:0;padding:6px 10px;border-radius:12px;border:1.5px solid ${liked?'#A89FE8':'rgba(10,10,10,0.15)'};background:${liked?'rgba(168,159,232,0.15)':'transparent'};color:${liked?'#A89FE8':'#9A948E'};font-size:0.82rem;cursor:pointer;margin-top:2px;">${liked?'♥':'♡'}</button>
       </div>
     </div>`;
   }).join('');
+}
+
+function quickLikeTip(id, btn) {
+  const was = swipes[id] === 'like';
+  swipes[id] = was ? null : 'like';
+  if (!swipes[id]) delete swipes[id];
+  save();
+  btn.textContent = swipes[id] === 'like' ? '♥' : '♡';
+  btn.style.borderColor = swipes[id] === 'like' ? '#A89FE8' : 'rgba(10,10,10,0.15)';
+  btn.style.background = swipes[id] === 'like' ? 'rgba(168,159,232,0.15)' : 'transparent';
+  btn.style.color = swipes[id] === 'like' ? '#A89FE8' : '#9A948E';
 }
 
 function renderCommunityBronnen() {
