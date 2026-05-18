@@ -381,6 +381,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     <div class="login-error" id="code-error"></div>
   </div>
   <div id="step2" class="login-step hidden">
+    <div style="text-align:center;margin-bottom:16px;font-family:var(--sans);font-style:italic;font-size:1rem;color:#0A0A0A;line-height:1.5;">Vroegzat — van dansen tot Parijs.<br><span style="font-style:normal;font-size:0.8rem;color:#6B6560;">Nu maken jullie samen het programma.</span></div>
     <div class="login-label" style="text-align:center;margin-bottom:12px;">Wie ben jij?</div>
     <div class="profile-grid">
       <div class="profile-card" onclick="selectProfile('frederike')">
@@ -424,6 +425,9 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+
+<!-- PROFIELFOTO UPLOAD -->
+<input type="file" id="photo-upload-input" accept="image/*" style="display:none;" onchange="handlePhotoUpload(this)">
 
 <!-- MATCH OVERLAY -->
 <div class="match-overlay" id="match-overlay">
@@ -545,6 +549,9 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <div style="font-weight:700;font-size:0.82rem;color:#0A0A0A;margin-bottom:6px;">📋 Niet iedereen heeft ingevuld</div>
       <div id="voorkeur-home-status" style="font-size:0.75rem;color:#6B6560;line-height:1.8;flex-wrap:wrap;display:flex;gap:4px;"></div>
     </div>
+
+    <!-- MARLINDE TIMEZONE NOTE (shown pre-trip als Marlinde inlogt) -->
+    <div id="marlinde-tz-note" style="display:none;margin:8px 20px 0;padding:10px 14px;background:rgba(168,159,232,0.1);border-radius:var(--r);font-size:0.75rem;color:#6B6560;">⏰ Jouw tijd: we rekenen met +6 uur (Penang → Parijs)</div>
 
     <!-- STORIES -->
     <div class="stories-row" id="stories-row"></div>
@@ -1263,10 +1270,39 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
 }
+function saveToast(defaultMsg) {
+  showToast(currentUser === 'marlinde' ? 'Opgeslagen ✓ — geen marlindetje deze keer.' : defaultMsg);
+}
+function getUserPhoto(user) {
+  return localStorage.getItem('vz_photo_' + user) || null;
+}
+function avatarImg(user, size) {
+  const p = PROFILES[user];
+  const s = size || 52;
+  const photo = getUserPhoto(user);
+  if (photo) return `<img src="${photo}" style="width:${s}px;height:${s}px;border-radius:50%;object-fit:cover;display:block;" alt="${p.naam}">`;
+  return `<div style="width:${s}px;height:${s}px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-style:italic;font-size:${Math.round(s*0.35)}px;color:#fff;font-weight:700;">${p.init}</div>`;
+}
 function avatar(user, size) {
   const p = PROFILES[user];
   const s = size || 32;
+  const photo = getUserPhoto(user);
+  if (photo) return `<img src="${photo}" class="mvr-av" style="width:${s}px;height:${s}px;font-size:${s*0.35}px;object-fit:cover;" alt="${p.naam}">`;
   return `<div class="mvr-av" style="background:${p.color};width:${s}px;height:${s}px;font-size:${s*0.35}px;">${p.init}</div>`;
+}
+function openPhotoUpload() {
+  document.getElementById('photo-upload-input').click();
+}
+function handlePhotoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    localStorage.setItem('vz_photo_' + currentUser, e.target.result);
+    initStories();
+    showToast('Profielfoto opgeslagen 📷');
+  };
+  reader.readAsDataURL(file);
 }
 
 // ── LOGIN ─────────────────────────────────────────
@@ -1355,6 +1391,8 @@ function initApp() {
   updateVoorkeurNudge();
   initWeekendEvents();
   setTimeout(initMap, 100);
+  const tzNote = document.getElementById('marlinde-tz-note');
+  if (tzNote) tzNote.style.display = (currentUser === 'marlinde' && new Date() < new Date('2026-06-01')) ? 'block' : 'none';
 }
 
 // ── MAP ───────────────────────────────────────────
@@ -1470,15 +1508,22 @@ function reelNext() {
 function initStories() {
   const row = document.getElementById('stories-row');
   const streaks = {griette:12, frederike:8, miriam:5, marlinde:15};
-  row.innerHTML = Object.entries(PROFILES).map(([k,p]) =>
-    `<div class="story-item" onclick="showToast('${p.naam} — profiel binnenkort 🔜')">
-      <div class="story-ring">
-        <div class="story-avatar" style="background:${p.color};">${p.init}</div>
+  row.innerHTML = Object.entries(PROFILES).map(([k,p]) => {
+    const isMe = k === currentUser;
+    const photo = getUserPhoto(k);
+    const avatarInner = photo
+      ? `<img src="${photo}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;display:block;border:2px solid #F0E8E2;" alt="${p.naam}">`
+      : `<div class="story-avatar" style="background:${p.color};">${p.init}</div>`;
+    const cameraOverlay = isMe ? `<div style="position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:#0A0A0A;color:#F0E8E2;font-size:0.6rem;display:flex;align-items:center;justify-content:center;border:2px solid #F0E8E2;">📷</div>` : '';
+    return `<div class="story-item" onclick="${isMe ? 'openPhotoUpload()' : `showToast('${p.naam} — profiel binnenkort 🔜')`}" style="position:relative;">
+      <div class="story-ring" style="position:relative;">
+        ${avatarInner}
+        ${cameraOverlay}
       </div>
-      <div class="story-name">${p.naam}</div>
+      <div class="story-name">${isMe ? p.naam + ' · jij' : p.naam}</div>
       <div class="story-streak">🔥 ${streaks[k]}</div>
-    </div>`
-  ).join('');
+    </div>`;
+  }).join('');
 }
 
 // ── COUNTDOWN ─────────────────────────────────────
@@ -1517,7 +1562,7 @@ function vote(pollId, optIdx, el) {
   POLL_DEFS[pollId].votes[currentUser] = optIdx;
   localStorage.setItem('vz_poll_' + pollId + '_' + currentUser, optIdx);
   renderPoll(pollId);
-  showToast('Stem opgeslagen! 🗳️');
+  saveToast('Stem opgeslagen! 🗳️');
 }
 function renderPoll(pollId) {
   const def = POLL_DEFS[pollId];
@@ -1838,7 +1883,7 @@ function performSwipe(type) {
     renderGroep();
   }, 400);
 
-  showToast(type === 'like' ? '♥ Wil ik!' : type === 'dream' ? '★ Droom!' : '✕ Pas');
+  saveToast(type === 'like' ? '♥ Wil ik!' : type === 'dream' ? '★ Droom!' : '✕ Pas');
 }
 
 function switchSwipeTab(tab, el) {
@@ -2052,7 +2097,52 @@ function renderHerinneringen() {
         onchange="saveHerin('vrij',this.value)">${saved['qvrij']||''}</textarea>
     </div>
     <button onclick="saveAllHerin()" style="width:100%;padding:12px;background:var(--gold);color:#000;border:none;border-radius:var(--r);font-weight:700;font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;">Opslaan ✓</button>
+
+    <!-- FOTO UPLOAD -->
+    <div style="margin-top:20px;">
+      <div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">📷 Foto's van deze dag</div>
+      <div id="herin-photos-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;"></div>
+      <button onclick="document.getElementById('herin-photo-input').click()" style="padding:9px 18px;border:1.5px dashed rgba(10,10,10,0.2);border-radius:var(--r);background:transparent;color:var(--t2);font-size:0.78rem;cursor:pointer;">+ Foto toevoegen</button>
+      <input type="file" id="herin-photo-input" accept="image/*" style="display:none;" onchange="addHerinPhoto(this)">
+    </div>
   `;
+  renderHerinPhotos();
+}
+function getHerinPhotoKey() {
+  return 'vz_herin_photos_' + currentUser + '_' + herinDay;
+}
+function renderHerinPhotos() {
+  const grid = document.getElementById('herin-photos-grid');
+  if (!grid) return;
+  const photos = JSON.parse(localStorage.getItem(getHerinPhotoKey()) || '[]');
+  grid.innerHTML = photos.map((src,i) =>
+    `<div style="position:relative;width:80px;height:80px;border-radius:8px;overflow:hidden;flex-shrink:0;">
+      <img src="${src}" style="width:100%;height:100%;object-fit:cover;" alt="foto ${i+1}">
+      <button onclick="deleteHerinPhoto(${i})" style="position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,0.6);border:none;color:#fff;font-size:0.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;">×</button>
+    </div>`
+  ).join('');
+}
+function addHerinPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const key = getHerinPhotoKey();
+    const photos = JSON.parse(localStorage.getItem(key) || '[]');
+    photos.push(e.target.result);
+    localStorage.setItem(key, JSON.stringify(photos));
+    renderHerinPhotos();
+    showToast('Foto opgeslagen 📷');
+    input.value = '';
+  };
+  reader.readAsDataURL(file);
+}
+function deleteHerinPhoto(idx) {
+  const key = getHerinPhotoKey();
+  const photos = JSON.parse(localStorage.getItem(key) || '[]');
+  photos.splice(idx, 1);
+  localStorage.setItem(key, JSON.stringify(photos));
+  renderHerinPhotos();
 }
 function saveHerin(key, val) {
   const k = 'vz_herin_' + currentUser + '_' + herinDay;
@@ -2068,7 +2158,7 @@ function saveAllHerin() {
     saved['q'+(ta.id === 'herin-vrij' ? 'vrij' : i)] = ta.value;
   });
   localStorage.setItem(k, JSON.stringify(saved));
-  showToast('Opgeslagen ✓');
+  saveToast('Opgeslagen ✓');
 }
 
 // ── NIEUWE SPELLEN ─────────────────────────────────
@@ -2086,6 +2176,7 @@ const PARIJS_MISSIES = [
   {titel:'Koop één ding voor iemand thuis',desc:'Iets kleins, iets dat ze nooit zelf zouden kopen maar perfect bij ze past.', punten:1},
   {titel:'Zeg één compliment aan een vreemde',desc:'Een compliment aan een voorbijganger, garçon, of winkelier die je echt meent.', punten:2},
   {titel:'Loop minstens 30 minuten zonder GPS',desc:'Scherm weg, lopen, kijken, verdwalen mag. Gewoon lopen en zien waar je uitkomt.', punten:3},
+  {titel:'Welke outfit neem je mee naar Parijs?',desc:'Stuur een foto van je Parijs-outfit naar de groep. Eén look, één foto, vóór vertrek. Pre-trip missie!', punten:2},
 ];
 let twoLiesIdx = 0;
 let twoLiesGuess = null;
