@@ -93,10 +93,10 @@ h1,h2,h3,h4{font-family:var(--serif);}
 .countdown-label{font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;opacity:0.7;margin-bottom:12px;}
 .countdown-nums{display:flex;gap:12px;align-items:center;}
 .count-unit{text-align:center;}
-.count-num{font-family:var(--serif);font-size:2.2rem;line-height:1;color:var(--rose);}
-.count-lbl{font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;opacity:0.7;margin-top:2px;}
-.count-sep{font-family:var(--serif);font-size:2rem;color:var(--rose);opacity:0.5;margin-bottom:8px;}
-.countdown-badge{display:inline-block;margin-top:12px;background:var(--terra);border-radius:20px;padding:4px 14px;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;}
+.count-num{font-family:var(--serif);font-size:2.4rem;line-height:1;color:var(--gold);}
+.count-lbl{font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;opacity:0.6;margin-top:2px;}
+.count-sep{font-family:var(--serif);font-size:2rem;color:var(--gold);opacity:0.4;margin-bottom:8px;}
+.countdown-badge{display:inline-block;margin-top:12px;background:var(--gold2);border:1px solid rgba(201,169,110,0.25);border-radius:20px;padding:4px 14px;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);}
 
 .home-section-title{font-family:var(--serif);font-style:italic;font-size:1.3rem;color:var(--t1);padding:8px 16px 4px;}
 .home-section-sub{font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--t2);padding:0 16px 12px;}
@@ -495,19 +495,42 @@ h1,h2,h3,h4{font-family:var(--serif);}
       <div class="countdown-badge" id="cd-badge">– – dagen</div>
     </div>
 
+    <!-- WEATHER -->
+    <div style="margin:0 16px 4px;display:flex;gap:10px;">
+      <div style="flex:1;background:#1e1e1e;border:1px solid var(--bd);border-radius:var(--r-lg);padding:14px 16px;text-align:center;">
+        <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--t2);margin-bottom:6px;">Vr 26 juni</div>
+        <div style="font-size:1.6rem;margin-bottom:4px;">☀️</div>
+        <div style="font-family:var(--serif);font-size:1.3rem;color:var(--t1);">24°C</div>
+        <div style="font-size:0.65rem;color:var(--t2);margin-top:2px;">Zonnig</div>
+      </div>
+      <div style="flex:1;background:#1e1e1e;border:1px solid var(--bd);border-radius:var(--r-lg);padding:14px 16px;text-align:center;">
+        <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--t2);margin-bottom:6px;">Za 27 juni</div>
+        <div style="font-size:1.6rem;margin-bottom:4px;">🌤️</div>
+        <div style="font-family:var(--serif);font-size:1.3rem;color:var(--t1);">22°C</div>
+        <div style="font-size:0.65rem;color:var(--t2);margin-top:2px;">Lichte bewolking</div>
+      </div>
+      <div style="flex:1;background:#1e1e1e;border:1px solid var(--bd);border-radius:var(--r-lg);padding:14px 16px;text-align:center;">
+        <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--t2);margin-bottom:6px;">Zo 28 juni</div>
+        <div style="font-size:1.6rem;margin-bottom:4px;">☀️</div>
+        <div style="font-family:var(--serif);font-size:1.3rem;color:var(--t1);">25°C</div>
+        <div style="font-size:0.65rem;color:var(--t2);margin-top:2px;">Zonnig</div>
+      </div>
+    </div>
+    <div style="margin:0 16px 16px;font-size:0.65rem;color:var(--t3);letter-spacing:0.06em;text-align:center;">Typisch Parijs juni · licht jasje mee</div>
+
     <!-- WEEKEND EVENTS -->
     <div class="home-section-title">Wat speelt dit weekend</div>
-    <div class="home-section-sub">26–28 juni 2026 · Pride weekend</div>
+    <div class="home-section-sub">26–28 juni 2026 in Parijs</div>
     <div class="weekend-chips">
-      <div class="weekend-chip" onclick="showToast('🏳️‍🌈 Paris Pride: za 27 juni, start 13:30 Palais-Royal. 500.000+ mensen!')">
-        <div class="chip-emoji">🏳️‍🌈</div>
+      <div class="weekend-chip" onclick="showToast('🛍️ Puces de Vanves: za+zo 7–14u, 380 verkopers. Aligre: za+zo 7:30–13:30, 500m van airbnb!')">
+        <div class="chip-emoji">🛍️</div>
         <div class="chip-info">
-          <div class="chip-name">Paris Pride — La Marche</div>
-          <div class="chip-desc">Za 27/6 · Palais-Royal → Nation · gratis</div>
+          <div class="chip-name">Brocantes & Vlooienmarkten</div>
+          <div class="chip-desc">Za + zo · Vanves, Aligre (500m!), Saint-Ouen</div>
         </div>
         <div class="chip-badge">Weekend</div>
       </div>
-      <div class="weekend-chip" onclick="showToast('🎵 Solidays: heel weekend Hippodrome Longchamp. Bigflo & Oli, Gims, Orelsan!')">
+      <div class="weekend-chip" onclick="showToast('🎵 Solidays: heel weekend Hippodrome Longchamp. Bigflo & Oli, Gims, Orelsan! €60–70 dagticket')">
         <div class="chip-emoji">🎵</div>
         <div class="chip-info">
           <div class="chip-name">Solidays Festival</div>
@@ -515,11 +538,19 @@ h1,h2,h3,h4{font-family:var(--serif);}
         </div>
         <div class="chip-badge">Weekend</div>
       </div>
-      <div class="weekend-chip" onclick="showToast('🛍️ Brocantes: Vanves (za–zo ochtend), Aligre (za ochtend), Saint-Ouen (za–ma)!')">
-        <div class="chip-emoji">🛍️</div>
+      <div class="weekend-chip" onclick="showToast('💃 Cargo Disc\'o Cargo: za 27/6 vanaf 19u, Port de Bercy. Open-air disco op de Seine-kade!')">
+        <div class="chip-emoji">💃</div>
         <div class="chip-info">
-          <div class="chip-name">Brocantes & Markten</div>
-          <div class="chip-desc">Za + zo · Vanves, Aligre, Saint-Ouen</div>
+          <div class="chip-name">Disc'o Cargo — open-air disco</div>
+          <div class="chip-desc">Za 27/6 · Port de Bercy · gratis entree</div>
+        </div>
+        <div class="chip-badge">Weekend</div>
+      </div>
+      <div class="weekend-chip" onclick="showToast('🥂 Rosa Bonheur guinguette: za vanaf 13u, zo vanaf 19u. Dansen op de Seine, bal-musette, pizza!')">
+        <div class="chip-emoji">🥂</div>
+        <div class="chip-info">
+          <div class="chip-name">Rosa Bonheur guinguette</div>
+          <div class="chip-desc">Za+zo · Port des Invalides · gratis entree</div>
         </div>
         <div class="chip-badge">Weekend</div>
       </div>
@@ -528,29 +559,29 @@ h1,h2,h3,h4{font-family:var(--serif);}
     <!-- POLLS -->
     <div class="home-section-title" style="margin-top:8px;">Stem mee</div>
     <div class="poll-block" id="poll1">
-      <div class="poll-q">Sézane of brocante — zaterdagochtend?</div>
+      <div class="poll-q">Zaterdagochtend: Sézane of brocante Vanves?</div>
       <div class="poll-options">
-        <div class="poll-opt" onclick="vote('poll1',0,this)">Sézane direct open!</div>
-        <div class="poll-opt" onclick="vote('poll1',1,this)">Eerst Vanves brocante</div>
+        <div class="poll-opt" onclick="vote('poll1',0,this)">Sézane 🛍️</div>
+        <div class="poll-opt" onclick="vote('poll1',1,this)">Vanves brocante 🔍</div>
       </div>
       <div class="poll-result" id="poll1-result">
         <div>Sézane: <span id="poll1-pct0">55</span>%</div>
         <div class="poll-bar"><div class="poll-bar-fill" id="poll1-bar0" style="width:55%"></div></div>
         <div style="margin-top:4px;">Vanves: <span id="poll1-pct1">45</span>%</div>
-        <div class="poll-bar"><div class="poll-bar-fill" id="poll1-bar1" style="width:45%;background:var(--vert)"></div></div>
+        <div class="poll-bar"><div class="poll-bar-fill" id="poll1-bar1" style="width:45%;"></div></div>
       </div>
     </div>
     <div class="poll-block" id="poll2" style="margin-top:0;">
-      <div class="poll-q">Vrijdagavond Les Follivores?</div>
+      <div class="poll-q">Vrijdagavond: feesten of rustig aanloopje?</div>
       <div class="poll-options">
-        <div class="poll-opt" onclick="vote('poll2',0,this)">JA dansen! 💃</div>
-        <div class="poll-opt" onclick="vote('poll2',1,this)">Rustig aanloopje</div>
+        <div class="poll-opt" onclick="vote('poll2',0,this)">Feesten! 💃</div>
+        <div class="poll-opt" onclick="vote('poll2',1,this)">Rustig aanloopje 🍷</div>
       </div>
       <div class="poll-result" id="poll2-result">
-        <div>JA dansen: <span id="poll2-pct0">75</span>%</div>
+        <div>Feesten: <span id="poll2-pct0">75</span>%</div>
         <div class="poll-bar"><div class="poll-bar-fill" id="poll2-bar0" style="width:75%"></div></div>
         <div style="margin-top:4px;">Rustig: <span id="poll2-pct1">25</span>%</div>
-        <div class="poll-bar"><div class="poll-bar-fill" id="poll2-bar1" style="width:25%;background:var(--vert)"></div></div>
+        <div class="poll-bar"><div class="poll-bar-fill" id="poll2-bar1" style="width:25%;"></div></div>
       </div>
     </div>
 
@@ -926,10 +957,11 @@ let reelIdx = 0;
 let reelTimer = null;
 
 const REEL_DATA = [
-  {h:'26–28 juni 2026',p:'Eurostar 08:10 · Parijs'},
-  {h:'Le Marais',p:'Onze buurt · autovrij weekend'},
+  {h:'Vroegzat',p:'Parijs · 26–28 juni 2026'},
+  {h:'Le Marais',p:'Onze buurt · drie dagen Parijs'},
   {h:'Marchés & brocantes',p:'Vanves · Aligre · Saint-Ouen'},
-  {h:'Vroegzat 🥂',p:'Vier vriendinnen · drie dagen'},
+  {h:'Quatre amies',p:'Eurostar 08:10 Amsterdam CS'},
+  {h:'À bientôt, Parijs',p:'C\'est à nous'},
 ];
 
 // ── UTILS ─────────────────────────────────────────
