@@ -573,6 +573,9 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     <!-- MARLINDE TIMEZONE NOTE (shown pre-trip als Marlinde inlogt) -->
     <div id="marlinde-tz-note" style="display:none;margin:8px 20px 0;padding:10px 14px;background:rgba(168,159,232,0.1);border-radius:var(--r);font-size:0.75rem;color:#6B6560;">⏰ Jouw tijd: we rekenen met +6 uur (Penang → Parijs)</div>
 
+    <!-- PRE-TRIP NUDGE -->
+    <div id="pretip-nudge" style="display:none;position:relative;margin:8px 20px 0;padding:14px 16px;background:rgba(122,158,130,0.12);border-left:3px solid #7A9E82;border-radius:0 var(--r-lg) var(--r-lg) 0;"></div>
+
     <!-- STORIES -->
     <div class="stories-row" id="stories-row"></div>
 
@@ -1636,6 +1639,7 @@ function initApp() {
   initReel();
   initStories();
   initCountdown();
+  showPreTripNudge();
   renderWeekendBlok();
   initPolls();
   initFeed();
@@ -1843,6 +1847,71 @@ function initCountdown() {
   }
   tick();
   setInterval(tick, 30000);
+}
+
+// ── PRE-TRIP NUDGES ───────────────────────────────
+const PRE_TRIP_NUDGES = [
+  {key:'T30', days:[30,29,28], emoji:'🗼',
+   title:'Nog een maand tot Parijs!',
+   text:'Alles geregeld? Paspoort geldig, reisinfo gelezen, inpaklijst doorgenomen?',
+   marlinde: {title:'Nog een maand, Marlinde! 🌴', text:'Nog één maandje vanuit Penang naar Parijs. Paspoort geldig? Retourvlucht NL op tijd?'}},
+  {key:'T14', days:[14,13], emoji:'🚂',
+   title:'Treintijden gecheckt?',
+   text:'Open 9292.nl en bevestig je eigen vertrektijd voor vrijdag 26 juni.',
+   link: true},
+  {key:'T7', days:[7,6], emoji:'🎫',
+   title:'Treinkaartjes & OV-chip',
+   text:'OV-chip opgeladen? NS-app reisbudget ingesteld? Check het vandaag nog.',
+   link: true},
+  {key:'T2', days:[2], emoji:'📋',
+   title:'Nog 2 dagen — check je inpaklijst',
+   text:'Paspoort · Eurostar QR-code · ORS-verzekering · powerbank · treinkaartje. Alles klaar?'},
+  {key:'T1', days:[1], emoji:'⏰',
+   title:'Morgen vroeg op! Wekker op 05:30',
+   text:'Trein vertrekt vanuit Houten rond 06:21. Leg alles vast klaar. Slaap lekker!',
+   marlinde: {title:'Marlinde — koffer klaar! 😘',
+     text:'Morgen om 05:30 wakker. Tas gepakt? Paspoort, ORS, oplader, Eurostar QR — alles klaar? Slaap lekker! 💛'}},
+  {key:'T0', days:[0], emoji:'☕',
+   title:'Het is zover — goedemorgen!',
+   text:'Heb je: paspoort · QR-code Eurostar · ORS-verzekering · powerbank · treinkaartje?',
+   marlinde: {title:'Goedemorgen Marlinde! ☕',
+     text:'Jouw trein vertrekt om 06:21 vanuit Houten. Tas? Paspoort? ORS? Oplader? We zien je op het perron! 😘💛'}},
+];
+
+function getActiveNudge() {
+  const trip = new Date('2026-06-26T00:00:00');
+  const now = new Date();
+  const days = Math.ceil((trip - now) / 86400000);
+  return PRE_TRIP_NUDGES.find(n => n.days.includes(days)) || null;
+}
+
+function showPreTripNudge() {
+  const el = document.getElementById('pretip-nudge');
+  if (!el) return;
+  const nudge = getActiveNudge();
+  if (!nudge) { el.style.display = 'none'; return; }
+  const dismissed = localStorage.getItem(`vz_nudge_${nudge.key}_${currentUser}`);
+  if (dismissed) { el.style.display = 'none'; return; }
+
+  const isMarlinde = currentUser === 'marlinde';
+  const title = (isMarlinde && nudge.marlinde?.title) || nudge.title;
+  const text  = (isMarlinde && nudge.marlinde?.text)  || nudge.text;
+  const td = TREIN_DATA[currentUser] || TREIN_DATA.griette;
+  const link9292 = `https://9292.nl/reisadvies/${td.ns}/amsterdam-centraal/vertrek/2026-06-26T0600`;
+
+  el.innerHTML = `
+    <button onclick="dismissNudge('${nudge.key}')" style="position:absolute;top:8px;right:10px;background:none;border:none;font-size:1.2rem;cursor:pointer;color:#6B6560;line-height:1;">×</button>
+    <div style="font-size:1.4rem;margin-bottom:5px;">${nudge.emoji}</div>
+    <div style="font-family:var(--sans);font-weight:700;font-size:0.88rem;color:#0A0A0A;margin-bottom:4px;">${title}</div>
+    <div style="font-size:0.78rem;color:#4a4540;line-height:1.55;padding-right:20px;">${text}</div>
+    ${nudge.link ? `<a href="${link9292}" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-size:0.72rem;color:#7A9E82;font-weight:600;text-decoration:none;">🔍 Check jouw trein op 9292.nl →</a>` : ''}
+  `;
+  el.style.display = 'block';
+}
+
+function dismissNudge(key) {
+  localStorage.setItem(`vz_nudge_${key}_${currentUser}`, '1');
+  document.getElementById('pretip-nudge').style.display = 'none';
 }
 
 // ── WEEKEND BLOK ──────────────────────────────────
@@ -3206,6 +3275,7 @@ function switchTab(name, el) {
   const sec = document.getElementById('sec-' + name);
   if (sec) sec.classList.add('active');
   if (el) el.classList.add('active');
+  if (name === 'home') { showPreTripNudge(); }
   if (name === 'groep') { renderGroep(); }
   if (name === 'top5') { renderProgramma(); }
   if (name === 'spellen') { renderHerinneringen(); }
