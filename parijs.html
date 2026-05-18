@@ -847,6 +847,10 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     <div class="page-header">
       <div class="page-logo">Programma</div>
     </div>
+    <div style="margin:0 16px 12px;padding:14px 16px;background:rgba(168,159,232,0.1);border-radius:var(--r-lg);border-left:3px solid #A89FE8;">
+      <div style="font-size:0.78rem;color:#6B6560;line-height:1.6;">Dit is een voorstel, geen verplichting. Alles is aanpasbaar, niets is gepland zonder dat jullie het zelf gekozen hebben. Bewaak je eigen grenzen — als je een ochtend voor jezelf wilt, plan dat in. De app is overzicht, niet wetgeving.</div>
+      <button onclick="showToast('⏸️ Noteer het in de chat met Griette — zij past het programma aan.')" style="margin-top:10px;width:100%;padding:10px;border:1.5px solid #A89FE8;border-radius:20px;background:transparent;color:#A89FE8;font-family:var(--sans);font-size:0.78rem;font-weight:700;cursor:pointer;letter-spacing:0.05em;">⏸️ Reserveer een dagdeel voor mezelf</button>
+    </div>
     <div class="swipe-tabs" id="prog-day-tabs" style="-webkit-overflow-scrolling:touch;">
       <button class="stab active" onclick="switchProgDay('vr26',this)">Vr 26 juni</button>
       <button class="stab" onclick="switchProgDay('za27',this)">Za 27 juni</button>
@@ -890,6 +894,13 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       </div>
     </div>
 
+    <!-- MUST-HAVES PER PERSOON -->
+    <div style="margin:0 20px 16px;padding:16px 0;border-top:1px solid rgba(10,10,10,0.08);">
+      <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.1rem;color:#0A0A0A;margin-bottom:4px;">💌 Dit mag niet missen</div>
+      <div style="font-size:0.78rem;color:#6B6560;margin-bottom:12px;line-height:1.4;">Wat elke vriendin echt wil dit weekend — ingevuld bij de voorkeuren.</div>
+      <div id="groep-musthaves" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+
     <div class="groep-section-head" style="display:flex;align-items:center;gap:8px;">Jullie matches <span style="font-size:0.7rem;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;">3+ stemmen</span></div>
     <div class="groep-sub">Hier verschijnen jullie gedeelde favorieten</div>
     <div class="groep-matches" id="groep-matches"></div>
@@ -904,7 +915,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <div style="font-size:0.78rem;color:#6B6560;margin-bottom:12px;line-height:1.4;">Frederike regelt Splitwise — dat weten we allemaal.</div>
       <div style="display:flex;gap:10px;">
         <a href="https://splitwise.com" target="_blank" rel="noopener" style="flex:1;padding:11px 0;text-align:center;background:#0A0A0A;color:#F0E8E2;border-radius:30px;font-size:0.78rem;font-weight:700;text-decoration:none;letter-spacing:0.06em;">📊 Open Splitwise</a>
-        <button onclick="showToast('Stuur een tikkie via Miriam — dat is haar specialiteit 😄')" style="flex:1;padding:11px 0;border:1.5px solid rgba(10,10,10,0.12);border-radius:30px;background:transparent;font-size:0.78rem;font-weight:600;cursor:pointer;color:#0A0A0A;">💸 Tikkie via Miriam</button>
+        <button onclick="showToast('Tikkie stuur je gewoon via je eigen bank-app 😄')" style="flex:1;padding:11px 0;border:1.5px solid rgba(10,10,10,0.12);border-radius:30px;background:transparent;font-size:0.78rem;font-weight:600;cursor:pointer;color:#0A0A0A;">💸 Tikkie sturen</button>
       </div>
     </div>
 
@@ -1051,6 +1062,21 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     </div>
   </section>
 
+  <!-- VROEGZAT VIBES -->
+  <section id="sec-vibes" class="section">
+    <div class="page-header"><div class="page-logo">Vibes</div></div>
+    <div style="padding:0 20px 12px;font-size:0.82rem;color:var(--t2);line-height:1.6;">11 belevingen, elk met eigen karakter. Geen schema — gewoon wat past bij het moment.</div>
+    <div style="display:flex;gap:8px;padding:0 20px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;" id="vibes-filter-bar">
+      <button onclick="filterVibes('all',this)" class="vibes-filter-btn active" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid #0A0A0A;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">Alle</button>
+      <button onclick="filterVibes('ochtend',this)" class="vibes-filter-btn" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">🌅 Ochtend</button>
+      <button onclick="filterVibes('middag',this)" class="vibes-filter-btn" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">☀️ Middag</button>
+      <button onclick="filterVibes('avond',this)" class="vibes-filter-btn" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">🌙 Avond</button>
+      <button onclick="filterVibes('zaterdag',this)" class="vibes-filter-btn" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">Za-special</button>
+      <button onclick="filterVibes('zondag',this)" class="vibes-filter-btn" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;">Zo-rustig</button>
+    </div>
+    <div id="vibes-grid" style="padding:0 16px 100px;display:flex;flex-direction:column;gap:14px;"></div>
+  </section>
+
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <button class="nav-btn active" onclick="switchTab('home',this)">
@@ -1077,7 +1103,19 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
       Ideeën
     </button>
+    <button class="nav-btn" onclick="switchTab('vibes',this)">
+      <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+      Vibes
+    </button>
   </nav>
+</div>
+
+<!-- VIBE DETAIL MODAL -->
+<div class="modal-overlay" id="vibe-modal" style="display:none;align-items:flex-end;" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-sheet" style="max-height:90vh;overflow-y:auto;padding:20px;">
+    <div id="vibe-modal-body"></div>
+    <button onclick="document.getElementById('vibe-modal').style.display='none'" style="margin-top:16px;width:100%;padding:13px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Sluiten</button>
+  </div>
 </div>
 
 <!-- BRON TOEVOEGEN MODAL -->
@@ -1284,7 +1322,7 @@ const ITEMS_BASE = [
   {id:'cafe-de-flore',cat:'koffie',sub:'Iconisch terras',naam:'Café de Flore',wijk:'6e — Saint-Germain',prijs:'€€€',duur:'30–45 min',tijden:'7–1:30 dagelijks',reserveren:false,must_van:'griette',verhaal:'Simone de Beauvoir en Sartre schreven hier hun beste werk. Terrasse met verwarmde lampen. Koffie is €7 — maar je betaalt voor het gevoel van écht Parijs.',tip:'Buiten zitten, camera klaar, een koffie en een croissant. Dit is Parijs.',img:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80'},
   {id:'merci-cafe',cat:'koffie',sub:'Concept store café',naam:'Merci Café',wijk:'3e — Marais',prijs:'€€',duur:'30 min',tijden:'10–19 ma–za',reserveren:false,must_van:null,verhaal:'Koffie in het mooiste concept store van Parijs, tussen vintage lampen en designobjecten. Stap na je koffie de winkel in — erg gevaarlijk voor de portemonnee.',tip:'Op de begane grond van Merci, Boulevard Beaumarchais. Neem koffie en dwaal.',img:'https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=600&q=80'},
   {id:'telescope-coffee',cat:'koffie',sub:'Specialty coffee',naam:'Telescope',wijk:'1e — Palais-Royal',prijs:'€',duur:'20 min',tijden:'8–17 ma–vr, 9:30–17 za',reserveren:false,must_van:null,verhaal:'Beste specialty coffee van Parijs in een minuscule, stijlvolle zaak. 2 minuten van het Palais-Royal. Geen wifi, geen laptops — alleen heel goede koffie en mensen die er van houden.',tip:'Combineer met korte wandeling door Jardin du Palais Royal daarna.',img:'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&q=80'},
-  {id:'cafe-pli',cat:'koffie',sub:'Bijzonder café',naam:'Café Pli',wijk:'11e — Faubourg du Temple',prijs:'€–€€',duur:'1u',tijden:'di–zo ~9–18 · reserveer een uur',reserveren:false,must_van:'griette',verhaal:'Een concept uit Korea: je schrijft, terwijl je koffie of thee drinkt, een brief aan jezelf die je op de gekozen datum terugkrijgt. 1 jaar: €15, 5 jaar: €25, 20 jaar: €45 — stationery en drank inbegrepen. Hoe gaaf is het om over 20 jaar — wij zijn dan 66 — een brief uit Parijs 2026 te krijgen?',tip:'Wees specifiek: wat verwacht je van jezelf over 5 jaar? Van ons? Neem de tijd. Je kan ook een brief aan een vriendin schrijven die over 5 jaar arriveert.',img:'https://images.unsplash.com/photo-1456086272160-b28b0645d729?w=600&q=80'},
+  {id:'cafe-pli',cat:'koffie',sub:'Bijzonder café',naam:'Café Pli',wijk:'11e — Faubourg du Temple',prijs:'€–€€',duur:'1u',tijden:'wo–vr 8:30–21, za+zo 10–21 · ma+di gesloten',reserveren:false,must_van:'griette',verhaal:'Een concept uit Korea: je schrijft, terwijl je koffie of thee drinkt, een brief aan jezelf die je op de gekozen datum terugkrijgt. 1 jaar: €15, 5 jaar: €25, 20 jaar: €45 — stationery en drank inbegrepen. Hoe gaaf is het om over 20 jaar — wij zijn dan 66 — een brief uit Parijs 2026 te krijgen?',tip:'Wees specifiek: wat verwacht je van jezelf over 5 jaar? Van ons? Neem de tijd. Je kan ook een brief aan een vriendin schrijven die over 5 jaar arriveert.',img:'https://images.unsplash.com/photo-1456086272160-b28b0645d729?w=600&q=80'},
   // ── BORREL (extra) ──
   {id:'comptoir-general',cat:'borrel',sub:'Geheim bar',naam:'Comptoir Général',wijk:'10e — Canal Saint-Martin',prijs:'€€',duur:'2u',tijden:'18–2 vr+za, 11–2 zo',reserveren:false,must_van:null,verhaal:'Verborgen achter een zwarte deur — na 5 minuten lopen kom je in een koloniaal-tropisch universum. Uniek, sfeervol, altijd goed gesprek. Niemand van onze vrienden kent dit.',tip:'Zwarte deur aan Quai de Jemmapes. Geen bord. Gewoon binnenlopen en je ogen uitkijken.',img:'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=80'},
   {id:'bar-hemingway',cat:'borrel',sub:'Legendarische bar',naam:'Bar Hemingway — Hôtel Ritz',wijk:'1e — Place Vendôme',prijs:'€€€€',duur:'1u',tijden:'18–2 dagelijks',reserveren:false,must_van:null,verhaal:'Hemingway bevrijdde deze bar eigenhanden in 1944. Eén klassieke cocktail als herinnering — dit is het soort ding waar je tien jaar later nog over vertelt.',tip:'Smart casual vereist. Eén cocktail €22–28. De "Serendipity" is de signature.',img:'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=600&q=80'},
@@ -1335,12 +1373,16 @@ const ITEMS_BASE = [
   {id:'bisou',cat:'borrel',sub:'Cocktailbar',naam:'Bisou',wijk:'3e — Marais',prijs:'€€–€€€',duur:'1u',tijden:'18–2',drukte:'gemixt',reserveren:false,must_van:null,weekend_special:false,verhaal:'Geen menu. Vertel barman wat je lekker vindt, hij maakt iets.',tip:'Vroeg = beter. Wees specifiek: "iets fris met gin".',img:'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=80'},
   {id:'perchoir',cat:'borrel',sub:'Rooftop bar',naam:'Le Perchoir Ménilmontant',wijk:'11e — Ménilmontant',prijs:'€€–€€€',duur:'1–2u',tijden:'18–2',drukte:'druk vanaf 19',reserveren:false,must_van:null,weekend_special:false,verhaal:'Rooftop, 360° uitzicht (Sacré-Cœur in beeld). 40+ welkom.',tip:'20:30 in juni voor zonsondergang.',img:'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80'},
   {id:'rosa-bal-musette',cat:'uitgaan',sub:'Dansen',naam:'Rosa Bonheur bal-musette',wijk:'Port des Invalides',prijs:'gratis',duur:'2–3u',tijden:'ZATERDAG vanaf 13:00',drukte:'intergenerationeel',reserveren:false,must_van:null,weekend_special:true,verhaal:'Drijvende guinguette op de Seine — tango, wals, Madison. Iedereen mag meedansen.',tip:'Zaterdagmiddag. Geen reservering. Pizza van houtoven.',img:'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80'},
-  {id:'badaboum',cat:'uitgaan',sub:'Club',naam:'Badaboum',wijk:'11e — vlakbij airbnb',prijs:'€15–25',duur:'avond',tijden:'vr/za vanaf 23:30, sluit ~05:00',drukte:'creatief jong publiek',reserveren:false,must_van:null,weekend_special:false,verhaal:'Vlakbij airbnb. Electronisch, soms 90s techno/house. Loopafstand van Marais.',tip:'Begin met diner in Marais, eindig hier.',img:'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80'},
+
   {id:'pavillon-puebla',cat:'uitgaan',sub:'Bar / Dansen',naam:'Pavillon Puebla',wijk:'19e — Buttes-Chaumont',prijs:'€€',duur:'avond',tijden:'~17–01 in zomer',drukte:'cool maar niet exclusief',reserveren:false,must_van:null,weekend_special:false,verhaal:'Open-air bar in Buttes-Chaumont. Cocktails, Corsicaans bier. Zomeravond-perfectie.',tip:'Vroeg komen (18:00) voor goede tafel.',img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80'},
   {id:'solidays',cat:'activiteit',sub:'Festival',naam:'Solidays festival',wijk:'16e — Longchamp',prijs:'€60–70 dagticket',duur:'hele dag',tijden:'26–28 juni, hele weekend',drukte:'tienduizenden',reserveren:true,must_van:null,weekend_special:true,verhaal:'Festival voor solidariteit (anti-AIDS). Bigflo & Oli, Gims, Orelsan.',tip:'Één dag is genoeg. Zondag is relaxste. Tickets vooraf via solidays.org.',img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80'},
   {id:'cargo-container-bar',cat:'borrel',sub:'Open-air bar',naam:'Cargo Container Bar',wijk:'12e — Port de Bercy Aval',prijs:'€€',duur:'avond',tijden:'do–zo 17–01 (zomer)',drukte:'druk weekend',reserveren:false,must_van:null,weekend_special:true,verhaal:'Open-air feestbar op de kades van de Seine in shipping containers. Terras met uitzicht op de Bibliothèque nationale. ZATERDAG 27 juni = "Disc\'o Cargo" — discoavond. Perfect slot van dag 2.',tip:'Zaterdag = Disc\'o Cargo night (house/disco). Kom rond 19u voor goede plek. Iovine\'s Napolitaanse pizza ter plekke.',img:'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&q=80'},
   {id:'musee-vie-romantique',cat:'activiteit',sub:'Verborgen museum',naam:'Musée de la Vie Romantique',wijk:'9e — Pigalle',prijs:'gratis',duur:'1u',tijden:'di–zo 10–18',drukte:'altijd rustig',reserveren:false,must_van:null,weekend_special:false,verhaal:'Schilderijtjes van George Sand, kleine tuinsalon achter het huis. Niemand weet dat dit gratis is. Theesalon in de tuin is onbetaalbaar voor een zomerse ochtend.',tip:'Combineer met Buvette in Pigalle. Terrastje in de tuin bij goed weer — altijd doen.',img:'https://images.unsplash.com/photo-1541427468627-a89a96e5ca1d?w=600&q=80'},
   {id:'square-vert-galant',cat:'wandelen',sub:'Verborgen plek',naam:'Square du Vert-Galant',wijk:'1e — Île de la Cité',prijs:'gratis',duur:'30 min',tijden:'hele dag',drukte:'altijd rustig',reserveren:false,must_van:null,weekend_special:false,verhaal:'Het puntje van Île de la Cité — laagste punt van Parijs, omringd door de Seine. Beste picknickplek van de stad, vijf minuten van Notre-Dame. Toeristen lopen eraan voorbij.',tip:'Wijn + stokbrood + kaas van Rue Mouffetard. Kom rond zonsondergang voor oranje licht.',img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80'},
+  {id:'place-des-vosges',cat:'wandelen',sub:'Plein / Park',naam:'Place des Vosges',wijk:'4e — Le Marais',prijs:'gratis',duur:'30–60 min',tijden:'hele dag',drukte:'toeristen in zomer',reserveren:false,must_van:null,weekend_special:false,verhaal:'Oudste plein van Parijs (1612). Symmetrische arcade rondom een grasveld. Victor Hugo woonde hier op nummer 6. Op een zomerse ochtend kun je onder de galerijen koffie halen en rustig zitten zonder dat het voelt als toeristenattratie.',tip:'Vroeg gaan — vóór 10u is het leeg en mooi. Haal koffie bij Carette op de hoek.',img:'https://images.unsplash.com/photo-1549144511-f099e773c147?w=600&q=80'},
+  {id:'stella-suzie',cat:'shopping',sub:'Boetiek',naam:'Stella & Suzie',wijk:'3e — Haut Marais',prijs:'€€–€€€',duur:'30–45 min',tijden:'ma–za 11–19, zo 12–18',drukte:'rustig',reserveren:false,must_van:null,weekend_special:false,verhaal:'Californisch-boho boetiek verstopt in het Haut Marais. Linnen, kleuren, vloeiende vormen. Niet fast fashion — de soort winkel die je onthoudt.',tip:'Wijk door het Haut Marais — er zijn hier tientallen kleine boetiekjes naast elkaar.',img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80'},
+  {id:'le-peloton-cafe',cat:'koffie',sub:'Specialty koffie',naam:'Le Peloton Café',wijk:'4e — Le Marais',prijs:'€',duur:'30–45 min',tijden:'ma–vr 8–18, za+zo 9–18',drukte:'rustig',reserveren:false,must_van:null,weekend_special:false,verhaal:'Specialty koffie in Le Marais, gedecoreerd rond de wielrennende tijger. Lichte ruimte, rustige sfeer. Eigenlijk het beste adres voor een ochtend espresso als je toch door het Marais loopt.',tip:'Combineer met een wandeling door het Haut Marais.',img:'https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=600&q=80'},
+  {id:'sequoia-rooftop',cat:'borrel',sub:'Rooftop bar',naam:'Sequoia Rooftop Bar',wijk:'13e — Bibliothèque',prijs:'€€–€€€',duur:'1–2u',tijden:'vr 18–1, za 16–1, zo 16–23',drukte:'chic maar toegankelijk',reserveren:false,must_van:null,weekend_special:true,verhaal:'Rooftop boven het Sequoia hotel aan de Seine — uitzicht op de rivier en de stad. Minder bekend dan Le Perchoir maar net zo sfeervol. Cocktails van niveau, terras met kussens, kaarsjes bij zonsondergang.',tip:'Zaterdag 16u voor de beste plek en het mooiste licht. Geen dresscode maar je gaat er netjes naartoe.',img:'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&q=80'},
 ];
 
 // hook (≤50 chars, punchy), type (ervaring/plek/moment), verborgen
@@ -1398,7 +1440,7 @@ const ITEM_ENRICHMENT = {
   'bisou':                  {hook:'Geen menu — vertel barman wat je lekker vindt',type:'ervaring'},
   'perchoir':               {hook:'Rooftop, 360° uitzicht, 20:30 voor sunset',  type:'moment'},
   'rosa-bal-musette':       {hook:'Bal-musette dansen op drijvend ponton',      type:'ervaring'},
-  'badaboum':               {hook:'Loopafstand van airbnb, dansen tot 5u',       type:'ervaring'},
+
   'solidays':               {hook:'Festival solidariteit — Bigflo & Oli',        type:'ervaring'},
   'cargo-container-bar':    {hook:'Za = Disc\'o Cargo — discoavond aan de Seine',type:'moment'},
   'musee-vie-romantique':   {hook:'Gratis, theesalon in de tuin — niemand hier', type:'plek',     verborgen:true},
@@ -1417,7 +1459,7 @@ const MOCK_VOTES = {
     'as-du-fallafel':'dream','clamato':'like','buvette':'dream',
     'chez-janou':'like','le-mary-celeste':'like','septime-cave':'like',
     'little-red-door':'dream','bisou':'like','perchoir':'like',
-    'les-follivores':'like','podium-fiertes':'like','badaboum':'like',
+    'les-follivores':'like','podium-fiertes':'like',
     'cargo-container-bar':'dream',
   },
   miriam: {
@@ -1443,7 +1485,7 @@ const MOCK_VOTES = {
     'chez-janou':'dream','le-mary-celeste':'like','septime-cave':'like',
     'little-red-door':'like','bisou':'like','perchoir':'dream',
     'rosa-bal-musette':'dream','les-follivores':'dream','pulse-pride':'like',
-    'badaboum':'like','podium-fiertes':'dream','solidays':'like',
+    'podium-fiertes':'dream','solidays':'like',
     'cargo-container-bar':'like',
   }
 };
@@ -1809,7 +1851,7 @@ const TREIN_DATA = {
   frederike: {station:'Houten centrum',   vertrek:'06:21', ns:'houten-centrum',      target:'2026-06-26T06:21:00'},
   griette:   {station:'Houten Castellum', vertrek:'06:23', ns:'houten-castellum',    target:'2026-06-26T06:23:00'},
   marlinde:  {station:'Houten centrum',   vertrek:'06:21', ns:'houten-centrum',      target:'2026-06-26T06:21:00'},
-  miriam:    {station:'Utrecht CS',       vertrek:'06:38', ns:'utrecht-centraal',    target:'2026-06-26T06:38:00'},
+  miriam:    {station:'Houten centrum',   vertrek:'06:21', ns:'houten-centrum',      target:'2026-06-26T06:21:00'},
 };
 
 // ── COUNTDOWN ─────────────────────────────────────
@@ -2801,6 +2843,34 @@ function toggleFav(id) {
 // ── GROEP ─────────────────────────────────────────
 function renderGroep() {
   renderSlaapIndeling();
+  // Must-haves
+  const mhDiv = document.getElementById('groep-musthaves');
+  if (mhDiv) {
+    const allUsers = ['griette','frederike','miriam','marlinde'];
+    const MUSTHAVE_IDX = 9; // 10th question (0-indexed)
+    mhDiv.innerHTML = allUsers.map(u => {
+      const p = PROFILES[u];
+      const raw = localStorage.getItem('vz_voorkeur_' + u);
+      let mh = '';
+      if (raw) {
+        try {
+          const answers = JSON.parse(raw);
+          const ans = answers[MUSTHAVE_IDX];
+          if (Array.isArray(ans)) {
+            const found = ans.find(a => typeof a === 'string' && a.startsWith('musthave:'));
+            if (found) mh = found.replace('musthave:', '');
+          }
+        } catch(e) {}
+      }
+      return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--r-lg);background:rgba(10,10,10,0.04);">
+        <div style="width:32px;height:32px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.8rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>
+        <div style="flex:1;">
+          <div style="font-size:0.75rem;font-weight:700;color:#0A0A0A;margin-bottom:2px;">${p.naam}</div>
+          <div style="font-size:0.8rem;color:${mh ? '#0A0A0A' : '#9A948E'};font-style:${mh ? 'normal' : 'italic'};line-height:1.4;">${mh || 'Nog niet ingevuld'}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
   const matchDiv = document.getElementById('groep-matches');
   const nearDiv = document.getElementById('groep-near');
   const allProfiles = ['griette','frederike','miriam','marlinde'];
@@ -3298,6 +3368,7 @@ function switchTab(name, el) {
   if (name === 'top5') { renderProgramma(); }
   if (name === 'spellen') { renderHerinneringen(); }
   if (name === 'inspiratie') { initInspiratie(); }
+  if (name === 'vibes') { renderVibes('all'); }
   const fab = document.getElementById('swipe-fab');
   if (name === 'swipe') {
     updateVoorkeurNudge(); checkSwipeMode();
@@ -3305,6 +3376,226 @@ function switchTab(name, el) {
   } else {
     if (fab) fab.style.display = 'none';
   }
+}
+
+// ── VROEGZAT VIBES ────────────────────────────────
+const VIBES = [
+  {
+    id:'cool-girl-ochtend', naam:'Cool Girl Slow Morning', wijk:'Le Marais · 3e/4e', dagdeel:'ochtend',
+    duur:'2–3 uur', emojis:'☕✉️🛏️', attributie:'griette',
+    zin:'Laat opstaan is geen schaamte — het is een statement. Haal koffie, schrijf een brief, loop er nergens naartoe.',
+    img:'https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=600&q=80',
+    stops:[
+      {naam:'Du Pain et des Idées', actie:'Croissant aux pistaches — haal er één mee voor onderweg'},
+      {naam:'Ten Belles', actie:'Espresso met oat milk. Geen haast.'},
+      {naam:'Café Pli', actie:'Schrijf een brief aan jezelf in 2031. Duurt een uur, blijft een leven.'},
+    ]
+  },
+  {
+    id:'boetiek-bandiet', naam:'Boetiek Bandiet', wijk:'Haut Marais · 3e', dagdeel:'middag',
+    duur:'2–4 uur', emojis:'🛍️👗💳', attributie:'frederike',
+    zin:'Je gaat even kijken. Twee uur later loop je met een tas. Klassiek Marais-scenario.',
+    img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
+    stops:[
+      {naam:'Stella & Suzie', actie:'Californisch-boho boetiek — linnen, kleuren, gevaarlijk'},
+      {naam:'Sézane', actie:'De klassieker. Griette heeft hier al wat gezien.'},
+      {naam:'Merci', actie:'Concept store 3e — koffie en design en dan toch iets kopen'},
+    ]
+  },
+  {
+    id:'mouffetard-zondag', naam:'Quartier-Latin Zondagskind', wijk:'5e — Mouffetard', dagdeel:'zondag',
+    duur:'2–3 uur', emojis:'🥖🍓🎵', attributie:'miriam',
+    zin:'Zondagochtend, markt open, kerk zingt. Dit is het Parijs dat toeristen niet weten te vinden.',
+    img:'https://images.unsplash.com/photo-1550159930-40066082a4fc?w=600&q=80',
+    stops:[
+      {naam:'Marché Mouffetard', actie:'Kaas, fruit, stokbrood — voor een picknick of gewoon snacken'},
+      {naam:'Église Saint-Médard', actie:'Zondagochtend koor — de kerk zingt. Loop even naar binnen.'},
+      {naam:'Square du Vert-Galant', actie:'Picknick op het puntje van Île de la Cité met je marktaankopen'},
+    ]
+  },
+  {
+    id:'bohemian-sundown', naam:'Bohemian Sundown', wijk:'Montmartre · 18e', dagdeel:'avond',
+    duur:'3–4 uur', emojis:'🌅🍷🎨', attributie:'griette',
+    zin:'Montmartre bij zonsondergang is een cliché dat klopt. Dit keer doen jullie het goed.',
+    img:'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80',
+    stops:[
+      {naam:'Place du Tertre', actie:'Kijk naar de schilders — koop niets, observeer alles'},
+      {naam:'Sacré-Cœur traptreden', actie:'21:00 in juni = gouden licht op de stad. Fles wijn, trap, uitzicht.'},
+      {naam:'Bar à vins Montmartre', actie:'Kleine wijnbar in de buurt — vraag de ober wat hij aanraadt'},
+    ]
+  },
+  {
+    id:'aligre-ochtend', naam:'500m-van-Huis Marktganger', wijk:'Marché d\'Aligre · 12e', dagdeel:'zaterdag',
+    duur:'1,5–2 uur', emojis:'🥕🧀🧺', attributie:'frederike',
+    zin:'10 minuten lopen van de airbnb. Dé markt van het 11e en 12e — alles te vinden, geen toeristen.',
+    img:'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&q=80',
+    stops:[
+      {naam:'Marché d\'Aligre', actie:'Groente, kaas, Noord-Afrikaanse kruideniers — zaterdagochtendroutine'},
+      {naam:'Le Baron Rouge', actie:'Wijnbar om de hoek — zaterdagochtend oesters met witte wijn is een ding hier'},
+      {naam:'Bakker Rue de Charonne', actie:'Pain de campagne voor de picknick, pain au chocolat voor nu'},
+    ]
+  },
+  {
+    id:'canal-lunch', naam:'Kanaal Slow Lunch', wijk:'Canal Saint-Martin · 10e', dagdeel:'middag',
+    duur:'2–3 uur', emojis:'🌊🥗☀️', attributie:'marlinde',
+    zin:'Lange lunch langs het kanaal. Water, bomen, niemand haast. Het enige doel is niks doen maar dan goed.',
+    img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=600&q=80',
+    stops:[
+      {naam:'Hôtel du Nord terras', actie:'Lunch op het terras aan het kanaal — simpel, goed, langzaam'},
+      {naam:'Canal Saint-Martin kade', actie:'Na de lunch gewoon langs het water wandelen. Geen doel.'},
+      {naam:'Ten Belles Bread', actie:'Dessertstopp: focaccia of iets zoets als afsluiter'},
+    ]
+  },
+  {
+    id:'mode-missie', naam:'Mode-Missie', wijk:'Le Marais → Sézane · 2e', dagdeel:'ochtend',
+    duur:'2–3 uur', emojis:'👒🧥✨', attributie:'griette',
+    zin:'Griette heeft dit al drie keer gesaved. Nu gaan we het doen. Sézane, dan verder.',
+    img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
+    stops:[
+      {naam:'Sézane flagship', actie:'Rue Saint-Fiacre 15 — het échte flagshipstore, beter dan online'},
+      {naam:'Rouje', actie:'Rond de hoek — Jeanne Damas\' label, romantisch Frans'},
+      {naam:'Le Peloton Café', actie:'Koffie-stopp voor de wandeling terug naar Marais'},
+    ]
+  },
+  {
+    id:'cargo-avond', naam:'Cargo Queen', wijk:'Port de Bercy · 12e', dagdeel:'zaterdag',
+    duur:'4–6 uur', emojis:'🚢🕺🌉', attributie:'frederike',
+    zin:'Zaterdag 27 juni = Disc\'o Cargo op de kades van de Seine. Dansen bij de rivier. Dit is de avond.',
+    img:'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&q=80',
+    stops:[
+      {naam:'Sequoia Rooftop Bar', actie:'16:00 — aperitief met uitzicht op de Seine als warming-up'},
+      {naam:'Cargo Container Bar', actie:'19:00 — eten bij Iovine\'s pizza, plek claimen vóór het druk wordt'},
+      {naam:'Disc\'o Cargo dancefloor', actie:'21:00+ — house en disco op de kade. Dit is het moment.'},
+    ]
+  },
+  {
+    id:'vintage-vrijbuiter', naam:'Vintage Vrijbuiter', wijk:'Marché Saint-Ouen · 18e', dagdeel:'zondag',
+    duur:'3–4 uur', emojis:'🪑🧵🔍', attributie:'marlinde',
+    zin:'Grootste vlooienmarkt ter wereld, zondag open. Eén goede vondst is genoeg. Maar je vindt er altijd meer.',
+    img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
+    stops:[
+      {naam:'Marché Vernaison', actie:'Oudste hal — curiosa, vintage linnen, schilderijtjes. Langzaam lopen.'},
+      {naam:'Marché Dauphine', actie:'Twee verdiepingen vintage kleding en meubels — beter voor mode'},
+      {naam:'Café aan de rand', actie:'Café Paul Bert — na het zoeken even zitten, koffie, napraten over wat je gevonden hebt'},
+    ]
+  },
+  {
+    id:'stille-sterren', naam:'Stil-Dan-Sterren', wijk:'Père Lachaise → Belleville · 20e', dagdeel:'middag',
+    duur:'2–3 uur', emojis:'🌿🪦🌆', attributie:'miriam',
+    zin:'Père Lachaise voor de stilte. Belleville voor het uitzicht. Niemand doet dit combo — jullie wel.',
+    img:'https://images.unsplash.com/photo-1541427468627-a89a96e5ca1d?w=600&q=80',
+    stops:[
+      {naam:'Père Lachaise', actie:'Jim Morrison, Édith Piaf, Oscar Wilde — loop en ontdek. Kaart bij de ingang.'},
+      {naam:'Parc de Belleville', actie:'Hoogste park van Parijs — uitzicht op de Eiffeltoren en de hele stad'},
+      {naam:'Bar in Belleville', actie:'Café de la Plage of een andere buurtcafé — neem een biertje en kijk uit over de stad'},
+    ]
+  },
+  {
+    id:'wijn-wandel', naam:'Wijn-Wandel-Wijf', wijk:'Le Marais → 11e', dagdeel:'avond',
+    duur:'3–4 uur', emojis:'🍷🚶‍♀️🌙', attributie:'marlinde',
+    zin:'Geen reservering. Geen schema. Start met één glas, eindig waar de avond je brengt.',
+    img:'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=80',
+    stops:[
+      {naam:'Septime La Cave', actie:'16:30 of 17:00 — walk-in wijnbar, geen reservering, kleine borden'},
+      {naam:'Le Mary Celeste bar', actie:'Na het eten blijven voor cocktails aan de bar — sfeervolst punt van het Marais'},
+      {naam:'Bisou of Little Red Door', actie:'Eindstation: één cocktail in de beste bar van het Marais — je kiest'},
+    ]
+  },
+];
+
+let vibesActiveFilter = 'all';
+
+function filterVibes(dagdeel, el) {
+  vibesActiveFilter = dagdeel;
+  document.querySelectorAll('.vibes-filter-btn').forEach(b => {
+    b.style.background = 'transparent';
+    b.style.borderColor = 'rgba(10,10,10,0.15)';
+    b.style.color = '#6B6560';
+  });
+  if (el) {
+    el.style.background = '#0A0A0A';
+    el.style.borderColor = '#0A0A0A';
+    el.style.color = '#F0E8E2';
+  }
+  renderVibes(dagdeel);
+}
+
+function renderVibes(filter) {
+  const grid = document.getElementById('vibes-grid');
+  if (!grid) return;
+  const filtered = filter === 'all' ? VIBES : VIBES.filter(v => v.dagdeel === filter);
+  if (!filtered.length) {
+    grid.innerHTML = `<div style="padding:32px 0;text-align:center;font-size:0.85rem;color:#9A948E;font-style:italic;">Geen vibes voor dit filter</div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(v => {
+    const p = PROFILES[v.attributie] || {};
+    const dagLabel = {ochtend:'🌅 Ochtend',middag:'☀️ Middag',avond:'🌙 Avond',zaterdag:'🗓 Za-special',zondag:'☁️ Zo-rustig'}[v.dagdeel] || v.dagdeel;
+    return `<div onclick="openVibeDetail('${v.id}')" style="border-radius:var(--r-lg);overflow:hidden;background:#fff;box-shadow:0 2px 12px rgba(10,10,10,0.08);cursor:pointer;transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.98)'" ontouchend="this.style.transform=''">
+      <div style="height:160px;background-image:url('${v.img}');background-size:cover;background-position:center;position:relative;">
+        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,10,10,0) 40%,rgba(10,10,10,0.7));"></div>
+        <div style="position:absolute;top:10px;left:12px;display:flex;gap:6px;align-items:center;">
+          <span style="background:rgba(10,10,10,0.55);color:#F0E8E2;font-size:0.62rem;padding:3px 8px;border-radius:12px;font-weight:600;letter-spacing:0.06em;">${dagLabel}</span>
+          <span style="background:rgba(10,10,10,0.55);color:#F0E8E2;font-size:0.62rem;padding:3px 8px;border-radius:12px;">${v.duur}</span>
+        </div>
+        <div style="position:absolute;bottom:10px;left:12px;right:12px;">
+          <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.15rem;color:#F0E8E2;line-height:1.2;">${v.emojis} ${v.naam}</div>
+          <div style="font-size:0.7rem;color:rgba(240,232,226,0.8);margin-top:2px;">${v.wijk}</div>
+        </div>
+      </div>
+      <div style="padding:12px 14px 14px;">
+        <div style="font-size:0.82rem;color:#3A3530;line-height:1.55;margin-bottom:10px;">"${v.zin}"</div>
+        <div style="display:flex;align-items:center;gap:6px;border-top:1px solid rgba(10,10,10,0.06);padding-top:8px;">
+          <div style="width:22px;height:22px;border-radius:50%;background:${p.color||'#ccc'};display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:#fff;font-weight:700;font-style:italic;font-family:var(--sans);">${p.init||'?'}</div>
+          <div style="font-size:0.68rem;color:#9A948E;">Tip van ${p.naam||v.attributie}</div>
+          <div style="margin-left:auto;font-size:0.68rem;color:#A89FE8;font-weight:600;">${v.stops.length} stops →</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openVibeDetail(id) {
+  const v = VIBES.find(x => x.id === id);
+  if (!v) return;
+  const p = PROFILES[v.attributie] || {};
+  const dagLabel = {ochtend:'🌅 Ochtend',middag:'☀️ Middag',avond:'🌙 Avond',zaterdag:'🗓 Za-special',zondag:'☁️ Zo-rustig'}[v.dagdeel] || v.dagdeel;
+  const modal = document.getElementById('vibe-modal');
+  if (!modal) return;
+  document.getElementById('vibe-modal-body').innerHTML = `
+    <div style="height:200px;background-image:url('${v.img}');background-size:cover;background-position:center;position:relative;margin:-20px -20px 0;">
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,10,10,0) 30%,rgba(10,10,10,0.75));"></div>
+      <div style="position:absolute;bottom:14px;left:20px;right:20px;">
+        <div style="display:flex;gap:6px;margin-bottom:6px;">
+          <span style="background:rgba(10,10,10,0.55);color:#F0E8E2;font-size:0.62rem;padding:3px 8px;border-radius:12px;font-weight:600;">${dagLabel}</span>
+          <span style="background:rgba(10,10,10,0.55);color:#F0E8E2;font-size:0.62rem;padding:3px 8px;border-radius:12px;">${v.duur}</span>
+        </div>
+        <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.35rem;color:#F0E8E2;line-height:1.2;">${v.emojis} ${v.naam}</div>
+        <div style="font-size:0.75rem;color:rgba(240,232,226,0.8);margin-top:3px;">${v.wijk}</div>
+      </div>
+    </div>
+    <div style="margin-top:20px;">
+      <div style="font-size:0.9rem;color:#3A3530;line-height:1.6;font-style:italic;margin-bottom:20px;padding:14px 16px;background:rgba(168,159,232,0.08);border-radius:var(--r-lg);border-left:3px solid #A89FE8;">"${v.zin}"</div>
+      <div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">De route</div>
+      ${v.stops.map((s, i) => `
+        <div style="display:flex;gap:12px;margin-bottom:14px;">
+          <div style="width:24px;height:24px;border-radius:50%;background:#0A0A0A;color:#F0E8E2;font-size:0.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">${i+1}</div>
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:0.88rem;color:#0A0A0A;margin-bottom:2px;">${s.naam}</div>
+            <div style="font-size:0.78rem;color:#6B6560;line-height:1.5;">${s.actie}</div>
+          </div>
+        </div>
+      `).join('')}
+      <div style="margin-top:16px;padding:12px 14px;background:rgba(10,10,10,0.04);border-radius:var(--r-lg);display:flex;align-items:center;gap:10px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:${p.color||'#ccc'};display:flex;align-items:center;justify-content:center;font-size:0.8rem;color:#fff;font-weight:700;font-style:italic;font-family:var(--sans);">${p.init||'?'}</div>
+        <div>
+          <div style="font-size:0.72rem;font-weight:700;color:#0A0A0A;">${p.naam||v.attributie}</div>
+          <div style="font-size:0.68rem;color:#9A948E;">Samengesteld deze vibe</div>
+        </div>
+      </div>
+    </div>
+  `;
+  modal.style.display = 'flex';
 }
 
 // ── VOORKEUR CHECK ───────────────────────────────
@@ -3318,6 +3609,7 @@ const VOORKEUR_VRAGEN = [
   { emoji:'💃', vraag:'Zaterdagnacht?', opties:['Dansen tot we er niet meer bij kunnen','Leuk diner + bar, dan zien we wel','Dat was vroeger — nu slaap ik graag uit'] },
   { emoji:'💸', vraag:'Budget dit weekend:', opties:['Bewust en selectief','Normaal, maar niet overdreven','Dit is een uitje — ik geef me over'] },
   { emoji:'✨', vraag:'Eén ding dat dit weekend voor jou perfect maakt:', opties:['Dat we écht even niets hoeven','Een onvergetelijke avond met z\'n vieren','Eén moment dat ik 10 jaar nog onthoud'] },
+  { emoji:'💌', vraag:'Niet alles kan deze trip. Maar wat moet wél?', type:'text', placeholder:'Eén of twee dingen — groot of klein. Schrijf het op.' },
 ];
 
 let vkIdx = 0;
@@ -3327,7 +3619,7 @@ let vkSelected = [];
 const VOORKEUR_INTRO = {
   frederike: 'Jij houdt van een helder plan — prima. Na deze vragen weet de app precies hoeveel structuur je wil, en wordt jouw dagview ook echt een dagview met tijdslots.',
   griette: 'Jij swipet toch het snelst. Maar doe deze even eerst — dan weet de app of de anderen jou kunnen bijhouden.',
-  marlinde: '9 korte vragen, dan is het klaar. De app zorgt dat er geen enkel "marlinde-momentje" in de planning zit.',
+  marlinde: '10 korte vragen, dan is het klaar. De app zorgt dat er geen enkel "marlinde-momentje" in de planning zit.',
   miriam: 'Jij weet altijd een goed restaurant. Vraag 8 is speciaal voor jou — dan zorgen we dat er geen slechte diner-optie in de swipe-stack terechtkomt.',
 };
 
@@ -3341,7 +3633,7 @@ function showVoorkeurScherm() {
 
 function renderVoorkeurIntro() {
   document.getElementById('vk-bar').style.width = '0%';
-  document.getElementById('vk-counter').textContent = '9 vragen';
+  document.getElementById('vk-counter').textContent = '10 vragen';
   const p = PROFILES[currentUser];
   const intro = VOORKEUR_INTRO[currentUser] || 'Jouw antwoorden helpen Griette het programma op jou af te stemmen.';
   document.getElementById('vk-body').innerHTML = `
@@ -3358,21 +3650,32 @@ function renderVoorkeurVraag() {
   vkSelected = [];
   document.getElementById('vk-bar').style.width = pct + '%';
   document.getElementById('vk-counter').textContent = (vkIdx + 1) + ' / ' + VOORKEUR_VRAGEN.length;
-  document.getElementById('vk-body').innerHTML = `
-    <div style="font-size:3rem;text-align:center;margin-bottom:20px;">${v.emoji}</div>
-    <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.35rem;text-align:center;line-height:1.3;color:#0A0A0A;margin-bottom:6px;">${v.vraag}</div>
-    <div style="font-size:0.72rem;color:#9A948E;text-align:center;margin-bottom:20px;">Kies wat past — ook meerdere antwoorden zijn goed</div>
-    <div style="display:flex;flex-direction:column;gap:10px;" id="vk-opties">
-      ${v.opties.map((opt, i) => `
-        <button id="vkopt-${i}" onclick="toggleVoorkeurOpt(${i})" style="padding:14px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;text-align:left;color:#0A0A0A;transition:all 0.15s;line-height:1.4;">${opt}</button>
-      `).join('')}
-      <button id="vkopt-anders" onclick="toggleVoorkeurAnders()" style="padding:14px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;text-align:left;color:#9A948E;transition:all 0.15s;line-height:1.4;">✏️ Anders, namelijk…</button>
-      <div id="vk-anders-input" style="display:none;">
-        <input id="vk-anders-text" type="text" placeholder="Typ je eigen antwoord…" style="width:100%;padding:12px 14px;border:1.5px solid var(--bd2);border-radius:var(--r);background:rgba(10,10,10,0.04);font-family:var(--sans);font-size:0.9rem;color:#0A0A0A;outline:none;">
+  if (v.type === 'text') {
+    document.getElementById('vk-body').innerHTML = `
+      <div style="font-size:3rem;text-align:center;margin-bottom:20px;">${v.emoji}</div>
+      <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.35rem;text-align:center;line-height:1.3;color:#0A0A0A;margin-bottom:6px;">${v.vraag}</div>
+      <div style="font-size:0.72rem;color:#9A948E;text-align:center;margin-bottom:20px;">Schrijf in je eigen woorden — dit is voor jou</div>
+      <textarea id="vk-musthave-text" placeholder="${v.placeholder}" rows="4" style="width:100%;padding:14px;border:1.5px solid rgba(10,10,10,0.12);border-radius:var(--r-lg);background:rgba(10,10,10,0.04);font-family:var(--sans);font-size:0.9rem;color:#0A0A0A;outline:none;resize:none;line-height:1.5;box-sizing:border-box;"></textarea>
+      <div style="font-size:0.7rem;color:#9A948E;margin-top:8px;line-height:1.5;">Mag je ook overslaan — dan telt het als "alles is goed".</div>
+      <button onclick="bevestigVoorkeur()" style="margin-top:16px;width:100%;padding:14px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Afronden →</button>
+    `;
+  } else {
+    document.getElementById('vk-body').innerHTML = `
+      <div style="font-size:3rem;text-align:center;margin-bottom:20px;">${v.emoji}</div>
+      <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.35rem;text-align:center;line-height:1.3;color:#0A0A0A;margin-bottom:6px;">${v.vraag}</div>
+      <div style="font-size:0.72rem;color:#9A948E;text-align:center;margin-bottom:20px;">Kies wat past — ook meerdere antwoorden zijn goed</div>
+      <div style="display:flex;flex-direction:column;gap:10px;" id="vk-opties">
+        ${v.opties.map((opt, i) => `
+          <button id="vkopt-${i}" onclick="toggleVoorkeurOpt(${i})" style="padding:14px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;text-align:left;color:#0A0A0A;transition:all 0.15s;line-height:1.4;">${opt}</button>
+        `).join('')}
+        <button id="vkopt-anders" onclick="toggleVoorkeurAnders()" style="padding:14px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;text-align:left;color:#9A948E;transition:all 0.15s;line-height:1.4;">✏️ Anders, namelijk…</button>
+        <div id="vk-anders-input" style="display:none;">
+          <input id="vk-anders-text" type="text" placeholder="Typ je eigen antwoord…" style="width:100%;padding:12px 14px;border:1.5px solid var(--bd2);border-radius:var(--r);background:rgba(10,10,10,0.04);font-family:var(--sans);font-size:0.9rem;color:#0A0A0A;outline:none;">
+        </div>
       </div>
-    </div>
-    <button onclick="bevestigVoorkeur()" style="margin-top:16px;width:100%;padding:14px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Volgende →</button>
-  `;
+      <button onclick="bevestigVoorkeur()" style="margin-top:16px;width:100%;padding:14px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Volgende →</button>
+    `;
+  }
 }
 
 function toggleVoorkeurOpt(i) {
@@ -3400,11 +3703,18 @@ function toggleVoorkeurAnders() {
   if (!showing) document.getElementById('vk-anders-text').focus();
 }
 function bevestigVoorkeur() {
-  const andersText = document.getElementById('vk-anders-text')?.value?.trim();
-  const selected = [...vkSelected];
-  if (andersText) selected.push('anders:' + andersText);
-  vkAnswers.push(selected.length > 0 ? selected : [-1]);
-  vkIdx++;
+  const v = VOORKEUR_VRAGEN[vkIdx];
+  if (v && v.type === 'text') {
+    const mustText = document.getElementById('vk-musthave-text')?.value?.trim() || '';
+    vkAnswers.push(mustText ? ['musthave:' + mustText] : [-1]);
+    vkIdx++;
+  } else {
+    const andersText = document.getElementById('vk-anders-text')?.value?.trim();
+    const selected = [...vkSelected];
+    if (andersText) selected.push('anders:' + andersText);
+    vkAnswers.push(selected.length > 0 ? selected : [-1]);
+    vkIdx++;
+  }
   if (vkIdx >= VOORKEUR_VRAGEN.length) {
     finishVoorkeur();
   } else {
@@ -3879,11 +4189,11 @@ function submitConn() {
 
 // ── MARLINDE BINGO ────────────────────────────────
 const BINGO_VAKJES = [
-  'Marlinde vergeet iets in airbnb','Fred legt uit met handen','Griette koopt bij Sézane','Miriam stuurt tikkie','Iemand zegt "ik heb honger"',
+  'Marlinde vergeet iets in airbnb','Fred legt uit met handen','Griette koopt bij Sézane','Iemand zegt "volgende ronde van mij"','Iemand zegt "ik heb honger"',
   'Fransman is bot','Iemand belt naar huis','Miriam wijst restaurant af','Fred plant ochtend in','Marlinde slaapt om 23u',
   'Niemand kan kaartlezen','Iemand huilt om kunst','Pijnlijke schoenen','Tweede ronde wijn','Griette danst op straat',
   'Iemand zegt "ik kom hier wonen"','Marinière kopen','Foto voor Instagram','Miriam vindt restaurant toch goed','Confetti-moment',
-  'Tikkie €11,50','Marlinde zegt sorry voor niets','Fred maakt to-do-lijst','Iemand mist huis','Iedereen lacht om hetzelfde',
+  'Cash opnemen-moment','Marlinde zegt sorry voor niets','Fred maakt to-do-lijst','Iemand mist huis','Iedereen lacht om hetzelfde',
 ];
 let bingoStaat = {};
 
