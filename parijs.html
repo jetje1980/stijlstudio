@@ -2280,15 +2280,21 @@ function renderWeekendBlok() {
 // ── POLLS ─────────────────────────────────────────
 const pollState = {poll1: null, poll2: null};
 const POLL_DEFS = {
-  poll1: {labels:['Aligre 🛒','Sézane 🛍️'], votes:{griette:1,frederike:0,miriam:0,marlinde:null}},
-  poll2: {labels:['Feesten! 💃','Rustig diner 🍷'], votes:{griette:0,frederike:null,miriam:1,marlinde:null}},
+  poll1: {labels:['Aligre 🛒','Sézane 🛍️'], votes:{griette:null,frederike:null,miriam:null,marlinde:null}},
+  poll2: {labels:['Feesten! 💃','Rustig diner 🍷'], votes:{griette:null,frederike:null,miriam:null,marlinde:null}},
 };
 function vote(pollId, optIdx, el) {
-  if (POLL_DEFS[pollId].votes[currentUser] !== null) return;
-  POLL_DEFS[pollId].votes[currentUser] = optIdx;
-  localStorage.setItem('vz_poll_' + pollId + '_' + currentUser, optIdx);
+  const def = POLL_DEFS[pollId];
+  // Toggle: clicking same option removes vote, clicking different option changes it
+  const current = def.votes[currentUser];
+  def.votes[currentUser] = (current === optIdx) ? null : optIdx;
+  if (def.votes[currentUser] === null) {
+    localStorage.removeItem('vz_poll_' + pollId + '_' + currentUser);
+  } else {
+    localStorage.setItem('vz_poll_' + pollId + '_' + currentUser, def.votes[currentUser]);
+  }
   renderPoll(pollId);
-  saveToast('Stem opgeslagen! 🗳️');
+  if (def.votes[currentUser] !== null) saveToast('Stem opgeslagen! 🗳️');
 }
 function renderPoll(pollId) {
   const def = POLL_DEFS[pollId];
