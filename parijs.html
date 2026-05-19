@@ -1861,7 +1861,12 @@ function initApp() {
   initHomeVoorkeurBanner();
   updateVoorkeurNudge();
   initWeekendEvents();
-  setTimeout(initMap, 400);
+  // Init map when element scrolls into view (avoids 0-width init from display:none parent)
+  const _mapObs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) { initMap(); _mapObs.disconnect(); }
+  }, {threshold: 0.1});
+  const _mapEl = document.getElementById('paris-map');
+  if (_mapEl) _mapObs.observe(_mapEl);
   const tzNote = document.getElementById('marlinde-tz-note');
   if (tzNote) tzNote.style.display = (currentUser === 'marlinde' && new Date() < new Date('2026-06-01')) ? 'block' : 'none';
 }
@@ -1937,7 +1942,6 @@ function initMap() {
   if (!el || el._mapInit) return;
   el._mapInit = true;
 
-  requestAnimationFrame(() => {
   const map = L.map('paris-map', {
     center: [48.860, 2.348],
     zoom: 13,
@@ -2009,8 +2013,7 @@ function initMap() {
   });
 
   _parisMap = map;
-  setTimeout(() => map.invalidateSize(), 200);
-  }); // end requestAnimationFrame
+  map.invalidateSize();
 }
 
 // ── REEL ──────────────────────────────────────────
@@ -2259,7 +2262,7 @@ const POLL_DEFS = {
   poll2: {
     vraag: 'Vrijdagavond: feesten of rustig beginnen?',
     sub: 'Eerste avond in Parijs — hoe ver gaan we?',
-    opties: ['Feesten! 💃', 'Rustig diner 🍷'],
+    opties: ['Feesten! 💃', 'Rustig diner 🍷', 'Beide / we zien wel 🤷'],
     votes: {griette:null, frederike:null, miriam:null, marlinde:null}
   },
 };
@@ -5401,7 +5404,7 @@ function showVervoerType(type, el) {
 
     taxi:`<div style="padding:14px 16px;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);">
       <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--t2);margin-bottom:8px;">Taxi & ride-sharing</div>
-      <div style="font-size:0.82rem;color:#0A0A0A;line-height:1.6;margin-bottom:10px;"><strong>Bolt eerst</strong> (15-25% goedkoper), daarna Uber. Voor 4 personen + bagage: <strong>Uber XL</strong>. Split-fare: alle 4 Uber-account → automatisch verdeeld.</div>
+      <div style="font-size:0.82rem;color:#0A0A0A;line-height:1.6;margin-bottom:10px;"><strong>Bolt eerst</strong> (15-25% goedkoper), daarna Uber. Voor 4 personen + bagage: <strong>Uber XL</strong>. Eén persoon bestelt, iedereen stapt in.</div>
       <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--t2);margin-bottom:6px;">Tarieven vanuit Airbnb (voor 4)</div>
       <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;font-size:0.78rem;padding:7px 10px;background:#fff;border-radius:8px;"><span>→ Eiffeltoren</span><span style="font-weight:600;">€15-22 · 12 min</span></div>
