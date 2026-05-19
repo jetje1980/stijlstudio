@@ -378,6 +378,14 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 .hoofd-btn.correct{background:#dcfce7;color:#166534;}
 .hoofd-result{text-align:center;padding:20px;}
 .hoofd-result-num{font-family:var(--sans);font-weight:800;font-size:4rem;color:#A89FE8;letter-spacing:-0.02em;}
+
+/* ── POLL CHAIN ── */
+.poll-day-tab{padding:7px 16px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.15s;flex-shrink:0;}
+.poll-day-tab.active{border-color:#0A0A0A;background:#0A0A0A;color:#F0E8E2;}
+.pchain-block{margin-bottom:12px;border-radius:var(--r-lg);overflow:hidden;}
+.pchain-answered{background:rgba(122,158,130,0.08);border:1px solid rgba(122,158,130,0.2);padding:12px 14px;}
+.pchain-active{background:#fff;border:2px solid #A89FE8;padding:14px 16px;box-shadow:0 2px 12px rgba(168,159,232,0.15);}
+.pchain-locked{background:rgba(10,10,10,0.03);border:1px dashed rgba(10,10,10,0.1);padding:10px 14px;opacity:0.6;}
 </style>
 </head>
 <body>
@@ -694,15 +702,14 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 
     <!-- POLLS -->
     <div class="home-section-title" style="margin-top:8px;">Stem mee</div>
-    <div class="home-section-sub" id="polls-sub">Jullie voorkeuren bepalen welke polls er zijn</div>
-    <div id="polls-nudge" style="display:none;margin:0 20px 12px;padding:12px 14px;background:rgba(168,159,232,0.1);border-radius:var(--r-lg);font-size:0.82rem;color:#6B6560;line-height:1.5;">
-      📊 Zodra jullie alle vier je voorkeuren hebben ingevuld, maken we de eerste poll op maat.
-      <span id="polls-nudge-count" style="font-weight:700;color:#A89FE8;"></span>
+    <div class="home-section-sub" id="polls-sub">Stem per dagdeel — volgende vraag zichtbaar na jouw keuze</div>
+    <!-- Day tabs -->
+    <div style="display:flex;gap:8px;padding:0 20px 14px;overflow-x:auto;">
+      <button class="poll-day-tab active" onclick="switchPollDay('vr26',this)">Vr 26</button>
+      <button class="poll-day-tab" onclick="switchPollDay('za27',this)">Za 27</button>
+      <button class="poll-day-tab" onclick="switchPollDay('zo28',this)">Zo 28</button>
     </div>
-    <div id="polls-container">
-      <div class="poll-block" id="poll1"></div>
-      <div class="poll-block" id="poll2" style="margin-top:0;"></div>
-    </div>
+    <div id="poll-chain-content" style="padding:0 20px 8px;"></div>
 
     <!-- REISINFO -->
     <div class="collapsible" id="reisinfo-coll">
@@ -811,6 +818,11 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <button class="stab" onclick="switchProgDay('zo28',this)">Zo 28 juni</button>
     </div>
     <div id="prog-content" style="padding:12px 16px 32px;"></div>
+    <!-- GROEPSPLAN CHIPS -->
+    <div id="groepsplan-block" style="padding:0 16px 16px;display:none;">
+      <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Groepskeuze</div>
+      <div id="groepsplan-chips" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+    </div>
   </section>
 
   <!-- GROEP -->
@@ -1849,7 +1861,7 @@ function initApp() {
   initCountdown();
   showPreTripNudge();
   renderWeekendBlok();
-  initPolls();
+  initPollChain();
   initFeed();
   buildSwipeStack();
   renderProgramma();
@@ -2250,95 +2262,210 @@ function renderWeekendBlok() {
     </div>`;
 }
 
-// ── POLLS ─────────────────────────────────────────
-const pollState = {poll1: null, poll2: null};
-const POLL_DEFS = {
-  poll1: {
-    vraag: 'Wat wil je doen gelijk bij aankomst?',
-    sub: 'We zijn er om ~12:45 — wat eerst?',
-    opties: ['Spullen naar Airbnb 🏠', 'Lunchen ergens 🥗', 'Iets anders, namelijk...'],
-    votes: {griette:null, frederike:null, miriam:null, marlinde:null}
-  },
-  poll2: {
-    vraag: 'Vrijdagavond: feesten of rustig beginnen?',
-    sub: 'Eerste avond in Parijs — hoe ver gaan we?',
-    opties: ['Feesten! 💃', 'Rustig diner 🍷', 'Beide / we zien wel 🤷'],
-    votes: {griette:null, frederike:null, miriam:null, marlinde:null}
-  },
-};
+// ── POLL CHAIN ────────────────────────────────────
+const POLL_CHAIN = [
+  // VRIJDAG 26 JUNI
+  {id:'pvr1', dag:'vr26', dagdeel:'Aankomst', vraag:'Wat doe je als eerste na aankomst?',
+   opties:['Spullen wegbrengen naar Airbnb 🏠','Direct ergens lunchen 🥗','Even wandelen en de buurt verkennen 👀']},
+  {id:'pvr2', dag:'vr26', dagdeel:'Middag', vraag:'Vrijdagmiddag — wat trekt je?',
+   opties:['Wandelen door Le Marais','Even bijkomen in de Airbnb','Al een beetje shoppen 🛍️','We zien wel ter plekke']},
+  {id:'pvr3', dag:'vr26', dagdeel:'Diner', vraag:'Vrijdagavond diner?',
+   opties:['Chez Janou reserveren 🍷','Hank Burger of iets spontaans 🍔','Le Mary Celeste cocktailbar','We zien wel']},
+  {id:'pvr4', dag:'vr26', dagdeel:'Nacht', vraag:'Vrijdagnacht — hoe ver gaan we?',
+   opties:['Feesten! 💃','Bar + cocktail, dan slapen 🍸','Rustig — morgen vroeg op']},
+  // ZATERDAG 27 JUNI
+  {id:'pza1', dag:'za27', dagdeel:'Ochtend', vraag:'Zaterdagochtend?',
+   opties:["Marché d'Aligre (500m!) 🛒",'Sézane + shoppen 🛍️','Uitslapen + rustige ochtend ☕','Beide markten doen']},
+  {id:'pza2', dag:'za27', dagdeel:'Middag', vraag:'Zaterdagmiddag?',
+   opties:['Museum (Orsay / Louvre / Lumières) 🎨','Wandelen en terrassen ☀️','Solidays festival 🎵','Geen plan — spontaan']},
+  {id:'pza3', dag:'za27', dagdeel:'Avond', vraag:'Zaterdagavond — de grote avond?',
+   opties:['Feesten tot we niet meer kunnen 💃','Mooi diner + daarna bar 🍷','Rustig diner, vroeg naar bed']},
+  // ZONDAG 28 JUNI
+  {id:'pzo1', dag:'zo28', dagdeel:'Ochtend', vraag:'Zondagochtend — laatste ochtend in Parijs',
+   opties:['Rustig ontbijt + inpakken ☕','Nog één wandelingetje 🚶','Markt of brocante snappen']},
+  {id:'pzo2', dag:'zo28', dagdeel:'Middag', vraag:'Zondagmiddag voor de trein (16:25)?',
+   opties:['Lunch ergens leuks 🥗','Nog snel één last-minute plek','Rustig naar Gare du Nord']},
+];
 
-function vote(pollId, optIdx) {
-  const def = POLL_DEFS[pollId];
-  const current = def.votes[currentUser];
-  def.votes[currentUser] = (current === optIdx) ? null : optIdx;
-  if (def.votes[currentUser] === null) {
-    localStorage.removeItem('vz_poll_' + pollId + '_' + currentUser);
-  } else {
-    localStorage.setItem('vz_poll_' + pollId + '_' + currentUser, def.votes[currentUser]);
-  }
-  renderPoll(pollId);
-  if (def.votes[currentUser] !== null) saveToast('Stem opgeslagen! 🗳️');
+const ALL_CHAIN_USERS = ['griette','frederike','miriam','marlinde'];
+
+function getChainVote(pollId, user) {
+  const v = localStorage.getItem('vz_pchain_' + pollId + '_' + (user || currentUser));
+  return v !== null ? parseInt(v) : null;
 }
 
-function renderPoll(pollId) {
-  const block = document.getElementById(pollId);
-  if (!block) return;
-  const def = POLL_DEFS[pollId];
-  const allUsers = ['frederike','griette','marlinde','miriam'];
-  const n = def.opties.length;
+function voteChain(pollId, optIdx) {
+  const current = getChainVote(pollId, currentUser);
+  if (current === optIdx) {
+    localStorage.removeItem('vz_pchain_' + pollId + '_' + currentUser);
+  } else {
+    localStorage.setItem('vz_pchain_' + pollId + '_' + currentUser, optIdx);
+  }
+  const poll = POLL_CHAIN.find(p => p.id === pollId);
+  if (poll) renderPollChainDay(poll.dag);
+  renderGroepsplan();
+  if (getChainVote(pollId, currentUser) !== null) saveToast('Stem opgeslagen! 🗳️');
+}
 
-  // Restore from localStorage
-  allUsers.forEach(u => {
-    const stored = localStorage.getItem('vz_poll_' + pollId + '_' + u);
-    if (stored !== null && def.votes[u] === null) def.votes[u] = parseInt(stored);
+function getDayProgress(dag) {
+  const polls = POLL_CHAIN.filter(p => p.dag === dag);
+  const answered = polls.filter(p => getChainVote(p.id, currentUser) !== null).length;
+  return {answered, total: polls.length};
+}
+
+function getWinningOption(pollId) {
+  const poll = POLL_CHAIN.find(p => p.id === pollId);
+  if (!poll) return null;
+  const counts = Array(poll.opties.length).fill(0);
+  let total = 0;
+  ALL_CHAIN_USERS.forEach(u => {
+    const v = getChainVote(pollId, u);
+    if (v !== null) { counts[v]++; total++; }
+  });
+  if (total < 2) return null;
+  let maxIdx = 0;
+  counts.forEach((c, i) => { if (c > counts[maxIdx]) maxIdx = i; });
+  return {optionIdx: maxIdx, count: counts[maxIdx], total, label: poll.opties[maxIdx]};
+}
+
+function renderPollChainDay(dag) {
+  const container = document.getElementById('poll-chain-content');
+  if (!container) return;
+  const polls = POLL_CHAIN.filter(p => p.dag === dag);
+
+  // Find first unanswered poll index for current user
+  let firstUnanswered = polls.findIndex(p => getChainVote(p.id, currentUser) === null);
+  if (firstUnanswered === -1) firstUnanswered = polls.length; // all answered
+
+  const progress = getDayProgress(dag);
+  let html = '';
+
+  if (progress.total > 0) {
+    html += `<div style="font-size:0.68rem;color:#6B6560;margin-bottom:10px;">
+      <span style="font-weight:600;color:#0A0A0A;">${progress.answered}</span> van ${progress.total} vragen beantwoord
+    </div>`;
+  }
+
+  polls.forEach((poll, idx) => {
+    const myVote = getChainVote(poll.id, currentUser);
+    const isAnswered = myVote !== null;
+    const isActive = idx === firstUnanswered;
+    const isLocked = idx > firstUnanswered;
+
+    // Count votes from all users for aggregate display
+    const counts = Array(poll.opties.length).fill(0);
+    let votedCount = 0;
+    ALL_CHAIN_USERS.forEach(u => {
+      const v = getChainVote(poll.id, u);
+      if (v !== null) { counts[v]++; votedCount++; }
+    });
+    const total = votedCount || 1;
+
+    if (isAnswered && idx < firstUnanswered) {
+      // Answered state
+      const pct = Array(poll.opties.length).fill(0).map((_, i) => Math.round(counts[i] / total * 100));
+      const barsHtml = poll.opties.map((opt, i) => `
+        <div style="margin-bottom:5px;">
+          <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;">
+            <span style="${myVote===i?'font-weight:700;color:#0A0A0A;':'color:#6B6560;'}">${opt}</span>
+            <span style="font-weight:600;color:#6B6560;">${pct[i]}%</span>
+          </div>
+          <div class="poll-bar"><div class="poll-bar-fill" style="width:${pct[i]}%;background:${myVote===i?'#0A0A0A':'#A89FE8'};"></div></div>
+        </div>`).join('');
+
+      html += `<div class="pchain-block">
+        <div class="pchain-answered">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <div>
+              <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#7A9E82;margin-bottom:2px;">${poll.dagdeel}</div>
+              <div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;">${poll.vraag}</div>
+            </div>
+            <button onclick="voteChain('${poll.id}',${myVote})" style="flex-shrink:0;margin-left:10px;padding:4px 10px;border:1px solid rgba(10,10,10,0.15);border-radius:20px;background:transparent;font-size:0.65rem;font-weight:600;cursor:pointer;color:#6B6560;font-family:var(--sans);">Wijzig ▸</button>
+          </div>
+          <div style="font-size:0.72rem;color:#6B6560;margin-bottom:8px;">Jouw keuze: <strong style="color:#0A0A0A;">${poll.opties[myVote]}</strong></div>
+          ${barsHtml}
+          <div style="font-size:0.65rem;color:#9A948E;margin-top:6px;">${votedCount} van 4 gestemd</div>
+          <div id="cmt-pchain-${poll.id}" style="margin-top:8px;"></div>
+        </div>
+      </div>`;
+    } else if (isActive) {
+      // Active state — show options
+      html += `<div class="pchain-block">
+        <div class="pchain-active">
+          <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#A89FE8;margin-bottom:4px;">${poll.dagdeel}</div>
+          <div class="poll-q" style="margin-bottom:12px;">${poll.vraag}</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            ${poll.opties.map((opt, i) => `<button class="poll-opt" style="text-align:left;" onclick="voteChain('${poll.id}',${i})">${opt}</button>`).join('')}
+          </div>
+          <div id="cmt-pchain-${poll.id}" style="margin-top:10px;"></div>
+        </div>
+      </div>`;
+    } else {
+      // Locked state
+      html += `<div class="pchain-block">
+        <div class="pchain-locked">
+          <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin-bottom:2px;">${poll.dagdeel}</div>
+          <div style="font-size:0.88rem;font-weight:600;color:#9A948E;">${poll.vraag}</div>
+          <div style="font-size:0.72rem;color:#9A948E;margin-top:6px;">🔒 Beantwoord de vorige vraag eerst</div>
+        </div>
+      </div>`;
+    }
   });
 
-  const myVote = def.votes[currentUser];
-  const hasMyVote = myVote !== null;
-  const voted = allUsers.filter(u => def.votes[u] !== null);
-  const counts = Array(n).fill(0);
-  voted.forEach(u => { if (def.votes[u] !== null) counts[def.votes[u]]++; });
-  const total = voted.length || 1;
+  container.innerHTML = html;
 
-  const optionsHTML = def.opties.map((lbl, i) => {
-    const isMine = hasMyVote && myVote === i;
-    return `<div class="poll-opt${isMine ? ' selected' : ''}" onclick="vote('${pollId}',${i})">${lbl}</div>`;
-  }).join('');
-
-  const resultsHTML = hasMyVote ? def.opties.map((lbl, i) => {
-    const pct = Math.round(counts[i] / total * 100);
-    return `<div style="display:flex;justify-content:space-between;margin-bottom:2px;font-size:0.75rem;"><span>${lbl}</span><span style="font-weight:600;">${pct}%</span></div>
-      <div class="poll-bar"><div class="poll-bar-fill" style="width:${pct}%"></div></div>
-      ${i < n-1 ? '<div style="height:6px;"></div>' : ''}`;
-  }).join('') : '';
-
-  const votersHTML = allUsers.map(u => {
-    const p = PROFILES[u];
-    const hv = def.votes[u] !== null;
-    return `<div class="poll-voter-av ${hv?'':'pending'}" style="background:${hv?p.color:''}" title="${p.naam}">${p.init}</div>`;
-  }).join('') + `<span style="font-size:0.68rem;color:#6B6560;margin-left:4px;">${voted.length} van 4 gestemd</span>`;
-
-  const cmtId = pollId + '-cmt';
-  const cmtHTML = `<div id="${cmtId}"></div>`;
-
-  block.innerHTML = `
-    <div class="poll-q">${def.vraag}</div>
-    <div style="font-size:0.72rem;color:#6B6560;margin-bottom:10px;font-style:italic;">${def.sub}</div>
-    <div class="poll-options" style="flex-direction:${n > 2 ? 'column' : 'row'};">${optionsHTML}</div>
-    <div class="poll-result" style="display:${hasMyVote?'block':'none'};margin-top:10px;">${resultsHTML}</div>
-    <div class="poll-voters" style="margin-top:10px;">${votersHTML}</div>
-    ${cmtHTML}`;
-
-  // Re-init comment widget after re-render
-  const cmtEl = document.getElementById(cmtId);
-  if (cmtEl && !cmtEl.dataset.init) { cmtEl.innerHTML = cmtWidget('poll', pollId); cmtEl.dataset.init = '1'; cmtPreloadCount('poll', pollId); }
+  // Init comment widgets for answered + active polls
+  polls.forEach((poll, idx) => {
+    const myVote = getChainVote(poll.id, currentUser);
+    const isAnswered = myVote !== null;
+    const isActive = idx === firstUnanswered;
+    if (isAnswered || isActive) {
+      const cmtEl = document.getElementById('cmt-pchain-' + poll.id);
+      if (cmtEl && !cmtEl.dataset.init) {
+        cmtEl.innerHTML = cmtWidget('poll', poll.id);
+        cmtEl.dataset.init = '1';
+        cmtPreloadCount('poll', poll.id);
+      }
+    }
+  });
 }
-function initPolls() {
-  const nudge = document.getElementById('polls-nudge');
-  const container = document.getElementById('polls-container');
-  if (nudge) nudge.style.display = 'none';
-  if (container) container.style.display = 'block';
-  ['poll1','poll2'].forEach(id => renderPoll(id));
+
+let _activePollDay = 'vr26';
+
+function switchPollDay(dag, el) {
+  _activePollDay = dag;
+  document.querySelectorAll('.poll-day-tab').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderPollChainDay(dag);
+}
+
+function initPollChain() {
+  renderPollChainDay(_activePollDay);
+}
+
+function renderGroepsplan() {
+  const block = document.getElementById('groepsplan-block');
+  const chipsEl = document.getElementById('groepsplan-chips');
+  if (!block || !chipsEl) return;
+
+  const dayPolls = POLL_CHAIN.filter(p => p.dag === progDay);
+  const chips = [];
+  dayPolls.forEach(poll => {
+    const win = getWinningOption(poll.id);
+    if (win) {
+      chips.push(`<div style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:rgba(168,159,232,0.1);border:1px solid rgba(168,159,232,0.25);border-radius:20px;font-size:0.68rem;color:#0A0A0A;">
+        <span style="font-weight:700;color:#6B6560;">${poll.dagdeel}:</span>
+        <span>${win.label} <span style="color:#A89FE8;font-weight:700;">(${win.count}/${win.total})</span></span>
+      </div>`);
+    }
+  });
+
+  if (chips.length > 0) {
+    block.style.display = 'block';
+    chipsEl.innerHTML = chips.join('');
+  } else {
+    block.style.display = 'none';
+  }
 }
 
 // ── FEED ──────────────────────────────────────────
@@ -2781,6 +2908,7 @@ function renderProgramma() {
         <button onclick="openPlanAddSheet()" style="padding:11px 20px;border:1.5px solid rgba(10,10,10,0.15);border-radius:20px;background:transparent;color:#0A0A0A;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;">＋ Losse plek</button>
       </div>
     </div>`;
+    renderGroepsplan();
     return;
   }
 
@@ -2795,6 +2923,7 @@ function renderProgramma() {
   </div>`;
 
   container.innerHTML = ctxHtml + fixedHtml + vibeHtml;
+  renderGroepsplan();
 }
 
 function toggleProgDone(slotKey) {
@@ -3587,7 +3716,7 @@ function switchTab(name, el) {
   const sec = document.getElementById('sec-' + name);
   if (sec) sec.classList.add('active');
   if (el) el.classList.add('active');
-  if (name === 'home') { showPreTripNudge(); renderUpcomingStrip(); if (_parisMap) setTimeout(() => _parisMap.invalidateSize(), 80); }
+  if (name === 'home') { showPreTripNudge(); renderUpcomingStrip(); initPollChain(); if (_parisMap) setTimeout(() => _parisMap.invalidateSize(), 80); }
   if (name === 'groep') { renderGroep(); }
   if (name === 'top5') { renderProgramma(); }
   if (name === 'spellen') { renderHerinneringen(); }
