@@ -4920,6 +4920,7 @@ function initInspiratie() {
         <div>
           <div style="font-weight:700;font-size:0.88rem;color:#0A0A0A;margin-bottom:2px;">${br.naam}</div>
           <div style="font-size:0.72rem;color:#6B6560;">${br.info} · ${br.adres}</div>
+          <a href="https://maps.google.com/?q=${encodeURIComponent(br.adres)}" target="_blank" rel="noopener" style="font-size:0.68rem;color:#A89FE8;text-decoration:none;display:inline-block;margin-top:3px;">📍 Maps →</a>
         </div>
         ${br.badge ? `<div style="font-size:0.7rem;color:var(--gold);flex-shrink:0;">${br.badge}</div>` : ''}
       </div>
@@ -4988,6 +4989,7 @@ function renderIdeeenGrid(filter) {
     const p = it.must_van ? PROFILES[it.must_van] : null;
     const hook = it.hook || it.tip || '';
     const vibe = VIBES.find(v => v.stops.some(s => s.naam === it.naam));
+    const mapsUrl = 'https://maps.google.com/?q=' + encodeURIComponent(it.naam + ', Paris');
     return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 20px;border-bottom:1px solid rgba(10,10,10,0.06);">
       <div style="width:36px;height:36px;border-radius:10px;background:rgba(10,10,10,0.06);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">${CAT_ICON[it.cat]||'📍'}</div>
       <div style="flex:1;min-width:0;">
@@ -5008,6 +5010,7 @@ function renderIdeeenGrid(filter) {
           ${vibe ? `<span onclick="openVibeDetail('${vibe.id}')" style="font-size:0.62rem;padding:2px 7px;border-radius:8px;background:rgba(168,159,232,0.12);color:#A89FE8;cursor:pointer;">✨ ${vibe.naam}</span>` : ''}
         </div>
         ${hook ? `<div style="font-size:0.7rem;color:#6B6560;margin-top:4px;font-style:italic;">"${hook}"</div>` : ''}
+        <a href="${mapsUrl}" target="_blank" rel="noopener" style="display:inline-block;margin-top:5px;font-size:0.68rem;color:#A89FE8;text-decoration:none;">📍 Open in Maps →</a>
         ${cmtWidget('item', it.id)}
       </div>
     </div>`;
