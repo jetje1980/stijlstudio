@@ -1558,7 +1558,7 @@ const ITEM_ENRICHMENT = {
   'marche-enfants-rouges':  {hook:'Oudste markthal 1615, Japan + Libanon',      type:'moment', context_intro:'Oudste overdekte markthal van Parijs (1615) — Japanse, Marokkaanse en Libanese kraampjes waar je aan lange tafels samen luncht. Zaterdag is het drukst maar ook het leukst.'},
   'hank-burger':            {hook:'Plant-based die vleeseters bekeert',         type:'plek'},
   'shakespeare-co':         {hook:'Katten, briefjes op muren, stempel in elk boek',type:'plek', context_intro:'Meest fotografeerde boekwinkel ter wereld. Overvolle planken, slapende katten, briefjes van schrijvers. 30 meter van Notre-Dame. Koop iets kleins — elk boek heeft een stempel.'},
-  'palais-royal':           {hook:'Tuin achter Louvre — toeristen slaan over',  type:'plek',     verborgen:true},
+  'palais-royal':           {hook:'Tuin achter Louvre — toeristen slaan over',  type:'plek',     verborgen:true, must_van:'griette'},
   'wandeling-saint-germain':{hook:'Sartre + Beauvoir + Baldwin — alles hier',   type:'plek'},
   'wandeling-montmartre-early':{hook:'Magisch stil voor 9u, 50K toeristen daarna',type:'moment', context_intro:'De heuvel boven Parijs, ooit een apart dorp. Sacré-Cœur, schilders op Place du Tertre, het roze café van Picasso. Voor 9u magisch stil — erna een mensensoep van 50.000 toeristen.'},
   'sezane-marais':          {hook:'Enige Sézane die op zondag open is',         type:'plek', context_intro:'Sézane is hét Parijse vrouwenmerk van deze generatie — blazers, rokken, stoffen tassen. Het Marais-filiaal is de mooiste vestiging en de enige die op zondag open is.'},
@@ -1619,7 +1619,7 @@ const ITEM_ENRICHMENT = {
   'terroirs-avenir':    {hook:'Beste croissant van Parijs · 4 min lopen',    type:'plek', context_intro:'Greg Marchand\'s Rue du Nil is een 100-meter straat die het beste van Parijs in één blok stopt. Terroirs d\'Avenir levert aan de top-restaurants van de stad — de croissants gaan hier rechtstreeks naar de mond. Op loopafstand van jullie airbnb.'},
   'altro-frenchie':     {hook:'€34 set lunch · Greg Marchand · 4 min lopen', type:'ervaring', context_intro:'Frenchie (de ster-versie) is altijd volgeboekt. Altro is de toegankelijke maar even gepassioneerde Italiaanse zus — pasta, antipasti, geen toeristen-gevoel, en letterlijk om de hoek.'},
   'sezane-apartment':   {hook:'Flagship als huiskamer · 3 min van airbnb',   type:'plek'},
-  'passage-panoramas':  {hook:'Oudste passage couvert 1799 · 4 min lopen',   type:'plek', context_intro:'1799 — het eerste jaar van de 19e eeuw, het eerste jaar van de passages couverts. Glas-dak, mozaïek, philatelie-stalletjes en Caffè Stern. Loop door naar Jouffroy en Verdeau voor een complete passage-wandeling.'},
+  'passage-panoramas':  {hook:'Oudste passage couvert 1799 · 4 min lopen',   type:'plek', must_van:'griette', context_intro:'1799 — het eerste jaar van de 19e eeuw, het eerste jaar van de passages couverts. Glas-dak, mozaïek, philatelie-stalletjes en Caffè Stern. Loop door naar Jouffroy en Verdeau voor een complete passage-wandeling.'},
   'le-grand-rex':       {hook:'Art Deco bioscoop 1932 · monument · 3 min',   type:'ervaring', context_intro:'2750 zitplaatsen, geclassificeerd monument, Art Deco-stijl die geen enkel modern bioscoopgebouw haalt. De backstage-tour is het soort Parijs-ervaring waar je thuis over vertelt.'},
   'passage-du-caire':   {hook:'Hiërogliefen-gevel · oudste passage · 4 min', type:'plek', verborgen:true, context_intro:'1798 — een jaar na Napoleons Egypte-expeditie. Drie gezichten van godin Hathor bewaken de ingang. Binnen: textielgroothandels. Buiten: het mooiste en minst bekende geveltje van heel Sentier.'},
 };
@@ -2281,15 +2281,15 @@ const WALKING_ROUTES = [
   },
   {
     id: 'mode-passages-route',
-    title: 'Mode & passages',
-    emoji: '👗',
+    title: 'Passages & Parijs',
+    emoji: '🏛️',
     color: '#D4A0A7',
     persona_vibe: ['griette'],
     daypart: 'Middag',
     suggested_start: '14:00',
     duration_min: 180,
     distance_km: 2.0,
-    hook: 'Vier passages, één Sézane-flagship, koffie in een caffè uit 1834.',
+    hook: 'Vier passages vol 19e-eeuwse histoire, één Sézane, espresso bij Caffè Stern — en daarna mensen kijken op de boulevard.',
     stops: [
       { order:0, name:'Airbnb', type:'start', lat:48.8696, lng:2.3490, price:null },
       { order:1, name:'Sézane Apartment', type:'shop', lat:48.8695, lng:2.3478, address:'1 Rue Saint-Fiacre, 75002', walk_min:3, tip:'Vroeg = rustig. Rij later op de dag.', price:'€€' },
@@ -2383,7 +2383,7 @@ const POLL_CHAIN = [
   {id:'pvr1', dag:'vr26', dagdeel:'Aankomst', vraag:'Aankomst ~12:30, check-in pas om 16:00 — wat doen we die 3,5 uur?',
    opties:['Tassen droppen + direct Rue Montorgueil op ☕','Lunch bij Claus of Stohrer en daarna de buurt in 🥗','Passages couverts verkennen — 4 min lopen 🏛️','Neerploffen op een terrasje en eerst even ademen 🌿']},
   {id:'pvr2', dag:'vr26', dagdeel:'Middag', vraag:'Vrijdagmiddag — eerste plek die je wil zien?',
-   opties:['Sézane Apartment + Passage des Panoramas (3–4 min) 👗','Canal Saint-Martin wandeling (20 min metro) 🌊','Le Marais + Place des Vosges verkennen 🏛️','Even bijkomen in de Airbnb — ik kom vanzelf bij 🛋️']},
+   opties:['Passages couverts + Café de Flore-terrasje (200 jaar histoire) 🏛️','Canal Saint-Martin wandeling (20 min metro) 🌊','Le Marais + Place des Vosges verkennen 🏛️','Even bijkomen in de Airbnb — ik kom vanzelf bij 🛋️']},
   {id:'pvr3', dag:'vr26', dagdeel:'Diner', vraag:'Eerste diner in Parijs — de toon zetten:',
    opties:['Altro Frenchie (4 min, Italiaans, reserveer!) 🍝','Frenchie Bar à Vins (4 min, wijn + hapjes, geen res) 🍷','Buvette — bistro-klassiekers, geen reservering 🧅','Verrassing — ik ga mee met wat de groep wil ✨']},
   {id:'pvr4', dag:'vr26', dagdeel:'Nacht', vraag:'Na het diner — hoe laat gaan we naar bed?',
@@ -4655,7 +4655,7 @@ let vkSelected = [];
 
 const VOORKEUR_INTRO = {
   frederike: 'Jij houdt van een helder plan — prima. Na deze vragen weet de app precies hoeveel structuur je wil, en wordt jouw dagview ook echt een dagview met tijdslots.',
-  griette: 'Jij swipet toch het snelst. Maar doe deze even eerst — dan weet de app of de anderen jou kunnen bijhouden.',
+  griette: 'Mode, cultuur, terrasje met mensen kijken — en ja, nog een Sézane ook. Vul dit in zodat de app weet welk Griette-Parijs deze keer wint.',
   marlinde: '10 korte vragen, dan is het klaar. De app zorgt dat er geen enkel "marlinde-momentje" in de planning zit.',
   miriam: 'Jij weet altijd een goed restaurant. Vraag 8 is speciaal voor jou — dan zorgen we dat er geen slechte diner-optie in de swipe-stack terechtkomt.',
 };
