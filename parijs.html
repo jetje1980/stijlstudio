@@ -1038,6 +1038,120 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     </div>
   </section>
 
+  <!-- VERVOER -->
+  <section id="sec-vervoer" class="section">
+    <div class="page-header"><div class="page-logo">Vervoer</div></div>
+
+    <!-- ROUTE FINDER -->
+    <div style="padding:0 16px 16px;">
+      <div style="background:#0A0A0A;border-radius:var(--r-lg);padding:16px 18px;">
+        <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(240,232,226,0.5);margin-bottom:10px;">🎯 Waar wil je heen?</div>
+        <select id="vervoer-dest" onchange="renderRouteSuggestion()" style="width:100%;padding:11px 14px;border:none;border-radius:12px;background:rgba(240,232,226,0.12);color:#F0E8E2;font-family:var(--sans);font-size:0.88rem;cursor:pointer;outline:none;">
+          <option value="" style="background:#111;">— Kies bestemming —</option>
+          <option value="marche-aligre" style="background:#111;">Marché d'Aligre</option>
+          <option value="enfants-rouges" style="background:#111;">Marché des Enfants Rouges</option>
+          <option value="place-vosges" style="background:#111;">Place des Vosges</option>
+          <option value="pompidou" style="background:#111;">Centre Pompidou</option>
+          <option value="notre-dame" style="background:#111;">Notre-Dame</option>
+          <option value="galerie-vivienne" style="background:#111;">Galerie Vivienne</option>
+          <option value="louvre" style="background:#111;">Louvre</option>
+          <option value="pere-lachaise" style="background:#111;">Père Lachaise</option>
+          <option value="sacre-coeur" style="background:#111;">Sacré-Cœur / Montmartre</option>
+          <option value="eiffeltoren" style="background:#111;">Eiffeltoren</option>
+          <option value="solidays" style="background:#111;">Solidays (Hippodrome Longchamp)</option>
+          <option value="gare-du-nord" style="background:#111;">Gare du Nord</option>
+        </select>
+        <div id="route-result" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- TYPE CHIPS -->
+    <div style="display:flex;gap:8px;padding:0 16px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch;">
+      <button onclick="showVervoerType('metro',this)" class="vervoer-chip active-chip" style="flex-shrink:0;padding:7px 15px;border-radius:20px;border:1.5px solid #0A0A0A;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.15s;">🚇 Metro</button>
+      <button onclick="showVervoerType('fiets',this)" class="vervoer-chip" style="flex-shrink:0;padding:7px 15px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.15s;">🚴 Fiets</button>
+      <button onclick="showVervoerType('taxi',this)" class="vervoer-chip" style="flex-shrink:0;padding:7px 15px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.15s;">🚗 Taxi</button>
+      <button onclick="showVervoerType('lopen',this)" class="vervoer-chip" style="flex-shrink:0;padding:7px 15px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.15s;">🚶 Lopen</button>
+      <button onclick="showVervoerType('seine',this)" class="vervoer-chip" style="flex-shrink:0;padding:7px 15px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.15s;">⛴ Seine</button>
+    </div>
+    <div id="vervoer-type-content" style="padding:0 16px 4px;"></div>
+
+    <!-- KAART -->
+    <div style="padding:8px 20px 8px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">🗺 Onze plekken op de kaart</div>
+    <div id="vervoer-map" style="height:240px;margin:0 16px 16px;border-radius:var(--r-lg);overflow:hidden;"></div>
+
+    <!-- SNEL ROUTES -->
+    <div style="padding:0 20px 8px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">⭐ Snel-routes voor deze trip</div>
+
+    <div style="margin:0 16px 10px;padding:14px 16px;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);">
+      <div style="font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--t2);margin-bottom:6px;">Route A — Eurostar aankomst → Airbnb</div>
+      <div style="font-size:0.78rem;color:#0A0A0A;line-height:1.8;">🇫🇷 <strong>11:56</strong> aankomst Paris Gare du Nord<br>🚇 Metro <strong>lijn 5</strong> richting Place d'Italie → Bastille (5 stops, ~14 min)<br>🚶 <strong>6 min</strong> lopen naar Airbnb Rue du Temple<br><span style="color:#7A9E82;font-weight:600;">⏱ Totaal: ~25 min vanaf Gare du Nord</span></div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+        <a href="https://citymapper.com/directions?endcoord=48.861,2.354&endname=Airbnb+Rue+du+Temple&startcoord=48.881,2.355" target="_blank" rel="noopener" style="padding:7px 14px;border-radius:20px;background:#A89FE8;color:#0A0A0A;font-family:var(--sans);font-size:0.72rem;font-weight:700;text-decoration:none;">🗺 Citymapper →</a>
+        <a href="https://m.uber.com/ul/?action=setPickup&pickup[latitude]=48.881&pickup[longitude]=2.355&dropoff[latitude]=48.861&dropoff[longitude]=2.354" target="_blank" rel="noopener" style="padding:7px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;text-decoration:none;">🚗 Uber XL (€15-20)</a>
+      </div>
+    </div>
+
+    <div style="margin:0 16px 10px;padding:14px 16px;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);">
+      <div style="font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--t2);margin-bottom:6px;">Route B — Airbnb → Solidays festival</div>
+      <div style="font-size:0.78rem;color:#0A0A0A;line-height:1.8;">🚶 <strong>4 min</strong> naar metro Saint-Paul (lijn 1)<br>🚇 <strong>Lijn 1</strong> → overstap bij Nation naar <strong>lijn 10</strong> → Porte d'Auteuil<br>🚌 Gratis shuttle → festival-ingang<br><span style="color:#7A9E82;font-weight:600;">⏱ Totaal: 45-55 min</span></div>
+      <div style="margin-top:8px;padding:8px 10px;background:rgba(212,120,90,0.1);border-radius:8px;font-size:0.7rem;color:#D4785A;">⚠️ Terug na middernacht: lijn 10 stopt om 00:40 (vr-za 01:40). Bestel Uber XL terug — €30-40 voor 4 personen.</div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+        <a href="https://citymapper.com/directions?endcoord=48.857,2.252&endname=Solidays+Hippodrome+Longchamp&startcoord=48.861,2.354" target="_blank" rel="noopener" style="padding:7px 14px;border-radius:20px;background:#A89FE8;color:#0A0A0A;font-family:var(--sans);font-size:0.72rem;font-weight:700;text-decoration:none;">🗺 Citymapper →</a>
+        <a href="https://m.uber.com/ul/?action=setPickup&pickup[latitude]=48.861&pickup[longitude]=2.354&dropoff[latitude]=48.857&dropoff[longitude]=2.252" target="_blank" rel="noopener" style="padding:7px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;text-decoration:none;">🚗 Uber XL terug (€30-40)</a>
+      </div>
+    </div>
+
+    <div style="margin:0 16px 10px;padding:14px 16px;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);">
+      <div style="font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--t2);margin-bottom:6px;">Route C — Airbnb → Vanves brocante (za ochtend)</div>
+      <div style="font-size:0.78rem;color:#0A0A0A;line-height:1.8;">🚶 <strong>4 min</strong> naar metro Saint-Paul (lijn 1)<br>🚇 <strong>Lijn 1</strong> → Châtelet, overstap <strong>lijn 4</strong> → Porte de Vanves<br>🚶 <strong>5 min</strong> lopen naar Avenue Marc Sangnier<br><span style="color:#7A9E82;font-weight:600;">⏱ Totaal: ~40 min · vertrek 9:00 → aankomst 9:45</span></div>
+      <a href="https://citymapper.com/directions?endcoord=48.831,2.304&endname=Marche+de+Vanves&startcoord=48.861,2.354" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px;padding:7px 14px;border-radius:20px;background:#A89FE8;color:#0A0A0A;font-family:var(--sans);font-size:0.72rem;font-weight:700;text-decoration:none;">🗺 Citymapper →</a>
+    </div>
+
+    <div style="margin:0 16px 16px;padding:14px 16px;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);">
+      <div style="font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--t2);margin-bottom:6px;">Route D — Airbnb → Eurostar terug (zo middag)</div>
+      <div style="font-size:0.78rem;color:#0A0A0A;line-height:1.8;">🚂 Eurostar <strong>16:25</strong> Paris Gare du Nord → Amsterdam CS 20:03<br>⏰ Aanwezig op Gare du Nord: <strong>uiterlijk 15:55</strong><br>🚶/🚇 25 min vanaf Airbnb → vertrek <strong>uiterlijk 15:30</strong></div>
+      <div style="margin-top:8px;padding:8px 10px;background:rgba(168,159,232,0.1);border-radius:8px;font-size:0.7rem;color:#A89FE8;font-weight:600;">💡 Aanbeveling: Uber XL bestellen om 15:20 — €15-20 voor 4 pers. + bagage, 15 min.</div>
+      <a href="https://m.uber.com/ul/?action=setPickup&pickup[latitude]=48.861&pickup[longitude]=2.354&dropoff[latitude]=48.881&dropoff[longitude]=2.355" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px;padding:7px 14px;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.72rem;font-weight:700;text-decoration:none;">🚗 Uber XL naar Gare du Nord →</a>
+    </div>
+
+    <!-- TREINTIJDEN -->
+    <div style="padding:0 20px 8px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">🚂 Treintijden — Houten → Amsterdam CS</div>
+    <div style="margin:0 16px 16px;padding:16px;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);">
+      <div style="font-size:0.7rem;color:var(--t2);margin-bottom:10px;line-height:1.6;">Iedereen vertrekt vanuit Houten. Stap over in Utrecht CS, daarna samen met de IC naar Amsterdam CS.</div>
+      <div id="vervoer-trein-personen" style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px;"></div>
+      <div style="padding:10px 0;border-top:1px solid rgba(10,10,10,0.1);">
+        <div style="font-size:0.65rem;font-weight:700;color:#6B6560;margin-bottom:4px;letter-spacing:0.06em;text-transform:uppercase;">Segment 2 — Eurostar 🇫🇷</div>
+        <div style="font-size:0.82rem;font-weight:600;color:#0A0A0A;">08:10 Amsterdam CS → 11:56 Paris Gare du Nord</div>
+        <div style="font-size:0.72rem;color:#D4785A;margin-top:3px;">⏰ Boarding-poort sluit 07:40 · Paspoort of ID verplicht</div>
+      </div>
+      <div style="padding:10px 0 0;border-top:1px solid rgba(10,10,10,0.1);margin-top:4px;">
+        <div style="font-size:0.65rem;font-weight:700;color:#6B6560;margin-bottom:4px;letter-spacing:0.06em;text-transform:uppercase;">Terugreis — zondag 28 juni</div>
+        <div style="font-size:0.82rem;font-weight:600;color:#0A0A0A;">16:25 Paris Gare du Nord → 20:03 Amsterdam CS</div>
+        <div style="font-size:0.72rem;color:#6B6560;margin-top:3px;">Aankomst 20:03 → IC Utrecht ~20:38 → Sprinter Houten ~21:16</div>
+      </div>
+      <a id="vervoer-9292-link" href="https://9292.nl/reisadvies/houten-centrum/amsterdam-centraal/vertrek/2026-06-26T0600" target="_blank" rel="noopener" style="display:inline-block;margin-top:12px;font-size:0.72rem;color:#A89FE8;text-decoration:none;padding:6px 14px;border:1px solid rgba(168,159,232,0.4);border-radius:20px;">🔍 Controleer op 9292.nl →</a>
+    </div>
+
+    <!-- TICKETS -->
+    <div style="padding:0 20px 8px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">💳 Tickets & passen</div>
+    <div style="margin:0 16px 16px;padding:14px 16px;background:rgba(122,158,130,0.1);border-left:3px solid #7A9E82;border-radius:0 var(--r-lg) var(--r-lg) 0;">
+      <div style="font-weight:700;font-size:0.85rem;color:#0A0A0A;margin-bottom:6px;">💡 Aanbeveling: Navigo Easy</div>
+      <div style="font-size:0.78rem;color:#4a4540;line-height:1.6;">Oplaadbare kaart (€2 aanschaf + opladen). 10 tickets = €17 — goedkoper dan €21 los. Werkt voor metro, bus en RER zone 1. Schat 6-8 ritten per persoon over 3 dagen = ~€14.</div>
+      <div style="margin-top:10px;font-size:0.72rem;color:#6B6560;"><strong>Alternatieven:</strong><br>Paris Visite 3 dagen zone 1-3 = €30,10 pp (onbeperkt) · Los per rit = €2,10 pp met contactloze betaalpas</div>
+    </div>
+
+    <!-- APPS -->
+    <div style="padding:0 20px 8px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">📱 Apps installeren voor de trip</div>
+    <div style="margin:0 16px 24px;display:flex;flex-direction:column;gap:8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:rgba(10,10,10,0.05);border-radius:var(--r);"><div><div style="font-weight:700;font-size:0.82rem;color:#0A0A0A;">Citymapper</div><div style="font-size:0.7rem;color:var(--t2);">Route-planner Parijs — beter dan Google Maps</div></div><a href="https://citymapper.com/app" target="_blank" rel="noopener" style="flex-shrink:0;padding:7px 14px;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.72rem;font-weight:700;text-decoration:none;">Install</a></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:rgba(10,10,10,0.05);border-radius:var(--r);"><div><div style="font-weight:700;font-size:0.82rem;color:#0A0A0A;">Vélib Métropole</div><div style="font-size:0.7rem;color:var(--t2);">Stadsfietsen — dagpas €5, eerste 30 min gratis</div></div><a href="https://www.velib-metropole.fr/" target="_blank" rel="noopener" style="flex-shrink:0;padding:7px 14px;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.72rem;font-weight:700;text-decoration:none;">Install</a></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:rgba(10,10,10,0.05);border-radius:var(--r);"><div><div style="font-weight:700;font-size:0.82rem;color:#0A0A0A;">Lime</div><div style="font-size:0.7rem;color:var(--t2);">E-bikes zonder station — €1 unlock + €0,20/min</div></div><a href="https://lime.app.link/" target="_blank" rel="noopener" style="flex-shrink:0;padding:7px 14px;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.72rem;font-weight:700;text-decoration:none;">Install</a></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:rgba(10,10,10,0.05);border-radius:var(--r);"><div><div style="font-weight:700;font-size:0.82rem;color:#0A0A0A;">Bolt</div><div style="font-size:0.7rem;color:var(--t2);">Taxi — 15-25% goedkoper dan Uber</div></div><a href="https://bolt.eu/" target="_blank" rel="noopener" style="flex-shrink:0;padding:7px 14px;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.72rem;font-weight:700;text-decoration:none;">Install</a></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:rgba(10,10,10,0.05);border-radius:var(--r);"><div><div style="font-weight:700;font-size:0.82rem;color:#0A0A0A;">Uber</div><div style="font-size:0.7rem;color:var(--t2);">Taxi voor 4 — Uber XL voor bagage</div></div><a href="https://uber.com/app" target="_blank" rel="noopener" style="flex-shrink:0;padding:7px 14px;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.72rem;font-weight:700;text-decoration:none;">Install</a></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:rgba(10,10,10,0.05);border-radius:var(--r);"><div><div style="font-weight:700;font-size:0.82rem;color:#0A0A0A;">Bonjour RATP</div><div style="font-size:0.7rem;color:var(--t2);">Officiële metro-app met real-time info</div></div><a href="https://www.ratp.fr/en/apps" target="_blank" rel="noopener" style="flex-shrink:0;padding:7px 14px;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.72rem;font-weight:700;text-decoration:none;">Install</a></div>
+    </div>
+  </section>
+
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <button class="nav-btn active" onclick="switchTab('home',this)">
@@ -1063,6 +1177,10 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     <button class="nav-btn" onclick="switchTab('inspiratie',this)">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
       Ideeën
+    </button>
+    <button class="nav-btn" onclick="switchTab('vervoer',this)">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4M7 8h10M7 12h4"/></svg>
+      Vervoer
     </button>
   </nav>
 </div>
@@ -1842,6 +1960,8 @@ function renderUpcomingStrip() {
 }
 
 // ── MAP ───────────────────────────────────────────
+let _parisMap = null;
+
 function initMap() {
   const el = document.getElementById('paris-map');
   if (!el || el._mapInit) return;
@@ -1916,6 +2036,8 @@ function initMap() {
     L.marker(c, {icon: pin(color, 10)}).addTo(map)
       .bindPopup(`<div style="${popStyle}"><strong>${item.naam}</strong><br><span style="color:#6B6560;font-size:11px;">${item.wijk} · ${item.prijs}</span></div>`);
   });
+
+  _parisMap = map;
 }
 
 // ── REEL ──────────────────────────────────────────
@@ -3481,12 +3603,13 @@ function switchTab(name, el) {
   const sec = document.getElementById('sec-' + name);
   if (sec) sec.classList.add('active');
   if (el) el.classList.add('active');
-  if (name === 'home') { showPreTripNudge(); renderUpcomingStrip(); }
+  if (name === 'home') { showPreTripNudge(); renderUpcomingStrip(); if (_parisMap) setTimeout(() => _parisMap.invalidateSize(), 80); }
   if (name === 'groep') { renderGroep(); }
   if (name === 'top5') { renderProgramma(); }
   if (name === 'spellen') { renderHerinneringen(); }
   if (name === 'inspiratie') { initInspiratie(); }
   if (name === 'swipe') { renderBelevingen(belActiveFilter || 'all'); }
+  if (name === 'vervoer') { initVervoer(); }
 }
 
 // ── BELEVINGEN (vibes selector in swipe tab) ──────
@@ -5149,6 +5272,210 @@ function kiesCOC(keuze) {
   cocIdx++;
   localStorage.setItem('vz_coc_' + currentUser, JSON.stringify(cocKeuzes));
   renderCOC();
+}
+
+// ── VERVOER ──────────────────────────────────────
+const AIRBNB_COORD = {lat:48.861, lng:2.354};
+
+const VERVOER_DESTS = {
+  'marche-aligre':    {naam:"Marché d'Aligre",        lat:48.850, lng:2.375, metro:'Ledru-Rollin (lijn 8)'},
+  'enfants-rouges':   {naam:'Enfants Rouges',          lat:48.862, lng:2.359, metro:'Filles du Calvaire (lijn 8)'},
+  'place-vosges':     {naam:'Place des Vosges',        lat:48.854, lng:2.362, metro:'Chemin Vert (lijn 8)'},
+  'pompidou':         {naam:'Centre Pompidou',         lat:48.860, lng:2.352, metro:'Rambuteau (lijn 11)'},
+  'notre-dame':       {naam:'Notre-Dame',              lat:48.853, lng:2.348, metro:'Saint-Michel (lijn 4)'},
+  'galerie-vivienne': {naam:'Galerie Vivienne',        lat:48.865, lng:2.337, metro:'Bourse (lijn 3)'},
+  'louvre':           {naam:'Louvre',                  lat:48.860, lng:2.338, metro:'Palais Royal (lijn 1)'},
+  'pere-lachaise':    {naam:'Père Lachaise',           lat:48.861, lng:2.389, metro:'Père Lachaise (lijn 2/3)'},
+  'sacre-coeur':      {naam:'Sacré-Cœur',              lat:48.887, lng:2.343, metro:'Abbesses (lijn 12)'},
+  'eiffeltoren':      {naam:'Eiffeltoren',             lat:48.858, lng:2.294, metro:'Bir-Hakeim (lijn 6)'},
+  'solidays':         {naam:'Solidays (Longchamp)',    lat:48.857, lng:2.252, metro:"Porte d'Auteuil (lijn 10)"},
+  'gare-du-nord':     {naam:'Gare du Nord',            lat:48.881, lng:2.355, metro:'Gare du Nord (lijn 5)'},
+};
+
+function haversine(a, b) {
+  const R = 6371;
+  const dLat = (b.lat - a.lat) * Math.PI / 180;
+  const dLng = (b.lng - a.lng) * Math.PI / 180;
+  const x = Math.sin(dLat/2)**2 + Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
+}
+
+function suggestTransport(destId) {
+  const dest = VERVOER_DESTS[destId];
+  if (!dest) return null;
+  const km = haversine(AIRBNB_COORD, dest);
+  const walkMin = Math.round(km * 12);
+  const bikeMin = Math.round(km * 5);
+  const metroMin = Math.round(10 + km * 3);
+  const cm = `https://citymapper.com/directions?endcoord=${dest.lat},${dest.lng}&endname=${encodeURIComponent(dest.naam)}&startcoord=48.861,2.354`;
+  const gm = `https://www.google.com/maps/dir/?api=1&origin=48.861,2.354&destination=${dest.lat},${dest.lng}&travelmode=walking`;
+  const ub = `https://m.uber.com/ul/?action=setPickup&pickup[latitude]=48.861&pickup[longitude]=2.354&dropoff[latitude]=${dest.lat}&dropoff[longitude]=${dest.lng}`;
+  const uberEst = km < 4 ? '€8-15' : km < 8 ? '€15-22' : '€25-40';
+
+  let best, alt;
+  if (km < 0.8) {
+    best = {icon:'🚶', label:'Lopen', time:walkMin, note:Math.round(km*1000)+'m', cta:'Google Maps', url:gm};
+    alt  = {icon:'🚴', label:'Vélib', time:bikeMin, url:'https://www.velib-metropole.fr/'};
+  } else if (km < 2) {
+    best = {icon:'🚴', label:'Vélib', time:bikeMin, note:'sneller dan metro', cta:'Open Vélib', url:'https://www.velib-metropole.fr/'};
+    alt  = {icon:'🚶', label:'Lopen', time:walkMin, url:gm};
+  } else if (km < 8) {
+    best = {icon:'🚇', label:'Metro', time:metroMin, note:dest.metro, cta:'Citymapper', url:cm};
+    alt  = {icon:'🚴', label:'Vélib', time:bikeMin, url:'https://www.velib-metropole.fr/'};
+  } else {
+    best = {icon:'🚗', label:'Uber XL', time:Math.round(km*2+5), note:uberEst+' voor 4 pers.', cta:'Bestel Uber', url:ub};
+    alt  = {icon:'🚇', label:'Metro', time:metroMin, url:cm};
+  }
+  return {dest, km, best, alt};
+}
+
+function renderRouteSuggestion() {
+  const sel = document.getElementById('vervoer-dest');
+  const res = document.getElementById('route-result');
+  if (!sel || !res) return;
+  if (!sel.value) { res.style.display = 'none'; return; }
+  const s = suggestTransport(sel.value);
+  if (!s) return;
+  const kmStr = s.km < 1 ? Math.round(s.km*1000)+'m' : s.km.toFixed(1)+'km';
+  res.style.display = 'block';
+  res.innerHTML = `<div style="border-top:1px solid rgba(240,232,226,0.12);padding-top:12px;margin-top:12px;">
+    <div style="font-size:0.65rem;color:rgba(240,232,226,0.4);margin-bottom:8px;">${kmStr} van Airbnb</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
+      <div style="flex:1;">
+        <div style="color:#F0E8E2;font-size:0.9rem;font-weight:700;">${s.best.icon} ${s.best.label}</div>
+        <div style="color:rgba(240,232,226,0.55);font-size:0.72rem;margin-top:2px;">⏱ ${s.best.time} min${s.best.note ? ' · '+s.best.note : ''}</div>
+      </div>
+      <a href="${s.best.url}" target="_blank" rel="noopener" style="flex-shrink:0;padding:8px 16px;border-radius:20px;background:#A89FE8;color:#0A0A0A;font-family:var(--sans);font-size:0.75rem;font-weight:700;text-decoration:none;">${s.best.cta || 'Open →'}</a>
+    </div>
+    <div style="font-size:0.7rem;color:rgba(240,232,226,0.38);">Alt: ${s.alt.icon} ${s.alt.label} ~${s.alt.time} min · <a href="${s.alt.url}" target="_blank" rel="noopener" style="color:rgba(168,159,232,0.65);text-decoration:none;">open →</a></div>
+  </div>`;
+}
+
+function showVervoerType(type, el) {
+  document.querySelectorAll('.vervoer-chip').forEach(c => {
+    c.style.background = 'transparent'; c.style.color = '#6B6560'; c.style.borderColor = 'rgba(10,10,10,0.15)';
+  });
+  if (el) { el.style.background = '#0A0A0A'; el.style.color = '#F0E8E2'; el.style.borderColor = '#0A0A0A'; }
+  const ct = document.getElementById('vervoer-type-content');
+  if (!ct) return;
+
+  const loopItems = [
+    ["Marché des Enfants Rouges","400m","5 min"],["Place des Vosges","500m","6 min"],
+    ["Marché d'Aligre","600m","8 min"],["Centre Pompidou","800m","10 min"],
+    ["Notre-Dame","1,0km","12 min"],["Galerie Vivienne","1,8km","22 min"],
+    ["Louvre","2,0km","25 min"],["Père Lachaise","3,0km","35 min"],
+    ["Sacré-Cœur","5,0km","60 min"],["Eiffeltoren","6,0km","75 min"],
+  ].map(([naam,dist,tijd]) => `<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#fff;border-radius:8px;"><div style="font-size:0.78rem;color:#0A0A0A;">${naam}</div><div style="text-align:right;"><span style="font-size:0.75rem;font-weight:700;color:#7A9E82;">${tijd}</span><span style="font-size:0.65rem;color:var(--t2);margin-left:5px;">${dist}</span></div></div>`).join('');
+
+  const html = {
+    metro:`<div style="padding:14px 16px;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);">
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--t2);margin-bottom:8px;">Metro in 30 seconden</div>
+      <div style="font-size:0.82rem;color:#0A0A0A;line-height:1.7;margin-bottom:12px;">Volg het eindstation voor de richting. Ticket bewaren tot je buiten bent — boete €50. <strong>€2,10 per rit.</strong> Werkingsuren: 05:30–01:15 (vr-za tot 02:15).</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fff;border-radius:8px;"><div style="width:26px;height:18px;border-radius:4px;background:#009A44;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;color:#fff;flex-shrink:0;">8</div><div style="font-size:0.78rem;"><strong>Lijn 8</strong> — Marais, Bastille, Opéra · halte <em>Ledru-Rollin</em> (4 min)</div></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fff;border-radius:8px;"><div style="width:26px;height:18px;border-radius:4px;background:#FFCD00;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;color:#0A0A0A;flex-shrink:0;">1</div><div style="font-size:0.78rem;"><strong>Lijn 1</strong> — Louvre, Champs-Élysées · halte <em>Bastille</em> (8 min)</div></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fff;border-radius:8px;"><div style="width:26px;height:18px;border-radius:4px;background:#F28024;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;color:#fff;flex-shrink:0;">5</div><div style="font-size:0.78rem;"><strong>Lijn 5</strong> — Père Lachaise, Gare du Nord · halte <em>Bastille</em></div></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fff;border-radius:8px;"><div style="width:26px;height:18px;border-radius:4px;background:#6B0CA8;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;color:#fff;flex-shrink:0;">14</div><div style="font-size:0.78rem;"><strong>Lijn 14</strong> — snel naar Cargo (Bercy) · halte <em>Bastille</em></div></div>
+      </div>
+      <a href="https://citymapper.com/paris" target="_blank" rel="noopener" style="display:inline-block;padding:8px 16px;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.75rem;font-weight:700;text-decoration:none;">🗺 Open Citymapper →</a>
+    </div>`,
+
+    fiets:`<div style="padding:14px 16px;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);">
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--t2);margin-bottom:8px;">Vélib & Lime e-bikes</div>
+      <div style="font-size:0.82rem;color:#0A0A0A;line-height:1.6;margin-bottom:8px;"><strong>Vélib</strong> — 19.000 fietsen, 1.500+ stations. Betaal in de app. <span style="background:#E8F5E9;padding:2px 6px;border-radius:4px;color:#2E7D32;font-size:0.75rem;">Groen = mechanisch</span> <span style="background:#E3F2FD;padding:2px 6px;border-radius:4px;color:#1565C0;font-size:0.75rem;">Blauw = elektrisch</span></div>
+      <div style="font-size:0.78rem;color:#0A0A0A;margin-bottom:4px;">Dagpas <strong>€5</strong> — eerste 30 min gratis per rit</div>
+      <div style="font-size:0.72rem;color:#6B6560;margin-bottom:10px;">💡 Uitchecken + opnieuw pakken bij elk station = altijd 30 min gratis</div>
+      <div style="font-size:0.82rem;color:#0A0A0A;margin-bottom:4px;"><strong>Lime</strong> e-bikes — geen station nodig. €1 unlock + €0,20/min.</div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+        <a href="https://www.velib-metropole.fr/" target="_blank" rel="noopener" style="padding:8px 16px;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.75rem;font-weight:700;text-decoration:none;">🚴 Open Vélib →</a>
+        <a href="https://lime.app.link/" target="_blank" rel="noopener" style="padding:8px 16px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.18);color:#0A0A0A;font-family:var(--sans);font-size:0.75rem;font-weight:600;text-decoration:none;">🟡 Lime e-bike →</a>
+      </div>
+      <div style="margin-top:10px;padding:8px 10px;background:rgba(212,120,90,0.08);border-radius:8px;font-size:0.7rem;color:#D4785A;">⚠️ Helm aanbevolen, niet verplicht voor volwassenen. Niet rijden op de stoep (boete €135).</div>
+    </div>`,
+
+    taxi:`<div style="padding:14px 16px;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);">
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--t2);margin-bottom:8px;">Taxi & ride-sharing</div>
+      <div style="font-size:0.82rem;color:#0A0A0A;line-height:1.6;margin-bottom:10px;"><strong>Bolt eerst</strong> (15-25% goedkoper), daarna Uber. Voor 4 personen + bagage: <strong>Uber XL</strong>. Split-fare: alle 4 Uber-account → automatisch verdeeld.</div>
+      <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--t2);margin-bottom:6px;">Tarieven vanuit Airbnb (voor 4)</div>
+      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;font-size:0.78rem;padding:7px 10px;background:#fff;border-radius:8px;"><span>→ Eiffeltoren</span><span style="font-weight:600;">€15-22 · 12 min</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.78rem;padding:7px 10px;background:#fff;border-radius:8px;"><span>→ Sacré-Cœur</span><span style="font-weight:600;">€18-25 · 15 min</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.78rem;padding:7px 10px;background:#fff;border-radius:8px;"><span>→ Solidays (Longchamp)</span><span style="font-weight:600;">€30-40 · 25 min</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.78rem;padding:7px 10px;background:#fff;border-radius:8px;"><span>→ Gare du Nord</span><span style="font-weight:600;">€15-20 · 15 min</span></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <a href="https://bolt.eu/" target="_blank" rel="noopener" style="padding:8px 16px;border-radius:20px;background:#34D186;color:#0A0A0A;font-family:var(--sans);font-size:0.75rem;font-weight:700;text-decoration:none;">🟢 Bolt →</a>
+        <a href="https://m.uber.com/ul/" target="_blank" rel="noopener" style="padding:8px 16px;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.75rem;font-weight:700;text-decoration:none;">⬛ Uber →</a>
+      </div>
+    </div>`,
+
+    lopen:`<div style="padding:14px 16px;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);">
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--t2);margin-bottom:6px;">Lopen vanuit Airbnb</div>
+      <div style="font-size:0.75rem;color:#6B6560;margin-bottom:10px;">Voor &lt;1,5km is lopen vaak sneller dan metro (incl. wachten + lopen naar halte)</div>
+      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px;">${loopItems}</div>
+      <a href="https://www.google.com/maps/search/?api=1&query=Paris+France" target="_blank" rel="noopener" style="display:inline-block;padding:8px 16px;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.75rem;font-weight:700;text-decoration:none;">🗺 Open Google Maps →</a>
+    </div>`,
+
+    seine:`<div style="padding:14px 16px;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);">
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--t2);margin-bottom:8px;">Batobus — hop-on-hop-off over de Seine</div>
+      <div style="font-size:0.82rem;color:#0A0A0A;line-height:1.7;margin-bottom:10px;">9 haltes langs de Seine. Geen toeristen-cruise — gewoon openbaar vervoer over water. Dichtste halte: <strong>Hôtel de Ville</strong> (10 min lopen).</div>
+      <div style="display:flex;gap:10px;margin-bottom:10px;">
+        <div style="flex:1;padding:8px 10px;background:#fff;border-radius:8px;text-align:center;font-size:0.78rem;"><div style="font-weight:600;">€17</div><div style="font-size:0.68rem;color:var(--t2);">1 dag</div></div>
+        <div style="flex:1;padding:8px 10px;background:#fff;border-radius:8px;text-align:center;font-size:0.78rem;"><div style="font-weight:600;">€19</div><div style="font-size:0.68rem;color:var(--t2);">2 dagen</div></div>
+      </div>
+      <div style="font-size:0.72rem;color:#6B6560;margin-bottom:10px;">✓ Mooi weer + tijd over &nbsp; ✗ Snel ergens komen (te traag)</div>
+      <a href="https://www.batobus.com/" target="_blank" rel="noopener" style="display:inline-block;padding:8px 16px;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.75rem;font-weight:700;text-decoration:none;">⛴ Batobus website →</a>
+    </div>`,
+  };
+  ct.innerHTML = html[type] || '';
+}
+
+let _vervoerMapInit = false;
+
+function initVervoer() {
+  // Treintijden per persoon
+  const treinEl = document.getElementById('vervoer-trein-personen');
+  if (treinEl && !treinEl.dataset.init) {
+    treinEl.dataset.init = '1';
+    const td = TREIN_DATA[currentUser] || TREIN_DATA.griette;
+    treinEl.innerHTML = Object.entries(TREIN_DATA).map(([u, t]) => {
+      const p = PROFILES[u];
+      const isCurrent = u === currentUser;
+      return `<div style="display:flex;align-items:center;gap:8px;padding:5px ${isCurrent?'8px':'2px 0'};${isCurrent?'background:rgba(168,159,232,0.1);border-radius:8px;':''}">
+        ${avatarImg(u, 22)}
+        <div style="flex:1;">
+          <span style="font-size:0.78rem;font-weight:${isCurrent?'700':'500'};color:#0A0A0A;">${p.naam}</span>
+          <span style="font-size:0.72rem;color:#6B6560;margin-left:6px;">${t.station} · ${t.vertrek}</span>
+        </div>
+      </div>`;
+    }).join('');
+    const lnk = document.getElementById('vervoer-9292-link');
+    if (lnk) lnk.href = `https://9292.nl/reisadvies/${(TREIN_DATA[currentUser]||TREIN_DATA.griette).ns}/amsterdam-centraal/vertrek/2026-06-26T0600`;
+  }
+
+  // Show default metro content
+  if (!document.getElementById('vervoer-type-content').innerHTML) {
+    showVervoerType('metro', document.querySelector('.vervoer-chip.active-chip') || document.querySelector('.vervoer-chip'));
+  }
+
+  // Init vervoer map
+  if (!_vervoerMapInit) {
+    _vervoerMapInit = true;
+    setTimeout(() => {
+      const el = document.getElementById('vervoer-map');
+      if (!el) return;
+      const vmap = L.map('vervoer-map', {center:[48.862,2.348],zoom:13,zoomControl:false,scrollWheelZoom:false,attributionControl:false});
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(vmap);
+      L.control.zoom({position:'bottomright'}).addTo(vmap);
+      const pin = (color, size) => L.divIcon({className:'',html:`<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};border:2.5px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.2);"></div>`,iconSize:[size,size],iconAnchor:[size/2,size/2]});
+      const ps = 'font-family:DM Sans,sans-serif;font-size:13px;';
+      L.marker([48.861,2.354],{icon:pin('#0A0A0A',16)}).addTo(vmap).bindPopup(`<div style="${ps}"><strong>🏠 Airbnb</strong><br><span style="font-size:11px;color:#6B6560;">Rue du Temple, Le Marais</span></div>`);
+      L.marker([48.881,2.355],{icon:pin('#D4785A',13)}).addTo(vmap).bindPopup(`<div style="${ps}"><strong>🚂 Gare du Nord</strong></div>`);
+      Object.entries(VERVOER_DESTS).forEach(([id,d]) => {
+        L.marker([d.lat,d.lng],{icon:pin('#A89FE8',9)}).addTo(vmap).bindPopup(`<div style="${ps}"><strong>${d.naam}</strong><br><span style="font-size:11px;color:#6B6560;">${d.metro||''}</span></div>`);
+      });
+    }, 100);
+  }
 }
 
 // ── BOOT ─────────────────────────────────────────
