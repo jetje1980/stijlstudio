@@ -742,11 +742,10 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
           <div style="border-top:1px solid rgba(10,10,10,0.08);padding-top:10px;">
             <div style="font-size:0.68rem;font-weight:700;color:#0A0A0A;margin-bottom:4px;letter-spacing:0.05em;">Segment 3 — Aankomst & doorreis</div>
             <div style="font-size:0.78rem;color:#0A0A0A;">🇫🇷 11:56 Paris Gare du Nord</div>
-            <div style="font-size:0.72rem;color:#6B6560;margin-top:3px;">→ 🚇 Metro lijn 5 → Bastille (5 stops, ~14 min)</div>
-            <div style="font-size:0.72rem;color:#6B6560;">→ 🚶 10 min lopen via Rue du Faubourg-Poissonnière naar Airbnb Rue de la Lune</div>
-            <div style="font-size:0.72rem;color:#6B6560;">→ 🚇 Of: Metro 4 → Strasbourg-Saint-Denis (3 min) + 5 min lopen</div>
-            <div style="font-size:0.7rem;color:#7A9E82;margin-top:4px;font-weight:600;">⏰ Verwachte aankomst Airbnb: ~12:45</div>
-            <div style="font-size:0.65rem;color:var(--t2);margin-top:3px;">Check-in vanaf 15:00 · OV-kaart werkt niet in Parijs! Navigo of los kaartje €2,15</div>
+            <div style="font-size:0.72rem;color:#6B6560;margin-top:3px;">→ 🚶 <strong>Optie A:</strong> 10 min lopen via Rue du Faubourg-Poissonnière</div>
+            <div style="font-size:0.72rem;color:#6B6560;">→ 🚇 <strong>Optie B:</strong> Metro 4 → Strasbourg-Saint-Denis (3 min) + 5 min lopen</div>
+            <div style="font-size:0.7rem;color:#7A9E82;margin-top:4px;font-weight:600;">⏰ Verwachte aankomst Airbnb: ~12:30</div>
+            <div style="font-size:0.65rem;color:var(--t2);margin-top:3px;">Check-in vanaf 16:00 · OV-kaart werkt niet in Parijs! Navigo of los kaartje €2,15</div>
           </div>
         </div>
         <!-- Eurostar terug -->
@@ -1060,7 +1059,12 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 
     <!-- KAART -->
     <div style="padding:8px 20px 8px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">🗺 Onze plekken op de kaart</div>
-    <div id="vervoer-map" style="height:240px;margin:0 16px 16px;border-radius:var(--r-lg);overflow:hidden;"></div>
+    <div id="vervoer-map" style="height:240px;margin:0 16px 0;border-radius:var(--r-lg);overflow:hidden;"></div>
+
+    <!-- WANDELROUTES CARROUSEL -->
+    <div style="padding:12px 20px 6px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">👟 Wandelroutes vanaf je voordeur</div>
+    <div style="font-size:0.72rem;color:#6B6560;padding:0 20px 10px;">Geen metro nodig — tap een route om hem op de kaart te zien.</div>
+    <div id="route-carousel" style="display:flex;gap:10px;padding:0 20px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;"></div>
 
     <!-- SNEL ROUTES -->
     <div style="padding:0 20px 8px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">⭐ Snel-routes voor deze trip</div>
@@ -1134,6 +1138,10 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:rgba(10,10,10,0.05);border-radius:var(--r);"><div><div style="font-weight:700;font-size:0.82rem;color:#0A0A0A;">Bonjour RATP</div><div style="font-size:0.7rem;color:var(--t2);">Officiële metro-app met real-time info</div></div><a href="https://www.ratp.fr/en/apps" target="_blank" rel="noopener" style="flex-shrink:0;padding:7px 14px;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.72rem;font-weight:700;text-decoration:none;">Install</a></div>
     </div>
   </section>
+
+  <!-- ROUTE PANEL OVERLAY -->
+  <div id="route-panel-overlay" onclick="closeRoutePanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:900;"></div>
+  <div id="route-panel" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#F0E8E2;border-radius:20px 20px 0 0;z-index:901;max-height:80vh;overflow-y:auto;padding-bottom:max(env(safe-area-inset-bottom,0px),16px);"></div>
 
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
@@ -2248,6 +2256,74 @@ const WEEKEND_EVENTS = {
   ],
 };
 let weekendTab = 'vlooien';
+
+// ── WALKING ROUTES ────────────────────────────────
+const WALKING_ROUTES = [
+  {
+    id: 'croissant-route',
+    title: 'Croissant & koffie',
+    emoji: '🥐',
+    color: '#E8A87C',
+    persona_vibe: ['miriam', 'marlinde'],
+    daypart: 'Ochtend',
+    suggested_start: '08:30',
+    duration_min: 60,
+    distance_km: 1.2,
+    hook: 'Voor de echte foodie en de late opstaander die net op tijd de warme croissants haalt.',
+    inside_joke: 'Voor wie écht vroeg op kan. (Marlinde, wij geloven in je.)',
+    stops: [
+      { order:0, name:'Airbnb', type:'start', lat:48.8696, lng:2.3490, tip:'Vertrek om 08:30 voor warme croissants', price:null },
+      { order:1, name:"Boulangerie Terroirs d'Avenir", type:'food', lat:48.8674, lng:2.3501, address:'3 Rue du Nil, 75002', walk_min:4, tip:'Probeer kouign-amann als je hem ziet. Vroeg = warm.', price:'€' },
+      { order:2, name:'Passage du Caire-gevel', type:'sight', lat:48.8673, lng:2.3527, address:'Place du Caire, 75002', walk_min:3, tip:'Hiërogliefen + 3 hoofden van Hathor. Even staren, niet naar binnen.', price:null },
+      { order:3, name:'Rue Beauregard', type:'walk', lat:48.8682, lng:2.3512, walk_min:3, tip:'Kleine straatjes, echt Sentier-gevoel', price:null },
+      { order:4, name:'Terug naar Airbnb', type:'end', lat:48.8696, lng:2.3490, walk_min:2, price:null }
+    ]
+  },
+  {
+    id: 'mode-passages-route',
+    title: 'Mode & passages',
+    emoji: '👗',
+    color: '#D4A0A7',
+    persona_vibe: ['griette'],
+    daypart: 'Middag',
+    suggested_start: '14:00',
+    duration_min: 180,
+    distance_km: 2.0,
+    hook: 'Vier passages, één Sézane-flagship, koffie in een caffè uit 1834.',
+    stops: [
+      { order:0, name:'Airbnb', type:'start', lat:48.8696, lng:2.3490, price:null },
+      { order:1, name:'Sézane Apartment', type:'shop', lat:48.8695, lng:2.3478, address:'1 Rue Saint-Fiacre, 75002', walk_min:3, tip:'Vroeg = rustig. Rij later op de dag.', price:'€€' },
+      { order:2, name:'Passage des Panoramas', type:'sight', lat:48.8720, lng:2.3471, address:'11 Boulevard Montmartre, 75002', walk_min:4, tip:"Caffè Stern voor espresso, brasserie L'Arbre à Cannelle", price:'€' },
+      { order:3, name:'Passage Jouffroy', type:'sight', lat:48.8720, lng:2.3472, address:'10 Boulevard Montmartre, 75009', walk_min:1, tip:'Steek over Boulevard Montmartre. Musée Grévin halverwege.', price:'€' },
+      { order:4, name:'Passage Verdeau', type:'sight', lat:48.8722, lng:2.3487, address:'6 Rue de la Grange Batelière, 75009', walk_min:2, tip:'Antiquariaat, oude prints, fotografie-shops', price:'€' },
+      { order:5, name:'Galerie Vivienne', type:'sight', lat:48.8654, lng:2.3385, address:'4 Rue des Petits Champs, 75002', walk_min:8, tip:'Mozaïek-vloer, Legrand Filles et Fils (wijn sinds 1880)', price:'€' },
+      { order:6, name:'Terug naar Airbnb', type:'end', lat:48.8696, lng:2.3490, walk_min:10, price:null }
+    ]
+  },
+  {
+    id: 'apero-crawl',
+    title: 'Apero-crawl',
+    emoji: '🥂',
+    color: '#5C7C5A',
+    persona_vibe: ['alle'],
+    daypart: 'Avond',
+    suggested_start: '18:30',
+    duration_min: 180,
+    distance_km: 1.0,
+    hook: 'Drie bars, geen metro, één avond. Klaar om 22:00 voor diner of door.',
+    stops: [
+      { order:0, name:'Airbnb', type:'start', lat:48.8696, lng:2.3490, tip:'18:30, iedereen mooi', price:null },
+      { order:1, name:'Frenchie Bar à Vins', type:'drink', lat:48.8674, lng:2.3502, address:'5-6 Rue du Nil, 75002', walk_min:4, tip:'Natuurwijn, geen reservering, bar-zitten. €8-12/glas.', price:'€€' },
+      { order:2, name:'Brasserie Bellanger', type:'drink', lat:48.8742, lng:2.3478, address:'140 Rue du Faubourg Poissonnière, 75010', walk_min:7, tip:'Apero, klein bord delen. Authentiek.', price:'€€' },
+      { order:3, name:'Experimental Cocktail Club', type:'drink', lat:48.8667, lng:2.3503, address:'37 Rue Saint-Sauveur, 75002', walk_min:6, tip:'Speakeasy, discrete zwarte deur, druk na 21:00. Eventueel reserveren.', price:'€€€' },
+      { order:4, name:'Naar huis of door', type:'end', lat:48.8696, lng:2.3490, walk_min:5, price:null }
+    ]
+  }
+];
+let activeRouteId = null;
+let _routePolyline = null;
+let _routeStopMarkers = [];
+
 function renderWeekendBlok() {
   const el = document.getElementById('weekend-blok');
   if (!el) return;
@@ -2258,6 +2334,22 @@ function renderWeekendBlok() {
     {key:'drinken',  label:'🥂 Drinken'},
   ];
   const items = WEEKEND_EVENTS[weekendTab] || [];
+  const _routeEntryCard = weekendTab === 'omdehoek' ? `
+    <div style="padding:12px 0;border-top:1px solid rgba(10,10,10,0.08);cursor:pointer;" onclick="switchTab('vervoer',document.querySelectorAll('.nav-btn')[6]);setTimeout(()=>{const rc=document.getElementById('route-carousel');if(rc)rc.scrollIntoView({behavior:'smooth',block:'start'});},400);">
+      <div style="display:flex;align-items:flex-start;gap:10px;">
+        <div style="font-size:1.5rem;flex-shrink:0;line-height:1.2;">👟</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:0.9rem;color:#0A0A0A;">Drie wandelroutes vanaf je voordeur →</div>
+          <div style="font-size:0.75rem;color:#6B6560;margin-top:1px;font-style:italic;">🥐 Croissant &amp; koffie · 👗 Mode &amp; passages · 🥂 Apero-crawl</div>
+          <div style="display:flex;gap:8px;margin-top:5px;flex-wrap:wrap;">
+            <span style="font-size:0.65rem;color:var(--t2);">⏱ 60–180 min</span>
+            <span style="font-size:0.65rem;color:var(--t2);">📍 1–2 km</span>
+            <span style="font-size:0.65rem;color:var(--t2);">🚶 Geen metro</span>
+          </div>
+        </div>
+        <div style="font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;background:#5C7C5A;color:#fff;border-radius:10px;padding:2px 8px;flex-shrink:0;align-self:flex-start;">Routes</div>
+      </div>
+    </div>` : '';
   el.innerHTML = `
     <div style="display:flex;gap:6px;padding:0 20px 12px;overflow-x:auto;scrollbar-width:none;">
       ${cats.map(c => `
@@ -2265,6 +2357,7 @@ function renderWeekendBlok() {
       `).join('')}
     </div>
     <div style="display:flex;flex-direction:column;gap:0;padding:0 20px 4px;">
+      ${_routeEntryCard}
       ${items.map(ev => `
         <div style="padding:12px 0;border-top:1px solid rgba(10,10,10,0.08);" onclick="showToast('${ev.emoji} ${ev.naam}: ${ev.tip}')">
           <div style="display:flex;align-items:flex-start;gap:10px;">
@@ -5642,8 +5735,10 @@ function showVervoerType(type, el) {
 }
 
 let _vervoerMapInit = false;
+let _vmap = null;
 
 function initVervoer() {
+  renderRouteCarousel();
   // Treintijden per persoon
   const treinEl = document.getElementById('vervoer-trein-personen');
   if (treinEl && !treinEl.dataset.init) {
@@ -5675,18 +5770,152 @@ function initVervoer() {
     setTimeout(() => {
       const el = document.getElementById('vervoer-map');
       if (!el) return;
-      const vmap = L.map('vervoer-map', {center:[48.862,2.348],zoom:13,zoomControl:false,scrollWheelZoom:false,attributionControl:false});
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(vmap);
-      L.control.zoom({position:'bottomright'}).addTo(vmap);
+      _vmap = L.map('vervoer-map', {center:[48.862,2.348],zoom:13,zoomControl:false,scrollWheelZoom:false,attributionControl:false});
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(_vmap);
+      L.control.zoom({position:'bottomright'}).addTo(_vmap);
       const pin = (color, size) => L.divIcon({className:'',html:`<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};border:2.5px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.2);"></div>`,iconSize:[size,size],iconAnchor:[size/2,size/2]});
       const ps = 'font-family:DM Sans,sans-serif;font-size:13px;';
-      L.marker([48.8696,2.3490],{icon:pin('#0A0A0A',16)}).addTo(vmap).bindPopup(`<div style="${ps}"><strong>🏠 Airbnb</strong><br><span style="font-size:11px;color:#6B6560;">Rue de la Lune · Bonne Nouvelle (2e)</span></div>`);
-      L.marker([48.881,2.355],{icon:pin('#D4785A',13)}).addTo(vmap).bindPopup(`<div style="${ps}"><strong>🚂 Gare du Nord</strong></div>`);
+      L.marker([48.8696,2.3490],{icon:pin('#0A0A0A',16)}).addTo(_vmap).bindPopup(`<div style="${ps}"><strong>🏠 Airbnb</strong><br><span style="font-size:11px;color:#6B6560;">Rue de la Lune · Bonne Nouvelle (2e)</span></div>`);
+      L.marker([48.881,2.355],{icon:pin('#D4785A',13)}).addTo(_vmap).bindPopup(`<div style="${ps}"><strong>🚂 Gare du Nord</strong></div>`);
       Object.entries(VERVOER_DESTS).forEach(([id,d]) => {
-        L.marker([d.lat,d.lng],{icon:pin('#A89FE8',9)}).addTo(vmap).bindPopup(`<div style="${ps}"><strong>${d.naam}</strong><br><span style="font-size:11px;color:#6B6560;">${d.metro||''}</span></div>`);
+        L.marker([d.lat,d.lng],{icon:pin('#A89FE8',9)}).addTo(_vmap).bindPopup(`<div style="${ps}"><strong>${d.naam}</strong><br><span style="font-size:11px;color:#6B6560;">${d.metro||''}</span></div>`);
       });
+      if (activeRouteId) _drawRouteOnMap(activeRouteId);
     }, 100);
   }
+}
+
+// ── ROUTE FUNCTIES ───────────────────────────────
+function renderRouteCarousel() {
+  const el = document.getElementById('route-carousel');
+  if (!el) return;
+  el.innerHTML = WALKING_ROUTES.map(r => {
+    const isActive = r.id === activeRouteId;
+    const vibeText = r.persona_vibe.includes('alle')
+      ? 'alle vier'
+      : r.persona_vibe.map(v => (PROFILES[v] && PROFILES[v].naam) || v).join(' + ') + '-vibe';
+    return `<div onclick="selectRoute('${r.id}')" style="flex-shrink:0;width:155px;border-radius:16px;padding:13px;background:${isActive ? r.color : 'rgba(10,10,10,0.05)'};border:2px solid ${isActive ? r.color : 'transparent'};cursor:pointer;transition:all 0.2s;">
+      <div style="font-size:1.7rem;margin-bottom:4px;">${r.emoji}</div>
+      <div style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:${isActive ? 'rgba(10,10,10,0.55)' : 'var(--t2)'};margin-bottom:2px;">${r.daypart} · ${r.suggested_start}</div>
+      <div style="font-size:0.88rem;font-weight:700;color:#0A0A0A;line-height:1.2;margin-bottom:5px;">${r.title}</div>
+      <div style="font-size:0.67rem;color:${isActive ? 'rgba(10,10,10,0.65)' : '#6B6560'};line-height:1.4;margin-bottom:8px;">${r.hook.length > 58 ? r.hook.substring(0,55)+'…' : r.hook}</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;">
+        <span style="font-size:0.58rem;background:rgba(10,10,10,0.1);border-radius:10px;padding:2px 6px;">⏱ ${r.duration_min}m</span>
+        <span style="font-size:0.58rem;background:rgba(10,10,10,0.1);border-radius:10px;padding:2px 6px;">📍 ${r.distance_km}km</span>
+      </div>
+      <div style="margin-top:5px;font-size:0.6rem;color:${isActive ? 'rgba(10,10,10,0.55)' : 'var(--t2)'};">${vibeText}</div>
+    </div>`;
+  }).join('');
+}
+
+function _drawRouteOnMap(routeId) {
+  if (!_vmap) return;
+  const route = WALKING_ROUTES.find(r => r.id === routeId);
+  if (!route) return;
+  if (_routePolyline) { _vmap.removeLayer(_routePolyline); _routePolyline = null; }
+  _routeStopMarkers.forEach(m => _vmap.removeLayer(m));
+  _routeStopMarkers = [];
+  const latlngs = route.stops.map(s => [s.lat, s.lng]);
+  _routePolyline = L.polyline(latlngs, {color: route.color, weight: 4, opacity: 0.9, dashArray: '8,5'}).addTo(_vmap);
+  _vmap.fitBounds(_routePolyline.getBounds(), {padding: [24, 24]});
+  route.stops.forEach((stop, i) => {
+    const isEnd = stop.type === 'start' || stop.type === 'end';
+    const label = stop.type === 'start' ? '▶' : (stop.type === 'end' ? '⌂' : String(i));
+    const sz = isEnd ? 18 : 22;
+    const icon = L.divIcon({className:'',html:`<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:${isEnd ? '#0A0A0A' : route.color};border:2.5px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:${isEnd ? '7' : '9'}px;font-weight:800;color:${isEnd ? '#fff' : '#0A0A0A'};line-height:1;">${label}</div>`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
+    const ps2 = 'font-family:DM Sans,sans-serif;font-size:12px;min-width:160px;line-height:1.4;';
+    const mapsUrl = `https://maps.google.com/?q=${stop.lat},${stop.lng}`;
+    const popupHtml = `<div style="${ps2}"><strong>${stop.name}</strong>${stop.address ? `<br><span style="font-size:10px;color:#6B6560;">${stop.address}</span>` : ''}${stop.tip ? `<br><span style="font-size:10px;color:#4a4540;">${stop.tip}</span>` : ''}${stop.address ? `<br><a href="${mapsUrl}" target="_blank" rel="noopener" style="font-size:10px;color:#A89FE8;">📍 Maps →</a>` : ''}</div>`;
+    _routeStopMarkers.push(L.marker([stop.lat, stop.lng], {icon}).addTo(_vmap).bindPopup(popupHtml));
+  });
+}
+
+function selectRoute(id) {
+  activeRouteId = id;
+  renderRouteCarousel();
+  const route = WALKING_ROUTES.find(r => r.id === id);
+  if (!route) return;
+  _drawRouteOnMap(id);
+  _showRoutePanel(route);
+}
+
+function _showRoutePanel(route) {
+  const overlay = document.getElementById('route-panel-overlay');
+  const panel = document.getElementById('route-panel');
+  if (!overlay || !panel) return;
+  const typeIcons = {start:'🏁', end:'🏠', food:'🥐', shop:'🛍️', sight:'🏛️', walk:'🚶', drink:'🥂'};
+  const personaLabel = route.persona_vibe.includes('alle')
+    ? 'voor alle vier 💛'
+    : route.persona_vibe.map(v => (PROFILES[v] && PROFILES[v].naam) || v).join(' + ') + '-vibe';
+  let cumMin = 0;
+  const stopsHtml = route.stops.map((stop, i) => {
+    if (i > 0) cumMin += (stop.walk_min || 0);
+    const [sh, sm] = route.suggested_start.split(':').map(Number);
+    const tot = sh * 60 + sm + cumMin;
+    const tStr = `${String(Math.floor(tot / 60)).padStart(2,'0')}:${String(tot % 60).padStart(2,'0')}`;
+    const mapsUrl = `https://maps.google.com/?q=${stop.lat},${stop.lng}`;
+    return `<div style="display:flex;gap:11px;padding:10px 0;border-top:1px solid rgba(10,10,10,0.07);">
+      <div style="display:flex;flex-direction:column;align-items:center;min-width:28px;">
+        <div style="width:26px;height:26px;border-radius:50%;background:${stop.type==='start'||stop.type==='end'?'#0A0A0A':route.color};display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:800;color:${stop.type==='start'||stop.type==='end'?'#fff':'#0A0A0A'};flex-shrink:0;">${stop.type==='start'?'▶':(stop.type==='end'?'⌂':i)}</div>
+        ${stop.walk_min && stop.type !== 'end' ? `<div style="font-size:0.55rem;color:var(--t2);margin-top:2px;">${stop.walk_min}m</div>` : ''}
+      </div>
+      <div style="flex:1;">
+        <div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">
+          <span style="font-size:0.62rem;">${typeIcons[stop.type]||'📍'}</span>
+          <span style="font-weight:700;font-size:0.88rem;color:#0A0A0A;">${stop.name}</span>
+          <span style="font-size:0.65rem;color:var(--t2);margin-left:auto;">${tStr}</span>
+        </div>
+        ${stop.address ? `<div style="font-size:0.7rem;color:#6B6560;">${stop.address}</div>` : ''}
+        ${stop.tip ? `<div style="font-size:0.72rem;color:#4a4540;margin-top:2px;line-height:1.4;font-style:italic;">${stop.tip}</div>` : ''}
+        ${stop.price ? `<span style="display:inline-block;margin-top:3px;font-size:0.62rem;background:rgba(10,10,10,0.07);border-radius:8px;padding:1px 6px;">${stop.price}</span>` : ''}
+        ${stop.address ? `<div style="margin-top:4px;"><a href="${mapsUrl}" target="_blank" rel="noopener" style="font-size:0.68rem;color:#A89FE8;text-decoration:none;">📍 Open in Google Maps →</a></div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  panel.innerHTML = `
+    <div style="position:sticky;top:0;background:#F0E8E2;border-radius:20px 20px 0 0;z-index:1;padding:12px 20px 0;">
+      <div style="width:36px;height:4px;background:rgba(10,10,10,0.18);border-radius:2px;margin:0 auto 12px;"></div>
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
+        <div style="font-size:2.2rem;line-height:1;">${route.emoji}</div>
+        <div style="flex:1;">
+          <div style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--t2);">${route.daypart} · ${route.suggested_start} · ${route.duration_min} min · ${route.distance_km} km</div>
+          <div style="font-size:1.15rem;font-weight:800;color:#0A0A0A;line-height:1.2;">${route.title}</div>
+          <div style="font-size:0.73rem;color:#6B6560;margin-top:3px;line-height:1.4;">${route.hook}</div>
+          <div style="margin-top:6px;display:inline-block;font-size:0.63rem;background:${route.color};border-radius:10px;padding:2px 10px;color:#0A0A0A;">${personaLabel}</div>
+        </div>
+      </div>
+      ${route.inside_joke ? `<div style="background:rgba(10,10,10,0.05);border-radius:10px;padding:8px 12px;font-size:0.72rem;color:#6B6560;font-style:italic;margin-bottom:8px;">"${route.inside_joke}"</div>` : ''}
+    </div>
+    <div style="padding:0 20px 4px;">${stopsHtml}</div>
+    <div style="padding:12px 20px 20px;display:flex;flex-direction:column;gap:8px;">
+      <div style="display:flex;gap:8px;">
+        <button onclick="shareRoute('${route.id}')" style="flex:1;padding:11px;border:none;border-radius:20px;background:rgba(10,10,10,0.07);color:#0A0A0A;font-family:var(--sans);font-size:0.78rem;font-weight:700;cursor:pointer;">💬 Deel met groep</button>
+        <button onclick="planRoute('${route.id}')" style="flex:1;padding:11px;border:none;border-radius:20px;background:rgba(10,10,10,0.07);color:#0A0A0A;font-family:var(--sans);font-size:0.78rem;font-weight:700;cursor:pointer;">📅 Plan in</button>
+      </div>
+      <button onclick="closeRoutePanel()" style="width:100%;padding:13px;border:none;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.88rem;font-weight:700;cursor:pointer;">← Terug</button>
+    </div>`;
+  overlay.style.display = 'block';
+  panel.style.display = 'block';
+  panel.scrollTop = 0;
+}
+
+function closeRoutePanel() {
+  const o = document.getElementById('route-panel-overlay');
+  const p = document.getElementById('route-panel');
+  if (o) o.style.display = 'none';
+  if (p) p.style.display = 'none';
+}
+
+function shareRoute(routeId) {
+  const r = WALKING_ROUTES.find(x => x.id === routeId);
+  closeRoutePanel();
+  if (r) saveToast(`${r.emoji} "${r.title}" gedeeld met de groep! 💬`);
+}
+
+function planRoute(routeId) {
+  const r = WALKING_ROUTES.find(x => x.id === routeId);
+  closeRoutePanel();
+  if (r) saveToast(`${r.emoji} ${r.title} ingepland — check de Plan-tab! 📅`);
 }
 
 // ── BOOT ─────────────────────────────────────────
