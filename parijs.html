@@ -2291,20 +2291,48 @@ const ALL_CHAIN_USERS = ['griette','frederike','miriam','marlinde'];
 
 function getChainVote(pollId, user) {
   const v = localStorage.getItem('vz_pchain_' + pollId + '_' + (user || currentUser));
-  return v !== null ? parseInt(v) : null;
+  if (v === null) return null;
+  if (v === 'custom') return 'custom';
+  return parseInt(v);
+}
+
+function getChainText(pollId, user) {
+  return localStorage.getItem('vz_pchain_text_' + pollId + '_' + (user || currentUser));
 }
 
 function voteChain(pollId, optIdx) {
   const current = getChainVote(pollId, currentUser);
   if (current === optIdx) {
     localStorage.removeItem('vz_pchain_' + pollId + '_' + currentUser);
+    localStorage.removeItem('vz_pchain_text_' + pollId + '_' + currentUser);
   } else {
     localStorage.setItem('vz_pchain_' + pollId + '_' + currentUser, optIdx);
+    localStorage.removeItem('vz_pchain_text_' + pollId + '_' + currentUser);
   }
   const poll = POLL_CHAIN.find(p => p.id === pollId);
   if (poll) renderPollChainDay(poll.dag);
   renderGroepsplan();
   if (getChainVote(pollId, currentUser) !== null) saveToast('Stem opgeslagen! 🗳️');
+}
+
+function showChainCustomInput(pollId) {
+  const wrap = document.getElementById('pchain-custom-' + pollId);
+  if (!wrap) return;
+  const hidden = wrap.style.display === 'none' || wrap.style.display === '';
+  wrap.style.display = hidden ? 'flex' : 'none';
+  if (hidden) wrap.querySelector('input')?.focus();
+}
+
+function voteChainCustom(pollId) {
+  const wrap = document.getElementById('pchain-custom-' + pollId);
+  const text = wrap?.querySelector('input')?.value?.trim();
+  if (!text) { wrap?.querySelector('input')?.focus(); return; }
+  localStorage.setItem('vz_pchain_' + pollId + '_' + currentUser, 'custom');
+  localStorage.setItem('vz_pchain_text_' + pollId + '_' + currentUser, text);
+  const poll = POLL_CHAIN.find(p => p.id === pollId);
+  if (poll) renderPollChainDay(poll.dag);
+  renderGroepsplan();
+  saveToast('Eigen antwoord opgeslagen! ✏️');
 }
 
 function getDayProgress(dag) {
@@ -2317,14 +2345,16 @@ function getWinningOption(pollId) {
   const poll = POLL_CHAIN.find(p => p.id === pollId);
   if (!poll) return null;
   const counts = Array(poll.opties.length).fill(0);
-  let total = 0;
+  let total = 0, customCount = 0;
   ALL_CHAIN_USERS.forEach(u => {
     const v = getChainVote(pollId, u);
-    if (v !== null) { counts[v]++; total++; }
+    if (v === 'custom') { customCount++; total++; }
+    else if (v !== null) { counts[v]++; total++; }
   });
   if (total < 2) return null;
   let maxIdx = 0;
   counts.forEach((c, i) => { if (c > counts[maxIdx]) maxIdx = i; });
+  if (customCount > counts[maxIdx]) return {optionIdx: -1, count: customCount, total, label: 'Anders'};
   return {optionIdx: maxIdx, count: counts[maxIdx], total, label: poll.opties[maxIdx]};
 }
 
@@ -2354,16 +2384,21 @@ function renderPollChainDay(dag) {
 
     // Count votes from all users for aggregate display
     const counts = Array(poll.opties.length).fill(0);
-    let votedCount = 0;
+    let votedCount = 0, customCount = 0;
     ALL_CHAIN_USERS.forEach(u => {
       const v = getChainVote(poll.id, u);
-      if (v !== null) { counts[v]++; votedCount++; }
+      if (v === 'custom') { customCount++; votedCount++; }
+      else if (v !== null) { counts[v]++; votedCount++; }
     });
     const total = votedCount || 1;
 
     if (isAnswered && idx < firstUnanswered) {
       // Answered state
-      const pct = Array(poll.opties.length).fill(0).map((_, i) => Math.round(counts[i] / total * 100));
+      const myText = myVote === 'custom' ? (getChainText(poll.id, currentUser) || 'Anders') : null;
+      const myLabel = myText || poll.opties[myVote];
+      const pct = poll.opties.map((_, i) => Math.round(counts[i] / total * 100));
+      const customPct = Math.round(customCount / total * 100);
+
       const barsHtml = poll.opties.map((opt, i) => `
         <div style="margin-bottom:5px;">
           <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;">
@@ -2371,7 +2406,18 @@ function renderPollChainDay(dag) {
             <span style="font-weight:600;color:#6B6560;">${pct[i]}%</span>
           </div>
           <div class="poll-bar"><div class="poll-bar-fill" style="width:${pct[i]}%;background:${myVote===i?'#0A0A0A':'#A89FE8'};"></div></div>
-        </div>`).join('');
+        </div>`).join('') + (customCount > 0 ? `
+        <div style="margin-bottom:5px;">
+          <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;">
+            <span style="${myVote==='custom'?'font-weight:700;color:#0A0A0A;':'color:#6B6560;'}">✏️ Anders</span>
+            <span style="font-weight:600;color:#6B6560;">${customPct}%</span>
+          </div>
+          <div class="poll-bar"><div class="poll-bar-fill" style="width:${customPct}%;background:${myVote==='custom'?'#0A0A0A':'#A89FE8'};"></div></div>
+          ${ALL_CHAIN_USERS.filter(u => getChainVote(poll.id, u) === 'custom').map(u => {
+            const t = getChainText(poll.id, u);
+            return t ? `<div style="font-size:0.65rem;color:#9A948E;margin-top:2px;padding-left:4px;">↳ ${PROFILES[u]?.naam}: &ldquo;${t}&rdquo;</div>` : '';
+          }).join('')}
+        </div>` : '');
 
       html += `<div class="pchain-block">
         <div class="pchain-answered">
@@ -2380,9 +2426,9 @@ function renderPollChainDay(dag) {
               <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#7A9E82;margin-bottom:2px;">${poll.dagdeel}</div>
               <div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;">${poll.vraag}</div>
             </div>
-            <button onclick="voteChain('${poll.id}',${myVote})" style="flex-shrink:0;margin-left:10px;padding:4px 10px;border:1px solid rgba(10,10,10,0.15);border-radius:20px;background:transparent;font-size:0.65rem;font-weight:600;cursor:pointer;color:#6B6560;font-family:var(--sans);">Wijzig ▸</button>
+            <button onclick="localStorage.removeItem('vz_pchain_${poll.id}_'+currentUser);localStorage.removeItem('vz_pchain_text_${poll.id}_'+currentUser);renderPollChainDay('${poll.dag}');" style="flex-shrink:0;margin-left:10px;padding:4px 10px;border:1px solid rgba(10,10,10,0.15);border-radius:20px;background:transparent;font-size:0.65rem;font-weight:600;cursor:pointer;color:#6B6560;font-family:var(--sans);">Wijzig ▸</button>
           </div>
-          <div style="font-size:0.72rem;color:#6B6560;margin-bottom:8px;">Jouw keuze: <strong style="color:#0A0A0A;">${poll.opties[myVote]}</strong></div>
+          <div style="font-size:0.72rem;color:#6B6560;margin-bottom:8px;">Jouw keuze: <strong style="color:#0A0A0A;">${myLabel}</strong></div>
           ${barsHtml}
           <div style="font-size:0.65rem;color:#9A948E;margin-top:6px;">${votedCount} van 4 gestemd</div>
           <div id="cmt-pchain-${poll.id}" style="margin-top:8px;"></div>
@@ -2396,6 +2442,11 @@ function renderPollChainDay(dag) {
           <div class="poll-q" style="margin-bottom:12px;">${poll.vraag}</div>
           <div style="display:flex;flex-direction:column;gap:8px;">
             ${poll.opties.map((opt, i) => `<button class="poll-opt" style="text-align:left;" onclick="voteChain('${poll.id}',${i})">${opt}</button>`).join('')}
+            <button class="poll-opt" style="text-align:left;color:#9A948E;border-style:dashed;" onclick="showChainCustomInput('${poll.id}')">✏️ Anders, namelijk...</button>
+          </div>
+          <div id="pchain-custom-${poll.id}" style="display:none;margin-top:10px;gap:8px;align-items:center;">
+            <input type="text" placeholder="Typ je eigen antwoord..." style="flex:1;padding:10px 12px;border:1.5px solid rgba(168,159,232,0.5);border-radius:var(--r-lg);font-family:var(--sans);font-size:0.88rem;color:#0A0A0A;outline:none;background:#fff;" onkeydown="if(event.key==='Enter')voteChainCustom('${poll.id}')">
+            <button onclick="voteChainCustom('${poll.id}')" style="flex-shrink:0;padding:10px 16px;border:none;border-radius:var(--r-lg);background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;">Ok</button>
           </div>
           <div id="cmt-pchain-${poll.id}" style="margin-top:10px;"></div>
         </div>
