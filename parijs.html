@@ -4194,7 +4194,11 @@ function openVibeDetail(id) {
         </div>
       `).join('')}
     </div>
+    <div style="height:8px;"></div>
+    <div style="padding:0 2px;">${cmtWidget('vibe', v.id)}</div>
+    <div style="height:8px;"></div>
   `;
+  cmtPreloadCount('vibe', v.id);
   modal.style.display = 'flex';
 }
 
