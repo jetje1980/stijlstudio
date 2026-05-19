@@ -2380,26 +2380,26 @@ function renderWeekendBlok() {
 // ── POLL CHAIN ────────────────────────────────────
 const POLL_CHAIN = [
   // VRIJDAG 26 JUNI
-  {id:'pvr1', dag:'vr26', dagdeel:'Aankomst', vraag:'Wat doe je als eerste na aankomst?',
-   opties:['Spullen wegbrengen naar Airbnb 🏠','Direct ergens lunchen 🥗','Even wandelen en de buurt verkennen 👀']},
-  {id:'pvr2', dag:'vr26', dagdeel:'Middag', vraag:'Vrijdagmiddag — wat trekt je?',
-   opties:['Wandelen door Le Marais','Even bijkomen in de Airbnb','Al een beetje shoppen 🛍️','We zien wel ter plekke']},
-  {id:'pvr3', dag:'vr26', dagdeel:'Diner', vraag:'Vrijdagavond diner?',
-   opties:['Chez Janou reserveren 🍷','Frenchie Bar à Vins (4 min, geen reservering) 🍾','Hank Burger of iets spontaans 🍔','Le Mary Celeste cocktailbar']},
-  {id:'pvr4', dag:'vr26', dagdeel:'Nacht', vraag:'Vrijdagnacht — hoe ver gaan we?',
-   opties:['Feesten! 💃','Experimental Cocktail Club (Sentier, 6 min) 🍸','Bar + cocktail, vroeg naar bed','Rustig — morgen vroeg op']},
+  {id:'pvr1', dag:'vr26', dagdeel:'Aankomst', vraag:'Aankomst ~12:30, check-in pas om 16:00 — wat doen we die 3,5 uur?',
+   opties:['Tassen droppen + direct Rue Montorgueil op ☕','Lunch bij Claus of Stohrer en daarna de buurt in 🥗','Passages couverts verkennen — 4 min lopen 🏛️','Neerploffen op een terrasje en eerst even ademen 🌿']},
+  {id:'pvr2', dag:'vr26', dagdeel:'Middag', vraag:'Vrijdagmiddag — eerste plek die je wil zien?',
+   opties:['Sézane Apartment + Passage des Panoramas (3–4 min) 👗','Canal Saint-Martin wandeling (20 min metro) 🌊','Le Marais + Place des Vosges verkennen 🏛️','Even bijkomen in de Airbnb — ik kom vanzelf bij 🛋️']},
+  {id:'pvr3', dag:'vr26', dagdeel:'Diner', vraag:'Eerste diner in Parijs — de toon zetten:',
+   opties:['Altro Frenchie (4 min, Italiaans, reserveer!) 🍝','Frenchie Bar à Vins (4 min, wijn + hapjes, geen res) 🍷','Buvette — bistro-klassiekers, geen reservering 🧅','Verrassing — ik ga mee met wat de groep wil ✨']},
+  {id:'pvr4', dag:'vr26', dagdeel:'Nacht', vraag:'Na het diner — hoe laat gaan we naar bed?',
+   opties:['Experimental Cocktail Club (6 min, speakeasy) 🍸','Bar-hopping in de buurt — kijken waar we eindigen 🚶','Één cocktail en dan bed — morgen vroeg op 😴','Feesten zolang we kunnen 💃']},
   // ZATERDAG 27 JUNI
-  {id:'pza1', dag:'za27', dagdeel:'Ochtend', vraag:'Zaterdagochtend?',
-   opties:["Marché d'Aligre (15 min metro) 🛒",'Rue Montorgueil + koffie (5 min lopen) ☕','Sézane + Passages couverts (3 min lopen) 🛍️','Uitslapen + rustige ochtend']},
-  {id:'pza2', dag:'za27', dagdeel:'Middag', vraag:'Zaterdagmiddag?',
-   opties:['Museum (Orsay / Louvre / Lumières) 🎨','Wandelen en terrassen ☀️','Solidays festival 🎵','Geen plan — spontaan']},
-  {id:'pza3', dag:'za27', dagdeel:'Avond', vraag:'Zaterdagavond — de grote avond?',
-   opties:['Feesten tot we niet meer kunnen 💃','Mooi diner + daarna bar 🍷','Rustig diner, vroeg naar bed']},
+  {id:'pza1', dag:'za27', dagdeel:'Ochtend', vraag:'Zaterdagochtend — hoe begin je de dag?',
+   opties:['🥐 Croissant-route: Terroirs d\'Avenir om 08:30 (4 min)','☕ Koffie + terrasje Rue Montorgueil (5 min)','🛒 Marché d\'Aligre vroeg pakken (15 min metro)','😴 Uitslapen — ik haal jullie bij in de ochtend']},
+  {id:'pza2', dag:'za27', dagdeel:'Middag', vraag:'Zaterdagmiddag — groot weekend, grote keuze:',
+   opties:['🎵 Solidays (Hippodrome, hele dag festival)','🎨 Museum — Orsay, Louvre of Atelier Lumières','🌈 Le Marais + Pride-sfeer + terrasje','☀️ Wandelen, terrassen, niks plannen']},
+  {id:'pza3', dag:'za27', dagdeel:'Avond', vraag:'Zaterdagavond — de grote avond:',
+   opties:['💃 Apero-crawl (Frenchie → Bellanger → ECC) en daarna feesten','🍷 Mooi diner + daarna bar — Chez Julien of Septime Cave','🎵 Solidays avond meepakken en dan kijken','🛋️ Relaxed diner, vroeg naar bed — zondag is ook een dag']},
   // ZONDAG 28 JUNI
-  {id:'pzo1', dag:'zo28', dagdeel:'Ochtend', vraag:'Zondagochtend — laatste ochtend in Parijs',
-   opties:['Rustig ontbijt + inpakken ☕','Nog één wandelingetje 🚶','Markt of brocante snappen']},
-  {id:'pzo2', dag:'zo28', dagdeel:'Middag', vraag:'Zondagmiddag voor de trein (16:25)?',
-   opties:['Lunch ergens leuks 🥗','Nog snel één last-minute plek','Rustig naar Gare du Nord']},
+  {id:'pzo1', dag:'zo28', dagdeel:'Ochtend', vraag:'Laatste ochtend in Parijs — hoe geniet je ervan?',
+   opties:['🥐 Nog één croissant bij Terroirs d\'Avenir (4 min)','🛍️ Sézane + passages — nog even shoppen voor check-out','🛒 Puces de Vanves brocante (sluit om 14u, haast!)','☕ Rustig koffie, inpakken, genieten van de Airbnb']},
+  {id:'pzo2', dag:'zo28', dagdeel:'Middag', vraag:'Check-out 11u, trein 16:25 — hoe vul je de middag?',
+   opties:['🥗 Lunch Rue Montorgueil (Stohrer, terrasje)','🚶 Louvre-tuin wandeling en dan rustig naar Gare du Nord','🏛️ Nog één plek die we gemist hebben','🚂 Geen risico — rustig op tijd naar Gare du Nord']},
 ];
 
 const ALL_CHAIN_USERS = ['griette','frederike','miriam','marlinde'];
