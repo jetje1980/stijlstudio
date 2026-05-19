@@ -271,6 +271,26 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 .pack-label{font-size:0.9rem;flex:1;line-height:1.3;color:#0A0A0A;}
 .pack-note{font-size:0.72rem;color:#6B6560;margin-top:2px;line-height:1.35;}
 
+/* ── COMMENT THREADS ── */
+.cmt-thread{padding:0;margin-top:0;}
+.cmt-item{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid rgba(10,10,10,0.05);}
+.cmt-item:last-child{border-bottom:none;}
+.cmt-body{flex:1;min-width:0;}
+.cmt-header{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
+.cmt-naam{font-size:0.72rem;font-weight:700;color:#0A0A0A;}
+.cmt-tijd{font-size:0.65rem;color:#9A948E;}
+.cmt-text{font-size:0.8rem;color:#3A3530;line-height:1.45;word-break:break-word;}
+.cmt-mention{color:#A89FE8;font-weight:600;}
+.cmt-compose{margin-top:8px;position:relative;}
+.cmt-compose textarea{width:100%;padding:9px 38px 9px 12px;border:1.5px solid rgba(10,10,10,0.12);border-radius:var(--r-lg);font-family:var(--sans);font-size:0.82rem;resize:none;background:#fff;box-sizing:border-box;line-height:1.4;min-height:38px;}
+.cmt-compose textarea:focus{outline:none;border-color:#A89FE8;}
+.cmt-send{position:absolute;right:8px;bottom:8px;border:none;background:none;font-size:1.1rem;cursor:pointer;color:#A89FE8;padding:0;line-height:1;}
+.cmt-counter{font-size:0.6rem;color:#9A948E;text-align:right;margin-top:2px;}
+.cmt-toggle{display:flex;align-items:center;gap:5px;padding:6px 0;cursor:pointer;color:#6B6560;font-size:0.75rem;font-weight:600;border:none;background:none;font-family:var(--sans);}
+.cmt-toggle-count{background:rgba(168,159,232,0.15);color:#A89FE8;border-radius:10px;padding:1px 7px;font-size:0.68rem;font-weight:700;}
+.cmt-delete{border:none;background:none;font-size:0.7rem;color:#9A948E;cursor:pointer;padding:0 0 0 4px;flex-shrink:0;}
+.mention-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:10px;background:rgba(168,159,232,0.12);color:#A89FE8;font-size:0.72rem;font-weight:600;cursor:pointer;border:none;font-family:var(--sans);}
+
 /* ── MISSIE VAN DE DAG ── */
 .missie-block{margin:0 20px 16px;padding:20px 0;border-top:1px solid rgba(10,10,10,0.08);color:#0A0A0A;position:relative;}
 .missie-label{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:#A89FE8;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
@@ -1307,6 +1327,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
   <div class="game-body" id="parijs-missie-body"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 // ── PROFILES ──────────────────────────────────────
@@ -1535,6 +1556,12 @@ ITEMS_BASE.forEach(it => {
     GRIETTE_AUTO[it.id] = 'like';
   }
 });
+
+// ── SUPABASE ──────────────────────────────────────
+const SUPA_URL = 'https://osuqtfsxmquwqsbgzlqn.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
+const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+const _commentChannels = {};
 
 // ── STATE ─────────────────────────────────────────
 let currentUser = null;
@@ -3784,6 +3811,180 @@ function renderVibePlanBlock(entry, idx, day) {
   </div>`;
 }
 
+// ── COMMENTS (Supabase realtime) ─────────────────
+function cmtTimeAgo(iso) {
+  const d = new Date(iso), now = Date.now(), diff = now - d;
+  if (diff < 60000) return 'nu';
+  if (diff < 3600000) return Math.floor(diff/60000) + ' min';
+  if (diff < 86400000) return Math.floor(diff/3600000) + 'u';
+  return Math.floor(diff/86400000) + 'd';
+}
+
+function cmtHighlightMentions(text) {
+  return text.replace(/@(\w+)/g, (m, u) => {
+    const known = ['griette','frederike','miriam','marlinde'];
+    const match = known.find(k => k.startsWith(u.toLowerCase()) || PROFILES[k]?.naam.toLowerCase().startsWith(u.toLowerCase()));
+    return match ? `<span class="cmt-mention">@${PROFILES[match]?.naam||u}</span>` : m;
+  });
+}
+
+function cmtExtractMentions(text) {
+  const out = [];
+  ['griette','frederike','miriam','marlinde'].forEach(u => {
+    const naam = PROFILES[u]?.naam.toLowerCase() || u;
+    if (text.toLowerCase().includes('@'+u) || text.toLowerCase().includes('@'+naam)) out.push(u);
+  });
+  return out;
+}
+
+async function cmtLoad(targetType, targetId) {
+  const {data, error} = await supa.from('comments').select('*')
+    .eq('target_type', targetType).eq('target_id', targetId)
+    .is('deleted_at', null).order('created_at', {ascending:true});
+  if (error) { console.warn('cmtLoad', error); return []; }
+  return data || [];
+}
+
+async function cmtPost(targetType, targetId, text) {
+  if (!text.trim() || text.length > 200) return;
+  const mentions = cmtExtractMentions(text);
+  const {error} = await supa.from('comments').insert({
+    target_type: targetType, target_id: targetId,
+    user_id: currentUser, text: text.trim(), mentions
+  });
+  if (error) console.warn('cmtPost', error);
+}
+
+async function cmtDelete(id) {
+  await supa.from('comments').update({deleted_at: new Date().toISOString()}).eq('id', id);
+}
+
+function cmtRenderList(comments) {
+  if (!comments.length) return '<div style="font-size:0.75rem;color:#9A948E;padding:6px 0;">Nog geen reacties.</div>';
+  return comments.map(c => {
+    const p = PROFILES[c.user_id] || {};
+    const isOwn = c.user_id === currentUser;
+    return `<div class="cmt-item">
+      ${avatarImg(c.user_id, 24)}
+      <div class="cmt-body">
+        <div class="cmt-header">
+          <span class="cmt-naam">${p.naam||c.user_id}</span>
+          <span class="cmt-tijd">${cmtTimeAgo(c.created_at)}</span>
+          ${isOwn ? `<button class="cmt-delete" onclick="cmtDelete('${c.id}').then(()=>cmtRefresh('${c.target_type}','${c.target_id}'))">✕</button>` : ''}
+        </div>
+        <div class="cmt-text">${cmtHighlightMentions(c.text.replace(/</g,'&lt;').replace(/>/g,'&gt;'))}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function cmtMentionBar() {
+  return `<div style="display:flex;gap:5px;margin-bottom:6px;flex-wrap:wrap;">
+    ${['griette','frederike','miriam','marlinde'].filter(u=>u!==currentUser).map(u=>`<button class="mention-chip" onclick="cmtInsertMention(this,'${u}')">@${PROFILES[u]?.naam||u}</button>`).join('')}
+  </div>`;
+}
+
+function cmtInsertMention(btn, user) {
+  const ta = btn.closest('.cmt-compose')?.querySelector('textarea');
+  if (!ta) return;
+  const naam = PROFILES[user]?.naam || user;
+  ta.value = (ta.value + '@' + naam + ' ').trimStart();
+  ta.focus();
+  const remaining = 200 - ta.value.length;
+  const counter = btn.closest('.cmt-block')?.querySelector('.cmt-counter');
+  if (counter) counter.textContent = remaining + ' tekens';
+}
+
+async function cmtRefresh(targetType, targetId) {
+  const listEl = document.getElementById('cmt-list-' + targetId);
+  if (!listEl) return;
+  const comments = await cmtLoad(targetType, targetId);
+  listEl.innerHTML = cmtRenderList(comments);
+  const toggle = document.querySelector(`[data-cmt-target="${targetId}"]`);
+  if (toggle) {
+    const countEl = toggle.querySelector('.cmt-toggle-count');
+    if (countEl) countEl.textContent = comments.length;
+  }
+}
+
+function cmtSubscribe(targetType, targetId) {
+  if (_commentChannels[targetId]) return;
+  _commentChannels[targetId] = supa.channel('cmt_' + targetId)
+    .on('postgres_changes', {event:'*', schema:'public', table:'comments', filter:'target_id=eq.'+targetId},
+      () => cmtRefresh(targetType, targetId))
+    .subscribe();
+}
+
+function cmtUnsubscribeAll() {
+  Object.values(_commentChannels).forEach(ch => supa.removeChannel(ch));
+  Object.keys(_commentChannels).forEach(k => delete _commentChannels[k]);
+}
+
+async function cmtToggle(targetType, targetId, wrapId) {
+  const block = document.getElementById('cmt-block-' + wrapId);
+  if (!block) return;
+  const isOpen = block.style.display !== 'none';
+  if (isOpen) { block.style.display = 'none'; return; }
+  block.style.display = 'block';
+  const listEl = document.getElementById('cmt-list-' + targetId);
+  if (listEl && !listEl.dataset.loaded) {
+    listEl.innerHTML = '<div style="font-size:0.75rem;color:#9A948E;padding:6px 0;">Laden…</div>';
+    const comments = await cmtLoad(targetType, targetId);
+    listEl.innerHTML = cmtRenderList(comments);
+    listEl.dataset.loaded = '1';
+    cmtSubscribe(targetType, targetId);
+    const toggle = document.querySelector(`[data-cmt-target="${targetId}"]`);
+    if (toggle) {
+      const countEl = toggle.querySelector('.cmt-toggle-count');
+      if (countEl) countEl.textContent = comments.length;
+    }
+  }
+}
+
+async function cmtSubmit(targetType, targetId, textareaId) {
+  const ta = document.getElementById(textareaId);
+  if (!ta) return;
+  const text = ta.value.trim();
+  if (!text) return;
+  ta.value = '';
+  ta.style.height = '';
+  const counter = ta.closest('.cmt-block')?.querySelector('.cmt-counter');
+  if (counter) counter.textContent = '200 tekens';
+  await cmtPost(targetType, targetId, text);
+  await cmtRefresh(targetType, targetId);
+}
+
+function cmtWidget(targetType, targetId) {
+  const wrapId = targetId.replace(/[^a-z0-9]/gi, '_');
+  const taId = 'cmt-ta-' + wrapId;
+  return `<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(10,10,10,0.07);">
+    <button class="cmt-toggle" data-cmt-target="${targetId}" onclick="cmtToggle('${targetType}','${targetId}','${wrapId}')">
+      \u{1F4AC} <span>Reacties</span> <span class="cmt-toggle-count" style="margin-left:2px;">…</span>
+    </button>
+    <div id="cmt-block-${wrapId}" class="cmt-block" style="display:none;">
+      <div id="cmt-list-${targetId}"></div>
+      ${cmtMentionBar()}
+      <div class="cmt-compose">
+        <textarea id="${taId}" maxlength="200" rows="2" placeholder="Reageer… (max 200 tekens)"
+          oninput="this.closest('.cmt-block').querySelector('.cmt-counter').textContent=(200-this.value.length)+' tekens'"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();cmtSubmit('${targetType}','${targetId}','${taId}')}"></textarea>
+        <button class="cmt-send" onclick="cmtSubmit('${targetType}','${targetId}','${taId}')">↑</button>
+      </div>
+      <div class="cmt-counter">200 tekens</div>
+    </div>
+  </div>`;
+}
+
+async function cmtPreloadCount(targetType, targetId) {
+  const {count} = await supa.from('comments').select('*', {count:'exact', head:true})
+    .eq('target_type', targetType).eq('target_id', targetId).is('deleted_at', null);
+  const toggle = document.querySelector(`[data-cmt-target="${targetId}"]`);
+  if (toggle) {
+    const countEl = toggle.querySelector('.cmt-toggle-count');
+    if (countEl) countEl.textContent = count || 0;
+  }
+}
+
 // ── VROEGZAT VIBES ────────────────────────────────
 const VIBES = [
   {
@@ -4370,9 +4571,11 @@ function renderIdeeenGrid(filter) {
           ${vibe ? `<span onclick="openVibeDetail('${vibe.id}')" style="font-size:0.62rem;padding:2px 7px;border-radius:8px;background:rgba(168,159,232,0.12);color:#A89FE8;cursor:pointer;">✨ ${vibe.naam}</span>` : ''}
         </div>
         ${hook ? `<div style="font-size:0.7rem;color:#6B6560;margin-top:4px;font-style:italic;">"${hook}"</div>` : ''}
+        ${cmtWidget('item', it.id)}
       </div>
     </div>`;
   }).join('');
+  items.forEach(it => cmtPreloadCount('item', it.id));
 }
 
 function checkGrietteErkenning() {
