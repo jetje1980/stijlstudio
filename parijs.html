@@ -2335,26 +2335,15 @@ function renderPoll(pollId) {
   }).join('') + `<span style="font-size:0.68rem;color:#6B6560;margin-left:4px;">${voted.length} van 4 gestemd</span>`;
 }
 function initPolls() {
-  const allUsers = ['griette','frederike','miriam','marlinde'];
-  const filledIn = allUsers.filter(u => u === 'griette' || !!localStorage.getItem('vz_voorkeur_' + u)).length;
   const nudge = document.getElementById('polls-nudge');
   const container = document.getElementById('polls-container');
-  if (filledIn < 2) {
-    if (nudge) {
-      nudge.style.display = 'block';
-      const cnt = document.getElementById('polls-nudge-count');
-      if (cnt) cnt.textContent = ' Nu al ' + filledIn + ' van de 4 gedaan.';
-    }
-    if (container) container.style.display = 'none';
-  } else {
-    if (nudge) nudge.style.display = 'none';
-    if (container) container.style.display = 'block';
-    ['poll1','poll2'].forEach(id => {
-      renderPoll(id);
-      const el = document.getElementById(id + '-cmt');
-      if (el && !el.dataset.init) { el.innerHTML = cmtWidget('poll', id); el.dataset.init = '1'; cmtPreloadCount('poll', id); }
-    });
-  }
+  if (nudge) nudge.style.display = 'none';
+  if (container) container.style.display = 'block';
+  ['poll1','poll2'].forEach(id => {
+    renderPoll(id);
+    const el = document.getElementById(id + '-cmt');
+    if (el && !el.dataset.init) { el.innerHTML = cmtWidget('poll', id); el.dataset.init = '1'; cmtPreloadCount('poll', id); }
+  });
 }
 
 // ── FEED ──────────────────────────────────────────
@@ -4294,10 +4283,34 @@ function renderVibes(filter) {
 function openVibeDetail(id) {
   const v = VIBES.find(x => x.id === id);
   if (!v) return;
-  const p = PROFILES[v.attributie] || {};
   const dagLabel = {ochtend:'🌅 Ochtend',middag:'☀️ Middag',avond:'🌙 Avond',zaterdag:'🗓 Za-special',zondag:'☁️ Zo-rustig'}[v.dagdeel] || v.dagdeel;
   const modal = document.getElementById('vibe-modal');
   if (!modal) return;
+
+  // Check if vibe is in plan
+  const plan = getPlanVibes();
+  let planDay = null, planIdx = -1;
+  ['vr26','za27','zo28'].forEach(d => {
+    plan[d].forEach((e, i) => { if (e.id === id) { planDay = d; planIdx = i; } });
+  });
+  const DAY_NAMES = {vr26:'Vr 26 juni',za27:'Za 27 juni',zo28:'Zo 28 juni'};
+  const DAY_NAMES_SHORT = {vr26:'Vr 26',za27:'Za 27',zo28:'Zo 28'};
+
+  const planActies = planDay ? `
+    <div style="margin-top:16px;padding:14px 16px;background:rgba(168,159,232,0.1);border-radius:var(--r-lg);">
+      <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:#A89FE8;margin-bottom:10px;font-weight:700;">✓ Ingepland op ${DAY_NAMES[planDay]}</div>
+      <div style="font-size:0.78rem;color:#6B6560;margin-bottom:10px;">Verplaats naar andere dag:</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${Object.entries(DAY_NAMES_SHORT).filter(([d])=>d!==planDay).map(([d,lbl])=>`
+          <button onclick="moveVibeToDay('${planDay}',${planIdx},'${d}');document.getElementById('vibe-modal').style.display='none';" style="padding:8px 16px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;font-family:var(--sans);font-size:0.78rem;font-weight:600;cursor:pointer;color:#0A0A0A;">→ ${lbl}</button>
+        `).join('')}
+        <button onclick="removeVibeFromPlan('${planDay}',${planIdx});document.getElementById('vibe-modal').style.display='none';" style="padding:8px 16px;border-radius:20px;border:1.5px solid rgba(212,120,90,0.3);background:rgba(212,120,90,0.08);font-family:var(--sans);font-size:0.78rem;font-weight:600;cursor:pointer;color:#D4785A;margin-left:auto;">✕ Verwijder</button>
+      </div>
+    </div>` : `
+    <div style="margin-top:16px;">
+      <button onclick="toggleVibeLike({stopPropagation:()=>{}}, '${id}');document.getElementById('vibe-modal').style.display='none';" style="width:100%;padding:11px;border:none;border-radius:20px;background:#A89FE8;color:#0A0A0A;font-family:var(--sans);font-size:0.85rem;font-weight:700;cursor:pointer;">♡ Voeg toe aan plan</button>
+    </div>`;
+
   document.getElementById('vibe-modal-body').innerHTML = `
     <div style="height:200px;background-image:url('${v.img}');background-size:cover;background-position:center;position:relative;margin:-20px -20px 0;">
       <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,10,10,0) 30%,rgba(10,10,10,0.75));"></div>
@@ -4323,6 +4336,7 @@ function openVibeDetail(id) {
         </div>
       `).join('')}
     </div>
+    ${planActies}
     <div style="height:8px;"></div>
     <div style="padding:0 2px;">${cmtWidget('vibe', v.id)}</div>
     <div style="height:8px;"></div>
