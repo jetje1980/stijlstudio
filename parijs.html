@@ -714,6 +714,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
         <div class="poll-bar"><div class="poll-bar-fill" id="poll1-bar1" style="width:0%"></div></div>
       </div>
       <div class="poll-voters" id="poll1-voters"></div>
+      <div id="poll1-cmt"></div>
     </div>
     <div class="poll-block" id="poll2" style="margin-top:0;">
       <div class="poll-q">Vrijdagavond na aankomst: feesten of rustig?</div>
@@ -729,6 +730,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
         <div class="poll-bar"><div class="poll-bar-fill" id="poll2-bar1" style="width:0%"></div></div>
       </div>
       <div class="poll-voters" id="poll2-voters"></div>
+      <div id="poll2-cmt"></div>
     </div>
     </div>
 
@@ -2225,7 +2227,11 @@ function initPolls() {
   } else {
     if (nudge) nudge.style.display = 'none';
     if (container) container.style.display = 'block';
-    ['poll1','poll2'].forEach(id => renderPoll(id));
+    ['poll1','poll2'].forEach(id => {
+      renderPoll(id);
+      const el = document.getElementById(id + '-cmt');
+      if (el && !el.dataset.init) { el.innerHTML = cmtWidget('poll', id); el.dataset.init = '1'; cmtPreloadCount('poll', id); }
+    });
   }
 }
 
