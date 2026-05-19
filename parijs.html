@@ -1891,7 +1891,7 @@ function initApp() {
   initHomeVoorkeurBanner();
   updateVoorkeurNudge();
   initWeekendEvents();
-  setTimeout(initMap, 100);
+  setTimeout(initMap, 400);
   const tzNote = document.getElementById('marlinde-tz-note');
   if (tzNote) tzNote.style.display = (currentUser === 'marlinde' && new Date() < new Date('2026-06-01')) ? 'block' : 'none';
 }
@@ -1967,6 +1967,7 @@ function initMap() {
   if (!el || el._mapInit) return;
   el._mapInit = true;
 
+  requestAnimationFrame(() => {
   const map = L.map('paris-map', {
     center: [48.860, 2.348],
     zoom: 13,
@@ -2038,6 +2039,8 @@ function initMap() {
   });
 
   _parisMap = map;
+  setTimeout(() => map.invalidateSize(), 200);
+  }); // end requestAnimationFrame
 }
 
 // ── REEL ──────────────────────────────────────────
