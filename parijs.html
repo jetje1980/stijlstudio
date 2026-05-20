@@ -2478,25 +2478,70 @@ function renderWeekendBlok() {
 const POLL_CHAIN = [
   // VRIJDAG 26 JUNI
   {id:'pvr1', dag:'vr26', dagdeel:'Aankomst', vraag:'Aankomst ~12:30, check-in pas om 16:00 — wat doen we die 3,5 uur?',
-   opties:['Tassen droppen + direct Rue Montorgueil op ☕','Lunch bij Claus of Stohrer en daarna de buurt in 🥗','Passages couverts verkennen — 4 min lopen 🏛️','Neerploffen op een terrasje en eerst even ademen 🌿']},
-  {id:'pvr2', dag:'vr26', dagdeel:'Middag', vraag:'Vrijdagmiddag — eerste plek die je wil zien?',
-   opties:['Passages couverts + Café de Flore-terrasje (200 jaar histoire) 🏛️','Canal Saint-Martin wandeling (20 min metro) 🌊','Le Marais + Place des Vosges verkennen 🏛️','Even bijkomen in de Airbnb — ik kom vanzelf bij 🛋️']},
+   opties:[
+     'Tassen droppen + direct Rue Montorgueil op — de levendigste marktstraat van de buurt, 5 min lopen ☕',
+     'Lunch bij Stohrer (patisserie uit 1730, om de hoek) of Claus (Scandi ontbijt, Rue du Nil, 4 min) 🥗',
+     'Passages couverts verkennen — overdekte 19e-eeuwse winkelgalerijen, letterlijk 4 min lopen 🏛️',
+     'Neerploffen op een terrasje en eerst even ademen 🌿',
+   ]},
+  {id:'pvr2', dag:'vr26', dagdeel:'Middag', vraag:'Vrijdagmiddag — eerste buurt die je wil zien?',
+   opties:[
+     'Passages couverts (Sentier, 4 min) daarna doorlopen naar Le Marais 🏛️',
+     'Canal Saint-Martin (hippe buurt, smalle bruggetjes, 20 min lopen of metro 5) 🌊',
+     'Le Marais + Place des Vosges (oudste plein van Parijs, 1612) — 20 min lopen 🏛️',
+     'Even bijkomen in de Airbnb — ik kom vanzelf bij 🛋️',
+   ]},
   {id:'pvr3', dag:'vr26', dagdeel:'Diner', vraag:'Eerste diner in Parijs — de toon zetten:',
-   opties:['Altro Frenchie (4 min, Italiaans, reserveer!) 🍝','Frenchie Bar à Vins (4 min, wijn + hapjes, geen res) 🍷','Buvette — bistro-klassiekers, geen reservering 🧅','Verrassing — ik ga mee met wat de groep wil ✨']},
+   opties:[
+     'Altro Frenchie — Italiaans van sterrenchef Greg Marchand, Rue du Nil, 4 min · reserveer vooraf! 🍝',
+     'Frenchie Bar à Vins — wijn + kleine gerechten, geen reservering, ook Rue du Nil, 4 min 🍷',
+     'Buvette — klassieke Parijse bistro, Pigalle (9e), 20 min lopen of metro 2 🧅',
+     'Verrassing — ik ga mee met wat de groep wil ✨',
+   ]},
   {id:'pvr4', dag:'vr26', dagdeel:'Nacht', vraag:'Na het diner — hoe laat gaan we naar bed?',
-   opties:['Experimental Cocktail Club (6 min, speakeasy) 🍸','Bar-hopping in de buurt — kijken waar we eindigen 🚶','Één cocktail en dan bed — morgen vroeg op 😴','Feesten zolang we kunnen 💃']},
+   opties:[
+     'Experimental Cocktail Club — speakeasy, Rue Saint-Sauveur, 6 min lopen, druk na 21u 🍸',
+     'Bar-hopping in de buurt — kijken waar we eindigen 🚶',
+     'Één cocktail en dan bed — morgen vroeg op 😴',
+     'Feesten zolang we kunnen 💃',
+   ]},
   // ZATERDAG 27 JUNI
   {id:'pza1', dag:'za27', dagdeel:'Ochtend', vraag:'Zaterdagochtend — hoe begin je de dag?',
-   opties:['🥐 Croissant-route: Terroirs d\'Avenir om 08:30 (4 min)','☕ Koffie + terrasje Rue Montorgueil (5 min)','🛒 Marché d\'Aligre vroeg pakken (15 min metro)','😴 Uitslapen — ik haal jullie bij in de ochtend']},
+   opties:[
+     '🥐 Terroirs d\'Avenir (leverancier van de beste restaurants van Parijs, Rue du Nil, 4 min) — om 08:30 voor warme croissants',
+     '☕ Terrasje op Rue Montorgueil (marktstraat, 5 min lopen) — koffie, mensen kijken',
+     '🛒 Marché d\'Aligre (brocante + versmarkt, 12e arr., 15 min metro lijn 8) — vóór 13u weg',
+     '😴 Uitslapen — ik haal jullie bij in de ochtend',
+   ]},
   {id:'pza2', dag:'za27', dagdeel:'Middag', vraag:'Zaterdagmiddag — groot weekend, grote keuze:',
-   opties:['🎵 Solidays (Hippodrome, hele dag festival)','🎨 Museum — Orsay, Louvre of Atelier Lumières','🌈 Le Marais + Pride-sfeer + terrasje','☀️ Wandelen, terrassen, niks plannen']},
+   opties:[
+     '🎵 Solidays (muziekfestival, Hippodrome de Paris, 16e, 30 min metro · dagticket ~€70)',
+     '🎨 Museum: Orsay (impressionisten, 7e, 20 min metro) of Louvre (1e, 20 min lopen) of Atelier Lumières (lichtkunst, 11e, 18 min metro)',
+     '🌈 Le Marais (4e, 20 min lopen · Pride-weekend, terrassen, vintage shops, Place des Vosges)',
+     '☀️ Wandelen, terrassen, niks plannen',
+   ]},
   {id:'pza3', dag:'za27', dagdeel:'Avond', vraag:'Zaterdagavond — de grote avond:',
-   opties:['💃 Apero-crawl (Frenchie → Bellanger → ECC) en daarna feesten','🍷 Mooi diner + daarna bar — Chez Julien of Septime Cave','🎵 Solidays avond meepakken en dan kijken','🛋️ Relaxed diner, vroeg naar bed — zondag is ook een dag']},
+   opties:[
+     '💃 Apero-crawl: Frenchie Bar (Sentier, 4 min) → Bellanger (10e, 10 min) → Experimental Cocktail Club (6 min) — daarna feesten',
+     '🍷 Diner bij Chez Julien (bekende bistro Île Saint-Louis, 25 min lopen) of Septime Cave (11e, 20 min metro)',
+     '🎵 Solidays avondprogramma (Hippodrome, 16e, 30 min metro) en daarna zien we wel',
+     '🛋️ Relaxed diner in de buurt, vroeg naar bed — zondag is ook een dag',
+   ]},
   // ZONDAG 28 JUNI
   {id:'pzo1', dag:'zo28', dagdeel:'Ochtend', vraag:'Laatste ochtend in Parijs — hoe geniet je ervan?',
-   opties:['🥐 Nog één croissant bij Terroirs d\'Avenir (4 min)','🛍️ Sézane + passages — nog even shoppen voor check-out','🛒 Puces de Vanves brocante (sluit om 14u, haast!)','☕ Rustig koffie, inpakken, genieten van de Airbnb']},
+   opties:[
+     '🥐 Afscheidsronde bij Terroirs d\'Avenir (Rue du Nil, 4 min) — vóór 10u voor warme batch',
+     '🛍️ Sézane (Rue Saint-Fiacre, 3 min · enige Sézane die op zondag open is) + door de passages',
+     '🛒 Puces de Vanves (brocante, 14e, 30 min metro lijn 13) — sluit om 14u, dus vroeg weg!',
+     '☕ Rustig koffie, inpakken, genieten van de Airbnb',
+   ]},
   {id:'pzo2', dag:'zo28', dagdeel:'Middag', vraag:'Check-out 11u, trein 16:25 — hoe vul je de middag?',
-   opties:['🥗 Lunch Rue Montorgueil (Stohrer, terrasje)','🚶 Louvre-tuin wandeling en dan rustig naar Gare du Nord','🏛️ Nog één plek die we gemist hebben','🚂 Geen risico — rustig op tijd naar Gare du Nord']},
+   opties:[
+     '🥗 Lunch op Rue Montorgueil: Stohrer (patisserie 1730, taarten + quiches) of terrasje in de zon',
+     '🚶 Tuileries- of Louvre-tuin (1e, 20 min lopen) en daarna rustig naar Gare du Nord',
+     '🏛️ Nog één plek die we gemist hebben',
+     '🚂 Geen risico — rustig richting Gare du Nord (trein 16:25, aanwezig uiterlijk 15:55)',
+   ]},
 ];
 
 const ALL_CHAIN_USERS = ['griette','frederike','miriam','marlinde'];
