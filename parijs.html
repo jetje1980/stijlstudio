@@ -940,14 +940,18 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 
     <div style="padding:0 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:#D4785A;">🔥 Begin hier — speel nu al</div>
     <div class="spellen-grid" style="padding-bottom:4px;">
-      <div class="spel-card" onclick="openGame('warmup')" style="grid-column:1/-1;border:2px solid rgba(212,120,90,0.3);background:rgba(212,120,90,0.06);">
-        <div style="display:flex;align-items:center;gap:12px;">
+      <div style="grid-column:1/-1;border:2px solid rgba(212,120,90,0.3);background:rgba(212,120,90,0.06);border-radius:var(--r-lg);padding:20px 16px;">
+        <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="openGame('warmup')">
           <div class="spel-emoji" style="font-size:2rem;">🎤</div>
           <div style="flex:1;text-align:left;">
             <div class="spel-naam">Vroegzat Warming-up</div>
             <div class="spel-desc">7 mini-vraagjes — vóór de trip, async, geen druk. Zie meteen wat de anderen zeggen.</div>
           </div>
           <div id="warmup-badge" style="font-size:0.65rem;color:#D4785A;font-weight:700;white-space:nowrap;"></div>
+        </div>
+        <div style="margin-top:12px;border-top:1px solid rgba(212,120,90,0.2);padding-top:12px;display:flex;gap:8px;">
+          <button onclick="openGame('warmup')" style="flex:1;padding:9px;border:none;border-radius:var(--r-lg);background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;">Speel mee →</button>
+          <button onclick="_wuShare()" style="padding:9px 14px;border:1.5px solid rgba(212,120,90,0.4);border-radius:var(--r-lg);background:transparent;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;color:#D4785A;">📤 Stuur link</button>
         </div>
       </div>
     </div>
@@ -1513,6 +1517,8 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
   </div>
   <div class="game-body" id="parijs-missie-body"></div>
 </div>
+
+<div class="game-overlay" id="game-warmup" style="display:none;flex-direction:column;overflow-y:auto;"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -3340,7 +3346,7 @@ let missiesGedaan = {};
 
 function openGame(name) {
   if (name === 'warmup') {
-    const overlay = document.getElementById('game-overlay');
+    const overlay = document.getElementById('game-warmup');
     if (overlay) { overlay.style.display = 'flex'; overlay.classList.add('show'); renderWarmupGame(); }
     return;
   }
@@ -6275,7 +6281,7 @@ function _wuAvatarHtml(user, size) {
 }
 
 async function renderWarmupGame() {
-  const overlay = document.getElementById('game-overlay');
+  const overlay = document.getElementById('game-warmup');
   if (!overlay) return;
   await _wuLoadMyAnswers();
   _wuCurrentQ = 0;
@@ -6288,19 +6294,19 @@ async function renderWarmupGame() {
 }
 
 function _renderWuScreen() {
-  const overlay = document.getElementById('game-overlay');
+  const overlay = document.getElementById('game-warmup');
   const pct = Math.round((_wuCurrentQ / WU_VRAGEN.length) * 100);
 
   if (_wuCurrentQ >= WU_VRAGEN.length) {
     overlay.innerHTML = `<div class="game-sheet">
-      <button class="game-close" onclick="closeGame()">✕</button>
+      <button class="game-close" onclick="closeGame('warmup')">✕</button>
       <div style="padding:20px 20px 12px;">
         <div class="wu-bar"><div class="wu-bar-fill" style="width:100%;"></div></div>
         <div style="text-align:center;padding:20px 0 28px;">
           <div style="font-size:2.5rem;margin-bottom:12px;">🔥</div>
           <div style="font-family:Georgia,serif;font-size:1.4rem;color:#0A0A0A;margin-bottom:8px;">Jullie zijn warmgedraaid.</div>
           <div style="font-size:0.88rem;color:#6B6560;line-height:1.5;margin-bottom:24px;">Nu het echte werk — swipen en het programma samenstellen.</div>
-          <button onclick="closeGame();switchTab('swipe',document.querySelectorAll('.nav-btn')[1]);" style="padding:13px 32px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;">Swipen 🔥</button>
+          <button onclick="closeGame('warmup');switchTab('swipe',document.querySelectorAll('.nav-btn')[1]);" style="padding:13px 32px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;">Swipen 🔥</button>
         </div>
         <div style="border-top:1px solid rgba(10,10,10,0.08);padding-top:14px;">
           <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin-bottom:8px;">Jullie antwoorden</div>
@@ -6345,7 +6351,7 @@ function _renderWuScreen() {
   }
 
   overlay.innerHTML = `<div class="game-sheet">
-    <button class="game-close" onclick="closeGame()">✕</button>
+    <button class="game-close" onclick="closeGame('warmup')">✕</button>
     <div style="padding:20px 20px 16px;">
       <div class="wu-bar"><div class="wu-bar-fill" style="width:${pct}%;"></div></div>
       <div style="font-size:0.65rem;color:#9A948E;text-align:right;margin-bottom:16px;">${_wuCurrentQ + 1} / ${WU_VRAGEN.length}</div>
@@ -6385,7 +6391,7 @@ async function _showWuReveal(qId) {
   const all = await _wuLoadAllAnswers(qId);
   const myVal = _wuAnswers[qId];
 
-  const overlay = document.getElementById('game-overlay');
+  const overlay = document.getElementById('game-warmup');
   let revealHtml = '';
   if (q.type === 'avatar') {
     const myTarget = PROFILES[myVal]?.naam || myVal;
@@ -6401,7 +6407,7 @@ async function _showWuReveal(qId) {
   }
 
   overlay.innerHTML = `<div class="game-sheet">
-    <button class="game-close" onclick="closeGame()">✕</button>
+    <button class="game-close" onclick="closeGame('warmup')">✕</button>
     <div style="padding:20px 20px 16px;">
       <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#A89FE8;margin-bottom:12px;">${q.emoji} ${q.vraag}</div>
       ${revealHtml}
