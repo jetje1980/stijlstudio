@@ -2332,10 +2332,14 @@ let _parisMap = null;
 
 function initMap() {
   if (_parisMap) { _parisMap.invalidateSize(); return; }
-  if (typeof L === 'undefined') return;
+  if (typeof L === 'undefined') { setTimeout(initMap, 500); return; }
   const el = document.getElementById('paris-map');
   if (!el) return;
-
+  // Retry if container has no height yet (display:none parent not yet rendered)
+  if (el.getBoundingClientRect().height === 0) { setTimeout(initMap, 400); return; }
+  // Guard against already-initialised container (e.g. hot reload)
+  if (el._leaflet_id) return;
+  try {
   const map = L.map('paris-map', {
     center: [48.866, 2.348],
     zoom: 13,
@@ -2517,7 +2521,9 @@ function initMap() {
 
   _parisMap = map;
   map.invalidateSize();
-  setTimeout(() => map.invalidateSize(), 200);
+  setTimeout(() => map.invalidateSize(), 300);
+  setTimeout(() => map.invalidateSize(), 900);
+  } catch(e) { console.warn('Map init error:', e); setTimeout(initMap, 800); }
 }
 
 // ── REEL ──────────────────────────────────────────
