@@ -471,10 +471,10 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
   <div class="login-logo">Vroegzat</div>
   <div class="login-sub">Jullie naam, jullie verhaal.</div>
   <div style="display:flex;gap:10px;justify-content:center;margin:10px 0;">
-    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:34px;height:34px;border-radius:50%;background:#7A9E82;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.75rem;color:#fff;font-weight:700;">Fr</div><div style="font-size:0.55rem;color:#9A948E;">Frederike</div></div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:34px;height:34px;border-radius:50%;background:#D4785A;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.75rem;color:#fff;font-weight:700;">Gr</div><div style="font-size:0.55rem;color:#9A948E;">Griette</div></div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:34px;height:34px;border-radius:50%;background:#AD7A9E;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.75rem;color:#fff;font-weight:700;">Ma</div><div style="font-size:0.55rem;color:#9A948E;">Marlinde</div></div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="width:34px;height:34px;border-radius:50%;background:#7A8EAD;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.75rem;color:#fff;font-weight:700;">Mi</div><div style="font-size:0.55rem;color:#9A948E;">Miriam</div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><img src="img_frederike.jpg" style="width:34px;height:34px;border-radius:50%;object-fit:cover;display:block;border:2px solid #7A9E82;"><div style="font-size:0.55rem;color:#9A948E;">Frederike</div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><img src="img_griette.jpg" style="width:34px;height:34px;border-radius:50%;object-fit:cover;display:block;border:2px solid #D4785A;"><div style="font-size:0.55rem;color:#9A948E;">Griette</div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><img src="img_marlinde.jpg" style="width:34px;height:34px;border-radius:50%;object-fit:cover;display:block;border:2px solid #AD7A9E;"><div style="font-size:0.55rem;color:#9A948E;">Marlinde</div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><img src="img_miriam.jpg" style="width:34px;height:34px;border-radius:50%;object-fit:cover;display:block;border:2px solid #7A8EAD;"><div style="font-size:0.55rem;color:#9A948E;">Miriam</div></div>
   </div>
   <div style="font-size:0.6rem;letter-spacing:0.12em;color:#9A948E;margin-bottom:8px;">Jullie trip. Jullie programma.</div>
   <div class="login-divider"></div>
@@ -3136,8 +3136,10 @@ function renderPollChainDay(dag) {
       // Avatar chips per option
       function _avatarChips(optIdx) {
         return ALL_CHAIN_USERS.filter(u => getChainVote(poll.id, u) === optIdx).map(u => {
-          const p = PROFILES[u];
-          return `<span title="${p.naam}" style="display:inline-flex;width:20px;height:20px;border-radius:50%;background:${p.color};align-items:center;justify-content:center;font-size:0.55rem;color:#fff;font-style:italic;font-weight:700;margin-right:3px;">${p.init}</span>`;
+          const p = PROFILES[u]; const ph = getUserPhoto(u);
+          return ph
+            ? `<img src="${ph}" title="${p.naam}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;margin-right:3px;vertical-align:middle;">`
+            : `<span title="${p.naam}" style="display:inline-flex;width:20px;height:20px;border-radius:50%;background:${p.color};align-items:center;justify-content:center;font-size:0.55rem;color:#fff;font-style:italic;font-weight:700;margin-right:3px;">${p.init}</span>`;
         }).join('');
       }
 
@@ -3562,9 +3564,12 @@ function triggerMatch(item, votes) {
   const row = document.getElementById('match-votes-row');
   row.innerHTML = Object.entries(votes).map(([u, v]) => {
     if (!v) return '';
-    const p = PROFILES[u];
+    const p = PROFILES[u]; const ph = getUserPhoto(u);
     const icon = v === 'like' ? '♥' : '★';
-    return `<div style="text-align:center;"><div style="width:36px;height:36px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--serif);font-style:italic;font-weight:600;font-size:0.8rem;margin:0 auto 4px;">${p.init}</div><div style="font-size:0.65rem;">${icon}</div></div>`;
+    const avEl = ph
+      ? `<img src="${ph}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 4px;">`
+      : `<div style="width:36px;height:36px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--serif);font-style:italic;font-weight:600;font-size:0.8rem;margin:0 auto 4px;">${p.init}</div>`;
+    return `<div style="text-align:center;">${avEl}<div style="font-size:0.65rem;">${icon}</div></div>`;
   }).join('');
   document.getElementById('match-overlay').classList.add('show');
   startConfetti();
@@ -4026,8 +4031,12 @@ function renderGroep() {
           }
         } catch(e) {}
       }
+      const ph = getUserPhoto(u);
+      const avEl = ph
+        ? `<img src="${ph}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+        : `<div style="width:32px;height:32px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.8rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>`;
       return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--r-lg);background:rgba(10,10,10,0.04);">
-        <div style="width:32px;height:32px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.8rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>
+        ${avEl}
         <div style="flex:1;">
           <div style="font-size:0.75rem;font-weight:700;color:#0A0A0A;margin-bottom:2px;">${p.naam}</div>
           <div style="font-size:0.8rem;color:${mh ? '#0A0A0A' : '#9A948E'};font-style:${mh ? 'normal' : 'italic'};line-height:1.4;">${mh || 'Nog niet ingevuld'}</div>
@@ -4055,7 +4064,10 @@ function renderGroep() {
       const p = PROFILES[u];
       const cls = v === 'like' ? 'v-like' : v === 'dream' ? 'v-dream' : v === 'pass' ? 'v-pass' : 'v-none';
       const icon = v === 'like' ? '♥' : v === 'dream' ? '★' : v === 'pass' ? '✕' : '?';
-      return `<div title="${p.naam}: ${v||'geen stem'}" class="mvr-av ${cls}" style="background:${p.color};">${p.init}</div>`;
+      const ph = getUserPhoto(u);
+      return ph
+        ? `<img src="${ph}" title="${p.naam}: ${v||'geen stem'}" class="mvr-av ${cls}" style="width:32px;height:32px;object-fit:cover;">`
+        : `<div title="${p.naam}: ${v||'geen stem'}" class="mvr-av ${cls}" style="background:${p.color};">${p.init}</div>`;
     }).join('');
     return `<div class="match-card">
       <div class="match-card-hero" style="background-image:url('${item.img||''}')">
@@ -4096,8 +4108,12 @@ function renderSlaapIndeling() {
       const p = PROFILES[u];
       const isMarlindeKamer = mensen.includes('marlinde') && u !== 'marlinde';
       const warning = isMarlindeKamer ? ' <span title="Je bent gewaarschuwd" style="cursor:help;">⚠️</span>' : '';
+      const ph = getUserPhoto(u);
+      const avEl = ph
+        ? `<img src="${ph}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+        : `<div style="width:28px;height:28px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.65rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>`;
       return `<div onclick="wisselslaap('${u}')" style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:var(--r);cursor:pointer;background:rgba(10,10,10,0.04);transition:background 0.15s;" title="Tap om te wisselen">
-        <div style="width:28px;height:28px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.65rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>
+        ${avEl}
         <div style="font-size:0.85rem;color:#0A0A0A;">${p.naam}${warning}</div>
         <div style="margin-left:auto;font-size:0.65rem;color:#A89FE8;">↔</div>
       </div>`;
@@ -4241,8 +4257,12 @@ function renderStreaks(dayIdx) {
   const row = document.getElementById('streak-row');
   const html = Object.entries(PROFILES).map(([k, p]) => {
     const done = localStorage.getItem('vz_missie_' + k + '_' + dayIdx) === '1';
+    const ph = getUserPhoto(k);
+    const circleInner = ph
+      ? `<img src="${ph}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;opacity:${done?1:0.35};">`
+      : p.init;
     return `<div class="streak-av">
-      <div class="streak-circle" style="background:${done ? p.color : 'transparent'};border-color:${done ? p.color : 'rgba(255,255,255,0.3)'};">${p.init}</div>
+      <div class="streak-circle" style="background:${done ? p.color : 'transparent'};border-color:${done ? p.color : 'rgba(255,255,255,0.3)'};overflow:hidden;">${circleInner}</div>
       <div class="streak-fire">${done ? '🔥' : '·'}</div>
     </div>`;
   }).join('');
@@ -4427,11 +4447,17 @@ function renderWzd() {
   }
   const v = WZD_VRAGEN[wzdIdx];
   wzdAnswered = false;
-  const optsHtml = Object.entries(PROFILES).map(([k, p]) => `
+  const optsHtml = Object.entries(PROFILES).map(([k, p]) => {
+    const ph = getUserPhoto(k);
+    const avEl = ph
+      ? `<img src="${ph}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 6px;">`
+      : `<div class="mini-av" style="background:${p.color};">${p.init}</div>`;
+    return `
     <button class="wzd-opt" onclick="answerWzd('${k}')">
-      <div class="mini-av" style="background:${p.color};">${p.init}</div>
+      ${avEl}
       <div class="opt-name">${p.naam}</div>
-    </button>`).join('');
+    </button>`;
+  }).join('');
   body.innerHTML = `<div class="wzd-statement">
     <div class="wzd-quote">${v.quote}</div>
     <div class="wzd-attribution">Wie zei dit?</div>
@@ -5413,8 +5439,12 @@ function finishVoorkeur() {
   const statusHtml = allUsers.map(u => {
     const done = u === 'griette' || !!localStorage.getItem('vz_voorkeur_' + u);
     const p = PROFILES[u];
+    const ph = getUserPhoto(u);
+    const avEl = ph
+      ? `<img src="${ph}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+      : `<div style="width:36px;height:36px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.85rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>`;
     return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(10,10,10,0.06);">
-      <div style="width:36px;height:36px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.85rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>
+      ${avEl}
       <div style="flex:1;font-size:0.88rem;color:#0A0A0A;">${p.naam}</div>
       <div style="font-size:0.75rem;font-weight:${done ? '600' : '400'};color:${done ? '#7A9E82' : '#9A948E'};">${done ? '✓ Ingevuld' : 'Nog niet'}</div>
     </div>`;
@@ -5448,8 +5478,12 @@ function initHomeVoorkeurBanner() {
   statusEl.innerHTML = allUsers.map(u => {
     const done = u === 'griette' || !!localStorage.getItem('vz_voorkeur_' + u);
     const p = PROFILES[u];
+    const ph = getUserPhoto(u);
+    const avEl = ph
+      ? `<img src="${ph}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;opacity:${done?1:0.4};">`
+      : `<span style="width:20px;height:20px;border-radius:50%;background:${done ? p.color : 'rgba(10,10,10,0.1)'};display:inline-flex;align-items:center;justify-content:center;font-size:0.55rem;color:${done?'#fff':'#9A948E'};font-style:italic;font-weight:700;">${p.init}</span>`;
     return `<span style="display:inline-flex;align-items:center;gap:4px;margin-right:8px;">
-      <span style="width:20px;height:20px;border-radius:50%;background:${done ? p.color : 'rgba(10,10,10,0.1)'};display:inline-flex;align-items:center;justify-content:center;font-size:0.55rem;color:${done?'#fff':'#9A948E'};font-style:italic;font-weight:700;">${p.init}</span>
+      ${avEl}
       <span style="color:${done ? '#0A0A0A' : '#9A948E'};font-size:0.75rem;">${done ? '✓' : '○'} ${p.naam}</span>
     </span>`;
   }).join('');
@@ -6692,8 +6726,12 @@ function renderPersonalPolls() {
   if (done.length < 2) {
     const avatarRow = allUsers.map(u => {
       const p = PROFILES[u]; const isDone = done.includes(u);
+      const ph = getUserPhoto(u);
+      const avEl = ph
+        ? `<img src="${ph}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;opacity:${isDone?1:0.35};">`
+        : `<span style="width:28px;height:28px;border-radius:50%;background:${isDone?p.color:'rgba(10,10,10,0.1)'};display:inline-flex;align-items:center;justify-content:center;font-size:0.62rem;color:${isDone?'#fff':'#9A948E'};font-style:italic;font-weight:700;">${p.init}</span>`;
       return `<span style="display:inline-flex;flex-direction:column;align-items:center;gap:3px;margin-right:10px;">
-        <span style="width:28px;height:28px;border-radius:50%;background:${isDone?p.color:'rgba(10,10,10,0.1)'};display:inline-flex;align-items:center;justify-content:center;font-size:0.62rem;color:${isDone?'#fff':'#9A948E'};font-style:italic;font-weight:700;">${p.init}</span>
+        ${avEl}
         <span style="font-size:0.58rem;color:${isDone?'#0A0A0A':'#9A948E'};">${isDone?'✓':''} ${p.naam}</span>
       </span>`;
     }).join('');
@@ -6761,7 +6799,7 @@ function renderPersonalPolls() {
       const total = votes.length || 1;
       const barsH = poll.opties.map((opt, i) => {
         const pct = Math.round(optCounts[i]/total*100);
-        const chips = votes.filter(x => x.v == i).map(x => { const p=PROFILES[x.u]; return `<span title="${p.naam}" style="display:inline-flex;width:18px;height:18px;border-radius:50%;background:${p.color};align-items:center;justify-content:center;font-size:0.5rem;color:#fff;font-style:italic;font-weight:700;margin-right:2px;">${p.init}</span>`; }).join('');
+        const chips = votes.filter(x => x.v == i).map(x => { const p=PROFILES[x.u]; const ph=getUserPhoto(x.u); return ph ? `<img src="${ph}" title="${p.naam}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;margin-right:2px;vertical-align:middle;">` : `<span title="${p.naam}" style="display:inline-flex;width:18px;height:18px;border-radius:50%;background:${p.color};align-items:center;justify-content:center;font-size:0.5rem;color:#fff;font-style:italic;font-weight:700;margin-right:2px;">${p.init}</span>`; }).join('');
         return `<div style="margin-bottom:6px;">
           <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;"><span style="${myVote==i?'font-weight:700;':'color:#6B6560;'}">${opt}</span><span style="color:#9A948E;">${pct}%</span></div>
           <div class="poll-bar"><div class="poll-bar-fill" style="width:${pct}%;"></div></div>
