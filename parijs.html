@@ -810,6 +810,38 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Groepskeuze</div>
       <div id="groepsplan-chips" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
     </div>
+
+    <!-- WEATHER -->
+    <div style="margin:8px 16px 4px;display:flex;gap:10px;">
+      <div style="flex:1;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:14px 16px;text-align:center;">
+        <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--t2);margin-bottom:6px;">Vr 26 juni</div>
+        <div style="font-size:1.6rem;margin-bottom:4px;">☀️</div>
+        <div style="font-family:var(--serif);font-size:1.3rem;color:var(--t1);">24°C</div>
+        <div style="font-size:0.65rem;color:var(--t2);margin-top:2px;">Zonnig</div>
+      </div>
+      <div style="flex:1;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:14px 16px;text-align:center;">
+        <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--t2);margin-bottom:6px;">Za 27 juni</div>
+        <div style="font-size:1.6rem;margin-bottom:4px;">🌤️</div>
+        <div style="font-family:var(--serif);font-size:1.3rem;color:var(--t1);">22°C</div>
+        <div style="font-size:0.65rem;color:var(--t2);margin-top:2px;">Lichte bewolking</div>
+      </div>
+      <div style="flex:1;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:14px 16px;text-align:center;">
+        <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--t2);margin-bottom:6px;">Zo 28 juni</div>
+        <div style="font-size:1.6rem;margin-bottom:4px;">☀️</div>
+        <div style="font-family:var(--serif);font-size:1.3rem;color:var(--t1);">25°C</div>
+        <div style="font-size:0.65rem;color:var(--t2);margin-top:2px;">Zonnig</div>
+      </div>
+    </div>
+    <div style="margin:0 16px 16px;font-size:0.65rem;color:var(--t3);letter-spacing:0.06em;text-align:center;">Typisch Parijs juni · licht jasje mee</div>
+
+    <!-- WEEKEND EVENTS -->
+    <div class="home-section-title" style="margin-top:4px;">Wat speelt dit weekend</div>
+    <div class="home-section-sub">26–28 juni 2026 in Parijs</div>
+    <div id="weekend-blok"></div>
+    <div id="custom-event-chips"></div>
+    <button onclick="openEventModal()" style="display:flex;align-items:center;gap:8px;margin:2px 20px 20px;padding:10px 0;border:none;background:none;cursor:pointer;font-size:0.82rem;color:#A89FE8;width:calc(100% - 40px);border-top:1px dashed rgba(168,159,232,0.35);">
+      <span style="font-size:1.1rem;line-height:1;">＋</span> Voeg evenement toe
+    </button>
   </section>
 
   <!-- GROEP -->
@@ -995,41 +1027,9 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
         <div style="font-size:0.68rem;color:#1DB954;font-weight:600;">▶ Spotify · Yann Tiersen</div>
       </a>
     </div>
-
-    <!-- WEATHER -->
-    <div style="margin:16px 16px 4px;display:flex;gap:10px;">
-      <div style="flex:1;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:14px 16px;text-align:center;">
-        <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--t2);margin-bottom:6px;">Vr 26 juni</div>
-        <div style="font-size:1.6rem;margin-bottom:4px;">☀️</div>
-        <div style="font-family:var(--serif);font-size:1.3rem;color:var(--t1);">24°C</div>
-        <div style="font-size:0.65rem;color:var(--t2);margin-top:2px;">Zonnig</div>
-      </div>
-      <div style="flex:1;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:14px 16px;text-align:center;">
-        <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--t2);margin-bottom:6px;">Za 27 juni</div>
-        <div style="font-size:1.6rem;margin-bottom:4px;">🌤️</div>
-        <div style="font-family:var(--serif);font-size:1.3rem;color:var(--t1);">22°C</div>
-        <div style="font-size:0.65rem;color:var(--t2);margin-top:2px;">Lichte bewolking</div>
-      </div>
-      <div style="flex:1;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:14px 16px;text-align:center;">
-        <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--t2);margin-bottom:6px;">Zo 28 juni</div>
-        <div style="font-size:1.6rem;margin-bottom:4px;">☀️</div>
-        <div style="font-family:var(--serif);font-size:1.3rem;color:var(--t1);">25°C</div>
-        <div style="font-size:0.65rem;color:var(--t2);margin-top:2px;">Zonnig</div>
-      </div>
-    </div>
-    <div style="margin:0 16px 16px;font-size:0.65rem;color:var(--t3);letter-spacing:0.06em;text-align:center;">Typisch Parijs juni · licht jasje mee</div>
-
-    <!-- WEEKEND EVENTS -->
-    <div class="home-section-title" style="margin-top:4px;">Wat speelt dit weekend</div>
-    <div class="home-section-sub">26–28 juni 2026 in Parijs</div>
-    <div id="weekend-blok"></div>
-    <div id="custom-event-chips"></div>
-    <button onclick="openEventModal()" style="display:flex;align-items:center;gap:8px;margin:2px 20px 20px;padding:10px 0;border:none;background:none;cursor:pointer;font-size:0.82rem;color:#A89FE8;width:calc(100% - 40px);border-top:1px dashed rgba(168,159,232,0.35);">
-      <span style="font-size:1.1rem;line-height:1;">＋</span> Voeg evenement toe
-    </button>
   </section>
 
-  <!-- INSPIRATIE -->
+  <!-- GROEP -->
   <section id="sec-inspiratie" class="section">
     <div class="page-header"><div class="page-logo">Inspiratie</div></div>
     <div style="padding:0 20px 16px;font-size:0.82rem;color:var(--t2);line-height:1.6;">Hier staat waar wij onze tips vandaan halen. Volg ze, of voeg je eigen favoriet toe.</div>
@@ -1196,7 +1196,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
           <div style="font-weight:700;font-size:0.92rem;color:#0A0A0A;">Vervoer</div>
           <div style="font-size:0.72rem;color:#6B6560;margin-top:4px;line-height:1.4;">Trein, metro, wandel­routes</div>
         </div>
-        <div onclick="switchTab('home',document.querySelectorAll('.nav-btn')[0]);setTimeout(()=>{document.getElementById('reisinfo-coll').scrollIntoView({behavior:'smooth',block:'start'});},300);" style="background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:18px 16px;cursor:pointer;border:1.5px solid rgba(10,10,10,0.08);">
+        <div onclick="setTimeout(()=>{document.getElementById('meer-reisinfo').scrollIntoView({behavior:'smooth',block:'start'});},50);" style="background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:18px 16px;cursor:pointer;border:1.5px solid rgba(10,10,10,0.08);">
           <div style="font-size:2rem;margin-bottom:8px;">🔒</div>
           <div style="font-weight:700;font-size:0.92rem;color:#0A0A0A;">Reisinfo</div>
           <div style="font-size:0.72rem;color:#6B6560;margin-top:4px;line-height:1.4;">Airbnb, treintijden, groepskas</div>
@@ -1209,6 +1209,61 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
         <div style="font-size:0.68rem;color:var(--t3);margin-top:5px;line-height:1.4;">Verwijdert jouw voorkeuren, swipes en warming-up-antwoorden. Raak data van anderen niet aan.</div>
       </div>
     </div>
+
+    <!-- REISINFO + INPAKLIJST (verplaatst van Home) -->
+    <div id="meer-reisinfo">
+      <div class="collapsible" id="reisinfo-coll">
+        <div class="collapsible-head" onclick="toggleCollapsible('reisinfo-coll')">
+          <div class="collapsible-title">🔒 Reisinfo — alleen voor ons</div>
+          <div class="collapsible-arrow">▾</div>
+        </div>
+        <div class="collapsible-body">
+          <div class="info-row"><div class="info-icon">🏠</div><div style="flex:1;"><div class="info-label">Verblijf <span style="color:#7A9E82;font-weight:600;">· geboekt door Frederike</span></div><div class="info-val">Rue de la Lune, 75002 Parijs (Bonne Nouvelle / Sentier · 2e arr.)<br><small style="color:var(--bruin)">Check-in: vr 26/6 vanaf 16u · Check-out: zo 28/6 voor 11u</small></div></div></div>
+          <div style="margin:4px 0 8px;padding:14px;background:rgba(10,10,10,0.04);border-radius:var(--r-lg);">
+            <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--t2);margin-bottom:10px;">🚂 Treinreis vrijdag 26 juni</div>
+            <div style="margin-bottom:12px;">
+              <div style="font-size:0.68rem;font-weight:700;color:#0A0A0A;margin-bottom:6px;letter-spacing:0.05em;">Segment 1 — naar Amsterdam CS</div>
+              <div style="font-size:0.78rem;color:#0A0A0A;line-height:1.6;">Frederike &amp; Griette: 06:21 Houten centrum<br>Marlinde: 06:21 Houten centrum<br>Miriam: 06:21 Houten centrum</div>
+              <div style="font-size:0.65rem;color:#7A9E82;font-weight:600;margin:6px 0 4px;">🤝 Allemaal samen op de IC vanaf Utrecht!</div>
+            </div>
+            <div style="border-top:1px solid rgba(10,10,10,0.08);padding-top:10px;margin-bottom:10px;">
+              <div style="font-size:0.68rem;font-weight:700;color:#0A0A0A;margin-bottom:4px;letter-spacing:0.05em;">Segment 2 — Eurostar 🇫🇷</div>
+              <div style="font-size:0.82rem;color:#0A0A0A;font-weight:600;">08:10 Amsterdam CS → 11:56 Paris Gare du Nord</div>
+              <div style="font-size:0.7rem;color:#D4785A;margin-top:3px;">⏰ Boarding-poort sluit: 07:40 · Paspoort of ID mee!</div>
+            </div>
+            <div style="border-top:1px solid rgba(10,10,10,0.08);padding-top:10px;">
+              <div style="font-size:0.68rem;font-weight:700;color:#0A0A0A;margin-bottom:4px;letter-spacing:0.05em;">Segment 3 — Aankomst &amp; doorreis</div>
+              <div style="font-size:0.78rem;color:#0A0A0A;">🇫🇷 11:56 Paris Gare du Nord</div>
+              <div style="font-size:0.72rem;color:#6B6560;margin-top:3px;">→ 🚶 <strong>Optie A:</strong> 10 min lopen via Rue du Faubourg-Poissonnière</div>
+              <div style="font-size:0.72rem;color:#6B6560;">→ 🚇 <strong>Optie B:</strong> Metro 4 → Strasbourg-Saint-Denis (3 min) + 5 min lopen</div>
+              <div style="font-size:0.7rem;color:#7A9E82;margin-top:4px;font-weight:600;">⏰ Verwachte aankomst Airbnb: ~12:30</div>
+              <div style="font-size:0.65rem;color:var(--t2);margin-top:3px;">Check-in vanaf 16:00 · OV-kaart werkt niet in Parijs! Navigo of los kaartje €2,15</div>
+            </div>
+          </div>
+          <div style="margin:0 0 8px;padding:14px;background:rgba(10,10,10,0.04);border-radius:var(--r-lg);">
+            <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--t2);margin-bottom:8px;">🚂 Terugreis zondag 28 juni</div>
+            <div style="font-size:0.82rem;color:#0A0A0A;font-weight:600;">16:25 Paris Gare du Nord → 20:03 Amsterdam CS</div>
+            <div style="font-size:0.7rem;color:#D4785A;margin-top:3px;">⏰ Aanwezig uiterlijk 15:55 op Gare du Nord</div>
+            <div style="font-size:0.72rem;color:#6B6560;margin-top:6px;">Aankomst 20:03 Amsterdam CS → IC Utrecht ~20:38 → Sprinter Houten ~21:16</div>
+          </div>
+          <div class="info-row"><div class="info-icon">🆘</div><div style="flex:1;"><div class="info-label">Noodnummers</div><div class="info-val">112 Europese noodhulp · 15 SAMU (ambulance) · 17 Politie · 18 Brandweer<br>Ambassade NL Parijs: +33 1 40 62 33 00</div></div></div>
+          <div class="info-row"><div class="info-icon">💳</div><div style="flex:1;"><div class="info-label">Handig weten</div><div class="info-val">Meeste plekken accepteren pin. Puces de Saint-Ouen = cash. Airbnb-sleutelcode via host WhatsApp.</div></div></div>
+        </div>
+      </div>
+      <div class="collapsible" id="inpak-coll">
+        <div class="collapsible-head" onclick="toggleCollapsible('inpak-coll')">
+          <div class="collapsible-title">🧳 Inpaklijst</div>
+          <div class="collapsible-arrow">▾</div>
+        </div>
+        <div class="collapsible-body" id="inpak-body"></div>
+      </div>
+      <div style="margin:0 20px 4px;padding:16px 0;border-top:1px solid rgba(10,10,10,0.08);display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div style="font-size:0.82rem;color:#6B6560;line-height:1.4;">Nog niet iedereen erbij?</div>
+        <button onclick="kopieerUitnodiging()" style="flex-shrink:0;padding:9px 18px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;">📤 Kopieer uitnodiging</button>
+      </div>
+      <div class="alarm-banner">🔔 <strong>Vergeet niet te reserveren:</strong> Chez Janou, Bouillon Racine, Baja Bikes, Atelier des Lumières, Louvre tijdslot</div>
+    </div>
+
   </section>
 
   <!-- ROUTE PANEL OVERLAY -->
@@ -3764,7 +3819,7 @@ function renderTop5() {
     return 0;
   });
   if (catItems.length === 0) {
-    container.innerHTML = `<div class="empty-top5"><div style="font-size:2rem;margin-bottom:10px;">🗼</div><p>Swipe eerst een paar belevingen —<br>dan verschijnen hier jullie gedeelde favorieten</p><p style="font-size:0.75rem;margin-top:6px;opacity:0.6;">Hoe meer je swipt, hoe beter het programma</p></div>`;
+    container.innerHTML = `<div class="empty-top5"><div style="font-size:2.2rem;margin-bottom:10px;">🗼</div><p style="font-weight:600;color:#0A0A0A;margin-bottom:6px;">Hier komt jouw Parijs-programma</p><p>Swipe een paar belevingen — dan zet de app automatisch jouw favorieten hier neer.</p><p style="font-size:0.75rem;margin-top:8px;opacity:0.6;line-height:1.5;">Hoe meer je swipt, hoe persoonlijker het wordt</p></div>`;
     return;
   }
   let html = '';
@@ -3856,7 +3911,7 @@ function renderGroep() {
     </div>`;
   }
 
-  matchDiv.innerHTML = matches.length ? matches.map(renderCard).join('') : `<div style="padding:16px;color:var(--bruin);font-size:0.85rem;">Swipe items om groepsmatches te zien!</div>`;
+  matchDiv.innerHTML = matches.length ? matches.map(renderCard).join('') : `<div style="padding:24px 20px;text-align:center;"><div style="font-size:2rem;margin-bottom:8px;">🗺️</div><div style="font-size:0.88rem;color:#0A0A0A;font-weight:600;margin-bottom:4px;">Nog niks om te laten zien</div><div style="font-size:0.78rem;color:#6B6560;line-height:1.5;">Swipe samen wat belevingen — dan verschijnen hier jullie gedeelde favorieten automatisch.</div></div>`;
   nearDiv.innerHTML = near.length ? `<div style="padding:0 16px;display:flex;flex-direction:column;gap:8px;">` + near.map(r => {
     const {item, votes} = r;
     const needed = 3 - r.pos;
@@ -3867,7 +3922,7 @@ function renderGroep() {
       </div>
       <span class="near-badge">Nog ${needed} nodig</span>
     </div>`;
-  }).join('') + `</div>` : `<div style="padding:16px;color:var(--bruin);font-size:0.85rem;">Geen bijna-matches nog.</div>`;
+  }).join('') + `</div>` : `<div style="padding:16px 20px;font-size:0.78rem;color:#9A948E;font-style:italic;">Bijna-matches verschijnen zodra jullie beginnen te swipen 🌙</div>`;
 }
 
 // ── WIE SLAAPT WAAR ──────────────────────────────
@@ -4316,12 +4371,12 @@ function switchTab(name, el) {
   if (el) el.classList.add('active');
   if (name === 'home') { showPreTripNudge(); renderUpcomingStrip(); initPollChain(); renderPersonalPolls(); renderBeginHier(); if (_parisMap) setTimeout(() => _parisMap.invalidateSize(), 200); }
   if (name === 'groep') { renderGroep(); }
-  if (name === 'top5') { renderProgramma(); }
+  if (name === 'top5') { renderProgramma(); renderWeekendBlok(); renderCustomEvents(); }
   if (name === 'spellen') { renderHerinneringen(); _updateWarmupBadge(); }
   if (name === 'inspiratie') { initInspiratie(); }
   if (name === 'swipe') { renderBelevingen(belActiveFilter || 'all'); }
   if (name === 'vervoer') { initVervoer(); }
-  if (name === 'meer') { /* nothing special needed */ }
+  if (name === 'meer') { renderInpaklijst(); }
 }
 
 // ── BELEVINGEN (vibes selector in swipe tab) ──────
@@ -6786,25 +6841,53 @@ function renderBeginHier() {
   const voorkeur = localStorage.getItem('vz_voorkeur_' + currentUser);
   const swipesRaw = localStorage.getItem('vz_swipes_' + currentUser);
   const swipeCount = swipesRaw ? Object.keys(JSON.parse(swipesRaw)).length : 0;
-  const wuDone = typeof _wuAnswers !== 'undefined' && _wuAnswers && Object.keys(_wuAnswers).length > 0;
+  const wuDone = typeof _wuAnswers !== 'undefined' && _wuAnswers && Object.keys(_wuAnswers).length >= 3;
+
+  const USERS = ['griette','frederike','marlinde','miriam'];
+  function doneAvatars(users) {
+    const others = users.filter(u => u !== currentUser);
+    if (!others.length) return '';
+    return `<div style="display:flex;gap:2px;margin-left:auto;flex-shrink:0;">${others.map(u => {
+      const pr = PROFILES[u]; const photo = getUserPhoto(u);
+      return photo
+        ? `<img src="${photo}" title="${pr.naam}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;border:1.5px solid #F0E8E2;">`
+        : `<div title="${pr.naam}" style="width:18px;height:18px;border-radius:50%;background:${pr.color};display:flex;align-items:center;justify-content:center;font-size:0.42rem;color:#fff;font-weight:700;border:1.5px solid #F0E8E2;">${pr.init}</div>`;
+    }).join('')}</div>`;
+  }
+
+  const vkDone = USERS.filter(u => u === currentUser ? !!voorkeur : Object.keys(_allVoorkeur[u] || {}).length > 0);
+  const swDone = USERS.filter(u => u === currentUser ? swipeCount >= 5 : Object.keys(_allSwipes[u] || {}).length >= 5);
+
   const steps = [
-    { done: !!voorkeur,       label: 'Vul je voorkeuren in',                    action: "herbeginVoorkeur()" },
-    { done: wuDone,           label: 'Speel de Warming-up',                     action: "openGame('warmup')" },
-    { done: swipeCount >= 5,  label: `Swipe ${swipeCount>0&&swipeCount<5?swipeCount+'/5 ':''}belevingen`, action: "switchTab('swipe',document.querySelectorAll('.nav-btn')[1])" },
+    { done: !!voorkeur,      label: 'Vul je voorkeuren in',    action: "herbeginVoorkeur()",                                            peers: vkDone },
+    { done: wuDone,          label: 'Speel de Warming-up',     action: "switchTab('spellen',document.querySelectorAll('.nav-btn')[3]);setTimeout(()=>openGame('warmup'),80)", peers: [] },
+    { done: swipeCount >= 5, label: `Swipe ${swipeCount>0&&swipeCount<5?swipeCount+'/5 ':''}belevingen`, action: "switchTab('swipe',document.querySelectorAll('.nav-btn')[1])", peers: swDone },
   ];
   const allDone = steps.every(s => s.done);
-  if (allDone) { card.style.display = 'none'; return; }
+  if (allDone) {
+    card.style.display = 'block';
+    card.innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:2px 0;">
+      <div style="font-size:1.3rem;">✨</div>
+      <div>
+        <div style="font-family:Georgia,serif;font-size:0.9rem;color:#0A0A0A;">Je bent helemaal bij, ${p.naam}.</div>
+        <div style="font-size:0.72rem;color:#6B6560;margin-top:2px;">Swipe verder en check jullie matches in Groep.</div>
+      </div>
+    </div>`;
+    setTimeout(() => { card.style.display = 'none'; }, 4000);
+    return;
+  }
   const remaining = steps.filter(s => !s.done).length;
   card.style.display = 'block';
   card.innerHTML = `
-    <div style="font-family:Georgia,serif;font-size:0.95rem;color:#0A0A0A;line-height:1.35;margin-bottom:12px;">
-      Welkom terug, ${p.naam}.
-      <span style="display:block;font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:normal;color:#6B6560;margin-top:2px;">Nog ${remaining} stap${remaining!==1?'pen':''} om de app tot leven te brengen:</span>
+    <div style="margin-bottom:10px;">
+      <div style="font-family:Georgia,serif;font-size:0.95rem;color:#0A0A0A;">Welkom terug, ${p.naam}.</div>
+      <div style="font-size:0.73rem;color:#6B6560;margin-top:2px;">Nog ${remaining} stap${remaining!==1?'pen':''} om de app tot leven te brengen:</div>
     </div>
     ${steps.map(s => `
       <div onclick="${s.done?'':s.action}" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid rgba(168,159,232,0.12);cursor:${s.done?'default':'pointer'};">
-        <div style="width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;background:${s.done?'rgba(122,158,130,0.2)':'rgba(168,159,232,0.15)'};color:${s.done?'#7A9E82':'#A89FE8'};">${s.done?'✓':'→'}</div>
-        <div style="font-size:0.8rem;color:${s.done?'#9A948E':'#0A0A0A'};text-decoration:${s.done?'line-through':'none'};">${s.label}</div>
+        <div style="width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;background:${s.done?'rgba(122,158,130,0.15)':'rgba(168,159,232,0.12)'};color:${s.done?'#7A9E82':'#A89FE8'};">${s.done?'✓':'→'}</div>
+        <div style="font-size:0.8rem;color:${s.done?'#9A948E':'#0A0A0A'};text-decoration:${s.done?'line-through':'none'};flex:1;">${s.label}</div>
+        ${doneAvatars(s.peers)}
       </div>`).join('')}`;
 }
 
