@@ -951,7 +951,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
         </div>
         <div style="margin-top:12px;border-top:1px solid rgba(212,120,90,0.2);padding-top:12px;display:flex;gap:8px;">
           <button onclick="openGame('warmup')" style="flex:1;padding:9px;border:none;border-radius:var(--r-lg);background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;">Speel mee →</button>
-          <button onclick="_wuShare()" style="padding:9px 14px;border:1.5px solid rgba(212,120,90,0.4);border-radius:var(--r-lg);background:transparent;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;color:#D4785A;">📤 Stuur link</button>
+          <button onclick="_wuShare()" style="padding:9px 14px;border:1.5px solid rgba(212,120,90,0.4);border-radius:var(--r-lg);background:transparent;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;color:#D4785A;">💬 Stuur via WhatsApp</button>
         </div>
       </div>
     </div>
@@ -6327,7 +6327,7 @@ function _renderWuScreen() {
           ${WU_VRAGEN.map(q => `<div style="margin-bottom:10px;"><div style="font-size:0.72rem;font-weight:600;color:#6B6560;margin-bottom:4px;">${q.emoji} ${q.vraag}</div><div id="wu-done-${q.id}" style="font-size:0.78rem;color:#0A0A0A;"></div></div>`).join('')}
         </div>
         <div style="padding:16px 0 8px;">
-          <button onclick="_wuShare()" style="width:100%;padding:11px;border:1.5px solid rgba(10,10,10,0.15);border-radius:var(--r-lg);background:transparent;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;color:#0A0A0A;">📤 Stuur naar de groep</button>
+          <button onclick="_wuShare()" style="width:100%;padding:11px;border:1.5px solid rgba(10,10,10,0.15);border-radius:var(--r-lg);background:transparent;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;color:#0A0A0A;">💬 Stuur via WhatsApp</button>
         </div>
       </div>
     </div>`;
@@ -6432,7 +6432,7 @@ async function _showWuReveal(qId) {
 }
 
 function _wuShare() {
-  const txt = `Hey meiden! 🗼\nIk heb de app al klaargezet voor onze Parijs-trip.\nBegin met de Warming-up — 7 mini-vraagjes, kost niks, gewoon leuk.\nDaarna swipen we het programma bij elkaar.\n→ stijlstudio.app/parijs.html · code VROEGZAT\nXG`;
+  const txt = `Parijs app staat klaar 🗼\nBegin even met de Warming-up — 7 korte vraagjes, je ziet gelijk wat de anderen zeggen.\nDaarna swipen we het programma samen.\nstijlstudio.app/parijs.html · code VROEGZAT`;
   const waUrl = 'https://wa.me/?text=' + encodeURIComponent(txt);
   if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
     window.open(waUrl, '_blank');
