@@ -2172,8 +2172,9 @@ function selectProfile(name) {
   ws.style.transition = 'opacity 0.5s';
   setTimeout(() => { ws.style.opacity = '1'; }, 20);
 }
-function startApp() {
+async function startApp() {
   document.getElementById('welkom-screen').style.display = 'none';
+  await _syncAllGroupState();
   const hasVoorkeur = localStorage.getItem('vz_voorkeur_' + currentUser);
   if (!hasVoorkeur) {
     showVoorkeurScherm();
