@@ -1820,6 +1820,58 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
 const _commentChannels = {};
 
+// ── GROUP STATE (Supabase sync) ───────────────────
+const GROUP_ID = 'VROEGZAT';
+
+async function setShared(key, value) {
+  if (!currentUser) return;
+  await supa.from('group_state').upsert(
+    { group_id: GROUP_ID, user_id: currentUser, key, value, updated_at: new Date().toISOString() },
+    { onConflict: 'group_id,user_id,key' }
+  );
+}
+
+async function getAllShared(key) {
+  const { data } = await supa.from('group_state')
+    .select('user_id,value')
+    .eq('group_id', GROUP_ID)
+    .eq('key', key);
+  const result = {};
+  if (data) data.forEach(r => { result[r.user_id] = r.value; });
+  return result;
+}
+
+async function _syncVoorkeuren() {
+  // Migratie: als eigen voorkeur lokaal staat maar nog niet in Supabase, push eenmalig
+  const localOwn = localStorage.getItem('vz_voorkeur_' + currentUser);
+  if (localOwn) {
+    const { data: existing } = await supa.from('group_state')
+      .select('user_id').eq('group_id', GROUP_ID).eq('user_id', currentUser).eq('key', 'voorkeur').maybeSingle();
+    if (!existing) {
+      try { await setShared('voorkeur', JSON.parse(localOwn)); } catch(e) {}
+    }
+  }
+  // Haal alle vier de voorkeuren op uit Supabase
+  const allData = await getAllShared('voorkeur');
+  let changed = false;
+  Object.entries(allData).forEach(([userId, value]) => {
+    const lsKey = 'vz_voorkeur_' + userId;
+    const newVal = JSON.stringify(value);
+    if (localStorage.getItem(lsKey) !== newVal) {
+      localStorage.setItem(lsKey, newVal);
+      changed = true;
+    }
+  });
+  if (changed) {
+    // Re-render alle secties die voorkeur-data tonen
+    initHomeVoorkeurBanner();
+    updateVoorkeurNudge();
+    renderPersonalPolls();
+    renderBeginHier();
+    if (document.getElementById('sec-groep')?.classList.contains('active')) renderGroep();
+  }
+}
+
 // ── STATE ─────────────────────────────────────────
 let currentUser = null;
 let swipes = {};
@@ -2038,6 +2090,8 @@ function initApp() {
   initHomeVoorkeurBanner();
   updateVoorkeurNudge();
   initWeekendEvents();
+  // Sync voorkeuren from Supabase, then re-render affected sections
+  _syncVoorkeuren();
   // Init map: direct call after paint, plus IntersectionObserver fallback for below-fold loads
   setTimeout(() => { if (!_parisMap) initMap(); }, 150);
   const _mapObs = new IntersectionObserver(entries => {
@@ -2278,6 +2332,8 @@ const TREIN_DATA = {
     const rmEl = document.getElementById('rcd-m');
     if(rdEl) { rdEl.textContent=d; rhEl.textContent=String(h).padStart(2,'0'); rmEl.textContent=String(m).padStart(2,'0'); }
     if(bEl) bEl.textContent = `Nog ${d} dag${d!==1?'en':''} tot Parijs`;
+    const intEl = document.getElementById('intro-days-txt');
+    if(intEl) intEl.textContent = `Over ${d} dag${d!==1?'en':''} staan jullie in Parijs.`;
   }
   tick();
   setInterval(tick, 30000);
@@ -5073,6 +5129,7 @@ function bevestigVoorkeur() {
 
 function finishVoorkeur() {
   localStorage.setItem('vz_voorkeur_' + currentUser, JSON.stringify(vkAnswers));
+  setShared('voorkeur', vkAnswers).catch(() => {});
   document.getElementById('vk-bar').style.width = '100%';
   document.getElementById('vk-counter').textContent = '✓';
   const allUsers = ['griette','frederike','miriam','marlinde'];
