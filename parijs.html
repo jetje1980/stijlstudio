@@ -873,14 +873,14 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     <div class="reserveer-block">
       <div class="reserveer-title">📋 Boek dit nog vóór de trip</div>
       <div class="reserveer-list">
-        <div class="reserveer-item"><div class="reserveer-dot"></div><span><strong>Chez Janou</strong> — min. 1 week vooraf · <a href="https://www.chezjanou.com" style="color:var(--gold);">chezjanou.com</a> · €€€ · 19–23:30</span></div>
+        <div class="reserveer-item"><div class="reserveer-dot"></div><span><strong>Chez Janou</strong> — min. 1 week vooraf · <a href="https://www.chezjanou.com" target="_blank" rel="noopener" style="color:var(--gold);">chezjanou.com</a> · €€€ · 19–23:30</span></div>
         <div class="reserveer-item"><div class="reserveer-dot"></div><span><strong>Bouillon Racine</strong> — bel direct · lunch €17,50 · 12–15 + 19–23</span></div>
         <div class="reserveer-item"><div class="reserveer-dot"></div><span><strong>Le Mary Celeste</strong> — reserveer via website · €€€ · 18–2</span></div>
-        <div class="reserveer-item"><div class="reserveer-dot"></div><span><strong>Atelier des Lumières</strong> — tijdslot online · €16 pp · <a href="https://www.atelier-lumieres.com" style="color:var(--gold);">atelier-lumieres.com</a></span></div>
-        <div class="reserveer-item"><div class="reserveer-dot"></div><span><strong>Louvre</strong> — tijdslot online · €22 pp · <a href="https://www.louvre.fr" style="color:var(--gold);">louvre.fr</a></span></div>
-        <div class="reserveer-item"><div class="reserveer-dot"></div><span><strong>Baja Bikes</strong> — 3+ dagen vooraf · €34–39 pp · <a href="https://www.bajabikes.eu" style="color:var(--gold);">bajabikes.eu</a></span></div>
+        <div class="reserveer-item"><div class="reserveer-dot"></div><span><strong>Atelier des Lumières</strong> — tijdslot online · €16 pp · <a href="https://www.atelier-lumieres.com" target="_blank" rel="noopener" style="color:var(--gold);">atelier-lumieres.com</a></span></div>
+        <div class="reserveer-item"><div class="reserveer-dot"></div><span><strong>Louvre</strong> — tijdslot online · €22 pp · <a href="https://www.louvre.fr" target="_blank" rel="noopener" style="color:var(--gold);">louvre.fr</a></span></div>
+        <div class="reserveer-item"><div class="reserveer-dot"></div><span><strong>Baja Bikes</strong> — 3+ dagen vooraf · €34–39 pp · <a href="https://www.bajabikes.eu" target="_blank" rel="noopener" style="color:var(--gold);">bajabikes.eu</a></span></div>
         <div class="reserveer-item"><div class="reserveer-dot"></div><span><strong>Benedict Paris</strong> — dag vooraf · €€ · 8–16 dagelijks</span></div>
-        <div class="reserveer-item"><div class="reserveer-dot"></div><span><strong>Musée d'Orsay</strong> — tijdslot aanbevolen · €16 pp · <a href="https://www.musee-orsay.fr" style="color:var(--gold);">musee-orsay.fr</a></span></div>
+        <div class="reserveer-item"><div class="reserveer-dot"></div><span><strong>Musée d'Orsay</strong> — tijdslot aanbevolen · €16 pp · <a href="https://www.musee-orsay.fr" target="_blank" rel="noopener" style="color:var(--gold);">musee-orsay.fr</a></span></div>
       </div>
     </div>
 
@@ -1231,7 +1231,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
           <div style="font-weight:700;font-size:0.92rem;color:#0A0A0A;">Vervoer</div>
           <div style="font-size:0.72rem;color:#6B6560;margin-top:4px;line-height:1.4;">Trein, metro, wandel­routes</div>
         </div>
-        <div onclick="setTimeout(()=>{document.getElementById('meer-reisinfo').scrollIntoView({behavior:'smooth',block:'start'});},50);" style="background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:18px 16px;cursor:pointer;border:1.5px solid rgba(10,10,10,0.08);">
+        <div onclick="setTimeout(()=>{document.getElementById('meer-reisinfo').scrollIntoView({behavior:'smooth',block:'start'});const c=document.getElementById('reisinfo-coll');if(c&&!c.classList.contains('open'))toggleCollapsible('reisinfo-coll');},80);" style="background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:18px 16px;cursor:pointer;border:1.5px solid rgba(10,10,10,0.08);">
           <div style="font-size:2rem;margin-bottom:8px;">🔒</div>
           <div style="font-weight:700;font-size:0.92rem;color:#0A0A0A;">Reisinfo</div>
           <div style="font-size:0.72rem;color:#6B6560;margin-top:4px;line-height:1.4;">Airbnb, treintijden, groepskas</div>
@@ -1258,7 +1258,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
             <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--t2);margin-bottom:10px;">🚂 Treinreis vrijdag 26 juni</div>
             <div style="margin-bottom:12px;">
               <div style="font-size:0.68rem;font-weight:700;color:#0A0A0A;margin-bottom:6px;letter-spacing:0.05em;">Segment 1 — naar Amsterdam CS</div>
-              <div style="font-size:0.78rem;color:#0A0A0A;line-height:1.6;">Frederike &amp; Griette: 06:21 Houten centrum<br>Marlinde: 06:21 Houten centrum<br>Miriam: 06:21 Houten centrum</div>
+              <div style="font-size:0.78rem;color:#0A0A0A;line-height:1.6;">Frederike, Marlinde &amp; Miriam: 06:21 Houten centrum<br>Griette: 06:23 Houten Castellum</div>
               <div style="font-size:0.65rem;color:#7A9E82;font-weight:600;margin:6px 0 4px;">🤝 Allemaal samen op de IC vanaf Utrecht!</div>
             </div>
             <div style="border-top:1px solid rgba(10,10,10,0.08);padding-top:10px;margin-bottom:10px;">
@@ -2188,6 +2188,7 @@ async function wisMijnData() {
   // Remove from Supabase
   await supa.from('group_state').delete().eq('group_id', GROUP_ID).eq('user_id', u);
   await supa.from('warmup_answers').delete().eq('user_id', u);
+  await supa.from('comments').delete().eq('user_id', u);
   // Remove per-user localStorage keys
   const keysToRemove = [
     'vz_voorkeur_' + u, 'vz_swipes_' + u, 'vz_planVibes_' + u,
