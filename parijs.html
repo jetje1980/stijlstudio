@@ -1959,10 +1959,18 @@ async function _syncAllGroupState() {
     { ls:'vz_swipes_'+currentUser,    k:'swipes',         uid:currentUser },
     { ls:'vz_planVibes_'+currentUser, k:'planVibes',      uid:currentUser },
     { ls:'vz_top5favs_'+currentUser,  k:'top5favs',       uid:currentUser },
+    { ls:'vz_photo_'+currentUser,     k:'photo',          uid:currentUser },
     { ls:'vz_added',                  k:'added',          uid:'shared'    },
     { ls:'vz_weekend_events',         k:'weekend_events', uid:'shared'    },
     { ls:'vz_bronnen',                k:'bronnen',        uid:'shared'    },
   ];
+  // Also migrate any pchain/pp/wvo_vote keys already in localStorage
+  Object.keys(localStorage).forEach(ls => {
+    const m = _keyToState(ls);
+    if (!m) return;
+    if (['voorkeur','swipes','planVibes','top5favs','photo','added','weekend_events','bronnen'].includes(m.key)) return;
+    if (!existing.has(m.key+':'+m.uid)) migs.push({ ls, k:m.key, uid:m.uid });
+  });
   for (const m of migs) {
     if (!existing.has(m.k+':'+m.uid)) {
       const local = localStorage.getItem(m.ls);
