@@ -44,9 +44,9 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 .login-error{color:#A89FE8;font-size:0.82rem;text-align:center;min-height:20px;}
 .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .profile-card{padding:20px 16px;border-radius:var(--r-lg);border:none;background:rgba(10,10,10,0.06);cursor:pointer;text-align:center;transition:all 0.2s;}
-.profile-card:hover,.profile-card:active{background:rgba(10,10,10,0.1);transform:translateY(-2px);}
+
 .avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-style:italic;font-size:1.2rem;color:#fff;margin:0 auto 10px;font-weight:700;}
-.profile-name{font-family:var(--sans);font-style:italic;font-size:1.1rem;color:#0A0A0A;}
+.profile-name{font-family:var(--sans);font-style:italic;font-size:1.1rem;color:#0A0A0A;/* overridden in new CSS block below */}
 
 /* NAV */
 #app{display:none;}
@@ -386,9 +386,68 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 .pchain-answered{background:rgba(122,158,130,0.08);border:1px solid rgba(122,158,130,0.2);padding:12px 14px;}
 .pchain-active{background:#fff;border:2px solid #A89FE8;padding:14px 16px;box-shadow:0 2px 12px rgba(168,159,232,0.15);}
 .pchain-locked{background:rgba(10,10,10,0.03);border:1px dashed rgba(10,10,10,0.1);padding:10px 14px;opacity:0.6;}
+/* ── INTRO */
+#intro-overlay{position:fixed;inset:0;z-index:9999;background:#0D1A0E;overflow:hidden;display:none;}
+.intro-slider{display:flex;height:100%;width:300%;transition:transform 0.6s cubic-bezier(.4,0,.2,1);}
+.intro-screen{width:33.333%;flex-shrink:0;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 36px;text-align:center;}
+.intro-big{font-family:Georgia,serif;font-size:1.95rem;color:#F0E8E2;line-height:1.4;max-width:320px;opacity:0;transition:opacity 1s 0.4s;}
+.intro-big.show{opacity:1;}
+.intro-med{font-family:Georgia,serif;font-size:1.6rem;color:#F0E8E2;line-height:1.55;opacity:0;transition:opacity 0.8s 0.3s;}
+.intro-med.show{opacity:1;}
+.intro-sub{font-family:Georgia,serif;color:#B8A890;font-size:0.95rem;margin-bottom:28px;opacity:0;transition:opacity 0.6s 0.2s;}
+.intro-sub.show{opacity:1;}
+.intro-cta-btn{padding:13px 36px;border:none;border-radius:30px;background:#F0E8E2;color:#0D1A0E;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;opacity:0;transition:opacity 0.5s;margin-top:4px;}
+.intro-cta-btn.show{opacity:1;}
+.intro-skip{position:absolute;top:20px;right:20px;background:transparent;border:none;color:rgba(240,232,226,0.45);font-family:'DM Sans',sans-serif;font-size:0.75rem;cursor:pointer;padding:8px;letter-spacing:0.04em;}
+.intro-dots{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;gap:6px;}
+.intro-dot{width:6px;height:6px;border-radius:3px;background:rgba(240,232,226,0.25);transition:all 0.35s;}
+.intro-dot.active{width:22px;background:rgba(240,232,226,0.85);}
+/* ── PROFILE CARD hover */
+.profile-card:hover,.profile-card:active{background:rgba(10,10,10,0.1);transform:scale(1.04);}
+.profile-name{font-family:Georgia,serif;font-size:1rem;color:#0A0A0A;margin-top:4px;}
+.sfeerlijn{font-size:0.75rem;color:#9A948E;text-align:center;padding:10px 20px 2px;letter-spacing:0.02em;min-height:22px;transition:opacity 0.35s;}
+/* ── WELKOM serif */
+#welkom-naam{font-family:Georgia,serif !important;font-weight:normal !important;font-style:normal !important;font-size:2.4rem !important;}
+/* ── PERSONAL POLLS */
+.pp-block{background:rgba(168,159,232,0.06);border:1.5px solid rgba(168,159,232,0.2);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:10px;}
+.pp-answered{background:rgba(122,158,130,0.07);border-color:rgba(122,158,130,0.22);}
+.pp-nudge{background:rgba(10,10,10,0.04);border:1.5px dashed rgba(10,10,10,0.1);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:10px;}
+/* ── WARMUP */
+.wu-q{font-family:Georgia,serif;font-size:1.1rem;color:#0A0A0A;line-height:1.5;text-align:center;margin-bottom:16px;}
+.wu-opt{width:100%;padding:11px 16px;border:1.5px solid rgba(10,10,10,0.12);border-radius:var(--r-lg);background:#fff;font-family:'DM Sans',sans-serif;font-size:0.88rem;cursor:pointer;text-align:left;transition:all 0.15s;margin-bottom:7px;display:block;}
+.wu-opt:active,.wu-opt.picked{background:#0A0A0A;color:#F0E8E2;border-color:#0A0A0A;}
+.wu-reveal{display:flex;align-items:flex-start;gap:9px;padding:9px 11px;background:rgba(10,10,10,0.04);border-radius:10px;margin-bottom:6px;}
+.wu-bar{height:3px;background:rgba(168,159,232,0.2);border-radius:2px;overflow:hidden;margin-bottom:18px;}
+.wu-bar-fill{height:100%;background:#A89FE8;border-radius:2px;transition:width 0.4s;}
 </style>
 </head>
 <body>
+
+<!-- INTRO OVERLAY -->
+<div id="intro-overlay">
+  <button class="intro-skip" onclick="finishIntro()">overslaan</button>
+  <div class="intro-slider" id="intro-slider">
+    <!-- Screen 1 -->
+    <div class="intro-screen">
+      <p id="intro-days-txt" class="intro-big">Over ? dagen staan jullie in Parijs.</p>
+    </div>
+    <!-- Screen 2 -->
+    <div class="intro-screen">
+      <p class="intro-med">Vier vriendinnen.<br>Eén weekend.<br>Geen WhatsApp-chaos meer.</p>
+    </div>
+    <!-- Screen 3 -->
+    <div class="intro-screen">
+      <div id="intro-names-list" style="margin-bottom:20px;"></div>
+      <p class="intro-sub">Tijd om te kiezen wie jij bent.</p>
+      <button class="intro-cta-btn" id="intro-cta" onclick="finishIntro()">Dat ben ik →</button>
+    </div>
+  </div>
+  <div class="intro-dots">
+    <div class="intro-dot active" id="idot-0"></div>
+    <div class="intro-dot" id="idot-1"></div>
+    <div class="intro-dot" id="idot-2"></div>
+  </div>
+</div>
 
 <!-- LOGIN -->
 <div id="login-screen">
@@ -431,15 +490,17 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
         <div class="profile-name">Miriam</div>
       </div>
     </div>
+    <div class="sfeerlijn" id="sfeerlijn-el">Van dansen tot Parijs.</div>
   </div>
 </div>
 
 <!-- WELKOM SCHERM -->
 <div id="welkom-screen" style="display:none;position:fixed;inset:0;z-index:950;background:#F0E8E2;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
-  <div id="welkom-avatar" style="width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-weight:800;font-size:1.6rem;color:#fff;margin:0 auto 20px;"></div>
-  <div id="welkom-naam" style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:800;font-size:2.2rem;color:#0A0A0A;letter-spacing:-0.02em;margin-bottom:8px;"></div>
-  <div id="welkom-sub" style="font-size:0.92rem;color:#6B6560;line-height:1.6;max-width:300px;margin:0 auto 32px;"></div>
+  <div id="welkom-avatar" style="width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-weight:800;font-size:1.6rem;color:#fff;margin:0 auto 24px;"></div>
+  <div id="welkom-naam" style="font-size:2.4rem;color:#0A0A0A;margin-bottom:10px;"></div>
+  <div id="welkom-sub" style="font-size:0.9rem;color:#6B6560;line-height:1.65;max-width:300px;margin:0 auto 28px;"></div>
   <button id="welkom-btn" onclick="startApp()" style="padding:14px 36px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Beginnen →</button>
+  <div id="welkom-nota" style="font-size:0.7rem;color:#9A948E;margin-top:16px;max-width:280px;line-height:1.5;"></div>
 </div>
 
 <!-- VOORKEUR CHECK -->
@@ -702,7 +763,8 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 
     <!-- POLLS -->
     <div class="home-section-title" style="margin-top:8px;">Stem mee</div>
-    <div class="home-section-sub" id="polls-sub">Stem per dagdeel — volgende vraag zichtbaar na jouw keuze</div>
+    <div id="personal-polls-section" style="padding:0 20px 4px;"></div>
+    <div class="home-section-sub" id="polls-sub" style="margin-top:4px;">Dagindeling — stem per dagdeel</div>
     <!-- Day tabs -->
     <div style="display:flex;gap:8px;padding:0 20px 14px;overflow-x:auto;">
       <button class="poll-day-tab active" onclick="switchPollDay('vr26',this)">Vr 26</button>
@@ -875,6 +937,20 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
   <section id="sec-spellen" class="section">
     <div class="page-header"><div class="page-logo">Spellen</div></div>
     <div style="padding:4px 16px 12px;font-size:0.72rem;color:var(--t2);letter-spacing:0.05em;">Voor in de trein, na het diner, of gewoon omdat het kan</div>
+
+    <div style="padding:0 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:#D4785A;">🔥 Begin hier — speel nu al</div>
+    <div class="spellen-grid" style="padding-bottom:4px;">
+      <div class="spel-card" onclick="openGame('warmup')" style="grid-column:1/-1;border:2px solid rgba(212,120,90,0.3);background:rgba(212,120,90,0.06);">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="spel-emoji" style="font-size:2rem;">🎤</div>
+          <div style="flex:1;text-align:left;">
+            <div class="spel-naam">Vroegzat Warming-up</div>
+            <div class="spel-desc">7 mini-vraagjes — vóór de trip, async, geen druk. Zie meteen wat de anderen zeggen.</div>
+          </div>
+          <div id="warmup-badge" style="font-size:0.65rem;color:#D4785A;font-weight:700;white-space:nowrap;"></div>
+        </div>
+      </div>
+    </div>
 
     <div style="padding:0 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Elke dag — async</div>
     <div class="spellen-grid">
@@ -1822,8 +1898,9 @@ const WELKOM_TEKSTEN = {
   },
   marlinde: {
     groet: 'Marlinde! 😘',
-    sub: 'Jij stelde Parijs voor, jij bevestigde de dates vanuit Penang — en nu ben je er bijna. Vul snel je voorkeuren in zodat het programma ook voor jou klopt. Tip: metro Bonne Nouvelle (lijn 8 + 9) is 1 minuut lopen van jullie airbnb — makkelijker kan niet.',
+    sub: 'Jij stelde Parijs voor, jij bevestigde de dates vanuit Penang — en nu ben je er bijna. Vul je voorkeuren in zodat het programma ook voor jou klopt.',
     knop: 'Even invullen →',
+    nota: '📍 Tip vanuit Penang: metro Bonne Nouvelle (lijn 8+9) is 1 minuut van de airbnb.',
   },
   miriam: {
     groet: 'Hoi Miriam 😊',
@@ -1851,8 +1928,14 @@ function selectProfile(name) {
   document.getElementById('welkom-naam').textContent = t.groet;
   document.getElementById('welkom-sub').textContent = t.sub;
   document.getElementById('welkom-btn').textContent = t.knop;
+  const notaEl = document.getElementById('welkom-nota');
+  if (notaEl) notaEl.textContent = t.nota || '';
   document.getElementById('login-screen').classList.add('hidden');
-  document.getElementById('welkom-screen').style.display = 'flex';
+  const ws = document.getElementById('welkom-screen');
+  ws.style.display = 'flex';
+  ws.style.opacity = '0';
+  ws.style.transition = 'opacity 0.5s';
+  setTimeout(() => { ws.style.opacity = '1'; }, 20);
 }
 function startApp() {
   document.getElementById('welkom-screen').style.display = 'none';
@@ -1887,6 +1970,8 @@ function initApp() {
   showPreTripNudge();
   renderWeekendBlok();
   initPollChain();
+  renderPersonalPolls();
+  _updateWarmupBadge();
   initFeed();
   buildSwipeStack();
   renderProgramma();
@@ -2518,15 +2603,24 @@ function renderPollChainDay(dag) {
       const pct = poll.opties.map((_, i) => Math.round(counts[i] / total * 100));
       const customPct = Math.round(customCount / total * 100);
 
+      // Avatar chips per option
+      function _avatarChips(optIdx) {
+        return ALL_CHAIN_USERS.filter(u => getChainVote(poll.id, u) === optIdx).map(u => {
+          const p = PROFILES[u];
+          return `<span title="${p.naam}" style="display:inline-flex;width:20px;height:20px;border-radius:50%;background:${p.color};align-items:center;justify-content:center;font-size:0.55rem;color:#fff;font-style:italic;font-weight:700;margin-right:3px;">${p.init}</span>`;
+        }).join('');
+      }
+
       const barsHtml = poll.opties.map((opt, i) => `
-        <div style="margin-bottom:5px;">
+        <div style="margin-bottom:7px;">
           <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;">
             <span style="${myVote===i?'font-weight:700;color:#0A0A0A;':'color:#6B6560;'}">${opt}</span>
             <span style="font-weight:600;color:#6B6560;">${pct[i]}%</span>
           </div>
           <div class="poll-bar"><div class="poll-bar-fill" style="width:${pct[i]}%;background:${myVote===i?'#0A0A0A':'#A89FE8'};"></div></div>
+          ${counts[i] > 0 ? `<div style="margin-top:3px;">${_avatarChips(i)}</div>` : ''}
         </div>`).join('') + (customCount > 0 ? `
-        <div style="margin-bottom:5px;">
+        <div style="margin-bottom:7px;">
           <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;">
             <span style="${myVote==='custom'?'font-weight:700;color:#0A0A0A;':'color:#6B6560;'}">✏️ Anders</span>
             <span style="font-weight:600;color:#6B6560;">${customPct}%</span>
@@ -2537,6 +2631,17 @@ function renderPollChainDay(dag) {
             return t ? `<div style="font-size:0.65rem;color:#9A948E;margin-top:2px;padding-left:4px;">↳ ${PROFILES[u]?.naam}: &ldquo;${t}&rdquo;</div>` : '';
           }).join('')}
         </div>` : '');
+
+      // Consensus message
+      const uniqueOpts = new Set(ALL_CHAIN_USERS.map(u => getChainVote(poll.id, u)).filter(v => v !== null));
+      const splitCounts = counts.filter(c => c > 0);
+      let consensusMsg = '';
+      if (votedCount >= 4 && uniqueOpts.size === 1) {
+        consensusMsg = `<div style="font-size:0.72rem;color:#7A9E82;font-weight:700;margin-top:6px;">Hier zijn jullie het roerend over eens 🥂</div>`;
+        if (typeof launchConfetti === 'function') setTimeout(() => launchConfetti(), 50);
+      } else if (votedCount >= 4 && splitCounts.length === 2 && splitCounts[0] === splitCounts[1]) {
+        consensusMsg = `<div style="font-size:0.72rem;color:#D4785A;font-weight:600;margin-top:6px;">Spannend — hier moeten jullie nog uitkomen 🤝</div>`;
+      }
 
       html += `<div class="pchain-block">
         <div class="pchain-answered">
@@ -2549,7 +2654,8 @@ function renderPollChainDay(dag) {
           </div>
           <div style="font-size:0.72rem;color:#6B6560;margin-bottom:8px;">Jouw keuze: <strong style="color:#0A0A0A;">${myLabel}</strong></div>
           ${barsHtml}
-          <div style="font-size:0.65rem;color:#9A948E;margin-top:6px;">${votedCount} van 4 gestemd</div>
+          <div style="font-size:0.65rem;color:#9A948E;margin-top:4px;">${votedCount} van 4 gestemd</div>
+          ${consensusMsg}
           <div id="cmt-pchain-${poll.id}" style="margin-top:8px;"></div>
         </div>
       </div>`;
@@ -3233,6 +3339,11 @@ let twoLiesGuess = null;
 let missiesGedaan = {};
 
 function openGame(name) {
+  if (name === 'warmup') {
+    const overlay = document.getElementById('game-overlay');
+    if (overlay) { overlay.style.display = 'flex'; overlay.classList.add('show'); renderWarmupGame(); }
+    return;
+  }
   if (name === 'twee-lies') {
     document.getElementById('game-twee-lies').style.display = 'flex';
     document.getElementById('game-twee-lies').classList.add('show');
@@ -3886,10 +3997,10 @@ function switchTab(name, el) {
   const sec = document.getElementById('sec-' + name);
   if (sec) sec.classList.add('active');
   if (el) el.classList.add('active');
-  if (name === 'home') { showPreTripNudge(); renderUpcomingStrip(); initPollChain(); if (_parisMap) setTimeout(() => _parisMap.invalidateSize(), 80); }
+  if (name === 'home') { showPreTripNudge(); renderUpcomingStrip(); initPollChain(); renderPersonalPolls(); if (_parisMap) setTimeout(() => _parisMap.invalidateSize(), 80); }
   if (name === 'groep') { renderGroep(); }
   if (name === 'top5') { renderProgramma(); }
-  if (name === 'spellen') { renderHerinneringen(); }
+  if (name === 'spellen') { renderHerinneringen(); _updateWarmupBadge(); }
   if (name === 'inspiratie') { initInspiratie(); }
   if (name === 'swipe') { renderBelevingen(belActiveFilter || 'all'); }
   if (name === 'vervoer') { initVervoer(); }
@@ -5926,9 +6037,401 @@ function planRoute(routeId) {
   if (r) saveToast(`${r.emoji} ${r.title} ingepland — check de Plan-tab! 📅`);
 }
 
+// ── INTRO ────────────────────────────────────────
+let _introTimer = null, _introScreen = 0, _introTouchX = 0;
+
+function _showIntroOverlay() {
+  const overlay = document.getElementById('intro-overlay');
+  overlay.style.display = 'block';
+  const days = Math.max(0, Math.ceil((new Date('2026-06-26') - new Date()) / 86400000));
+  const txt = document.getElementById('intro-days-txt');
+  txt.textContent = `Over ${days} dag${days !== 1 ? 'en' : ''} staan jullie in Parijs.`;
+  setTimeout(() => txt.classList.add('show'), 200);
+  _introScreen = 0;
+  _introTimer = setInterval(() => {
+    if (_introScreen < 2) { _introScreen++; _advanceIntroTo(_introScreen); }
+    else clearInterval(_introTimer);
+  }, 2700);
+  overlay.addEventListener('touchstart', e => { _introTouchX = e.touches[0].clientX; }, {passive:true});
+  overlay.addEventListener('touchend', e => {
+    const dx = _introTouchX - e.changedTouches[0].clientX;
+    if (dx > 50 && _introScreen < 2) { clearInterval(_introTimer); _introScreen++; _advanceIntroTo(_introScreen); }
+  }, {passive:true});
+}
+
+function _advanceIntroTo(n) {
+  document.getElementById('intro-slider').style.transform = `translateX(-${n * 33.333}%)`;
+  [0,1,2].forEach(i => document.getElementById('idot-'+i).classList.toggle('active', i === n));
+  if (n === 1) {
+    setTimeout(() => { const el = document.querySelector('.intro-med'); if(el) el.classList.add('show'); }, 150);
+  }
+  if (n === 2) {
+    clearInterval(_introTimer);
+    const names = ['Frederike','Griette','Marlinde','Miriam'];
+    const el = document.getElementById('intro-names-list');
+    el.innerHTML = '';
+    names.forEach((nm, i) => {
+      const d = document.createElement('div');
+      d.textContent = nm;
+      d.style.cssText = 'opacity:0;transition:opacity 0.5s;font-family:Georgia,serif;font-size:1.35rem;color:#F0E8E2;margin:5px 0;';
+      el.appendChild(d);
+      setTimeout(() => { d.style.opacity = '1'; }, 200 + i * 350);
+    });
+    setTimeout(() => {
+      const sub = document.querySelector('.intro-sub'); if(sub) sub.classList.add('show');
+      const cta = document.getElementById('intro-cta'); if(cta) cta.classList.add('show');
+    }, 200 + 4 * 350);
+  }
+}
+
+function finishIntro() {
+  clearInterval(_introTimer);
+  localStorage.setItem('intro_gezien','1');
+  const overlay = document.getElementById('intro-overlay');
+  overlay.style.transition = 'opacity 0.4s';
+  overlay.style.opacity = '0';
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    if (currentUser) initApp();
+    else document.getElementById('login-screen').classList.remove('hidden');
+  }, 420);
+}
+
+// ── SFEERREGELS ───────────────────────────────────
+const _SFEERREGELS = [
+  'Van dansen tot Parijs.',
+  'Jullie naam, jullie verhaal.',
+  'Het echte programma maken jullie samen.',
+  'Geen WhatsApp-chaos meer.',
+  'Vier mensen. Eén weekend. Alles klopt.',
+];
+let _sfeerIdx = 0;
+function _rotateSfeer() {
+  const el = document.getElementById('sfeerlijn-el');
+  if (!el) return;
+  el.style.opacity = '0';
+  setTimeout(() => {
+    _sfeerIdx = (_sfeerIdx + 1) % _SFEERREGELS.length;
+    el.textContent = _SFEERREGELS[_sfeerIdx];
+    el.style.opacity = '1';
+  }, 350);
+}
+setInterval(_rotateSfeer, 3500);
+
+// ── PERSONAL POLLS ────────────────────────────────
+function _vkOpt(user, qIdx) {
+  const raw = localStorage.getItem('vz_voorkeur_' + user);
+  if (!raw) return -1;
+  try { const a = JSON.parse(raw)[qIdx]; return (a && a.length > 0 && typeof a[0] === 'number') ? a[0] : -1; } catch(e) { return -1; }
+}
+
+function renderPersonalPolls() {
+  const sec = document.getElementById('personal-polls-section');
+  if (!sec) return;
+  const allUsers = ['griette','frederike','miriam','marlinde'];
+  const done = allUsers.filter(u => u === 'griette' || !!localStorage.getItem('vz_voorkeur_' + u));
+
+  if (done.length < 2) {
+    const avatarRow = allUsers.map(u => {
+      const p = PROFILES[u]; const isDone = done.includes(u);
+      return `<span style="display:inline-flex;flex-direction:column;align-items:center;gap:3px;margin-right:10px;">
+        <span style="width:28px;height:28px;border-radius:50%;background:${isDone?p.color:'rgba(10,10,10,0.1)'};display:inline-flex;align-items:center;justify-content:center;font-size:0.62rem;color:${isDone?'#fff':'#9A948E'};font-style:italic;font-weight:700;">${p.init}</span>
+        <span style="font-size:0.58rem;color:${isDone?'#0A0A0A':'#9A948E'};">${isDone?'✓':''} ${p.naam}</span>
+      </span>`;
+    }).join('');
+    sec.innerHTML = `<div class="pp-nudge">
+      <div style="font-size:0.78rem;font-weight:700;color:#0A0A0A;margin-bottom:6px;">📊 Persoonlijke polls worden aangemaakt zodra 2 van jullie klaar zijn.</div>
+      <div style="font-size:0.72rem;color:#6B6560;margin-bottom:10px;">Nu: ${done.length} van 4 ingevuld.</div>
+      <div style="display:flex;flex-wrap:wrap;">${avatarRow}</div>
+    </div>`;
+    return;
+  }
+
+  // Generate polls from voorkeur conflicts
+  const polls = [];
+
+  // Q0: Ochtend — 0=koffie+croissant, 1=direct stad, 2=uitslapen
+  const vroeg = done.filter(u => _vkOpt(u,0) <= 1);
+  const laat  = done.filter(u => _vkOpt(u,0) === 2);
+  if (vroeg.length > 0 && laat.length > 0) {
+    polls.push({ id:'pp_ochtend', dag:'za27', dagdeel:'Zaterdagochtend',
+      vraag: `Zaterdagochtend — vroeg of laat?`,
+      opties: [`🥐 Vroeg weg — ${vroeg.map(u=>PROFILES[u].naam).join(' + ')} wil direct de stad in`, `😴 Uitslapen — ${laat.map(u=>PROFILES[u].naam).join(' + ')} wil rustig beginnen`] });
+  }
+
+  // Q3: Tempo — 0=lopen, 2=terrassen
+  const actief = done.filter(u => _vkOpt(u,3) === 0);
+  const terras = done.filter(u => _vkOpt(u,3) === 2);
+  if (actief.length > 0 && terras.length > 0) {
+    polls.push({ id:'pp_tempo', dag:'za27', dagdeel:'Zaterdagmiddag',
+      vraag: `Tempo van de middag?`,
+      opties: [`🏃 Doorlopen — ${actief.map(u=>PROFILES[u].naam).join(' + ')} wil zoveel mogelijk zien`, `☀️ Terrasje — ${terras.map(u=>PROFILES[u].naam).join(' + ')} wil niks hoeven`] });
+  }
+
+  // Q6: Zaterdagnacht — 0=dansen, 2=vroeg bed
+  const danst  = done.filter(u => _vkOpt(u,6) === 0);
+  const vroegBed = done.filter(u => _vkOpt(u,6) === 2);
+  if (danst.length > 0 && vroegBed.length > 0) {
+    polls.push({ id:'pp_nacht', dag:'za27', dagdeel:'Zaterdagnacht',
+      vraag: `Zaterdagnacht — hoe laat is het gedaan?`,
+      opties: [`💃 Feesten — ${danst.map(u=>PROFILES[u].naam).join(' + ')} gaat door`, `🛋️ Vroeg naar bed — ${vroegBed.map(u=>PROFILES[u].naam).join(' + ')} wil uitslapen`] });
+  }
+
+  // Vaste THIS-OR-THAT: aankomst vrijdag
+  if (done.length >= 2) {
+    polls.push({ id:'pp_aankomst', dag:'vr26', dagdeel:'Vrijdagmiddag',
+      vraag: 'Vrijdagmiddag 12:30–16u: wat doen we met die 3,5 uur?',
+      opties: ['🏛️ Passages verkennen — direct sfeer opsnuiven', '☕ Terrasje en bijkomen — we zijn net aangekomen', '🛍️ Rue Montorgueil + Sézane', '🥗 Goede lunch pakken bij Stohrer of Frenchie'] });
+    polls.push({ id:'pp_croissant', dag:'za27', dagdeel:'Ontbijt',
+      vraag: 'Croissant 🥐 of pain au chocolat 🍫 — definitief antwoord:',
+      opties: ['🥐 Croissant — klassiek en altijd goed', '🍫 Pain au chocolat — team chocolade wint'] });
+  }
+
+  if (polls.length === 0) {
+    sec.innerHTML = '';
+    return;
+  }
+
+  let html = `<div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#A89FE8;margin-bottom:8px;padding-top:4px;">This or that — op basis van jullie voorkeuren</div>`;
+  polls.forEach(poll => {
+    const myVote = localStorage.getItem('vz_pp_' + poll.id + '_' + currentUser);
+    const votes = ['griette','frederike','miriam','marlinde'].map(u => ({u, v: localStorage.getItem('vz_pp_' + poll.id + '_' + u)})).filter(x => x.v !== null);
+    const answered = myVote !== null;
+
+    if (answered) {
+      const optCounts = poll.opties.map((_, i) => votes.filter(x => x.v == i).length);
+      const total = votes.length || 1;
+      const barsH = poll.opties.map((opt, i) => {
+        const pct = Math.round(optCounts[i]/total*100);
+        const chips = votes.filter(x => x.v == i).map(x => { const p=PROFILES[x.u]; return `<span title="${p.naam}" style="display:inline-flex;width:18px;height:18px;border-radius:50%;background:${p.color};align-items:center;justify-content:center;font-size:0.5rem;color:#fff;font-style:italic;font-weight:700;margin-right:2px;">${p.init}</span>`; }).join('');
+        return `<div style="margin-bottom:6px;">
+          <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;"><span style="${myVote==i?'font-weight:700;':'color:#6B6560;'}">${opt}</span><span style="color:#9A948E;">${pct}%</span></div>
+          <div class="poll-bar"><div class="poll-bar-fill" style="width:${pct}%;"></div></div>
+          ${optCounts[i]>0?`<div style="margin-top:2px;">${chips}</div>`:''}
+        </div>`;
+      }).join('');
+      const allSame = votes.length >= 4 && new Set(votes.map(x=>x.v)).size === 1;
+      const half = votes.length >= 4 && optCounts.filter(c=>c>0).length === 2 && optCounts.filter(c=>c>0)[0] === optCounts.filter(c=>c>0)[1];
+      html += `<div class="pp-block pp-answered">
+        <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#7A9E82;margin-bottom:2px;">${poll.dagdeel}</div>
+        <div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;margin-bottom:8px;">${poll.vraag}</div>
+        ${barsH}
+        <div style="font-size:0.65rem;color:#9A948E;margin-top:2px;">${votes.length} van 4 gestemd</div>
+        ${allSame ? '<div style="font-size:0.72rem;color:#7A9E82;font-weight:700;margin-top:4px;">Hier zijn jullie het roerend over eens 🥂</div>' : ''}
+        ${half ? '<div style="font-size:0.72rem;color:#D4785A;font-weight:600;margin-top:4px;">Spannend — hier moeten jullie nog uitkomen 🤝</div>' : ''}
+      </div>`;
+    } else {
+      html += `<div class="pp-block">
+        <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#A89FE8;margin-bottom:2px;">${poll.dagdeel}</div>
+        <div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;margin-bottom:10px;">${poll.vraag}</div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          ${poll.opties.map((opt, i) => `<button class="poll-opt" style="text-align:left;" onclick="votePersonalPoll('${poll.id}',${i})">${opt}</button>`).join('')}
+        </div>
+      </div>`;
+    }
+  });
+  sec.innerHTML = html;
+}
+
+function votePersonalPoll(pollId, optIdx) {
+  localStorage.setItem('vz_pp_' + pollId + '_' + currentUser, optIdx);
+  renderPersonalPolls();
+}
+
+// ── WARMING-UP ────────────────────────────────────
+const WU_VRAGEN = [
+  { id:0, type:'text',   emoji:'✨', vraag:'Eén woord: waar kijk jij het meest naar uit?', placeholder:'Typ hier (max 3 woorden)' },
+  { id:1, type:'choice', emoji:'🥐', vraag:'Croissant of pain au chocolat?', opties:['🥐 Croissant', '🍫 Pain au chocolat'] },
+  { id:2, type:'avatar', emoji:'📱', vraag:'Wie van ons checkt als eerste haar telefoon op het terras?', opties:['griette','frederike','marlinde','miriam'] },
+  { id:3, type:'choice', emoji:'👗', vraag:'Welke outfit-stemming neem jij mee?', opties:['✨ Chic', '👟 Comfy', '🤷 Ik zie wel'] },
+  { id:4, type:'avatar', emoji:'🥂', vraag:'Het eerste rondje in Parijs is voor rekening van...?', opties:['griette','frederike','marlinde','miriam'] },
+  { id:5, type:'choice', emoji:'🛒', vraag:'Markt om 8u \'s ochtends: doen of dromen?', opties:['✅ Doen!', '💤 Dromen...'] },
+  { id:6, type:'text',   emoji:'🌟', vraag:'Maak de zin af: "Deze trip wordt episch als we..."', placeholder:'Typ je antwoord (1 regel)' },
+];
+
+let _wuCurrentQ = 0;
+let _wuAnswers = {};
+
+async function _wuLoadMyAnswers() {
+  const { data } = await supa.from('warmup_answers').select('question_id,value').eq('user_id', currentUser);
+  if (data) data.forEach(r => { _wuAnswers[r.question_id] = r.value; });
+}
+
+async function _wuLoadAllAnswers(qId) {
+  const { data } = await supa.from('warmup_answers').select('user_id,value').eq('question_id', qId);
+  return data || [];
+}
+
+async function _wuSaveAnswer(qId, value) {
+  await supa.from('warmup_answers').upsert({ user_id: currentUser, question_id: qId, value: String(value) }, { onConflict: 'user_id,question_id' });
+  _wuAnswers[qId] = String(value);
+}
+
+function _wuAvatarHtml(user, size) {
+  const p = PROFILES[user];
+  const photo = getUserPhoto(user);
+  if (photo) return `<span style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;display:inline-flex;flex-shrink:0;"><img src="${photo}" style="width:100%;height:100%;object-fit:cover;"></span>`;
+  return `<span style="width:${size}px;height:${size}px;border-radius:50%;background:${p.color};display:inline-flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.35)}px;color:#fff;font-style:italic;font-weight:700;flex-shrink:0;">${p.init}</span>`;
+}
+
+async function renderWarmupGame() {
+  const overlay = document.getElementById('game-overlay');
+  if (!overlay) return;
+  await _wuLoadMyAnswers();
+  _wuCurrentQ = 0;
+  // Find first unanswered
+  for (let i = 0; i < WU_VRAGEN.length; i++) {
+    if (_wuAnswers[i] === undefined) { _wuCurrentQ = i; break; }
+    if (i === WU_VRAGEN.length - 1) _wuCurrentQ = WU_VRAGEN.length;
+  }
+  _renderWuScreen();
+}
+
+function _renderWuScreen() {
+  const overlay = document.getElementById('game-overlay');
+  const pct = Math.round((_wuCurrentQ / WU_VRAGEN.length) * 100);
+
+  if (_wuCurrentQ >= WU_VRAGEN.length) {
+    overlay.innerHTML = `<div class="game-sheet">
+      <button class="game-close" onclick="closeGame()">✕</button>
+      <div style="padding:20px 20px 12px;">
+        <div class="wu-bar"><div class="wu-bar-fill" style="width:100%;"></div></div>
+        <div style="text-align:center;padding:20px 0 28px;">
+          <div style="font-size:2.5rem;margin-bottom:12px;">🔥</div>
+          <div style="font-family:Georgia,serif;font-size:1.4rem;color:#0A0A0A;margin-bottom:8px;">Jullie zijn warmgedraaid.</div>
+          <div style="font-size:0.88rem;color:#6B6560;line-height:1.5;margin-bottom:24px;">Nu het echte werk — swipen en het programma samenstellen.</div>
+          <button onclick="closeGame();switchTab('swipe',document.querySelectorAll('.nav-btn')[1]);" style="padding:13px 32px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;">Swipen 🔥</button>
+        </div>
+        <div style="border-top:1px solid rgba(10,10,10,0.08);padding-top:14px;">
+          <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin-bottom:8px;">Jullie antwoorden</div>
+          ${WU_VRAGEN.map(q => `<div style="margin-bottom:10px;"><div style="font-size:0.72rem;font-weight:600;color:#6B6560;margin-bottom:4px;">${q.emoji} ${q.vraag}</div><div id="wu-done-${q.id}" style="font-size:0.78rem;color:#0A0A0A;"></div></div>`).join('')}
+        </div>
+        <div style="padding:16px 0 8px;">
+          <button onclick="_wuShare()" style="width:100%;padding:11px;border:1.5px solid rgba(10,10,10,0.15);border-radius:var(--r-lg);background:transparent;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;color:#0A0A0A;">📤 Stuur naar de groep</button>
+        </div>
+      </div>
+    </div>`;
+    // Load all answers for recap
+    WU_VRAGEN.forEach(async q => {
+      const all = await _wuLoadAllAnswers(q.id);
+      const el = document.getElementById('wu-done-' + q.id);
+      if (!el) return;
+      if (q.type === 'avatar') {
+        el.innerHTML = all.map(r => `<span style="display:inline-flex;align-items:center;gap:4px;margin-right:8px;">${_wuAvatarHtml(r.user_id,20)}<span style="font-size:0.72rem;">${PROFILES[r.value]?.naam || r.value}</span></span>`).join('');
+      } else {
+        el.innerHTML = all.map(r => `<div class="wu-reveal">${_wuAvatarHtml(r.user_id,24)}<div><div style="font-size:0.65rem;color:#9A948E;">${PROFILES[r.user_id]?.naam}</div><div style="font-size:0.8rem;">${q.type==='choice' ? (WU_VRAGEN.find(v=>v.id===q.id)?.opties?.[Number(r.value)] || r.value) : r.value}</div></div></div>`).join('');
+      }
+    });
+    return;
+  }
+
+  const q = WU_VRAGEN[_wuCurrentQ];
+  let inputHtml = '';
+  if (q.type === 'text') {
+    inputHtml = `<div style="margin-bottom:12px;">
+      <input id="wu-text-input" type="text" placeholder="${q.placeholder}" maxlength="60" style="width:100%;box-sizing:border-box;padding:11px 14px;border:1.5px solid rgba(168,159,232,0.4);border-radius:var(--r-lg);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;" onkeydown="if(event.key==='Enter')_wuSubmitText()">
+      <button onclick="_wuSubmitText()" style="margin-top:8px;width:100%;padding:11px;border:none;border-radius:var(--r-lg);background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;">Bevestigen →</button>
+    </div>`;
+  } else if (q.type === 'choice') {
+    inputHtml = q.opties.map((opt, i) => `<button class="wu-opt" onclick="_wuSubmitChoice(${i})">${opt}</button>`).join('');
+  } else if (q.type === 'avatar') {
+    inputHtml = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">` +
+      q.opties.map(u => { const p = PROFILES[u];
+        return `<button onclick="_wuSubmitAvatar('${u}')" style="padding:14px 10px;border:1.5px solid rgba(10,10,10,0.12);border-radius:var(--r-lg);background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all 0.15s;">
+          ${_wuAvatarHtml(u, 42)}
+          <span style="font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;">${p.naam}</span>
+        </button>`;
+      }).join('') + `</div>`;
+  }
+
+  overlay.innerHTML = `<div class="game-sheet">
+    <button class="game-close" onclick="closeGame()">✕</button>
+    <div style="padding:20px 20px 16px;">
+      <div class="wu-bar"><div class="wu-bar-fill" style="width:${pct}%;"></div></div>
+      <div style="font-size:0.65rem;color:#9A948E;text-align:right;margin-bottom:16px;">${_wuCurrentQ + 1} / ${WU_VRAGEN.length}</div>
+      <div style="font-size:2rem;text-align:center;margin-bottom:10px;">${q.emoji}</div>
+      <div class="wu-q">${q.vraag}</div>
+      ${inputHtml}
+      <button onclick="_wuSkip()" style="width:100%;padding:8px;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:0.75rem;color:#9A948E;cursor:pointer;">Overslaan (pas later)</button>
+    </div>
+  </div>`;
+  if (q.type === 'text') setTimeout(() => { const inp = document.getElementById('wu-text-input'); if(inp) inp.focus(); }, 100);
+}
+
+async function _wuSubmitText() {
+  const inp = document.getElementById('wu-text-input');
+  if (!inp || !inp.value.trim()) return;
+  await _wuSaveAnswer(_wuCurrentQ, inp.value.trim());
+  _wuCurrentQ++;
+  _showWuReveal(_wuCurrentQ - 1);
+}
+
+async function _wuSubmitChoice(idx) {
+  await _wuSaveAnswer(_wuCurrentQ, idx);
+  _wuCurrentQ++;
+  _showWuReveal(_wuCurrentQ - 1);
+}
+
+async function _wuSubmitAvatar(user) {
+  await _wuSaveAnswer(_wuCurrentQ, user);
+  _wuCurrentQ++;
+  _showWuReveal(_wuCurrentQ - 1);
+}
+
+function _wuSkip() { _wuCurrentQ++; _renderWuScreen(); }
+
+async function _showWuReveal(qId) {
+  const q = WU_VRAGEN[qId];
+  const all = await _wuLoadAllAnswers(qId);
+  const myVal = _wuAnswers[qId];
+
+  const overlay = document.getElementById('game-overlay');
+  let revealHtml = '';
+  if (q.type === 'avatar') {
+    const myTarget = PROFILES[myVal]?.naam || myVal;
+    revealHtml = `<div style="text-align:center;margin-bottom:16px;"><div style="font-size:1.4rem;margin-bottom:6px;">👆</div><div style="font-family:Georgia,serif;font-size:1.1rem;color:#0A0A0A;">Jij koos: <strong>${myTarget}</strong></div></div>`;
+    revealHtml += all.map(r => `<div class="wu-reveal">${_wuAvatarHtml(r.user_id,30)}<div><div style="font-size:0.65rem;color:#9A948E;">${PROFILES[r.user_id]?.naam}</div><div style="font-size:0.82rem;font-weight:600;">${PROFILES[r.value]?.naam || r.value}</div></div></div>`).join('');
+  } else if (q.type === 'choice') {
+    const myLabel = q.opties[Number(myVal)] || myVal;
+    revealHtml = `<div style="text-align:center;margin-bottom:16px;"><div style="font-size:1.4rem;margin-bottom:6px;">✓</div><div style="font-family:Georgia,serif;font-size:1.1rem;color:#0A0A0A;">Jij: <strong>${myLabel}</strong></div></div>`;
+    revealHtml += all.map(r => { const lbl = q.opties[Number(r.value)] || r.value; return `<div class="wu-reveal">${_wuAvatarHtml(r.user_id,30)}<div><div style="font-size:0.65rem;color:#9A948E;">${PROFILES[r.user_id]?.naam}</div><div style="font-size:0.82rem;">${lbl}</div></div></div>`; }).join('');
+  } else {
+    revealHtml = `<div style="text-align:center;margin-bottom:16px;"><div style="font-family:Georgia,serif;font-size:1.1rem;color:#0A0A0A;">"${myVal}"</div></div>`;
+    revealHtml += all.map(r => `<div class="wu-reveal">${_wuAvatarHtml(r.user_id,30)}<div><div style="font-size:0.65rem;color:#9A948E;">${PROFILES[r.user_id]?.naam}</div><div style="font-size:0.82rem;font-style:italic;">"${r.value}"</div></div></div>`).join('');
+  }
+
+  overlay.innerHTML = `<div class="game-sheet">
+    <button class="game-close" onclick="closeGame()">✕</button>
+    <div style="padding:20px 20px 16px;">
+      <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#A89FE8;margin-bottom:12px;">${q.emoji} ${q.vraag}</div>
+      ${revealHtml}
+      <div style="font-size:0.65rem;color:#9A948E;margin-bottom:16px;">${all.length} van 4 geantwoord</div>
+      <button onclick="_renderWuScreen()" style="width:100%;padding:12px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;">Volgende vraag →</button>
+    </div>
+  </div>`;
+}
+
+function _wuShare() {
+  const txt = `Hey meiden! 🗼\nIk heb de app al klaargezet voor onze Parijs-trip.\nBegin met de Warming-up — 7 mini-vraagjes, kost niks, gewoon leuk.\nDaarna swipen we het programma bij elkaar.\n→ stijlstudio.app/parijs.html · code VROEGZAT\nXG`;
+  if (navigator.clipboard) { navigator.clipboard.writeText(txt).then(() => showToast('Tekst gekopieerd! 📋 Plak in WhatsApp.')); }
+  else { showToast('Kopieer: ' + txt.substring(0, 40) + '...'); }
+}
+
+function _updateWarmupBadge() {
+  const badge = document.getElementById('warmup-badge');
+  if (!badge) return;
+  supa.from('warmup_answers').select('user_id', {count:'exact',head:false}).then(({data}) => {
+    if (!data) return;
+    const users = new Set(data.map(r => r.user_id));
+    badge.textContent = users.size > 0 ? `${users.size}/4 bezig` : '';
+  });
+}
+
 // ── BOOT ─────────────────────────────────────────
 load();
-if (currentUser) {
+if (!localStorage.getItem('intro_gezien') && !currentUser) {
+  _showIntroOverlay();
+} else if (currentUser) {
   initApp();
 } else {
   document.getElementById('login-screen').classList.remove('hidden');
