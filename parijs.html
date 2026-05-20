@@ -1589,6 +1589,17 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 
 <div class="game-overlay" id="game-warmup" style="display:none;flex-direction:column;overflow-y:auto;"></div>
 
+<!-- ADMIN PANEL -->
+<div id="admin-panel" style="display:none;position:fixed;inset:0;z-index:1200;background:#F0E8E2;overflow-y:auto;font-family:'DM Sans',sans-serif;">
+  <div style="max-width:500px;margin:0 auto;padding:32px 20px 20px;">
+    <div style="font-size:0.6rem;letter-spacing:0.14em;color:#9A948E;margin-bottom:4px;">BEHEER · ALLEEN VOOR GRIETTE</div>
+    <div style="font-size:1.7rem;font-weight:800;color:#0A0A0A;font-family:Georgia,serif;margin-bottom:2px;">Dashboard</div>
+    <div style="font-size:0.78rem;color:#9A948E;margin-bottom:28px;">stijlstudio.app/parijs.html?admin=griette</div>
+    <div id="admin-loading" style="text-align:center;padding:60px 0;color:#9A948E;font-size:0.9rem;">Laden uit Supabase…</div>
+    <div id="admin-content" style="display:none;"></div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -7189,16 +7200,5 @@ if (new URLSearchParams(window.location.search).get('admin') === 'griette') {
   }
 }
 </script>
-
-<!-- ADMIN PANEL -->
-<div id="admin-panel" style="display:none;position:fixed;inset:0;z-index:1200;background:#F0E8E2;overflow-y:auto;font-family:'DM Sans',sans-serif;">
-  <div style="max-width:500px;margin:0 auto;padding:32px 20px 20px;">
-    <div style="font-size:0.6rem;letter-spacing:0.14em;color:#9A948E;margin-bottom:4px;">BEHEER · ALLEEN VOOR GRIETTE</div>
-    <div style="font-size:1.7rem;font-weight:800;color:#0A0A0A;font-family:Georgia,serif;margin-bottom:2px;">Dashboard</div>
-    <div style="font-size:0.78rem;color:#9A948E;margin-bottom:28px;">stijlstudio.app/parijs.html?admin=griette</div>
-    <div id="admin-loading" style="text-align:center;padding:60px 0;color:#9A948E;font-size:0.9rem;">Laden uit Supabase…</div>
-    <div id="admin-content" style="display:none;"></div>
-  </div>
-</div>
 </body>
 </html>
