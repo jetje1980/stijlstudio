@@ -2415,6 +2415,74 @@ const WALKING_ROUTES = [
       { order:3, name:'Experimental Cocktail Club', type:'drink', lat:48.8667, lng:2.3503, address:'37 Rue Saint-Sauveur, 75002', walk_min:6, tip:'Speakeasy, discrete zwarte deur, druk na 21:00. Eventueel reserveren.', price:'€€€' },
       { order:4, name:'Naar huis of door', type:'end', lat:48.8696, lng:2.3490, walk_min:5, price:null }
     ]
+  },
+  {
+    id: 'historie-route',
+    title: 'Weetjes & histoire',
+    emoji: '🏺',
+    color: '#A89FE8',
+    persona_vibe: ['griette', 'frederike'],
+    vibe_label: 'voor de kijkers en de weetjes-liefhebbers',
+    daypart: 'Middag',
+    suggested_start: '14:00',
+    duration_min: 120,
+    distance_km: 1.8,
+    hook: 'Vier plekken die niemand verbindt, maar samen een verhaal vertellen van 700 jaar Parijs — alles op loopafstand.',
+    observatie_tip: 'Ga bij BnF of in de Galerie even op een bankje zitten en kijk wie er langskomt. Studenten, antiquairs, verdwaalde toeristen — Griette-modus aan.',
+    stops: [
+      { order:0, name:'Airbnb', type:'start', lat:48.8696, lng:2.3490, price:null },
+      { order:1, name:'Passage du Caire', type:'sight', lat:48.8673, lng:2.3527, address:'Place du Caire, 75002', walk_min:4,
+        tip:'Ga voor de gevel: drie gezichten van godin Hathor. Binnen textielhandelaren, al generaties lang.',
+        weetje:'Gebouwd in 1798 ná Napoleons Egypte-veldtocht — heel Parijs was toen Egypte-gek. De textielhandelaren die er nu zitten zijn er al sinds de 19e eeuw.',
+        price:null },
+      { order:2, name:'Tour Jean sans Peur', type:'sight', lat:48.8609, lng:2.3499, address:'20 Rue Étienne Marcel, 75002', walk_min:10,
+        tip:'Één van de weinige overblijfselen van middeleeuws Parijs. €5 entree, klein maar bijzonder.',
+        weetje:'Jean liet deze toren bouwen nadat hij zijn neef had laten vermoorden — letterlijk een machtsvertoon in steen. De gebeeldhouwde gewelftrap is uniek in Frankrijk.',
+        price:'€5' },
+      { order:3, name:'BnF Richelieu', type:'sight', lat:48.8654, lng:2.3404, address:'58 Rue de Richelieu, 75002', walk_min:8,
+        tip:'Buitenplein altijd vrij toegankelijk. Leeszaal open di–za. Even naar binnen kijken de moeite.',
+        weetje:'Hier lag eeuwenlang élk boek dat in Frankrijk verscheen — uitgevers waren verplicht een exemplaar in te leveren. Dat geldt vandaag nog steeds.',
+        price:'gratis' },
+      { order:4, name:'Galerie Vivienne', type:'sight', lat:48.8654, lng:2.3385, address:'4 Rue des Petits Champs, 75002', walk_min:5,
+        tip:'Legrand Filles et Fils voor een glas wijn (wijnhandel sinds 1880). Bankje zoeken onder het glasdak.',
+        weetje:'Vivienne werd de chiquere van de twee passages omdat de beroemde misdaadbaas Vidocq er om de hoek woonde — het trok het juiste publiek.',
+        price:null },
+      { order:5, name:'Terug naar Airbnb', type:'end', lat:48.8696, lng:2.3490, walk_min:10, price:null }
+    ]
+  },
+  {
+    id: 'observatie-route',
+    title: 'Terrassen & toekijken',
+    emoji: '👀',
+    color: '#C08552',
+    persona_vibe: ['griette'],
+    vibe_label: 'kijken, zitten, weetjes',
+    daypart: 'Late middag',
+    suggested_start: '16:00',
+    duration_min: 150,
+    distance_km: 1.3,
+    hook: 'De beste plekken om te zitten en Parijs voorbij te zien komen — met bij elke stop een weetje dat niemand je vertelt.',
+    observatie_tip: 'Regel van deze route: nergens haasten. Bestel iets, kijk wie er langskomt, raad hun verhaal.',
+    stops: [
+      { order:0, name:'Airbnb', type:'start', lat:48.8696, lng:2.3490, tip:'16:00 — het mooiste licht van de dag begint nu', price:null },
+      { order:1, name:'Rue Montorgueil terras', type:'drink', lat:48.8646, lng:2.3470, address:'Rue Montorgueil, 75002', walk_min:5,
+        tip:'Café du Centre of Le Compas. Terras op de hoek = beste uitzicht op de voorbijgangers.',
+        weetje:'Dit was eeuwenlang dé bevoorradingsstraat voor de oester- en vishandel van Les Halles, de oude buikmarkt van Parijs. Vandaar al die oude vishandels-gevels.',
+        price:'€' },
+      { order:2, name:'Place des Victoires', type:'sight', lat:48.8643, lng:2.3425, address:'Place des Victoires, 75002', walk_min:7,
+        tip:'Ga op het randje van het plein zitten. Rondom de grote modehuizen, mensen kijken.',
+        weetje:'Het ruiterstandbeeld van Lodewijk XIV staat precies zo dat alle straten er als een ster vanaf lopen — 17e-eeuwse stedenbouw als machtssymbool.',
+        price:null },
+      { order:3, name:'Galerie Vivienne', type:'sight', lat:48.8654, lng:2.3385, address:'4 Rue des Petits Champs, 75002', walk_min:4,
+        tip:'Bankje onder het glasdak. Kijk naar het licht op de mozaïekvloer. Legrand voor een glas.',
+        weetje:'De mozaïekvloer is origineel uit 1826. Elk bloemenmotief is met de hand gelegd — geen enkel patroon herhaalt zich precies.',
+        price:null },
+      { order:4, name:'Jardin du Palais-Royal', type:'sight', lat:48.8638, lng:2.3369, address:'Place du Palais-Royal, 75001', walk_min:6,
+        tip:'Verborgen tuin achter het Louvre die toeristen overslaan. Bankje kiezen, koffie van Telescope Coffee (2 min).',
+        weetje:'Hier speelde de jonge Napoleon als kind. De arcades hadden ooit de beste restaurants én de slechtste reputatie van Parijs — nu de chicste boetiekjes.',
+        price:null },
+      { order:5, name:'Terug naar Airbnb', type:'end', lat:48.8696, lng:2.3490, walk_min:12, price:null }
+    ]
   }
 ];
 let activeRouteId = null;
@@ -5975,9 +6043,9 @@ function renderRouteCarousel() {
   if (!el) return;
   el.innerHTML = WALKING_ROUTES.map(r => {
     const isActive = r.id === activeRouteId;
-    const vibeText = r.persona_vibe.includes('alle')
+    const vibeText = r.vibe_label || (r.persona_vibe.includes('alle')
       ? 'alle vier'
-      : r.persona_vibe.map(v => (PROFILES[v] && PROFILES[v].naam) || v).join(' + ') + '-vibe';
+      : r.persona_vibe.map(v => (PROFILES[v] && PROFILES[v].naam) || v).join(' + ') + '-vibe');
     return `<div onclick="selectRoute('${r.id}')" style="flex-shrink:0;width:155px;border-radius:16px;padding:13px;background:${isActive ? r.color : 'rgba(10,10,10,0.05)'};border:2px solid ${isActive ? r.color : 'transparent'};cursor:pointer;transition:all 0.2s;">
       <div style="font-size:1.7rem;margin-bottom:4px;">${r.emoji}</div>
       <div style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:${isActive ? 'rgba(10,10,10,0.55)' : 'var(--t2)'};margin-bottom:2px;">${r.daypart} · ${r.suggested_start}</div>
@@ -6028,9 +6096,9 @@ function _showRoutePanel(route) {
   const panel = document.getElementById('route-panel');
   if (!overlay || !panel) return;
   const typeIcons = {start:'🏁', end:'🏠', food:'🥐', shop:'🛍️', sight:'🏛️', walk:'🚶', drink:'🥂'};
-  const personaLabel = route.persona_vibe.includes('alle')
+  const personaLabel = route.vibe_label || (route.persona_vibe.includes('alle')
     ? 'voor alle vier 💛'
-    : route.persona_vibe.map(v => (PROFILES[v] && PROFILES[v].naam) || v).join(' + ') + '-vibe';
+    : route.persona_vibe.map(v => (PROFILES[v] && PROFILES[v].naam) || v).join(' + ') + '-vibe');
   let cumMin = 0;
   const stopsHtml = route.stops.map((stop, i) => {
     if (i > 0) cumMin += (stop.walk_min || 0);
@@ -6051,6 +6119,7 @@ function _showRoutePanel(route) {
         </div>
         ${stop.address ? `<div style="font-size:0.7rem;color:#6B6560;">${stop.address}</div>` : ''}
         ${stop.tip ? `<div style="font-size:0.72rem;color:#4a4540;margin-top:2px;line-height:1.4;font-style:italic;">${stop.tip}</div>` : ''}
+        ${stop.weetje ? `<div style="margin-top:5px;padding:6px 10px;background:rgba(168,159,232,0.1);border-radius:8px;border-left:2px solid #A89FE8;"><div style="font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:#A89FE8;margin-bottom:2px;">Wist je dat</div><div style="font-size:0.7rem;color:#4a4540;line-height:1.4;">${stop.weetje}</div></div>` : ''}
         ${stop.price ? `<span style="display:inline-block;margin-top:3px;font-size:0.62rem;background:rgba(10,10,10,0.07);border-radius:8px;padding:1px 6px;">${stop.price}</span>` : ''}
         ${stop.address ? `<div style="margin-top:4px;"><a href="${mapsUrl}" target="_blank" rel="noopener" style="font-size:0.68rem;color:#A89FE8;text-decoration:none;">📍 Open in Google Maps →</a></div>` : ''}
       </div>
@@ -6068,6 +6137,7 @@ function _showRoutePanel(route) {
           <div style="margin-top:6px;display:inline-block;font-size:0.63rem;background:${route.color};border-radius:10px;padding:2px 10px;color:#0A0A0A;">${personaLabel}</div>
         </div>
       </div>
+      ${route.observatie_tip ? `<div style="background:rgba(192,133,82,0.1);border-radius:10px;padding:8px 12px;font-size:0.72rem;color:#6B6560;line-height:1.4;margin-bottom:8px;">👁️ ${route.observatie_tip}</div>` : ''}
       ${route.inside_joke ? `<div style="background:rgba(10,10,10,0.05);border-radius:10px;padding:8px 12px;font-size:0.72rem;color:#6B6560;font-style:italic;margin-bottom:8px;">"${route.inside_joke}"</div>` : ''}
     </div>
     <div style="padding:0 20px 4px;">${stopsHtml}</div>
