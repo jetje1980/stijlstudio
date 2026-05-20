@@ -1270,6 +1270,12 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
           <div style="font-size:0.72rem;color:#6B6560;margin-top:4px;line-height:1.4;">Airbnb, treintijden, groepskas</div>
         </div>
       </div>
+      <div style="margin-top:32px;padding-top:20px;border-top:1px solid rgba(10,10,10,0.07);">
+        <button onclick="wisMijnData()" style="background:none;border:none;padding:0;cursor:pointer;color:#B04040;font-size:0.78rem;display:flex;align-items:center;gap:6px;opacity:0.7;">
+          🗑️ Wis mijn ingevulde data
+        </button>
+        <div style="font-size:0.68rem;color:var(--t3);margin-top:5px;line-height:1.4;">Verwijdert jouw voorkeuren, swipes en warming-up-antwoorden. Raak data van anderen niet aan.</div>
+      </div>
     </div>
   </section>
 
@@ -2154,6 +2160,33 @@ function uitloggen() {
   localStorage.removeItem('vz_user');
   location.reload();
 }
+async function wisMijnData() {
+  if (!confirm('Weet je het zeker? Dit wist jouw voorkeuren, swipes en warming-up-antwoorden. Niet terug te draaien.')) return;
+  const u = currentUser;
+  // Remove from Supabase
+  await supa.from('group_state').delete().eq('group_id', GROUP_ID).eq('user_id', u);
+  await supa.from('warmup_answers').delete().eq('user_id', u);
+  // Remove per-user localStorage keys
+  const keysToRemove = [
+    'vz_voorkeur_' + u, 'vz_swipes_' + u, 'vz_planVibes_' + u,
+    'vz_top5favs_' + u, 'vz_photo_' + u,
+  ];
+  // wvo votes per day
+  for (let d = 0; d < 30; d++) {
+    keysToRemove.push('vz_wvo_vote_' + d + '_' + u);
+    keysToRemove.push('vz_wvo_' + d); // legacy key
+  }
+  keysToRemove.push('vz_wvo_streak');
+  // warming-up cache
+  for (let i = 0; i < 20; i++) keysToRemove.push('vz_wu_' + u + '_' + i);
+  // pp / pchain votes
+  Object.keys(localStorage).filter(k =>
+    (k.startsWith('vz_pp_') || k.startsWith('vz_pchain_')) && k.endsWith('_' + u)
+  ).forEach(k => keysToRemove.push(k));
+  keysToRemove.forEach(k => localStorage.removeItem(k));
+  showToast('Jouw data is gewist ✓');
+  setTimeout(() => location.reload(), 1200);
+}
 function herbeginVoorkeur() {
   localStorage.removeItem('vz_voorkeur_' + currentUser);
   vkIdx = 0;
@@ -2345,6 +2378,7 @@ function initMap() {
 
   _parisMap = map;
   map.invalidateSize();
+  setTimeout(() => map.invalidateSize(), 200);
 }
 
 // ── REEL ──────────────────────────────────────────
@@ -4348,7 +4382,7 @@ function switchTab(name, el) {
   const sec = document.getElementById('sec-' + name);
   if (sec) sec.classList.add('active');
   if (el) el.classList.add('active');
-  if (name === 'home') { showPreTripNudge(); renderUpcomingStrip(); initPollChain(); renderPersonalPolls(); renderBeginHier(); if (_parisMap) setTimeout(() => _parisMap.invalidateSize(), 80); }
+  if (name === 'home') { showPreTripNudge(); renderUpcomingStrip(); initPollChain(); renderPersonalPolls(); renderBeginHier(); if (_parisMap) setTimeout(() => _parisMap.invalidateSize(), 200); }
   if (name === 'groep') { renderGroep(); }
   if (name === 'top5') { renderProgramma(); }
   if (name === 'spellen') { renderHerinneringen(); _updateWarmupBadge(); }
