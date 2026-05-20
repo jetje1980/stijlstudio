@@ -2247,6 +2247,7 @@ function initApp() {
   // Sync all group state from Supabase, migrate local data, enable realtime
   _syncAllGroupState();
   _initRealtime();
+  _wuLoadMyAnswers().then(() => renderBeginHier());
   // Init map: direct call after paint, plus IntersectionObserver fallback for below-fold loads
   setTimeout(initMap, 150);
   setTimeout(initMap, 800);
@@ -6879,7 +6880,7 @@ function renderBeginHier() {
   const voorkeur = localStorage.getItem('vz_voorkeur_' + currentUser);
   const swipesRaw = localStorage.getItem('vz_swipes_' + currentUser);
   const swipeCount = swipesRaw ? Object.keys(JSON.parse(swipesRaw)).length : 0;
-  const wuDone = typeof _wuAnswers !== 'undefined' && _wuAnswers && Object.keys(_wuAnswers).length >= 3;
+  const wuDone = Object.keys(_wuAnswers).length >= WU_VRAGEN.length;
 
   const USERS = ['griette','frederike','marlinde','miriam'];
   function doneAvatars(users) {
