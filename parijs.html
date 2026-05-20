@@ -419,6 +419,17 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 .wu-reveal{display:flex;align-items:flex-start;gap:9px;padding:9px 11px;background:rgba(10,10,10,0.04);border-radius:10px;margin-bottom:6px;}
 .wu-bar{height:3px;background:rgba(168,159,232,0.2);border-radius:2px;overflow:hidden;margin-bottom:18px;}
 .wu-bar-fill{height:100%;background:#A89FE8;border-radius:2px;transition:width 0.4s;}
+.reel-countdown{position:absolute;bottom:20px;right:20px;text-align:right;}
+.intro-screen:first-child{background-image:url('https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80');background-size:cover;background-position:center;}
+.intro-screen:first-child::before{content:'';position:absolute;inset:0;background:rgba(13,26,14,0.72);}
+.intro-screen:first-child{position:relative;}
+.intro-screen:nth-child(2){background-image:url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80');background-size:cover;background-position:center;}
+.intro-screen:nth-child(2)::before{content:'';position:absolute;inset:0;background:rgba(13,26,14,0.72);}
+.intro-screen:nth-child(2){position:relative;}
+.intro-screen:nth-child(3){background-image:url('https://images.unsplash.com/photo-1431274172761-fcdab704a114?w=1200&q=80');background-size:cover;background-position:center;}
+.intro-screen:nth-child(3)::before{content:'';position:absolute;inset:0;background:rgba(13,26,14,0.75);}
+.intro-screen:nth-child(3){position:relative;}
+.intro-screen *{position:relative;z-index:1;}
 </style>
 </head>
 <body>
@@ -651,6 +662,17 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
         <p id="reel-p"></p>
       </div>
       <div class="reel-progress" id="reel-progress"></div>
+      <div class="reel-countdown" id="reel-cd-overlay">
+        <div style="font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(240,232,226,0.7);margin-bottom:6px;">⏱ Vroegzat · Parijs 2026</div>
+        <div style="display:flex;gap:10px;align-items:baseline;">
+          <span style="font-family:Georgia,serif;font-size:2.2rem;font-weight:normal;color:#F0E8E2;line-height:1;" id="rcd-d">--</span>
+          <span style="font-size:0.7rem;color:rgba(240,232,226,0.7);">dagen</span>
+          <span style="font-family:Georgia,serif;font-size:1.4rem;color:rgba(240,232,226,0.75);line-height:1;" id="rcd-h">--</span>
+          <span style="font-size:0.65rem;color:rgba(240,232,226,0.55);">u</span>
+          <span style="font-family:Georgia,serif;font-size:1.4rem;color:rgba(240,232,226,0.75);line-height:1;" id="rcd-m">--</span>
+          <span style="font-size:0.65rem;color:rgba(240,232,226,0.55);">m</span>
+        </div>
+      </div>
     </div>
 
     <!-- HEADER (after reel) -->
@@ -2208,6 +2230,33 @@ const TREIN_DATA = {
   marlinde:  {station:'Houten centrum',   vertrek:'06:21', ns:'houten-centrum',      target:'2026-06-26T06:21:00'},
   miriam:    {station:'Houten centrum',    vertrek:'06:21', ns:'houten-centrum',      target:'2026-06-26T06:21:00'},
 };
+
+// Boot-time countdown — runs immediately, no login required
+(function _cdBoot() {
+  const T = new Date('2026-06-26T04:21:00Z'); // 06:21 CEST
+  function tick() {
+    const diff = T - new Date();
+    const dEl = document.getElementById('cd-d');
+    const hEl = document.getElementById('cd-h');
+    const mEl = document.getElementById('cd-m');
+    const bEl = document.getElementById('cd-badge');
+    if (!dEl) return;
+    if (diff <= 0) { dEl.textContent='0'; hEl.textContent='00'; mEl.textContent='00'; if(bEl)bEl.textContent='Op weg naar Parijs! 🚂'; return; }
+    const d = Math.floor(diff/86400000);
+    const h = Math.floor((diff%86400000)/3600000);
+    const m = Math.floor((diff%3600000)/60000);
+    dEl.textContent = d;
+    hEl.textContent = String(h).padStart(2,'0');
+    mEl.textContent = String(m).padStart(2,'0');
+    const rdEl = document.getElementById('rcd-d');
+    const rhEl = document.getElementById('rcd-h');
+    const rmEl = document.getElementById('rcd-m');
+    if(rdEl) { rdEl.textContent=d; rhEl.textContent=String(h).padStart(2,'0'); rmEl.textContent=String(m).padStart(2,'0'); }
+    if(bEl) bEl.textContent = `Nog ${d} dag${d!==1?'en':''} tot Parijs`;
+  }
+  tick();
+  setInterval(tick, 30000);
+})();
 
 // ── COUNTDOWN ─────────────────────────────────────
 function initCountdown() {
@@ -6179,7 +6228,7 @@ let _introTimer = null, _introScreen = 0, _introTouchX = 0;
 function _showIntroOverlay() {
   const overlay = document.getElementById('intro-overlay');
   overlay.style.display = 'block';
-  const days = Math.max(0, Math.ceil((new Date('2026-06-26') - new Date()) / 86400000));
+  const days = Math.max(0, Math.floor((new Date('2026-06-26T04:21:00Z') - new Date()) / 86400000));
   const txt = document.getElementById('intro-days-txt');
   txt.textContent = `Over ${days} dag${days !== 1 ? 'en' : ''} staan jullie in Parijs.`;
   setTimeout(() => txt.classList.add('show'), 200);
