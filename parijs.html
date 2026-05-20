@@ -1278,8 +1278,10 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 <div class="modal-overlay" id="context-intro-modal" style="display:none;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)this.style.display='none'">
   <div style="background:#F0E8E2;border-radius:20px;padding:24px 22px;max-width:340px;width:100%;position:relative;">
     <div style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Wat is dit eigenlijk?</div>
-    <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.1rem;color:#0A0A0A;margin-bottom:10px;" id="context-intro-title"></div>
+    <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.1rem;color:#0A0A0A;margin-bottom:6px;" id="context-intro-title"></div>
+    <div id="context-intro-meta" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
     <div style="font-size:0.85rem;color:#3A3530;line-height:1.6;" id="context-intro-body"></div>
+    <div id="context-intro-dist" style="margin-top:10px;font-size:0.75rem;color:#7A9E82;font-weight:600;"></div>
     <button onclick="document.getElementById('context-intro-modal').style.display='none'" style="margin-top:16px;width:100%;padding:11px;border:none;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.85rem;font-weight:700;cursor:pointer;">Duidelijk</button>
   </div>
 </div>
@@ -1628,26 +1630,26 @@ const ITEMS_BASE = [
 
 // hook (≤50 chars, punchy), type (ervaring/plek/moment), verborgen
 const ITEM_ENRICHMENT = {
-  'du-pain-idees':          {hook:'Om 12u uitverkocht — plan vroeg',          type:'moment', context_intro:'Dé bakkerij van Canal Saint-Martin — croissants en escargots die voor 12u uitverkocht zijn. Meer dan 150 jaar oud, alleen open op weekdagen. Als je ooit één Parijse bakker kiest, is het deze.'},
+  'du-pain-idees':          {hook:'Om 12u uitverkocht — plan vroeg',          type:'moment', context_intro:'Dé bakkerij van Canal Saint-Martin — croissants en escargots die voor 12u uitverkocht zijn. Meer dan 150 jaar oud, alleen open op weekdagen. Als je ooit één Parijse bakker kiest, is het deze.', dist_airbnb:'20 min lopen · of metro lijn 5 → Gare de l\'Est (3 stops)'},
   'ten-belles':             {hook:'Third-wave koffie + croissant van Du Pain', type:'plek'},
   'claus-breakfast':        {hook:'Scandi ontbijt, rustig, zonder haast',       type:'plek'},
   'rose-bakery-breakfast':  {hook:'Quiche van de dag + brownie — klaar',        type:'plek'},
-  'cafe-de-flore':          {hook:'Sartre schreef hier. Jij drinkt koffie.',    type:'plek', context_intro:'Sartre en Simone de Beauvoir schreven hier hun beste werk. Verwarmde terras, sterk licht, mensen die poseren. €7 koffie — maar je betaalt voor het gevoel van écht Parijs.'},
+  'cafe-de-flore':          {hook:'Sartre schreef hier. Jij drinkt koffie.',    type:'plek', context_intro:'Sartre en Simone de Beauvoir schreven hier hun beste werk. Verwarmde terras, sterk licht, mensen die poseren. €7 koffie — maar je betaalt voor het gevoel van écht Parijs.', dist_airbnb:'35 min lopen · of metro lijn 4 → Saint-Germain (7 stops, ~20 min)'},
   'merci-cafe':             {hook:'Koffie tussen design — gevaarlijk',           type:'plek'},
   'telescope-coffee':       {hook:'Minuscule specialty bar, 2 min Palais-Royal',type:'plek'},
-  'cafe-pli':               {hook:'Brief aan jezelf voor 2046 ✉️',              type:'ervaring', verborgen:true, context_intro:'Schrijf een brief aan jezelf die je pas over 1, 5 of 20 jaar terugkrijgt. Stationery en koffie inbegrepen. Over 20 jaar ontvangen we post uit Parijs 2026 — als we dan 66 zijn.'},
+  'cafe-pli':               {hook:'Brief aan jezelf voor 2046 ✉️',              type:'ervaring', verborgen:true, context_intro:'Schrijf een brief aan jezelf die je pas over 1, 5 of 20 jaar terugkrijgt. Stationery en koffie inbegrepen. Over 20 jaar ontvangen we post uit Parijs 2026 — als we dan 66 zijn.', dist_airbnb:'25 min lopen · of metro lijn 4 → Odéon (6 stops)'},
   'comptoir-general':       {hook:'Zwarte deur → tropisch universum',           type:'ervaring', verborgen:true},
   'bar-hemingway':          {hook:'Hemingway bevrijdde deze bar in 1944',       type:'plek'},
   'pavillon-puebla':        {hook:'Bar in park dat toeristen nooit vinden',     type:'moment',   verborgen:true},
-  'marche-enfants-rouges':  {hook:'Oudste markthal 1615, Japan + Libanon',      type:'moment', context_intro:'Oudste overdekte markthal van Parijs (1615) — Japanse, Marokkaanse en Libanese kraampjes waar je aan lange tafels samen luncht. Zaterdag is het drukst maar ook het leukst.'},
+  'marche-enfants-rouges':  {hook:'Oudste markthal 1615, Japan + Libanon',      type:'moment', context_intro:'Oudste overdekte markthal van Parijs (1615) — Japanse, Marokkaanse en Libanese kraampjes waar je aan lange tafels samen luncht. Zaterdag is het drukst maar ook het leukst.', dist_airbnb:'25 min lopen · of metro lijn 8 → Filles du Calvaire (5 stops, ~15 min)'},
   'hank-burger':            {hook:'Plant-based die vleeseters bekeert',         type:'plek'},
-  'shakespeare-co':         {hook:'Katten, briefjes op muren, stempel in elk boek',type:'plek', context_intro:'Meest fotografeerde boekwinkel ter wereld. Overvolle planken, slapende katten, briefjes van schrijvers. 30 meter van Notre-Dame. Koop iets kleins — elk boek heeft een stempel.'},
-  'piscine-josephine-baker':{hook:'Zwembad op de Seine · zonnedek boven het water', type:'ervaring', verborgen:false},
+  'shakespeare-co':         {hook:'Katten, briefjes op muren, stempel in elk boek',type:'plek', context_intro:'Meest fotografeerde boekwinkel ter wereld. Overvolle planken, slapende katten, briefjes van schrijvers. 30 meter van Notre-Dame. Koop iets kleins — elk boek heeft een stempel.', dist_airbnb:'30 min lopen · of metro lijn 4 → Saint-Michel (6 stops, ~18 min)'},
+  'piscine-josephine-baker':{hook:'Zwembad op de Seine · zonnedek boven het water', type:'ervaring', verborgen:false, dist_airbnb:'metro lijn 14 → Bibliothèque (7 stops, ~20 min) · of RER C'},
   'palais-galliera':        {hook:'Enige mode-museum van Parijs · 200.000 stuks', type:'museum',   verborgen:false, must_van:'griette'},
   'palais-royal':           {hook:'Tuin achter Louvre — toeristen slaan over',  type:'plek',     verborgen:true, must_van:'griette'},
   'wandeling-saint-germain':{hook:'Sartre + Beauvoir + Baldwin — alles hier',   type:'plek'},
-  'wandeling-montmartre-early':{hook:'Magisch stil voor 9u, 50K toeristen daarna',type:'moment', context_intro:'De heuvel boven Parijs, ooit een apart dorp. Sacré-Cœur, schilders op Place du Tertre, het roze café van Picasso. Voor 9u magisch stil — erna een mensensoep van 50.000 toeristen.'},
-  'sezane-marais':          {hook:'Enige Sézane die op zondag open is',         type:'plek', context_intro:'Sézane is hét Parijse vrouwenmerk van deze generatie — blazers, rokken, stoffen tassen. Het Marais-filiaal is de mooiste vestiging en de enige die op zondag open is.'},
+  'wandeling-montmartre-early':{hook:'Magisch stil voor 9u, 50K toeristen daarna',type:'moment', context_intro:'De heuvel boven Parijs, ooit een apart dorp. Sacré-Cœur, schilders op Place du Tertre, het roze café van Picasso. Voor 9u magisch stil — erna een mensensoep van 50.000 toeristen.', dist_airbnb:'metro lijn 2 → Anvers (7 stops, ~20 min) · of lijn 12 → Abbesses'},
+  'sezane-marais':          {hook:'Enige Sézane die op zondag open is',         type:'plek', context_intro:'Sézane is hét Parijse vrouwenmerk van deze generatie — blazers, rokken, stoffen tassen. Het Marais-filiaal is de mooiste vestiging en de enige die op zondag open is.', dist_airbnb:'25 min lopen · of metro lijn 8 → Saint-Sébastien (4 stops, ~14 min)'},
   'sezane-17':              {hook:'Grootst + rustigst, geen wachtrij',          type:'plek'},
   'galeries-lafayette':     {hook:'Art-nouveau koepel 1912, gratis dak',        type:'plek'},
   'puces-saint-ouen':       {hook:'7 hectare, 2000 verkopers, cash mee',        type:'plek'},
@@ -1657,12 +1659,12 @@ const ITEM_ENRICHMENT = {
   'montmartre':             {hook:'Mensensoep 11–17u, magie voor 9 of na 17',   type:'moment'},
   'le-marais':              {hook:'Za 27/6 autovrij door Pride — straatfeest',  type:'moment'},
   'canal-saint-martin':     {hook:'Picknicken aan het water, bootjes door sluis',type:'moment'},
-  'coulee-verte':           {hook:'High Line van Parijs, 4m boven de stad',     type:'plek',     verborgen:true, context_intro:'Verhoogde wandelpromenade op een oude spoorbaan, 4 meter boven de straten. Feitelijk de eerste High Line ter wereld (1993, vóór New York). Rustiger dan de Seine-oever.'},
+  'coulee-verte':           {hook:'High Line van Parijs, 4m boven de stad',     type:'plek',     verborgen:true, context_intro:'Verhoogde wandelpromenade op een oude spoorbaan, 4 meter boven de straten. Feitelijk de eerste High Line ter wereld (1993, vóór New York). Rustiger dan de Seine-oever.', dist_airbnb:'metro lijn 8 → Bastille (5 stops, ~15 min) + 5 min lopen'},
   'arenes-lutece':          {hook:'Romeins amfitheater verstopt achter poort',  type:'plek',     verborgen:true},
-  'pere-lachaise':          {hook:'Morrison + Piaf + Wilde — mooi, niet morbide',type:'plek', context_intro:'Grootste begraafplaats van Parijs, maar eigenlijk een park. Jim Morrison, Édith Piaf, Oscar Wilde en Chopin liggen hier. Geen morbide sfeer — eerder een stille stadstuin.'},
+  'pere-lachaise':          {hook:'Morrison + Piaf + Wilde — mooi, niet morbide',type:'plek', context_intro:'Grootste begraafplaats van Parijs, maar eigenlijk een park. Jim Morrison, Édith Piaf, Oscar Wilde en Chopin liggen hier. Geen morbide sfeer — eerder een stille stadstuin.', dist_airbnb:'metro lijn 9 → Père Lachaise (8 stops, ~22 min)'},
   'orsay':                  {hook:'Impressionisten in oud treinstation',         type:'plek'},
   'louvre':                 {hook:'Sla Mona Lisa over, Galerie d\'Apollon niet', type:'plek'},
-  'atelier-lumieres':       {hook:'Klimt als lichtprojectie — 1u, bij regen',   type:'ervaring', verborgen:true, context_intro:'Digitale kunstinstallatie in een voormalige gieterij: Klimt, Van Gogh en Chagall als meeslepende lichtprojecties op muren en vloer. Eén uur, overweldigend, perfect bij regen.'},
+  'atelier-lumieres':       {hook:'Klimt als lichtprojectie — 1u, bij regen',   type:'ervaring', verborgen:true, context_intro:'Digitale kunstinstallatie in een voormalige gieterij: Klimt, Van Gogh en Chagall als meeslepende lichtprojecties op muren en vloer. Eén uur, overweldigend, perfect bij regen.', dist_airbnb:'metro lijn 8 → Ledru-Rollin (6 stops, ~18 min) + 8 min lopen'},
   'baja-highlights':        {hook:'NL gids langs iconen, dag 1-aanrader',        type:'ervaring'},
   'baja-hidden':            {hook:'Backstreets waar Parijzenaars wonen',         type:'ervaring'},
   'baja-night':             {hook:'Eiffeltoren sprankelt elk uur 5 minuten',    type:'moment'},
@@ -1670,7 +1672,7 @@ const ITEM_ENRICHMENT = {
   'vaartocht-seine':        {hook:'Om 20:30 nog licht, gevels gloeien oranje',  type:'moment'},
   'laduree':                {hook:'6 macarons in mooi doosje — doe het gewoon', type:'plek'},
   'benedict-paris':         {hook:'NY-style eggs benedict, 12 varianten',       type:'plek'},
-  'bouillon-racine':        {hook:'1906 art-nouveau, lunch voor €17,50',        type:'plek', context_intro:'Art-nouveau brasserie uit 1906, ooit een goedkope arbeiderseettent. Escargots, crème brûlée, klassieke Franse brasserie — maar verrassend betaalbaar. Absoluut het mooiste interieur voor €17,50 lunch.'},
+  'bouillon-racine':        {hook:'1906 art-nouveau, lunch voor €17,50',        type:'plek', context_intro:'Art-nouveau brasserie uit 1906, ooit een goedkope arbeiderseettent. Escargots, crème brûlée, klassieke Franse brasserie — maar verrassend betaalbaar. Absoluut het mooiste interieur voor €17,50 lunch.', dist_airbnb:'30 min lopen · of metro lijn 4 → Odéon (6 stops, ~18 min)'},
   'miznon':                 {hook:'Ottolenghi\'s broertje — geroosterde bloemkool',type:'plek'},
   'as-du-fallafel':         {hook:'DE falafel van Marais, rij = ervaring',       type:'plek'},
   'balls':                  {hook:'Gehaktballen in dozijn varianten, naast Atelier',type:'plek'},
@@ -1693,7 +1695,7 @@ const ITEM_ENRICHMENT = {
   'chez-julien':       {hook:'Gossip Girl seizoen 4 · chocolademousse', type:'plek'},
   'buly-1803':         {hook:'Apotheker parfumerie 1803 · viraal', type:'shoppen'},
   'stella-suzie':      {hook:'Boho riemen + tasjes · €35 perfecte riem', type:'shoppen'},
-  'i-love-you-wall':   {hook:'"Je t\'aime" in 311 talen · gratis', type:'moment', context_intro:'"Je t\'aime" in 311 talen op één muur op Square Jehan-Rictus in Montmartre. Gemaakt door twee kunstenaars op Valentijnsdag 2000. Simpel, ontroerend, gratis.'},
+  'i-love-you-wall':   {hook:'"Je t\'aime" in 311 talen · gratis', type:'moment', context_intro:'"Je t\'aime" in 311 talen op één muur op Square Jehan-Rictus in Montmartre. Gemaakt door twee kunstenaars op Valentijnsdag 2000. Simpel, ontroerend, gratis.', dist_airbnb:'metro lijn 2 → Abbesses (7 stops, ~20 min)'},
   'place-du-tertre':   {hook:'Kunstenaarsplein · Picasso atelier vroeger', type:'plek'},
   'vintage-marais':    {hook:'The Room · Revoir Vintage · Bimbo Vintage', type:'shoppen'},
   'baja-bikes':        {hook:'Fietstour Seine + Marais · €34–39 pp', type:'activiteit'},
@@ -5170,9 +5172,21 @@ function showContextIntro(id) {
   const modal = document.getElementById('context-intro-modal');
   const title = document.getElementById('context-intro-title');
   const body = document.getElementById('context-intro-body');
+  const meta = document.getElementById('context-intro-meta');
+  const dist = document.getElementById('context-intro-dist');
   if (!modal || !title || !body) return;
   title.textContent = it ? it.naam : id;
   body.textContent = enrich.context_intro;
+  // Meta chips: wijk, prijs, tijden
+  if (meta && it) {
+    const chips = [];
+    if (it.wijk) chips.push(`<span style="font-size:0.7rem;color:#6B6560;background:rgba(10,10,10,0.07);padding:3px 8px;border-radius:20px;">📍 ${it.wijk}</span>`);
+    if (it.prijs) chips.push(`<span style="font-size:0.7rem;color:#6B6560;background:rgba(10,10,10,0.07);padding:3px 8px;border-radius:20px;">${it.prijs}</span>`);
+    if (it.tijden) chips.push(`<span style="font-size:0.7rem;color:#6B6560;background:rgba(10,10,10,0.07);padding:3px 8px;border-radius:20px;">🕐 ${it.tijden}</span>`);
+    meta.innerHTML = chips.join('');
+  }
+  // Distance from Airbnb
+  if (dist) dist.textContent = enrich.dist_airbnb ? `🚶 Vanaf jullie airbnb: ${enrich.dist_airbnb}` : '';
   modal.style.display = 'flex';
 }
 
@@ -6419,8 +6433,14 @@ async function _showWuReveal(qId) {
 
 function _wuShare() {
   const txt = `Hey meiden! 🗼\nIk heb de app al klaargezet voor onze Parijs-trip.\nBegin met de Warming-up — 7 mini-vraagjes, kost niks, gewoon leuk.\nDaarna swipen we het programma bij elkaar.\n→ stijlstudio.app/parijs.html · code VROEGZAT\nXG`;
-  if (navigator.clipboard) { navigator.clipboard.writeText(txt).then(() => showToast('Tekst gekopieerd! 📋 Plak in WhatsApp.')); }
-  else { showToast('Kopieer: ' + txt.substring(0, 40) + '...'); }
+  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(txt);
+  if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+    window.open(waUrl, '_blank');
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(txt).then(() => showToast('Tekst gekopieerd! 📋 Plak in WhatsApp.'));
+  } else {
+    showToast('Kopieer en stuur: stijlstudio.app/parijs.html · VROEGZAT');
+  }
 }
 
 function _updateWarmupBadge() {
