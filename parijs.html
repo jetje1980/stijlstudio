@@ -454,7 +454,6 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     </div>
     <!-- Screen 3 -->
     <div class="intro-screen">
-      <div id="intro-names-list" style="margin-bottom:20px;"></div>
       <p class="intro-sub">Tijd om te kiezen wie jij bent.</p>
       <button class="intro-cta-btn" id="intro-cta" onclick="finishIntro()">Dat ben ik →</button>
     </div>
@@ -6653,20 +6652,10 @@ function _advanceIntroTo(n) {
   }
   if (n === 2) {
     clearInterval(_introTimer);
-    const names = ['Frederike','Griette','Marlinde','Miriam'];
-    const el = document.getElementById('intro-names-list');
-    el.innerHTML = '';
-    names.forEach((nm, i) => {
-      const d = document.createElement('div');
-      d.textContent = nm;
-      d.style.cssText = 'opacity:0;transition:opacity 0.5s;font-family:Georgia,serif;font-size:1.35rem;color:#F0E8E2;margin:5px 0;';
-      el.appendChild(d);
-      setTimeout(() => { d.style.opacity = '1'; }, 200 + i * 350);
-    });
     setTimeout(() => {
       const sub = document.querySelector('.intro-sub'); if(sub) sub.classList.add('show');
       const cta = document.getElementById('intro-cta'); if(cta) cta.classList.add('show');
-    }, 200 + 4 * 350);
+    }, 200);
   }
 }
 
