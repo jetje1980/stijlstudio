@@ -2149,6 +2149,7 @@ function selectProfile(name) {
   swipes = JSON.parse(localStorage.getItem('vz_swipes_' + name) || '{}');
   top5Favs = JSON.parse(localStorage.getItem('vz_top5favs_' + name) || '{}');
   save();
+  supa.from('sessions').insert({ user_code: name, event: 'login', metadata: { ua: navigator.userAgent, ts: new Date().toISOString() } }).then(() => {});
   const p = PROFILES[name];
   const t = WELKOM_TEKSTEN[name] || {groet:'Welkom, ' + p.naam + ' 👋', sub:'Jouw voorkeuren bepalen mee hoe het programma eruitziet.', knop:'Beginnen →'};
   const welkomAv = document.getElementById('welkom-avatar');
@@ -7077,15 +7078,123 @@ function renderBeginHier() {
       </div>`).join('')}`;
 }
 
+// ── ADMIN ─────────────────────────────────────────
+async function initAdmin() {
+  document.getElementById('admin-panel').style.display = 'block';
+  const [stateRes, sessionsRes] = await Promise.all([
+    supa.from('group_state').select('user_id,key,value,updated_at'),
+    supa.from('sessions').select('user_code,event,metadata,created_at').order('created_at', {ascending:false}).limit(500)
+  ]);
+  const states = stateRes.data || [];
+  const sessions = sessionsRes.data || [];
+  const users = ['frederike','griette','marlinde','miriam'];
+  const NAMEN = {frederike:'Frederike',griette:'Griette',marlinde:'Marlinde',miriam:'Miriam'};
+  const ud = {};
+  users.forEach(u => ud[u] = {swipes:{},hasVoorkeur:false,lastActive:null});
+  states.forEach(r => {
+    if (!ud[r.user_id]) return;
+    if (r.key === 'voorkeur') ud[r.user_id].hasVoorkeur = true;
+    if (r.key === 'swipes') ud[r.user_id].swipes = r.value || {};
+    const t = new Date(r.updated_at);
+    if (!ud[r.user_id].lastActive || t > ud[r.user_id].lastActive) ud[r.user_id].lastActive = t;
+  });
+  const loginCount = {};
+  sessions.forEach(s => { loginCount[s.user_code] = (loginCount[s.user_code]||0) + 1; });
+  const fmt = d => {
+    if (!d) return '—';
+    const diff = Date.now() - d;
+    if (diff < 60000) return 'zojuist';
+    if (diff < 3600000) return Math.floor(diff/60000) + ' min geleden';
+    if (diff < 86400000) return Math.floor(diff/3600000) + 'u geleden';
+    return d.toLocaleDateString('nl-NL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+  };
+  const fmtFull = d => d ? new Date(d).toLocaleString('nl-NL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+  let html = '<div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:#9A948E;margin-bottom:12px;">ACTIVITEIT PER PERSOON</div>';
+  users.forEach(u => {
+    const d = ud[u]; const p = PROFILES[u];
+    const sv = Object.values(d.swipes);
+    const likes = sv.filter(v=>v==='like').length, dreams = sv.filter(v=>v==='dream').length, nopes = sv.filter(v=>v==='nope').length;
+    const logins = loginCount[u]||0;
+    html += `<div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div style="width:36px;height:36px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-style:italic;font-weight:700;color:#fff;font-size:0.85rem;flex-shrink:0;">${p.init}</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:0.95rem;color:#0A0A0A;">${NAMEN[u]}</div>
+          <div style="font-size:0.72rem;color:#9A948E;">${logins>0?logins+'× ingelogd · ':'Nog niet ingelogd · '}${fmt(d.lastActive)}</div>
+        </div>
+        <div style="font-size:1.3rem;">${d.hasVoorkeur?'✅':'⬜'}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;text-align:center;">
+        <div style="background:#F0E8E2;border-radius:10px;padding:8px 4px;"><div style="font-size:1rem;font-weight:800;color:#0A0A0A;">${sv.length}</div><div style="font-size:0.6rem;color:#9A948E;letter-spacing:0.06em;">SWIPES</div></div>
+        <div style="background:rgba(122,158,130,0.12);border-radius:10px;padding:8px 4px;"><div style="font-size:1rem;font-weight:800;color:#7A9E82;">💚 ${likes}</div><div style="font-size:0.6rem;color:#9A948E;">likes</div></div>
+        <div style="background:rgba(168,159,232,0.12);border-radius:10px;padding:8px 4px;"><div style="font-size:1rem;font-weight:800;color:#A89FE8;">✨ ${dreams}</div><div style="font-size:0.6rem;color:#9A948E;">dreams</div></div>
+        <div style="background:rgba(10,10,10,0.05);border-radius:10px;padding:8px 4px;"><div style="font-size:1rem;font-weight:800;color:#9A948E;">✗ ${nopes}</div><div style="font-size:0.6rem;color:#9A948E;">nopes</div></div>
+      </div></div>`;
+  });
+  // Top plekken
+  const scores = {};
+  users.forEach(u => Object.entries(ud[u].swipes).forEach(([id,v]) => {
+    if (!scores[id]) scores[id] = {like:0,dream:0,nope:0};
+    if (v==='like') scores[id].like++; else if (v==='dream') scores[id].dream++; else if (v==='nope') scores[id].nope++;
+  }));
+  const ranked = Object.entries(scores).map(([id,s]) => ({id,score:s.dream*2+s.like-s.nope,...s})).sort((a,b)=>b.score-a.score).slice(0,10);
+  html += '<div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:#9A948E;margin-top:24px;margin-bottom:12px;">TOP 10 PLEKKEN (CONSENSUS)</div><div style="background:#fff;border-radius:16px;overflow:hidden;">';
+  ranked.forEach((item,i) => {
+    const naam = (ITEMS_BASE.find(x=>x.id===item.id)||{}).naam||item.id;
+    html += `<div style="display:flex;align-items:center;gap:12px;padding:11px 16px;${i>0?'border-top:1px solid rgba(10,10,10,0.06)':''}">
+      <div style="font-size:0.8rem;font-weight:800;color:#9A948E;width:20px;text-align:center;">${i+1}</div>
+      <div style="flex:1;"><div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;">${naam}</div><div style="font-size:0.7rem;color:#9A948E;">✨${item.dream} 💚${item.like} ✗${item.nope}</div></div>
+      <div style="font-size:0.75rem;font-weight:700;color:${item.score>=4?'#7A9E82':item.score>=2?'#D4785A':'#9A948E'};">${item.score>0?'+':''}${item.score}</div></div>`;
+  });
+  html += '</div>';
+  // Login log
+  html += `<div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:#9A948E;margin-top:24px;margin-bottom:12px;">LOGIN GESCHIEDENIS (${sessions.length} sessies)</div>`;
+  if (!sessions.length) {
+    html += '<div style="background:#fff;border-radius:16px;padding:20px;text-align:center;color:#9A948E;font-size:0.8rem;">Wordt bijgehouden vanaf nu</div>';
+  } else {
+    html += '<div style="background:#fff;border-radius:16px;overflow:hidden;">';
+    sessions.slice(0,60).forEach((s,i) => {
+      const p = PROFILES[s.user_code]||{color:'#ccc',init:'?'};
+      const ua = s.metadata?.ua||'';
+      const dev = ua.includes('iPhone')||ua.includes('iPad')?'📱 iOS':ua.includes('Android')?'📱 Android':ua.includes('Mac')?'💻 Mac':ua.includes('Windows')?'💻 Windows':'🌐 Browser';
+      html += `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;${i>0?'border-top:1px solid rgba(10,10,10,0.06)':''}">
+        <div style="width:28px;height:28px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-style:italic;font-weight:700;color:#fff;font-size:0.7rem;flex-shrink:0;">${p.init}</div>
+        <div style="flex:1;"><div style="font-size:0.82rem;font-weight:600;color:#0A0A0A;">${NAMEN[s.user_code]||s.user_code}</div><div style="font-size:0.68rem;color:#9A948E;">${dev}</div></div>
+        <div style="font-size:0.72rem;color:#9A948E;">${fmtFull(s.created_at)}</div></div>`;
+    });
+    html += '</div>';
+    if (sessions.length>60) html += `<div style="text-align:center;font-size:0.72rem;color:#9A948E;margin-top:8px;">+${sessions.length-60} oudere sessies</div>`;
+  }
+  html += '<div style="height:48px;"></div>';
+  document.getElementById('admin-loading').style.display = 'none';
+  document.getElementById('admin-content').innerHTML = html;
+  document.getElementById('admin-content').style.display = 'block';
+}
+
 // ── BOOT ─────────────────────────────────────────
-load();
-if (!localStorage.getItem('intro_gezien') && !currentUser) {
-  _showIntroOverlay();
-} else if (currentUser) {
-  initApp();
+if (new URLSearchParams(window.location.search).get('admin') === 'griette') {
+  initAdmin();
 } else {
-  document.getElementById('login-screen').classList.remove('hidden');
+  load();
+  if (!localStorage.getItem('intro_gezien') && !currentUser) {
+    _showIntroOverlay();
+  } else if (currentUser) {
+    initApp();
+  } else {
+    document.getElementById('login-screen').classList.remove('hidden');
+  }
 }
 </script>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel" style="display:none;position:fixed;inset:0;z-index:1200;background:#F0E8E2;overflow-y:auto;font-family:'DM Sans',sans-serif;">
+  <div style="max-width:500px;margin:0 auto;padding:32px 20px 20px;">
+    <div style="font-size:0.6rem;letter-spacing:0.14em;color:#9A948E;margin-bottom:4px;">BEHEER · ALLEEN VOOR GRIETTE</div>
+    <div style="font-size:1.7rem;font-weight:800;color:#0A0A0A;font-family:Georgia,serif;margin-bottom:2px;">Dashboard</div>
+    <div style="font-size:0.78rem;color:#9A948E;margin-bottom:28px;">stijlstudio.app/parijs.html?admin=griette</div>
+    <div id="admin-loading" style="text-align:center;padding:60px 0;color:#9A948E;font-size:0.9rem;">Laden uit Supabase…</div>
+    <div id="admin-content" style="display:none;"></div>
+  </div>
+</div>
 </body>
 </html>
