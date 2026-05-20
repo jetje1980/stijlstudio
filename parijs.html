@@ -758,7 +758,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 
     <div class="home-section-title" style="margin-top:8px;">Onze plekken op de kaart</div>
     <div class="home-section-sub">Tap een pin voor meer info</div>
-    <div id="paris-map" style="height:300px;margin:0 20px 8px;border-radius:var(--r-lg);overflow:hidden;"></div>
+    <div style="margin:0 20px 8px;border-radius:var(--r-lg);overflow:hidden;height:300px;"><div id="paris-map" style="width:100%;height:100%;"></div></div>
     <div style="padding:0 20px 16px;display:flex;justify-content:space-between;align-items:center;">
       <span style="font-size:0.65rem;color:var(--t2);letter-spacing:0.06em;">Onze pins · tap voor info</span>
       <a href="https://www.timetomomo.com/nl/ontdek/parijs/" target="_blank" rel="noopener" style="font-size:0.75rem;font-weight:700;color:#A89FE8;text-decoration:none;letter-spacing:0.04em;">Bekijk TtM routes →</a>
@@ -2248,7 +2248,8 @@ function initApp() {
   _syncAllGroupState();
   _initRealtime();
   // Init map: direct call after paint, plus IntersectionObserver fallback for below-fold loads
-  setTimeout(() => { if (!_parisMap) initMap(); }, 150);
+  setTimeout(initMap, 150);
+  setTimeout(initMap, 800);
   const _mapObs = new IntersectionObserver(entries => {
     if (entries[0].isIntersecting) { initMap(); _mapObs.disconnect(); }
   }, {threshold: 0.1});
@@ -2325,9 +2326,10 @@ function renderUpcomingStrip() {
 let _parisMap = null;
 
 function initMap() {
+  if (_parisMap) { _parisMap.invalidateSize(); return; }
+  if (typeof L === 'undefined') return;
   const el = document.getElementById('paris-map');
-  if (!el || el._mapInit) return;
-  el._mapInit = true;
+  if (!el) return;
 
   const map = L.map('paris-map', {
     center: [48.866, 2.348],
@@ -4405,7 +4407,7 @@ function switchTab(name, el) {
   const sec = document.getElementById('sec-' + name);
   if (sec) sec.classList.add('active');
   if (el) el.classList.add('active');
-  if (name === 'home') { showPreTripNudge(); renderUpcomingStrip(); initPollChain(); renderPersonalPolls(); renderBeginHier(); if (_parisMap) setTimeout(() => _parisMap.invalidateSize(), 200); }
+  if (name === 'home') { showPreTripNudge(); renderUpcomingStrip(); initPollChain(); renderPersonalPolls(); renderBeginHier(); setTimeout(initMap, 120); setTimeout(initMap, 600); }
   if (name === 'groep') { renderGroep(); }
   if (name === 'top5') { renderProgramma(); renderWeekendBlok(); renderCustomEvents(); }
   if (name === 'spellen') { renderHerinneringen(); _updateWarmupBadge(); }
