@@ -1822,54 +1822,147 @@ const _commentChannels = {};
 
 // ── GROUP STATE (Supabase sync) ───────────────────
 const GROUP_ID = 'VROEGZAT';
+let _allSwipes = {};    // {user: {itemId: vote}}
+let _allPlanVibes = {}; // {user: {day: [vibes]}}
+let _allVoorkeur = {};  // {user: answers[]}
 
+// Map localStorage key → {key, uid} for group_state
+function _keyToState(lsKey) {
+  const us = ['griette','frederike','marlinde','miriam'];
+  for (const u of us) {
+    if (lsKey === 'vz_voorkeur_' + u)  return { key:'voorkeur',  uid:u };
+    if (lsKey === 'vz_swipes_' + u)    return { key:'swipes',    uid:u };
+    if (lsKey === 'vz_planVibes_' + u) return { key:'planVibes', uid:u };
+    if (lsKey === 'vz_top5favs_' + u)  return { key:'top5favs',  uid:u };
+    if (lsKey === 'vz_photo_' + u)     return { key:'photo',     uid:u };
+    if (lsKey.startsWith('vz_pchain_text_') && lsKey.endsWith('_'+u))
+      return { key:'pchain_text_'+lsKey.slice(15,-u.length-1), uid:u };
+    if (lsKey.startsWith('vz_pchain_') && lsKey.endsWith('_'+u))
+      return { key:'pchain_'+lsKey.slice(10,-u.length-1), uid:u };
+    if (lsKey.startsWith('vz_pp_') && lsKey.endsWith('_'+u))
+      return { key:'pp_'+lsKey.slice(6,-u.length-1), uid:u };
+    if (lsKey.startsWith('vz_wvo_vote_') && lsKey.endsWith('_'+u))
+      return { key:'wvo_'+lsKey.slice(12,-u.length-1), uid:u };
+  }
+  if (lsKey === 'vz_added')          return { key:'added',          uid:'shared' };
+  if (lsKey === 'vz_weekend_events') return { key:'weekend_events', uid:'shared' };
+  if (lsKey === 'vz_bronnen')        return { key:'bronnen',        uid:'shared' };
+  return null; // vz_wvo_streak stays local
+}
+
+// Write to localStorage + fire-and-forget Supabase upsert
+function syncWrite(lsKey, valueJson) {
+  localStorage.setItem(lsKey, valueJson);
+  if (!currentUser) return;
+  const m = _keyToState(lsKey);
+  if (!m) return;
+  let val; try { val = JSON.parse(valueJson); } catch(e) { val = valueJson; }
+  supa.from('group_state').upsert(
+    { group_id:GROUP_ID, user_id:m.uid, key:m.key, value:val, updated_at:new Date().toISOString() },
+    { onConflict:'group_id,user_id,key' }
+  ).then(({error}) => { if (error) console.warn('syncWrite:', error.message); });
+}
+
+// Backwards-compat helpers (used by warming-up etc.)
 async function setShared(key, value) {
   if (!currentUser) return;
   await supa.from('group_state').upsert(
-    { group_id: GROUP_ID, user_id: currentUser, key, value, updated_at: new Date().toISOString() },
-    { onConflict: 'group_id,user_id,key' }
+    { group_id:GROUP_ID, user_id:currentUser, key, value, updated_at:new Date().toISOString() },
+    { onConflict:'group_id,user_id,key' }
   );
 }
-
 async function getAllShared(key) {
   const { data } = await supa.from('group_state')
-    .select('user_id,value')
-    .eq('group_id', GROUP_ID)
-    .eq('key', key);
+    .select('user_id,value').eq('group_id',GROUP_ID).eq('key',key);
   const result = {};
   if (data) data.forEach(r => { result[r.user_id] = r.value; });
   return result;
 }
 
-async function _syncVoorkeuren() {
-  // Migratie: als eigen voorkeur lokaal staat maar nog niet in Supabase, push eenmalig
-  const localOwn = localStorage.getItem('vz_voorkeur_' + currentUser);
-  if (localOwn) {
-    const { data: existing } = await supa.from('group_state')
-      .select('user_id').eq('group_id', GROUP_ID).eq('user_id', currentUser).eq('key', 'voorkeur').maybeSingle();
-    if (!existing) {
-      try { await setShared('voorkeur', JSON.parse(localOwn)); } catch(e) {}
+// Apply one group_state row to localStorage + memory caches
+function _applyGroupStateRow(key, uid, value) {
+  if (value === null || value === undefined) return;
+  const us = ['griette','frederike','marlinde','miriam'];
+  const scalar = v => typeof v === 'object' ? JSON.stringify(v) : String(v);
+  if (uid !== 'shared' && us.includes(uid)) {
+    const pU = { voorkeur:'vz_voorkeur_', swipes:'vz_swipes_', planVibes:'vz_planVibes_',
+                 top5favs:'vz_top5favs_', photo:'vz_photo_' };
+    if (pU[key])                           localStorage.setItem(pU[key]+uid, scalar(value));
+    else if (key.startsWith('pchain_text_')) localStorage.setItem('vz_pchain_text_'+key.slice(12)+'_'+uid, scalar(value));
+    else if (key.startsWith('pchain_'))     localStorage.setItem('vz_pchain_'+key.slice(7)+'_'+uid, scalar(value));
+    else if (key.startsWith('pp_'))         localStorage.setItem('vz_pp_'+key.slice(3)+'_'+uid, scalar(value));
+    else if (key.startsWith('wvo_')) {
+      localStorage.setItem('vz_wvo_vote_'+key.slice(4)+'_'+uid, scalar(value));
+      if (parseInt(key.slice(4)) === wvoDay) { wvoVotes[uid] = value; }
+    }
+    if (key === 'swipes')    { _allSwipes[uid]    = typeof value==='object' ? value : {}; }
+    if (key === 'planVibes') { _allPlanVibes[uid] = typeof value==='object' ? value : {}; }
+    if (key === 'voorkeur')  { _allVoorkeur[uid]  = Array.isArray(value)    ? value : []; }
+  } else if (uid === 'shared') {
+    if (key === 'added')           localStorage.setItem('vz_added',          scalar(value));
+    else if (key === 'weekend_events') localStorage.setItem('vz_weekend_events', scalar(value));
+    else if (key === 'bronnen')    localStorage.setItem('vz_bronnen',         scalar(value));
+  }
+}
+
+// Re-render all sections that display group data
+function _rerenderAfterSync() {
+  initHomeVoorkeurBanner();
+  updateVoorkeurNudge();
+  renderPersonalPolls();
+  renderBeginHier();
+  buildSwipeStack();
+  renderGroep();
+  if (document.getElementById('sec-top5')?.classList.contains('active')) renderProgramma();
+}
+
+// Full sync on app init: migrate local → Supabase, then load all remote data
+async function _syncAllGroupState() {
+  const { data, error } = await supa.from('group_state')
+    .select('key,user_id,value').eq('group_id', GROUP_ID);
+  if (error) { console.warn('sync error:', error.message); return; }
+  const rows = data || [];
+  const existing = new Set(rows.map(r => r.key+':'+r.user_id));
+  // Migrate own local data not yet in Supabase
+  const migs = [
+    { ls:'vz_voorkeur_'+currentUser,  k:'voorkeur',       uid:currentUser },
+    { ls:'vz_swipes_'+currentUser,    k:'swipes',         uid:currentUser },
+    { ls:'vz_planVibes_'+currentUser, k:'planVibes',      uid:currentUser },
+    { ls:'vz_top5favs_'+currentUser,  k:'top5favs',       uid:currentUser },
+    { ls:'vz_added',                  k:'added',          uid:'shared'    },
+    { ls:'vz_weekend_events',         k:'weekend_events', uid:'shared'    },
+    { ls:'vz_bronnen',                k:'bronnen',        uid:'shared'    },
+  ];
+  for (const m of migs) {
+    if (!existing.has(m.k+':'+m.uid)) {
+      const local = localStorage.getItem(m.ls);
+      if (local) try { await supa.from('group_state').upsert(
+        { group_id:GROUP_ID, user_id:m.uid, key:m.k, value:JSON.parse(local), updated_at:new Date().toISOString() },
+        { onConflict:'group_id,user_id,key' }
+      ); } catch(e) {}
     }
   }
-  // Haal alle vier de voorkeuren op uit Supabase
-  const allData = await getAllShared('voorkeur');
-  let changed = false;
-  Object.entries(allData).forEach(([userId, value]) => {
-    const lsKey = 'vz_voorkeur_' + userId;
-    const newVal = JSON.stringify(value);
-    if (localStorage.getItem(lsKey) !== newVal) {
-      localStorage.setItem(lsKey, newVal);
-      changed = true;
-    }
-  });
-  if (changed) {
-    // Re-render alle secties die voorkeur-data tonen
-    initHomeVoorkeurBanner();
-    updateVoorkeurNudge();
-    renderPersonalPolls();
-    renderBeginHier();
-    if (document.getElementById('sec-groep')?.classList.contains('active')) renderGroep();
-  }
+  // Re-fetch after migration and apply everything
+  const { data:fresh } = await supa.from('group_state')
+    .select('key,user_id,value').eq('group_id', GROUP_ID);
+  (fresh||[]).forEach(r => _applyGroupStateRow(r.key, r.user_id, r.value));
+  _rerenderAfterSync();
+}
+
+// Realtime: push other users' changes straight into the UI
+function _initRealtime() {
+  if (!currentUser) return;
+  supa.channel('gs_' + GROUP_ID)
+    .on('postgres_changes',
+      { event:'*', schema:'public', table:'group_state', filter:'group_id=eq.'+GROUP_ID },
+      payload => {
+        const r = payload.new;
+        if (!r || r.user_id === currentUser) return;
+        _applyGroupStateRow(r.key, r.user_id, r.value);
+        _rerenderAfterSync();
+        if (r.key === 'swipes') renderGroep();
+      }
+    ).subscribe();
 }
 
 // ── STATE ─────────────────────────────────────────
@@ -1894,9 +1987,9 @@ const REEL_DATA = [
 // ── UTILS ─────────────────────────────────────────
 function save() {
   localStorage.setItem('vz_user', currentUser);
-  localStorage.setItem('vz_swipes_' + currentUser, JSON.stringify(swipes));
-  localStorage.setItem('vz_added', JSON.stringify(addedItems));
-  localStorage.setItem('vz_top5favs_' + currentUser, JSON.stringify(top5Favs));
+  syncWrite('vz_swipes_' + currentUser, JSON.stringify(swipes));
+  syncWrite('vz_added', JSON.stringify(addedItems));
+  syncWrite('vz_top5favs_' + currentUser, JSON.stringify(top5Favs));
 }
 function load() {
   currentUser = localStorage.getItem('vz_user');
@@ -1913,8 +2006,11 @@ function getMockVote(user, itemId) {
 function getAllVotes(itemId) {
   const all = {};
   ['griette','frederike','miriam','marlinde'].forEach(u => {
-    if (u === currentUser) all[u] = swipes[itemId] || null;
-    else all[u] = getMockVote(u, itemId);
+    if (u === currentUser) { all[u] = swipes[itemId] || null; }
+    else {
+      const real = (_allSwipes[u] || {})[itemId];
+      all[u] = (real !== undefined) ? real : getMockVote(u, itemId);
+    }
   });
   return all;
 }
@@ -1971,7 +2067,9 @@ function handlePhotoUpload(input) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    localStorage.setItem('vz_photo_' + currentUser, e.target.result);
+    const dataUrl = e.target.result;
+    if (dataUrl.length > 200000) { showToast('Foto te groot — kies een kleiner bestand'); return; }
+    syncWrite('vz_photo_' + currentUser, JSON.stringify(dataUrl));
     initStories();
     showToast('Profielfoto opgeslagen 📷');
   };
@@ -2090,8 +2188,9 @@ function initApp() {
   initHomeVoorkeurBanner();
   updateVoorkeurNudge();
   initWeekendEvents();
-  // Sync voorkeuren from Supabase, then re-render affected sections
-  _syncVoorkeuren();
+  // Sync all group state from Supabase, migrate local data, enable realtime
+  _syncAllGroupState();
+  _initRealtime();
   // Init map: direct call after paint, plus IntersectionObserver fallback for below-fold loads
   setTimeout(() => { if (!_parisMap) initMap(); }, 150);
   const _mapObs = new IntersectionObserver(entries => {
@@ -2762,7 +2861,7 @@ function voteChain(pollId, optIdx) {
     localStorage.removeItem('vz_pchain_' + pollId + '_' + currentUser);
     localStorage.removeItem('vz_pchain_text_' + pollId + '_' + currentUser);
   } else {
-    localStorage.setItem('vz_pchain_' + pollId + '_' + currentUser, optIdx);
+    syncWrite('vz_pchain_' + pollId + '_' + currentUser, String(optIdx));
     localStorage.removeItem('vz_pchain_text_' + pollId + '_' + currentUser);
   }
   const poll = POLL_CHAIN.find(p => p.id === pollId);
@@ -2783,8 +2882,8 @@ function voteChainCustom(pollId) {
   const wrap = document.getElementById('pchain-custom-' + pollId);
   const text = wrap?.querySelector('input')?.value?.trim();
   if (!text) { wrap?.querySelector('input')?.focus(); return; }
-  localStorage.setItem('vz_pchain_' + pollId + '_' + currentUser, 'custom');
-  localStorage.setItem('vz_pchain_text_' + pollId + '_' + currentUser, text);
+  syncWrite('vz_pchain_' + pollId + '_' + currentUser, 'custom');
+  syncWrite('vz_pchain_text_' + pollId + '_' + currentUser, text);
   const poll = POLL_CHAIN.find(p => p.id === pollId);
   if (poll) renderPollChainDay(poll.dag);
   renderGroepsplan();
@@ -4266,7 +4365,7 @@ function getPlanVibes() {
   return JSON.parse(localStorage.getItem('vz_planVibes_' + currentUser) || '{"vr26":[],"za27":[],"zo28":[]}');
 }
 function savePlanVibes(plan) {
-  localStorage.setItem('vz_planVibes_' + currentUser, JSON.stringify(plan));
+  syncWrite('vz_planVibes_' + currentUser, JSON.stringify(plan));
 }
 function getSelectedVibeIds() {
   const plan = getPlanVibes();
@@ -5128,8 +5227,7 @@ function bevestigVoorkeur() {
 }
 
 function finishVoorkeur() {
-  localStorage.setItem('vz_voorkeur_' + currentUser, JSON.stringify(vkAnswers));
-  setShared('voorkeur', vkAnswers).catch(() => {});
+  syncWrite('vz_voorkeur_' + currentUser, JSON.stringify(vkAnswers));
   document.getElementById('vk-bar').style.width = '100%';
   document.getElementById('vk-counter').textContent = '✓';
   const allUsers = ['griette','frederike','miriam','marlinde'];
@@ -5226,7 +5324,7 @@ function submitEventAdd() {
     door: PROFILES[currentUser].naam,
   };
   customWeekendEvents.push(ev);
-  localStorage.setItem('vz_weekend_events', JSON.stringify(customWeekendEvents));
+  syncWrite('vz_weekend_events', JSON.stringify(customWeekendEvents));
   closeEventModal();
   renderCustomEvents();
   showToast(`"${naam}" toegevoegd! 🎉`);
@@ -5531,7 +5629,7 @@ function submitBron() {
   const bron = { handle, type: bronSelected.type || 'anders', why, personas: bronSelected.personas, door: currentUser, ts: Date.now() };
   const community = JSON.parse(localStorage.getItem('vz_bronnen') || '[]');
   community.push(bron);
-  localStorage.setItem('vz_bronnen', JSON.stringify(community));
+  syncWrite('vz_bronnen', JSON.stringify(community));
   sluitBronModal();
   renderCommunityBronnen();
   showToast('@' + handle + ' toegevoegd! ✓');
@@ -5539,7 +5637,7 @@ function submitBron() {
 function deleteCommunityBron(i) {
   const community = JSON.parse(localStorage.getItem('vz_bronnen') || '[]');
   community.splice(i, 1);
-  localStorage.setItem('vz_bronnen', JSON.stringify(community));
+  syncWrite('vz_bronnen', JSON.stringify(community));
   renderCommunityBronnen();
 }
 
@@ -5574,11 +5672,31 @@ const WVO_VRAGEN = [
 let wvoDay = 0;
 let wvoVotes = {};
 
-function openWieVanOns() {
+async function openWieVanOns() {
   const dayKey = Math.floor(Date.now() / 86400000) % WVO_VRAGEN.length;
   wvoDay = dayKey;
-  wvoVotes = JSON.parse(localStorage.getItem('vz_wvo_' + dayKey) || '{}');
+  // Seed from localStorage cache first so UI is instant
+  const cachedVotes = {};
+  ['griette','frederike','marlinde','miriam'].forEach(u => {
+    const v = localStorage.getItem('vz_wvo_vote_' + dayKey + '_' + u);
+    if (v) cachedVotes[u] = v;
+  });
+  wvoVotes = cachedVotes;
   renderWieVanOns();
+  // Then fetch fresh from Supabase
+  try {
+    const { data } = await supa.from('group_state')
+      .select('user_id,value')
+      .eq('group_id', GROUP_ID)
+      .eq('key', 'wvo_' + dayKey);
+    if (data && data.length) {
+      (data).forEach(r => {
+        wvoVotes[r.user_id] = r.value;
+        localStorage.setItem('vz_wvo_vote_' + dayKey + '_' + r.user_id, r.value);
+      });
+      renderWieVanOns();
+    }
+  } catch(e) {}
 }
 function renderWieVanOns() {
   const b = document.getElementById('wvo-body');
@@ -5637,14 +5755,7 @@ function renderWieVanOns() {
 function stemWVO(target) {
   if (wvoVotes[currentUser]) return;
   wvoVotes[currentUser] = target;
-  const allUsers = ['griette','frederike','miriam','marlinde'];
-  allUsers.filter(u => u !== currentUser).forEach(u => {
-    if (!wvoVotes[u]) {
-      const rand = Object.keys(PROFILES)[Math.floor(Math.random() * 4)];
-      wvoVotes[u] = rand;
-    }
-  });
-  localStorage.setItem('vz_wvo_' + wvoDay, JSON.stringify(wvoVotes));
+  syncWrite('vz_wvo_vote_' + wvoDay + '_' + currentUser, JSON.stringify(target));
   const streak = parseInt(localStorage.getItem('vz_wvo_streak')||'0') + 1;
   localStorage.setItem('vz_wvo_streak', streak);
   saveToast('Gestemd! 🗳️');
@@ -6502,7 +6613,7 @@ function renderPersonalPolls() {
 }
 
 function votePersonalPoll(pollId, optIdx) {
-  localStorage.setItem('vz_pp_' + pollId + '_' + currentUser, optIdx);
+  syncWrite('vz_pp_' + pollId + '_' + currentUser, String(optIdx));
   renderPersonalPolls();
 }
 
