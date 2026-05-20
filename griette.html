@@ -1833,18 +1833,30 @@ function handlePhoto(e, itemId) {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = ev => {
-    photos[itemId] = ev.target.result;
+  reader.onload = async ev => {
+    const dataUrl = ev.target.result;
+    photos[itemId] = dataUrl;
     const pa = document.getElementById('pa-' + itemId);
-    if (pa) pa.innerHTML = `<img src="${ev.target.result}" alt="">`;
+    if (pa) pa.innerHTML = `<img src="${dataUrl}" alt="">`;
     // update all outfit slots with this item
-    document.querySelectorAll(`.outfit-slot[data-item-id="${itemId}"] img`).forEach(img => img.src = ev.target.result);
+    document.querySelectorAll(`.outfit-slot[data-item-id="${itemId}"] img`).forEach(img => img.src = dataUrl);
     document.querySelectorAll(`.outfit-slot[data-item-id="${itemId}"]`).forEach(slot => {
       if (!slot.querySelector('img')) {
-        slot.innerHTML = `<img src="${ev.target.result}" alt=""><div class="slot-label">${getItemName(itemId)}</div><button class="remove-slot" onclick="removeSlot(this)">×</button>`;
+        slot.innerHTML = `<img src="${dataUrl}" alt=""><div class="slot-label">${getItemName(itemId)}</div><button class="remove-slot" onclick="removeSlot(this)">×</button>`;
       }
     });
     showToast('Foto toegevoegd ✓');
+    // Sla op in IndexedDB (direct, lokaal)
+    if (db) { try { await savePhoto(itemId, dataUrl); } catch(e) {} }
+    // Upload naar Cloudinary (cross-device persistentie)
+    try {
+      const cloudUrl = await uploadToCloudinary(file, itemId);
+      photos[itemId] = cloudUrl;
+      saveCloudinaryUrl(itemId, cloudUrl);
+      const pa2 = document.getElementById('pa-' + itemId);
+      if (pa2 && pa2.querySelector('img')) pa2.querySelector('img').src = cloudUrl;
+      document.querySelectorAll(`.outfit-slot[data-item-id="${itemId}"] img`).forEach(img => img.src = cloudUrl);
+    } catch(e) {}
   };
   reader.readAsDataURL(file);
 }
