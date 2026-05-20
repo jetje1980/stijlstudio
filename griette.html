@@ -1234,11 +1234,14 @@ async function restoreCloudinaryPhotos(manual) {
   var allIds = [];
   for (var cat in items) {
     (items[cat] || []).forEach(function(item) {
-      if (!item.id.startsWith('custom-')) allIds.push(item.id);
+      allIds.push(item.id);
     });
   }
+  var cloudMap = {};
+  try { var s = localStorage.getItem('griette-cloud-photos-v1'); if(s) cloudMap = JSON.parse(s); } catch(e) {}
+  var toCheck = manual ? allIds : allIds.filter(function(id) { return !cloudMap[id]; });
   var restored = {};
-  var checks = allIds.map(function(id) {
+  var checks = toCheck.map(function(id) {
     var url = 'https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_' + id;
     return new Promise(function(resolve) {
       var img = new Image();
@@ -1250,13 +1253,46 @@ async function restoreCloudinaryPhotos(manual) {
   await Promise.all(checks);
   if (Object.keys(restored).length > 0) {
     Object.assign(photos, restored);
-    try { localStorage.setItem('griette-cloud-photos-v1', JSON.stringify(restored)); } catch(e) {}
-    supabaseSet('cloud-photos', restored).catch(function(){});
+    Object.assign(cloudMap, restored);
+    try { localStorage.setItem('griette-cloud-photos-v1', JSON.stringify(cloudMap)); } catch(e) {}
+    supabaseSet('cloud-photos', cloudMap).catch(function(){});
     buildGarderobe();
     buildBoards();
     showToast('✓ ' + Object.keys(restored).length + ' foto\'s hersteld!');
   } else if (manual) {
     showToast('Geen foto\'s gevonden op Cloudinary');
+  }
+}
+
+// Herstel foto's van eigen items die nog niet in cloudMap staan
+async function restoreCustomItemPhotos() {
+  var cloudMap = {};
+  try { var s = localStorage.getItem('griette-cloud-photos-v1'); if(s) cloudMap = JSON.parse(s); } catch(e) {}
+  var missingIds = [];
+  for (var cat in items) {
+    (items[cat] || []).forEach(function(item) {
+      if (!cloudMap[item.id] && !photos[item.id]) missingIds.push(item.id);
+    });
+  }
+  if (!missingIds.length) return;
+  var restored = {};
+  var checks = missingIds.map(function(id) {
+    var url = 'https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_' + id;
+    return new Promise(function(resolve) {
+      var img = new Image();
+      img.onload = function() { restored[id] = url; resolve(); };
+      img.onerror = function() { resolve(); };
+      img.src = url;
+    });
+  });
+  await Promise.all(checks);
+  if (Object.keys(restored).length > 0) {
+    Object.assign(photos, restored);
+    Object.assign(cloudMap, restored);
+    try { localStorage.setItem('griette-cloud-photos-v1', JSON.stringify(cloudMap)); } catch(e) {}
+    supabaseSet('cloud-photos', cloudMap).catch(function(){});
+    buildGarderobe();
+    buildBoards();
   }
 }
 
@@ -5730,6 +5766,8 @@ openDB().then(async () => {
   loadAppDataFromSupabase();
   // Herstel foto's automatisch als localStorage leeg is (na domeinwisseling)
   restoreCloudinaryPhotos(false);
+  // Herstel foto's van eigen items die niet in cloudMap staan (domeinmigratie)
+  setTimeout(restoreCustomItemPhotos, 2000);
 }).catch(() => {
   loadAppData();
   buildGarderobe();
