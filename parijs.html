@@ -2149,7 +2149,11 @@ function selectProfile(name) {
   swipes = JSON.parse(localStorage.getItem('vz_swipes_' + name) || '{}');
   top5Favs = JSON.parse(localStorage.getItem('vz_top5favs_' + name) || '{}');
   save();
-  supa.from('sessions').insert({ user_code: name, event: 'login', metadata: { ua: navigator.userAgent, ts: new Date().toISOString() } }).then(() => {});
+  fetch('https://osuqtfsxmquwqsbgzlqn.supabase.co/functions/v1/log-session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
+    body: JSON.stringify({ user_code: name, event: 'login', metadata: { ua: navigator.userAgent, ts: new Date().toISOString() } })
+  }).catch(() => {});
   const p = PROFILES[name];
   const t = WELKOM_TEKSTEN[name] || {groet:'Welkom, ' + p.naam + ' 👋', sub:'Jouw voorkeuren bepalen mee hoe het programma eruitziet.', knop:'Beginnen →'};
   const welkomAv = document.getElementById('welkom-avatar');
