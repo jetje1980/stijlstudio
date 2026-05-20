@@ -1991,7 +1991,8 @@ function initApp() {
   initHomeVoorkeurBanner();
   updateVoorkeurNudge();
   initWeekendEvents();
-  // Init map when element scrolls into view (avoids 0-width init from display:none parent)
+  // Init map: direct call after paint, plus IntersectionObserver fallback for below-fold loads
+  setTimeout(() => { if (!_parisMap) initMap(); }, 150);
   const _mapObs = new IntersectionObserver(entries => {
     if (entries[0].isIntersecting) { initMap(); _mapObs.disconnect(); }
   }, {threshold: 0.1});
@@ -6379,9 +6380,9 @@ const WU_VRAGEN = [
   { id:1, type:'choice', emoji:'🥐', vraag:'Croissant of pain au chocolat?', opties:['🥐 Croissant', '🍫 Pain au chocolat'] },
   { id:2, type:'avatar', emoji:'📱', vraag:'Wie van ons checkt als eerste haar telefoon op het terras?', opties:['griette','frederike','marlinde','miriam'] },
   { id:3, type:'choice', emoji:'👗', vraag:'Welke outfit-stemming neem jij mee?', opties:['✨ Chic', '👟 Comfy', '🤷 Ik zie wel'] },
-  { id:4, type:'avatar', emoji:'🥂', vraag:'Het eerste rondje in Parijs is voor rekening van...?', opties:['griette','frederike','marlinde','miriam'] },
+  { id:4, type:'avatar', emoji:'💤', vraag:'Wie slaapt het langst uit op zaterdag?', opties:['griette','frederike','marlinde','miriam'] },
   { id:5, type:'choice', emoji:'🛒', vraag:'Markt om 8u \'s ochtends: doen of dromen?', opties:['✅ Doen!', '💤 Dromen...'] },
-  { id:6, type:'text',   emoji:'🌟', vraag:'Maak de zin af: "Deze trip wordt episch als we..."', placeholder:'Typ je antwoord (1 regel)' },
+  { id:6, type:'text',   emoji:'🌟', vraag:'Maak de zin af: "Dit weekend is geslaagd als we..."', placeholder:'Typ je antwoord (1 regel)' },
 ];
 
 let _wuCurrentQ = 0;
