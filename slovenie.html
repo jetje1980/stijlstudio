@@ -1030,6 +1030,17 @@ function renderProfileGrid(){
     <div class="game-card-icon">☔</div>
     <div class="game-card-text"><div class="game-card-title">Leedvermaak</div><div class="game-card-sub">Thuisweer vs. jullie</div></div>
   </div>
+
+  <div class="game-section-hdr">🎮 Puzzels</div>
+  <div class="game-card featured" onclick="openGame('game-sudoku')">
+    <img src="https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=700&q=80" alt="sudoku" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+    <div class="game-card-grad"></div>
+    <div class="game-card-icon">🔢</div>
+    <div class="game-card-text">
+      <div class="game-card-title">Dagelijkse Sudoku</div>
+      <div class="game-card-sub">Elke dag een nieuw puzzel</div>
+    </div>
+  </div>
 </div>
 
     <!-- U9: Reis-scorebord + gamification -->
@@ -1045,6 +1056,11 @@ function renderProfileGrid(){
       </div>
       <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:#9AC4A8;margin-bottom:12px;">
         <span id="g9-vonck-tot">0 pt</span><span id="g9-sierksma-tot">0 pt</span>
+      </div>
+      <!-- Top van vandaag -->
+      <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:10px;margin-bottom:10px;">
+        <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#9AC4A8;margin-bottom:6px;">⭐ Toppresteerder van vandaag</div>
+        <div id="g9-top-vandaag" style="font-size:0.88rem;color:#E8DDD0;font-weight:700;">Laden…</div>
       </div>
       <!-- Persoonsranglijst -->
       <div id="g9-ranglijst" style="display:flex;flex-direction:column;gap:5px;"></div>
@@ -1202,45 +1218,24 @@ function renderProfileGrid(){
 
     <!-- U5a: Autobingo -->
     <div class="uitleg-block" id="bingo-block">
-      <div class="uitleg-head" onclick="toggleUitleg(this)">
-        <div class="uitleg-title">🎯 Autobingo</div>
+      <div class="uitleg-head" onclick="toggleUitleg(this);initGlobalBingo()">
+        <div class="uitleg-title">🎯 Autobingo — de hele vakantie</div>
         <div class="uitleg-arrow">▼</div>
       </div>
       <div class="uitleg-body" id="bingo-body">
-
-        <!-- Lobby / sessie kiezen -->
-        <div id="bingo-lobby">
-          <p style="font-size:0.84rem;color:#6B6560;margin:0 0 12px;">Spot dingen onderweg, maak een foto als bewijs, en word bingo!</p>
-          <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-            <button onclick="bingoNieuw()" style="flex:1;padding:10px;background:#4A9E6E;color:#fff;border:none;border-radius:14px;font-family:inherit;font-size:0.88rem;font-weight:700;cursor:pointer;">🆕 Nieuw spel starten</button>
-          </div>
-          <div style="display:flex;gap:6px;margin-bottom:8px;">
-            <input id="bingo-code-in" placeholder="Spelcode (bijv. BOH3)" maxlength="6" style="flex:1;border:1.5px solid #ddd;border-radius:10px;padding:9px 11px;font-family:inherit;font-size:0.92rem;text-transform:uppercase;">
-            <button onclick="bingoJoin()" style="padding:9px 16px;background:#4A7CC4;color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:0.88rem;font-weight:700;cursor:pointer;">Meedoen</button>
-          </div>
-          <div id="bingo-lobby-status" style="font-size:0.82rem;color:#9A948E;margin-bottom:8px;"></div>
-          <div id="bingo-actieve-sessies" style="margin-top:4px;"></div>
-        </div>
-
-        <!-- Actief spel -->
-        <div id="bingo-spel" style="display:none;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-            <div>
-              <span id="bingo-sessie-code" style="font-weight:700;font-size:0.9rem;background:#4A9E6E;color:#fff;padding:3px 10px;border-radius:10px;"></span><button onclick="navigator.clipboard?.writeText(document.getElementById('bingo-sessie-code').dataset.code||'').then(()=>showToast('Code gekopieerd!'))" style="margin-left:8px;padding:3px 10px;background:#4A9E6E;color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:0.72rem;cursor:pointer;">📋 Kopieer</button>
-              <span id="bingo-modus-badge" style="font-size:0.78rem;color:#6B6560;margin-left:8px;"></span>
-            </div>
-            <button onclick="bingoStop()" style="font-size:0.78rem;color:#9A948E;background:none;border:1px solid #ddd;border-radius:10px;padding:4px 10px;cursor:pointer;">✕ Stoppen</button>
-          </div>
-          <div id="bingo-spelers-bar" style="font-size:0.78rem;color:#6B6560;margin-bottom:8px;"></div>
-          <div id="bingo-grid" style="display:grid;gap:5px;margin-bottom:10px;"></div>
-          <div id="bingo-status" style="font-size:0.84rem;color:#4A9E6E;font-weight:700;text-align:center;min-height:20px;"></div>
-        </div>
-
-        <!-- Foto-galerij (alle sessies) -->
-        <div style="margin-top:14px;border-top:1px solid #e0dbd6;padding-top:10px;">
-          <div style="font-size:0.75rem;font-weight:700;color:#6B6560;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">📸 Bewijsfoto's (alle sessies)</div>
+        <p style="font-size:0.84rem;color:#6B6560;margin:0 0 8px;">Eén gedeeld bord voor de hele reis. Spot iets — maak een foto. Wie als eerste 5 op een rij heeft wint! Iedereen ziet elkaars foto's live.</p>
+        <!-- Progress per persoon -->
+        <div id="bingo-progress-bar" style="margin-bottom:10px;"></div>
+        <!-- 5x5 grid -->
+        <div id="bingo-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:10px;"></div>
+        <div id="bingo-status" style="font-size:0.84rem;color:#4A9E6E;font-weight:700;text-align:center;min-height:18px;margin-bottom:6px;"></div>
+        <!-- Foto-galerij -->
+        <div style="margin-top:10px;border-top:1px solid #e0dbd6;padding-top:10px;">
+          <div style="font-size:0.75rem;font-weight:700;color:#6B6560;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">📸 Bewijsfoto's</div>
           <div id="bingo-galerie" style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;"></div>
         </div>
+        <!-- Hidden file input -->
+        <input type="file" id="bingo-foto-input" accept="image/*" capture="environment" style="display:none;" onchange="bingoFotoGekozen(this)">
       </div>
     </div>
 
@@ -1425,6 +1420,23 @@ function renderProfileGrid(){
           <div id="cb-bingo-banner" style="display:none;padding:6px 14px;background:#4A9E6E;color:#fff;border-radius:10px;font-size:0.78rem;font-weight:700;">🎉 BINGO!</div>
         </div>
         <div id="cb-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;"></div>
+      </div>
+    </div>
+
+    <!-- Sudoku dagelijks puzzel -->
+    <div class="uitleg-block" id="game-sudoku">
+      <div class="uitleg-head" onclick="toggleUitleg(this);initSudoku()">
+        <div class="uitleg-title">🔢 Dagelijkse Sudoku</div>
+        <div class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <div id="sudoku-info" style="font-size:0.82rem;color:#6B6560;margin-bottom:10px;"></div>
+        <div id="sudoku-grid" style="display:grid;grid-template-columns:repeat(9,1fr);gap:2px;max-width:324px;margin:0 auto 12px;"></div>
+        <div id="sudoku-status" style="text-align:center;font-size:0.88rem;font-weight:700;color:#4A9E6E;min-height:20px;margin-bottom:8px;"></div>
+        <div style="display:flex;gap:8px;justify-content:center;">
+          <button onclick="checkSudoku()" style="padding:8px 18px;background:#4A9E6E;color:#fff;border:none;border-radius:12px;font-family:inherit;font-size:0.82rem;font-weight:700;cursor:pointer;">✓ Controleer</button>
+          <button onclick="initSudoku(true)" style="padding:8px 14px;background:rgba(10,10,10,0.06);color:#6B6560;border:none;border-radius:12px;font-family:inherit;font-size:0.82rem;cursor:pointer;">↺ Opnieuw</button>
+        </div>
       </div>
     </div>
 
@@ -2158,7 +2170,7 @@ function startBingoNotifListener(){
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'slovenie_bingo_sessions'},payload=>{
       const sess = payload.new;
       if(!sess || !sess.actief) return;
-      if(bingoSessie && bingoSessie.id===sess.id) return;
+      if(bingoGlobalSessie && bingoGlobalSessie.id===sess.id) return;
       const naam = currentUser ? (currentUser.charAt(0).toUpperCase()+currentUser.slice(1)) : 'Iemand';
       stuurBingoNotif(sess.code, naam);
     })
@@ -3490,158 +3502,268 @@ function toggleCollapsibleMap(el, mapId, initFn){
   }
 }
 
-// ── AUTOBINGO U5a ────────────────────────────────────
-const BINGO_ITEMS = [
-  'Koe in de wei','Geel kenteken','Tunnel','Bergtop met sneeuw','Kerk met ui-koepel',
-  'Camper zoals die van ons','Meer / zwemplek','File','Tractor','Sloveens/Oostenrijks bord',
-  'Fietser op de berg','IJssalon','Windmolen','Brug over rivier','Gemzen/marmot-bord',
-  'Tolstation','Zonnepanelen op dak','Wegwerkzaamheden','Stork / ooievaar','Politieauto',
-  'Bootje op het water','Sloep op aanhanger','Sneeuw langs de weg','Wildwaarschuwingsbord',
-  'Caravan','Tankstation','Militair voertuig','Paard in weiland','Boom in bloei','Waterval',
+// ── AUTOBINGO — vakantie-lang gedeeld bord ───────────────
+const BINGO_VAKANTIE_CODE = 'VAKANTIE26';
+const BINGO_ITEMS_25 = [
+  'Koe in de wei','Geel kenteken','Tunnel door de berg','Bergtop met sneeuw','Kerk met ui-koepel',
+  'Camper zoals die van ons','Meer of zwemplek','File','Tractor','Tolstation',
+  'Fietser op de berg','IJssalon','Waterval','Brug over rivier','Marmot of gems gespot',
+  'Politieauto','Zonnepanelen op dak','Wegwerkzaamheden','Bootje op het water','Wildwaarschuwingsbord',
+  'Paard in weiland','Sneeuw langs de weg','Caravan','Stork of ooievaar','Lokaal bier geproefd!',
 ];
-let bingoSessie=null, bingoKaart=[], bingoMarks={}, bingoChannel=null, bingoSpelerNaam='';
 
-function bingoCode(){ return Math.random().toString(36).slice(2,6).toUpperCase(); }
+let bingoGlobalSessie = null, bingoGlobalMarks = {}, bingoChannel = null;
+let bingoHuidigItem = null;
 
 function shuffleArr(a){ const b=[...a]; for(let i=b.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]; } return b; }
 
-async function bingoLaadGalerie(){
+async function initGlobalBingo(){
+  if(!sb) return;
   try{
-    const {data} = await sb.from('slovenie_bingo_marks').select('foto_url,item,speler').not('foto_url','is',null).order('created_at',{ascending:false}).limit(18);
-    const el=document.getElementById('bingo-galerie'); if(!el) return;
-    if(!data?.length){ el.innerHTML='<div style="font-size:0.78rem;color:#9A948E;grid-column:span 3;">Nog geen bewijsfoto\'s.</div>'; return; }
-    el.innerHTML=data.map(r=>`<div title="${r.item} — ${r.speler}"><img src="${r.foto_url}" style="width:100%;height:70px;object-fit:cover;border-radius:7px;" loading="lazy"></div>`).join('');
+    let {data:sess} = await sb.from('slovenie_bingo_sessions').select('*').eq('code',BINGO_VAKANTIE_CODE).maybeSingle();
+    if(!sess){
+      const {data:nieuw} = await sb.from('slovenie_bingo_sessions').insert({code:BINGO_VAKANTIE_CODE,modus:'vakantie',actief:true}).select().single();
+      sess = nieuw;
+    }
+    bingoGlobalSessie = sess;
+    await laadGlobalMarks();
+    renderGlobalBingoGrid();
+    bingoAbonneer(sess.id);
+    bingoLaadGalerie();
+  } catch(e){ renderGlobalBingoGrid(); }
+}
+
+async function laadGlobalMarks(){
+  if(!bingoGlobalSessie) return;
+  try{
+    const {data} = await sb.from('slovenie_bingo_marks').select('*').eq('session_id',bingoGlobalSessie.id);
+    bingoGlobalMarks = {};
+    (data||[]).forEach(m=>{ bingoGlobalMarks[m.item] = m; });
   } catch{}
 }
 
-async function bingoNieuw(){
-  const naam=(currentUser||'').charAt(0).toUpperCase()+(currentUser||'').slice(1);
-  bingoSpelerNaam=naam||prompt('Jouw naam:');
-  if(!bingoSpelerNaam) return;
-  const code=bingoCode();
-  const modus='lijn';
-  try{
-    if(!sb) throw new Error('offline');
-    const {data:sess,error:se}=await sb.from('slovenie_bingo_sessions').insert({code,modus,actief:true}).select().single();
-    if(se) throw se;
-    const kaart=shuffleArr(BINGO_ITEMS).slice(0,16);
-    const {error:pe}=await sb.from('slovenie_bingo_players').insert({session_id:sess.id,naam:bingoSpelerNaam,kaart});
-    if(pe) throw pe;
-    bingoSessie=sess; bingoKaart=kaart; bingoMarks={};
-    document.getElementById('bingo-lobby-status').textContent='';
-    startBingoSpel(sess,kaart);
-  } catch(e){
-    // local fallback — speel zonder Supabase sync
-    const kaart=shuffleArr(BINGO_ITEMS).slice(0,16);
-    const localSess={id:'local-'+code, code, modus, actief:true};
-    bingoSessie=localSess; bingoKaart=kaart; bingoMarks={};
-    document.getElementById('bingo-lobby-status').textContent='';
-    startBingoSpel(localSess,kaart);
-  }
-}
+function renderGlobalBingoGrid(){
+  const grid = document.getElementById('bingo-grid'); if(!grid) return;
+  const prg = document.getElementById('bingo-progress-bar');
+  // Count per person
+  const telling = {};
+  Object.values(bingoGlobalMarks).forEach(m=>{
+    if(m.speler) telling[m.speler] = (telling[m.speler]||0)+1;
+  });
+  // Progress bar
+  const namen = Object.keys(telling).sort((a,b)=>telling[b]-telling[a]);
+  if(prg) prg.innerHTML = namen.length ? namen.map(n=>{
+    const klr = KLEUREN[n]||'#888';
+    const pct = Math.round((telling[n]/25)*100);
+    return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+      <div style="width:22px;height:22px;border-radius:50%;background:${klr};font-size:0.7rem;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;">${n.charAt(0).toUpperCase()}</div>
+      <div style="flex:1;background:#e0dbd6;border-radius:10px;height:8px;overflow:hidden;"><div style="background:${klr};width:${pct}%;height:100%;border-radius:10px;transition:width 0.5s;"></div></div>
+      <div style="font-size:0.7rem;font-weight:700;color:#6B6560;min-width:30px;">${telling[n]}/25</div>
+    </div>`;
+  }).join('') : '<div style="font-size:0.78rem;color:#9A948E;">Nog niemand begonnen — wees de eerste!</div>';
 
-async function bingoJoin(){
-  const code=(document.getElementById('bingo-code-in')?.value||'').trim().toUpperCase();
-  if(!code){ document.getElementById('bingo-lobby-status').textContent='Voer een spelcode in.'; return; }
-  const naam=(currentUser||'').charAt(0).toUpperCase()+(currentUser||'').slice(1);
-  bingoSpelerNaam=naam||prompt('Jouw naam:');
-  if(!bingoSpelerNaam) return;
-  try{
-    const {data:sess,error}=await sb.from('slovenie_bingo_sessions').select().eq('code',code).eq('actief',true).maybeSingle();
-    if(error||!sess){ document.getElementById('bingo-lobby-status').textContent='Spelcode niet gevonden of spel al afgelopen.'; return; }
-    const kaart=shuffleArr(BINGO_ITEMS).slice(0,16);
-    await sb.from('slovenie_bingo_players').insert({session_id:sess.id,naam:bingoSpelerNaam,kaart});
-    const {data:marks}=await sb.from('slovenie_bingo_marks').select('*').eq('session_id',sess.id).eq('speler',bingoSpelerNaam);
-    bingoMarks={}; (marks||[]).forEach(m=>{ bingoMarks[m.item]=m; });
-    bingoSessie=sess; bingoKaart=kaart;
-    startBingoSpel(sess,kaart);
-  } catch{ document.getElementById('bingo-lobby-status').textContent='⚠️ Fout bij het meedoen. Probeer opnieuw.'; }
-}
-
-function startBingoSpel(sess,kaart){
-  document.getElementById('bingo-lobby').style.display='none';
-  document.getElementById('bingo-spel').style.display='block';
-  document.getElementById('bingo-sessie-code').textContent='Code: '+sess.code;
-  document.getElementById('bingo-sessie-code').dataset.code=sess.code;
-  document.getElementById('bingo-modus-badge').textContent='Modus: '+sess.modus;
-  renderBingoGrid(kaart);
-  laadBingoSpelers(sess.id);
-  bingoAbonneer(sess.id);
-}
-
-function renderBingoGrid(kaart){
-  const grid=document.getElementById('bingo-grid'); if(!grid) return;
-  const cols=4;
-  grid.style.gridTemplateColumns=`repeat(${cols},1fr)`;
-  grid.innerHTML=kaart.map(item=>{
-    const m=bingoMarks[item];
-    return `<div class="bingo-cel${m?' gevonden':''}" onclick="bingoTikVakje('${item.replace(/'/,"\\'")}',this)">
-      ${m?.foto_url?`<img src="${m.foto_url}" alt="${item}">`:`<span>${item}</span>`}
+  // Grid
+  grid.innerHTML = BINGO_ITEMS_25.map(item=>{
+    const mark = bingoGlobalMarks[item];
+    const claimed = !!mark;
+    const klr = claimed ? (KLEUREN[mark.speler]||'#4A9E6E') : 'transparent';
+    const initl = claimed ? mark.speler.charAt(0).toUpperCase() : '';
+    return `<div onclick="bingoItemTap('${item.replace(/'/g,"\\'")}',${claimed})" style="position:relative;aspect-ratio:1;border-radius:8px;border:1.5px solid ${claimed?klr:'#ddd'};background:${claimed?klr+'22':'#fff'};cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;text-align:center;overflow:hidden;-webkit-tap-highlight-color:transparent;">
+      ${mark?.foto_url ? `<img src="${mark.foto_url}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.35;border-radius:6px;">` : ''}
+      <div style="position:relative;font-size:0.55rem;font-weight:${claimed?700:500};color:${claimed?klr:'#6B6560'};line-height:1.2;">${item}</div>
+      ${claimed ? `<div style="position:relative;width:18px;height:18px;border-radius:50%;background:${klr};font-size:0.6rem;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;margin-top:2px;">${initl}</div>` : ''}
     </div>`;
   }).join('');
-  controleerBingo(kaart);
+
+  // Check bingo
+  checkGlobalBingo();
 }
 
-async function bingoTikVakje(item,cel){
-  if(bingoMarks[item]) return;
-  const inp=document.createElement('input');
-  inp.type='file'; inp.accept='image/*'; inp.capture='environment';
-  inp.onchange=async()=>{
-    const file=inp.files[0]; if(!file) return;
-    cel.innerHTML='⏳'; cel.classList.add('gevonden');
-    try{
-      const blob=await comprimeerFoto(file);
-      const pad=`slovenie/${bingoSessie.code}/${Date.now()}.jpg`;
-      await sb.storage.from('slovenie-bingo').upload(pad,blob,{contentType:'image/jpeg'});
-      const {data:pub}=sb.storage.from('slovenie-bingo').getPublicUrl(pad);
-      const foto_url=pub.publicUrl;
-      await sb.from('slovenie_bingo_marks').insert({session_id:bingoSessie.id,speler:bingoSpelerNaam,item,foto_url});
-      bingoMarks[item]={foto_url,item,speler:bingoSpelerNaam};
-      cel.innerHTML=`<img src="${foto_url}" alt="${item}">`;
-      voegPuntenToe(bingoSpelerNaam.toLowerCase(),'bingo',1,'Bingo-vakje: '+item);
-    } catch{ cel.classList.remove('gevonden'); cel.innerHTML=`<span>${item}</span>`; }
-  };
-  inp.click();
+function bingoItemTap(item, claimed){
+  if(claimed){
+    const mark = bingoGlobalMarks[item];
+    if(mark?.foto_url) { window.open(mark.foto_url,'_blank'); }
+    return;
+  }
+  if(!currentUser){ showToast('Kies eerst een profiel'); return; }
+  bingoHuidigItem = item;
+  document.getElementById('bingo-foto-input').value='';
+  document.getElementById('bingo-foto-input').click();
 }
 
-function controleerBingo(kaart){
-  const cols=4, gevonden=item=>!!bingoMarks[item];
-  let bingo=false;
-  for(let r=0;r<4;r++){ if([0,1,2,3].every(c=>gevonden(kaart[r*cols+c]))) bingo=true; }
-  for(let c=0;c<4;c++){ if([0,1,2,3].every(r=>gevonden(kaart[r*cols+c]))) bingo=true; }
-  if([0,5,10,15].every(i=>gevonden(kaart[i]))) bingo=true;
-  if([3,6,9,12].every(i=>gevonden(kaart[i]))) bingo=true;
-  const st=document.getElementById('bingo-status');
-  if(st) st.textContent=bingo?'🎉 BINGO! Gefeliciteerd '+bingoSpelerNaam+'!':'';
+async function bingoFotoGekozen(input){
+  const file = input.files[0]; if(!file || !bingoHuidigItem) return;
+  showToast('Foto uploaden…');
+  try{
+    const pad = `slovenie/${BINGO_VAKANTIE_CODE}/${Date.now()}.jpg`;
+    const {error:ue} = await sb.storage.from('slovenie-bingo').upload(pad, file, {contentType:file.type});
+    if(ue) throw ue;
+    const {data:{publicUrl}} = sb.storage.from('slovenie-bingo').getPublicUrl(pad);
+    await sb.from('slovenie_bingo_marks').insert({
+      session_id: bingoGlobalSessie?.id || null,
+      speler: currentUser,
+      item: bingoHuidigItem,
+      foto_url: publicUrl
+    });
+    bingoGlobalMarks[bingoHuidigItem] = {speler:currentUser, item:bingoHuidigItem, foto_url:publicUrl};
+    renderGlobalBingoGrid();
+    bingoLaadGalerie();
+    showToast('✓ ' + bingoHuidigItem + ' gespot!');
+    // gamification
+    try{ await sb.from('slovenie_points').insert({profiel:currentUser,punten:5,omschrijving:'Bingo item: '+bingoHuidigItem}); } catch{}
+    bingoHuidigItem = null;
+  } catch(e){ showToast('Upload mislukt — probeer opnieuw'); }
+}
+
+function checkGlobalBingo(){
+  const status = document.getElementById('bingo-status'); if(!status) return;
+  const telling = {};
+  BINGO_ITEMS_25.forEach((item,i)=>{
+    const mark = bingoGlobalMarks[item];
+    if(mark) telling[mark.speler] = (telling[mark.speler]||[]).concat(i);
+  });
+  // Check 5-in-a-row for 5x5 grid
+  const lijnen = [
+    [0,1,2,3,4],[5,6,7,8,9],[10,11,12,13,14],[15,16,17,18,19],[20,21,22,23,24], // rows
+    [0,5,10,15,20],[1,6,11,16,21],[2,7,12,17,22],[3,8,13,18,23],[4,9,14,19,24], // cols
+    [0,6,12,18,24],[4,8,12,16,20] // diagonals
+  ];
+  const winners = [];
+  Object.keys(telling).forEach(speler=>{
+    const idxs = new Set(telling[speler]);
+    lijnen.forEach(lijn=>{ if(lijn.every(i=>idxs.has(i))) winners.push(speler); });
+  });
+  status.textContent = winners.length ? '🎉 BINGO! ' + winners.map(s=>s.charAt(0).toUpperCase()+s.slice(1)).join(', ') + ' heeft 5 op een rij!' : '';
 }
 
 function bingoAbonneer(sessionId){
   if(!sb) return;
   if(bingoChannel) bingoChannel.unsubscribe();
-  bingoChannel=sb.channel('bingo-'+sessionId)
+  bingoChannel = sb.channel('bingo-'+sessionId)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'slovenie_bingo_marks',filter:`session_id=eq.${sessionId}`},payload=>{
-      const m=payload.new;
-      if(m.speler!==bingoSpelerNaam){ bingoMarks[m.item]=m; renderBingoGrid(bingoKaart); }
-      laadBingoSpelers(sessionId);
+      const m = payload.new;
+      if(!bingoGlobalMarks[m.item]) {
+        bingoGlobalMarks[m.item] = m;
+        renderGlobalBingoGrid();
+        bingoLaadGalerie();
+        if(m.speler !== currentUser) showToast(`${m.speler.charAt(0).toUpperCase()+m.speler.slice(1)} spootte: ${m.item}!`);
+      }
     })
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'slovenie_bingo_players',filter:`session_id=eq.${sessionId}`},()=>{ laadBingoSpelers(sessionId); })
     .subscribe();
 }
 
-async function laadBingoSpelers(sessionId){
+async function bingoLaadGalerie(){
   try{
-    const {data}=await sb.from('slovenie_bingo_players').select('naam').eq('session_id',sessionId);
-    const el=document.getElementById('bingo-spelers-bar');
-    if(el&&data) el.textContent='Spelers: '+data.map(p=>p.naam).join(', ');
+    const sessId = bingoGlobalSessie?.id;
+    let q = sb.from('slovenie_bingo_marks').select('foto_url,item,speler').not('foto_url','is',null).order('created_at',{ascending:false}).limit(18);
+    if(sessId) q = q.eq('session_id',sessId);
+    const {data} = await q;
+    const el = document.getElementById('bingo-galerie'); if(!el) return;
+    const el2 = document.getElementById('g9-galerie');
+    const html = data?.length ? data.map(r=>`<div title="${r.item} — ${r.speler}" onclick="window.open('${r.foto_url}','_blank')"><img src="${r.foto_url}" style="width:100%;height:70px;object-fit:cover;border-radius:7px;cursor:pointer;" loading="lazy"></div>`).join('') : '<div style="font-size:0.78rem;color:#9A948E;grid-column:span 3;">Nog geen bewijsfoto\'s.</div>';
+    if(el) el.innerHTML = html;
+    if(el2) el2.innerHTML = html;
+    const leeg = document.getElementById('g9-galerie-leeg');
+    if(leeg) leeg.style.display = data?.length ? 'none' : 'block';
   } catch{}
 }
 
-function bingoStop(){
-  if(bingoChannel){ bingoChannel.unsubscribe(); bingoChannel=null; }
-  bingoSessie=null; bingoKaart=[]; bingoMarks={};
-  document.getElementById('bingo-lobby').style.display='block';
-  document.getElementById('bingo-spel').style.display='none';
-  bingoLaadGalerie();
+// ── SUDOKU ────────────────────────────────────────────
+// 10 daily puzzles (81 chars, 0=empty). Rotate by day-of-year mod 10.
+const SUDOKU_PUZZLES = [
+  // [puzzle, solution] — both 81-char strings left-to-right, top-to-bottom
+  ['530070000600195000098000060800060003400803001700020006060000280000419005000080079',
+   '534678912672195348198342567859761423426853791713924856961537284287419635345286179'],
+  ['010020300004005060070000008006900070000003040050080600800000030090600800003050009',
+   '416728395234895167975163428186942573729513846358487612841279235597631284623054791'],
+  ['000000907000420180000705026100904000050000040000507009920108000034059000507000000',
+   '462381957359427186817965324138974265256813749694572819925138672743659581571246893'],
+  ['360020089000361000000000000803000602000050000409000501000000000000418000970030014',
+   '364721589852369147179854236813947625726153498469582371548276913231418759971635824'],
+  ['009065430007000800600000095060020501000704000201060040820000007003000600046830900',
+   '189265437437319852625178395768923514953741268214567943892451376371692685546830921'],
+  ['000000000000003085001200000003000600055070900408000020000106800700000040000508070',
+   '987654321246173985531298467823945716655872943498361572169426853372519648714083279'],
+  ['200800000003004000000070600030000500006708400002000090009060000000500800000003007',
+   '245893761873614925196275638937142586516798423482356197759461372321587849684239517'],
+  ['000089006070040900260000000008000000003000010100002340000610709900070080020500000',
+   '314589726178246953265731408859423671743968512196852347432615789951374285627598134'],
+  ['100007090030020008009600500005300900010080002600004000300000010040000007007000300',
+   '162857493534129678789643521475312986918786452623594817356278139841935267297461385'],
+  ['000006000059000008200008000045000000003000600000003040006000075010040000000500100',
+   '431256789759431628286798413148572396573814962927163845694327175315849267862591034'],
+];
+
+let sudokuPuzzel = [], sudokuOplossing = [], sudokuGegeven = [];
+
+function initSudoku(reset=false){
+  const el = document.getElementById('sudoku-grid'); if(!el) return;
+  const info = document.getElementById('sudoku-info');
+  const dagIdx = Math.floor((Date.now() - new Date('2026-07-27').getTime()) / 86400000);
+  const pIdx = ((dagIdx % 10) + 10) % 10;
+  const [puz, opl] = SUDOKU_PUZZLES[pIdx];
+  sudokuOplossing = opl.split('').map(Number);
+  sudokuGegeven = puz.split('').map(Number);
+
+  const opgeslagenKey = `${SK}_sudoku_${new Date().toISOString().slice(0,10)}`;
+  if(!reset){
+    const opgeslagen = JSON.parse(localStorage.getItem(opgeslagenKey)||'null');
+    sudokuPuzzel = opgeslagen || [...sudokuGegeven];
+  } else {
+    sudokuPuzzel = [...sudokuGegeven];
+    localStorage.removeItem(opgeslagenKey);
+  }
+
+  const statusEl = document.getElementById('sudoku-status');
+  if(statusEl) statusEl.textContent = '';
+  if(info) info.textContent = `Puzzel ${pIdx+1} van 10 · Vandaag: ${new Date().toLocaleDateString('nl-NL',{day:'numeric',month:'long'})}`;
+  renderSudokuGrid();
+}
+
+function renderSudokuGrid(){
+  const el = document.getElementById('sudoku-grid'); if(!el) return;
+  el.innerHTML = '';
+  for(let i=0;i<81;i++){
+    const r=Math.floor(i/9), c=i%9;
+    const val = sudokuPuzzel[i];
+    const gegeven = sudokuGegeven[i] !== 0;
+    const borderR = (c===2||c===5) ? '2px solid #0A0A0A' : '1px solid #ddd';
+    const borderB = (r===2||r===5) ? '2px solid #0A0A0A' : '1px solid #ddd';
+    if(gegeven){
+      el.innerHTML += `<div style="width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:clamp(0.7rem,2.5vw,1rem);font-weight:700;color:#0A0A0A;border-right:${borderR};border-bottom:${borderB};background:#f5f0eb;">${val||''}</div>`;
+    } else {
+      el.innerHTML += `<input type="number" min="1" max="9" value="${val||''}" maxlength="1" oninput="sudokuInput(this,${i})" style="width:100%;aspect-ratio:1;border:none;border-right:${borderR};border-bottom:${borderB};text-align:center;font-size:clamp(0.7rem,2.5vw,1rem);font-weight:700;color:#4A9E6E;background:#fff;outline:none;font-family:inherit;-moz-appearance:textfield;appearance:textfield;" inputmode="numeric">`;
+    }
+  }
+}
+
+function sudokuInput(inp, idx){
+  const v = parseInt(inp.value);
+  inp.value = (v>=1&&v<=9) ? v : '';
+  sudokuPuzzel[idx] = (v>=1&&v<=9) ? v : 0;
+  localStorage.setItem(`${SK}_sudoku_${new Date().toISOString().slice(0,10)}`, JSON.stringify(sudokuPuzzel));
+}
+
+function checkSudoku(){
+  const status = document.getElementById('sudoku-status'); if(!status) return;
+  const vol = sudokuPuzzel.every(v=>v!==0);
+  if(!vol){ status.textContent='Puzzel is nog niet volledig ingevuld.'; status.style.color='#c0392b'; return; }
+  const goed = sudokuPuzzel.every((v,i)=>v===sudokuOplossing[i]);
+  if(goed){
+    status.textContent='🎉 Correct! Puzzel opgelost!'; status.style.color='#4A9E6E';
+    try{ sb.from('slovenie_points').insert({profiel:currentUser,punten:20,omschrijving:'Sudoku opgelost!'}); }catch{}
+  } else {
+    status.textContent='❌ Nog niet helemaal goed — zoek de fouten!'; status.style.color='#c0392b';
+    // Highlight errors
+    const inputs = document.getElementById('sudoku-grid').querySelectorAll('input');
+    let inp_idx=0;
+    for(let i=0;i<81;i++){
+      if(sudokuGegeven[i]===0){
+        const inp=inputs[inp_idx++];
+        if(inp) inp.style.color = (sudokuPuzzel[i]===sudokuOplossing[i]) ? '#4A9E6E' : '#c0392b';
+      }
+    }
+  }
 }
 
 // ── SCORELIJST U5b ────────────────────────────────────
@@ -3710,26 +3832,26 @@ async function addScore(gameId){
 
 // ── WEER-LEEDVERMAAK U5h ─────────────────────────────
 const LEED_NIEUWS = [
-  'Het KNMI heeft code geel afgegeven voor onweersbuien boven Utrecht. Gemiddelde temperatuur thuis: 14°C. Jullie: hopelijk 28°C. 😬',
-  'De Nederlanders hebben massaal strandtenten gepakt en zijn naar Zandvoort gereden. Parkeren: vol. Zon: afwezig. Sfeer: "gezellig maar eigenlijk niet".',
-  'Thuisfront update: de grasmaaier staat al 3 weken niet gebruikt. De tuin groeit vrolijk door. Niemand die het erg vindt.',
-  'Treinvertraging op Utrecht Centraal: 38 minuten door "overwegstoring". Commuters staren zwijgend naar het bord. Jullie staren naar een bergmeer.',
-  'Nederland: buien met windstoten tot 60 km/u. De BBQ is al twee keer omgewaaid. Het campingkamp in Biddinghuizen rukte het tentje af.',
-  'Vakantieganger rapporteert: "Het weer is eigenlijk best meevallend" — vervolgens regent het 4 uur lang.',
-  'De Jumbo heeft weer de goedkoopste vliesverpakking maïskolven ingeslagen. Thuis is alles zoals het was. Niets veranderd. Echt niets.',
-  'Schiphol-file: 2,5 uur wachttijd bij de security. 47 man in de rij voor een vliegtuig naar Lanzarote. Jullie zitten al op de bestemming.',
-  'Albert Heijn bezorgd: bestelling morgen. "Helaas niet op dezelfde dag." Ondertussen: jullie drinken Sloveense wijn aan het meer.',
-  'RIVM-meting: luchtkwaliteit Amsterdam "matig". Groene valleien: ook matig, maar dan van schoonheid.',
-  'Lokaal nieuws: nieuwe verkeersdrempel geplaatst in Schalkwijk. Bewoners "niet blij". Jullie: blij, ver weg, op vakantie.',
-  'Alle zwembaden in de buurt vol. Wachtrij 45 minuten voor een glijbaan. Jullie: springen zomaar het meer in.',
-  'Werkmail binnenkomst: "Ter info". Nog 9 e-mails. Allemaal ter info. Niks doen. Jullie doen ook niks — maar veel gezelliger.',
-  'Thuisfront: de wasmachine is klaar. Niemand heeft de was eruit gehaald. Staat er nog. Het zal er nog staan als jullie terug zijn.',
-  'Meteorologen voorspellen "een verfrissende zomer". Vertaald: het regent. Gezellig voor de plantenliefhebbers. Minder voor de rest.',
-  'Update van het thuisfront: de kat zit op het aanrecht. Weet niet waarom. Kijkt ernstig. Jullie foto van gisteren had 47 likes.',
-  'Stadsdeel publiceert plan voor nieuwe parkeerautomaat. Tarief omhoog. Reacties: 134 boze berichten op Facebook. Jullie: onbereikbaar.',
-  'Vakantiekiekje thuisliggend op de bank: 23°C buiten. "Wacht op beter weer." Het beter weer: volgende week. Dan ben je terug op werk.',
-  'Weerbericht: "Morgen kans op zon in de middag." Zon: afwezig. Middag: bewolkt. Weerbericht: optimistisch maar leugenachtig.',
-  'Live: het WK worstelen in Nijmegen. Doelpunt! Nee, wacht — dat is worstelen. Spannend! Jullie worstelen met wie het lekkerste ijsje haalt.',
+  'Hittegolf in Spanje: 43°C in Sevilla. Nederlanders liggen plat op het strand, te moe om te zwemmen.',
+  'File op de A7 bij Mâcon: 47 km. Nederlanders op weg naar de Côte d\'Azur eten smeltend stoplichtsnoep in de auto.',
+  'Franse gendarmerie sluit strand bij Biarritz vanwege de drukte. "Gezellig!" zegt iemand zonder het te menen.',
+  'Costa del Sol update: 38°C in de schaduw. Toeristen kopen derde fles zonnebrand. Parasols: uitverkocht.',
+  'Rome siddert onder 41°C. Nederlanders bij de Trevi-fontein gooien geen munten maar hun hoofd erin.',
+  'Athene kapot van de hitte: 44°C. Lokale gids roept groep op te drinken. Groep heeft al lang gedronken — liefst iets kouds.',
+  'Schiphol-file: 2,5 uur wachttijd bij de security. 47 man in de rij voor een vliegtuig naar Mallorca. Jullie zwemmen al.',
+  'Parijs: 39°C en de metro is een sauna op wielen. Toeristen bewegen in slow-motion richting Louvre dat vol is.',
+  'Barcelona strand bij Barceloneta: 2 cm ruimte per persoon. Nederlander vraagt of dit normaal is. Locals: "Ja."',
+  'Málaga: zelfs de zeagels zitten in de schaduw. Zwembad vol. Ijs uitverkocht. Ventilator kapot. Kustplaats trilt.',
+  'Nice: 37°C. Nederlanders staan in rij voor rosé. Rij duurt 20 minuten. Rosé is lauw. Ze kopen toch een fles.',
+  'Vlucht vertraagd vanwege hitte op het asfalt in Madrid. Passagiers: uitgeput. Piloot: ook. Aire acondicionado in lounge: kapot.',
+  'Treinvertraging Utrecht Centraal: 38 minuten door "warmtedeformatie spoor". Commuters staren zwijgend. Jullie staren naar een bergmeer.',
+  'Update thuisfront: het gras is dood. De tuin ziet eruit als een Spaans binnenland. Niemand die het erg vindt.',
+  'Alle zwembaden in de Randstad vol. Wachtrij 45 minuten voor een glijbaan. Jullie: springen zomaar het meer in.',
+  'Werkmail: "Ter info". Nog 9 e-mails. Allemaal ter info. Jullie doen ook niks — maar veel gezelliger dan op kantoor.',
+  'Wasmachine klaar. Niemand haalt de was eruit. Staat er nog. Zal er nog staan als jullie terug zijn. Was alles zo simpel.',
+  'Weerbericht: "Morgen kans op verkoeling." Verkoeling: 34°C i.p.v. 38°C. Meteoroloog trotser dan hij mag zijn.',
+  'Nederlanders evacueren Provence vanwege bosbrand-rooklucht. Vakantie: omgebood naar Zeeland. Zeeland: bewolkt.',
+  'Live: hitterecord in Venetië gebroken: 42°C. Gondoliers protesteren. Klanten protesteren ook maar betalen toch €120.',
 ];
 async function toonLeedNieuws(){
   const wrap=document.getElementById('leed-nieuws-wrap');
@@ -3753,15 +3875,16 @@ async function toonLeedNieuws(){
 }
 
 const WEER_LOCATIES = [
-  {naam:'Camp Bohinj 🇸🇮',lat:46.2789,lng:13.8377,thuis:false},
+  {naam:'Amsterdam 🇳🇱',lat:52.374,lng:4.890,thuis:true},
+  {naam:'Parijs 🇫🇷',lat:48.853,lng:2.350,thuis:true},
+  {naam:'Madrid 🇪🇸',lat:40.417,lng:-3.704,thuis:true},
+  {naam:'Barcelona 🇪🇸',lat:41.385,lng:2.173,thuis:true},
+  {naam:'Rome 🇮🇹',lat:41.902,lng:12.496,thuis:true},
+  {naam:'Málaga 🇪🇸',lat:36.720,lng:-4.420,thuis:true},
+  {naam:'Athene 🇬🇷',lat:37.979,lng:23.716,thuis:true},
+  {naam:'Nice 🇫🇷',lat:43.710,lng:7.262,thuis:true},
+  {naam:'Camp Bohinj 🇸🇮',lat:46.279,lng:13.838,thuis:false},
   {naam:'Appesbach 🇦🇹',lat:47.742,lng:13.435,thuis:false},
-  {naam:'Bergen 🇳🇴',lat:60.391,lng:5.322,thuis:true},
-  {naam:'Reykjavik 🇮🇸',lat:64.135,lng:-21.895,thuis:true},
-  {naam:'Dublin 🇮🇪',lat:53.349,lng:-6.260,thuis:true},
-  {naam:'Tromsø 🇳🇴',lat:69.650,lng:18.956,thuis:true},
-  {naam:'Brest 🇫🇷',lat:48.390,lng:-4.486,thuis:true},
-  {naam:'Aberdeen 🏴󠁧󠁢󠁳󠁣󠁴󠁿',lat:57.149,lng:-2.099,thuis:true},
-  {naam:'Faroer 🇫🇴',lat:62.011,lng:-6.769,thuis:true},
 ];
 const WEER_CODES={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',61:'🌧️',71:'🌨️',80:'🌦️',85:'🌨️',95:'⛈️',99:'⛈️'};
 let weerGeladen=false;
@@ -3775,21 +3898,29 @@ async function loadWeer(){
       return {...loc, temp:Math.round(d.current.temperature_2m), code:d.current.weathercode};
     }));
     const grid=document.getElementById('weer-grid'); if(!grid) return;
-    grid.innerHTML=results.map(r=>`
-      <div style="background:${r.thuis?'#1A3A2A':'#fff'};border:1.5px solid ${r.thuis?'transparent':'#e0dbd6'};border-radius:10px;padding:10px;text-align:center;">
-        <div style="font-size:1.5rem;">${WEER_CODES[r.code]||'🌡️'}</div>
-        <div style="font-weight:700;font-size:0.82rem;color:${r.thuis?'#E8DDD0':'#0A0A0A'};margin:2px 0;">${r.temp}°C</div>
-        <div style="font-size:0.72rem;color:${r.thuis?'#9AC4A8':'#6B6560'};">${r.naam}</div>
-      </div>`).join('');
-    const thuisGem=results.filter(r=>r.thuis).reduce((s,r)=>s+r.temp,0)/results.filter(r=>r.thuis).length;
-    const hier=results[0].temp;
-    const verschil=Math.max(0,thuisGem-hier);
-    const pct=Math.min(100,verschil*8);
+    grid.innerHTML=results.map(r=>{
+      const tempPrefix = r.temp > 35 ? '🔥' : (r.code===95||r.code===99) ? '⛈️' : r.temp < 15 ? '🥶' : '';
+      const bg = r.thuis ? '#1A3A2A' : '#fff';
+      const border = r.thuis ? 'transparent' : '#e0dbd6';
+      const tempClr = r.thuis ? '#E8DDD0' : '#0A0A0A';
+      const nameClr = r.thuis ? '#9AC4A8' : '#6B6560';
+      return `<div style="background:${bg};border:1.5px solid ${border};border-radius:10px;padding:10px;text-align:center;">
+        <div style="font-size:1.5rem;">${tempPrefix}${WEER_CODES[r.code]||'🌡️'}</div>
+        <div style="font-weight:700;font-size:0.82rem;color:${tempClr};margin:2px 0;">${r.temp}°C</div>
+        <div style="font-size:0.72rem;color:${nameClr};">${r.naam}</div>
+      </div>`;
+    }).join('');
+    const vacHotSpots=results.filter(r=>r.thuis);
+    const onzeKampen=results.filter(r=>!r.thuis);
+    const hotGem=vacHotSpots.reduce((s,r)=>s+r.temp,0)/Math.max(1,vacHotSpots.length);
+    const kamp=onzeKampen.length ? onzeKampen[0].temp : results[results.length-1].temp;
+    const verschil=Math.max(0,hotGem-kamp);
+    const pct=Math.min(100,verschil*6);
     const wrap=document.getElementById('leedmeter-wrap');
     const fill=document.getElementById('leedmeter-fill');
     const tekst=document.getElementById('leedmeter-tekst');
     if(wrap){ wrap.style.display='block'; fill.style.width=pct+'%'; }
-    if(tekst){ tekst.textContent=pct>60?`+${verschil.toFixed(0)}°C warmer dan thuis — genieten! 🎉`:pct>25?`${verschil.toFixed(0)}°C warmer — niet verkeerd!`:'Thuis is het nu ook best prima…'; }
+    if(tekst){ tekst.textContent=pct>60?`Vakantiebestemmingen zijn ${verschil.toFixed(0)}°C warmer — jullie hebben het goed! 🏔️❄️`:pct>25?`${verschil.toFixed(0)}°C koeler dan de vakantie-hotspots — niet slecht!`:'Onze Alpen zijn net zo warm als de rest — de zon pakt overal toe!'; }
     if(st) st.textContent='';
     weerGeladen=true;
   } catch(err){
@@ -3960,6 +4091,22 @@ const ALLE_BADGES = [
 
 let g9Points=[], g9Badges=[], g9Loaded=false;
 
+async function loadTopVandaag(){
+  const el = document.getElementById('g9-top-vandaag'); if(!el) return;
+  try{
+    const vandaag = new Date().toISOString().slice(0,10);
+    const morgen = new Date(Date.now()+86400000).toISOString().slice(0,10);
+    const {data} = await sb.from('slovenie_points').select('profiel,punten').gte('created_at',vandaag).lt('created_at',morgen);
+    if(!data?.length){ el.textContent='Nog geen punten vandaag — speel iets!'; return; }
+    const totalen = {};
+    data.forEach(r=>{ totalen[r.profiel]=(totalen[r.profiel]||0)+r.punten; });
+    const gesorteerd = Object.entries(totalen).sort((a,b)=>b[1]-a[1]);
+    const [winnaar,pts] = gesorteerd[0];
+    const naam = winnaar.charAt(0).toUpperCase()+winnaar.slice(1);
+    el.innerHTML = `<span style="color:${KLEUREN[winnaar]||'#fff'}">🥇 ${naam}</span> — ${pts} pt vandaag`;
+  } catch{ el.textContent='Niet beschikbaar'; }
+}
+
 async function loadG9(force=false){
   if(g9Loaded&&!force) return;
   if(!sb) return;
@@ -3973,6 +4120,7 @@ async function loadG9(force=false){
   } catch{ return; }
   renderG9Scoreboard();
   renderG9Badges();
+  loadTopVandaag();
 }
 
 function renderG9Scoreboard(){
@@ -4291,7 +4439,7 @@ function openGame(id){
       if(head) toggleUitleg(head);
     }
     if(id==='game-vvdg') loadVvdg();
-    if(id==='bingo-block') bingoLaadGalerie();
+    if(id==='bingo-block') initGlobalBingo();
   },120);
 }
 
@@ -4305,7 +4453,7 @@ function startSpellenAutoRefresh(){
     loadKvData();
     loadG9(false);
     loadScoreGames();
-    if(bingoSessie) bingoLaadGalerie();
+    if(bingoGlobalSessie) bingoLaadGalerie();
     const vvdgBody=document.getElementById('vvdg-content');
     if(vvdgBody&&vvdgBody.innerHTML) loadVvdg();
   },30000);
@@ -4313,35 +4461,91 @@ function startSpellenAutoRefresh(){
 
 // ── VRAAG VAN DE DAG (VVDG) ───────────────────────────
 const VVDG=[
-  // pre-vakantie (20–26 juli)
-  {id:'v01',dag:'2026-07-20',vraag:'Welk vakantiesnack neem jij als eerste mee de grens over?',type:'open'},
-  {id:'v02',dag:'2026-07-21',vraag:'Wat verwacht jij het meest te missen van thuis?',type:'open'},
-  {id:'v03',dag:'2026-07-22',vraag:'Geef jezelf een vakantie-superkracht — wat is die?',type:'open'},
-  {id:'v04',dag:'2026-07-23',vraag:'Wat is jouw geheime campingtruc die niemand kent?',type:'open'},
-  {id:'v05',dag:'2026-07-24',vraag:'Hoe lang houd jij het vol zonder wifi voor je gek wordt?',type:'keuze',opties:['< 1 uur','1–4 uur','Een dag','Geen probleem — digitale detox!']},
-  {id:'v06',dag:'2026-07-25',vraag:'Wie van de groep sliep het langst uit op de laatste vakantie?',type:'stemmen'},
-  {id:'v07',dag:'2026-07-26',vraag:'Twee waarheden, één leugen — over jezelf. Post ze!',type:'open'},
+  // pre-vakantie vanaf 2026-05-25
+  {id:'v01',dag:'2026-05-25',vraag:'Wie van de groep staat altijd als eerste op?',type:'stemmen'},
+  {id:'v02',dag:'2026-05-26',vraag:'Wie vergeet het vaakst zijn zonnebril?',type:'stemmen'},
+  {id:'v03',dag:'2026-05-27',vraag:'Wie neemt de meeste foto\'s op vakantie?',type:'stemmen'},
+  {id:'v04',dag:'2026-05-28',vraag:'Wie is het moeilijkst wakker te krijgen?',type:'stemmen'},
+  {id:'v05',dag:'2026-05-29',vraag:'Wie klaagt als eerste over vermoeidheid?',type:'stemmen'},
+  {id:'v06',dag:'2026-05-30',vraag:'Wie bestelt het meest exotisch eten?',type:'stemmen'},
+  {id:'v07',dag:'2026-05-31',vraag:'Wie is het beste in kaartlezen?',type:'stemmen'},
+  {id:'v08',dag:'2026-06-01',vraag:'Wie eet de meeste snacks onderweg?',type:'stemmen'},
+  {id:'v09',dag:'2026-06-02',vraag:'Wie zegt als eerste "zijn we er al bijna?"',type:'stemmen'},
+  {id:'v10',dag:'2026-06-03',vraag:'Wie is de kampioenkoukleum van de groep?',type:'stemmen'},
+  {id:'v11',dag:'2026-06-04',vraag:'Wie pakt als laatste zijn rugzak?',type:'stemmen'},
+  {id:'v12',dag:'2026-06-05',vraag:'Wie eet als eerste zijn lunchpakket op?',type:'stemmen'},
+  {id:'v13',dag:'2026-06-06',vraag:'Wie heeft de meeste kledingstukken mee?',type:'stemmen'},
+  {id:'v14',dag:'2026-06-07',vraag:'Wie maakt het eerste een selfie aan het meer?',type:'stemmen'},
+  {id:'v15',dag:'2026-06-08',vraag:'Wie protesteert het meest tegen vroeg opstaan?',type:'stemmen'},
+  {id:'v16',dag:'2026-06-09',vraag:'Wie zingt mee met de radio in de auto?',type:'stemmen'},
+  {id:'v17',dag:'2026-06-10',vraag:'Wie weet het meeste over lokale gerechten?',type:'stemmen'},
+  {id:'v18',dag:'2026-06-11',vraag:'Wie slaapt het snelst in de auto?',type:'stemmen'},
+  {id:'v19',dag:'2026-06-12',vraag:'Wie vindt altijd het goedkoopste restaurant?',type:'stemmen'},
+  {id:'v20',dag:'2026-06-13',vraag:'Wie heeft de meeste pleisters nodig?',type:'stemmen'},
+  {id:'v21',dag:'2026-06-14',vraag:'Wie is de "safety first" van de groep?',type:'stemmen'},
+  {id:'v22',dag:'2026-06-15',vraag:'Wie durft het hoogste te klimmen?',type:'stemmen'},
+  {id:'v23',dag:'2026-06-16',vraag:'Wie is als eerste wagenziek?',type:'stemmen'},
+  {id:'v24',dag:'2026-06-17',vraag:'Wie durft als eerste het koude bergwater in?',type:'stemmen'},
+  {id:'v25',dag:'2026-06-18',vraag:'Wie heeft thuis de planten water gegeven voor vertrek?',type:'stemmen'},
+  {id:'v26',dag:'2026-06-19',vraag:'Wie vergeet altijd zijn tandenborstel in te pakken?',type:'stemmen'},
+  {id:'v27',dag:'2026-06-20',vraag:'Wie is de beste zwemmer van de groep?',type:'stemmen'},
+  {id:'v28',dag:'2026-06-21',vraag:'Wie moppert het meest over de warmte?',type:'stemmen'},
+  {id:'v29',dag:'2026-06-22',vraag:'Wie is het meest avontuurlijk?',type:'stemmen'},
+  {id:'v30',dag:'2026-06-23',vraag:'Wie rent het hardst naar het ijsje?',type:'stemmen'},
+  {id:'v31',dag:'2026-06-24',vraag:'Wie heeft de meest creatieve verpakking voor het koffiemoment?',type:'stemmen'},
+  {id:'v32',dag:'2026-06-25',vraag:'Wie zou overleven als kampeerleider in de wildernis?',type:'stemmen'},
+  {id:'v33',dag:'2026-06-26',vraag:'Wie is het meest romantisch ingesteld?',type:'stemmen'},
+  {id:'v34',dag:'2026-06-27',vraag:'Wie heeft altijd als eerste honger?',type:'stemmen'},
+  {id:'v35',dag:'2026-06-28',vraag:'Wie mist het meest zijn eigen bed?',type:'stemmen'},
+  {id:'v36',dag:'2026-06-29',vraag:'Wie heeft de meeste apps op zijn telefoon?',type:'stemmen'},
+  {id:'v37',dag:'2026-06-30',vraag:'Wie is de beste navigator?',type:'stemmen'},
+  {id:'v38',dag:'2026-07-01',vraag:'Wie slaapt met zijn mond open?',type:'stemmen'},
+  {id:'v39',dag:'2026-07-02',vraag:'Wie tankt altijd op het allerlaatste moment?',type:'stemmen'},
+  {id:'v40',dag:'2026-07-03',vraag:'Wie is de beste kok van de groep?',type:'stemmen'},
+  {id:'v41',dag:'2026-07-04',vraag:'Welk kamp ga jij het meest waarderen — Bohinj of Appesbach?',type:'keuze',opties:['Bohinj — emeraldgroen meer!','Appesbach — Wolfgangsee!','Beide even geweldig','Vraag me als we er geweest zijn']},
+  {id:'v42',dag:'2026-07-05',vraag:'Wie heeft altijd een reden om niet te wandelen?',type:'stemmen'},
+  {id:'v43',dag:'2026-07-06',vraag:'Wie koopt het meeste souvenirs?',type:'stemmen'},
+  {id:'v44',dag:'2026-07-07',vraag:'Wie vraagt onderweg het vaakst om een tussenstop?',type:'stemmen'},
+  {id:'v45',dag:'2026-07-08',vraag:'Wie is het meest zenuwachtig voor de thuisreis?',type:'stemmen'},
+  {id:'v46',dag:'2026-07-09',vraag:'Wie durft als eerste de lokale specialiteit te proeven?',type:'stemmen'},
+  {id:'v47',dag:'2026-07-10',vraag:'Bestaat de perfecte vakantie uit meer & zon & niets doen, of wandelen & actief & avontuur?',type:'keuze',opties:['Meer, zon, niets doen','Wandelen, actief, avontuur','Half-half','Hangmat met een boek']},
+  {id:'v48',dag:'2026-07-11',vraag:'Wie klaagt het meest over het weer?',type:'stemmen'},
+  {id:'v49',dag:'2026-07-12',vraag:'Wie is de vroegste vogel van de groep?',type:'stemmen'},
+  {id:'v50',dag:'2026-07-13',vraag:'Wie neemt het meeste bagage mee?',type:'stemmen'},
+  {id:'v51',dag:'2026-07-14',vraag:'Wie heeft het minste bagage mee?',type:'stemmen'},
+  {id:'v52',dag:'2026-07-15',vraag:'Wie is de beste verhalenverteller?',type:'stemmen'},
+  {id:'v53',dag:'2026-07-16',vraag:'Wie van de groep lacht het luidst?',type:'stemmen'},
+  {id:'v54',dag:'2026-07-17',vraag:'Wie stelt het meeste vragen aan locals?',type:'stemmen'},
+  {id:'v55',dag:'2026-07-18',vraag:'Wie geeft het meeste fooi?',type:'stemmen'},
+  {id:'v56',dag:'2026-07-19',vraag:'Wie is de handigste knutselaar/reparateur onderweg?',type:'stemmen'},
+  {id:'v57',dag:'2026-07-20',vraag:'Welk vakantiesnack neem jij als eerste mee de grens over?',type:'open'},
+  {id:'v58',dag:'2026-07-21',vraag:'Wat verwacht jij het meest te missen van thuis?',type:'open'},
+  {id:'v59',dag:'2026-07-22',vraag:'Wie van de groep pakt altijd de meeste zonnebrandcrème in?',type:'stemmen'},
+  {id:'v60',dag:'2026-07-23',vraag:'Wat is jouw geheime campingtruc die niemand kent?',type:'open'},
+  {id:'v61',dag:'2026-07-24',vraag:'Hoe lang houd jij het vol zonder wifi voor je gek wordt?',type:'keuze',opties:['< 1 uur','1–4 uur','Een dag','Geen probleem — digitale detox!']},
+  {id:'v62',dag:'2026-07-25',vraag:'Wie van de groep sliep het langst uit op de laatste vakantie?',type:'stemmen'},
+  {id:'v63',dag:'2026-07-26',vraag:'Twee waarheden, één leugen — over jezelf. Post ze!',type:'open'},
   // vakantiedagen Slovenië (27 juli – 4 aug)
-  {id:'v08',dag:'2026-07-27',vraag:'Eerste indruk Bohinj — wat zeg je in één woord?',type:'open'},
-  {id:'v09',dag:'2026-07-28',vraag:'Wat was het hoogtepunt van dag 1?',type:'open'},
-  {id:'v10',dag:'2026-07-29',vraag:'Meest memorabele moment op het meer tot nu toe?',type:'open'},
-  {id:'v11',dag:'2026-07-30',vraag:'Wie duikt het koudste water in zonder schreeuwen?',type:'stemmen'},
-  {id:'v12',dag:'2026-07-31',vraag:'Kies: wandelen óf liggen aan het meer?',type:'keuze',opties:['Wandelen — hoe verder hoe beter','Liggen aan het meer','Half-half','Liggen maar zeggen dat ik ga wandelen']},
-  {id:'v13',dag:'2026-08-01',vraag:'Wat is het beste Sloveense eten dat je hebt geproefd?',type:'open'},
-  {id:'v14',dag:'2026-08-02',vraag:'Wie is de meest relaxte vakantieganger tot nu toe?',type:'stemmen'},
-  {id:'v15',dag:'2026-08-03',vraag:'Beschrijf Slovenië in drie woorden',type:'open'},
-  {id:'v16',dag:'2026-08-04',vraag:'Wat ga jij missen van Bohinj als we morgen vertrekken?',type:'open'},
+  {id:'v64',dag:'2026-07-27',vraag:'Eerste indruk Bohinj — wat zeg je in één woord?',type:'open'},
+  {id:'v65',dag:'2026-07-28',vraag:'Wat was het hoogtepunt van dag 1?',type:'open'},
+  {id:'v66',dag:'2026-07-29',vraag:'Meest memorabele moment op het meer tot nu toe?',type:'open'},
+  {id:'v67',dag:'2026-07-30',vraag:'Wie duikt het koudste water in zonder schreeuwen?',type:'stemmen'},
+  {id:'v68',dag:'2026-07-31',vraag:'Kies: wandelen óf liggen aan het meer?',type:'keuze',opties:['Wandelen — hoe verder hoe beter','Liggen aan het meer','Half-half','Liggen maar zeggen dat ik ga wandelen']},
+  {id:'v69',dag:'2026-08-01',vraag:'Wat is het beste Sloveense eten dat je hebt geproefd?',type:'open'},
+  {id:'v70',dag:'2026-08-02',vraag:'Wie is de meest relaxte vakantieganger tot nu toe?',type:'stemmen'},
+  {id:'v71',dag:'2026-08-03',vraag:'Beschrijf Slovenië in drie woorden',type:'open'},
+  {id:'v72',dag:'2026-08-04',vraag:'Welk moment van vandaag ga jij nooit vergeten?',type:'open'},
   // vakantiedagen Oostenrijk (5–14 aug)
-  {id:'v17',dag:'2026-08-05',vraag:'Eerste indruk Wolfgangsee — beter of anders dan verwacht?',type:'keuze',opties:['Nog mooier dan verwacht','Anders maar ook geweldig','Vergelijkbaar met Bohinj','Bohinj was toch beter']},
-  {id:'v18',dag:'2026-08-06',vraag:'Wat is het meest Oostenrijkse ding dat je vandaag hebt gezien?',type:'open'},
-  {id:'v19',dag:'2026-08-07',vraag:'Wie haalt de meeste platte steentjes bij het keilen?',type:'stemmen'},
-  {id:'v20',dag:'2026-08-08',vraag:'Favoriete activiteit tot nu toe van de hele reis?',type:'open'},
-  {id:'v21',dag:'2026-08-09',vraag:'Appesbach-leven: hoe beoordeel je het campingcomfort?',type:'keuze',opties:['5 sterren — verwend!','Goed genoeg voor mij','Kan beter','Ik mis de bungalow']},
-  {id:'v22',dag:'2026-08-10',vraag:'Wie heeft de meest epische actie van de vakantie gedaan?',type:'stemmen'},
-  {id:'v23',dag:'2026-08-11',vraag:'Wat ga je als eerste doen als je thuis bent?',type:'open'},
-  {id:'v24',dag:'2026-08-12',vraag:'Perseïden-meteorenregen vanavond — wensen tellen! Hoeveel zie jij er?',type:'open'},
-  {id:'v25',dag:'2026-08-13',vraag:'Wat was de grappigste blunder van de vakantie?',type:'open'},
-  {id:'v26',dag:'2026-08-14',vraag:'Laatste dag. Geef de vakantie een rapportcijfer 1–10 en waarom.',type:'open'},
+  {id:'v73',dag:'2026-08-05',vraag:'Eerste indruk Wolfgangsee — beter of anders dan verwacht?',type:'keuze',opties:['Nog mooier dan verwacht','Anders maar ook geweldig','Vergelijkbaar met Bohinj','Bohinj was toch beter']},
+  {id:'v74',dag:'2026-08-06',vraag:'Welk kamp was beter: Bohinj of Appesbach?',type:'keuze',opties:['Bohinj — emerald en wild','Appesbach — idyllisch en rustig','Allebei perfect op hun manier','Ik kies ze allebei!']},
+  {id:'v75',dag:'2026-08-07',vraag:'Wie haalt de meeste platte steentjes bij het keilen?',type:'stemmen'},
+  {id:'v76',dag:'2026-08-08',vraag:'Favoriete activiteit tot nu toe van de hele reis?',type:'open'},
+  {id:'v77',dag:'2026-08-09',vraag:'Roeiboot naar het eiland: romantisch of sloopwerk?',type:'keuze',opties:['Super romantisch!','Lekker sportief','Mijn armen doen pijn','Wij roeiden de verkeerde kant op']},
+  {id:'v78',dag:'2026-08-10',vraag:'Wie heeft de meest epische actie van de vakantie gedaan?',type:'stemmen'},
+  {id:'v79',dag:'2026-08-11',vraag:'Wat ga je als eerste doen als je thuis bent?',type:'open'},
+  {id:'v80',dag:'2026-08-12',vraag:'Perseïden-meteorenregen vanavond — wensen tellen! Hoeveel zie jij er?',type:'open'},
+  {id:'v81',dag:'2026-08-13',vraag:'Wat was de grappigste blunder van de vakantie?',type:'open'},
+  {id:'v82',dag:'2026-08-14',vraag:'Laatste dag. Geef de vakantie een rapportcijfer 1–10 en waarom.',type:'open'},
 ];
 
 function vvdgVandaag(){
