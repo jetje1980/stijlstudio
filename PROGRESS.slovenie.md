@@ -48,6 +48,8 @@
 | 2026-05-25 | U9c | ✅ | 19 dagelijkse uitdagingen (27 jul–14 aug), streak-teller, +3 pt bij volbracht | slovenie.html |
 | 2026-05-25 | U9d | ✅ | Hall of Fame: bingo-bewijsfoto's in 3-koloms grid (max 30, nieuwste boven) | slovenie.html |
 | 2026-05-25 | U9e | ✅ | Supabase: slovenie_points + _badges + _daily_done + RLS; puntenintegratie quiz/bingo/recept | slovenie.html, Supabase |
+| 2026-05-25 | U2-1 | ✅ | Appesbach: activiteiten (4 niveaus), zwemmen (Wolfgangsee), eten (Seecafé/Rössl/Zauner) collapsibles in Info-tab | slovenie.html |
+| 2026-05-25 | U2f | ✅ | 9 🟫 bruine markers op Appesbach-kaart (St. Wolfgang, Schafbergbahn, boot, Zwölferhorn, Postalm, Bad Ischl, Hallstatt, Dachstein, Salzburg) | slovenie.html |
 
 ## Datamodel U7 (aangemaakt in Supabase, project osuqtfsxmquwqsbgzlqn)
 
@@ -87,7 +89,7 @@
 | 1 | U7 | ✅ | Storage-fundament Supabase — klaar |
 | 2 | U3 | ✅ | Vertaaltool + gedeelde recepten + dag-maaltijden + camping-kaarten |
 | 3 | U5 | ✅ | Autospellen, bingo + foto's, kampvuurverhaal, waterspellen, weer-leedvermaak |
-| 4 | U2 | ⬜ | Oostenrijk Appesbach: activiteiten + afstanden + kaart + 🟫-markerlaag |
+| 4 | U2 | ✅ | Oostenrijk Appesbach: activiteiten + afstanden + kaart + 🟫-markerlaag |
 | 5 | U4 | ⬜ | Huttentochten Bohinj (1/2 nachten, splitsing, hutten/parkeren/afstand) |
 | 6 | U6 | ✅ | Quiz Slovenië & Oostenrijk (🟢/🔴 + meerkeuze A/B/C, koppelt aan scorelijst) |
 | 7 | U9 | ✅ | Gamification: totaalscore + gezin-vs-gezin, badges, dagelijkse uitdaging, foto-galerij |
