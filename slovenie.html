@@ -316,6 +316,25 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
 
 /* swipe dist pill */
 .card-dist{font-size:0.68rem;color:#9A948E;margin-top:5px;line-height:1.3;}
+
+/* U1 ter-plekke items */
+.u1-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid rgba(10,10,10,0.06);}
+.u1-item:last-child{border-bottom:none;}
+.u1-icon{font-size:1.05rem;flex-shrink:0;width:22px;text-align:center;padding-top:1px;}
+.u1-naam{font-size:0.88rem;font-weight:700;color:#0A0A0A;}
+.u1-desc{font-size:0.74rem;color:#6B6560;margin-top:2px;line-height:1.4;}
+.u1-afst{font-size:0.68rem;color:#4A9E6E;font-weight:600;margin-top:3px;}
+.u1-nivel{display:inline-block;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;border-radius:6px;padding:2px 7px;margin:10px 0 4px;}
+.nivel-easy{background:rgba(74,158,110,0.12);color:#2E7A4E;}
+.nivel-mid{background:rgba(232,168,56,0.14);color:#7A5200;}
+.nivel-hard{background:rgba(192,57,43,0.1);color:#c0392b;}
+.nivel-dag{background:rgba(74,124,196,0.12);color:#2E508A;}
+#bohinj-map{width:100%;height:260px;border-radius:var(--r-lg);z-index:0;margin-bottom:8px;}
+.bohinj-afst-list{margin-top:8px;}
+.bohinj-afst-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(10,10,10,0.05);font-size:0.78rem;}
+.bohinj-afst-row:last-child{border-bottom:none;}
+.bohinj-afst-row span:first-child{color:#0A0A0A;}
+.bohinj-afst-row span:last-child{color:#4A9E6E;font-weight:600;}
 </style>
 </head>
 <body>
@@ -787,6 +806,228 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
       </div>
     </div>
     <div style="height:6px;"></div>
+
+    <!-- U1e: KAMPKAART -->
+    <div class="collapsible" onclick="toggleCollapsibleMap(this,'bohinj-map',initBohinjMap)">
+      <div class="collapsible-head">
+        <div class="collapsible-title">🗺️ Kaart van de camping & omgeving</div>
+        <div class="collapsible-arrow">▼</div>
+      </div>
+      <div class="collapsible-body">
+        <div id="bohinj-map"></div>
+        <a href="https://www.google.com/maps/search/?api=1&query=46.2789,13.8377" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;color:#4A9E6E;font-weight:700;text-decoration:none;border:1.5px solid rgba(74,158,110,0.4);border-radius:16px;padding:6px 14px;margin-bottom:10px;">
+          📍 Open Camp Bohinj in Google Maps
+        </a>
+        <a href="https://www.camp-bohinj.si/" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;color:#6B6560;font-weight:700;text-decoration:none;border:1.5px solid rgba(10,10,10,0.15);border-radius:16px;padding:6px 14px;margin-bottom:10px;margin-left:8px;">
+          🏕️ Campingplattegrond (site)
+        </a>
+        <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#9A948E;margin:8px 0 4px;">Afstanden vanaf camp (bij benadering)</div>
+        <div class="bohinj-afst-list">
+          <div class="bohinj-afst-row"><span>🚶 Savica-waterval</span><span>ca. 4 km / 45 min</span></div>
+          <div class="bohinj-afst-row"><span>🚶 Vogel kabelbaan</span><span>ca. 1,5 km / 20 min</span></div>
+          <div class="bohinj-afst-row"><span>🚗 Mostnica-kloof</span><span>ca. 9 km / 15 min</span></div>
+          <div class="bohinj-afst-row"><span>🚗 Gostilna Mihovc</span><span>ca. 9 km / 15 min</span></div>
+          <div class="bohinj-afst-row"><span>🚗 Strand Ribčev Laz</span><span>ca. 5 km / 8 min</span></div>
+          <div class="bohinj-afst-row"><span>🚗 Srednja vas (restaurants)</span><span>ca. 12 km / 18 min</span></div>
+          <div class="bohinj-afst-row"><span>🚗 Meer van Bled</span><span>ca. 30 km / 40 min</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- U1a: WANDELINGEN -->
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+      <div class="collapsible-head">
+        <div class="collapsible-title">🥾 Wandelingen & hikes</div>
+        <div class="collapsible-arrow">▼</div>
+      </div>
+      <div class="collapsible-body">
+        <div class="u1-nivel nivel-easy">Makkelijk & gezinsproof</div>
+        <div class="u1-item">
+          <div class="u1-icon">🌿</div>
+          <div>
+            <div class="u1-naam">Mostnica-kloof (Korita Mostnice)</div>
+            <div class="u1-desc">Vanaf Stara Fužina / Hudičev most. ±1,5 u retour, smaragdgroene poeltjes, olifant-rots "Slonček". Door te trekken via Voje-vallei naar Slap Mostnica (21 m).</div>
+            <div class="u1-afst">🚗 ca. 9 km vanaf camp</div>
+          </div>
+        </div>
+        <div class="u1-item">
+          <div class="u1-icon">💧</div>
+          <div>
+            <div class="u1-naam">Savica-waterval (Slap Savica)</div>
+            <div class="u1-desc">Vanaf Ukanc &lt;1 u lopen naar parkeerplaats, dan steile trap omhoog naar de 78 m hoge A-vormige val. Ga vroeg — meest bezochte val van Slovenië.</div>
+            <div class="u1-afst">🚶 ca. 4 km vanaf camp</div>
+          </div>
+        </div>
+        <div class="u1-item">
+          <div class="u1-icon">🚲</div>
+          <div>
+            <div class="u1-naam">Rondje Lake Bohinj (±12 km, vlak)</div>
+            <div class="u1-desc">Wandelen of fietsen met zwemstops. Vlak pad om het hele meer — combineer met een picknick of dip.</div>
+            <div class="u1-afst">🚶 start bij camp</div>
+          </div>
+        </div>
+        <div class="u1-item">
+          <div class="u1-icon">🚡</div>
+          <div>
+            <div class="u1-naam">Vogel-kabelbaan naar 1535 m</div>
+            <div class="u1-desc">Per gondel omhoog + panoramische graatwandelingen 2–4 u. Lage inspanning, veel beloning — koffie met alpenuitzicht boven.</div>
+            <div class="u1-afst">🚶 ca. 1,5 km vanaf camp</div>
+          </div>
+        </div>
+
+        <div class="u1-nivel nivel-mid">Gemiddeld, mooi uitzicht</div>
+        <div class="u1-item">
+          <div class="u1-icon">⛰️</div>
+          <div>
+            <div class="u1-naam">Vogar of Peč uitzichtpunten</div>
+            <div class="u1-desc">Stevig klimmetje boven het meer — groots panorama over Bohinj en de Julische Alpen.</div>
+            <div class="u1-afst">🚗 ca. 9 km tot startpunt</div>
+          </div>
+        </div>
+
+        <div class="u1-nivel nivel-hard">Voor de fanatieke tieners</div>
+        <div class="u1-item">
+          <div class="u1-icon">🏔️</div>
+          <div>
+            <div class="u1-naam">Pršivec (1761 m)</div>
+            <div class="u1-desc">De berg pal boven de noordoever — schitterend panorama over het meer en Triglav NP.</div>
+            <div class="u1-afst">🚗 ca. 9–10 km tot startpunt</div>
+          </div>
+        </div>
+
+        <div class="u1-nivel nivel-dag">Grote dagtocht (ervaren hikers)</div>
+        <div class="u1-item">
+          <div class="u1-icon">🗻</div>
+          <div>
+            <div class="u1-naam">Savica → Komarča → Črno jezero → Vallei van de Zeven Meren</div>
+            <div class="u1-desc">Hele dag, goede wandelschoenen + vroeg weg. Via Komarča-wand naar het Zwart Meer en de Dolina Triglavskih jezer.</div>
+            <div class="u1-afst">🚗 start ca. 4 km (Savica parkeerplaats)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- U1b: ZWEMMEN -->
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+      <div class="collapsible-head">
+        <div class="collapsible-title">🏊 Zwemmen & water</div>
+        <div class="collapsible-arrow">▼</div>
+      </div>
+      <div class="collapsible-body">
+        <div class="u1-item">
+          <div class="u1-icon">🏕️</div>
+          <div>
+            <div class="u1-naam">Eigen strand Camp Bohinj (Ukanc)</div>
+            <div class="u1-desc">Helder gletsjerwater — fris maar zwembaar in de zomer.</div>
+            <div class="u1-afst">🚶 op campingterrein</div>
+          </div>
+        </div>
+        <div class="u1-item">
+          <div class="u1-icon">🏄</div>
+          <div>
+            <div class="u1-naam">SUP / kajak / kano-verhuur (PAC Sports)</div>
+            <div class="u1-desc">Direct op het terrein. Tip: SUP bij zonsopkomst of -ondergang als het meer spiegelglad is.</div>
+            <div class="u1-afst">🚶 op campingterrein</div>
+          </div>
+        </div>
+        <div class="u1-item">
+          <div class="u1-icon">🏖️</div>
+          <div>
+            <div class="u1-naam">Fužinski zaliv & strand Ribčev Laz</div>
+            <div class="u1-desc">Alternatieve zwemplekken aan het oostpunt van het meer — iets drukker maar fijn.</div>
+            <div class="u1-afst">🚗 ca. 5 km</div>
+          </div>
+        </div>
+        <div class="u1-item">
+          <div class="u1-icon">🥶</div>
+          <div>
+            <div class="u1-naam">Duik in de Mostnica-kloof poeltjes</div>
+            <div class="u1-desc">Voor de durfals — een snelle koude duik in de smaragdgroene bergpoeltjes.</div>
+            <div class="u1-afst">🚗 ca. 9 km</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- U1c: RESTAURANTS -->
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+      <div class="collapsible-head">
+        <div class="collapsible-title">🍽️ Restaurants & lokale keuken</div>
+        <div class="collapsible-arrow">▼</div>
+      </div>
+      <div class="collapsible-body">
+        <div class="info-row" style="padding:8px 0;"><div class="info-icon">⚠️</div><div style="flex:1;"><div class="info-val" style="font-size:0.78rem;">Voor diner <strong>vóór 20:00 aankomen</strong> en in de zomer <strong>reserveren</strong>.</div></div></div>
+        <div class="u1-item">
+          <div class="u1-icon">🍴</div>
+          <div>
+            <div class="u1-naam">Gostilna Mihovc — Stara Fužina</div>
+            <div class="u1-desc">Familiebedrijf &gt;100 jaar. Rundsoep, žlikrofi (Bohinj-knoedels), forel, wild, huisgemaakte desserts. <strong>Ma gesloten — reserveren!</strong></div>
+            <div class="u1-afst">🚗 ca. 9 km</div>
+          </div>
+        </div>
+        <div class="u1-item">
+          <div class="u1-icon">🍴</div>
+          <div>
+            <div class="u1-naam">Gostilna Rupa — Srednja vas</div>
+            <div class="u1-desc">Bekroonde familie-gostilna. Jota, gebraad, wild, schnitzels, vallei-uitzicht. Open ±08:00–22:00.</div>
+            <div class="u1-afst">🚗 ca. 12 km</div>
+          </div>
+        </div>
+        <div class="u1-item">
+          <div class="u1-icon">🍴</div>
+          <div>
+            <div class="u1-naam">Gostilna pri Hrvatu — Srednja vas</div>
+            <div class="u1-desc">Terras aan de rivier, lokale forel, kalfsmedaillons, huisgemaakte taarten.</div>
+            <div class="u1-afst">🚗 ca. 12 km</div>
+          </div>
+        </div>
+        <div class="u1-item">
+          <div class="u1-icon">🍕</div>
+          <div>
+            <div class="u1-naam">Pizzeria Ema — Srednja vas</div>
+            <div class="u1-desc">Grote pizza's met bergzicht — de casual avond met de kids.</div>
+            <div class="u1-afst">🚗 ca. 12 km</div>
+          </div>
+        </div>
+        <div class="u1-item">
+          <div class="u1-icon">🔥</div>
+          <div>
+            <div class="u1-naam">Gostišče Pod Skalco — Ribčev Laz</div>
+            <div class="u1-desc">Informele grill onder een 200 m hoge rotswand, aan de weg richting Ukanc.</div>
+            <div class="u1-afst">🚗 ca. 5 km</div>
+          </div>
+        </div>
+        <div class="u1-item">
+          <div class="u1-icon">🧀</div>
+          <div>
+            <div class="u1-naam">Proeven — lokale specialiteiten</div>
+            <div class="u1-desc">Bohinjski sir & Mohant (pittige beschermde kaas) · žlikrofi · jota · ričet (gerstestoof) · verse forel · kremšnita (bij Bled). Planšarski muzej in Stara Fužina voor kaas kopen.</div>
+            <div class="u1-afst">🚗 museum: ca. 9 km</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- U1d: SPELLEN -->
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+      <div class="collapsible-head">
+        <div class="collapsible-title">🎲 Spellen & quizzen</div>
+        <div class="collapsible-arrow">▼</div>
+      </div>
+      <div class="collapsible-body">
+        <div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:#4A9E6E;font-weight:700;padding:4px 0 8px;">🚐 Onderweg in de camper</div>
+        <div style="font-size:0.82rem;color:#0A0A0A;line-height:1.8;">
+          30 Seconds · Stadje-land-rivier · Kenteken-bingo · "Ik ga op vakantie en neem mee" · 20 vragen · Muziekquiz (raad het nummer) · Dobble
+        </div>
+        <div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:#4A9E6E;font-weight:700;padding:14px 0 8px;">🔥 's Avonds op de camping</div>
+        <div style="font-size:0.82rem;color:#0A0A0A;line-height:1.8;">
+          Weerwolven van Wakkerdam · Codenames · Just One · Wie ben ik (post-its) · Saboteur · The Mind · Kampvuur-categorieën
+        </div>
+        <div style="margin-top:10px;font-size:0.75rem;color:#6B6560;">Extra: een eigen "Slovenië & Oostenrijk"-quiz kan apart aangeleverd worden.</div>
+      </div>
+    </div>
 
     <!-- CAMPING BOHINJ -->
     <div class="collapsible open" onclick="toggleCollapsible(this)">
@@ -1608,6 +1849,50 @@ function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ── BOHINJ KAART (U1e + U1f) ─────────────────────────
+const BOHINJ_MARKERS = [
+  {naam:'Camp Bohinj / Camp Zlatorog',     lat:46.2789, lng:13.8377, cat:'kamp',  tip:'Basis. Eigen strand, SUP/kajak verhuur (PAC Sports).'},
+  {naam:'Slap Savica (waterval)',           lat:46.2959, lng:13.7882, cat:'hike',  tip:'78 m hoge A-vormige waterval. &lt;1 u lopen vanaf Ukanc. Ga vroeg!', verif:true},
+  {naam:'Mostnica-kloof / Hudičev most',   lat:46.3090, lng:13.8886, cat:'hike',  tip:'Smaragdgroene poeltjes, olifant-rots "Slonček". ±1,5 u retour.', verif:true},
+  {naam:'Slap Mostnica (Voje-vallei)',     lat:46.3290, lng:13.9051, cat:'hike',  tip:'21 m waterval aan het einde van de Voje-vallei.', verif:true},
+  {naam:'Vogel kabelbaan (dalstation)',    lat:46.2915, lng:13.8282, cat:'hike',  tip:'Gondel naar 1535 m. Panoramische graatwandelingen 2–4 u.', verif:true},
+  {naam:'Pršivec (1761 m)',               lat:46.3266, lng:13.8430, cat:'hike',  tip:'Top voor fanatieke hikers — uitzicht over het meer.', verif:true},
+  {naam:'Stara Fužina (Mihovc + museum)', lat:46.2899, lng:13.8958, cat:'eten',  tip:'Gostilna Mihovc >100 jaar. Planšarski muzej voor kaas. Ma gesloten.'},
+  {naam:'Srednja vas (Rupa, Hrvatu, Ema)',lat:46.2882, lng:13.9342, cat:'eten',  tip:'Gostilna Rupa + pri Hrvatu + Pizzeria Ema.', verif:true},
+  {naam:'Ribčev Laz (strand + Pod Skalco)',lat:46.2838,lng:13.9476, cat:'strand', tip:'Strand oostpunt meer. Gostišče Pod Skalco — grill onder rotswand.', verif:true},
+];
+const BOHINJ_CAT_COLOR = {kamp:'#E8C000', hike:'#4A9E6E', eten:'#E8943A', strand:'#4A7CC4'};
+
+let bohinjMap=null, bohinjMapInited=false;
+function initBohinjMap(){
+  if(bohinjMapInited) return;
+  bohinjMapInited=true;
+  bohinjMap=L.map('bohinj-map',{scrollWheelZoom:false});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:18
+  }).addTo(bohinjMap);
+  BOHINJ_MARKERS.forEach(m=>{
+    const c=BOHINJ_CAT_COLOR[m.cat]||'#9E6AAD';
+    const icon=L.divIcon({
+      className:'',
+      html:`<div style="width:13px;height:13px;border-radius:50%;background:${c};border:2.5px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.4);"></div>`,
+      iconSize:[13,13],iconAnchor:[6,6]
+    });
+    const verifNote=m.verif?'<br><span style="color:#c0392b;font-size:0.68rem;">⚠ coördinaten te verifiëren</span>':'';
+    const gmUrl=`https://www.google.com/maps/search/?api=1&query=${m.lat},${m.lng}`;
+    const popup=`<div style="font-family:system-ui;max-width:220px;"><strong style="font-size:0.88rem;">${m.naam}</strong><p style="font-size:0.78rem;color:#555;margin:5px 0 6px;line-height:1.4;">${m.tip}</p>${verifNote}<a href="${gmUrl}" target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;font-size:0.72rem;color:#4A9E6E;font-weight:700;text-decoration:none;">📍 Open in Google Maps →</a></div>`;
+    L.marker([m.lat,m.lng],{icon}).addTo(bohinjMap).bindPopup(popup);
+  });
+  bohinjMap.setView([46.295,13.880],12);
+}
+
+function toggleCollapsibleMap(el, mapId, initFn){
+  el.classList.toggle('open');
+  if(el.classList.contains('open')){
+    setTimeout(()=>{ initFn(); if(mapId==='bohinj-map'&&bohinjMap) bohinjMap.invalidateSize(); },150);
+  }
 }
 
 // ── INIT ──────────────────────────────────────────────
