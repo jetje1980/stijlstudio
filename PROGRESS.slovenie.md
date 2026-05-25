@@ -28,6 +28,9 @@
 | 2026-05-25 | U7c | ✅ | RLS + anon-policies: lezen + invoegen voor iedereen, buckets slovenie-recipes + slovenie-bingo publiek leesbaar | Supabase |
 | 2026-05-25 | U7d | ✅ | slovenie.html: Supabase client init, klaverjas + inpaklijst async naar Supabase, localStorage-migratie + offline-fallback | slovenie.html |
 | 2026-05-25 | U3a | ✅ | Vertaaltool Sloveens → NL: MyMemory API + 18-zinnen phrasebook fallback, collapsible in Info-tab | slovenie.html |
+| 2026-05-25 | U3b | ✅ | Gedeelde recepten: formulier + foto-upload → Supabase slovenie_recipes + bucket slovenie-recipes, kaartjesGrid + bottomsheet | slovenie.html |
+| 2026-05-25 | U3c | ✅ | Dagplanner "Eten vandaag": maaltijden per dag (ontbijt/lunch/diner/snack), upsert naar slovenie_day_meals, gedeeld zichtbaar | slovenie.html |
+| 2026-05-25 | U3d | ✅ | Camping-kaarten: Appesbach Leaflet-kaart + afstandenlijst toegevoegd (Bohinj zat al in U1e) | slovenie.html |
 
 ## Datamodel U7 (aangemaakt in Supabase, project osuqtfsxmquwqsbgzlqn)
 
@@ -65,7 +68,7 @@
 | Volgorde | ID | Status | Omschrijving |
 |---|---|---|---|
 | 1 | U7 | ✅ | Storage-fundament Supabase — klaar |
-| 2 | U3 | ⬜ | Vertaaltool + gedeelde recepten + dag-maaltijden + camping-kaarten |
+| 2 | U3 | ✅ | Vertaaltool + gedeelde recepten + dag-maaltijden + camping-kaarten |
 | 3 | U5 | ⬜ | Autospellen, bingo + foto's, kampvuurverhaal, waterspellen, weer-leedvermaak |
 | 4 | U2 | ⬜ | Oostenrijk Appesbach: activiteiten + afstanden + kaart + 🟫-markerlaag |
 | 5 | U4 | ⬜ | Huttentochten Bohinj (1/2 nachten, splitsing, hutten/parkeren/afstand) |
