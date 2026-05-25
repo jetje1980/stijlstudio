@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Zomer 2026 — Slovenië & Oostenrijk</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,500;1,9..40,700;1,9..40,800&display=swap" rel="stylesheet">
@@ -386,7 +389,7 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
       <div class="login-label">Groepscode</div>
       <input id="code-input" class="login-input" type="text" placeholder="••••••••" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off">
     </div>
-    <button class="login-btn" id="login-btn">Ga naar de vakantie →</button>
+    <button class="login-btn" id="login-btn" onclick="checkCode()">Ga naar de vakantie →</button>
     <div class="login-error" id="code-error"></div>
   </div>
   <div id="step2" class="login-step hidden">
@@ -1942,17 +1945,16 @@ function addKind() {
 
 // ── LOGIN ─────────────────────────────────────────────
 function checkCode() {
-  const raw = document.getElementById('code-input').value.trim();
-  // strip diacritics (ë→e etc.) dan uppercase — vangt autocorrectie van Android op
-  const val = raw.normalize('NFD').replace(/\p{M}/gu,'').toUpperCase();
-  if (val === 'SLOVENIE') {
+  const raw = document.getElementById('code-input').value.trim().toUpperCase()
+    .replace(/Ë/g,'E').replace(/É/g,'E').replace(/È/g,'E').replace(/Ê/g,'E');
+  if (raw === 'SLOVENIE' || raw === 'SLOVENIË' || raw === 'SLOVENIJE') {
     document.getElementById('step1').classList.add('hidden');
     document.getElementById('step2').classList.remove('hidden');
     renderProfileGrid();
   } else {
     const err = document.getElementById('code-error');
-    err.textContent = 'Oeps — probeer opnieuw. (Getypt: "' + raw + '")';
-    setTimeout(()=>err.textContent='', 4000);
+    err.textContent = 'Oeps — typ: slovenie  (Getypt: "' + raw + '")';
+    setTimeout(()=>err.textContent='', 6000);
   }
 }
 document.getElementById('code-input')?.addEventListener('keydown', e => { if(e.key==='Enter') checkCode(); });
