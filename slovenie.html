@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Vroegzat — Slovenië & Oostenrijk 2026</title>
+<title>Zomer 2026 — Slovenië & Oostenrijk</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,500;1,9..40,700;1,9..40,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
@@ -261,6 +262,60 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
 .intro-dots{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:2;}
 .intro-dot{width:6px;height:6px;border-radius:3px;background:rgba(240,232,226,0.25);transition:all 0.35s;}
 .intro-dot.active{width:22px;background:rgba(240,232,226,0.8);}
+
+/* ── HEENREIS ── */
+.hr-meta{display:flex;gap:16px;padding:14px 20px 0;flex-wrap:wrap;}
+.hr-meta-item{display:flex;align-items:center;gap:6px;font-size:0.78rem;color:#6B6560;}
+.hr-meta-item strong{color:#0A0A0A;}
+.etappe{background:#EDE4DC;border-radius:var(--r-lg);margin:12px 20px 0;overflow:hidden;}
+.etappe-hdr{padding:14px 18px 10px;display:flex;align-items:flex-start;gap:12px;}
+.etappe-num{width:36px;height:36px;border-radius:50%;background:#4A9E6E;color:#fff;font-weight:800;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.etappe-hdr-info{flex:1;}
+.etappe-dag{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:#4A9E6E;font-weight:700;}
+.etappe-titel{font-style:italic;font-weight:800;font-size:1.1rem;color:#0A0A0A;line-height:1.2;}
+.etappe-stops{border-top:1px solid rgba(10,10,10,0.08);}
+.estop{display:flex;gap:10px;padding:10px 18px;border-bottom:1px solid rgba(10,10,10,0.06);}
+.estop:last-child{border-bottom:none;}
+.estop-tijd{font-size:0.7rem;font-weight:700;color:#4A9E6E;min-width:46px;flex-shrink:0;padding-top:1px;}
+.estop-body{flex:1;}
+.estop-plek{font-size:0.88rem;font-weight:700;color:#0A0A0A;}
+.estop-tip{font-size:0.74rem;color:#6B6560;margin-top:2px;line-height:1.4;}
+.estop-warn{font-size:0.7rem;color:#c0392b;margin-top:3px;}
+.estop-cat{display:inline-flex;align-items:center;gap:4px;font-size:0.62rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;border-radius:8px;padding:2px 7px;margin-top:4px;}
+.cat-zwem{background:rgba(74,124,196,0.12);color:#2E508A;}
+.cat-slaap{background:rgba(232,148,58,0.12);color:#7A4A00;}
+.cat-tank{background:rgba(100,100,100,0.1);color:#555;}
+
+/* kaart */
+#hr-map{width:100%;height:300px;border-radius:var(--r-lg);z-index:0;}
+.hr-map-wrap{margin:12px 20px 0;}
+.hr-filters{display:flex;gap:6px;padding:10px 20px;overflow-x:auto;scrollbar-width:none;}
+.hr-filters::-webkit-scrollbar{display:none;}
+.hrf{flex:0 0 auto;padding:5px 13px;border-radius:20px;border:none;font-size:0.68rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;text-transform:uppercase;transition:opacity 0.2s;}
+.hrf.off{opacity:0.35;}
+
+/* marker sync lijst */
+.hr-list{margin:0 20px;}
+.hr-list-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(10,10,10,0.07);cursor:pointer;align-items:flex-start;}
+.hr-list-item:last-child{border-bottom:none;}
+.hr-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.hr-item-naam{font-size:0.86rem;font-weight:700;color:#0A0A0A;}
+.hr-item-tip{font-size:0.72rem;color:#6B6560;margin-top:1px;line-height:1.35;}
+
+/* gezin-2 bericht */
+.g2-msg{margin:24px 20px;padding:20px;background:#EDE4DC;border-radius:var(--r-lg);text-align:center;}
+.g2-msg h3{font-style:italic;font-size:1.2rem;margin-bottom:6px;}
+.g2-msg p{font-size:0.82rem;color:#6B6560;line-height:1.5;}
+
+/* praktisch S3 */
+.pr-blok{margin:12px 20px 0;background:#EDE4DC;border-radius:var(--r-lg);padding:14px 16px;}
+.pr-row{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid rgba(10,10,10,0.07);align-items:flex-start;}
+.pr-row:last-child{border-bottom:none;}
+.pr-icon{font-size:1rem;flex-shrink:0;}
+.pr-tekst{font-size:0.82rem;color:#0A0A0A;line-height:1.45;}
+
+/* swipe dist pill */
+.card-dist{font-size:0.68rem;color:#9A948E;margin-top:5px;line-height:1.3;}
 </style>
 </head>
 <body>
@@ -289,7 +344,7 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
 
 <!-- LOGIN -->
 <div id="login-screen">
-  <div class="login-logo">Vroegzat</div>
+  <div class="login-logo">Zomer 2026</div>
   <div class="login-sub">Zomer 2026</div>
   <div style="font-size:0.6rem;letter-spacing:0.12em;color:#9A948E;margin-bottom:8px;">Slovenië & Oostenrijk</div>
   <div class="login-divider"></div>
@@ -385,7 +440,7 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
       </div>
     </div>
     <div class="page-header">
-      <div class="page-logo">Vroegzat ✦</div>
+      <div class="page-logo">Zomer 2026 ✦</div>
       <button class="uitlog-btn" onclick="uitloggen()">Uitloggen</button>
     </div>
     <div class="countdown-block">
@@ -442,6 +497,142 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
         <div class="list-info"><div class="list-name">Reisinfo & inpaklijst</div><div class="list-desc">Camping, praktisch, checklist</div></div>
         <div style="color:#9A948E;font-size:1rem;">›</div>
       </div>
+    </div>
+  </section>
+
+  <!-- ── HEENREIS ── -->
+  <section id="sec-heenreis" class="section">
+    <div class="sec-photo-header">
+      <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700&q=80" alt="">
+      <div class="sec-photo-header-grad"></div>
+      <div class="sec-photo-header-text">
+        <div class="sec-photo-header-title">Heenreis</div>
+        <div class="sec-photo-header-sub">Schalkwijk → Camp Bohinj · ±1.050 km</div>
+      </div>
+    </div>
+
+    <!-- gezin 2: al ter plekke -->
+    <div class="g2-msg" id="hr-g2" style="display:none;">
+      <h3>Jullie zijn er al! 🎉</h3>
+      <p>De heenreis is voor gezin 1 (camper). Bekijk het programma en de activiteiten in de andere tabs.</p>
+    </div>
+
+    <!-- gezin 1: volledige heenreis -->
+    <div id="hr-g1">
+      <div class="hr-meta">
+        <div class="hr-meta-item">🚐 <span><strong>±1.050 km</strong> · ±12 uur rijden</span></div>
+        <div class="hr-meta-item">📅 <span><strong>26–27 juli 2026</strong></span></div>
+        <div class="hr-meta-item">👨‍👩‍ <span><strong>2 bestuurders</strong> — wissel bij stops</span></div>
+      </div>
+
+      <div class="sec-label" style="margin-top:16px;">Etappe 1</div>
+      <div class="etappe">
+        <div class="etappe-hdr">
+          <div class="etappe-num">1</div>
+          <div class="etappe-hdr-info">
+            <div class="etappe-dag">Zondag 26 juli</div>
+            <div class="etappe-titel">Schalkwijk → Neurenberg</div>
+          </div>
+        </div>
+        <div class="etappe-stops">
+          <div class="estop">
+            <div class="estop-tijd">17:00</div>
+            <div class="estop-body">
+              <div class="estop-plek">Vertrek Schalkwijk</div>
+              <div class="estop-tip">Barista de Dominee — laatste koffie thuis.</div>
+            </div>
+          </div>
+          <div class="estop">
+            <div class="estop-tijd">±18:30</div>
+            <div class="estop-body">
+              <div class="estop-plek">Tank-/benenstop Köln</div>
+              <div class="estop-tip">Functioneel en kort. Tankstation langs de A3/A4.</div>
+              <div class="estop-cat cat-tank">⛽ Tank</div>
+            </div>
+          </div>
+          <div class="estop">
+            <div class="estop-tijd">±21:00</div>
+            <div class="estop-body">
+              <div class="estop-plek">Avonddip — Strandbad Spessartblick</div>
+              <div class="estop-tip">Großkrotzenburg, pal aan de A3 (±410 km). Helder grindgat-water, eten in de camper.</div>
+              <div class="estop-warn">⚠ Officieel badbeheer sluit 20:00 — vooraf vrije oever checken.</div>
+              <div class="estop-cat cat-zwem">🟦 Zwemmen</div>
+            </div>
+          </div>
+          <div class="estop">
+            <div class="estop-tijd">±24:00</div>
+            <div class="estop-body">
+              <div class="estop-plek">Slaapstop — Stellplatz Wöhrdersee</div>
+              <div class="estop-tip">Neurenberg · Gratis, geen slagboom → makkelijk weg om 5:00. Alternatief: Stellplatz am Dutzendteich.</div>
+              <div class="estop-cat cat-slaap">🟧 Camperplek</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec-label" style="margin-top:12px;">Etappe 2</div>
+      <div class="etappe">
+        <div class="etappe-hdr">
+          <div class="etappe-num">2</div>
+          <div class="etappe-hdr-info">
+            <div class="etappe-dag">Maandag 27 juli</div>
+            <div class="etappe-titel">Neurenberg → Camp Bohinj</div>
+          </div>
+        </div>
+        <div class="etappe-stops">
+          <div class="estop">
+            <div class="estop-tijd">05:00</div>
+            <div class="estop-body">
+              <div class="estop-plek">Vertrek Neurenberg</div>
+              <div class="estop-tip">München vóór de ochtendspits — rustig rijden via de A9/A8.</div>
+            </div>
+          </div>
+          <div class="estop">
+            <div class="estop-tijd">±08:30</div>
+            <div class="estop-body">
+              <div class="estop-plek">Ontbijt-duik — Strandbad Übersee, Chiemsee</div>
+              <div class="estop-tip">Pal aan de A8. SUP-verhuur, bergzicht, helder meer.</div>
+              <div class="estop-cat cat-zwem">🟦 Zwemmen / SUP</div>
+            </div>
+          </div>
+          <div class="estop">
+            <div class="estop-tijd">±11:00</div>
+            <div class="estop-body">
+              <div class="estop-plek">Via Salzburg – Villach – Karawankentunnel</div>
+              <div class="estop-tip">Optioneel onderweg: dip in Faaker See (turquoise, warm) of Ossiacher See.</div>
+              <div class="estop-warn">⚠ Karawankentunnel = aparte tol, los van het vignet.</div>
+            </div>
+          </div>
+          <div class="estop">
+            <div class="estop-tijd">middag</div>
+            <div class="estop-body">
+              <div class="estop-plek">Aankomst — Camp Bohinj / Camp Zlatorog</div>
+              <div class="estop-tip">Ukanc 5, Bohinjsko jezero · Eigen strand, SUP/kajak-verhuur, Triglav National Park.</div>
+              <div class="estop-cat" style="background:rgba(232,199,58,0.15);color:#7A6200;">⭐ Eindbestemming</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S2: kaart & markers (wordt gevuld in Blok C+D) -->
+      <div class="sec-label" style="margin-top:16px;">Stoppenkaart</div>
+      <div style="padding:0 20px;">
+        <div class="hr-filters" id="hr-filters"></div>
+        <div class="hr-map-wrap"><div id="hr-map"></div></div>
+      </div>
+      <div class="sec-label" style="margin-top:8px;">Alle stops</div>
+      <div class="hr-list" id="hr-list"></div>
+
+      <!-- S3: praktisch -->
+      <div class="sec-label" style="margin-top:16px;">Praktisch</div>
+      <div class="pr-blok">
+        <div class="pr-row"><div class="pr-icon">🛣️</div><div class="pr-tekst"><strong>Vignet Oostenrijk</strong> én <strong>vignet Slovenië</strong> vooraf online regelen (asfinag.at / dars.si).</div></div>
+        <div class="pr-row"><div class="pr-icon">🚇</div><div class="pr-tekst"><strong>Karawankentunnel</strong> heeft aparte tol — los van het vignet betalen bij de slagboom.</div></div>
+        <div class="pr-row"><div class="pr-icon">👥</div><div class="pr-tekst"><strong>Twee bestuurders</strong> → wissel bij elke stop; nachtrit gaat zo veel rustiger.</div></div>
+        <div class="pr-row"><div class="pr-icon">📏</div><div class="pr-tekst">Totale afstand: <strong>±1.050 km · ±12 uur rijden</strong> (excl. stops).</div></div>
+      </div>
+
+      <div style="height:20px;"></div>
     </div>
   </section>
 
@@ -662,11 +853,11 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
     <button class="nav-btn active" onclick="switchTab('home')" id="nav-home">
       <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
     </button>
+    <button class="nav-btn" onclick="switchTab('heenreis')" id="nav-heenreis">
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Heenreis
+    </button>
     <button class="nav-btn" onclick="switchTab('programma')" id="nav-programma">
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Programma
-    </button>
-    <button class="nav-btn" onclick="switchTab('activiteiten')" id="nav-activiteiten">
-      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Activiteiten
     </button>
     <button class="nav-btn" onclick="switchTab('spellen')" id="nav-spellen">
       <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>Spellen
@@ -858,6 +1049,7 @@ const WELKOM = {
 
 function selectProfile(key, naam, init, color) {
   currentUser = key;
+  currentFamily = GEZIN1.includes(key) ? 1 : 2;
   swipes = JSON.parse(localStorage.getItem(`${SK}_swipes_${key}`) || '{}');
   packChecked = JSON.parse(localStorage.getItem(`${SK}_pack_${key}`) || '{}');
   const t = WELKOM[key] || {groet:`Welkom, ${naam} 👋`, sub:'Bekijk het programma en swipe mee.'};
@@ -875,6 +1067,8 @@ function selectProfile(key, naam, init, color) {
 function startApp() {
   document.getElementById('welkom-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
+  document.getElementById('hr-g1').style.display = currentFamily===1 ? 'block' : 'none';
+  document.getElementById('hr-g2').style.display = currentFamily===2 ? 'block' : 'none';
   initReel();
   tickCountdown();
   setInterval(tickCountdown, 30000);
@@ -923,9 +1117,13 @@ function finishIntro(){
   ov.removeEventListener('click',introAdv);
 }
 
+// ── FAMILY SPLIT ─────────────────────────────────────
+const GEZIN1 = ['duurt','griette'];
+let currentFamily = 0;
+
 // ── TABS ──────────────────────────────────────────────
-const SECS={home:'sec-home',programma:'sec-programma',activiteiten:'sec-activiteiten',spellen:'sec-spellen',info:'sec-info'};
-const NAVS={home:'nav-home',programma:'nav-programma',activiteiten:'nav-activiteiten',spellen:'nav-spellen',info:'nav-info'};
+const SECS={home:'sec-home',heenreis:'sec-heenreis',programma:'sec-programma',activiteiten:'sec-activiteiten',spellen:'sec-spellen',info:'sec-info'};
+const NAVS={home:'nav-home',heenreis:'nav-heenreis',programma:'nav-programma',activiteiten:'nav-activiteiten',spellen:'nav-spellen',info:'nav-info'};
 function switchTab(tab){
   Object.values(SECS).forEach(id=>document.getElementById(id)?.classList.remove('active'));
   Object.values(NAVS).forEach(id=>document.getElementById(id)?.classList.remove('active'));
@@ -933,6 +1131,9 @@ function switchTab(tab){
   document.getElementById(NAVS[tab])?.classList.add('active');
   window.scrollTo(0,0);
   if(tab==='activiteiten') renderSwipeStack();
+  if(tab==='heenreis' && currentFamily===1){
+    setTimeout(()=>{ if(!hrMapInited) initHrMap(); else if(hrMap) hrMap.invalidateSize(); },150);
+  }
 }
 
 // ── PROGRAMMA ────────────────────────────────────────
@@ -1262,6 +1463,117 @@ function togglePack(id,el){
   el.querySelector('.pack-check').textContent=packChecked[id]?'✓':'';
 }
 
+// ── HEENREIS KAART ───────────────────────────────────
+const HR_CATS = {
+  zwem:   {label:'🟦 Zwemmen/SUP', color:'#4A7CC4'},
+  stop:   {label:'🟩 Uitzicht',    color:'#4A9E6E'},
+  camper: {label:'🟧 Camperplek',  color:'#E8943A'},
+  end:    {label:'⭐ Bestemming',  color:'#E8C000'},
+};
+const HR_MARKERS = [
+  {id:'spessart', cat:'zwem',   naam:'Strandbad Spessartblick, Großkrotzenburg', lat:50.0856, lng:8.9965,
+   tip:'Avonddip op de route, pal aan A3, helder grindgat-water. Open tot 20:00 — check vrije oever.'},
+  {id:'walchensee',cat:'zwem',  naam:'Walchensee (Bade-/Surferwiese, Kochel)',   lat:47.5946, lng:11.3189,
+   tip:'Turquoise bergmeer, top voor SUP. Omweg van A8 maar prachtig — optioneel.'},
+  {id:'chiemsee',  cat:'zwem',  naam:'Strandbad Übersee, Chiemsee',              lat:47.8491, lng:12.4756,
+   tip:'Pal aan A8, SUP-verhuur, ontbijt-duik met bergzicht.'},
+  {id:'faaker',    cat:'zwem',  naam:'Strandbad Drobollach, Faaker See',         lat:46.5842, lng:13.9191,
+   tip:'Warm, turquoise, helder — laatste dip vóór Slovenië.'},
+  {id:'ossiach',   cat:'zwem',  naam:'Gemeindestrandbad Ossiach, Ossiacher See', lat:46.6750, lng:13.9813,
+   tip:'Alternatief bij Villach, fijn voor kinderen (glijbaan).'},
+  {id:'bled',      cat:'zwem',  naam:'Lake Bled',                                lat:46.3636, lng:14.0938,
+   tip:'Iconisch: zwemmen/SUP met kasteel + eilandkerk, vlak vóór Bohinj.'},
+  {id:'limburg',   cat:'stop',  naam:'Limburg an der Lahn (Altstadt)',           lat:50.3856, lng:8.0599,
+   tip:'Middeleeuws vakwerkstadje pal aan A3 — fijne benenstrek.', verif:true},
+  {id:'wohr',      cat:'camper',naam:'Stellplatz WOMO Wöhrdersee, Neurenberg',   lat:49.4592, lng:11.1128,
+   tip:'Gratis, slagboomvrij — slaapstop, makkelijk weg om 5:00.'},
+  {id:'dutz',      cat:'camper',naam:'Stellplatz am Dutzendteich, Neurenberg',   lat:49.4270, lng:11.1250,
+   tip:'Gratis alternatief, park met vijvers, ook slagboomvrij.', verif:true},
+  {id:'chicamp',   cat:'camper',naam:'Chiemsee Strandcamping, Grabenstätt',      lat:47.8765, lng:12.5288,
+   tip:'Camper aan het meer — voor een optionele extra nacht.'},
+  {id:'arneitz',   cat:'camper',naam:'Strandcamping Arneitz, Faaker See',        lat:46.5800, lng:13.9050,
+   tip:'Camper aan turquoise meer — mooie optionele 2e overnachting.', verif:true},
+  {id:'bohinj',    cat:'end',   naam:'Camp Bohinj / Camp Zlatorog, Ukanc 5',     lat:46.2789, lng:13.8377,
+   tip:'Eigen strand + SUP/kajak-verhuur, Triglav National Park.'},
+];
+const HR_ROUTE = [
+  [51.991,5.276],[51.600,6.600],[50.939,6.960],[50.386,8.060],
+  [50.086,8.997],[49.810,9.940],[49.460,11.113],[48.350,11.550],
+  [47.849,12.476],[47.800,13.040],[46.900,13.850],[46.616,13.857],
+  [46.487,14.054],[46.364,14.094],[46.279,13.838]
+];
+
+let hrMap=null, hrMapInited=false;
+const hrObjs={};
+let hrActive=new Set(Object.keys(HR_CATS));
+
+function initHrMap(){
+  if(hrMapInited) return;
+  hrMapInited=true;
+  hrMap=L.map('hr-map',{scrollWheelZoom:false});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:18
+  }).addTo(hrMap);
+  L.polyline(HR_ROUTE,{color:'#4A9E6E',weight:3,opacity:0.8}).addTo(hrMap);
+  HR_MARKERS.forEach(m=>{
+    const c=HR_CATS[m.cat].color;
+    const icon=L.divIcon({
+      className:'',
+      html:`<div style="width:13px;height:13px;border-radius:50%;background:${c};border:2.5px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.4);"></div>`,
+      iconSize:[13,13],iconAnchor:[6,6]
+    });
+    const verifNote=m.verif?'<br><span style="color:#c0392b;font-size:0.68rem;">⚠ coördinaten te verifiëren</span>':'';
+    const gmUrl=`https://www.google.com/maps/search/?api=1&query=${m.lat},${m.lng}`;
+    const popup=`<div style="font-family:system-ui;max-width:220px;"><strong style="font-size:0.88rem;">${m.naam}</strong><p style="font-size:0.78rem;color:#555;margin:5px 0 6px;line-height:1.4;">${m.tip}</p>${verifNote}<a href="${gmUrl}" target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;font-size:0.72rem;color:#4A9E6E;font-weight:700;text-decoration:none;">📍 Open in Google Maps →</a></div>`;
+    const marker=L.marker([m.lat,m.lng],{icon}).addTo(hrMap);
+    marker.bindPopup(popup);
+    hrObjs[m.id]={marker,cat:m.cat};
+  });
+  hrMap.fitBounds([[46.2,5.0],[52.1,14.5]],{padding:[20,20]});
+  renderHrFilters();
+  renderHrList();
+}
+
+function renderHrFilters(){
+  const el=document.getElementById('hr-filters');
+  if(!el) return;
+  el.innerHTML=`<button class="hrf${hrActive.has('all')||hrActive.size===4?' ':'  off'}" onclick="hrFilter('all')" style="background:#0A0A0A;color:#F0E8E2;">Alles</button>`+
+    Object.entries(HR_CATS).map(([k,v])=>
+      `<button class="hrf${hrActive.has(k)?'':' off'}" data-cat="${k}" onclick="hrFilter('${k}')" style="background:${v.color};color:#fff;">${v.label}</button>`
+    ).join('');
+}
+function hrFilter(cat){
+  if(cat==='all'){
+    hrActive=new Set(Object.keys(HR_CATS));
+  } else {
+    if(hrActive.has(cat)) hrActive.delete(cat); else hrActive.add(cat);
+  }
+  Object.entries(hrObjs).forEach(([id,{marker,cat:mc}])=>{
+    if(hrActive.has(mc)) hrMap.addLayer(marker); else hrMap.removeLayer(marker);
+  });
+  renderHrFilters();
+  renderHrList();
+}
+function renderHrList(){
+  const el=document.getElementById('hr-list');
+  if(!el) return;
+  const vis=HR_MARKERS.filter(m=>hrActive.has(m.cat));
+  el.innerHTML=vis.map(m=>`
+    <div class="hr-list-item" onclick="hrZoom('${m.id}')">
+      <div class="hr-dot" style="background:${HR_CATS[m.cat].color};"></div>
+      <div>
+        <div class="hr-item-naam">${m.naam}</div>
+        <div class="hr-item-tip">${m.tip.substring(0,90)}${m.tip.length>90?'…':''}</div>
+      </div>
+    </div>`).join('')||'<div style="padding:12px 0;color:#9A948E;font-size:0.85rem;">Geen stops zichtbaar.</div>';
+}
+function hrZoom(id){
+  const o=hrObjs[id]; if(!o||!hrMap) return;
+  hrMap.flyTo(o.marker.getLatLng(),13,{duration:0.8});
+  o.marker.openPopup();
+  window.scrollTo(0,0);
+}
+
 // ── TOAST ─────────────────────────────────────────────
 function showToast(msg){
   const t=document.getElementById('toast');
@@ -1272,5 +1584,6 @@ function showToast(msg){
 // ── INIT ──────────────────────────────────────────────
 tickCountdown();
 </script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </body>
 </html>
