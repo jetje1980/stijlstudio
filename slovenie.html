@@ -908,20 +908,48 @@ const DAGEN = [
 
 // ── ACTIVITEITEN ────────────────────────────────────
 const ITEMS = [
-  {id:'bled-roeien',cat:'natuur',naam:'Roeiboot naar Bled Eiland',loc:'Bled',prijs:'€15/boot',res:false,must:true,v:'Roeien naar het eilandje (20 min), 99 treden beklimmen, de klok luiden. Één van de meest iconische ervaringen van Slovenië.',img:'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600&q=80'},
-  {id:'vintgar',cat:'natuur',naam:'Vintgar Kloof',loc:'Bled (4 km)',prijs:'€10',res:false,must:true,v:'1,6 km houten pad over turquoise water door smalle kloof. Aan het einde een waterval.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
-  {id:'soca',cat:'natuur',naam:'Soča rivier & zwemmen',loc:'Bovec/Kobarid',prijs:'gratis',res:false,must:true,v:'Het beroemdste turquoise water van Europa. Bergpoelen om in te zwemmen.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
-  {id:'bohinj-meer',cat:'natuur',naam:'Bohinj meer zwemmen',loc:'Bohinj',prijs:'gratis',res:false,must:true,v:'Rustiger dan Bled, even mooi. Kristalhelder bergmeer, wandelingen eromheen.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
-  {id:'vogel-gondel',cat:'natuur',naam:'Gondelbaan Vogel',loc:'Bohinj',prijs:'€22',res:false,must:false,v:'Omhoog per gondel — panorama over het Bohinj meer en de Julische Alpen.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
-  {id:'lj-stad',cat:'stad',naam:'Ljubljana Oude Stad',loc:'Ljubljana',prijs:'gratis',res:false,must:true,v:'Terrasjes langs de rivier, Drievoudige Brug, art-nouveau gevels. Charme van klein Parijs.',img:'https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=600&q=80'},
-  {id:'odprta-kuhna',cat:'eten',naam:'Odprta Kuhna foodmarket',loc:'Ljubljana',prijs:'€–€€',res:false,must:true,v:'Elke vrijdag & zaterdag: 60+ kraampjes, Sloveense topchefs, lokale wijn. Absoluut niet missen.',img:'https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=600&q=80'},
-  {id:'predjama',cat:'cultuur',naam:'Predjama Kasteel',loc:'Predjama',prijs:'€16',res:false,must:false,v:'Middeleeuws kasteel gebouwd ín een 123m hoge rotswand. Surrealistisch.',img:'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=600&q=80'},
-  {id:'postojna',cat:'cultuur',naam:'Grotten van Postojna',loc:'Postojna',prijs:'€28',res:true,must:false,v:'Grootste grottencomplex van Europa. Elektrische trein neemt je mee naar binnen. Trui mee (12°C)!',img:'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=600&q=80'},
-  {id:'piran',cat:'strand',naam:'Piran & Adriatische kust',loc:'Piran',prijs:'gratis',res:false,must:false,v:'Venetiaans stadje aan de Sloveense kust. Zwemmen in de Adriatische Zee bij Fiesa.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
-  {id:'kayak-soca',cat:'avontuur',naam:'Kayakken op de Soča',loc:'Bovec',prijs:'€35–50',res:true,must:false,v:'Het turquoise water van de Soča per kajak beleven. Halve dag activiteit.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
-  {id:'triglav-wandel',cat:'avontuur',naam:'Wandeling Triglav NP',loc:'Triglav NP',prijs:'gratis',res:false,must:false,v:'Prachtige alpine wandelingen — Pokljuka plateau, Zadnja Trenta vallei.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
-  {id:'lj-kasteel',cat:'cultuur',naam:'Ljubljana Kasteel',loc:'Ljubljana',prijs:'€13',res:false,must:false,v:'360° uitzicht over de rode daken. Funiculaire rijdt omhoog.',img:'https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=600&q=80'},
-  {id:'sup-bohinj',cat:'avontuur',naam:'SUP Bohinj meer',loc:'Bohinj',prijs:'€15–20',res:false,must:false,v:'Stand-up paddleboard op het rustige bergmeer. Verhuur bij het kamp.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
+  {id:'bled-roeien',cat:'natuur',naam:'Roeiboot naar Bled Eiland',loc:'Bled',prijs:'€15/boot',res:false,must:true,
+   dist:'🚗 30 min · 27 km · 🚲 1,5 u',
+   v:'Roeien naar het eilandje (20 min), 99 treden beklimmen, de klok luiden. Één van de meest iconische ervaringen van Slovenië.',img:'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600&q=80'},
+  {id:'vintgar',cat:'natuur',naam:'Vintgar Kloof',loc:'Bled (4 km)',prijs:'€10',res:false,must:true,
+   dist:'🚗 35 min · 30 km · 🚲 1,5 u',
+   v:'1,6 km houten pad over turquoise water door smalle kloof. Aan het einde een waterval.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
+  {id:'soca',cat:'natuur',naam:'Soča rivier & zwemmen',loc:'Bovec/Kobarid',prijs:'gratis',res:false,must:true,
+   dist:'🚗 1u15 · 65 km',
+   v:'Het beroemdste turquoise water van Europa. Bergpoelen om in te zwemmen.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
+  {id:'bohinj-meer',cat:'natuur',naam:'Bohinj meer zwemmen',loc:'Bohinj',prijs:'gratis',res:false,must:true,
+   dist:'🚶 5 min · op campingterrein',
+   v:'Rustiger dan Bled, even mooi. Kristalhelder bergmeer, wandelingen eromheen.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
+  {id:'vogel-gondel',cat:'natuur',naam:'Gondelbaan Vogel',loc:'Bohinj',prijs:'€22',res:false,must:false,
+   dist:'🚶 20 min · 🚲 8 min · 1,5 km',
+   v:'Omhoog per gondel — panorama over het Bohinj meer en de Julische Alpen.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
+  {id:'lj-stad',cat:'stad',naam:'Ljubljana Oude Stad',loc:'Ljubljana',prijs:'gratis',res:false,must:true,
+   dist:'🚗 1u15 · 95 km · 🚌 1u45 (bus)',
+   v:'Terrasjes langs de rivier, Drievoudige Brug, art-nouveau gevels. Charme van klein Parijs.',img:'https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=600&q=80'},
+  {id:'odprta-kuhna',cat:'eten',naam:'Odprta Kuhna foodmarket',loc:'Ljubljana',prijs:'€–€€',res:false,must:true,
+   dist:'🚗 1u15 · 95 km · alleen vr & za',
+   v:'Elke vrijdag & zaterdag: 60+ kraampjes, Sloveense topchefs, lokale wijn. Absoluut niet missen.',img:'https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=600&q=80'},
+  {id:'predjama',cat:'cultuur',naam:'Predjama Kasteel',loc:'Predjama',prijs:'€16',res:false,must:false,
+   dist:'🚗 2u · 155 km',
+   v:'Middeleeuws kasteel gebouwd ín een 123m hoge rotswand. Surrealistisch.',img:'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=600&q=80'},
+  {id:'postojna',cat:'cultuur',naam:'Grotten van Postojna',loc:'Postojna',prijs:'€28',res:true,must:false,
+   dist:'🚗 2u · 150 km',
+   v:'Grootste grottencomplex van Europa. Elektrische trein neemt je mee naar binnen. Trui mee (12°C)!',img:'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=600&q=80'},
+  {id:'piran',cat:'strand',naam:'Piran & Adriatische kust',loc:'Piran',prijs:'gratis',res:false,must:false,
+   dist:'🚗 2u45 · 220 km',
+   v:'Venetiaans stadje aan de Sloveense kust. Zwemmen in de Adriatische Zee bij Fiesa.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
+  {id:'kayak-soca',cat:'avontuur',naam:'Kayakken op de Soča',loc:'Bovec',prijs:'€35–50',res:true,must:false,
+   dist:'🚗 1u15 · 65 km',
+   v:'Het turquoise water van de Soča per kajak beleven. Halve dag activiteit.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
+  {id:'triglav-wandel',cat:'avontuur',naam:'Wandeling Triglav NP',loc:'Triglav NP',prijs:'gratis',res:false,must:false,
+   dist:'🚶 variabel · vanuit kamp of 🚗 15 min',
+   v:'Prachtige alpine wandelingen — Pokljuka plateau, Zadnja Trenta vallei.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
+  {id:'lj-kasteel',cat:'cultuur',naam:'Ljubljana Kasteel',loc:'Ljubljana',prijs:'€13',res:false,must:false,
+   dist:'🚗 1u15 · 95 km · 🚌 1u45 (bus)',
+   v:'360° uitzicht over de rode daken. Funiculaire rijdt omhoog.',img:'https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=600&q=80'},
+  {id:'sup-bohinj',cat:'avontuur',naam:'SUP Bohinj meer',loc:'Bohinj',prijs:'€15–20',res:false,must:false,
+   dist:'🚶 2 min · op campingterrein',
+   v:'Stand-up paddleboard op het rustige bergmeer. Verhuur bij het kamp.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
 ];
 const CATS = ['alles','natuur','stad','eten','avontuur','cultuur','strand'];
 
@@ -1217,7 +1245,8 @@ function renderSwipeStack(){
           <span class="card-pill">📍 ${item.loc}</span>
           ${item.prijs?`<span class="card-pill">${item.prijs}</span>`:''}
         </div>
-        <div class="card-verhaal">${item.v.substring(0,130)}${item.v.length>130?'…':''}</div>
+        ${item.dist?`<div class="card-dist">🏕️ vanaf kamp: ${item.dist}</div>`:''}
+        <div class="card-verhaal">${item.v.substring(0,110)}${item.v.length>110?'…':''}</div>
       </div>`;
     if(isTop){
       card.addEventListener('touchstart',onTS,{passive:true});
