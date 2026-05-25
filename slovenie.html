@@ -342,6 +342,26 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
 .dag-chip-rm{background:none;border:none;cursor:pointer;color:#9A948E;font-size:0.68rem;padding:0 3px;line-height:1;flex-shrink:0;}
 .dag-add-btn{margin-top:4px;padding:5px 13px;border-radius:20px;border:1.5px dashed rgba(74,158,110,0.45);background:transparent;color:#4A9E6E;font-size:0.76rem;cursor:pointer;font-family:var(--sans);font-weight:600;}
 .dag-sug-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(10,10,10,0.05);border:1px dashed rgba(10,10,10,0.25);border-radius:20px;padding:4px 10px;font-size:0.75rem;color:#6B6560;cursor:pointer;transition:background 0.15s;}
+/* game tiles */
+.game-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 20px 4px;}
+.game-tile{border-radius:14px;overflow:hidden;position:relative;height:88px;cursor:pointer;background:#1A2510;-webkit-tap-highlight-color:transparent;}
+.game-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 0.2s;}
+.game-tile:active img{transform:scale(1.05);}
+.game-tile-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05),rgba(0,0,0,0.72));}
+.game-tile-text{position:absolute;bottom:0;left:0;right:0;padding:8px 8px;}
+.game-tile-title{color:#fff;font-weight:700;font-size:0.78rem;text-shadow:0 1px 4px rgba(0,0,0,0.6);line-height:1.2;}
+.game-tile-sub{color:rgba(255,255,255,0.72);font-size:0.6rem;margin-top:1px;}
+/* vvdg answers */
+.vvdg-ans-btn{padding:7px 10px;border-radius:10px;border:2px solid #ddd;background:#fff;font-family:inherit;font-size:0.8rem;cursor:pointer;text-align:left;transition:all 0.15s;width:100%;}
+.vvdg-ans-btn.gekozen{border-color:#4A9E6E;background:rgba(74,158,110,0.1);font-weight:700;}
+/* reaction bar */
+.react-bar{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;}
+.react-btn{background:rgba(10,10,10,0.05);border:1px solid rgba(10,10,10,0.1);border-radius:20px;padding:3px 8px;font-size:0.78rem;cursor:pointer;display:flex;align-items:center;gap:3px;transition:background 0.15s;}
+.react-btn.mine{background:rgba(74,158,110,0.12);border-color:rgba(74,158,110,0.4);}
+.react-btn:active{transform:scale(0.92);}
+/* live score pulse */
+@keyframes pulse-green{0%{box-shadow:0 0 0 0 rgba(74,158,110,0.4)}70%{box-shadow:0 0 0 8px rgba(74,158,110,0)}100%{box-shadow:0 0 0 0 rgba(74,158,110,0)}}
+.score-live{animation:pulse-green 2s infinite;}
 .dag-sug-chip:hover{background:rgba(74,158,110,0.1);border-color:rgba(74,158,110,0.4);color:#4A9E6E;}
 /* dagpicker modal */
 .sug-cats{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none;}
@@ -903,22 +923,51 @@ function renderProfileGrid(){
         <div class="sec-photo-header-sub">Klaverjas · Bingo · Quiz · Kampvuur</div>
       </div>
     </div>
-    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:10px 20px 4px;display:flex;gap:10px;">
-      <div class="reel-card" onclick="toggleUitleg(document.querySelector('#bingo-block .uitleg-head'));document.getElementById('bingo-block').scrollIntoView({behavior:'smooth'})">
-        <img src="https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=200&q=80" alt="Bingo">
-        <div class="reel-cap">🎯 Bingo</div>
+    <div class="game-grid">
+      <div class="game-tile" onclick="openGame('game-vvdg')">
+        <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=300&q=80" alt="">
+        <div class="game-tile-grad"></div>
+        <div class="game-tile-text"><div class="game-tile-title">❓ Vraag v/d dag</div><div class="game-tile-sub">Iedereen antwoordt live</div></div>
       </div>
-      <div class="reel-card" onclick="toggleUitleg(document.querySelector('#spellen .uitleg-block:nth-child(4) .uitleg-head'))">
-        <img src="https://images.unsplash.com/photo-1519817650390-64a93db51149?w=200&q=80" alt="Quiz">
-        <div class="reel-cap">🧠 Quiz</div>
+      <div class="game-tile" onclick="openGame('game-klaverjas')">
+        <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=300&q=80" alt="">
+        <div class="game-tile-grad"></div>
+        <div class="game-tile-text"><div class="game-tile-title">🃏 Klaverjas</div><div class="game-tile-sub">Scorebord &amp; potjes</div></div>
       </div>
-      <div class="reel-card" style="cursor:default;">
-        <img src="https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=200&q=80" alt="Kampvuur">
-        <div class="reel-cap">🔥 Kampvuur</div>
+      <div class="game-tile" onclick="openGame('bingo-block')">
+        <img src="https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=300&q=80" alt="">
+        <div class="game-tile-grad"></div>
+        <div class="game-tile-text"><div class="game-tile-title">🎯 Autobingo</div><div class="game-tile-sub">Spot &amp; foto's delen</div></div>
       </div>
-      <div class="reel-card" style="cursor:default;">
-        <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=200&q=80" alt="Klaverjas">
-        <div class="reel-cap">🃏 Klaverjas</div>
+      <div class="game-tile" onclick="openGame('game-quiz')">
+        <img src="https://images.unsplash.com/photo-1519817650390-64a93db51149?w=300&q=80" alt="">
+        <div class="game-tile-grad"></div>
+        <div class="game-tile-text"><div class="game-tile-title">🧠 Quiz</div><div class="game-tile-sub">Slovenië &amp; Oostenrijk</div></div>
+      </div>
+      <div class="game-tile" onclick="openGame('game-scores')">
+        <img src="https://images.unsplash.com/photo-1565945887714-d5139f4eb0ce?w=300&q=80" alt="">
+        <div class="game-tile-grad"></div>
+        <div class="game-tile-text"><div class="game-tile-title">🏆 Scores</div><div class="game-tile-sub">Bohnanza &amp; meer</div></div>
+      </div>
+      <div class="game-tile" onclick="openGame('game-kampvuur')">
+        <img src="https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=300&q=80" alt="">
+        <div class="game-tile-grad"></div>
+        <div class="game-tile-text"><div class="game-tile-title">🔥 Kampvuur</div><div class="game-tile-sub">Verhalen &amp; spellen</div></div>
+      </div>
+      <div class="game-tile" onclick="openGame('game-avond')">
+        <img src="https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=300&q=80" alt="">
+        <div class="game-tile-grad"></div>
+        <div class="game-tile-text"><div class="game-tile-title">🌙 Avondspel</div><div class="game-tile-sub">Kies &amp; timer</div></div>
+      </div>
+      <div class="game-tile" onclick="openGame('game-water')">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&q=80" alt="">
+        <div class="game-tile-grad"></div>
+        <div class="game-tile-text"><div class="game-tile-title">🏊 Waterspellen</div><div class="game-tile-sub">SUP &amp; meer</div></div>
+      </div>
+      <div class="game-tile" onclick="openGame('game-leed')">
+        <img src="https://images.unsplash.com/photo-1530908295418-a12e326966ba?w=300&q=80" alt="">
+        <div class="game-tile-grad"></div>
+        <div class="game-tile-text"><div class="game-tile-title">☔ Leedvermaak</div><div class="game-tile-sub">Thuisweer vs. jullie</div></div>
       </div>
     </div>
 
@@ -955,6 +1004,17 @@ function renderProfileGrid(){
       </div>
     </div>
 
+    <!-- VVDG: Vraag van de dag -->
+    <div class="uitleg-block" id="game-vvdg">
+      <div class="uitleg-head" onclick="toggleUitleg(this);loadVvdg()">
+        <div class="uitleg-title">❓ Vraag van de dag <span id="vvdg-badge" style="font-size:0.68rem;background:#4A9E6E;color:#fff;border-radius:10px;padding:2px 7px;margin-left:6px;vertical-align:middle;display:none;">NIEUW</span></div>
+        <div class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <div id="vvdg-content" style="min-height:60px;"></div>
+      </div>
+    </div>
+
     <!-- U9c: Dagelijkse uitdaging -->
     <div class="uitleg-block">
       <div class="uitleg-head" onclick="toggleUitleg(this);initDagUitdaging()">
@@ -980,7 +1040,7 @@ function renderProfileGrid(){
       </div>
     </div>
 
-    <div class="sec-label" style="margin-top:4px;">Scorebord</div>
+    <div id="game-klaverjas" class="sec-label" style="margin-top:4px;">Klaverjas scorebord <span class="score-live" style="display:inline-block;width:7px;height:7px;background:#4A9E6E;border-radius:50%;margin-left:6px;vertical-align:middle;" title="Live"></span></div>
     <div class="kv-teams" id="kv-teams">
       <div class="kv-team">
         <div class="kv-team-score" id="kv-score1" style="color:#9E7AAD;">0</div>
@@ -1121,7 +1181,7 @@ function renderProfileGrid(){
     </div>
 
     <!-- U6: Quiz -->
-    <div class="uitleg-block">
+    <div class="uitleg-block" id="game-quiz">
       <div class="uitleg-head" onclick="toggleUitleg(this);initQuiz()">
         <div class="uitleg-title">🧠 Quiz Slovenië & Oostenrijk</div>
         <div class="uitleg-arrow">▼</div>
@@ -1172,7 +1232,7 @@ function renderProfileGrid(){
     </div>
 
     <!-- U5b: Scorelijst -->
-    <div class="uitleg-block">
+    <div class="uitleg-block" id="game-scores">
       <div class="uitleg-head" onclick="toggleUitleg(this);loadScoreGames()">
         <div class="uitleg-title">🏆 Scorelijst (Bohnanza / eigen spel)</div>
         <div class="uitleg-arrow">▼</div>
@@ -1188,7 +1248,7 @@ function renderProfileGrid(){
     </div>
 
     <!-- U5g: Kampavond-spellen -->
-    <div class="uitleg-block">
+    <div class="uitleg-block" id="game-avond">
       <div class="uitleg-head" onclick="toggleUitleg(this)">
         <div class="uitleg-title">🌙 Kampavond-spellen</div>
         <div class="uitleg-arrow">▼</div>
@@ -1232,7 +1292,7 @@ function renderProfileGrid(){
     </div>
 
     <!-- U5h: Weer-leedvermaak -->
-    <div class="uitleg-block">
+    <div class="uitleg-block" id="game-leed">
       <div class="uitleg-head" onclick="toggleUitleg(this);weerGeladen=false;loadWeer()">
         <div class="uitleg-title">☔ Leedvermaak & slecht thuisweer</div>
         <div class="uitleg-arrow">▼</div>
@@ -1256,7 +1316,7 @@ function renderProfileGrid(){
     </div>
 
     <!-- U5e: Kampvuurverhaal -->
-    <div class="uitleg-block">
+    <div class="uitleg-block" id="game-kampvuur">
       <div class="uitleg-head" onclick="toggleUitleg(this)">
         <div class="uitleg-title">🔥 Kampvuurverhaal — Het Meer van Bohinj</div>
         <div class="uitleg-arrow">▼</div>
@@ -1289,7 +1349,7 @@ function renderProfileGrid(){
     </div>
 
     <!-- U5f: Waterspellen -->
-    <div class="uitleg-block">
+    <div class="uitleg-block" id="game-water">
       <div class="uitleg-head" onclick="toggleUitleg(this)">
         <div class="uitleg-title">🏊 Waterspellen (Bohinj / Wolfgangsee)</div>
         <div class="uitleg-arrow">▼</div>
@@ -2338,6 +2398,12 @@ function switchTab(tab){
   if(tab==='heenreis' && currentFamily===1){
     setTimeout(()=>{ if(!hrMapInited) initHrMap(); else if(hrMap) hrMap.invalidateSize(); },150);
   }
+  if(tab==='spellen'){
+    loadKvData();
+    loadG9(true);
+    loadScoreGames();
+    startSpellenAutoRefresh();
+  }
 }
 
 // ── PROGRAMMA ────────────────────────────────────────
@@ -2699,8 +2765,10 @@ function renderKvPotjes(){
         <div class="kv-pts${win2?' win':''}${p.nat&&p.roepTeam===2?' nat':''}">${p.nat&&p.roepTeam===2?'nat':p.pts2}</div>
       </div>
       <button class="kv-del" onclick="deletePotje(${i});event.stopPropagation()">🗑</button>
-    </div>`;
+    </div>
+    ${p.id?`<div class="react-bar" style="padding:0 12px 8px;" id="react-kv-${p.id}">${renderReactBar('kv',p.id)}</div>`:''}`;
   }).join('') + '</div>';
+  kvPotjes.filter(p=>p.id).forEach(p=>loadReactions('kv',p.id));
 }
 
 function openKvModal(){
@@ -3956,6 +4024,206 @@ function quizNav(d){
 function quizRandom(){
   quizIdx=Math.floor(Math.random()*quizFiltered.length);
   quizToon(quizIdx);
+}
+
+// ── OPEN GAME (tile nav) ──────────────────────────────
+function openGame(id){
+  switchTab('spellen');
+  setTimeout(()=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.scrollIntoView({behavior:'smooth',block:'start'});
+    const head=el.querySelector('.uitleg-head');
+    const body=el.querySelector('.uitleg-body');
+    if(body && !body.classList.contains('open')){
+      if(head) toggleUitleg(head);
+    }
+    if(id==='game-vvdg') loadVvdg();
+    if(id==='bingo-block') bingoLaadGalerie();
+  },120);
+}
+
+// ── SPELLEN AUTO-REFRESH ──────────────────────────────
+let spellenRefreshTimer=null;
+function startSpellenAutoRefresh(){
+  if(spellenRefreshTimer) return;
+  spellenRefreshTimer=setInterval(()=>{
+    const spelSec=document.getElementById('sec-spellen');
+    if(!spelSec||!spelSec.classList.contains('active')){ clearInterval(spellenRefreshTimer); spellenRefreshTimer=null; return; }
+    loadKvData();
+    loadG9(false);
+    loadScoreGames();
+    if(bingoSessie) bingoLaadGalerie();
+    const vvdgBody=document.getElementById('vvdg-content');
+    if(vvdgBody&&vvdgBody.innerHTML) loadVvdg();
+  },30000);
+}
+
+// ── VRAAG VAN DE DAG (VVDG) ───────────────────────────
+const VVDG=[
+  // pre-vakantie (20–26 juli)
+  {id:'v01',dag:'2026-07-20',vraag:'Welk vakantiesnack neem jij als eerste mee de grens over?',type:'open'},
+  {id:'v02',dag:'2026-07-21',vraag:'Wat verwacht jij het meest te missen van thuis?',type:'open'},
+  {id:'v03',dag:'2026-07-22',vraag:'Geef jezelf een vakantie-superkracht — wat is die?',type:'open'},
+  {id:'v04',dag:'2026-07-23',vraag:'Wat is jouw geheime campingtruc die niemand kent?',type:'open'},
+  {id:'v05',dag:'2026-07-24',vraag:'Hoe lang houd jij het vol zonder wifi voor je gek wordt?',type:'keuze',opties:['< 1 uur','1–4 uur','Een dag','Geen probleem — digitale detox!']},
+  {id:'v06',dag:'2026-07-25',vraag:'Wie van de groep sliep het langst uit op de laatste vakantie?',type:'stemmen'},
+  {id:'v07',dag:'2026-07-26',vraag:'Twee waarheden, één leugen — over jezelf. Post ze!',type:'open'},
+  // vakantiedagen Slovenië (27 juli – 4 aug)
+  {id:'v08',dag:'2026-07-27',vraag:'Eerste indruk Bohinj — wat zeg je in één woord?',type:'open'},
+  {id:'v09',dag:'2026-07-28',vraag:'Wat was het hoogtepunt van dag 1?',type:'open'},
+  {id:'v10',dag:'2026-07-29',vraag:'Meest memorabele moment op het meer tot nu toe?',type:'open'},
+  {id:'v11',dag:'2026-07-30',vraag:'Wie duikt het koudste water in zonder schreeuwen?',type:'stemmen'},
+  {id:'v12',dag:'2026-07-31',vraag:'Kies: wandelen óf liggen aan het meer?',type:'keuze',opties:['Wandelen — hoe verder hoe beter','Liggen aan het meer','Half-half','Liggen maar zeggen dat ik ga wandelen']},
+  {id:'v13',dag:'2026-08-01',vraag:'Wat is het beste Sloveense eten dat je hebt geproefd?',type:'open'},
+  {id:'v14',dag:'2026-08-02',vraag:'Wie is de meest relaxte vakantieganger tot nu toe?',type:'stemmen'},
+  {id:'v15',dag:'2026-08-03',vraag:'Beschrijf Slovenië in drie woorden',type:'open'},
+  {id:'v16',dag:'2026-08-04',vraag:'Wat ga jij missen van Bohinj als we morgen vertrekken?',type:'open'},
+  // vakantiedagen Oostenrijk (5–14 aug)
+  {id:'v17',dag:'2026-08-05',vraag:'Eerste indruk Wolfgangsee — beter of anders dan verwacht?',type:'keuze',opties:['Nog mooier dan verwacht','Anders maar ook geweldig','Vergelijkbaar met Bohinj','Bohinj was toch beter']},
+  {id:'v18',dag:'2026-08-06',vraag:'Wat is het meest Oostenrijkse ding dat je vandaag hebt gezien?',type:'open'},
+  {id:'v19',dag:'2026-08-07',vraag:'Wie haalt de meeste platte steentjes bij het keilen?',type:'stemmen'},
+  {id:'v20',dag:'2026-08-08',vraag:'Favoriete activiteit tot nu toe van de hele reis?',type:'open'},
+  {id:'v21',dag:'2026-08-09',vraag:'Appesbach-leven: hoe beoordeel je het campingcomfort?',type:'keuze',opties:['5 sterren — verwend!','Goed genoeg voor mij','Kan beter','Ik mis de bungalow']},
+  {id:'v22',dag:'2026-08-10',vraag:'Wie heeft de meest epische actie van de vakantie gedaan?',type:'stemmen'},
+  {id:'v23',dag:'2026-08-11',vraag:'Wat ga je als eerste doen als je thuis bent?',type:'open'},
+  {id:'v24',dag:'2026-08-12',vraag:'Perseïden-meteorenregen vanavond — wensen tellen! Hoeveel zie jij er?',type:'open'},
+  {id:'v25',dag:'2026-08-13',vraag:'Wat was de grappigste blunder van de vakantie?',type:'open'},
+  {id:'v26',dag:'2026-08-14',vraag:'Laatste dag. Geef de vakantie een rapportcijfer 1–10 en waarom.',type:'open'},
+];
+
+function vvdgVandaag(){
+  const t=new Date().toISOString().slice(0,10);
+  return VVDG.find(v=>v.dag===t)||VVDG[VVDG.length-1];
+}
+
+async function loadVvdg(){
+  const q=vvdgVandaag();
+  const el=document.getElementById('vvdg-content');
+  if(!el) return;
+  const badge=document.getElementById('vvdg-badge');
+  el.innerHTML='<div style="text-align:center;padding:16px;color:#9A948E;font-size:0.82rem;">Laden…</div>';
+  try{
+    const {data:antwoorden}=await sb.from('slovenie_vvdg').select('*').eq('dag',q.dag).eq('vraag_id',q.id);
+    renderVvdg(q,antwoorden||[]);
+    if(badge){
+      const eigen=antwoorden?.find(a=>a.speler===currentUser);
+      badge.style.display=eigen?'none':'inline';
+    }
+  }catch(e){
+    el.innerHTML='<div style="padding:12px;color:#c0392b;font-size:0.82rem;">Kon vraag niet laden.</div>';
+  }
+}
+
+function renderVvdg(q,antwoorden){
+  const el=document.getElementById('vvdg-content');
+  if(!el) return;
+  const eigen=antwoorden.find(a=>a.speler===currentUser);
+  let html=`<div style="font-weight:700;font-size:0.92rem;color:#0A0A0A;margin-bottom:10px;line-height:1.4;">${q.vraag}</div>`;
+  // eigen antwoord invullen
+  if(!eigen){
+    if(q.type==='open'){
+      html+=`<div style="display:flex;gap:6px;margin-bottom:12px;">
+        <input id="vvdg-inp" placeholder="Jouw antwoord…" style="flex:1;border:1.5px solid #ddd;border-radius:10px;padding:8px 12px;font-family:inherit;font-size:0.88rem;outline:none;">
+        <button onclick="submitVvdg('${q.dag}','${q.id}','open')" style="padding:8px 14px;background:#4A9E6E;color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;">Verstuur</button>
+      </div>`;
+    } else if(q.type==='keuze'){
+      html+=`<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">`;
+      q.opties.forEach((opt,i)=>{
+        html+=`<button class="vvdg-ans-btn" onclick="submitVvdgKeuze('${q.dag}','${q.id}','${opt.replace(/'/g,"\\'")}')">${opt}</button>`;
+      });
+      html+=`</div>`;
+    } else if(q.type==='stemmen'){
+      const namen=['Duurt','Griette','Arjen','Sanne','Jort','Lenn','Mette','Teun'];
+      html+=`<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">`;
+      namen.forEach(n=>{
+        html+=`<button class="vvdg-ans-btn" onclick="submitVvdgKeuze('${q.dag}','${q.id}','${n}')">${n}</button>`;
+      });
+      html+=`</div>`;
+    }
+  } else {
+    html+=`<div style="background:rgba(74,158,110,0.1);border:1.5px solid rgba(74,158,110,0.3);border-radius:10px;padding:8px 12px;font-size:0.85rem;color:#2D7A52;margin-bottom:12px;">✓ Jouw antwoord: <strong>${eigen.antwoord}</strong></div>`;
+  }
+  // antwoorden van anderen
+  if(antwoorden.length>0){
+    html+=`<div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin-bottom:7px;">${antwoorden.length} antwoord${antwoorden.length!==1?'en':''}</div>`;
+    antwoorden.forEach(a=>{
+      const isEigen=a.speler===currentUser;
+      html+=`<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:${KLEUREN[a.speler]||'#888'};display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:#fff;flex-shrink:0;font-style:italic;">${a.speler.charAt(0).toUpperCase()}</div>
+        <div style="flex:1;">
+          <div style="font-size:0.7rem;color:#9A948E;margin-bottom:2px;">${a.speler.charAt(0).toUpperCase()+a.speler.slice(1)}</div>
+          <div style="font-size:0.85rem;color:#0A0A0A;font-weight:${isEigen?700:400};">${a.antwoord}</div>
+          <div class="react-bar" id="react-vvdg-${a.id}">${renderReactBar('vvdg',a.id)}</div>
+        </div>
+      </div>`;
+    });
+  } else {
+    html+=`<div style="font-size:0.82rem;color:#9A948E;text-align:center;padding:8px 0;">Wees de eerste die antwoordt!</div>`;
+  }
+  el.innerHTML=html;
+  antwoorden.forEach(a=>loadReactions('vvdg',a.id));
+}
+
+const KLEUREN={duurt:'#2D4A8A',griette:'#8A2D6B',arjen:'#2D7A52',sanne:'#8A5A2D',jort:'#2D6B8A',lenn:'#8A2D2D',mette:'#6B8A2D',teun:'#6B2D8A'};
+
+async function submitVvdg(dag,vraagId,type){
+  if(!currentUser) return;
+  const inp=document.getElementById('vvdg-inp');
+  const val=inp?inp.value.trim():'';
+  if(!val){inp&&inp.focus();return;}
+  await submitVvdgKeuze(dag,vraagId,val);
+}
+
+async function submitVvdgKeuze(dag,vraagId,antwoord){
+  if(!currentUser) return;
+  try{
+    await sb.from('slovenie_vvdg').upsert({dag,vraag_id:vraagId,speler:currentUser,antwoord},{onConflict:'dag,vraag_id,speler'});
+    showToast('Antwoord verstuurd!');
+    loadVvdg();
+  }catch(e){
+    showToast('Opslaan mislukt');
+  }
+}
+
+// ── REACTIONS ─────────────────────────────────────────
+const EMOJIS=['👏','❤️','😂','🔥'];
+const reactieCache={};
+
+function renderReactBar(itemType,itemId){
+  return EMOJIS.map(e=>`<button class="react-btn" onclick="toggleReactie('${itemType}','${itemId}','${e}')" id="rbtn-${itemType}-${itemId}-${e.codePointAt(0)}">${e} <span id="rcnt-${itemType}-${itemId}-${e.codePointAt(0)}">0</span></button>`).join('');
+}
+
+async function loadReactions(itemType,itemId){
+  try{
+    const {data}=await sb.from('slovenie_reactions').select('*').eq('item_type',itemType).eq('item_id',itemId);
+    if(!data) return;
+    reactieCache[`${itemType}-${itemId}`]=data;
+    EMOJIS.forEach(e=>{
+      const cp=e.codePointAt(0);
+      const cnt=data.filter(r=>r.emoji===e).length;
+      const mine=data.some(r=>r.emoji===e&&r.speler===currentUser);
+      const cntEl=document.getElementById(`rcnt-${itemType}-${itemId}-${cp}`);
+      const btnEl=document.getElementById(`rbtn-${itemType}-${itemId}-${cp}`);
+      if(cntEl) cntEl.textContent=cnt;
+      if(btnEl){ btnEl.classList.toggle('mine',mine); }
+    });
+  }catch(e){}
+}
+
+async function toggleReactie(itemType,itemId,emoji){
+  if(!currentUser) return;
+  const key=`${itemType}-${itemId}`;
+  const cached=reactieCache[key]||[];
+  const existing=cached.find(r=>r.emoji===emoji&&r.speler===currentUser);
+  try{
+    if(existing){
+      await sb.from('slovenie_reactions').delete().eq('id',existing.id);
+    } else {
+      await sb.from('slovenie_reactions').insert({item_type:itemType,item_id:itemId,speler:currentUser,emoji});
+    }
+    loadReactions(itemType,itemId);
+  }catch(e){}
 }
 
 // ── INIT ──────────────────────────────────────────────
