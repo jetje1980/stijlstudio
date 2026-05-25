@@ -1389,7 +1389,13 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
 // ── SUPABASE ─────────────────────────────────────────
 const SB_URL  = 'https://osuqtfsxmquwqsbgzlqn.supabase.co';
 const SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
-const sb      = supabase.createClient(SB_URL, SB_KEY);
+let sb;
+try {
+  sb = (typeof supabase !== 'undefined') ? supabase.createClient(SB_URL, SB_KEY) : null;
+} catch(e) {
+  sb = null;
+  console.warn('Supabase niet beschikbaar — app werkt verder zonder gedeelde opslag.');
+}
 
 // ── CONFIG ──────────────────────────────────────────
 const TRIP_DATE = new Date('2026-07-27T07:00:00');
@@ -2569,6 +2575,7 @@ function controleerBingo(kaart){
 }
 
 function bingoAbonneer(sessionId){
+  if(!sb) return;
   if(bingoChannel) bingoChannel.unsubscribe();
   bingoChannel=sb.channel('bingo-'+sessionId)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'slovenie_bingo_marks',filter:`session_id=eq.${sessionId}`},payload=>{
