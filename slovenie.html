@@ -803,6 +803,55 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
       </div>
     </div>
 
+    <!-- U5e: Kampvuurverhaal -->
+    <div class="uitleg-block">
+      <div class="uitleg-head" onclick="toggleUitleg(this)">
+        <div class="uitleg-title">🔥 Kampvuurverhaal — Het Meer van Bohinj</div>
+        <div class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <p style="font-size:0.84rem;color:#6B6560;margin:0 0 10px;">Vul de namen in en tik "Vertel het verhaal" — elk keer anders!</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;">
+          <div>
+            <div style="font-size:0.75rem;font-weight:700;color:#6B6560;margin-bottom:3px;">Held (naam)</div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px;" id="kv-held-knoppen"></div>
+            <input id="kv-held" placeholder="bijv. Jort" style="width:100%;box-sizing:border-box;border:1.5px solid #ddd;border-radius:8px;padding:7px 9px;font-family:inherit;font-size:0.88rem;">
+          </div>
+          <div>
+            <div style="font-size:0.75rem;font-weight:700;color:#6B6560;margin-bottom:3px;">Schurk (naam)</div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px;" id="kv-schurk-knoppen"></div>
+            <input id="kv-schurk" placeholder="bijv. Duurt" style="width:100%;box-sizing:border-box;border:1.5px solid #ddd;border-radius:8px;padding:7px 9px;font-family:inherit;font-size:0.88rem;">
+          </div>
+          <div>
+            <div style="font-size:0.75rem;font-weight:700;color:#6B6560;margin-bottom:3px;">Plek</div>
+            <input id="kv-plek" placeholder="bijv. Savica-waterval" style="width:100%;box-sizing:border-box;border:1.5px solid #ddd;border-radius:8px;padding:7px 9px;font-family:inherit;font-size:0.88rem;" value="Savica-waterval">
+          </div>
+          <div>
+            <div style="font-size:0.75rem;font-weight:700;color:#6B6560;margin-bottom:3px;">Voorwerp</div>
+            <input id="kv-ding" placeholder="bijv. fles stroop" style="width:100%;box-sizing:border-box;border:1.5px solid #ddd;border-radius:8px;padding:7px 9px;font-family:inherit;font-size:0.88rem;" value="kompas">
+          </div>
+        </div>
+        <button onclick="vertelVerhaal()" style="padding:10px 22px;background:#4A9E6E;color:#fff;border:none;border-radius:20px;font-family:inherit;font-size:0.9rem;font-weight:700;cursor:pointer;">🔥 Vertel het verhaal</button>
+        <div id="kv-verhaal" style="margin-top:12px;display:none;background:#1A3A2A;color:#E8DDD0;border-radius:12px;padding:16px;font-size:0.88rem;line-height:1.65;white-space:pre-wrap;"></div>
+      </div>
+    </div>
+
+    <!-- U5f: Waterspellen -->
+    <div class="uitleg-block">
+      <div class="uitleg-head" onclick="toggleUitleg(this)">
+        <div class="uitleg-title">🏊 Waterspellen (Bohinj / Wolfgangsee)</div>
+        <div class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <div class="uitleg-row" style="font-size:0.8rem;color:#9A948E;margin-bottom:8px;">⚠️ Veiligheid: gletsjerwater is koud — rustig inwennen, niet alleen zwemmen, op diepte letten.</div>
+        <div class="uitleg-row"><strong>SUP-estafette</strong> — Twee teams, twee boards. Estafette om een boeibaken en terug. Eerste die alle teamleden heeft laten varen wint.</div>
+        <div class="uitleg-row"><strong>King of the Board</strong> — Iedereen probeert elkaar van een SUP-board te duwen (in het water eindigen is spannend, niet gevaarlijk). Wie het langst op het board blijft is King.</div>
+        <div class="uitleg-row"><strong>Steentje keilen</strong> — Wie haalt de meeste keren met één steen? Vlak, plat steentje zoeken, laag gooien met spin. Tellen!</div>
+        <div class="uitleg-row"><strong>Duik-schattenjacht</strong> — Gooi een handvol witte steentjes in het heldere ondiepe water. Wie de meeste opduikt in 60 seconden wint.</div>
+        <div class="uitleg-row"><strong>Koud-water-challenge</strong> — Wie springt er als eerste in? Punten voor stijl bij de landing. Jury = de rest van de groep.</div>
+      </div>
+    </div>
+
     <!-- U5c: Wist-je-datjes -->
     <div class="uitleg-block">
       <div class="uitleg-head" onclick="toggleUitleg(this)">
@@ -1478,6 +1527,7 @@ function startApp() {
   loadRecepten();
   loadDayMeals();
   renderPhrases();
+  initKvNaamKnoppen();
   renderKvScores();
   const seen = localStorage.getItem(`${SK}_intro_${currentUser}`);
   if (!seen) { showIntro(); localStorage.setItem(`${SK}_intro_${currentUser}`,'1'); }
@@ -2298,6 +2348,31 @@ function toggleCollapsibleMap(el, mapId, initFn){
   if(el.classList.contains('open')){
     setTimeout(()=>{ initFn(); if(mapId==='bohinj-map'&&bohinjMap) bohinjMap.invalidateSize(); if(mapId==='appesbach-map'&&appesbach) appesbach.invalidateSize(); },150);
   }
+}
+
+// ── KAMPVUURVERHAAL U5e ───────────────────────────────
+const ALLE_NAMEN=['Duurt','Griette','Lauren','Jort','Sanne','Arjen','Silas','Gijs','Ot'];
+const VERHAAL_TEMPLATES = [
+  (h,s,p,d)=>`Lang geleden, op een avond dat de maan laag hing boven het ${p}, liep ${h} alleen het pad op. In de tas: alleen een ${d} en veel moed.\n\nMaar ${s} had hetzelfde idee — en was al eerder. "Dat meer is van mij," grijnzde ${s}.\n\n${h} hield het ${d} omhoog. Gouden licht flitste over het water. Een ruis in de struiken — en toen: Zlatorog zelf, de gouden gems, die met één sprong over het pad school en ${s} precies zó aankeek dat die stilstond.\n\n${h} liep rustig verder. Het meer glinsterde, ijskoud en stilletjes. Soms vind je schat niet door te zoeken, maar door gewoon te lopen.`,
+  (h,s,p,d)=>`${h} was naar het ${p} gegaan om één ding te doen: zwemmen vóór iedereen wakker was. Maar naast het water lag een ${d}.\n\nEen briefje eraan: "Niet aanraken — ${s}."\n\n${h} pakte het op. Op hetzelfde moment ruiste er iets in het gras — een marmot, twee marmotten, en toen twaalf. Ze staarden allemaal naar het ${d}.\n\n${s} kwam aanrennen: "Hé! Dat is van mij!"\n\n"Jammer," zei ${h} vrolijk. "De marmotten kozen mij." En dat was, zo bleek, de enige regel die er telde.`,
+  (h,s,p,d)=>`De legende zegt dat Zlatorog zijn goud verborg op de bodem van het meer bij het ${p}. Niemand geloofde het — totdat ${h} met een ${d} in het water sprong en het bij de derde duik terugvond.\n\n${s} wachtte op de oever, klaar om het over te nemen. Maar goud is zwaar, en ${s} kon niet zwemmen.\n\n${h} legde het voorzichtig terug op de bodem. "Voor de volgende die het echt nodig heeft," fluisterde ${h}.\n\nDie nacht zagen ze allebei een gouden glinstering diep in het water. Of misschien was het gewoon de maan.`,
+];
+function vertelVerhaal(){
+  const h=document.getElementById('kv-held').value.trim()||'de held';
+  const s=document.getElementById('kv-schurk').value.trim()||'de schurk';
+  const p=document.getElementById('kv-plek').value.trim()||'meer';
+  const d=document.getElementById('kv-ding').value.trim()||'kompas';
+  const t=VERHAAL_TEMPLATES[Math.floor(Math.random()*VERHAAL_TEMPLATES.length)];
+  const el=document.getElementById('kv-verhaal');
+  el.textContent=t(h,s,p,d); el.style.display='block';
+}
+function initKvNaamKnoppen(){
+  ['kv-held-knoppen','kv-schurk-knoppen'].forEach((id,idx)=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.innerHTML=ALLE_NAMEN.slice(0,5).map(n=>
+      `<button onclick="document.getElementById('${idx===0?'kv-held':'kv-schurk'}').value='${n}'" style="padding:3px 8px;background:#F0E8E2;border:1px solid #ddd;border-radius:12px;font-size:0.72rem;cursor:pointer;">${n}</button>`
+    ).join('');
+  });
 }
 
 // ── WIST-JE-DATJES U5c ───────────────────────────────
