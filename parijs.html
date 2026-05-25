@@ -2243,6 +2243,12 @@ function herbeginVoorkeur() {
 // ── INIT APP ──────────────────────────────────────
 function initApp() {
   ITEMS = [...addedItems.map(it => ({...it, added:true})), ...ITEMS_BASE];
+  // Log elke app-opening (niet alleen bij profiel-selectie)
+  fetch('https://osuqtfsxmquwqsbgzlqn.supabase.co/functions/v1/log-session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
+    body: JSON.stringify({ user_code: currentUser, event: 'visit', metadata: { ua: navigator.userAgent, ts: new Date().toISOString() } })
+  }).catch(() => {});
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('app').classList.add('visible');
   initIntroBanner();
