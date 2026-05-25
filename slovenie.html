@@ -1630,6 +1630,7 @@ function startApp() {
   loadDayMeals();
   renderPhrases();
   initKvNaamKnoppen();
+  bingoLaadGalerie();
   renderKvScores();
   const seen = localStorage.getItem(`${SK}_intro_${currentUser}`);
   if (!seen) { showIntro(); localStorage.setItem(`${SK}_intro_${currentUser}`,'1'); }
@@ -2450,6 +2451,149 @@ function toggleCollapsibleMap(el, mapId, initFn){
   if(el.classList.contains('open')){
     setTimeout(()=>{ initFn(); if(mapId==='bohinj-map'&&bohinjMap) bohinjMap.invalidateSize(); if(mapId==='appesbach-map'&&appesbach) appesbach.invalidateSize(); },150);
   }
+}
+
+// ── AUTOBINGO U5a ────────────────────────────────────
+const BINGO_ITEMS = [
+  'Koe in de wei','Geel kenteken','Tunnel','Bergtop met sneeuw','Kerk met ui-koepel',
+  'Camper zoals die van ons','Meer / zwemplek','File','Tractor','Sloveens/Oostenrijks bord',
+  'Fietser op de berg','IJssalon','Windmolen','Brug over rivier','Gemzen/marmot-bord',
+  'Tolstation','Zonnepanelen op dak','Wegwerkzaamheden','Stork / ooievaar','Politieauto',
+  'Bootje op het water','Sloep op aanhanger','Sneeuw langs de weg','Wildwaarschuwingsbord',
+  'Caravan','Tankstation','Militair voertuig','Paard in weiland','Boom in bloei','Waterval',
+];
+let bingoSessie=null, bingoKaart=[], bingoMarks={}, bingoChannel=null, bingoSpelerNaam='';
+
+function bingoCode(){ return Math.random().toString(36).slice(2,6).toUpperCase(); }
+
+function shuffleArr(a){ const b=[...a]; for(let i=b.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]; } return b; }
+
+async function bingoLaadGalerie(){
+  try{
+    const {data} = await sb.from('slovenie_bingo_marks').select('foto_url,item,speler').not('foto_url','is',null).order('created_at',{ascending:false}).limit(18);
+    const el=document.getElementById('bingo-galerie'); if(!el) return;
+    if(!data?.length){ el.innerHTML='<div style="font-size:0.78rem;color:#9A948E;grid-column:span 3;">Nog geen bewijsfoto\'s.</div>'; return; }
+    el.innerHTML=data.map(r=>`<div title="${r.item} — ${r.speler}"><img src="${r.foto_url}" style="width:100%;height:70px;object-fit:cover;border-radius:7px;" loading="lazy"></div>`).join('');
+  } catch{}
+}
+
+async function bingoNieuw(){
+  const naam=(currentUser||'').charAt(0).toUpperCase()+(currentUser||'').slice(1);
+  bingoSpelerNaam=naam||prompt('Jouw naam:');
+  if(!bingoSpelerNaam) return;
+  const code=bingoCode();
+  const modus='lijn';
+  try{
+    const {data:sess,error:se}=await sb.from('slovenie_bingo_sessions').insert({code,modus,actief:true}).select().single();
+    if(se) throw se;
+    const kaart=shuffleArr(BINGO_ITEMS).slice(0,16);
+    const {error:pe}=await sb.from('slovenie_bingo_players').insert({session_id:sess.id,naam:bingoSpelerNaam,kaart});
+    if(pe) throw pe;
+    bingoSessie=sess; bingoKaart=kaart; bingoMarks={};
+    document.getElementById('bingo-lobby-status').textContent='';
+    startBingoSpel(sess,kaart);
+  } catch(e){ document.getElementById('bingo-lobby-status').textContent='⚠️ Kon spel niet starten. Controleer verbinding.'; }
+}
+
+async function bingoJoin(){
+  const code=(document.getElementById('bingo-code-in')?.value||'').trim().toUpperCase();
+  if(!code){ document.getElementById('bingo-lobby-status').textContent='Voer een spelcode in.'; return; }
+  const naam=(currentUser||'').charAt(0).toUpperCase()+(currentUser||'').slice(1);
+  bingoSpelerNaam=naam||prompt('Jouw naam:');
+  if(!bingoSpelerNaam) return;
+  try{
+    const {data:sess,error}=await sb.from('slovenie_bingo_sessions').select().eq('code',code).eq('actief',true).maybeSingle();
+    if(error||!sess){ document.getElementById('bingo-lobby-status').textContent='Spelcode niet gevonden of spel al afgelopen.'; return; }
+    const kaart=shuffleArr(BINGO_ITEMS).slice(0,16);
+    await sb.from('slovenie_bingo_players').insert({session_id:sess.id,naam:bingoSpelerNaam,kaart});
+    const {data:marks}=await sb.from('slovenie_bingo_marks').select('*').eq('session_id',sess.id).eq('speler',bingoSpelerNaam);
+    bingoMarks={}; (marks||[]).forEach(m=>{ bingoMarks[m.item]=m; });
+    bingoSessie=sess; bingoKaart=kaart;
+    startBingoSpel(sess,kaart);
+  } catch{ document.getElementById('bingo-lobby-status').textContent='⚠️ Fout bij het meedoen. Probeer opnieuw.'; }
+}
+
+function startBingoSpel(sess,kaart){
+  document.getElementById('bingo-lobby').style.display='none';
+  document.getElementById('bingo-spel').style.display='block';
+  document.getElementById('bingo-sessie-code').textContent='Code: '+sess.code;
+  document.getElementById('bingo-modus-badge').textContent='Modus: '+sess.modus;
+  renderBingoGrid(kaart);
+  laadBingoSpelers(sess.id);
+  bingoAbonneer(sess.id);
+}
+
+function renderBingoGrid(kaart){
+  const grid=document.getElementById('bingo-grid'); if(!grid) return;
+  const cols=4;
+  grid.style.gridTemplateColumns=`repeat(${cols},1fr)`;
+  grid.innerHTML=kaart.map(item=>{
+    const m=bingoMarks[item];
+    return `<div class="bingo-cel${m?' gevonden':''}" onclick="bingoTikVakje('${item.replace(/'/,"\\'")}',this)">
+      ${m?.foto_url?`<img src="${m.foto_url}" alt="${item}">`:`<span>${item}</span>`}
+    </div>`;
+  }).join('');
+  controleerBingo(kaart);
+}
+
+async function bingoTikVakje(item,cel){
+  if(bingoMarks[item]) return;
+  const inp=document.createElement('input');
+  inp.type='file'; inp.accept='image/*'; inp.capture='environment';
+  inp.onchange=async()=>{
+    const file=inp.files[0]; if(!file) return;
+    cel.innerHTML='⏳'; cel.classList.add('gevonden');
+    try{
+      const blob=await comprimeerFoto(file);
+      const pad=`slovenie/${bingoSessie.code}/${Date.now()}.jpg`;
+      await sb.storage.from('slovenie-bingo').upload(pad,blob,{contentType:'image/jpeg'});
+      const {data:pub}=sb.storage.from('slovenie-bingo').getPublicUrl(pad);
+      const foto_url=pub.publicUrl;
+      await sb.from('slovenie_bingo_marks').insert({session_id:bingoSessie.id,speler:bingoSpelerNaam,item,foto_url});
+      bingoMarks[item]={foto_url,item,speler:bingoSpelerNaam};
+      cel.innerHTML=`<img src="${foto_url}" alt="${item}">`;
+    } catch{ cel.classList.remove('gevonden'); cel.innerHTML=`<span>${item}</span>`; }
+  };
+  inp.click();
+}
+
+function controleerBingo(kaart){
+  const cols=4, gevonden=item=>!!bingoMarks[item];
+  let bingo=false;
+  for(let r=0;r<4;r++){ if([0,1,2,3].every(c=>gevonden(kaart[r*cols+c]))) bingo=true; }
+  for(let c=0;c<4;c++){ if([0,1,2,3].every(r=>gevonden(kaart[r*cols+c]))) bingo=true; }
+  if([0,5,10,15].every(i=>gevonden(kaart[i]))) bingo=true;
+  if([3,6,9,12].every(i=>gevonden(kaart[i]))) bingo=true;
+  const st=document.getElementById('bingo-status');
+  if(st) st.textContent=bingo?'🎉 BINGO! Gefeliciteerd '+bingoSpelerNaam+'!':'';
+}
+
+function bingoAbonneer(sessionId){
+  if(bingoChannel) bingoChannel.unsubscribe();
+  bingoChannel=sb.channel('bingo-'+sessionId)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'slovenie_bingo_marks',filter:`session_id=eq.${sessionId}`},payload=>{
+      const m=payload.new;
+      if(m.speler!==bingoSpelerNaam){ bingoMarks[m.item]=m; renderBingoGrid(bingoKaart); }
+      laadBingoSpelers(sessionId);
+    })
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'slovenie_bingo_players',filter:`session_id=eq.${sessionId}`},()=>{ laadBingoSpelers(sessionId); })
+    .subscribe();
+}
+
+async function laadBingoSpelers(sessionId){
+  try{
+    const {data}=await sb.from('slovenie_bingo_players').select('naam').eq('session_id',sessionId);
+    const el=document.getElementById('bingo-spelers-bar');
+    if(el&&data) el.textContent='Spelers: '+data.map(p=>p.naam).join(', ');
+  } catch{}
+}
+
+function bingoStop(){
+  if(bingoChannel){ bingoChannel.unsubscribe(); bingoChannel=null; }
+  bingoSessie=null; bingoKaart=[]; bingoMarks={};
+  document.getElementById('bingo-lobby').style.display='block';
+  document.getElementById('bingo-spel').style.display='none';
+  bingoLaadGalerie();
 }
 
 // ── SCORELIJST U5b ────────────────────────────────────
