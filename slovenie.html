@@ -803,6 +803,45 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
       </div>
     </div>
 
+    <!-- U5g: Kampavond-spellen -->
+    <div class="uitleg-block">
+      <div class="uitleg-head" onclick="toggleUitleg(this)">
+        <div class="uitleg-title">🌙 Kampavond-spellen</div>
+        <div class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <div class="uitleg-row"><strong>Wie ben ik?</strong> — Iemand denkt aan een persoon (beroemd of uit de groep). De rest stelt om beurten ja/nee-vragen. Degene die het raadt mag de volgende zijn.</div>
+        <div class="uitleg-row"><strong>Categorieënspel met timer</strong> — Kies een categorie (bijv. "dieren op de camping" of "Sloveense steden"). Ieder geeft om beurten een antwoord. Wie herhaalt, te lang nadenkt of een leeg antwoord geeft, valt af. Begin met 10 seconden per persoon.</div>
+        <div class="uitleg-row"><strong>Verhaalstokje</strong> — Iemand begint een zin van een verhaal. De volgende voegt een zin toe, enzovoort. Probeer het spannend te houden — eindig met "En toen…" om door te geven.</div>
+        <div class="uitleg-row"><strong>Twee waarheden, één leugen</strong> — Iedereen zegt drie dingen over zichzelf: twee zijn waar, één is gelogen. De rest raadt welke leugen is. Wie de meeste mensen misleidt, wint.</div>
+        <div style="margin-top:10px;background:#1A3A2A;border-radius:10px;padding:12px 14px;color:#E8DDD0;font-size:0.85rem;">
+          <div style="font-weight:700;margin-bottom:6px;">🌠 Perseïden-meteorenregen</div>
+          In augustus piekt de Perseïden-regen — rond <strong>11–13 augustus</strong> (exacte topnacht te verifiëren, verschilt per jaar). Ideaal voor wie bij Appesbach zit, ver van stadslichten.<br><br>
+          <strong>Tip:</strong> Kijk weg van campinglampen, geef je ogen 15 min om te wennen, en doe een wens bij elke vallende ster. Het zijn kleine stukjes komeet die verbranden in de atmosfeer.
+        </div>
+      </div>
+    </div>
+
+    <!-- U5h: Weer-leedvermaak -->
+    <div class="uitleg-block">
+      <div class="uitleg-head" onclick="toggleUitleg(this);loadWeer()">
+        <div class="uitleg-title">☔ Waar is het slecht weer?</div>
+        <div class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <p style="font-size:0.82rem;color:#6B6560;margin:0 0 10px;">Live weer op jullie route en thuis — voor Sanne & Duurt.</p>
+        <div id="weer-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;"></div>
+        <div id="leedmeter-wrap" style="display:none;background:#1A3A2A;border-radius:10px;padding:12px;color:#E8DDD0;font-size:0.85rem;text-align:center;">
+          <div style="font-weight:700;margin-bottom:6px;">Leedvermaak-meter 🎉</div>
+          <div id="leedmeter-bar" style="background:#0A0A0A;border-radius:20px;height:18px;overflow:hidden;margin-bottom:6px;">
+            <div id="leedmeter-fill" style="height:100%;background:linear-gradient(90deg,#4A9E6E,#E8943A);border-radius:20px;width:0%;transition:width 0.8s;"></div>
+          </div>
+          <div id="leedmeter-tekst" style="font-size:0.82rem;"></div>
+        </div>
+        <div id="weer-status" style="font-size:0.82rem;color:#6B6560;text-align:center;"></div>
+      </div>
+    </div>
+
     <!-- U5e: Kampvuurverhaal -->
     <div class="uitleg-block">
       <div class="uitleg-head" onclick="toggleUitleg(this)">
@@ -2348,6 +2387,50 @@ function toggleCollapsibleMap(el, mapId, initFn){
   if(el.classList.contains('open')){
     setTimeout(()=>{ initFn(); if(mapId==='bohinj-map'&&bohinjMap) bohinjMap.invalidateSize(); if(mapId==='appesbach-map'&&appesbach) appesbach.invalidateSize(); },150);
   }
+}
+
+// ── WEER-LEEDVERMAAK U5h ─────────────────────────────
+const WEER_LOCATIES = [
+  {naam:'Camp Bohinj 🇸🇮',lat:46.2789,lng:13.8377,thuis:false},
+  {naam:'Appesbach 🇦🇹',lat:47.742,lng:13.435,thuis:false},
+  {naam:'Schalkwijk 🏠',lat:51.991,lng:5.276,thuis:true},
+  {naam:'Leeuwarden 🏠',lat:53.201,lng:5.800,thuis:true},
+  {naam:'Veluwe',lat:52.126,lng:5.819,thuis:true},
+  {naam:'Zeeland',lat:51.498,lng:3.607,thuis:true},
+  {naam:'Drenthe',lat:52.922,lng:6.672,thuis:true},
+  {naam:'Gardameer 🇮🇹',lat:45.660,lng:10.741,thuis:true},
+  {naam:'Ardèche 🇫🇷',lat:44.489,lng:4.292,thuis:true},
+];
+const WEER_CODES={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',61:'🌧️',71:'🌨️',80:'🌦️',85:'🌨️',95:'⛈️',99:'⛈️'};
+let weerGeladen=false;
+async function loadWeer(){
+  if(weerGeladen) return;
+  const st=document.getElementById('weer-status'); if(st) st.textContent='⏳ Weerdata laden…';
+  try{
+    const results = await Promise.all(WEER_LOCATIES.map(async loc=>{
+      const url=`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lng}&current=temperature_2m,weathercode&timezone=auto`;
+      const r=await fetch(url); const d=await r.json();
+      return {...loc, temp:Math.round(d.current.temperature_2m), code:d.current.weathercode};
+    }));
+    const grid=document.getElementById('weer-grid'); if(!grid) return;
+    grid.innerHTML=results.map(r=>`
+      <div style="background:${r.thuis?'#1A3A2A':'#fff'};border:1.5px solid ${r.thuis?'transparent':'#e0dbd6'};border-radius:10px;padding:10px;text-align:center;">
+        <div style="font-size:1.5rem;">${WEER_CODES[r.code]||'🌡️'}</div>
+        <div style="font-weight:700;font-size:0.82rem;color:${r.thuis?'#E8DDD0':'#0A0A0A'};margin:2px 0;">${r.temp}°C</div>
+        <div style="font-size:0.72rem;color:${r.thuis?'#9AC4A8':'#6B6560'};">${r.naam}</div>
+      </div>`).join('');
+    const thuisGem=results.filter(r=>r.thuis).reduce((s,r)=>s+r.temp,0)/results.filter(r=>r.thuis).length;
+    const hier=results[0].temp;
+    const verschil=Math.max(0,thuisGem-hier);
+    const pct=Math.min(100,verschil*8);
+    const wrap=document.getElementById('leedmeter-wrap');
+    const fill=document.getElementById('leedmeter-fill');
+    const tekst=document.getElementById('leedmeter-tekst');
+    if(wrap){ wrap.style.display='block'; fill.style.width=pct+'%'; }
+    if(tekst){ tekst.textContent=pct>60?`+${verschil.toFixed(0)}°C warmer dan thuis — genieten! 🎉`:pct>25?`${verschil.toFixed(0)}°C warmer — niet verkeerd!`:'Thuis is het nu ook best prima…'; }
+    if(st) st.textContent='';
+    weerGeladen=true;
+  } catch{ if(st) st.textContent='⚠️ Weerdata niet beschikbaar — controleer verbinding.'; }
 }
 
 // ── KAMPVUURVERHAAL U5e ───────────────────────────────
