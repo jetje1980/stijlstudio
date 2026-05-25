@@ -1351,9 +1351,18 @@ function renderProfileGrid(){
         <div class="sec-photo-header-sub">Alles wat je nodig hebt</div>
       </div>
     </div>
-    <div style="height:6px;"></div>
+    <!-- Quick-jump nav -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 20px 4px;">
+      <button onclick="document.getElementById('info-bohinj').scrollIntoView({behavior:'smooth'})" style="padding:10px 6px;background:#E8F4EE;border:none;border-radius:12px;font-family:inherit;font-size:0.72rem;font-weight:700;cursor:pointer;color:#2D6A42;text-align:center;line-height:1.3;">🇸🇮<br>Bohinj</button>
+      <button onclick="document.getElementById('info-appesbach').scrollIntoView({behavior:'smooth'})" style="padding:10px 6px;background:#EDE4F8;border:none;border-radius:12px;font-family:inherit;font-size:0.72rem;font-weight:700;cursor:pointer;color:#5C3B8A;text-align:center;line-height:1.3;">🇦🇹<br>Appesbach</button>
+      <button onclick="document.getElementById('info-winkels').scrollIntoView({behavior:'smooth'})" style="padding:10px 6px;background:#FFF3E8;border:none;border-radius:12px;font-family:inherit;font-size:0.72rem;font-weight:700;cursor:pointer;color:#A05A20;text-align:center;line-height:1.3;">🛒<br>Winkels</button>
+      <button onclick="document.getElementById('info-wandelen').scrollIntoView({behavior:'smooth'})" style="padding:10px 6px;background:#EEF2FF;border:none;border-radius:12px;font-family:inherit;font-size:0.72rem;font-weight:700;cursor:pointer;color:#3D4FA0;text-align:center;line-height:1.3;">🏔️<br>Wandelen</button>
+      <button onclick="document.getElementById('info-eten').scrollIntoView({behavior:'smooth'})" style="padding:10px 6px;background:#FFF8E0;border:none;border-radius:12px;font-family:inherit;font-size:0.72rem;font-weight:700;cursor:pointer;color:#7A5A10;text-align:center;line-height:1.3;">🍽️<br>Eten</button>
+      <button onclick="document.getElementById('info-vertaal').scrollIntoView({behavior:'smooth'})" style="padding:10px 6px;background:#F5EFE8;border:none;border-radius:12px;font-family:inherit;font-size:0.72rem;font-weight:700;cursor:pointer;color:#6B6560;text-align:center;line-height:1.3;">💬<br>Woorden</button>
+    </div>
 
     <!-- U1e: KAMPKAART -->
+    <div id="info-bohinj" style="margin-top:8px;padding:6px 20px 4px;font-size:0.62rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4A9E6E;border-top:2px solid rgba(74,158,110,0.2);">🇸🇮 Slovenië · Camp Bohinj</div>
     <div class="collapsible" onclick="toggleCollapsibleMap(this,'bohinj-map',initBohinjMap)">
       <div class="collapsible-head">
         <div class="collapsible-title">🗺️ Kaart van de camping & omgeving</div>
@@ -1379,7 +1388,7 @@ function renderProfileGrid(){
           <div class="bohinj-afst-row"><span>🚗 Srednja vas (restaurants)</span><span>ca. 12 km / 18 min</span></div>
           <div class="bohinj-afst-row"><span>🚗 Meer van Bled</span><span>ca. 30 km / 40 min</span></div>
         </div>
-        <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#9A948E;margin:10px 0 4px;">🛒 Boodschappen &amp; winkels — Bohinj</div>
+        <div id="info-winkels" style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#9A948E;margin:10px 0 4px;">🛒 Boodschappen &amp; winkels — Bohinj</div>
         <div class="bohinj-afst-list">
           <div class="bohinj-afst-row"><span>🛒 <a class="maps-row-link" href="https://maps.google.com/?q=Mercator+Bohinjska+Bistrica" target="_blank">Mercator (supermarkt)</a></span><span>Bohinjska Bistrica · 2 km / 5 min</span></div>
           <div class="bohinj-afst-row"><span>🛒 <a class="maps-row-link" href="https://maps.google.com/?q=Tuš+Bohinjska+Bistrica" target="_blank">Tuš supermarkt</a></span><span>Bohinjska Bistrica · 2 km / 5 min</span></div>
@@ -1433,7 +1442,8 @@ function renderProfileGrid(){
     </div>
 
     <!-- U2: Appesbach activiteiten -->
-    <div style="position:relative;height:140px;overflow:hidden;border-radius:12px;margin:12px 20px 0;">
+    <div id="info-appesbach" style="padding:6px 20px 4px;margin-top:6px;font-size:0.62rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#8C6BAE;border-top:2px solid rgba(140,107,174,0.2);">🇦🇹 Oostenrijk · Seecamping Appesbach</div>
+    <div style="position:relative;height:140px;overflow:hidden;border-radius:12px;margin:8px 20px 0;">
       <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700&q=80" alt="Wolfgangsee" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;">
       <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05),rgba(0,0,0,0.6));"></div>
       <div style="position:absolute;bottom:12px;left:14px;right:14px;">
@@ -1597,6 +1607,7 @@ function renderProfileGrid(){
     </div>
 
     <!-- U1a: WANDELINGEN -->
+    <div id="info-wandelen"></div>
     <div class="collapsible" onclick="toggleCollapsible(this)">
       <div class="collapsible-head">
         <div class="collapsible-title">🥾 Wandelingen & hikes</div>
@@ -1723,6 +1734,7 @@ function renderProfileGrid(){
     </div>
 
     <!-- U1c: RESTAURANTS -->
+    <div id="info-eten"></div>
     <div class="collapsible" onclick="toggleCollapsible(this)">
       <div class="collapsible-head">
         <div class="collapsible-title">🍽️ Restaurants & lokale keuken</div>
@@ -1892,6 +1904,7 @@ function renderProfileGrid(){
       </div>
     </div>
 
+    <div id="info-vertaal"></div>
     <!-- U3a: Vertaaltool Sloveens → NL -->
     <div class="collapsible" onclick="toggleCollapsible(this)">
       <div class="collapsible-head">
