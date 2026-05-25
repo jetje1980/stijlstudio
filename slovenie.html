@@ -382,7 +382,8 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
 <div id="login-screen">
   <div class="login-logo">Zomer 2026</div>
   <div class="login-sub">Zomer 2026</div>
-  <div style="font-size:0.6rem;letter-spacing:0.12em;color:#9A948E;margin-bottom:8px;">Slovenië & Oostenrijk</div>
+  <div style="font-size:0.6rem;letter-spacing:0.12em;color:#9A948E;margin-bottom:2px;">Slovenië & Oostenrijk</div>
+  <div id="js-status" style="font-size:0.55rem;color:#9A948E;margin-bottom:6px;">js laden…</div>
   <div class="login-divider"></div>
   <div id="step1" class="login-step">
     <form onsubmit="checkCode();return false;">
@@ -1742,11 +1743,18 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
 </div>
 
 <script>
+// ── VERSIE-CHECK (debug) ──────────────────────────────
+(function(){
+  var s=document.getElementById('js-status');
+  if(s) s.textContent='js ✓ v9';
+})();
+
 // ── FOUT-OPVANG (debug) ───────────────────────────────
 window.onerror = function(msg, src, line) {
-  const el = document.getElementById('code-error');
-  if (el) el.textContent = '⚠ JS-fout r' + line + ': ' + msg;
-  console.error('JS error:', msg, src, line);
+  var el = document.getElementById('code-error');
+  if (el) el.textContent = '⚠ r' + line + ': ' + msg;
+  var s = document.getElementById('js-status');
+  if (s) s.textContent = 'js ✗ fout r' + line;
   return false;
 };
 
