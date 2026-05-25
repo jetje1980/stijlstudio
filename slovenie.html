@@ -324,6 +324,23 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
 .bingo-cel img{width:100%;height:44px;object-fit:cover;border-radius:5px;display:block;}
 .dag-meal{margin-top:10px;padding:8px 10px;background:#EDE4DC;border-radius:8px;font-size:0.83rem;cursor:pointer;min-height:28px;}
 .dag-meal:empty::before{content:'🍽️ Eten vandaag — tik om toe te voegen';color:#9A948E;}
+/* dagplan chips */
+.dag-my-acts{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px;}
+.dag-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(74,158,110,0.12);border:1px solid rgba(74,158,110,0.3);border-radius:20px;padding:4px 6px 4px 10px;font-size:0.78rem;color:#0A0A0A;max-width:100%;}
+.dag-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dag-chip-rm{background:none;border:none;cursor:pointer;color:#9A948E;font-size:0.68rem;padding:0 3px;line-height:1;flex-shrink:0;}
+.dag-add-btn{margin-top:4px;padding:5px 13px;border-radius:20px;border:1.5px dashed rgba(74,158,110,0.45);background:transparent;color:#4A9E6E;font-size:0.76rem;cursor:pointer;font-family:var(--sans);font-weight:600;}
+/* dagpicker modal */
+.sug-cats{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none;}
+.sug-cats::-webkit-scrollbar{display:none;}
+.sug-cat-btn{padding:5px 13px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.14);background:transparent;font-size:0.75rem;color:#6B6560;cursor:pointer;white-space:nowrap;font-family:var(--sans);}
+.sug-cat-btn.active{background:#0A0A0A;color:#F0E8E2;border-color:#0A0A0A;}
+.sug-grid{display:flex;flex-wrap:wrap;gap:7px;max-height:240px;overflow-y:auto;padding:2px 0 6px;scrollbar-width:thin;}
+.sug-chip{padding:7px 12px;background:#fff;border:1.5px solid #e0dbd6;border-radius:20px;font-size:0.8rem;color:#0A0A0A;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background 0.1s;}
+.sug-chip:active{background:#EDE4DC;}
+.dag-picker-custom-row{display:flex;gap:8px;margin-top:10px;}
+.dag-picker-custom-row input{flex:1;padding:9px 13px;border:1.5px solid #e0dbd6;border-radius:10px;font-size:0.82rem;font-family:var(--sans);background:#fff;color:#0A0A0A;outline:none;}
+.dag-picker-custom-row button{padding:9px 14px;border-radius:10px;background:#0A0A0A;color:#F0E8E2;border:none;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:var(--sans);}
 .rec-card{background:#fff;border:1.5px solid #e0dbd6;border-radius:12px;overflow:hidden;cursor:pointer;transition:box-shadow 0.15s;}
 .rec-card:active{box-shadow:0 2px 8px rgba(0,0,0,0.12);}
 .rec-card img{width:100%;height:100px;object-fit:cover;display:block;}
@@ -488,6 +505,20 @@ function renderProfileGrid(){
     <div id="kv-modal-preview" style="margin:8px 0;padding:10px 12px;background:rgba(74,158,110,0.08);border-radius:var(--r);font-size:0.8rem;color:#6B6560;min-height:36px;"></div>
     <button class="modal-submit" onclick="submitPotje()">Opslaan ✓</button>
     <button class="modal-cancel" onclick="closeKvModal()">Annuleren</button>
+  </div>
+</div>
+
+<!-- DAGPLAN PICKER MODAL -->
+<div class="modal-ov" id="dag-picker-modal" style="display:none;" onclick="if(event.target===this)closeDagPicker()">
+  <div class="modal-sheet">
+    <div class="modal-title" id="dag-picker-title">Activiteit toevoegen</div>
+    <div class="sug-cats" id="dag-picker-cats"></div>
+    <div id="dag-picker-list"></div>
+    <div class="dag-picker-custom-row">
+      <input id="dag-picker-custom" type="text" placeholder="Of typ zelf iets…" onkeydown="if(event.key==='Enter')addCustomToDag()">
+      <button onclick="addCustomToDag()">＋</button>
+    </div>
+    <button class="modal-cancel" style="margin-top:12px;" onclick="closeDagPicker()">Sluiten</button>
   </div>
 </div>
 
@@ -1895,6 +1926,58 @@ const ITEMS = [
 ];
 const CATS = ['alles','natuur','stad','eten','avontuur','cultuur','strand'];
 
+// ── SUGGESTIES (dagplanner picker pool) ─────────────
+const SUGGESTIES = [
+  {naam:'Uitslapen & ontbijten op je gemak', cat:'kamp', ic:'☕'},
+  {naam:'Zwemmen bij het kamp', cat:'kamp', ic:'🏊'},
+  {naam:'SUP op het Bohinj meer', cat:'kamp', ic:'🏄'},
+  {naam:'Fietsen langs het meer', cat:'kamp', ic:'🚲'},
+  {naam:'BBQ & kampvuur', cat:'kamp', ic:'🔥'},
+  {naam:'Vrije dag — niksdoen', cat:'kamp', ic:'🌿'},
+  {naam:'Klaverjas marathon', cat:'kamp', ic:'🃏'},
+  {naam:'Bohnanza spelen', cat:'kamp', ic:'🎴'},
+  {naam:'Shopjes in Bohinjska Bistrica', cat:'kamp', ic:'🛒'},
+  {naam:'Wolfgangsee zwemmen (AT)', cat:'kamp', ic:'🏖️'},
+  {naam:'Vogel gondelbaan — panorama Triglav', cat:'natuur', ic:'🚡'},
+  {naam:'Savica waterval wandeling', cat:'natuur', ic:'💧'},
+  {naam:'Mostnica kloof & Hudičev most', cat:'natuur', ic:'🌊'},
+  {naam:'Voje vallei wandeling', cat:'natuur', ic:'🥾'},
+  {naam:'Vintgar kloof (bij Bled)', cat:'natuur', ic:'🌊'},
+  {naam:'Soča rivier zwemmen', cat:'natuur', ic:'🏞️'},
+  {naam:'Komna plateau wandeling', cat:'natuur', ic:'⛰️'},
+  {naam:'Pršivec hike (1761 m)', cat:'natuur', ic:'🏔️'},
+  {naam:'Triglav NP verkennen', cat:'natuur', ic:'🌲'},
+  {naam:'Postalm wandeling (AT)', cat:'natuur', ic:'🏔️'},
+  {naam:'Dachstein gletsjer (AT)', cat:'natuur', ic:'❄️'},
+  {naam:'Zwölferhorn hike (AT)', cat:'natuur', ic:'⛰️'},
+  {naam:'Ljubljana dagtrip', cat:'stad', ic:'🏙️'},
+  {naam:'Bled dorp verkennen', cat:'stad', ic:'🏘️'},
+  {naam:'Roeiboot naar Bled eiland', cat:'stad', ic:'🚣'},
+  {naam:'Bled kasteel', cat:'stad', ic:'🏰'},
+  {naam:'Piran & Adriatische kust', cat:'stad', ic:'⛵'},
+  {naam:'St. Wolfgang verkennen (AT)', cat:'stad', ic:'🏘️'},
+  {naam:'Bad Ischl (AT)', cat:'stad', ic:'🏙️'},
+  {naam:'Salzburg dagtrip (AT)', cat:'stad', ic:'🎼'},
+  {naam:'Hallstatt (AT)', cat:'stad', ic:'🏔️'},
+  {naam:'Odprta Kuhna foodmarket (vr/za)', cat:'eten', ic:'🍽️'},
+  {naam:'Kremna rezina proeven (Bled)', cat:'eten', ic:'🍰'},
+  {naam:'Lokaal restaurant — Sloveense keuken', cat:'eten', ic:'🥩'},
+  {naam:'Konditorei Zauner, Bad Ischl (AT)', cat:'eten', ic:'🎂'},
+  {naam:'Seecafé Appesbach (AT)', cat:'eten', ic:'☕'},
+  {naam:'Weißes Rössl restaurant (AT)', cat:'eten', ic:'🍽️'},
+  {naam:'Markt & boodschappen', cat:'eten', ic:'🛒'},
+  {naam:'Kayakken op de Soča', cat:'avontuur', ic:'🛶'},
+  {naam:'Rafting op de Soča', cat:'avontuur', ic:'🌊'},
+  {naam:'Huttentocht (1 nacht)', cat:'avontuur', ic:'🏔️'},
+  {naam:'Schafbergbahn tandradbaan (AT)', cat:'avontuur', ic:'🚂'},
+  {naam:'Rondvaart Wolfgangsee (AT)', cat:'avontuur', ic:'⛴️'},
+  {naam:'Predjama kasteel', cat:'cultuur', ic:'🏯'},
+  {naam:'Grotten van Postojna', cat:'cultuur', ic:'🦇'},
+  {naam:'Ljubljana kasteel', cat:'cultuur', ic:'🏰'},
+  {naam:'Kobarid Museum (WO I)', cat:'cultuur', ic:'🎖️'},
+];
+const SUG_CATS = ['alles','kamp','natuur','stad','eten','avontuur','cultuur'];
+
 // ── STATE ────────────────────────────────────────────
 let currentUser = null;
 let swipes = {};
@@ -1904,6 +1987,9 @@ let swipeQueue = [];
 let packChecked = {};
 let kvPotjes = [];
 let kvScore = {t1:0, t2:0};
+let dagplannen = {};
+let dagPickerKey = null;
+let dagPickerCat = 'alles';
 
 // teams — elk object heeft {t1:[naam,naam], t2:[naam,naam]}
 const KV_TEAM_PRESETS = [
@@ -2045,6 +2131,7 @@ function startApp() {
   tickCountdown();
   setInterval(tickCountdown, 30000);
   loadPacklist();
+  loadDagplan();
   renderProgramma();
   renderSwipeStack();
   loadKvData();
@@ -2118,7 +2205,15 @@ function switchTab(tab){
 function dagKey(datum){ return datum.replace(/\s+/g,'-'); }
 function renderProgramma() {
   const el = document.getElementById('programma-list');
-  el.innerHTML = DAGEN.map((dag,i)=>`
+  const plan = dagplannen[currentUser] || {};
+  el.innerHTML = DAGEN.map((dag,i)=>{
+    const k = dagKey(dag.datum);
+    const myActs = plan[k] || [];
+    const chipsHtml = myActs.map((a,ai)=>
+      `<div class="dag-chip"><span>${a}</span><button class="dag-chip-rm" onclick="event.stopPropagation();removeFromDag('${k}',${ai})" title="Verwijder">✕</button></div>`
+    ).join('');
+    const countLbl = myActs.length ? ` &middot; <span style="color:${dag.kleur};font-weight:600;">${myActs.length} gepland</span>` : '';
+    return `
     <div class="dag-item" id="dag-${i}" onclick="toggleDag(${i})">
       <div class="dag-head">
         <div class="dag-badge" style="background:${dag.kleur}20;border:2px solid ${dag.kleur}40;">
@@ -2126,25 +2221,96 @@ function renderProgramma() {
         </div>
         <div class="dag-info">
           <div class="dag-title">${dag.label}</div>
-          <div class="dag-datum">${dag.datum}</div>
+          <div class="dag-datum">${dag.datum}${countLbl}</div>
         </div>
         <div class="dag-arrow">▼</div>
       </div>
       <div class="dag-body">
-        ${dag.desc ? `<div class="dag-desc">${dag.desc}</div>` : ''}
-        ${dag.acts.length ? `<div class="dag-activiteiten">${dag.acts.map(a=>`<div class="dag-act">${a}</div>`).join('')}</div>` : ''}
-        <div class="dag-loc" style="margin-top:8px;">
-          <span>${dag.land}</span> <span>${dag.datum}</span>
-        </div>
-        <div id="meal-${dagKey(dag.datum)}" class="dag-meal" onclick="event.stopPropagation();openMealEdit('${dagKey(dag.datum)}')"></div>
+        ${dag.desc ? `<div class="dag-desc" style="font-size:0.78rem;color:#9A948E;line-height:1.5;">${dag.desc}</div>` : ''}
+        <div class="dag-my-acts">${chipsHtml}</div>
+        <button class="dag-add-btn" onclick="event.stopPropagation();openDagPicker('${k}','${dag.label} — ${dag.datum}')">+ Toevoegen</button>
+        <div id="meal-${k}" class="dag-meal" onclick="event.stopPropagation();openMealEdit('${k}')"></div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   const first = document.getElementById('dag-0');
-  if(first){ first.classList.add('open'); }
+  if(first) first.classList.add('open');
+  renderAllMeals();
 }
 function toggleDag(i){
   const el = document.getElementById(`dag-${i}`);
   el?.classList.toggle('open');
+}
+
+// ── DAGPLAN PICKER ────────────────────────────────────
+function loadDagplan() {
+  if (!currentUser) return;
+  try { dagplannen[currentUser] = JSON.parse(localStorage.getItem(`${SK}_dagplan_${currentUser}`) || '{}'); }
+  catch(e) { dagplannen[currentUser] = {}; }
+}
+function saveDagplan() {
+  if (!currentUser) return;
+  localStorage.setItem(`${SK}_dagplan_${currentUser}`, JSON.stringify(dagplannen[currentUser] || {}));
+}
+function openDagPicker(k, label) {
+  dagPickerKey = k;
+  dagPickerCat = 'alles';
+  document.getElementById('dag-picker-title').textContent = label;
+  renderDagPickerList();
+  document.getElementById('dag-picker-modal').style.display = 'flex';
+  document.getElementById('dag-picker-custom').value = '';
+}
+function closeDagPicker() {
+  document.getElementById('dag-picker-modal').style.display = 'none';
+  dagPickerKey = null;
+}
+function setDagPickerCat(cat) {
+  dagPickerCat = cat;
+  renderDagPickerList();
+}
+function renderDagPickerList() {
+  document.getElementById('dag-picker-cats').innerHTML = SUG_CATS.map(c=>
+    `<button class="sug-cat-btn${c===dagPickerCat?' active':''}" onclick="setDagPickerCat('${c}')">${c.charAt(0).toUpperCase()+c.slice(1)}</button>`
+  ).join('');
+  const filtered = dagPickerCat==='alles' ? SUGGESTIES : SUGGESTIES.filter(s=>s.cat===dagPickerCat);
+  document.getElementById('dag-picker-list').innerHTML =
+    `<div class="sug-grid">${filtered.map(s=>`<div class="sug-chip" onclick="pickSuggestie('${s.naam.replace(/'/g,"&#39;")}')">${s.ic} ${s.naam}</div>`).join('')}</div>`;
+}
+function pickSuggestie(naam) {
+  if (!dagPickerKey || !currentUser) return;
+  if (!dagplannen[currentUser]) dagplannen[currentUser] = {};
+  if (!dagplannen[currentUser][dagPickerKey]) dagplannen[currentUser][dagPickerKey] = [];
+  if (!dagplannen[currentUser][dagPickerKey].includes(naam)) {
+    dagplannen[currentUser][dagPickerKey].push(naam);
+    saveDagplan();
+  }
+  closeDagPicker();
+  const k = dagPickerKey || '';
+  renderProgramma();
+  const di = DAGEN.findIndex(d=>dagKey(d.datum)===k);
+  if (di>=0) document.getElementById(`dag-${di}`)?.classList.add('open');
+}
+function addCustomToDag() {
+  const inp = document.getElementById('dag-picker-custom');
+  const val = (inp?.value||'').trim();
+  if (!val || !dagPickerKey || !currentUser) return;
+  if (!dagplannen[currentUser]) dagplannen[currentUser] = {};
+  if (!dagplannen[currentUser][dagPickerKey]) dagplannen[currentUser][dagPickerKey] = [];
+  dagplannen[currentUser][dagPickerKey].push(val);
+  saveDagplan();
+  const k = dagPickerKey;
+  closeDagPicker();
+  renderProgramma();
+  const di = DAGEN.findIndex(d=>dagKey(d.datum)===k);
+  if (di>=0) document.getElementById(`dag-${di}`)?.classList.add('open');
+}
+function removeFromDag(k, idx) {
+  if (!currentUser || !dagplannen[currentUser]?.[k]) return;
+  dagplannen[currentUser][k].splice(idx,1);
+  saveDagplan();
+  renderProgramma();
+  const di = DAGEN.findIndex(d=>dagKey(d.datum)===k);
+  if (di>=0) document.getElementById(`dag-${di}`)?.classList.add('open');
 }
 
 // ── SWIPE ─────────────────────────────────────────────
