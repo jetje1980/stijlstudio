@@ -1656,6 +1656,14 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
 </div>
 
 <script>
+// ── FOUT-OPVANG (debug) ───────────────────────────────
+window.onerror = function(msg, src, line) {
+  const el = document.getElementById('code-error');
+  if (el) el.textContent = '⚠ JS-fout r' + line + ': ' + msg;
+  console.error('JS error:', msg, src, line);
+  return false;
+};
+
 // ── SUPABASE ─────────────────────────────────────────
 const SB_URL  = 'https://osuqtfsxmquwqsbgzlqn.supabase.co';
 const SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
@@ -1864,7 +1872,7 @@ function checkCode() {
     setTimeout(()=>err.textContent='', 2000);
   }
 }
-document.getElementById('code-input').addEventListener('keydown', e => { if(e.key==='Enter') checkCode(); });
+document.getElementById('code-input')?.addEventListener('keydown', e => { if(e.key==='Enter') checkCode(); });
 
 const WELKOM = {
   duurt:   {groet:'Hey Duurt 👋',   sub:'Klaar voor drie weken bergen, meren en klaverjas tot middernacht?'},
