@@ -31,6 +31,14 @@
 | 2026-05-25 | U3b | ✅ | Gedeelde recepten: formulier + foto-upload → Supabase slovenie_recipes + bucket slovenie-recipes, kaartjesGrid + bottomsheet | slovenie.html |
 | 2026-05-25 | U3c | ✅ | Dagplanner "Eten vandaag": maaltijden per dag (ontbijt/lunch/diner/snack), upsert naar slovenie_day_meals, gedeeld zichtbaar | slovenie.html |
 | 2026-05-25 | U3d | ✅ | Camping-kaarten: Appesbach Leaflet-kaart + afstandenlijst toegevoegd (Bohinj zat al in U1e) | slovenie.html |
+| 2026-05-25 | U5a | ✅ | Autobingo: 30-item pool, 4x4 kaart, foto-upload → bucket slovenie-bingo, Supabase realtime, galerij | slovenie.html |
+| 2026-05-25 | U5b | ✅ | Scorelijst Bohnanza + algemeen: spellen aanmaken, spelers + punten live via Supabase | slovenie.html, Supabase |
+| 2026-05-25 | U5c | ✅ | Wist-je-datjes: 13 natuur/reisweetjes, carousel met ◀▶ + 'Verras me' | slovenie.html |
+| 2026-05-25 | U5d | ✅ | Klierspellen: 6 onschuldige plaagspellen onderweg, veiligheidsregel | slovenie.html |
+| 2026-05-25 | U5e | ✅ | Kampvuurverhaal mad-libs: 3 Zlatorog-templates, invoer held/schurk/plek/ding + naam-snelkeuze | slovenie.html |
+| 2026-05-25 | U5f | ✅ | Waterspellen: 5 spellen (SUP-estafette, king of the board, keilen, duik-schattenjacht, koud-water) | slovenie.html |
+| 2026-05-25 | U5g | ✅ | Kampavond: Wie ben ik, categorieënspel, verhaalstokje, twee waarheden/één leugen + Perseïden-tip | slovenie.html |
+| 2026-05-25 | U5h | ✅ | Weer-leedvermaak: 9 locaties via Open-Meteo, leedvermaak-meter, lazy load bij openen | slovenie.html |
 
 ## Datamodel U7 (aangemaakt in Supabase, project osuqtfsxmquwqsbgzlqn)
 
@@ -69,7 +77,7 @@
 |---|---|---|---|
 | 1 | U7 | ✅ | Storage-fundament Supabase — klaar |
 | 2 | U3 | ✅ | Vertaaltool + gedeelde recepten + dag-maaltijden + camping-kaarten |
-| 3 | U5 | ⬜ | Autospellen, bingo + foto's, kampvuurverhaal, waterspellen, weer-leedvermaak |
+| 3 | U5 | ✅ | Autospellen, bingo + foto's, kampvuurverhaal, waterspellen, weer-leedvermaak |
 | 4 | U2 | ⬜ | Oostenrijk Appesbach: activiteiten + afstanden + kaart + 🟫-markerlaag |
 | 5 | U4 | ⬜ | Huttentochten Bohinj (1/2 nachten, splitsing, hutten/parkeren/afstand) |
 | 6 | U6 | ⬜ | Quiz Slovenië & Oostenrijk (🟢/🔴 + meerkeuze A/B/C, koppelt aan scorelijst) |
