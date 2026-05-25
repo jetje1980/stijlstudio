@@ -332,12 +332,17 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
 .prog-filt{display:flex;gap:8px;padding:12px 20px 4px;}
 .prog-filt-btn{flex:1;padding:10px 8px;border-radius:12px;border:none;background:rgba(10,10,10,0.06);font-size:0.82rem;font-weight:700;cursor:pointer;font-family:var(--sans);color:#6B6560;transition:all 0.15s;}
 .prog-filt-btn.active{background:#0A0A0A;color:#F0E8E2;}
+.reel-card{flex:0 0 110px;border-radius:12px;overflow:hidden;text-decoration:none;position:relative;height:160px;display:block;background:#1A2510;}
+.reel-card img{width:100%;height:100%;object-fit:cover;display:block;}
+.reel-cap{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.75));color:#fff;font-size:0.68rem;font-weight:700;padding:20px 6px 6px;text-align:center;}
 /* dagplan chips */
 .dag-my-acts{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px;}
 .dag-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(74,158,110,0.12);border:1px solid rgba(74,158,110,0.3);border-radius:20px;padding:4px 6px 4px 10px;font-size:0.78rem;color:#0A0A0A;max-width:100%;}
 .dag-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .dag-chip-rm{background:none;border:none;cursor:pointer;color:#9A948E;font-size:0.68rem;padding:0 3px;line-height:1;flex-shrink:0;}
 .dag-add-btn{margin-top:4px;padding:5px 13px;border-radius:20px;border:1.5px dashed rgba(74,158,110,0.45);background:transparent;color:#4A9E6E;font-size:0.76rem;cursor:pointer;font-family:var(--sans);font-weight:600;}
+.dag-sug-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(10,10,10,0.05);border:1px dashed rgba(10,10,10,0.25);border-radius:20px;padding:4px 10px;font-size:0.75rem;color:#6B6560;cursor:pointer;transition:background 0.15s;}
+.dag-sug-chip:hover{background:rgba(74,158,110,0.1);border-color:rgba(74,158,110,0.4);color:#4A9E6E;}
 /* dagpicker modal */
 .sug-cats{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none;}
 .sug-cats::-webkit-scrollbar{display:none;}
@@ -500,7 +505,7 @@ function renderProfileGrid(){
     <div id="kv-modal-t1-label" style="margin-bottom:6px;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#6B6560;">Team 1 (Sanne & Griette)</div>
     <div class="mf-row">
       <div class="mf"><label>Roem</label><input id="kv-roem1" type="number" min="0" value="0" placeholder="0"></div>
-      <div class="mf"><label>Slagen</label><input id="kv-slagen1" type="number" min="0" max="162" value="" placeholder="0–162"></div>
+      <div class="mf"><label>Slagen</label><input id="kv-slagen1" type="number" min="0" max="162" value="" placeholder="0–162" oninput="autoSlagen2(this)"></div>
     </div>
     <div id="kv-modal-t2-label" style="margin-bottom:6px;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#6B6560;">Team 2 (Arjen & Duurt)</div>
     <div class="mf-row">
@@ -846,6 +851,28 @@ function renderProfileGrid(){
       <button class="prog-filt-btn active" id="pfb-si" onclick="setProgrammaFilter('si')">🇸🇮 Slovenië<br><span style="font-size:0.65rem;font-weight:400;opacity:0.7;">27 jul – 4 aug</span></button>
       <button class="prog-filt-btn" id="pfb-at" onclick="setProgrammaFilter('at')">🇦🇹 Oostenrijk<br><span style="font-size:0.65rem;font-weight:400;opacity:0.7;">5 – 14 aug</span></button>
     </div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:10px 20px 4px;display:flex;gap:10px;" id="prog-reels">
+      <a href="https://www.youtube.com/results?search_query=Lake+Bohinj+Slovenia+travel" target="_blank" rel="noopener" class="reel-card">
+        <img src="https://images.unsplash.com/photo-1586348943529-beaae6c28db9?w=200&q=80" alt="Bohinj">
+        <div class="reel-cap">🎬 Bohinj meer</div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=Bled+Slovenia+travel+reel" target="_blank" rel="noopener" class="reel-card">
+        <img src="https://images.unsplash.com/photo-1564507592333-c60657eea523?w=200&q=80" alt="Bled">
+        <div class="reel-cap">🎬 Meer van Bled</div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=Wolfgangsee+Austria+travel" target="_blank" rel="noopener" class="reel-card">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&q=80" alt="Wolfgangsee">
+        <div class="reel-cap">🎬 Wolfgangsee</div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=Soca+Valley+Slovenia" target="_blank" rel="noopener" class="reel-card">
+        <img src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=200&q=80" alt="Soča">
+        <div class="reel-cap">🎬 Soča Vallei</div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=Hallstatt+Austria+travel" target="_blank" rel="noopener" class="reel-card">
+        <img src="https://images.unsplash.com/photo-1571406252241-db0280bd36cd?w=200&q=80" alt="Hallstatt">
+        <div class="reel-cap">🎬 Hallstatt</div>
+      </a>
+    </div>
     <div id="programma-list"></div>
     <div style="height:16px;"></div>
   </section>
@@ -1109,7 +1136,7 @@ function renderProfileGrid(){
           </div>
           <div id="quiz-vraag" style="font-size:0.95rem;font-weight:700;line-height:1.4;margin-bottom:12px;"></div>
           <!-- Meerkeuze (kindermodus) -->
-          <div id="quiz-keuze" style="display:none;display:grid;gap:7px;"></div>
+          <div id="quiz-keuze" style="display:none;gap:7px;"></div>
           <!-- Normaal toon-antwoord -->
           <button id="quiz-toon-btn" onclick="quizToonAntwoord()" style="padding:9px 20px;background:#0A0A0A;color:#fff;border:none;border-radius:16px;font-family:inherit;font-size:0.85rem;cursor:pointer;">Toon antwoord</button>
           <div id="quiz-antwoord" style="display:none;margin-top:10px;background:#4A9E6E;color:#fff;border-radius:10px;padding:10px 12px;font-size:0.88rem;font-weight:700;"></div>
@@ -1162,12 +1189,12 @@ function renderProfileGrid(){
 
     <!-- U5h: Weer-leedvermaak -->
     <div class="uitleg-block">
-      <div class="uitleg-head" onclick="toggleUitleg(this);loadWeer()">
-        <div class="uitleg-title">☔ Waar is het slecht weer?</div>
+      <div class="uitleg-head" onclick="toggleUitleg(this);weerGeladen=false;loadWeer()">
+        <div class="uitleg-title">☔ Leedvermaak & slecht thuisweer</div>
         <div class="uitleg-arrow">▼</div>
       </div>
       <div class="uitleg-body">
-        <p style="font-size:0.82rem;color:#6B6560;margin:0 0 10px;">Live weer op jullie route en thuis — voor Sanne & Duurt.</p>
+        <p style="font-size:0.82rem;color:#6B6560;margin:0 0 10px;">Live weer bij jullie vs. de natste/koudste plekken in Europa.</p>
         <div id="weer-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;"></div>
         <div id="leedmeter-wrap" style="display:none;background:#1A3A2A;border-radius:10px;padding:12px;color:#E8DDD0;font-size:0.85rem;text-align:center;">
           <div style="font-weight:700;margin-bottom:6px;">Leedvermaak-meter 🎉</div>
@@ -1176,7 +1203,11 @@ function renderProfileGrid(){
           </div>
           <div id="leedmeter-tekst" style="font-size:0.82rem;"></div>
         </div>
-        <div id="weer-status" style="font-size:0.82rem;color:#6B6560;text-align:center;"></div>
+        <div id="leed-nieuws-wrap" style="margin-top:10px;background:#3A1A1A;border-radius:10px;padding:12px;color:#F0D4C8;font-size:0.82rem;display:none;">
+          <div style="font-weight:700;margin-bottom:5px;">📰 Thuisfront nieuws van vandaag</div>
+          <div id="leed-nieuws-tekst" style="line-height:1.5;"></div>
+        </div>
+        <div id="weer-status" style="font-size:0.82rem;color:#6B6560;text-align:center;margin-top:6px;"></div>
       </div>
     </div>
 
@@ -1304,6 +1335,15 @@ function renderProfileGrid(){
           <div class="bohinj-afst-row"><span>🚗 Srednja vas (restaurants)</span><span>ca. 12 km / 18 min</span></div>
           <div class="bohinj-afst-row"><span>🚗 Meer van Bled</span><span>ca. 30 km / 40 min</span></div>
         </div>
+        <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#9A948E;margin:10px 0 4px;">🛒 Boodschappen &amp; winkels — Bohinj</div>
+        <div class="bohinj-afst-list">
+          <div class="bohinj-afst-row"><span>🛒 <a class="maps-row-link" href="https://maps.google.com/?q=Mercator+Bohinjska+Bistrica" target="_blank">Mercator (supermarkt)</a></span><span>Bohinjska Bistrica · 2 km / 5 min</span></div>
+          <div class="bohinj-afst-row"><span>🛒 <a class="maps-row-link" href="https://maps.google.com/?q=Tuš+Bohinjska+Bistrica" target="_blank">Tuš supermarkt</a></span><span>Bohinjska Bistrica · 2 km / 5 min</span></div>
+          <div class="bohinj-afst-row"><span>🥐 <a class="maps-row-link" href="https://maps.google.com/?q=pekarna+Bohinjska+Bistrica" target="_blank">Lokale pekarna (bakker)</a></span><span>Bohinjska Bistrica · 2 km</span></div>
+          <div class="bohinj-afst-row"><span>🟡 <a class="maps-row-link" href="https://maps.google.com/?q=Lidl+Radovljica" target="_blank">Lidl Radovljica</a></span><span>ca. 20 km / 25 min rijden</span></div>
+          <div class="bohinj-afst-row"><span>🟡 <a class="maps-row-link" href="https://maps.google.com/?q=Lidl+Jesenice" target="_blank">Lidl Jesenice</a></span><span>ca. 25 km / 28 min rijden</span></div>
+          <div class="bohinj-afst-row"><span>🏃 <a class="maps-row-link" href="https://maps.google.com/?q=Decathlon+Ljubljana" target="_blank">Decathlon Ljubljana</a></span><span>ca. 65 km / 55 min rijden</span></div>
+        </div>
       </div>
     </div>
 
@@ -1336,6 +1376,14 @@ function renderProfileGrid(){
           <div class="bohinj-afst-row"><span>🚗 Hallstatt</span><span>ca. 35 km / 45 min</span></div>
           <div class="bohinj-afst-row"><span>🚗 Dachstein/Krippenstein</span><span>ca. 40 km / 45 min</span></div>
           <div class="bohinj-afst-row"><span>🚗 Salzburg</span><span>ca. 50 km / 50 min</span></div>
+        </div>
+        <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#9A948E;margin:10px 0 4px;">🛒 Boodschappen &amp; winkels — Wolfgangsee</div>
+        <div class="bohinj-afst-list">
+          <div class="bohinj-afst-row"><span>🛒 <a class="maps-row-link" href="https://maps.google.com/?q=Spar+St.+Wolfgang" target="_blank">SPAR St. Wolfgang</a></span><span>centrum · 1 km / 12 min lopen</span></div>
+          <div class="bohinj-afst-row"><span>🛒 <a class="maps-row-link" href="https://maps.google.com/?q=Interspar+Bad+Ischl" target="_blank">Interspar Bad Ischl</a></span><span>ca. 13 km / 15 min rijden</span></div>
+          <div class="bohinj-afst-row"><span>🥐 <a class="maps-row-link" href="https://maps.google.com/?q=Bäckerei+St.+Wolfgang" target="_blank">Lokale Bäckerei</a></span><span>St. Wolfgang centrum · 1 km</span></div>
+          <div class="bohinj-afst-row"><span>🟡 <a class="maps-row-link" href="https://maps.google.com/?q=Lidl+Bad+Ischl" target="_blank">Lidl Bad Ischl</a></span><span>ca. 13 km / 15 min rijden</span></div>
+          <div class="bohinj-afst-row"><span>🏃 <a class="maps-row-link" href="https://maps.google.com/?q=Decathlon+Salzburg" target="_blank">Decathlon Salzburg</a></span><span>ca. 50 km / 50 min rijden</span></div>
         </div>
       </div>
     </div>
@@ -2283,6 +2331,8 @@ function renderProgramma() {
       </div>
       <div class="dag-body">
         ${dag.desc ? `<div class="dag-desc" style="font-size:0.78rem;color:#9A948E;line-height:1.5;">${dag.desc}</div>` : ''}
+        ${dag.acts.length ? `<div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#9A948E;margin:8px 0 4px;">💡 Suggesties</div><div class="dag-my-acts">${dag.acts.filter(a=>!myActs.includes(a)).map(a=>`<div class="dag-sug-chip" onclick="event.stopPropagation();addActFromDag('${k}','${a.replace(/'/g,"&#39;")}')">＋ ${a}</div>`).join('')}</div>` : ''}
+        ${myActs.length ? `<div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:${dag.kleur};margin:8px 0 4px;">✓ Jouw plan</div>` : ''}
         <div class="dag-my-acts">${chipsHtml}</div>
         <button class="dag-add-btn" onclick="event.stopPropagation();openDagPicker('${k}','${dag.label} — ${dag.datum}')">+ Toevoegen</button>
         <div id="meal-${k}" class="dag-meal" onclick="event.stopPropagation();openMealEdit('${k}')"></div>
@@ -2331,6 +2381,18 @@ function renderDagPickerList() {
   const filtered = dagPickerCat==='alles' ? SUGGESTIES : SUGGESTIES.filter(s=>s.cat===dagPickerCat);
   document.getElementById('dag-picker-list').innerHTML =
     `<div class="sug-grid">${filtered.map(s=>`<div class="sug-chip" onclick="pickSuggestie('${s.naam.replace(/'/g,"&#39;")}')">${s.ic} ${s.naam}</div>`).join('')}</div>`;
+}
+function addActFromDag(k, naam) {
+  if (!currentUser) return;
+  if (!dagplannen[currentUser]) dagplannen[currentUser] = {};
+  if (!dagplannen[currentUser][k]) dagplannen[currentUser][k] = [];
+  if (!dagplannen[currentUser][k].includes(naam)) {
+    dagplannen[currentUser][k].push(naam);
+    saveDagplan();
+  }
+  renderProgramma();
+  const di = DAGEN.findIndex(d=>dagKey(d.datum)===k);
+  if (di>=0) document.getElementById(`dag-${di}`)?.classList.add('open');
 }
 function pickSuggestie(naam) {
   if (!dagPickerKey || !currentUser) return;
@@ -2615,6 +2677,11 @@ function updateKvPreview(){
   if(prev) prev.innerHTML = nat
     ? `<span style="color:#c0392b;font-weight:700;">NAT</span> — Team ${roepTeam===1?2:1} (${roepTeam===1?kvTeams.t2.join(' & '):kvTeams.t1.join(' & ')}) krijgt alle punten: <strong>${roepTeam===1?pts2:pts1}</strong>`
     : `${kvTeams.t1.join(' & ')}: <strong>${pts1}</strong> &nbsp;·&nbsp; ${kvTeams.t2.join(' & ')}: <strong>${pts2}</strong>`;
+}
+function autoSlagen2(inp){
+  const v=parseInt(inp.value);
+  const el2=document.getElementById('kv-slagen2');
+  if(el2&&!isNaN(v)&&v>=0&&v<=162) el2.value=162-v;
 }
 async function submitPotje(){
   const nat    = document.getElementById('kv-nat')?.checked;
@@ -3300,17 +3367,19 @@ function bingoStop(){
 let scoreGames=[]; let scoreEntries=[];
 let scoreLoaded=false;
 async function loadScoreGames(){
-  if(scoreLoaded) return;
   const st=document.getElementById('score-status'); if(st) st.textContent='⏳ Laden…';
   try{
+    if(!sb) throw new Error('offline');
     const [{data:g},{data:e}] = await Promise.all([
       sb.from('slovenie_score_games').select('*').order('created_at'),
       sb.from('slovenie_score_entries').select('*').order('created_at'),
     ]);
     scoreGames=g||[]; scoreEntries=e||[];
     scoreLoaded=true;
-  } catch{ scoreGames=[]; scoreEntries=[]; }
-  if(st) st.textContent='';
+    if(st) st.textContent='';
+  } catch{
+    if(st) st.textContent='⚠️ Offline — scores worden lokaal bewaard.';
+  }
   renderScoreGames();
 }
 function renderScoreGames(){
@@ -3359,6 +3428,39 @@ async function addScore(gameId){
 }
 
 // ── WEER-LEEDVERMAAK U5h ─────────────────────────────
+const LEED_NIEUWS = [
+  'Het KNMI heeft code geel afgegeven voor onweersbuien boven Utrecht. Gemiddelde temperatuur thuis: 14°C. Jullie: hopelijk 28°C. 😬',
+  'De Nederlanders hebben massaal strandtenten gepakt en zijn naar Zandvoort gereden. Parkeren: vol. Zon: afwezig. Sfeer: "gezellig maar eigenlijk niet".',
+  'Thuisfront update: de grasmaaier staat al 3 weken niet gebruikt. De tuin groeit vrolijk door. Niemand die het erg vindt.',
+  'Treinvertraging op Utrecht Centraal: 38 minuten door "overwegstoring". Commuters staren zwijgend naar het bord. Jullie staren naar een bergmeer.',
+  'Nederland: buien met windstoten tot 60 km/u. De BBQ is al twee keer omgewaaid. Het campingkamp in Biddinghuizen rukte het tentje af.',
+  'Vakantieganger rapporteert: "Het weer is eigenlijk best meevallend" — vervolgens regent het 4 uur lang.',
+  'De Jumbo heeft weer de goedkoopste vliesverpakking maïskolven ingeslagen. Thuis is alles zoals het was. Niets veranderd. Echt niets.',
+  'Schiphol-file: 2,5 uur wachttijd bij de security. 47 man in de rij voor een vliegtuig naar Lanzarote. Jullie zitten al op de bestemming.',
+  'Albert Heijn bezorgd: bestelling morgen. "Helaas niet op dezelfde dag." Ondertussen: jullie drinken Sloveense wijn aan het meer.',
+  'RIVM-meting: luchtkwaliteit Amsterdam "matig". Groene valleien: ook matig, maar dan van schoonheid.',
+  'Lokaal nieuws: nieuwe verkeersdrempel geplaatst in Schalkwijk. Bewoners "niet blij". Jullie: blij, ver weg, op vakantie.',
+  'Alle zwembaden in de buurt vol. Wachtrij 45 minuten voor een glijbaan. Jullie: springen zomaar het meer in.',
+  'Werkmail binnenkomst: "Ter info". Nog 9 e-mails. Allemaal ter info. Niks doen. Jullie doen ook niks — maar veel gezelliger.',
+  'Thuisfront: de wasmachine is klaar. Niemand heeft de was eruit gehaald. Staat er nog. Het zal er nog staan als jullie terug zijn.',
+  'Meteorologen voorspellen "een verfrissende zomer". Vertaald: het regent. Gezellig voor de plantenliefhebbers. Minder voor de rest.',
+  'Update van het thuisfront: de kat zit op het aanrecht. Weet niet waarom. Kijkt ernstig. Jullie foto van gisteren had 47 likes.',
+  'Stadsdeel publiceert plan voor nieuwe parkeerautomaat. Tarief omhoog. Reacties: 134 boze berichten op Facebook. Jullie: onbereikbaar.',
+  'Vakantiekiekje thuisliggend op de bank: 23°C buiten. "Wacht op beter weer." Het beter weer: volgende week. Dan ben je terug op werk.',
+  'Weerbericht: "Morgen kans op zon in de middag." Zon: afwezig. Middag: bewolkt. Weerbericht: optimistisch maar leugenachtig.',
+  'Live: het WK worstelen in Nijmegen. Doelpunt! Nee, wacht — dat is worstelen. Spannend! Jullie worstelen met wie het lekkerste ijsje haalt.',
+];
+function toonLeedNieuws(){
+  const wrap=document.getElementById('leed-nieuws-wrap');
+  const tekst=document.getElementById('leed-nieuws-tekst');
+  if(!wrap||!tekst) return;
+  const vandaag=new Date();
+  const offset=Math.floor((vandaag-new Date('2026-07-27'))/(1000*60*60*24));
+  const idx=((offset%LEED_NIEUWS.length)+LEED_NIEUWS.length)%LEED_NIEUWS.length;
+  tekst.textContent=LEED_NIEUWS[idx];
+  wrap.style.display='block';
+}
+
 const WEER_LOCATIES = [
   {naam:'Camp Bohinj 🇸🇮',lat:46.2789,lng:13.8377,thuis:false},
   {naam:'Appesbach 🇦🇹',lat:47.742,lng:13.435,thuis:false},
@@ -3399,7 +3501,10 @@ async function loadWeer(){
     if(tekst){ tekst.textContent=pct>60?`+${verschil.toFixed(0)}°C warmer dan thuis — genieten! 🎉`:pct>25?`${verschil.toFixed(0)}°C warmer — niet verkeerd!`:'Thuis is het nu ook best prima…'; }
     if(st) st.textContent='';
     weerGeladen=true;
-  } catch{ if(st) st.textContent='⚠️ Weerdata niet beschikbaar — controleer verbinding.'; }
+  } catch(err){
+    if(st) st.textContent='⚠️ Weerdata niet beschikbaar — controleer verbinding.';
+  }
+  toonLeedNieuws();
 }
 
 // ── KAMPVUURVERHAAL U5e ───────────────────────────────
@@ -3716,7 +3821,7 @@ function quizToon(i){
   if(heeftKeuze){
     const opties=[...q.keuze].sort(()=>Math.random()-0.5);
     keuzeEl.style.gridTemplateColumns='1fr';
-    keuzeEl.innerHTML=opties.map(o=>`<button onclick="quizKeuze(this,'${o.replace(/'/,"\\'")}','${q.a.replace(/'/,"\\'")}')}"
+    keuzeEl.innerHTML=opties.map(o=>`<button onclick="quizKeuze(this,'${o.replace(/'/,"\\'")}','${q.a.replace(/'/,"\\'")}')"`+`
       style="padding:9px 12px;background:#fff;border:1.5px solid #ddd;border-radius:10px;font-family:inherit;font-size:0.84rem;text-align:left;cursor:pointer;">${o}</button>`).join('');
   }
 }
