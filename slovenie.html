@@ -803,6 +803,22 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
       </div>
     </div>
 
+    <!-- U5b: Scorelijst -->
+    <div class="uitleg-block">
+      <div class="uitleg-head" onclick="toggleUitleg(this);loadScoreGames()">
+        <div class="uitleg-title">🏆 Scorelijst (Bohnanza / eigen spel)</div>
+        <div class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <button onclick="newScoreGame('Bohnanza')" style="padding:7px 14px;background:#E8943A;color:#fff;border:none;border-radius:16px;font-family:inherit;font-size:0.82rem;font-weight:700;cursor:pointer;">+ Bohnanza</button>
+          <button onclick="newScoreGame(prompt('Naam van het spel:')||'')" style="padding:7px 14px;background:#4A7CC4;color:#fff;border:none;border-radius:16px;font-family:inherit;font-size:0.82rem;font-weight:700;cursor:pointer;">+ Ander spel</button>
+        </div>
+        <div id="score-games-list"></div>
+        <div id="score-status" style="font-size:0.82rem;color:#6B6560;margin-top:4px;"></div>
+      </div>
+    </div>
+
     <!-- U5g: Kampavond-spellen -->
     <div class="uitleg-block">
       <div class="uitleg-head" onclick="toggleUitleg(this)">
@@ -2387,6 +2403,68 @@ function toggleCollapsibleMap(el, mapId, initFn){
   if(el.classList.contains('open')){
     setTimeout(()=>{ initFn(); if(mapId==='bohinj-map'&&bohinjMap) bohinjMap.invalidateSize(); if(mapId==='appesbach-map'&&appesbach) appesbach.invalidateSize(); },150);
   }
+}
+
+// ── SCORELIJST U5b ────────────────────────────────────
+let scoreGames=[]; let scoreEntries=[];
+let scoreLoaded=false;
+async function loadScoreGames(){
+  if(scoreLoaded) return;
+  const st=document.getElementById('score-status'); if(st) st.textContent='⏳ Laden…';
+  try{
+    const [{data:g},{data:e}] = await Promise.all([
+      sb.from('slovenie_score_games').select('*').order('created_at'),
+      sb.from('slovenie_score_entries').select('*').order('created_at'),
+    ]);
+    scoreGames=g||[]; scoreEntries=e||[];
+    scoreLoaded=true;
+  } catch{ scoreGames=[]; scoreEntries=[]; }
+  if(st) st.textContent='';
+  renderScoreGames();
+}
+function renderScoreGames(){
+  const el=document.getElementById('score-games-list'); if(!el) return;
+  if(!scoreGames.length){ el.innerHTML='<div style="font-size:0.84rem;color:#9A948E;padding:8px 0;">Nog geen spel gestart.</div>'; return; }
+  el.innerHTML=scoreGames.map(g=>{
+    const entries=scoreEntries.filter(e=>e.game_id===g.id);
+    const spelers=[...new Set(entries.map(e=>e.speler))];
+    const totalen=spelers.map(s=>({s,tot:entries.filter(e=>e.speler===s).reduce((a,e)=>a+e.punten,0)}))
+      .sort((a,b)=>b.tot-a.tot);
+    const medals=['🥇','🥈','🥉'];
+    return `<div style="background:#fff;border:1.5px solid #e0dbd6;border-radius:12px;padding:12px;margin-bottom:10px;">
+      <div style="font-weight:700;font-size:0.92rem;margin-bottom:8px;">🎲 ${g.naam}</div>
+      ${totalen.map((t,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f0ebe6;">
+        <span>${medals[i]||'  '} ${t.s}</span><span style="font-weight:700;color:#4A9E6E;">${t.tot} pt</span>
+      </div>`).join('')}
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
+        <input id="sn-${g.id}" placeholder="Naam" style="flex:1;min-width:80px;border:1.5px solid #ddd;border-radius:8px;padding:6px 8px;font-family:inherit;font-size:0.84rem;">
+        <input id="sp-${g.id}" type="number" placeholder="Punten" style="width:70px;border:1.5px solid #ddd;border-radius:8px;padding:6px 8px;font-family:inherit;font-size:0.84rem;">
+        <button onclick="addScore('${g.id}')" style="padding:6px 12px;background:#4A9E6E;color:#fff;border:none;border-radius:12px;font-family:inherit;font-size:0.82rem;cursor:pointer;">+ Punt</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+async function newScoreGame(naam){
+  if(!naam) return;
+  try{
+    const {data,error}=await sb.from('slovenie_score_games').insert({naam}).select().single();
+    if(error) throw error;
+    scoreGames.push(data); scoreLoaded=true;
+    renderScoreGames();
+  } catch{ alert('Kon spel niet aanmaken. Controleer verbinding.'); }
+}
+async function addScore(gameId){
+  const naam=(document.getElementById('sn-'+gameId)?.value||'').trim();
+  const punten=parseInt(document.getElementById('sp-'+gameId)?.value||'0');
+  if(!naam||isNaN(punten)) return;
+  try{
+    const {data,error}=await sb.from('slovenie_score_entries').insert({game_id:gameId,speler:naam,punten}).select().single();
+    if(error) throw error;
+    scoreEntries.push(data);
+    document.getElementById('sn-'+gameId).value='';
+    document.getElementById('sp-'+gameId).value='';
+    renderScoreGames();
+  } catch{ alert('Kon score niet opslaan.'); }
 }
 
 // ── WEER-LEEDVERMAAK U5h ─────────────────────────────
