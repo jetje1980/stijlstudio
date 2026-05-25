@@ -803,6 +803,40 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
       </div>
     </div>
 
+    <!-- U5c: Wist-je-datjes -->
+    <div class="uitleg-block">
+      <div class="uitleg-head" onclick="toggleUitleg(this)">
+        <div class="uitleg-title">🌿 Wist je dat…</div>
+        <div class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <div id="wjd-card" style="background:#4A9E6E;border-radius:12px;padding:16px;color:#fff;font-size:0.92rem;line-height:1.5;margin-bottom:10px;min-height:60px;"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button onclick="wjdVerras()" style="padding:8px 18px;background:#0A0A0A;color:#fff;border:none;border-radius:20px;font-family:inherit;font-size:0.85rem;cursor:pointer;">🎲 Verras me</button>
+          <button onclick="wjdNav(-1)" style="padding:8px 14px;background:#fff;color:#0A0A0A;border:1.5px solid #ddd;border-radius:20px;font-family:inherit;font-size:0.85rem;cursor:pointer;">◀</button>
+          <button onclick="wjdNav(1)" style="padding:8px 14px;background:#fff;color:#0A0A0A;border:1.5px solid #ddd;border-radius:20px;font-family:inherit;font-size:0.85rem;cursor:pointer;">▶</button>
+          <span id="wjd-teller" style="font-size:0.78rem;color:#6B6560;align-self:center;"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- U5d: Klierspellen -->
+    <div class="uitleg-block">
+      <div class="uitleg-head" onclick="toggleUitleg(this)">
+        <div class="uitleg-title">😄 Klierspellen onderweg</div>
+        <div class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <div class="uitleg-row" style="font-size:0.8rem;color:#9A948E;margin-bottom:8px;">⚠️ Veiligheid voorop — niets dat de bestuurder afleidt. Puur giechelen.</div>
+        <div class="uitleg-row"><strong>Het verboden woord</strong> — Kies samen een woord dat niemand mag zeggen (bijv. "moe" of "zijn we er al"). Wie het zegt krijgt een strafpunt. Wie het minste heeft aan het einde wint.</div>
+        <div class="uitleg-row"><strong>Niet lachen</strong> — Eén persoon trekt 30 seconden gekke bekken. De rest mag absoluut niet lachen. Wie lacht is af.</div>
+        <div class="uitleg-row"><strong>Bananen-antwoord</strong> — Eén speler beantwoordt 5 minuten élke vraag met "banaan". Hoe normaler de vraag, hoe grappiger.</div>
+        <div class="uitleg-row"><strong>Stil als een steen</strong> — Wie het langst stil blijft wint. Anderen mogen alles proberen (zonder aanraken) om je te laten praten.</div>
+        <div class="uitleg-row"><strong>Naäap-detective</strong> — Iemand imiteert stiekem een ander; merkt diegene het, dan wisselen jullie. Vriendelijk blijven!</div>
+        <div class="uitleg-row"><strong>Plaatsnaam-verhaspel</strong> — Maak de gekste zinnen van borden en plaatsnamen die je onderweg ziet. Langste zin wint.</div>
+      </div>
+    </div>
+
     <div style="height:20px;"></div>
   </section>
 
@@ -2266,8 +2300,36 @@ function toggleCollapsibleMap(el, mapId, initFn){
   }
 }
 
+// ── WIST-JE-DATJES U5c ───────────────────────────────
+const WJD = [
+  'De Triglav (2864 m) is de hoogste berg van Slovenië en staat op de nationale vlag én op het muntje van 50 cent.',
+  'Het water van het Bohinj- en Bledmeer is van oorsprong gletsjerwater — ijskoud maar kraakhelder. De gemiddelde temperatuur in augustus is zo\'n 18–22 °C.',
+  'De smaragdgroene kleur van Sloveense bergbeken (Mostnica, Soča) komt door piepfijn rotsstof — "gesteentemeel" — dat in het water zweeft.',
+  'In de Alpen leven steenbokken, gemzen en marmotten. Marmotten fluiten luid als waarschuwing. Hoor je gefluit? Kijk dan goed naar de rotsen!',
+  'Edelweiss is een beschermde bergbloem — plukken mag niet. De naam betekent letterlijk "edel wit" in het Duits.',
+  'In Sloveense grotten leeft de "mensvis" (proteus/olm): een blinde, bleke grottensalamander die meer dan 100 jaar oud kan worden en wel 10 jaar zonder eten kan.',
+  'De wereldberoemde Lipizzaner-paarden komen uit Lipica in Slovenië. Ze worden altijd donker geboren en worden wit naarmate ze ouder worden.',
+  'Volgens de Sloveense legende bewaakte een gouden gems, Zlatorog, de schatten van de Triglav. Hij was onsterfelijk — totdat hij door een jager werd geraakt.',
+  'De Karawankentunnel onder de grens tussen Slovenië en Oostenrijk is bijna 8 km lang (exacte lengte te verifiëren).',
+  'Beieren en Tirol herken je aan kerktorens met ronde "ui-koepels" (Zwiebeltürme) — een typisch kenmerk van de barokke bouwstijl in die regio.',
+  'Slovenië heeft maar 47 km kustlijn aan de Adriatische Zee — toch heeft het land drie officiële stranden.',
+  'De Postojna-grot is een van de grootste grotten van Europa: ruim 24 km aan gangen, waarvan je er 5 km per elektrische trein doorkruist.',
+  'Wolfgangsee is een van de warmste meren van de Oostenrijkse Alpen. In augustus kan het water oplopen tot 25 °C.',
+];
+let wjdIdx=0;
+function wjdToon(i){
+  const el=document.getElementById('wjd-card');
+  const tel=document.getElementById('wjd-teller');
+  if(!el) return;
+  el.textContent=WJD[i];
+  if(tel) tel.textContent=`${i+1} / ${WJD.length}`;
+}
+function wjdVerras(){ wjdIdx=Math.floor(Math.random()*WJD.length); wjdToon(wjdIdx); }
+function wjdNav(d){ wjdIdx=(wjdIdx+d+WJD.length)%WJD.length; wjdToon(wjdIdx); }
+
 // ── INIT ──────────────────────────────────────────────
 tickCountdown();
+wjdToon(0);
 </script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </body>
