@@ -324,6 +324,10 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
 .bingo-cel img{width:100%;height:44px;object-fit:cover;border-radius:5px;display:block;}
 .dag-meal{margin-top:10px;padding:8px 10px;background:#EDE4DC;border-radius:8px;font-size:0.83rem;cursor:pointer;min-height:28px;}
 .dag-meal:empty::before{content:'🍽️ Eten vandaag — tik om toe te voegen';color:#9A948E;}
+/* programma filter */
+.prog-filt{display:flex;gap:8px;padding:12px 20px 4px;}
+.prog-filt-btn{flex:1;padding:10px 8px;border-radius:12px;border:none;background:rgba(10,10,10,0.06);font-size:0.82rem;font-weight:700;cursor:pointer;font-family:var(--sans);color:#6B6560;transition:all 0.15s;}
+.prog-filt-btn.active{background:#0A0A0A;color:#F0E8E2;}
 /* dagplan chips */
 .dag-my-acts{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px;}
 .dag-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(74,158,110,0.12);border:1px solid rgba(74,158,110,0.3);border-radius:20px;padding:4px 6px 4px 10px;font-size:0.78rem;color:#0A0A0A;max-width:100%;}
@@ -827,14 +831,17 @@ function renderProfileGrid(){
   <!-- ── PROGRAMMA ── -->
   <section id="sec-programma" class="section">
     <div class="sec-photo-header">
-      <img src="https://images.unsplash.com/photo-1564507592333-c60657eea523?w=700&q=80" alt="">
+      <img id="prog-header-img" src="https://images.unsplash.com/photo-1564507592333-c60657eea523?w=700&q=80" alt="">
       <div class="sec-photo-header-grad"></div>
       <div class="sec-photo-header-text">
-        <div class="sec-photo-header-title">Dag voor dag</div>
-        <div class="sec-photo-header-sub">27 juli — 14 augustus 2026</div>
+        <div class="sec-photo-header-title" id="prog-header-title">Slovenië</div>
+        <div class="sec-photo-header-sub" id="prog-header-sub">27 juli – 4 augustus · Bohinj</div>
       </div>
     </div>
-    <div style="height:8px;"></div>
+    <div class="prog-filt">
+      <button class="prog-filt-btn active" id="pfb-si" onclick="setProgrammaFilter('si')">🇸🇮 Slovenië<br><span style="font-size:0.65rem;font-weight:400;opacity:0.7;">27 jul – 4 aug</span></button>
+      <button class="prog-filt-btn" id="pfb-at" onclick="setProgrammaFilter('at')">🇦🇹 Oostenrijk<br><span style="font-size:0.65rem;font-weight:400;opacity:0.7;">5 – 14 aug</span></button>
+    </div>
     <div id="programma-list"></div>
     <div style="height:16px;"></div>
   </section>
@@ -1238,7 +1245,7 @@ function renderProfileGrid(){
     <!-- U5d: Klierspellen -->
     <div class="uitleg-block">
       <div class="uitleg-head" onclick="toggleUitleg(this)">
-        <div class="uitleg-title">😄 Klierspellen onderweg</div>
+        <div class="uitleg-title">😄 Spelletjes onderweg</div>
         <div class="uitleg-arrow">▼</div>
       </div>
       <div class="uitleg-body">
@@ -1414,11 +1421,6 @@ function renderProfileGrid(){
         <div class="collapsible-arrow">▼</div>
       </div>
       <div class="collapsible-body">
-
-        <!-- splitsing-tip -->
-        <div style="background:rgba(142,107,174,0.1);border-left:3px solid #8C6BAE;border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:14px;font-size:0.82rem;line-height:1.55;color:#3d2f52;">
-          <strong>Splitsing groep</strong> — Kleine kinderen (Ot, evt. Silas) blijven met één ouder op kamp. Oudere kinderen (Lauren, Jort, Gijs) kunnen meegaan. Spreek van tevoren af wie meegaat op welke tocht.
-        </div>
 
         <!-- TOCHT 1 -->
         <div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,0.07);">
@@ -1708,8 +1710,11 @@ function renderProfileGrid(){
         <div class="collapsible-arrow">▼</div>
       </div>
       <div class="collapsible-body">
-        <div style="padding:10px 0;font-size:0.85rem;color:#9A948E;font-style:italic;">Details volgen — Griette voegt de info toe zodra de camping geboekt is.</div>
-        <div class="info-row"><div class="info-icon">📅</div><div style="flex:1;"><div class="info-label">Periode</div><div class="info-val">Circa 4–5 augustus t/m 14 augustus 2026</div></div></div>
+        <div class="info-row"><div class="info-icon">📍</div><div style="flex:1;"><div class="info-label">Naam</div><div class="info-val">Seecamping Appesbach</div></div></div>
+        <div class="info-row"><div class="info-icon">📍</div><div style="flex:1;"><div class="info-label">Adres</div><div class="info-val">Au 99, 5360 St. Wolfgang im Salzkammergut, Oostenrijk</div></div></div>
+        <div class="info-row"><div class="info-icon">📅</div><div style="flex:1;"><div class="info-label">Periode</div><div class="info-val">5 augustus – 14 augustus 2026</div></div></div>
+        <div class="info-row"><div class="info-icon">🏊</div><div style="flex:1;"><div class="info-label">Meer</div><div class="info-val">Direct aan het Wolfgangsee — één van de warmste bergmeren van Oostenrijk (tot 25°C in augustus)</div></div></div>
+        <div class="info-row"><div class="info-icon">💡</div><div style="flex:1;"><div class="info-label">Tip</div><div class="info-val">St. Wolfgang centrum op 1 km lopen. Schafbergbahn vertrek (tandradbaan naar 1783 m) ook nabij.</div></div></div>
       </div>
     </div>
 
@@ -1866,16 +1871,16 @@ const DAGEN = [
   {datum:'za 1 aug',label:'Soča Vallei',kleur:'#4A9E6E',land:'🇸🇮',desc:'Naar de beroemde turquoise rivier — het water is onwerkelijk van kleur door mineralen. Zwemmen in bergpoelen, wandelen langs de oever.',acts:['Soča rivier wandeling (Bovec/Kobarid)','Zwemmen in de bergpoelen','Kobarid Museum (WO I, optioneel)','Napoleonsburg wandeling']},
   {datum:'zo 2 aug',label:'Predjama + Postojna',kleur:'#4A9E6E',land:'🇸🇮',desc:'Kasteel in een rotswand + de grootste grottencomplexen van Europa. Volle dag! Trui mee — in de grotten is het 12°C.',acts:['Predjama Kasteel (kasteel ÍN een rots)','Postojna grotten (elektrische trein, 24 km gangen)','Combinatieticket = voordeliger']},
   {datum:'ma 3 aug',label:'Piran & Adriatische kust',kleur:'#4A9E6E',land:'🇸🇮',desc:'Venetiaans stadje aan de Sloveense kust — maar 47 km kustlijn! Kleurrijke huisjes, versgezouten vis, zwemmen in de Adriatische Zee.',acts:['Piran Oude Stad verkennen','Tartinijev trg (plein)','Zwemmen bij Fiesa baai','Verse vis op de markt']},
-  {datum:'di 4 aug',label:'Reisdag → Oostenrijk',kleur:'#8C6BAE',land:'🇦🇹',desc:'Afscheid van Slovenië. Rijden naar de camping in Oostenrijk. Locatie volgt zodra de camping geboekt is.',acts:['Afbraak kamp Bohinj','Rit naar Oostenrijk','Aankomst camping Oostenrijk']},
-  {datum:'wo 5 aug',label:'Oostenrijk — dag 2',kleur:'#8C6BAE',land:'🇦🇹',desc:'Verkennen van de omgeving. Locatie en activiteiten volgen zodra de camping bekend is.',acts:['Programma volgt']},
-  {datum:'do 6 aug',label:'Oostenrijk — dag 3',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:['Programma volgt']},
-  {datum:'vr 7 aug',label:'Oostenrijk — dag 4',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:['Programma volgt']},
-  {datum:'za 8 aug',label:'Oostenrijk — dag 5',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:['Programma volgt']},
-  {datum:'zo 9 aug',label:'Oostenrijk — dag 6',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:['Programma volgt']},
-  {datum:'ma 10 aug',label:'Oostenrijk — dag 7',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:['Programma volgt']},
-  {datum:'di 11 aug',label:'Oostenrijk — dag 8',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:['Programma volgt']},
-  {datum:'wo 12 aug',label:'Oostenrijk — dag 9',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:['Programma volgt']},
-  {datum:'do 13 aug',label:'Laatste dag',kleur:'#8C6BAE',land:'🇦🇹',desc:'Laatste avond — goed eten, klaverjas, herinneringen ophalen.',acts:['Laatste diner buitenshuis','Klaverjas finale','Koffers inpakken']},
+  {datum:'di 4 aug',label:'Laatste dag Bohinj',kleur:'#4A9E6E',land:'🇸🇮',desc:'Laatste volle dag bij Camp Bohinj — morgen rijden we naar Oostenrijk. Geniet van het meer, wandel nog een keer naar Savica, of hang gewoon bij het kamp.',acts:[]},
+  {datum:'wo 5 aug',label:'Overstapdag → Appesbach',kleur:'#8C6BAE',land:'🚗',desc:'Van Camp Bohinj via de Karawankentunnel naar Seecamping Appesbach bij St. Wolfgang. Onderweg zwemstop Wörthersee (Velden) + boodschappen Villach. Aankomst Appesbach middag/avond.',acts:[]},
+  {datum:'do 6 aug',label:'Appesbach — dag 1',kleur:'#8C6BAE',land:'🇦🇹',desc:'Eerste dag bij het Wolfgangsee — kamp verkennen, zwemmen, St. Wolfgang binnenlopen.',acts:[]},
+  {datum:'vr 7 aug',label:'Appesbach — dag 2',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:[]},
+  {datum:'za 8 aug',label:'Appesbach — dag 3',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:[]},
+  {datum:'zo 9 aug',label:'Appesbach — dag 4',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:[]},
+  {datum:'ma 10 aug',label:'Appesbach — dag 5',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:[]},
+  {datum:'di 11 aug',label:'Appesbach — dag 6',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:[]},
+  {datum:'wo 12 aug',label:'Appesbach — dag 7',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:[]},
+  {datum:'do 13 aug',label:'Appesbach — dag 8 · Laatste avond',kleur:'#8C6BAE',land:'🇦🇹',desc:'Laatste avond — goed eten, klaverjas, herinneringen ophalen.',acts:[]},
   {datum:'vr 14 aug',label:'Thuisdag',kleur:'#9A948E',land:'🏠',desc:'Rit terug naar Nederland. Dankbaar, moe, en vol mooie herinneringen.',acts:['Afbraak kamp','Rit terug ±10–12 uur','Thuis 🏠']},
 ];
 
@@ -1990,6 +1995,7 @@ let kvScore = {t1:0, t2:0};
 let dagplannen = {};
 let dagPickerKey = null;
 let dagPickerCat = 'alles';
+let progFilter = 'si';
 
 // teams — elk object heeft {t1:[naam,naam], t2:[naam,naam]}
 const KV_TEAM_PRESETS = [
@@ -2203,10 +2209,32 @@ function switchTab(tab){
 
 // ── PROGRAMMA ────────────────────────────────────────
 function dagKey(datum){ return datum.replace(/\s+/g,'-'); }
+function setProgrammaFilter(f) {
+  progFilter = f;
+  ['si','at'].forEach(k => {
+    const btn = document.getElementById('pfb-'+k);
+    if (btn) btn.className = 'prog-filt-btn' + (k===f?' active':'');
+  });
+  const img = document.getElementById('prog-header-img');
+  const ttl = document.getElementById('prog-header-title');
+  const sub = document.getElementById('prog-header-sub');
+  if (f === 'si') {
+    if (img) img.src = 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=700&q=80';
+    if (ttl) ttl.textContent = 'Slovenië';
+    if (sub) sub.textContent = '27 juli – 4 augustus · Bohinj';
+  } else {
+    if (img) img.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700&q=80';
+    if (ttl) ttl.textContent = 'Oostenrijk';
+    if (sub) sub.textContent = '5 – 14 augustus · Wolfgangsee';
+  }
+  renderProgramma();
+}
 function renderProgramma() {
   const el = document.getElementById('programma-list');
   const plan = dagplannen[currentUser] || {};
   el.innerHTML = DAGEN.map((dag,i)=>{
+    if (progFilter==='si' && i>8) return '';
+    if (progFilter==='at' && i<9) return '';
     const k = dagKey(dag.datum);
     const myActs = plan[k] || [];
     const chipsHtml = myActs.map((a,ai)=>
@@ -3118,6 +3146,7 @@ async function bingoNieuw(){
   const code=bingoCode();
   const modus='lijn';
   try{
+    if(!sb) throw new Error('offline');
     const {data:sess,error:se}=await sb.from('slovenie_bingo_sessions').insert({code,modus,actief:true}).select().single();
     if(se) throw se;
     const kaart=shuffleArr(BINGO_ITEMS).slice(0,16);
@@ -3126,7 +3155,14 @@ async function bingoNieuw(){
     bingoSessie=sess; bingoKaart=kaart; bingoMarks={};
     document.getElementById('bingo-lobby-status').textContent='';
     startBingoSpel(sess,kaart);
-  } catch(e){ document.getElementById('bingo-lobby-status').textContent='⚠️ Kon spel niet starten. Controleer verbinding.'; }
+  } catch(e){
+    // local fallback — speel zonder Supabase sync
+    const kaart=shuffleArr(BINGO_ITEMS).slice(0,16);
+    const localSess={id:'local-'+code, code, modus, actief:true};
+    bingoSessie=localSess; bingoKaart=kaart; bingoMarks={};
+    document.getElementById('bingo-lobby-status').textContent='';
+    startBingoSpel(localSess,kaart);
+  }
 }
 
 async function bingoJoin(){
@@ -3298,13 +3334,13 @@ async function addScore(gameId){
 const WEER_LOCATIES = [
   {naam:'Camp Bohinj 🇸🇮',lat:46.2789,lng:13.8377,thuis:false},
   {naam:'Appesbach 🇦🇹',lat:47.742,lng:13.435,thuis:false},
-  {naam:'Schalkwijk 🏠',lat:51.991,lng:5.276,thuis:true},
-  {naam:'Leeuwarden 🏠',lat:53.201,lng:5.800,thuis:true},
-  {naam:'Veluwe',lat:52.126,lng:5.819,thuis:true},
-  {naam:'Zeeland',lat:51.498,lng:3.607,thuis:true},
-  {naam:'Drenthe',lat:52.922,lng:6.672,thuis:true},
-  {naam:'Gardameer 🇮🇹',lat:45.660,lng:10.741,thuis:true},
-  {naam:'Ardèche 🇫🇷',lat:44.489,lng:4.292,thuis:true},
+  {naam:'Bergen 🇳🇴',lat:60.391,lng:5.322,thuis:true},
+  {naam:'Reykjavik 🇮🇸',lat:64.135,lng:-21.895,thuis:true},
+  {naam:'Dublin 🇮🇪',lat:53.349,lng:-6.260,thuis:true},
+  {naam:'Tromsø 🇳🇴',lat:69.650,lng:18.956,thuis:true},
+  {naam:'Brest 🇫🇷',lat:48.390,lng:-4.486,thuis:true},
+  {naam:'Aberdeen 🏴󠁧󠁢󠁳󠁣󠁴󠁿',lat:57.149,lng:-2.099,thuis:true},
+  {naam:'Faroer 🇫🇴',lat:62.011,lng:-6.769,thuis:true},
 ];
 const WEER_CODES={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',61:'🌧️',71:'🌨️',80:'🌦️',85:'🌨️',95:'⛈️',99:'⛈️'};
 let weerGeladen=false;
@@ -3646,7 +3682,7 @@ function quizToon(i){
   document.getElementById('quiz-antwoord').textContent=q.a;
   const keuzeEl=document.getElementById('quiz-keuze');
   const toonBtn=document.getElementById('quiz-toon-btn');
-  const heeftKeuze=q.keuze && q.niv==='makkelijk' && kindModus;
+  const heeftKeuze=!!q.keuze;
   keuzeEl.style.display=heeftKeuze?'grid':'none';
   toonBtn.style.display=heeftKeuze?'none':'block';
   if(heeftKeuze){
