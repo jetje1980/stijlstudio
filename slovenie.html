@@ -317,6 +317,9 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
 
 /* swipe dist pill */
 .card-dist{font-size:0.68rem;color:#9A948E;margin-top:5px;line-height:1.3;}
+.bingo-cel{position:relative;border:1.5px solid #ddd;border-radius:8px;background:#fff;padding:6px 4px;text-align:center;font-size:0.68rem;line-height:1.2;cursor:pointer;min-height:52px;display:flex;align-items:center;justify-content:center;transition:background 0.2s;}
+.bingo-cel.gevonden{background:#4A9E6E;border-color:#4A9E6E;color:#fff;}
+.bingo-cel img{width:100%;height:44px;object-fit:cover;border-radius:5px;display:block;}
 .dag-meal{margin-top:10px;padding:8px 10px;background:#EDE4DC;border-radius:8px;font-size:0.83rem;cursor:pointer;min-height:28px;}
 .dag-meal:empty::before{content:'🍽️ Eten vandaag — tik om toe te voegen';color:#9A948E;}
 .rec-card{background:#fff;border:1.5px solid #e0dbd6;border-radius:12px;overflow:hidden;cursor:pointer;transition:box-shadow 0.15s;}
@@ -800,6 +803,50 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
         <div class="uitleg-row"><strong>4.</strong> Speel 8 slagen. Bij troef <em>moet</em> je altijd bekennen of troeven als je dat kunt.</div>
         <div class="uitleg-row"><strong>5.</strong> Tel slagen en roem op per team. Check of de roeper nat is.</div>
         <div class="uitleg-row"><strong>6.</strong> Noteer op het scorebord en ga verder. Spel eindigt op een afgesproken totaalscore (bijv. 1500 of 2000 punten).</div>
+      </div>
+    </div>
+
+    <!-- U5a: Autobingo -->
+    <div class="uitleg-block" id="bingo-block">
+      <div class="uitleg-head" onclick="toggleUitleg(this)">
+        <div class="uitleg-title">🎯 Autobingo</div>
+        <div class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body" id="bingo-body">
+
+        <!-- Lobby / sessie kiezen -->
+        <div id="bingo-lobby">
+          <p style="font-size:0.84rem;color:#6B6560;margin:0 0 12px;">Spot dingen onderweg, maak een foto als bewijs, en word bingo!</p>
+          <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+            <button onclick="bingoNieuw()" style="flex:1;padding:10px;background:#4A9E6E;color:#fff;border:none;border-radius:14px;font-family:inherit;font-size:0.88rem;font-weight:700;cursor:pointer;">🆕 Nieuw spel starten</button>
+          </div>
+          <div style="display:flex;gap:6px;margin-bottom:8px;">
+            <input id="bingo-code-in" placeholder="Spelcode (bijv. BOH3)" maxlength="6" style="flex:1;border:1.5px solid #ddd;border-radius:10px;padding:9px 11px;font-family:inherit;font-size:0.92rem;text-transform:uppercase;">
+            <button onclick="bingoJoin()" style="padding:9px 16px;background:#4A7CC4;color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:0.88rem;font-weight:700;cursor:pointer;">Meedoen</button>
+          </div>
+          <div id="bingo-lobby-status" style="font-size:0.82rem;color:#9A948E;margin-bottom:8px;"></div>
+          <div id="bingo-actieve-sessies" style="margin-top:4px;"></div>
+        </div>
+
+        <!-- Actief spel -->
+        <div id="bingo-spel" style="display:none;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div>
+              <span id="bingo-sessie-code" style="font-weight:700;font-size:0.9rem;background:#4A9E6E;color:#fff;padding:3px 10px;border-radius:10px;"></span>
+              <span id="bingo-modus-badge" style="font-size:0.78rem;color:#6B6560;margin-left:8px;"></span>
+            </div>
+            <button onclick="bingoStop()" style="font-size:0.78rem;color:#9A948E;background:none;border:1px solid #ddd;border-radius:10px;padding:4px 10px;cursor:pointer;">✕ Stoppen</button>
+          </div>
+          <div id="bingo-spelers-bar" style="font-size:0.78rem;color:#6B6560;margin-bottom:8px;"></div>
+          <div id="bingo-grid" style="display:grid;gap:5px;margin-bottom:10px;"></div>
+          <div id="bingo-status" style="font-size:0.84rem;color:#4A9E6E;font-weight:700;text-align:center;min-height:20px;"></div>
+        </div>
+
+        <!-- Foto-galerij (alle sessies) -->
+        <div style="margin-top:14px;border-top:1px solid #e0dbd6;padding-top:10px;">
+          <div style="font-size:0.75rem;font-weight:700;color:#6B6560;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">📸 Bewijsfoto's (alle sessies)</div>
+          <div id="bingo-galerie" style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;"></div>
+        </div>
       </div>
     </div>
 
