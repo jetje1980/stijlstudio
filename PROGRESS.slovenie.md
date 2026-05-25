@@ -27,6 +27,7 @@
 | 2026-05-25 | U7b | ✅ | Supabase-tabellen aangemaakt: slovenie_config, _klaverjas_scores, _packlist, _recipes, _day_meals, _bingo_sessions/players/marks, _quiz_scores | Supabase migration |
 | 2026-05-25 | U7c | ✅ | RLS + anon-policies: lezen + invoegen voor iedereen, buckets slovenie-recipes + slovenie-bingo publiek leesbaar | Supabase |
 | 2026-05-25 | U7d | ✅ | slovenie.html: Supabase client init, klaverjas + inpaklijst async naar Supabase, localStorage-migratie + offline-fallback | slovenie.html |
+| 2026-05-25 | U3a | ✅ | Vertaaltool Sloveens → NL: MyMemory API + 18-zinnen phrasebook fallback, collapsible in Info-tab | slovenie.html |
 
 ## Datamodel U7 (aangemaakt in Supabase, project osuqtfsxmquwqsbgzlqn)
 
