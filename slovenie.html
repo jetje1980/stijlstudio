@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,500;1,9..40,700;1,9..40,800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
@@ -1110,10 +1111,15 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
 </div>
 
 <script>
+// ── SUPABASE ─────────────────────────────────────────
+const SB_URL  = 'https://osuqtfsxmquwqsbgzlqn.supabase.co';
+const SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
+const sb      = supabase.createClient(SB_URL, SB_KEY);
+
 // ── CONFIG ──────────────────────────────────────────
 const TRIP_DATE = new Date('2026-07-27T07:00:00');
 const END_DATE  = new Date('2026-08-14T18:00:00');
-const SK = 'slov26'; // storage key prefix
+const SK = 'slov26'; // localStorage prefix (alleen lokale UI-state)
 
 // ── PROFILES ────────────────────────────────────────
 const PROFILES = {
@@ -1341,7 +1347,7 @@ function startApp() {
   initReel();
   tickCountdown();
   setInterval(tickCountdown, 30000);
-  renderPacklist();
+  loadPacklist();
   renderProgramma();
   renderSwipeStack();
   loadKvData();
@@ -1546,10 +1552,39 @@ function doSwipe(dir){
 function resetSwipes(){swipes={};localStorage.setItem(`${SK}_swipes_${currentUser}`,JSON.stringify(swipes));renderSwipeStack();}
 
 // ── KLAVERJAS ────────────────────────────────────────
-function loadKvData(){
-  kvPotjes = JSON.parse(localStorage.getItem(`${SK}_kv_potjes`) || '[]');
-  kvTeams  = JSON.parse(localStorage.getItem(`${SK}_kv_teams`)  || 'null') || KV_TEAM_PRESETS[0];
+async function loadKvData(){
+  try {
+    const [{ data: potjes }, { data: cfg }] = await Promise.all([
+      sb.from('slovenie_klaverjas_scores').select('*').order('created_at'),
+      sb.from('slovenie_config').select('value').eq('key','kv_teams').maybeSingle()
+    ]);
+    if (potjes) kvPotjes = potjes.map(r=>({
+      id:r.id, roeper:r.roeper, troef:r.troef, roepTeam:r.roep_team,
+      r1:r.roem1, r2:r.roem2, s1:r.slagen1, s2:r.slagen2,
+      nat:r.nat, pts1:r.pts1, pts2:r.pts2, ts:r.ts
+    }));
+    if (cfg?.value) kvTeams = cfg.value;
+    else {
+      const old = JSON.parse(localStorage.getItem(`${SK}_kv_teams`)||'null');
+      if (old) kvTeams = old;
+    }
+    migreerKvLocalStorage();
+  } catch(e) {
+    kvPotjes = JSON.parse(localStorage.getItem(`${SK}_kv_potjes`)||'[]');
+    kvTeams  = JSON.parse(localStorage.getItem(`${SK}_kv_teams`)||'null') || KV_TEAM_PRESETS[0];
+  }
   recalcKvScores();
+}
+async function migreerKvLocalStorage(){
+  const lokaal = JSON.parse(localStorage.getItem(`${SK}_kv_potjes`)||'[]');
+  if (!lokaal.length || kvPotjes.length) return;
+  const rows = lokaal.map(p=>({
+    roeper:p.roeper, troef:p.troef, roep_team:p.roepTeam,
+    roem1:p.r1||0, roem2:p.r2||0, slagen1:p.s1||0, slagen2:p.s2||0,
+    nat:!!p.nat, pts1:p.pts1, pts2:p.pts2, ts:p.ts
+  }));
+  await sb.from('slovenie_klaverjas_scores').insert(rows);
+  localStorage.removeItem(`${SK}_kv_potjes`);
 }
 function recalcKvScores(){
   kvScore={t1:0,t2:0};
@@ -1583,12 +1618,16 @@ function renderTeamsWisselOpties(){
     </button>`;
   }).join('');
 }
-function setKvTeam(i){
+async function setKvTeam(i){
   kvTeams = KV_TEAM_PRESETS[i];
-  localStorage.setItem(`${SK}_kv_teams`, JSON.stringify(kvTeams));
   document.getElementById('teams-wissel-bar').style.display='none';
   renderKvScores();
   showToast('Teams gewijzigd!');
+  try {
+    await sb.from('slovenie_config').upsert({key:'kv_teams', value:kvTeams, updated_at:new Date().toISOString()});
+  } catch(e) {
+    localStorage.setItem(`${SK}_kv_teams`, JSON.stringify(kvTeams));
+  }
 }
 function renderKvPotjes(){
   const el = document.getElementById('kv-potjes-list');
@@ -1667,11 +1706,22 @@ function submitPotje(){
   } else {
     pts1=s1+r1; pts2=s2+r2;
   }
-  kvPotjes.push({roeper,troef,roepTeam,r1,r2,s1,s2,nat:!!nat,pts1,pts2,ts:Date.now()});
-  localStorage.setItem(`${SK}_kv_potjes`,JSON.stringify(kvPotjes));
+  const potje = {roeper,troef,roepTeam,r1,r2,s1,s2,nat:!!nat,pts1,pts2,ts:Date.now()};
   closeKvModal();
+  showToast('Opslaan…');
+  try {
+    const {data} = await sb.from('slovenie_klaverjas_scores').insert({
+      roeper,troef,roep_team:roepTeam,roem1:r1,roem2:r2,slagen1:s1,slagen2:s2,
+      nat:!!nat,pts1,pts2,ts:potje.ts
+    }).select().single();
+    if(data) potje.id = data.id;
+    showToast('Potje opgeslagen! ✓');
+  } catch(e) {
+    localStorage.setItem(`${SK}_kv_potjes`,JSON.stringify([...kvPotjes,potje]));
+    showToast('Opgeslagen (offline)');
+  }
+  kvPotjes.push(potje);
   renderKvScores();
-  showToast('Potje opgeslagen!');
   // Reset form
   document.getElementById('kv-nat').checked=false;
   document.getElementById('kv-roem1').value='0';
@@ -1679,11 +1729,14 @@ function submitPotje(){
   document.getElementById('kv-slagen1').value='';
   document.getElementById('kv-slagen2').value='';
 }
-function deletePotje(i){
+async function deletePotje(i){
   if(!confirm('Dit potje verwijderen?')) return;
+  const potje = kvPotjes[i];
   kvPotjes.splice(i,1);
-  localStorage.setItem(`${SK}_kv_potjes`,JSON.stringify(kvPotjes));
   renderKvScores();
+  try {
+    if(potje.id) await sb.from('slovenie_klaverjas_scores').delete().eq('id',potje.id);
+  } catch(e) { /* stille fout */ }
 }
 
 // ── UITLEG TOGGLE ─────────────────────────────────────
@@ -1719,6 +1772,22 @@ const PACK = [
   {id:'klaver',l:'Klaverjas kaarten',n:'Of gewoon een normaal kaartspel!'},
   {id:'spelregel',l:'Spelregels meegenomen?',n:'Bekijk de Spellen tab'},
 ];
+async function loadPacklist(){
+  try {
+    const {data} = await sb.from('slovenie_packlist').select('item_id,gedaan').eq('profiel',currentUser);
+    if(data) data.forEach(r=>{ packChecked[r.item_id]=r.gedaan; });
+    const lokaal = JSON.parse(localStorage.getItem(`${SK}_pack_${currentUser}`)||'{}');
+    if(Object.keys(lokaal).length && !data?.length){
+      const rows=Object.entries(lokaal).map(([item_id,gedaan])=>({profiel:currentUser,item_id,gedaan}));
+      await sb.from('slovenie_packlist').upsert(rows,{onConflict:'profiel,item_id'});
+      localStorage.removeItem(`${SK}_pack_${currentUser}`);
+      rows.forEach(r=>{ packChecked[r.item_id]=r.gedaan; });
+    }
+  } catch(e) {
+    packChecked = JSON.parse(localStorage.getItem(`${SK}_pack_${currentUser}`)||'{}');
+  }
+  renderPacklist();
+}
 function renderPacklist(){
   document.getElementById('packlist').innerHTML = PACK.map(p=>`
     <div class="pack-item${packChecked[p.id]?' checked':''}" onclick="togglePack('${p.id}',this)">
@@ -1726,11 +1795,15 @@ function renderPacklist(){
       <div><div class="pack-label">${p.l}</div>${p.n?`<div class="pack-note">${p.n}</div>`:''}</div>
     </div>`).join('');
 }
-function togglePack(id,el){
+async function togglePack(id,el){
   packChecked[id]=!packChecked[id];
-  localStorage.setItem(`${SK}_pack_${currentUser}`,JSON.stringify(packChecked));
   el.classList.toggle('checked');
   el.querySelector('.pack-check').textContent=packChecked[id]?'✓':'';
+  try {
+    await sb.from('slovenie_packlist').upsert({profiel:currentUser,item_id:id,gedaan:packChecked[id],updated_at:new Date().toISOString()},{onConflict:'profiel,item_id'});
+  } catch(e) {
+    localStorage.setItem(`${SK}_pack_${currentUser}`,JSON.stringify(packChecked));
+  }
 }
 
 // ── HEENREIS KAART ───────────────────────────────────
