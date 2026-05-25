@@ -324,6 +324,10 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
 .bingo-cel img{width:100%;height:44px;object-fit:cover;border-radius:5px;display:block;}
 .dag-meal{margin-top:10px;padding:8px 10px;background:#EDE4DC;border-radius:8px;font-size:0.83rem;cursor:pointer;min-height:28px;}
 .dag-meal:empty::before{content:'🍽️ Eten vandaag — tik om toe te voegen';color:#9A948E;}
+/* google maps links */
+.maps-btn{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;background:rgba(74,158,110,0.12);border-radius:12px;font-size:0.68rem;color:#4A9E6E;font-weight:700;text-decoration:none;margin-top:5px;}
+.maps-btn:active{background:rgba(74,158,110,0.22);}
+.maps-row-link{color:inherit;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(74,158,110,0.4);}
 /* programma filter */
 .prog-filt{display:flex;gap:8px;padding:12px 20px 4px;}
 .prog-filt-btn{flex:1;padding:10px 8px;border-radius:12px;border:none;background:rgba(10,10,10,0.06);font-size:0.82rem;font-weight:700;cursor:pointer;font-family:var(--sans);color:#6B6560;transition:all 0.15s;}
@@ -1337,7 +1341,15 @@ function renderProfileGrid(){
     </div>
 
     <!-- U2: Appesbach activiteiten -->
-    <div class="sec-label" style="margin-top:4px;">Appesbach (5–12 aug)</div>
+    <div style="position:relative;height:140px;overflow:hidden;border-radius:12px;margin:12px 20px 0;">
+      <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700&q=80" alt="Wolfgangsee" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;">
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05),rgba(0,0,0,0.6));"></div>
+      <div style="position:absolute;bottom:12px;left:14px;right:14px;">
+        <div style="font-family:Georgia,serif;font-style:italic;font-size:1.2rem;color:#F0E8E2;text-shadow:0 2px 8px rgba(0,0,0,0.5);">Wolfgangsee · Appesbach</div>
+        <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(240,232,226,0.7);margin-top:2px;">5 – 14 augustus 2026 · St. Wolfgang 🇦🇹</div>
+      </div>
+    </div>
+    <div class="sec-label" style="margin-top:12px;">Appesbach (5–14 aug)</div>
 
     <div class="collapsible" onclick="toggleCollapsible(this)">
       <div class="collapsible-head">
@@ -1347,27 +1359,27 @@ function renderProfileGrid(){
       <div class="collapsible-body">
         <div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin-bottom:8px;">🌿 Makkelijk & gezinsproof</div>
         <div class="bohinj-afst-list">
-          <div class="bohinj-afst-row"><span>🚲 Wolfgangsee Radweg</span><span>vlak fietspad langs het meer, zwemstops | vanaf camp</span></div>
-          <div class="bohinj-afst-row"><span>🚂 Schafbergbahn</span><span>nostalgische tandradbaan → 1783 m, groots uitzicht | ca. 1,5 km dalstation</span></div>
-          <div class="bohinj-afst-row"><span>⛵ Wolfgangsee-Schifffahrt</span><span>rondvaart naar St. Gilgen en Strobl | ca. 1 km aanlegsteiger</span></div>
-          <div class="bohinj-afst-row"><span>⛪ St. Wolfgang + kerk</span><span>Michael Pacher-altaar (14e eeuws meesterwerk) | ca. 1 km / 12 min</span></div>
+          <div class="bohinj-afst-row"><span><a class="maps-row-link" href="https://maps.google.com/?q=Wolfgangsee+Radweg+St.+Wolfgang" target="_blank" rel="noopener">🚲 Wolfgangsee Radweg</a></span><span>vlak fietspad langs het meer, zwemstops | vanaf camp</span></div>
+          <div class="bohinj-afst-row"><span><a class="maps-row-link" href="https://maps.google.com/?q=Schafbergbahn+St.+Wolfgang+im+Salzkammergut" target="_blank" rel="noopener">🚂 Schafbergbahn</a></span><span>nostalgische tandradbaan → 1783 m, groots uitzicht | ca. 1,5 km dalstation</span></div>
+          <div class="bohinj-afst-row"><span><a class="maps-row-link" href="https://maps.google.com/?q=Wolfgangsee+Schifffahrt+St.+Wolfgang" target="_blank" rel="noopener">⛵ Wolfgangsee-Schifffahrt</a></span><span>rondvaart naar St. Gilgen en Strobl | ca. 1 km aanlegsteiger</span></div>
+          <div class="bohinj-afst-row"><span><a class="maps-row-link" href="https://maps.google.com/?q=Pfarrkirche+St.+Wolfgang+im+Salzkammergut" target="_blank" rel="noopener">⛪ St. Wolfgang + kerk</a></span><span>Michael Pacher-altaar (14e eeuws meesterwerk) | ca. 1 km / 12 min</span></div>
         </div>
         <div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin:10px 0 8px;">⛰️ Gemiddeld, mooi uitzicht</div>
         <div class="bohinj-afst-list">
-          <div class="bohinj-afst-row"><span>🚡 Zwölferhorn-kabelbaan (St. Gilgen)</span><span>graatwandelingen, panorama | ca. 14 km of per boot</span></div>
-          <div class="bohinj-afst-row"><span>🌿 Postalm (Strobl)</span><span>groot alpenplateau, familiewandelingen, tolweg | ca. 20 km</span></div>
+          <div class="bohinj-afst-row"><span><a class="maps-row-link" href="https://maps.google.com/?q=Zwölferhorn+Seilbahn+St.+Gilgen" target="_blank" rel="noopener">🚡 Zwölferhorn-kabelbaan (St. Gilgen)</a></span><span>graatwandelingen, panorama | ca. 14 km of per boot</span></div>
+          <div class="bohinj-afst-row"><span><a class="maps-row-link" href="https://maps.google.com/?q=Postalm+Strobl+Austria" target="_blank" rel="noopener">🌿 Postalm (Strobl)</a></span><span>groot alpenplateau, familiewandelingen, tolweg | ca. 20 km</span></div>
         </div>
         <div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin:10px 0 8px;">🔥 Voor de fanatieke tieners</div>
         <div class="bohinj-afst-list">
-          <div class="bohinj-afst-row"><span>🥾 Schafberg te voet (i.p.v. de trein)</span><span>stevige dagtocht, topbeloning | start ca. 1,5 km</span></div>
-          <div class="bohinj-afst-row"><span>🧊 Dachstein/Krippenstein (Obertraun)</span><span>gondel + ijsgrotten / 5 Fingers of pittige wandeling | ca. 40 km / 45 min</span></div>
+          <div class="bohinj-afst-row"><span><a class="maps-row-link" href="https://maps.google.com/?q=Schafberg+St.+Wolfgang" target="_blank" rel="noopener">🥾 Schafberg te voet (i.p.v. de trein)</a></span><span>stevige dagtocht, topbeloning | start ca. 1,5 km</span></div>
+          <div class="bohinj-afst-row"><span><a class="maps-row-link" href="https://maps.google.com/?q=Dachstein+Krippenstein+Obertraun" target="_blank" rel="noopener">🧊 Dachstein/Krippenstein (Obertraun)</a></span><span>gondel + ijsgrotten / 5 Fingers of pittige wandeling | ca. 40 km / 45 min</span></div>
         </div>
         <div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin:10px 0 8px;">✈️ Dagtrips</div>
         <div class="bohinj-afst-list">
-          <div class="bohinj-afst-row"><span>🏛️ Hallstatt (UNESCO)</span><span>ca. 35 km / 45 min</span></div>
-          <div class="bohinj-afst-row"><span>👑 Bad Ischl (Kaiservilla)</span><span>ca. 13 km / 15 min</span></div>
-          <div class="bohinj-afst-row"><span>🎵 Salzburg (Altstadt, Mozart)</span><span>ca. 50 km / 50 min</span></div>
-          <div class="bohinj-afst-row"><span>🎬 Mondsee (Sound of Music-kerk)</span><span>ca. 25 km / 25 min</span></div>
+          <div class="bohinj-afst-row"><span><a class="maps-row-link" href="https://maps.google.com/?q=47.5622,13.6493" target="_blank" rel="noopener">🏛️ Hallstatt (UNESCO)</a></span><span>ca. 35 km / 45 min</span></div>
+          <div class="bohinj-afst-row"><span><a class="maps-row-link" href="https://maps.google.com/?q=47.7141,13.6218" target="_blank" rel="noopener">👑 Bad Ischl (Kaiservilla)</a></span><span>ca. 13 km / 15 min</span></div>
+          <div class="bohinj-afst-row"><span><a class="maps-row-link" href="https://maps.google.com/?q=47.8095,13.0550" target="_blank" rel="noopener">🎵 Salzburg (Altstadt, Mozart)</a></span><span>ca. 50 km / 50 min</span></div>
+          <div class="bohinj-afst-row"><span><a class="maps-row-link" href="https://maps.google.com/?q=Mondsee+Basilika+Austria" target="_blank" rel="noopener">🎬 Mondsee (Sound of Music-kerk)</a></span><span>ca. 25 km / 25 min</span></div>
         </div>
         <div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin:10px 0 8px;">🛁 Rustdag / wellness</div>
         <div class="bohinj-afst-list">
@@ -1402,9 +1414,9 @@ function renderProfileGrid(){
       </div>
       <div class="collapsible-body">
         <div class="bohinj-afst-list">
-          <div class="bohinj-afst-row"><span>☕ Bacherls Seecafé (op camping)</span><span>regionale keuken, meeneem | op het terrein</span></div>
-          <div class="bohinj-afst-row"><span>🦢 Im Weißen Rössl</span><span>iconisch Gasthof aan het meer in St. Wolfgang | ca. 1 km</span></div>
-          <div class="bohinj-afst-row"><span>🎂 Konditorei Zauner, Bad Ischl</span><span>keizerlijke patisserie, Gugelhupf/Zaunerstollen | ca. 13 km</span></div>
+          <div class="bohinj-afst-row"><span><a class="maps-row-link" href="https://maps.google.com/?q=Bacherls+Seecafe+St+Wolfgang" target="_blank" rel="noopener">☕ Bacherls Seecafé (op camping)</a></span><span>regionale keuken, meeneem | op het terrein</span></div>
+          <div class="bohinj-afst-row"><span><a class="maps-row-link" href="https://maps.google.com/?q=Im+Weissen+Rössl+St+Wolfgang+am+Wolfgangsee" target="_blank" rel="noopener">🦢 Im Weißen Rössl</a></span><span>iconisch Gasthof aan het meer in St. Wolfgang | ca. 1 km</span></div>
+          <div class="bohinj-afst-row"><span><a class="maps-row-link" href="https://maps.google.com/?q=Konditorei+Zauner+Bad+Ischl" target="_blank" rel="noopener">🎂 Konditorei Zauner, Bad Ischl</a></span><span>keizerlijke patisserie, Gugelhupf/Zaunerstollen | ca. 13 km</span></div>
         </div>
         <div style="margin-top:10px;font-size:0.78rem;color:#6B6560;">
           <strong>Proeven:</strong> verse meervis (Reinanke/Saibling), Kaiserschmarrn, Tafelspitz, Salzburger Nockerl, Salzkammergut-Bauernkrapfen.<br><br>
@@ -1435,7 +1447,7 @@ function renderProfileGrid(){
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.78rem;margin-bottom:8px;">
             <div><span style="color:#8C6BAE;">📏</span> <strong>Afstand:</strong> 8 km enkel · 16 km retour</div>
             <div><span style="color:#8C6BAE;">↑</span> <strong>Stijging:</strong> +800 m</div>
-            <div><span style="color:#8C6BAE;">🏠</span> <strong>Hut:</strong> Dom na Komni (1474 m)</div>
+            <div><span style="color:#8C6BAE;">🏠</span> <strong>Hut:</strong> <a class="maps-row-link" href="https://maps.google.com/?q=46.3037,13.8068" target="_blank" rel="noopener">Dom na Komni (1474 m)</a></div>
             <div><span style="color:#8C6BAE;">🚗</span> <strong>Parkeren:</strong> bij kamp (te voet)</div>
           </div>
           <div style="font-size:0.75rem;color:#9A948E;">Geschikt voor: 13+ jaar fit · volwassenen</div>
@@ -1455,7 +1467,7 @@ function renderProfileGrid(){
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.78rem;margin-bottom:8px;">
             <div><span style="color:#4A9E6E;">📏</span> <strong>Afstand:</strong> 7 km enkel · 14 km retour</div>
             <div><span style="color:#4A9E6E;">↑</span> <strong>Stijging:</strong> +550 m</div>
-            <div><span style="color:#4A9E6E;">🏠</span> <strong>Hut:</strong> Koča na Planini v Lazu (1182 m)</div>
+            <div><span style="color:#4A9E6E;">🏠</span> <strong>Hut:</strong> <a class="maps-row-link" href="https://maps.google.com/?q=46.3390,13.9155" target="_blank" rel="noopener">Koča na Planini v Lazu (1182 m)</a></div>
             <div><span style="color:#4A9E6E;">🚗</span> <strong>Parkeren:</strong> Stara Fužina (10 min rijden)</div>
           </div>
           <div style="font-size:0.75rem;color:#9A948E;">Geschikt voor: 10+ jaar · alle niveaus</div>
@@ -1506,6 +1518,7 @@ function renderProfileGrid(){
             <div class="u1-naam">Mostnica-kloof (Korita Mostnice)</div>
             <div class="u1-desc">Vanaf Stara Fužina / Hudičev most. ±1,5 u retour, smaragdgroene poeltjes, olifant-rots "Slonček". Door te trekken via Voje-vallei naar Slap Mostnica (21 m).</div>
             <div class="u1-afst">🚗 ca. 9 km vanaf camp</div>
+            <a class="maps-btn" href="https://maps.google.com/?q=46.3090,13.8886" target="_blank" rel="noopener">📍 Open in Maps</a>
           </div>
         </div>
         <div class="u1-item">
@@ -1514,6 +1527,7 @@ function renderProfileGrid(){
             <div class="u1-naam">Savica-waterval (Slap Savica)</div>
             <div class="u1-desc">Vanaf Ukanc &lt;1 u lopen naar parkeerplaats, dan steile trap omhoog naar de 78 m hoge A-vormige val. Ga vroeg — meest bezochte val van Slovenië.</div>
             <div class="u1-afst">🚶 ca. 4 km vanaf camp</div>
+            <a class="maps-btn" href="https://maps.google.com/?q=46.2959,13.7882" target="_blank" rel="noopener">📍 Open in Maps</a>
           </div>
         </div>
         <div class="u1-item">
@@ -1522,6 +1536,7 @@ function renderProfileGrid(){
             <div class="u1-naam">Rondje Lake Bohinj (±12 km, vlak)</div>
             <div class="u1-desc">Wandelen of fietsen met zwemstops. Vlak pad om het hele meer — combineer met een picknick of dip.</div>
             <div class="u1-afst">🚶 start bij camp</div>
+            <a class="maps-btn" href="https://maps.google.com/?q=46.2789,13.8377" target="_blank" rel="noopener">📍 Open in Maps</a>
           </div>
         </div>
         <div class="u1-item">
@@ -1530,6 +1545,7 @@ function renderProfileGrid(){
             <div class="u1-naam">Vogel-kabelbaan naar 1535 m</div>
             <div class="u1-desc">Per gondel omhoog + panoramische graatwandelingen 2–4 u. Lage inspanning, veel beloning — koffie met alpenuitzicht boven.</div>
             <div class="u1-afst">🚶 ca. 1,5 km vanaf camp</div>
+            <a class="maps-btn" href="https://maps.google.com/?q=46.2915,13.8282" target="_blank" rel="noopener">📍 Open in Maps</a>
           </div>
         </div>
 
@@ -1540,6 +1556,7 @@ function renderProfileGrid(){
             <div class="u1-naam">Vogar of Peč uitzichtpunten</div>
             <div class="u1-desc">Stevig klimmetje boven het meer — groots panorama over Bohinj en de Julische Alpen.</div>
             <div class="u1-afst">🚗 ca. 9 km tot startpunt</div>
+            <a class="maps-btn" href="https://maps.google.com/?q=Vogar+Bohinj+Slovenia" target="_blank" rel="noopener">📍 Open in Maps</a>
           </div>
         </div>
 
@@ -1550,6 +1567,7 @@ function renderProfileGrid(){
             <div class="u1-naam">Pršivec (1761 m)</div>
             <div class="u1-desc">De berg pal boven de noordoever — schitterend panorama over het meer en Triglav NP.</div>
             <div class="u1-afst">🚗 ca. 9–10 km tot startpunt</div>
+            <a class="maps-btn" href="https://maps.google.com/?q=46.3266,13.8430" target="_blank" rel="noopener">📍 Open in Maps</a>
           </div>
         </div>
 
@@ -1560,6 +1578,7 @@ function renderProfileGrid(){
             <div class="u1-naam">Savica → Komarča → Črno jezero → Vallei van de Zeven Meren</div>
             <div class="u1-desc">Hele dag, goede wandelschoenen + vroeg weg. Via Komarča-wand naar het Zwart Meer en de Dolina Triglavskih jezer.</div>
             <div class="u1-afst">🚗 start ca. 4 km (Savica parkeerplaats)</div>
+            <a class="maps-btn" href="https://maps.google.com/?q=46.2959,13.7882" target="_blank" rel="noopener">📍 Open in Maps</a>
           </div>
         </div>
       </div>
@@ -1578,6 +1597,7 @@ function renderProfileGrid(){
             <div class="u1-naam">Eigen strand Camp Bohinj (Ukanc)</div>
             <div class="u1-desc">Helder gletsjerwater — fris maar zwembaar in de zomer.</div>
             <div class="u1-afst">🚶 op campingterrein</div>
+            <a class="maps-btn" href="https://maps.google.com/?q=46.2789,13.8377" target="_blank" rel="noopener">📍 Open in Maps</a>
           </div>
         </div>
         <div class="u1-item">
@@ -1586,6 +1606,7 @@ function renderProfileGrid(){
             <div class="u1-naam">SUP / kajak / kano-verhuur (PAC Sports)</div>
             <div class="u1-desc">Direct op het terrein. Tip: SUP bij zonsopkomst of -ondergang als het meer spiegelglad is.</div>
             <div class="u1-afst">🚶 op campingterrein</div>
+            <a class="maps-btn" href="https://maps.google.com/?q=PAC+Sports+Bohinj+Slovenia" target="_blank" rel="noopener">📍 Open in Maps</a>
           </div>
         </div>
         <div class="u1-item">
@@ -1594,6 +1615,7 @@ function renderProfileGrid(){
             <div class="u1-naam">Fužinski zaliv & strand Ribčev Laz</div>
             <div class="u1-desc">Alternatieve zwemplekken aan het oostpunt van het meer — iets drukker maar fijn.</div>
             <div class="u1-afst">🚗 ca. 5 km</div>
+            <a class="maps-btn" href="https://maps.google.com/?q=46.2838,13.9476" target="_blank" rel="noopener">📍 Open in Maps</a>
           </div>
         </div>
         <div class="u1-item">
@@ -1602,6 +1624,7 @@ function renderProfileGrid(){
             <div class="u1-naam">Duik in de Mostnica-kloof poeltjes</div>
             <div class="u1-desc">Voor de durfals — een snelle koude duik in de smaragdgroene bergpoeltjes.</div>
             <div class="u1-afst">🚗 ca. 9 km</div>
+            <a class="maps-btn" href="https://maps.google.com/?q=46.3090,13.8886" target="_blank" rel="noopener">📍 Open in Maps</a>
           </div>
         </div>
       </div>
@@ -1621,6 +1644,7 @@ function renderProfileGrid(){
             <div class="u1-naam">Gostilna Mihovc — Stara Fužina</div>
             <div class="u1-desc">Familiebedrijf &gt;100 jaar. Rundsoep, žlikrofi (Bohinj-knoedels), forel, wild, huisgemaakte desserts. <strong>Ma gesloten — reserveren!</strong></div>
             <div class="u1-afst">🚗 ca. 9 km</div>
+            <a class="maps-btn" href="https://maps.google.com/?q=Gostilna+Mihovc+Stara+Fuzina+Slovenia" target="_blank" rel="noopener">📍 Open in Maps</a>
           </div>
         </div>
         <div class="u1-item">
@@ -1629,6 +1653,7 @@ function renderProfileGrid(){
             <div class="u1-naam">Gostilna Rupa — Srednja vas</div>
             <div class="u1-desc">Bekroonde familie-gostilna. Jota, gebraad, wild, schnitzels, vallei-uitzicht. Open ±08:00–22:00.</div>
             <div class="u1-afst">🚗 ca. 12 km</div>
+            <a class="maps-btn" href="https://maps.google.com/?q=Gostilna+Rupa+Srednja+vas+Bohinj" target="_blank" rel="noopener">📍 Open in Maps</a>
           </div>
         </div>
         <div class="u1-item">
@@ -1637,6 +1662,7 @@ function renderProfileGrid(){
             <div class="u1-naam">Gostilna pri Hrvatu — Srednja vas</div>
             <div class="u1-desc">Terras aan de rivier, lokale forel, kalfsmedaillons, huisgemaakte taarten.</div>
             <div class="u1-afst">🚗 ca. 12 km</div>
+            <a class="maps-btn" href="https://maps.google.com/?q=Gostilna+pri+Hrvatu+Srednja+vas+Bohinj" target="_blank" rel="noopener">📍 Open in Maps</a>
           </div>
         </div>
         <div class="u1-item">
@@ -1645,6 +1671,7 @@ function renderProfileGrid(){
             <div class="u1-naam">Pizzeria Ema — Srednja vas</div>
             <div class="u1-desc">Grote pizza's met bergzicht — de casual avond met de kids.</div>
             <div class="u1-afst">🚗 ca. 12 km</div>
+            <a class="maps-btn" href="https://maps.google.com/?q=Pizzeria+Ema+Srednja+vas+Bohinj" target="_blank" rel="noopener">📍 Open in Maps</a>
           </div>
         </div>
         <div class="u1-item">
@@ -1653,6 +1680,7 @@ function renderProfileGrid(){
             <div class="u1-naam">Gostišče Pod Skalco — Ribčev Laz</div>
             <div class="u1-desc">Informele grill onder een 200 m hoge rotswand, aan de weg richting Ukanc.</div>
             <div class="u1-afst">🚗 ca. 5 km</div>
+            <a class="maps-btn" href="https://maps.google.com/?q=Gostisc+Pod+Skalco+Ribcev+Laz" target="_blank" rel="noopener">📍 Open in Maps</a>
           </div>
         </div>
         <div class="u1-item">
@@ -1692,7 +1720,7 @@ function renderProfileGrid(){
         <div class="collapsible-arrow">▼</div>
       </div>
       <div class="collapsible-body">
-        <div class="info-row"><div class="info-icon">📍</div><div style="flex:1;"><div class="info-label">Locatie</div><div class="info-val">Bohinjska Bistrica 500A, 4264 Bohinjska Bistrica, Slovenië<br><span style="color:#4A9E6E;">2 km van het Bohinj meer · 20 km van Bled</span></div></div></div>
+        <div class="info-row"><div class="info-icon">📍</div><div style="flex:1;"><div class="info-label">Locatie</div><div class="info-val"><a class="maps-row-link" href="https://maps.google.com/?q=46.2789,13.8377" target="_blank" rel="noopener">Bohinjska Bistrica 500A, 4264 Bohinjska Bistrica, Slovenië</a><br><span style="color:#4A9E6E;">2 km van het Bohinj meer · 20 km van Bled</span></div></div></div>
         <div class="info-row"><div class="info-icon">🌐</div><div style="flex:1;"><div class="info-label">Website</div><div class="info-val"><a href="https://www.camp-bohinj.si/" target="_blank" rel="noopener" style="color:#4A9E6E;font-weight:600;">camp-bohinj.si →</a></div></div></div>
         <div class="info-row"><div class="info-icon">⭐</div><div style="flex:1;"><div class="info-label">Categorie</div><div class="info-val">4-sterren camping · midden in Triglav Nationaal Park</div></div></div>
         <div class="info-row"><div class="info-icon">🏊</div><div style="flex:1;"><div class="info-label">Faciliteiten</div><div class="info-val">Zwembad, restaurant, supermarktje, WiFi, wasserette, sportterreinen</div></div></div>
@@ -1711,7 +1739,7 @@ function renderProfileGrid(){
       </div>
       <div class="collapsible-body">
         <div class="info-row"><div class="info-icon">📍</div><div style="flex:1;"><div class="info-label">Naam</div><div class="info-val">Seecamping Appesbach</div></div></div>
-        <div class="info-row"><div class="info-icon">📍</div><div style="flex:1;"><div class="info-label">Adres</div><div class="info-val">Au 99, 5360 St. Wolfgang im Salzkammergut, Oostenrijk</div></div></div>
+        <div class="info-row"><div class="info-icon">📍</div><div style="flex:1;"><div class="info-label">Adres</div><div class="info-val"><a class="maps-row-link" href="https://maps.google.com/?q=47.742,13.435" target="_blank" rel="noopener">Au 99, 5360 St. Wolfgang im Salzkammergut, Oostenrijk</a></div></div></div>
         <div class="info-row"><div class="info-icon">📅</div><div style="flex:1;"><div class="info-label">Periode</div><div class="info-val">5 augustus – 14 augustus 2026</div></div></div>
         <div class="info-row"><div class="info-icon">🏊</div><div style="flex:1;"><div class="info-label">Meer</div><div class="info-val">Direct aan het Wolfgangsee — één van de warmste bergmeren van Oostenrijk (tot 25°C in augustus)</div></div></div>
         <div class="info-row"><div class="info-icon">💡</div><div style="flex:1;"><div class="info-label">Tip</div><div class="info-val">St. Wolfgang centrum op 1 km lopen. Schafbergbahn vertrek (tandradbaan naar 1783 m) ook nabij.</div></div></div>
