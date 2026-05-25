@@ -1746,6 +1746,7 @@ function startApp() {
   renderPhrases();
   initKvNaamKnoppen();
   bingoLaadGalerie();
+  loadG9();
   renderKvScores();
   const seen = localStorage.getItem(`${SK}_intro_${currentUser}`);
   if (!seen) { showIntro(); localStorage.setItem(`${SK}_intro_${currentUser}`,'1'); }
@@ -2230,8 +2231,9 @@ async function submitRecept(){
     if(error) throw error;
     ['rec-inzender','rec-titel','rec-personen','rec-ing','rec-ber'].forEach(i=>document.getElementById(i).value='');
     document.getElementById('rec-foto').value='';
-    st.textContent='✅ Recept gedeeld!';
+    st.textContent='✅ Recept gedeeld! (+2 pt)';
     setTimeout(()=>{ st.textContent=''; },3000);
+    voegPuntenToe(inz.toLowerCase(),'badge',2,'Kampkok: recept ingestuurd');
     await loadRecepten();
   } catch(e){ st.textContent='⚠️ Opslaan mislukt. Controleer verbinding.'; }
   btn.disabled=false;
@@ -2667,6 +2669,7 @@ async function bingoTikVakje(item,cel){
       await sb.from('slovenie_bingo_marks').insert({session_id:bingoSessie.id,speler:bingoSpelerNaam,item,foto_url});
       bingoMarks[item]={foto_url,item,speler:bingoSpelerNaam};
       cel.innerHTML=`<img src="${foto_url}" alt="${item}">`;
+      voegPuntenToe(bingoSpelerNaam.toLowerCase(),'bingo',1,'Bingo-vakje: '+item);
     } catch{ cel.classList.remove('gevonden'); cel.innerHTML=`<span>${item}</span>`; }
   };
   inp.click();
@@ -2870,6 +2873,190 @@ function wjdToon(i){
 function wjdVerras(){ wjdIdx=Math.floor(Math.random()*WJD.length); wjdToon(wjdIdx); }
 function wjdNav(d){ wjdIdx=(wjdIdx+d+WJD.length)%WJD.length; wjdToon(wjdIdx); }
 
+// ── GAMIFICATION U9 ──────────────────────────────────
+const GEZIN_VONCK    = ['duurt','griette','lauren','jort'];
+const GEZIN_SIERKSMA = ['sanne','arjen','silas','gijs','ot'];
+
+const ALLE_BADGES = [
+  {key:'eerste_bingo',   ico:'🎯', naam:'Eerste bingo',      omschr:'Win je eerste bingo'},
+  {key:'spotter',        ico:'📸', naam:'Spotter',            omschr:'10 bingo-foto\'s geüpload'},
+  {key:'quizmaster',     ico:'🧠', naam:'Quizmaster',         omschr:'15 quizvragen goed'},
+  {key:'bergbeklimmer',  ico:'⛰️',  naam:'Bergbeklimmer',      omschr:'Huttentocht of Triglav voltooid'},
+  {key:'waterrat',       ico:'🏊', naam:'Waterrat',           omschr:'Meedoen aan een waterspel'},
+  {key:'sterrenkijker',  ico:'⭐', naam:'Sterrenkijker',      omschr:'Perseïden gespot (kampavond)'},
+  {key:'kampkok',        ico:'👩‍🍳', naam:'Kampkok',            omschr:'Een recept ingestuurd'},
+  {key:'leedvermaak',    ico:'😂', naam:'Leedvermaak-king',   omschr:'Thuis regent het terwijl jullie zwemmen'},
+  {key:'vroege_vogel',   ico:'🐦', naam:'Vroege vogel',       omschr:'Als eerste bij de waterval'},
+  {key:'navigator',      ico:'🗺️',  naam:'Navigator',          omschr:'De route uitgestippeld zonder Google Maps'},
+];
+
+let g9Points=[], g9Badges=[], g9Loaded=false;
+
+async function loadG9(force=false){
+  if(g9Loaded&&!force) return;
+  if(!sb) return;
+  try{
+    const [{data:pts},{data:bdg}] = await Promise.all([
+      sb.from('slovenie_points').select('*').order('created_at'),
+      sb.from('slovenie_badges').select('*'),
+    ]);
+    g9Points = pts||[]; g9Badges = bdg||[];
+    g9Loaded = true;
+  } catch{ return; }
+  renderG9Scoreboard();
+  renderG9Badges();
+}
+
+function renderG9Scoreboard(){
+  const totalen = {};
+  g9Points.forEach(p=>{ totalen[p.profiel]=(totalen[p.profiel]||0)+p.punten; });
+  const gesorteerd = Object.entries(totalen).sort((a,b)=>b[1]-a[1]);
+  const medals=['🥇','🥈','🥉'];
+
+  const rangEl=document.getElementById('g9-ranglijst');
+  if(rangEl){
+    rangEl.innerHTML = gesorteerd.map(([profiel,tot],i)=>`
+      <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.07);">
+        <span style="font-size:1rem;width:22px;">${medals[i]||'  '}</span>
+        <span style="color:#E8DDD0;font-weight:700;font-size:0.88rem;flex:1;text-transform:capitalize;">${profiel}</span>
+        <span style="color:#4A9E6E;font-weight:700;font-size:0.9rem;">${tot} pt</span>
+      </div>`).join('') || '<div style="font-size:0.82rem;color:#9AC4A8;">Nog geen punten.</div>';
+  }
+
+  const vonckTot  = gesorteerd.filter(([p])=>GEZIN_VONCK.includes(p)).reduce((s,[,t])=>s+t,0);
+  const sierkTot  = gesorteerd.filter(([p])=>GEZIN_SIERKSMA.includes(p)).reduce((s,[,t])=>s+t,0);
+  const totaal    = vonckTot + sierkTot || 1;
+  const vonckPct  = Math.round(vonckTot/totaal*100);
+  document.getElementById('g9-bar-vonck')?.style && (document.getElementById('g9-bar-vonck').style.width=vonckPct+'%');
+  document.getElementById('g9-bar-sierksma')?.style && (document.getElementById('g9-bar-sierksma').style.width=(100-vonckPct)+'%');
+  const vtEl=document.getElementById('g9-vonck-tot'); if(vtEl) vtEl.textContent=vonckTot+' pt';
+  const stEl=document.getElementById('g9-sierksma-tot'); if(stEl) stEl.textContent=sierkTot+' pt';
+}
+
+function renderG9Badges(){
+  const mijn = g9Badges.filter(b=>b.profiel===currentUser);
+  const mijnEl = document.getElementById('g9-badges-mijn');
+  if(mijnEl){
+    if(!mijn.length){
+      mijnEl.innerHTML='<div style="font-size:0.84rem;color:#9A948E;">Jij hebt nog geen badges.</div>';
+    } else {
+      mijnEl.innerHTML='<div style="font-size:0.75rem;font-weight:700;color:#6B6560;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">Jouw badges</div>'
+        +mijn.map(b=>{ const bd=ALLE_BADGES.find(x=>x.key===b.badge_key)||{ico:'🏅',naam:b.badge_key}; return `<span title="${bd.omschr||''}" style="font-size:1.3rem;margin-right:4px;">${bd.ico}</span>`; }).join('');
+    }
+  }
+  const allEl = document.getElementById('g9-badges-all');
+  if(allEl){
+    allEl.innerHTML = ALLE_BADGES.map(b=>{
+      const behaald = g9Badges.filter(x=>x.badge_key===b.key);
+      const isEigen = behaald.some(x=>x.profiel===currentUser);
+      return `<div style="background:${isEigen?'#4A9E6E':'#fff'};border:1.5px solid ${isEigen?'#4A9E6E':'#e0dbd6'};border-radius:10px;padding:8px;display:flex;align-items:center;gap:6px;">
+        <span style="font-size:1.2rem;">${b.ico}</span>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:0.8rem;color:${isEigen?'#fff':'#0A0A0A'};">${b.naam}</div>
+          <div style="font-size:0.7rem;color:${isEigen?'rgba(255,255,255,0.8)':'#9A948E'};">${b.omschr}</div>
+        </div>
+        <button onclick="kenBadgeToe('${b.key}')" title="Toekennen" style="background:none;border:none;font-size:0.9rem;cursor:pointer;color:${isEigen?'#fff':'#9A948E'};">🎖️</button>
+      </div>`;
+    }).join('');
+  }
+}
+
+async function kenBadgeToe(key){
+  if(!currentUser||!sb) return;
+  try{
+    await sb.from('slovenie_badges').upsert({profiel:currentUser,badge_key:key},{onConflict:'profiel,badge_key'});
+    await loadG9(true);
+  } catch{ alert('Kon badge niet toekennen. Controleer verbinding.'); }
+}
+
+async function voegPuntenToe(profiel,bron,punten,omschr){
+  if(!sb) return;
+  try{ await sb.from('slovenie_points').insert({profiel,bron,punten,omschrijving:omschr}); }
+  catch{}
+}
+
+// U9c — Dagelijkse uitdagingen
+const DAG_UITDAGINGEN = [
+  {dag:'ma-27-jul', tekst:'Spot een marmot vandaag en maak een foto!', punten:3},
+  {dag:'di-28-jul', tekst:'Zeg "hvala" (dank je wel) in het Sloveens tegen iemand van buiten de groep.', punten:3},
+  {dag:'wo-29-jul', tekst:'Maak een foto van jezelf in het Bohinj-meer.', punten:3},
+  {dag:'do-30-jul', tekst:'Luidt het kerkje op het Bledeiland (roeiboot).', punten:3},
+  {dag:'vr-31-jul', tekst:'Proef iets van de Odprta Kuhna foodmarket in Ljubljana.', punten:3},
+  {dag:'za-1-aug',  tekst:'Steek een hand in de Soča — en blijf minstens 5 seconden!', punten:3},
+  {dag:'zo-2-aug',  tekst:'Zoek in de Postojna-grotten naar de proteus (mensvis).', punten:3},
+  {dag:'ma-3-aug',  tekst:'Proef verse vis aan de kust in Piran.', punten:3},
+  {dag:'di-4-aug',  tekst:'Zeg "auf Wiedersehen" op de grens!', punten:3},
+  {dag:'wo-5-aug',  tekst:'Ga zwemmen in het Wolfgangsee op jullie eerste dag in Oostenrijk.', punten:3},
+  {dag:'do-6-aug',  tekst:'Bestel iets bij de Schafbergbahn of de aanlegsteiger.', punten:3},
+  {dag:'vr-7-aug',  tekst:'Maak een wandeling van minstens 30 minuten rond St. Wolfgang.', punten:3},
+  {dag:'za-8-aug',  tekst:'Gooi een steentje over het water (steentje keilen). Tellen maar!', punten:3},
+  {dag:'zo-9-aug',  tekst:'Bezoek de Wallfahrtskirche in St. Wolfgang (Michael Pacher-altaar).', punten:3},
+  {dag:'ma-10-aug', tekst:'Probeer een Kaiserschmarrn te bestellen in het Duits.', punten:3},
+  {dag:'di-11-aug', tekst:'Kijk 's avonds naar de sterren — de Perseïden pieken rond nu!', punten:3},
+  {dag:'wo-12-aug', tekst:'Speel een potje Bohnanza en verzin zelf een variante.', punten:3},
+  {dag:'do-13-aug', tekst:'Schrijf samen één mooiste vakantie-herinnering op.', punten:3},
+  {dag:'vr-14-aug', tekst:'Zing "The Sound of Music" zodra je de grens naar Nederland oversteekt.', punten:3},
+];
+let dagUitdagingInited=false;
+
+async function initDagUitdaging(){
+  if(dagUitdagingInited) return;
+  dagUitdagingInited=true;
+  const vandaag=dagKey(new Date().toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'}).replace('.',''));
+  const uitdaging=DAG_UITDAGINGEN.find(d=>d.dag===vandaag)||DAG_UITDAGINGEN[0];
+  let gedaan=false;
+  let streak=0;
+  if(sb&&currentUser){
+    try{
+      const {data:dd}=await sb.from('slovenie_daily_done').select('dag_key').eq('profiel',currentUser);
+      const keys=new Set((dd||[]).map(x=>x.dag_key));
+      gedaan=keys.has(uitdaging.dag);
+      streak=DAG_UITDAGINGEN.filter(d=>keys.has(d.dag)).length;
+    } catch{}
+  }
+  const el=document.getElementById('g9-dag-uitdaging');
+  const strEl=document.getElementById('g9-streak');
+  if(el){
+    el.innerHTML=`<div style="font-size:0.78rem;font-weight:700;color:#4A9E6E;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">Uitdaging van vandaag</div>
+      <div style="font-size:0.92rem;font-weight:700;line-height:1.4;margin-bottom:12px;">${uitdaging.tekst}</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:0.8rem;color:#6B6560;">+${uitdaging.punten} punten</span>
+        ${gedaan
+          ? '<span style="font-size:0.85rem;color:#4A9E6E;font-weight:700;">✅ Volbracht!</span>'
+          : `<button onclick="dagVolbracht('${uitdaging.dag}',${uitdaging.punten})" style="padding:8px 18px;background:#4A9E6E;color:#fff;border:none;border-radius:14px;font-family:inherit;font-size:0.85rem;font-weight:700;cursor:pointer;">✓ Volbracht!</button>`
+        }
+      </div>`;
+  }
+  if(strEl) strEl.textContent=streak>0?'🔥 Streak: '+streak+' dag'+( streak!==1?'en':''):' ';
+}
+
+async function dagVolbracht(dagSlug,punten){
+  if(!sb||!currentUser) return;
+  try{
+    await sb.from('slovenie_daily_done').insert({profiel:currentUser,dag_key:dagSlug});
+    await voegPuntenToe(currentUser,'challenge',punten,'Dagelijkse uitdaging');
+    dagUitdagingInited=false;
+    await initDagUitdaging();
+    await loadG9(true);
+  } catch{ alert('Kon niet opslaan. Controleer verbinding.'); }
+}
+
+async function laadHallOfFame(){
+  const el=document.getElementById('g9-galerie');
+  const leeg=document.getElementById('g9-galerie-leeg');
+  if(!el) return;
+  if(!sb){ if(leeg) leeg.style.display='block'; return; }
+  try{
+    const {data}=await sb.from('slovenie_bingo_marks').select('foto_url,item,speler').not('foto_url','is',null).order('created_at',{ascending:false}).limit(30);
+    if(!data?.length){ el.innerHTML=''; if(leeg) leeg.style.display='block'; return; }
+    if(leeg) leeg.style.display='none';
+    el.innerHTML=data.map(r=>`<div title="${r.item} — ${r.speler}" style="border-radius:8px;overflow:hidden;">
+      <img src="${r.foto_url}" style="width:100%;height:90px;object-fit:cover;display:block;" loading="lazy">
+      <div style="font-size:0.62rem;color:#6B6560;padding:2px 4px;background:#fff;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">${r.speler}</div>
+    </div>`).join('');
+  } catch{ if(leeg) leeg.style.display='block'; }
+}
+
 // ── QUIZ U6 ──────────────────────────────────────────
 const QUIZ_VRAGEN = [
   // 🌍 Aardrijkskunde
@@ -2957,8 +3144,9 @@ function quizKeuze(btn,keuze,antwoord){
   const juist=keuze===antwoord;
   btn.style.background=juist?'#4A9E6E':'#E86060';
   btn.style.color='#fff'; btn.style.borderColor=juist?'#4A9E6E':'#E86060';
-  btn.insertAdjacentHTML('afterend',`<div style="font-size:0.82rem;margin-top:4px;color:${juist?'#4A9E6E':'#E86060'}">${juist?'✅ Juist!':'❌ Fout — het juiste antwoord is: '+antwoord}</div>`);
+  btn.insertAdjacentHTML('afterend',`<div style="font-size:0.82rem;margin-top:4px;color:${juist?'#4A9E6E':'#E86060'}">${juist?'✅ Juist! (+1 pt)':'❌ Fout — het juiste antwoord is: '+antwoord}</div>`);
   document.querySelectorAll('#quiz-keuze button').forEach(b=>b.disabled=true);
+  if(juist&&currentUser) voegPuntenToe(currentUser,'quiz',1,'Quiz juist');
 }
 
 function quizToonAntwoord(){
