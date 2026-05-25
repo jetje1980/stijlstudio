@@ -2812,6 +2812,112 @@ function wjdToon(i){
 function wjdVerras(){ wjdIdx=Math.floor(Math.random()*WJD.length); wjdToon(wjdIdx); }
 function wjdNav(d){ wjdIdx=(wjdIdx+d+WJD.length)%WJD.length; wjdToon(wjdIdx); }
 
+// ── QUIZ U6 ──────────────────────────────────────────
+const QUIZ_VRAGEN = [
+  // 🌍 Aardrijkskunde
+  {cat:'Aardrijkskunde',niv:'makkelijk',v:'Wat is de hoofdstad van Slovenië?',a:'Ljubljana',keuze:['Ljubljana','Zagreb','Sarajevo']},
+  {cat:'Aardrijkskunde',niv:'makkelijk',v:'Wat is de hoofdstad van Oostenrijk?',a:'Wenen (Wien)',keuze:['Wenen (Wien)','Graz','Salzburg']},
+  {cat:'Aardrijkskunde',niv:'makkelijk',v:'In welk land ligt het Bledmeer met het kerkje op een eilandje?',a:'Slovenië',keuze:['Slovenië','Kroatië','Oostenrijk']},
+  {cat:'Aardrijkskunde',niv:'makkelijk',v:'Met welke munt betaal je in Slovenië én Oostenrijk?',a:'De euro',keuze:['De euro','De Sloveense tolar','De Oostenrijkse schilling']},
+  {cat:'Aardrijkskunde',niv:'makkelijk',v:'Welke rivier stroomt dwars door Wenen?',a:'De Donau',keuze:['De Donau','De Rijn','De Elbe']},
+  {cat:'Aardrijkskunde',niv:'pittig',v:'Hoe heet de hoogste berg van Slovenië?',a:'Triglav (2864 m)'},
+  {cat:'Aardrijkskunde',niv:'pittig',v:'Hoe heet de hoogste berg van Oostenrijk?',a:'Großglockner (3798 m)'},
+  {cat:'Aardrijkskunde',niv:'pittig',v:'Hoeveel deelstaten (Bundesländer) heeft Oostenrijk?',a:'Negen'},
+  {cat:'Aardrijkskunde',niv:'pittig',v:'In welk jaar werd Slovenië onafhankelijk van Joegoslavië?',a:'1991'},
+  {cat:'Aardrijkskunde',niv:'pittig',v:'Hoe heet het enige nationale park van Slovenië, rond de hoogste berg?',a:'Triglav National Park'},
+  {cat:'Aardrijkskunde',niv:'pittig',v:'Hoe heet het smaragdgroene rivierdal in het westen van Slovenië?',a:'De Soča (Italiaans: Isonzo)'},
+  // 🐾 Natuur & dieren
+  {cat:'Natuur',niv:'makkelijk',v:'Welk bergdier fluit hard als waarschuwing en woont in de rotsen?',a:'De marmot',keuze:['De marmot','De steenbok','De gemzen']},
+  {cat:'Natuur',niv:'makkelijk',v:'Waar komt de groene kleur van Sloveense bergbeken vandaan?',a:'Van piepfijn rotsstof ("gesteentemeel") in het water',keuze:['Van piepfijn rotsstof ("gesteentemeel") in het water','Van algen en waterplanten','Van koperertsen in de bodem']},
+  {cat:'Natuur',niv:'pittig',v:'Welke beschermde witte bergbloem is een symbool van de Alpen?',a:'Edelweiss'},
+  {cat:'Natuur',niv:'pittig',v:'Welk blind, bleek "mensvis"-salamandertje leeft in Sloveense grotten?',a:'De proteus / človeška ribica (olm)'},
+  {cat:'Natuur',niv:'pittig',v:'Welk wereldberoemd ras witte paarden komt uit Lipica in Slovenië?',a:'De Lipizzaners'},
+  {cat:'Natuur',niv:'pittig',v:'Slovenië nam het initiatief voor de internationale Dag van de Bij. Op welke datum is die?',a:'20 mei (te verifiëren)'},
+  // 🍽️ Eten & drinken
+  {cat:'Eten',niv:'makkelijk',v:'Welk beroemd gepaneerd kalfs-/varkenslapje eet je in Oostenrijk?',a:'Wiener schnitzel',keuze:['Wiener schnitzel','Kaiserschmarrn','Tafelspitz']},
+  {cat:'Eten',niv:'makkelijk',v:'Welke chocoladetaart uit Wenen is wereldberoemd?',a:'Sachertorte',keuze:['Sachertorte','Schwarzwälder Kirschtorte','Apfelstrudel']},
+  {cat:'Eten',niv:'makkelijk',v:'Welk warm appelgebak is typisch Oostenrijks?',a:'Apfelstrudel',keuze:['Apfelstrudel','Kaiserschmarrn','Gugelhupf']},
+  {cat:'Eten',niv:'pittig',v:'Welk roomgebak is dé specialiteit van Bled?',a:'Kremšnita (cremeschnitte)'},
+  {cat:'Eten',niv:'pittig',v:'Hoe heten de Sloveense "ravioli"/knoedeltjes uit Idrija (beschermd)?',a:'Žlikrofi'},
+  {cat:'Eten',niv:'pittig',v:'Welk opgerold zoet brood/gebak is een Sloveens feestgerecht?',a:'Potica'},
+  // 🗣️ Taal & weetjes
+  {cat:'Taal',niv:'makkelijk',v:'Hoe zeg je "dank je wel" in het Sloveens?',a:'Hvala',keuze:['Hvala','Danke','Grazie']},
+  {cat:'Taal',niv:'makkelijk',v:'Hoe zeg je "proost" in het Sloveens?',a:'Na zdravje',keuze:['Na zdravje','Prost','Živeli']},
+  {cat:'Taal',niv:'makkelijk',v:'In welke Oostenrijkse stad werd componist Mozart geboren?',a:'Salzburg',keuze:['Salzburg','Wenen','Graz']},
+  {cat:'Taal',niv:'pittig',v:'Welke beroemde musical/film werd in en rond Salzburg opgenomen?',a:'The Sound of Music'},
+  {cat:'Taal',niv:'pittig',v:'Welk beroemd energiedrank-merk komt uit Oostenrijk?',a:'Red Bull'},
+  {cat:'Taal',niv:'pittig',v:'In welk land werd acteur/bodybuilder Arnold Schwarzenegger geboren?',a:'Oostenrijk (bij Graz)'},
+  {cat:'Taal',niv:'pittig',v:'Wat betekent de bergnaam "Triglav" letterlijk?',a:'"Drie hoofden/koppen"'},
+  {cat:'Taal',niv:'pittig',v:'Welk Sloveens grotkasteel is letterlijk ín een rotswand gebouwd?',a:'Predjama-kasteel (bij de Postojna-grot)'},
+  {cat:'Taal',niv:'pittig',v:'Welke Sloveense basketballer is een NBA-ster?',a:'Luka Dončić'},
+  // 🎯 Raad-de-afstand
+  {cat:'Afstand',niv:'pittig',v:'Hoe lang is de Karawankentunnel onder de grens?',a:'Bijna 8 km (te verifiëren)'},
+  {cat:'Afstand',niv:'pittig',v:'Hoeveel kilometer is de hele reis Schalkwijk → Camp Bohinj ongeveer?',a:'Ongeveer 1.050 km'},
+];
+
+let quizFiltered=[...QUIZ_VRAGEN], quizIdx=0, quizInited=false;
+
+function initQuiz(){
+  if(quizInited) return;
+  quizInited=true;
+  quizFilter();
+}
+
+function quizFilter(){
+  const cat=document.getElementById('quiz-cat-filter')?.value||'';
+  const niv=document.getElementById('quiz-niv-filter')?.value||'';
+  quizFiltered=QUIZ_VRAGEN.filter(q=>(cat?q.cat===cat:true)&&(niv?q.niv===niv:true));
+  quizIdx=0;
+  const leeg=document.getElementById('quiz-leeg');
+  if(leeg) leeg.style.display=quizFiltered.length?'none':'block';
+  if(quizFiltered.length) quizToon(quizIdx);
+}
+
+function quizToon(i){
+  const q=quizFiltered[i]; if(!q) return;
+  const kindModus=document.getElementById('quiz-kind-toggle')?.checked;
+  document.getElementById('quiz-badge').textContent=(q.niv==='makkelijk'?'🟢':'🔴')+' '+q.cat;
+  document.getElementById('quiz-badge').style.background=q.niv==='makkelijk'?'#D4EDDA':'#FADADD';
+  document.getElementById('quiz-vraag').textContent=q.v;
+  document.getElementById('quiz-teller').textContent=(i+1)+' / '+quizFiltered.length;
+  document.getElementById('quiz-antwoord').style.display='none';
+  document.getElementById('quiz-antwoord').textContent=q.a;
+  const keuzeEl=document.getElementById('quiz-keuze');
+  const toonBtn=document.getElementById('quiz-toon-btn');
+  const heeftKeuze=q.keuze && q.niv==='makkelijk' && kindModus;
+  keuzeEl.style.display=heeftKeuze?'grid':'none';
+  toonBtn.style.display=heeftKeuze?'none':'block';
+  if(heeftKeuze){
+    const opties=[...q.keuze].sort(()=>Math.random()-0.5);
+    keuzeEl.style.gridTemplateColumns='1fr';
+    keuzeEl.innerHTML=opties.map(o=>`<button onclick="quizKeuze(this,'${o.replace(/'/,"\\'")}','${q.a.replace(/'/,"\\'")}')}"
+      style="padding:9px 12px;background:#fff;border:1.5px solid #ddd;border-radius:10px;font-family:inherit;font-size:0.84rem;text-align:left;cursor:pointer;">${o}</button>`).join('');
+  }
+}
+
+function quizKeuze(btn,keuze,antwoord){
+  const juist=keuze===antwoord;
+  btn.style.background=juist?'#4A9E6E':'#E86060';
+  btn.style.color='#fff'; btn.style.borderColor=juist?'#4A9E6E':'#E86060';
+  btn.insertAdjacentHTML('afterend',`<div style="font-size:0.82rem;margin-top:4px;color:${juist?'#4A9E6E':'#E86060'}">${juist?'✅ Juist!':'❌ Fout — het juiste antwoord is: '+antwoord}</div>`);
+  document.querySelectorAll('#quiz-keuze button').forEach(b=>b.disabled=true);
+}
+
+function quizToonAntwoord(){
+  document.getElementById('quiz-antwoord').style.display='block';
+  document.getElementById('quiz-toon-btn').style.display='none';
+}
+
+function quizNav(d){
+  quizIdx=(quizIdx+d+quizFiltered.length)%quizFiltered.length;
+  quizToon(quizIdx);
+}
+
+function quizRandom(){
+  quizIdx=Math.floor(Math.random()*quizFiltered.length);
+  quizToon(quizIdx);
+}
+
 // ── INIT ──────────────────────────────────────────────
 tickCountdown();
 wjdToon(0);
