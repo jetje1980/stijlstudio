@@ -1406,6 +1406,7 @@ function startApp() {
   renderProgramma();
   renderSwipeStack();
   loadKvData();
+  loadRecepten();
   renderPhrases();
   renderKvScores();
   const seen = localStorage.getItem(`${SK}_intro_${currentUser}`);
@@ -1806,6 +1807,95 @@ function toggleUitleg(headEl){
 // ── COLLAPSIBLE ───────────────────────────────────────
 function toggleCollapsible(el){
   el.classList.toggle('open');
+}
+
+// ── RECEPTEN U3b ─────────────────────────────────────
+let recepten = [];
+async function loadRecepten(){
+  try{
+    const {data} = await sb.from('slovenie_recipes').select('*').order('created_at',{ascending:false});
+    recepten = data || [];
+  } catch{ recepten = []; }
+  renderRecepten();
+}
+function renderRecepten(){
+  const grid = document.getElementById('rec-grid');
+  const leeg = document.getElementById('rec-leeg');
+  if(!grid) return;
+  if(!recepten.length){ grid.innerHTML=''; leeg.style.display='block'; return; }
+  leeg.style.display='none';
+  grid.innerHTML = recepten.map(r=>`
+    <div class="rec-card" onclick="showRecept('${r.id}')">
+      ${r.foto_url ? `<img src="${r.foto_url}" alt="${r.titel}" loading="lazy">` : '<div style="height:100px;background:#E8E0D8;display:flex;align-items:center;justify-content:center;font-size:1.8rem;">🍳</div>'}
+      <div class="rec-card-body">
+        <div class="rec-card-titel">${r.titel}</div>
+        <div class="rec-card-meta">${r.inzender} · ${r.personen} pers.</div>
+      </div>
+    </div>`).join('');
+}
+function showRecept(id){
+  const r = recepten.find(x=>x.id===id); if(!r) return;
+  const ov = document.createElement('div');
+  ov.className='rec-detail-overlay';
+  ov.innerHTML=`<div class="rec-detail-sheet">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div style="font-weight:700;font-size:1.05rem;">${r.titel}</div>
+      <button onclick="this.closest('.rec-detail-overlay').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;">✕</button>
+    </div>
+    ${r.foto_url?`<img src="${r.foto_url}" style="width:100%;max-height:180px;object-fit:cover;border-radius:10px;margin-bottom:12px;" loading="lazy">` :''}
+    <div style="font-size:0.82rem;color:#6B6560;margin-bottom:10px;">Van ${r.inzender} · ${r.personen} personen</div>
+    <div style="font-weight:700;font-size:0.88rem;margin-bottom:4px;">Ingrediënten</div>
+    <pre style="white-space:pre-wrap;font-family:inherit;font-size:0.85rem;color:#0A0A0A;margin:0 0 12px;">${r.ingredienten}</pre>
+    <div style="font-weight:700;font-size:0.88rem;margin-bottom:4px;">Bereiding</div>
+    <pre style="white-space:pre-wrap;font-family:inherit;font-size:0.85rem;color:#0A0A0A;margin:0;">${r.bereiding}</pre>
+  </div>`;
+  ov.addEventListener('click',e=>{ if(e.target===ov) ov.remove(); });
+  document.body.appendChild(ov);
+}
+async function comprimeerFoto(file){
+  return new Promise(res=>{
+    const img=new Image(), url=URL.createObjectURL(file);
+    img.onload=()=>{
+      const mx=1024, sc=Math.min(1,mx/Math.max(img.width,img.height));
+      const c=document.createElement('canvas');
+      c.width=img.width*sc; c.height=img.height*sc;
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      c.toBlob(b=>{ URL.revokeObjectURL(url); res(b); },'image/jpeg',0.82);
+    };
+    img.src=url;
+  });
+}
+async function submitRecept(){
+  const inz=document.getElementById('rec-inzender').value.trim();
+  const tit=document.getElementById('rec-titel').value.trim();
+  const per=parseInt(document.getElementById('rec-personen').value)||0;
+  const ing=document.getElementById('rec-ing').value.trim();
+  const ber=document.getElementById('rec-ber').value.trim();
+  const fotoFile=document.getElementById('rec-foto').files[0];
+  const st=document.getElementById('rec-status');
+  const btn=document.getElementById('rec-btn');
+  if(!inz||!tit||!per||!ing||!ber){ st.textContent='Vul alle verplichte velden in.'; return; }
+  btn.disabled=true; st.textContent='⏳ Opslaan…';
+  try{
+    let foto_url=null;
+    if(fotoFile){
+      const blob=await comprimeerFoto(fotoFile);
+      const naam=`slovenie/${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`;
+      const {error:upe} = await sb.storage.from('slovenie-recipes').upload(naam,blob,{contentType:'image/jpeg'});
+      if(!upe){
+        const {data:pub} = sb.storage.from('slovenie-recipes').getPublicUrl(naam);
+        foto_url = pub.publicUrl;
+      }
+    }
+    const {error} = await sb.from('slovenie_recipes').insert({inzender:inz,titel:tit,personen:per,ingredienten:ing,bereiding:ber,foto_url});
+    if(error) throw error;
+    ['rec-inzender','rec-titel','rec-personen','rec-ing','rec-ber'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('rec-foto').value='';
+    st.textContent='✅ Recept gedeeld!';
+    setTimeout(()=>{ st.textContent=''; },3000);
+    await loadRecepten();
+  } catch(e){ st.textContent='⚠️ Opslaan mislukt. Controleer verbinding.'; }
+  btn.disabled=false;
 }
 
 // ── VERTAALTOOL U3a ───────────────────────────────────
