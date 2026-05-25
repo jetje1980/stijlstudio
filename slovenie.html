@@ -401,6 +401,44 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
   </div>
 </div>
 
+<!-- LOGIN-SCRIPT: tiny, standalone, geen dependencies -->
+<script>
+var _jss=document.getElementById('js-status');
+if(_jss) _jss.textContent='js ok';
+
+var _SK='slov26';
+var _PROFILES={duurt:{naam:'Duurt',init:'Du',color:'#4A7CAE'},griette:{naam:'Griette',init:'Gr',color:'#D4785A'},sanne:{naam:'Sanne',init:'Sa',color:'#9E7AAD'},arjen:{naam:'Arjen',init:'Ar',color:'#5A9E6E'}};
+var _KEYS=['duurt','griette','sanne','arjen'];
+
+function checkCode(){
+  var raw=(document.getElementById('code-input').value||'').trim().toUpperCase();
+  var val=raw.replace(/Ë/g,'E').replace(/É/g,'E');
+  if(val==='SLOVENIE'||val==='SLOVENIJE'||val==='SLOVENIJE'){
+    document.getElementById('step1').className='login-step hidden';
+    document.getElementById('step2').className='login-step';
+    renderProfileGrid();
+  } else {
+    var e=document.getElementById('code-error');
+    e.textContent='Typ: slovenie  (jij typte: "'+raw+'")';
+    setTimeout(function(){e.textContent='';},5000);
+  }
+}
+
+function renderProfileGrid(){
+  var g=document.getElementById('profile-grid');
+  if(!g) return;
+  var extra=[];
+  try{extra=JSON.parse(localStorage.getItem(_SK+'_extra_profiles')||'[]');}catch(e){}
+  var all=_KEYS.map(function(k){return {key:k,naam:_PROFILES[k].naam,init:_PROFILES[k].init,color:_PROFILES[k].color};});
+  extra.forEach(function(k){all.push({key:k.key,naam:k.naam,init:k.naam.substring(0,2),color:k.color});});
+  g.innerHTML=all.map(function(p){
+    return '<div class="profile-card" onclick="selectProfile(\''+p.key+'\',\''+p.naam+'\',\''+p.init+'\',\''+p.color+'\')">'
+      +'<div class="av" style="background:'+p.color+';">'+p.init+'</div>'
+      +'<div class="profile-name">'+p.naam+'</div></div>';
+  }).join('');
+}
+</script>
+
 <!-- WELKOM -->
 <div id="welkom-screen" style="display:none;position:fixed;inset:0;z-index:950;background:#F0E8E2;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
   <div id="welkom-avatar" style="width:74px;height:74px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-style:italic;font-weight:800;font-size:1.5rem;color:#fff;margin:0 auto 22px;"></div>
