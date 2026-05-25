@@ -1741,12 +1741,11 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
   </nav>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ── VERSIE-CHECK (debug) ──────────────────────────────
 (function(){
   var s=document.getElementById('js-status');
-  if(s) s.textContent='js ✓ v9';
+  if(s) s.textContent='js ✓ v10';
 })();
 
 // ── FOUT-OPVANG (debug) ───────────────────────────────
@@ -1758,16 +1757,21 @@ window.onerror = function(msg, src, line) {
   return false;
 };
 
-// ── SUPABASE ─────────────────────────────────────────
-const SB_URL  = 'https://osuqtfsxmquwqsbgzlqn.supabase.co';
-const SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
-let sb;
-try {
-  sb = (typeof supabase !== 'undefined') ? supabase.createClient(SB_URL, SB_KEY) : null;
-} catch(e) {
-  sb = null;
-  console.warn('Supabase niet beschikbaar — app werkt verder zonder gedeelde opslag.');
+// ── SUPABASE (async — blokkeert niets) ───────────────
+const SB_URL = 'https://osuqtfsxmquwqsbgzlqn.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
+let sb = null;
+function initSupabase() {
+  try {
+    if (typeof supabase !== 'undefined') sb = supabase.createClient(SB_URL, SB_KEY);
+  } catch(e) { sb = null; }
 }
+(function(){
+  const scr = document.createElement('script');
+  scr.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+  scr.onload = initSupabase;
+  document.head.appendChild(scr);
+})();
 
 // ── CONFIG ──────────────────────────────────────────
 const TRIP_DATE = new Date('2026-07-27T07:00:00');
