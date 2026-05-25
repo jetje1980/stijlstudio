@@ -2839,6 +2839,7 @@ async function loadKvData(){
     kvTeams  = JSON.parse(localStorage.getItem(`${SK}_kv_teams`)||'null') || KV_TEAM_PRESETS[0];
   }
   recalcKvScores();
+  renderKvScores();
 }
 async function migreerKvLocalStorage(){
   const lokaal = JSON.parse(localStorage.getItem(`${SK}_kv_potjes`)||'[]');
