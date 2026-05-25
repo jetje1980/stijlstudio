@@ -710,6 +710,64 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
       </div>
     </div>
 
+    <!-- U9: Reis-scorebord + gamification -->
+    <div style="margin:14px 20px 0;background:#1A3A2A;border-radius:14px;padding:14px 16px;">
+      <div style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:#9AC4A8;margin-bottom:10px;">🏆 Reis-scorebord</div>
+      <!-- Gezin vs gezin balk -->
+      <div style="display:flex;justify-content:space-between;font-size:0.78rem;font-weight:700;color:#E8DDD0;margin-bottom:4px;">
+        <span>Vonck (Schalkwijk)</span><span>Sierksma (Leeuwarden)</span>
+      </div>
+      <div style="background:rgba(255,255,255,0.1);border-radius:20px;height:14px;overflow:hidden;margin-bottom:10px;position:relative;">
+        <div id="g9-bar-vonck" style="position:absolute;left:0;top:0;height:100%;background:#4A9E6E;border-radius:20px;width:50%;transition:width 0.8s;"></div>
+        <div id="g9-bar-sierksma" style="position:absolute;right:0;top:0;height:100%;background:#4A7CC4;border-radius:20px;width:50%;transition:width 0.8s;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:#9AC4A8;margin-bottom:12px;">
+        <span id="g9-vonck-tot">0 pt</span><span id="g9-sierksma-tot">0 pt</span>
+      </div>
+      <!-- Persoonsranglijst -->
+      <div id="g9-ranglijst" style="display:flex;flex-direction:column;gap:5px;"></div>
+      <button onclick="loadG9(true)" style="margin-top:10px;padding:5px 12px;background:rgba(255,255,255,0.1);color:#E8DDD0;border:none;border-radius:10px;font-family:inherit;font-size:0.75rem;cursor:pointer;">↻ Vernieuwen</button>
+    </div>
+
+    <!-- U9b: Badges -->
+    <div class="uitleg-block" style="margin-top:0;">
+      <div class="uitleg-head" onclick="toggleUitleg(this)">
+        <div class="uitleg-title">🎖️ Badges</div>
+        <div class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <p style="font-size:0.82rem;color:#6B6560;margin:0 0 10px;">Verdiend tijdens de vakantie. Druk op 🎖️ om een badge toe te kennen.</p>
+        <div id="g9-badges-mijn" style="margin-bottom:12px;"></div>
+        <div style="font-size:0.75rem;font-weight:700;color:#6B6560;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Alle badges</div>
+        <div id="g9-badges-all" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;"></div>
+      </div>
+    </div>
+
+    <!-- U9c: Dagelijkse uitdaging -->
+    <div class="uitleg-block">
+      <div class="uitleg-head" onclick="toggleUitleg(this);initDagUitdaging()">
+        <div class="uitleg-title">⚡ Dagelijkse uitdaging</div>
+        <div class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <div id="g9-dag-uitdaging" style="background:#fff;border:1.5px solid #e0dbd6;border-radius:12px;padding:14px;min-height:60px;"></div>
+        <div id="g9-streak" style="font-size:0.82rem;color:#6B6560;margin-top:8px;text-align:center;"></div>
+      </div>
+    </div>
+
+    <!-- U9d: Foto-galerij -->
+    <div class="uitleg-block">
+      <div class="uitleg-head" onclick="toggleUitleg(this);laadHallOfFame()">
+        <div class="uitleg-title">📸 Hall of Fame</div>
+        <div class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <p style="font-size:0.82rem;color:#6B6560;margin:0 0 10px;">Alle bingo-bewijsfoto's van de reis, nieuwste boven.</p>
+        <div id="g9-galerie" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;"></div>
+        <div id="g9-galerie-leeg" style="font-size:0.84rem;color:#9A948E;text-align:center;display:none;padding:12px 0;">Nog geen foto's — spot dingen tijdens de bingo!</div>
+      </div>
+    </div>
+
     <div class="sec-label" style="margin-top:4px;">Scorebord</div>
     <div class="kv-teams" id="kv-teams">
       <div class="kv-team">
