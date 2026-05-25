@@ -3,55 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Vroegzat — Slovenië 2026</title>
+<title>Vroegzat — Slovenië & Oostenrijk 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,500;1,9..40,700;1,9..40,800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
-  --bg:#F0E8E2;--s1:#E8DED7;--s2:#EDE4DC;--s3:#E0D5CC;
-  --bd:rgba(10,10,10,0.08);--bd2:rgba(10,10,10,0.14);
+  --bg:#F0E8E2;--s2:#EDE4DC;
   --t1:#0A0A0A;--t2:#6B6560;--t3:#9A948E;
-  --gold:#4A9E6E;--gold2:rgba(74,158,110,0.12);
-  --accent:#4A9E6E;--accent2:rgba(74,158,110,0.15);
+  --accent:#4A9E6E;--accent2:rgba(74,158,110,0.14);
   --red:#c0392b;
-  --ink:#0A0A0A;--bruin:#6B6560;
-  --serif:'DM Sans',system-ui,sans-serif;
   --sans:'DM Sans',system-ui,sans-serif;
   --r:12px;--r-lg:20px;
-  --shadow:0 1px 2px rgba(10,10,10,0.04);
-  --shadow-lg:0 2px 8px rgba(10,10,10,0.06);
 }
 html{font-size:16px;scroll-behavior:smooth;}
 body{background:#F0E8E2;font-family:var(--sans);color:#0A0A0A;overflow-x:hidden;min-height:100svh;padding-bottom:80px;}
-h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
+h1,h2,h3,h4{font-weight:700;font-style:italic;}
 
 /* LOGIN */
 #login-screen{position:fixed;inset:0;z-index:900;background:#F0E8E2;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;}
 #login-screen.hidden{display:none;}
-.login-logo{font-family:var(--sans);font-style:italic;font-weight:800;font-size:3.2rem;color:#0A0A0A;margin-bottom:2px;letter-spacing:-0.02em;line-height:1;}
+.login-logo{font-style:italic;font-weight:800;font-size:3.2rem;color:#0A0A0A;margin-bottom:2px;letter-spacing:-0.02em;line-height:1;}
 .login-sub{font-size:0.62rem;letter-spacing:0.25em;text-transform:uppercase;color:#6B6560;margin-bottom:12px;}
 .login-divider{width:40px;height:2px;background:#4A9E6E;margin:0 auto 36px;}
-.login-step{width:100%;max-width:340px;display:flex;flex-direction:column;gap:16px;}
+.login-step{width:100%;max-width:360px;display:flex;flex-direction:column;gap:16px;}
 .login-step.hidden{display:none;}
 .login-label{font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:#6B6560;margin-bottom:4px;}
-.login-input{width:100%;padding:14px 16px;border:none;border-radius:30px;background:rgba(10,10,10,0.07);color:#0A0A0A;font-size:1.1rem;letter-spacing:0.2em;text-align:center;outline:none;font-family:var(--sans);}
-.login-input::placeholder{color:#9A948E;letter-spacing:0.1em;}
+.login-input{width:100%;padding:14px 16px;border:none;border-radius:30px;background:rgba(10,10,10,0.07);color:#0A0A0A;font-size:1.1rem;letter-spacing:0.2em;text-align:center;outline:none;}
 .login-input:focus{background:rgba(10,10,10,0.11);}
 .login-btn{padding:14px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-size:0.82rem;font-weight:700;cursor:pointer;letter-spacing:0.12em;text-transform:uppercase;}
 .login-error{color:#4A9E6E;font-size:0.82rem;text-align:center;min-height:20px;}
 .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.profile-card{padding:20px 16px;border-radius:var(--r-lg);border:none;background:rgba(10,10,10,0.06);cursor:pointer;text-align:center;transition:all 0.2s;}
+.profile-card{padding:18px 12px;border-radius:var(--r-lg);border:none;background:rgba(10,10,10,0.06);cursor:pointer;text-align:center;transition:all 0.2s;}
 .profile-card:hover,.profile-card:active{background:rgba(10,10,10,0.1);transform:scale(1.04);}
-.profile-name{font-family:Georgia,serif;font-size:1rem;color:#0A0A0A;margin-top:4px;}
-.sfeerlijn{font-size:0.75rem;color:#9A948E;text-align:center;padding:10px 20px 2px;letter-spacing:0.02em;min-height:22px;}
+.profile-card .av{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:italic;font-weight:700;font-size:1.3rem;color:#fff;margin:0 auto 8px;}
+.profile-name{font-family:Georgia,serif;font-size:0.95rem;color:#0A0A0A;}
+.add-profile-card{border:2px dashed rgba(10,10,10,0.18);background:transparent;}
 
 /* NAV */
 #app{display:none;}
 #app.visible{display:block;}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:200;background:#F0E8E2;border-top:1px solid rgba(10,10,10,0.08);display:flex;padding:6px 8px;padding-bottom:calc(6px + env(safe-area-inset-bottom));}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;cursor:pointer;border:none;background:none;color:#6B6560;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;gap:4px;transition:all 0.2s;border-radius:20px;}
-.nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.5;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:200;background:#F0E8E2;border-top:1px solid rgba(10,10,10,0.08);display:flex;padding:6px 4px;padding-bottom:calc(6px + env(safe-area-inset-bottom));}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 2px;cursor:pointer;border:none;background:none;color:#6B6560;font-size:0.5rem;letter-spacing:0.08em;text-transform:uppercase;gap:3px;transition:all 0.2s;border-radius:16px;}
+.nav-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;}
 .nav-btn.active{background:#0A0A0A;color:#F0E8E2;}
 .nav-btn.active svg{stroke:#F0E8E2;}
 
@@ -59,211 +53,231 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 .section{display:none;min-height:100svh;}
 .section.active{display:block;}
 
-/* HEADER */
+/* SHARED */
+.sec-photo-header{position:relative;height:160px;overflow:hidden;background:#1A2510;flex-shrink:0;}
+.sec-photo-header img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.sec-photo-header-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.7) 100%);}
+.sec-photo-header-text{position:absolute;bottom:14px;left:20px;right:20px;}
+.sec-photo-header-title{font-family:Georgia,serif;font-style:italic;font-size:1.6rem;color:#F0E8E2;text-shadow:0 2px 10px rgba(0,0,0,0.5);line-height:1;}
+.sec-photo-header-sub{font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(240,232,226,0.7);margin-top:4px;}
 .page-header{padding:20px 20px 0;display:flex;justify-content:space-between;align-items:center;}
-.sec-photo-header{position:relative;height:170px;overflow:hidden;background:#1A2510;flex-shrink:0;}
-.sec-photo-header img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;}
-.sec-photo-header-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.08) 0%,rgba(0,0,0,0.72) 100%);}
-.sec-photo-header-text{position:absolute;bottom:16px;left:20px;right:20px;}
-.sec-photo-header-title{font-family:Georgia,serif;font-style:italic;font-size:1.7rem;color:#F0E8E2;text-shadow:0 2px 10px rgba(0,0,0,0.5);line-height:1;}
-.sec-photo-header-sub{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(240,232,226,0.7);margin-top:5px;}
-.page-logo{font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.8rem;color:#0A0A0A;letter-spacing:-0.02em;}
+.page-logo{font-style:italic;font-weight:800;font-size:1.8rem;color:#0A0A0A;letter-spacing:-0.02em;}
 .uitlog-btn{font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:#6B6560;background:none;border:none;padding:5px 0;cursor:pointer;}
+.sec-label{font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:#4A9E6E;padding:16px 20px 4px;font-weight:700;}
+.sec-title{font-style:italic;font-weight:800;font-size:1.25rem;color:#0A0A0A;padding:0 20px 4px;}
+.sec-sub{font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:#6B6560;padding:0 20px 12px;}
 
-/* HOME */
-.reel-wrap{position:relative;width:100%;height:clamp(300px,72vw,500px);overflow:hidden;background:#1A2510;}
+/* REEL */
+.reel-wrap{position:relative;width:100%;height:clamp(280px,68vw,460px);overflow:hidden;background:#1A2510;}
 .reel-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 0.8s;}
 .reel-slide.active{opacity:1;}
-.reel-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.82) 0%,rgba(0,0,0,0.15) 55%,rgba(0,0,0,0.45) 100%);}
-.reel-caption{position:absolute;bottom:0;left:0;right:0;padding:20px 20px 22px;color:#fff;}
-.reel-caption h3{font-family:Georgia,serif;font-style:italic;font-weight:normal;font-size:2rem;line-height:1.1;text-shadow:0 2px 12px rgba(0,0,0,0.5);margin:0 0 5px;}
-.reel-caption p{font-size:0.62rem;letter-spacing:0.13em;text-transform:uppercase;color:rgba(240,232,226,0.7);margin:0;}
+.reel-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.82) 0%,rgba(0,0,0,0.1) 55%,rgba(0,0,0,0.4) 100%);}
 .reel-progress{position:absolute;top:12px;left:12px;right:12px;display:flex;gap:4px;}
-.reel-dot{flex:1;height:2px;background:rgba(255,255,255,0.35);border-radius:2px;overflow:hidden;}
+.reel-dot{flex:1;height:2px;background:rgba(255,255,255,0.3);border-radius:2px;overflow:hidden;}
 .reel-dot-fill{height:100%;background:#fff;width:0%;border-radius:2px;}
 .reel-dot.done .reel-dot-fill{width:100%;}
-.reel-dot.active .reel-dot-fill{animation:reel-fill 4s linear forwards;}
-@keyframes reel-fill{from{width:0%}to{width:100%}}
+.reel-dot.active .reel-dot-fill{animation:rfill 4s linear forwards;}
+@keyframes rfill{from{width:0%}to{width:100%}}
+.reel-caption{position:absolute;bottom:0;left:0;right:0;padding:18px 20px 20px;color:#fff;}
+.reel-caption h3{font-family:Georgia,serif;font-style:italic;font-size:1.85rem;line-height:1.1;text-shadow:0 2px 12px rgba(0,0,0,0.5);margin:0 0 4px;}
+.reel-caption p{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(240,232,226,0.7);margin:0;}
+.reel-cd{display:flex;gap:6px;align-items:baseline;justify-content:flex-end;}
+.reel-cd span.big{font-family:Georgia,serif;font-size:2rem;font-weight:normal;color:#F0E8E2;line-height:1;}
+.reel-cd span.lbl{font-size:0.6rem;color:rgba(240,232,226,0.55);}
 
-.countdown-block{padding:20px 20px 0;}
-.countdown-label{font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;opacity:0.5;margin-bottom:12px;}
-.countdown-nums{display:flex;gap:12px;align-items:center;}
+/* COUNTDOWN */
+.countdown-block{padding:16px 20px 0;}
+.countdown-nums{display:flex;gap:10px;align-items:center;}
 .count-unit{text-align:center;}
-.count-num{font-family:var(--sans);font-weight:800;font-size:2.4rem;line-height:1;color:#0A0A0A;letter-spacing:-0.02em;}
-.count-lbl{font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;opacity:0.5;margin-top:2px;}
-.count-sep{font-size:2rem;color:#4A9E6E;opacity:0.5;margin-bottom:8px;}
-.countdown-badge{display:inline-block;margin-top:12px;background:#4A9E6E;border-radius:20px;padding:4px 14px;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:#fff;}
+.count-num{font-weight:800;font-size:2.2rem;line-height:1;color:#0A0A0A;letter-spacing:-0.02em;}
+.count-lbl{font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;opacity:0.5;margin-top:2px;}
+.count-sep{font-size:1.8rem;color:#4A9E6E;opacity:0.4;margin-bottom:6px;}
+.cd-badge{display:inline-block;margin-top:10px;background:#4A9E6E;border-radius:20px;padding:3px 12px;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:#fff;}
 
-.home-section-title{font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.3rem;color:#0A0A0A;padding:16px 20px 4px;letter-spacing:-0.01em;}
-.home-section-sub{font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:#6B6560;padding:0 20px 12px;}
-
-.weekend-chips{display:flex;flex-direction:column;gap:0;padding:0 20px 4px;}
-.weekend-chip{display:flex;align-items:center;gap:12px;background:transparent;padding:12px 0;border-top:1px solid rgba(10,10,10,0.08);cursor:pointer;}
-.chip-emoji{font-size:1.4rem;flex-shrink:0;}
-.chip-info{flex:1;}
-.chip-name{font-weight:700;font-size:0.9rem;color:#0A0A0A;}
-.chip-desc{font-size:0.75rem;color:#6B6560;margin-top:2px;}
-.chip-badge{font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;background:#4A9E6E;color:#fff;border-radius:10px;padding:2px 8px;flex-shrink:0;}
+/* LIST ITEMS */
+.list-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid rgba(10,10,10,0.08);}
+.list-emoji{font-size:1.3rem;flex-shrink:0;width:28px;text-align:center;}
+.list-info{flex:1;}
+.list-name{font-weight:700;font-size:0.9rem;color:#0A0A0A;}
+.list-desc{font-size:0.73rem;color:#6B6560;margin-top:2px;line-height:1.4;}
+.list-badge{font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;background:#4A9E6E;color:#fff;border-radius:10px;padding:2px 8px;flex-shrink:0;}
 
 /* SWIPE */
-.swipe-tabs{display:flex;background:#4A9E6E;overflow-x:auto;scrollbar-width:none;padding:10px 12px;gap:6px;}
-.swipe-tabs::-webkit-scrollbar{display:none;}
-.stab{flex:0 0 auto;padding:8px 16px;text-align:center;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,0.75);border-radius:20px;transition:all 0.2s;white-space:nowrap;font-family:var(--sans);font-weight:600;}
+.swipe-tabs-bar{display:flex;background:#4A9E6E;overflow-x:auto;scrollbar-width:none;padding:10px 12px;gap:6px;}
+.swipe-tabs-bar::-webkit-scrollbar{display:none;}
+.stab{flex:0 0 auto;padding:7px 14px;font-size:0.68rem;letter-spacing:0.07em;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,0.7);border-radius:20px;transition:all 0.2s;white-space:nowrap;font-weight:600;}
 .stab.active{background:#0A0A0A;color:#F0E8E2;}
-
-.swipe-stack{position:relative;height:420px;margin:16px 20px;touch-action:none;}
+.swipe-stack{position:relative;height:400px;margin:14px 20px;touch-action:none;}
 .swipe-card{position:absolute;inset:0;border-radius:var(--r-lg);overflow:hidden;transform-origin:bottom center;background:#EDE4DC;cursor:grab;user-select:none;}
 .swipe-card:active{cursor:grabbing;}
-.swipe-card.animate-like{animation:fly-right 0.4s forwards;}
-.swipe-card.animate-pass{animation:fly-left 0.4s forwards;}
-@keyframes fly-right{to{transform:translateX(120%) rotate(20deg);opacity:0;}}
-@keyframes fly-left{to{transform:translateX(-120%) rotate(-20deg);opacity:0;}}
-
-.card-hero{height:220px;background-size:cover;background-position:center;position:relative;flex-shrink:0;}
-.card-hero-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.78) 0%,rgba(0,0,0,0.1) 60%,transparent 100%);}
-.card-badges{position:absolute;top:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;}
-.badge{font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;border-radius:20px;padding:3px 8px;font-weight:700;}
+.swipe-card.fly-like{animation:fly-r 0.4s forwards;}
+.swipe-card.fly-pass{animation:fly-l 0.4s forwards;}
+@keyframes fly-r{to{transform:translateX(120%) rotate(20deg);opacity:0;}}
+@keyframes fly-l{to{transform:translateX(-120%) rotate(-20deg);opacity:0;}}
+.card-hero{height:200px;background-size:cover;background-position:center;position:relative;}
+.card-hero-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.75) 0%,transparent 60%);}
+.card-badges{position:absolute;top:10px;left:12px;display:flex;gap:5px;}
+.badge{font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;border-radius:20px;padding:3px 8px;font-weight:700;}
 .badge-must{background:#4A9E6E;color:#fff;}
-.badge-cat{background:rgba(0,0,0,0.4);color:#fff;backdrop-filter:blur(4px);}
-.badge-reserveer{background:#c0392b;color:#fff;}
-.card-like-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.15s;}
-.card-like-overlay.show-like{background:rgba(74,158,110,0.3);opacity:1;}
-.card-like-overlay.show-pass{background:rgba(239,68,68,0.2);opacity:1;}
-.overlay-text{font-size:2rem;font-weight:900;color:#fff;border:4px solid #fff;border-radius:8px;padding:4px 16px;letter-spacing:0.1em;transform:rotate(-12deg);}
-.card-body{padding:14px 16px;background:#EDE4DC;}
-.card-naam{font-family:var(--sans);font-size:1.25rem;font-style:italic;font-weight:700;line-height:1.2;color:#0A0A0A;}
-.card-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
-.card-meta-pill{font-size:0.65rem;background:rgba(10,10,10,0.07);border-radius:10px;padding:2px 8px;color:#6B6560;}
-.card-votes{padding:10px 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:#EDE4DC;}
-.vote-chip{display:flex;align-items:center;gap:4px;font-size:0.7rem;background:rgba(10,10,10,0.07);border-radius:10px;padding:3px 8px;color:#0A0A0A;}
-.vote-chip .mini-av{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:#fff;font-family:var(--sans);font-style:italic;font-weight:700;}
-
-.swipe-btns{display:flex;justify-content:center;align-items:center;gap:20px;padding:12px 20px 0;}
-.sbtn{width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.4rem;transition:transform 0.15s;}
-.sbtn:active{transform:scale(0.92);}
+.badge-cat{background:rgba(0,0,0,0.38);color:#fff;backdrop-filter:blur(4px);}
+.badge-res{background:#c0392b;color:#fff;}
+.card-like-ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.12s;}
+.card-like-ov.sl{background:rgba(74,158,110,0.28);opacity:1;}
+.card-like-ov.sp{background:rgba(239,68,68,0.18);opacity:1;}
+.ov-txt{font-size:2rem;font-weight:900;color:#fff;border:4px solid #fff;border-radius:8px;padding:4px 14px;letter-spacing:0.1em;transform:rotate(-12deg);}
+.card-body{padding:12px 14px;background:#EDE4DC;}
+.card-naam{font-style:italic;font-weight:700;font-size:1.2rem;line-height:1.2;color:#0A0A0A;}
+.card-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
+.card-pill{font-size:0.63rem;background:rgba(10,10,10,0.07);border-radius:10px;padding:2px 8px;color:#6B6560;}
+.card-verhaal{font-size:0.78rem;color:#6B6560;margin-top:7px;line-height:1.45;}
+.swipe-btns{display:flex;justify-content:center;gap:20px;padding:10px 20px 0;}
+.sbtn{width:54px;height:54px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.4rem;transition:transform 0.15s;}
+.sbtn:active{transform:scale(0.9);}
 .sbtn-pass{background:rgba(10,10,10,0.08);}
 .sbtn-like{background:#0A0A0A;color:#F0E8E2;}
-.swipe-hint{text-align:center;font-size:0.65rem;color:#9A948E;letter-spacing:0.08em;text-transform:uppercase;padding:8px;margin-top:4px;}
-.empty-stack{display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;color:#6B6560;gap:12px;}
-.empty-stack p{font-size:0.9rem;}
+.swipe-hint{text-align:center;font-size:0.62rem;color:#9A948E;letter-spacing:0.08em;text-transform:uppercase;padding:7px;margin-top:2px;}
+.empty-stack{display:flex;flex-direction:column;align-items:center;justify-content:center;height:260px;color:#6B6560;gap:10px;}
+.empty-stack p{font-size:0.88rem;}
 
-/* TOP5 */
-.top5-tabs{display:flex;border-bottom:1px solid rgba(10,10,10,0.08);background:#F0E8E2;}
-.top5-tab{flex:1;padding:11px 4px;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:#6B6560;border-bottom:2px solid transparent;cursor:pointer;transition:all 0.2s;font-family:var(--sans);text-align:center;}
-.top5-tab.active{color:#0A0A0A;border-bottom-color:#0A0A0A;}
-.top5-list{padding:12px 20px;display:flex;flex-direction:column;gap:10px;}
-.top5-item{background:transparent;border-radius:0;border:none;border-bottom:1px solid rgba(10,10,10,0.08);padding:12px 0;display:flex;align-items:center;gap:10px;}
-.top5-item-info{flex:1;}
-.top5-item-naam{font-family:var(--sans);font-style:italic;font-weight:700;font-size:1.05rem;color:#0A0A0A;}
-.top5-item-meta{font-size:0.7rem;color:#6B6560;margin-top:2px;}
-.top5-rank{width:28px;height:28px;border-radius:50%;background:#4A9E6E;color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:800;flex-shrink:0;}
-.top5-rank.silver{background:#9A948E;}
-.top5-rank.bronze{background:#A0784A;}
-.empty-top5{padding:40px 24px;text-align:center;color:#6B6560;}
-.empty-top5 p{font-size:0.9rem;line-height:1.6;}
+/* PROGRAMMA */
+.dag-item{margin:0 20px;border-top:1px solid rgba(10,10,10,0.08);}
+.dag-head{display:flex;align-items:center;gap:12px;padding:14px 0;cursor:pointer;}
+.dag-badge{width:44px;height:44px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;font-size:0.55rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;}
+.dag-badge .dag-num{font-size:1.2rem;font-weight:800;line-height:1;letter-spacing:-0.02em;}
+.dag-info{flex:1;}
+.dag-title{font-weight:700;font-size:0.95rem;color:#0A0A0A;}
+.dag-datum{font-size:0.68rem;color:#6B6560;margin-top:1px;}
+.dag-arrow{color:#9A948E;font-size:0.85rem;transition:transform 0.2s;flex-shrink:0;}
+.dag-item.open .dag-arrow{transform:rotate(180deg);}
+.dag-body{display:none;padding:0 0 14px 56px;}
+.dag-item.open .dag-body{display:block;}
+.dag-desc{font-size:0.82rem;color:#6B6560;line-height:1.6;}
+.dag-activiteiten{margin-top:8px;display:flex;flex-direction:column;gap:4px;}
+.dag-act{font-size:0.8rem;color:#0A0A0A;display:flex;align-items:flex-start;gap:6px;line-height:1.4;}
+.dag-act::before{content:'→';color:#4A9E6E;flex-shrink:0;margin-top:1px;}
+.dag-loc{display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:0.68rem;color:#6B6560;background:rgba(10,10,10,0.05);border-radius:10px;padding:2px 8px;}
 
-/* GROEP */
-.match-overlay{position:fixed;inset:0;z-index:800;background:rgba(240,232,226,0.95);display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px;}
-.match-overlay.show{display:flex;}
-.match-box{background:#F0E8E2;border-radius:var(--r-lg);padding:28px 24px;text-align:center;max-width:320px;width:100%;box-shadow:0 4px 32px rgba(10,10,10,0.1);}
-.match-title{font-family:var(--sans);font-style:italic;font-weight:800;font-size:2rem;color:#4A9E6E;margin-bottom:8px;}
-.match-item{font-family:var(--sans);font-size:1.2rem;margin:8px 0 16px;color:#0A0A0A;}
-.match-close{padding:12px 28px;border-radius:30px;background:#0A0A0A;color:#F0E8E2;border:none;font-size:0.9rem;cursor:pointer;font-weight:600;}
+/* KLAVERJAS */
+.kv-teams{display:flex;gap:10px;margin:16px 20px 0;}
+.kv-team{flex:1;padding:14px 12px;border-radius:var(--r-lg);text-align:center;background:rgba(10,10,10,0.05);}
+.kv-team-score{font-weight:800;font-size:2.4rem;letter-spacing:-0.02em;line-height:1;}
+.kv-team-name{font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:#6B6560;margin-top:4px;}
+.kv-team-sub{font-size:0.68rem;color:#9A948E;margin-top:2px;}
 
-.groep-section-head{font-family:var(--sans);font-style:italic;font-weight:700;font-size:1.2rem;padding:16px 20px 4px;color:#0A0A0A;}
-.groep-sub{font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:#6B6560;padding:0 20px 8px;}
-.groep-matches{padding:0 20px;display:flex;flex-direction:column;gap:0;}
-.match-card{background:transparent;border-bottom:1px solid rgba(10,10,10,0.08);overflow:hidden;padding-bottom:12px;}
-.match-card-hero{height:80px;background-size:cover;background-position:center;position:relative;border-radius:var(--r);margin-bottom:10px;}
-.match-card-hero-grad{position:absolute;inset:0;background:rgba(74,158,110,0.25);border-radius:var(--r);}
-.match-card-naam{font-family:var(--sans);font-style:italic;font-weight:700;font-size:1.1rem;color:#0A0A0A;}
-.match-card-wijk{font-size:0.7rem;color:#6B6560;margin-top:2px;}
-.match-votes-row{display:flex;gap:6px;margin-top:10px;}
-.mvr-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-style:italic;font-size:0.75rem;color:#fff;font-weight:700;border:2px solid #F0E8E2;}
-.mvr-av.v-like{outline:2px solid #4A9E6E;}
-.mvr-av.v-pass{opacity:0.4;}
-.mvr-av.v-none{opacity:0.25;}
+.kv-potjes{margin:12px 20px 0;}
+.kv-potje{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid rgba(10,10,10,0.07);font-size:0.82rem;}
+.kv-potje-nr{font-weight:700;color:#9A948E;width:22px;text-align:right;font-size:0.75rem;flex-shrink:0;}
+.kv-potje-roep{flex:1;}
+.kv-potje-roep span{font-style:italic;}
+.kv-potje-scores{display:flex;gap:8px;flex-shrink:0;}
+.kv-pts{width:42px;text-align:center;font-weight:700;background:rgba(10,10,10,0.06);border-radius:8px;padding:3px 4px;font-size:0.82rem;}
+.kv-pts.win{background:rgba(74,158,110,0.15);color:#2E7A4E;}
+.kv-pts.nat{background:rgba(192,57,43,0.12);color:#c0392b;font-size:0.65rem;letter-spacing:0.04em;}
+.kv-del{background:none;border:none;color:#9A948E;font-size:1rem;cursor:pointer;padding:0 4px;}
+.kv-empty{padding:24px 20px;text-align:center;color:#9A948E;font-size:0.88rem;line-height:1.6;}
 
-/* REISINFO collapsibles */
-.collapsible{margin:0 20px;background:transparent;border:none;border-top:1px solid rgba(10,10,10,0.08);overflow:hidden;}
-.collapsible-head{display:flex;align-items:center;justify-content:space-between;padding:16px 0;cursor:pointer;}
-.collapsible-title{font-family:var(--sans);font-style:italic;font-weight:700;font-size:1.1rem;color:#0A0A0A;}
-.collapsible-arrow{font-size:1rem;transition:transform 0.2s;color:#6B6560;}
-.collapsible-body{display:none;padding:0 0 16px;}
+.kv-add-btn{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 20px;padding:13px;border-radius:30px;background:#0A0A0A;color:#F0E8E2;border:none;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;}
+
+/* KLAVERJAS uitleg */
+.uitleg-block{margin:0 20px;border-top:1px solid rgba(10,10,10,0.08);}
+.uitleg-head{display:flex;align-items:center;justify-content:space-between;padding:14px 0;cursor:pointer;}
+.uitleg-title{font-style:italic;font-weight:700;font-size:1rem;color:#0A0A0A;}
+.uitleg-body{display:none;padding:0 0 14px;}
+.uitleg-body.open{display:block;}
+.uitleg-row{font-size:0.8rem;color:#6B6560;line-height:1.6;margin-bottom:6px;}
+.uitleg-tabel{width:100%;border-collapse:collapse;margin:8px 0;font-size:0.78rem;}
+.uitleg-tabel th{text-align:left;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;padding:4px 6px 6px;border-bottom:1px solid rgba(10,10,10,0.1);}
+.uitleg-tabel td{padding:5px 6px;border-bottom:1px solid rgba(10,10,10,0.06);color:#0A0A0A;}
+.uitleg-tabel td:nth-child(2){font-weight:700;color:#4A9E6E;}
+.tag-groen{display:inline-block;background:rgba(74,158,110,0.12);color:#2E7A4E;border-radius:8px;padding:1px 7px;font-size:0.72rem;font-weight:600;}
+.tag-rood{display:inline-block;background:rgba(192,57,43,0.1);color:#c0392b;border-radius:8px;padding:1px 7px;font-size:0.72rem;font-weight:600;}
+
+/* ADD POTJE MODAL */
+.modal-ov{position:fixed;inset:0;z-index:700;background:rgba(10,10,10,0.28);display:none;align-items:flex-end;}
+.modal-ov.show{display:flex;}
+.modal-sheet{background:#F0E8E2;border-radius:var(--r-lg) var(--r-lg) 0 0;padding:24px 20px 40px;width:100%;max-height:88vh;overflow-y:auto;}
+.modal-title{font-style:italic;font-weight:700;font-size:1.35rem;margin-bottom:16px;color:#0A0A0A;}
+.mf{margin-bottom:13px;}
+.mf label{display:block;font-size:0.63rem;letter-spacing:0.1em;text-transform:uppercase;color:#6B6560;margin-bottom:5px;}
+.mf input,.mf select{width:100%;padding:10px 12px;border:none;border-radius:var(--r);font-size:0.9rem;outline:none;background:rgba(10,10,10,0.07);color:#0A0A0A;}
+.mf-row{display:flex;gap:10px;}
+.mf-row .mf{flex:1;}
+.mf-check{display:flex;align-items:center;gap:10px;font-size:0.88rem;color:#0A0A0A;cursor:pointer;}
+.mf-check input[type=checkbox]{width:18px;height:18px;cursor:pointer;accent-color:#4A9E6E;}
+.modal-submit{width:100%;padding:14px;background:#0A0A0A;color:#F0E8E2;border:none;border-radius:30px;font-size:0.9rem;font-weight:700;cursor:pointer;margin-top:6px;letter-spacing:0.08em;text-transform:uppercase;}
+.modal-cancel{width:100%;padding:9px;background:none;color:#6B6560;border:none;font-size:0.85rem;cursor:pointer;margin-top:6px;}
+
+/* REISINFO */
+.collapsible{margin:0 20px;border-top:1px solid rgba(10,10,10,0.08);}
+.collapsible-head{display:flex;align-items:center;justify-content:space-between;padding:14px 0;cursor:pointer;}
+.collapsible-title{font-style:italic;font-weight:700;font-size:1rem;color:#0A0A0A;}
+.collapsible-arrow{font-size:0.85rem;transition:transform 0.2s;color:#6B6560;}
 .collapsible.open .collapsible-arrow{transform:rotate(180deg);}
+.collapsible-body{display:none;padding:0 0 14px;}
 .collapsible.open .collapsible-body{display:block;}
-.info-row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(10,10,10,0.06);font-size:0.85rem;align-items:flex-start;}
+.info-row{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid rgba(10,10,10,0.05);align-items:flex-start;}
 .info-row:last-child{border-bottom:none;}
-.info-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
-.info-label{font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:#6B6560;margin-bottom:2px;}
-.info-val{font-size:0.85rem;color:#0A0A0A;}
-
-.pack-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(10,10,10,0.06);cursor:pointer;}
+.info-icon{font-size:1.05rem;flex-shrink:0;margin-top:1px;}
+.info-label{font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:#6B6560;margin-bottom:2px;}
+.info-val{font-size:0.82rem;color:#0A0A0A;line-height:1.5;}
+.pack-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid rgba(10,10,10,0.06);cursor:pointer;}
 .pack-item:last-child{border-bottom:none;}
 .pack-check{width:22px;height:22px;border-radius:6px;border:1.5px solid rgba(10,10,10,0.2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s;margin-top:1px;}
 .pack-item.checked .pack-check{background:#0A0A0A;border-color:#0A0A0A;color:#F0E8E2;}
 .pack-item.checked .pack-label{text-decoration:line-through;color:#9A948E;}
-.pack-label{font-size:0.9rem;flex:1;line-height:1.3;color:#0A0A0A;}
-.pack-note{font-size:0.72rem;color:#6B6560;margin-top:2px;line-height:1.35;}
+.pack-label{font-size:0.88rem;flex:1;line-height:1.3;color:#0A0A0A;}
+.pack-note{font-size:0.7rem;color:#6B6560;margin-top:2px;}
+
+/* INSPIRATIE */
+.insp-card{margin:0 20px 12px;border-radius:var(--r-lg);overflow:hidden;background:#EDE4DC;text-decoration:none;display:block;}
+.insp-thumb{height:180px;background-size:cover;background-position:center;position:relative;}
+.insp-thumb-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,transparent 60%);}
+.insp-thumb-text{position:absolute;bottom:12px;left:14px;right:14px;}
+.insp-thumb-title{font-family:Georgia,serif;font-style:italic;font-size:1.3rem;color:#F0E8E2;line-height:1.2;}
+.insp-thumb-sub{font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(240,232,226,0.7);margin-top:3px;}
+.insp-body{padding:12px 14px 14px;}
+.insp-body p{font-size:0.8rem;color:#6B6560;line-height:1.55;}
+.insp-link{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:0.75rem;color:#4A9E6E;font-weight:700;text-decoration:none;padding:6px 14px;border:1.5px solid rgba(74,158,110,0.4);border-radius:20px;}
 
 /* TOAST */
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#0A0A0A;color:#F0E8E2;padding:10px 20px;border-radius:30px;font-size:0.85rem;opacity:0;transition:all 0.3s;z-index:999;white-space:nowrap;pointer-events:none;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;z-index:700;background:rgba(10,10,10,0.3);display:none;align-items:flex-end;}
-.modal-overlay.show{display:flex;}
-.modal-sheet{background:#F0E8E2;border-radius:var(--r-lg) var(--r-lg) 0 0;padding:24px 20px 40px;width:100%;max-height:85vh;overflow-y:auto;}
-.modal-title{font-family:var(--sans);font-style:italic;font-weight:700;font-size:1.4rem;margin-bottom:16px;color:#0A0A0A;}
-.modal-field{margin-bottom:14px;}
-.modal-field label{display:block;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:#6B6560;margin-bottom:6px;}
-.modal-field input,.modal-field select,.modal-field textarea{width:100%;padding:10px 12px;border:none;border-radius:var(--r);font-size:0.9rem;outline:none;font-family:var(--sans);background:rgba(10,10,10,0.07);color:#0A0A0A;}
-.modal-submit{width:100%;padding:14px;background:#0A0A0A;color:#F0E8E2;border:none;border-radius:30px;font-size:0.9rem;font-weight:700;cursor:pointer;margin-top:8px;letter-spacing:0.08em;text-transform:uppercase;}
-.modal-cancel{width:100%;padding:10px;background:none;color:#6B6560;border:none;font-size:0.85rem;cursor:pointer;margin-top:8px;}
-
 /* INTRO */
-#intro-overlay{position:fixed;inset:0;z-index:9999;background:#0D1A0E;overflow:hidden;display:none;}
+#intro-ov{position:fixed;inset:0;z-index:9999;overflow:hidden;display:none;}
 .intro-slider{display:flex;height:100%;width:300%;transition:transform 0.6s cubic-bezier(.4,0,.2,1);}
-.intro-screen{width:33.333%;flex-shrink:0;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 36px;text-align:center;position:relative;}
-.intro-screen::before{content:'';position:absolute;inset:0;background:rgba(13,26,14,0.72);}
-.intro-screen *{position:relative;z-index:1;}
-.intro-big{font-family:Georgia,serif;font-size:1.95rem;color:#F0E8E2;line-height:1.4;max-width:320px;opacity:0;transition:opacity 1s 0.4s;}
+.intro-screen{width:33.333%;flex-shrink:0;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 36px;text-align:center;position:relative;background-size:cover;background-position:center;}
+.intro-screen::before{content:'';position:absolute;inset:0;background:rgba(10,20,10,0.68);}
+.intro-screen>*{position:relative;z-index:1;}
+.intro-big{font-family:Georgia,serif;font-size:1.85rem;color:#F0E8E2;line-height:1.4;max-width:320px;opacity:0;transition:opacity 1s 0.4s;}
 .intro-big.show{opacity:1;}
-.intro-med{font-family:Georgia,serif;font-size:1.6rem;color:#F0E8E2;line-height:1.55;opacity:0;transition:opacity 0.8s 0.3s;}
+.intro-med{font-family:Georgia,serif;font-size:1.55rem;color:#F0E8E2;line-height:1.55;opacity:0;transition:opacity 0.8s 0.3s;}
 .intro-med.show{opacity:1;}
-.intro-sub{font-family:Georgia,serif;color:#B8A890;font-size:0.95rem;margin-bottom:28px;opacity:0;transition:opacity 0.6s 0.2s;}
+.intro-sub{font-family:Georgia,serif;color:#B8C4A0;font-size:0.95rem;margin-bottom:24px;opacity:0;transition:opacity 0.6s 0.2s;}
 .intro-sub.show{opacity:1;}
-.intro-cta-btn{padding:13px 36px;border:none;border-radius:30px;background:#F0E8E2;color:#0D1A0E;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;opacity:0;transition:opacity 0.5s;margin-top:4px;}
-.intro-cta-btn.show{opacity:1;}
-.intro-skip{position:absolute;top:20px;right:20px;background:transparent;border:none;color:rgba(240,232,226,0.45);font-family:'DM Sans',sans-serif;font-size:0.75rem;cursor:pointer;padding:8px;letter-spacing:0.04em;z-index:2;}
-.intro-dots{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:2;}
+.intro-cta{padding:12px 34px;border:none;border-radius:30px;background:#F0E8E2;color:#0D1A0E;font-size:0.88rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;opacity:0;transition:opacity 0.5s;margin-top:4px;}
+.intro-cta.show{opacity:1;}
+.intro-skip{position:absolute;top:20px;right:20px;background:transparent;border:none;color:rgba(240,232,226,0.4);font-size:0.75rem;cursor:pointer;padding:8px;z-index:2;}
+.intro-dots{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:2;}
 .intro-dot{width:6px;height:6px;border-radius:3px;background:rgba(240,232,226,0.25);transition:all 0.35s;}
-.intro-dot.active{width:22px;background:rgba(240,232,226,0.85);}
-
-.intro-screen:nth-child(1){background-image:url('https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80');background-size:cover;background-position:center;}
-.intro-screen:nth-child(2){background-image:url('https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=1200&q=80');background-size:cover;background-position:center;}
-.intro-screen:nth-child(3){background-image:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80');background-size:cover;background-position:center;}
-
-#welkom-naam{font-family:Georgia,serif !important;font-weight:normal !important;font-style:normal !important;font-size:2.4rem !important;}
-
-.add-btn{display:flex;align-items:center;gap:8px;margin:8px 20px 16px;padding:12px 0;border:none;background:none;cursor:pointer;font-size:0.85rem;color:#4A9E6E;width:calc(100% - 40px);border-top:1px dashed rgba(74,158,110,0.4);}
+.intro-dot.active{width:22px;background:rgba(240,232,226,0.8);}
 </style>
 </head>
 <body>
 
 <!-- INTRO -->
-<div id="intro-overlay">
+<div id="intro-ov">
   <button class="intro-skip" onclick="finishIntro()">overslaan</button>
   <div class="intro-slider" id="intro-slider">
-    <div class="intro-screen">
-      <p id="intro-days-txt" class="intro-big">Over ? dagen staan jullie in Slovenië.</p>
+    <div class="intro-screen" style="background-image:url('https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80')">
+      <p id="intro-days-txt" class="intro-big">Over ? dagen begint de vakantie.</p>
     </div>
-    <div class="intro-screen">
-      <p class="intro-med">Vier vriendinnen.<br>Één zomeravontuur.</p>
+    <div class="intro-screen" style="background-image:url('https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=1200&q=80')">
+      <p class="intro-med">Slovenië.<br>Oostenrijk.<br>Samen.</p>
     </div>
-    <div class="intro-screen">
-      <p class="intro-sub">Tijd om te kiezen wie jij bent.</p>
-      <button class="intro-cta-btn" id="intro-cta" onclick="finishIntro()">Dat ben ik →</button>
+    <div class="intro-screen" style="background-image:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80')">
+      <p class="intro-sub">Bergen, meren en klaverjas tot middernacht.</p>
+      <button class="intro-cta" onclick="finishIntro()">Laten we gaan →</button>
     </div>
   </div>
   <div class="intro-dots">
@@ -276,99 +290,80 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-logo">Vroegzat</div>
-  <div class="login-sub">Jullie trip. Jullie programma.</div>
-  <div style="font-size:0.6rem;letter-spacing:0.12em;color:#9A948E;margin-bottom:8px;">Slovenië 2026</div>
+  <div class="login-sub">Zomer 2026</div>
+  <div style="font-size:0.6rem;letter-spacing:0.12em;color:#9A948E;margin-bottom:8px;">Slovenië & Oostenrijk</div>
   <div class="login-divider"></div>
   <div id="step1" class="login-step">
     <div>
       <div class="login-label">Groepscode</div>
       <input id="code-input" class="login-input" type="text" placeholder="••••••••" autocomplete="off" spellcheck="false">
     </div>
-    <button class="login-btn" onclick="checkCode()">Ga naar Slovenië →</button>
+    <button class="login-btn" onclick="checkCode()">Ga naar de vakantie →</button>
     <div class="login-error" id="code-error"></div>
   </div>
   <div id="step2" class="login-step hidden">
-    <div style="text-align:center;margin-bottom:16px;font-family:var(--sans);font-style:italic;font-size:1rem;color:#0A0A0A;line-height:1.5;">Vroegzat — van Bled tot Ljubljana.<br><span style="font-style:normal;font-size:0.8rem;color:#6B6560;">Jullie maken samen het programma.</span></div>
-    <div class="login-label" style="text-align:center;margin-bottom:12px;">Wie ben jij?</div>
-    <div class="profile-grid">
-      <div class="profile-card" onclick="selectProfile('frederike')">
-        <img src="img_frederike.jpg" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 10px;display:block;border:3px solid #7A9E82;">
-        <div class="profile-name">Frederike</div>
-      </div>
-      <div class="profile-card" onclick="selectProfile('griette')">
-        <img src="img_griette.jpg" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 10px;display:block;border:3px solid #D4785A;">
-        <div class="profile-name">Griette</div>
-      </div>
-      <div class="profile-card" onclick="selectProfile('marlinde')">
-        <img src="img_marlinde.jpg" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 10px;display:block;border:3px solid #AD7A9E;">
-        <div class="profile-name">Marlinde</div>
-      </div>
-      <div class="profile-card" onclick="selectProfile('miriam')">
-        <img src="img_miriam.jpg" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 10px;display:block;border:3px solid #7A8EAD;">
-        <div class="profile-name">Miriam</div>
-      </div>
-    </div>
-    <div class="sfeerlijn" id="sfeerlijn-el"></div>
+    <div style="text-align:center;margin-bottom:8px;font-style:italic;font-size:1rem;color:#0A0A0A;line-height:1.5;">Wie ben jij?</div>
+    <div class="profile-grid" id="profile-grid"></div>
+    <div style="font-size:0.72rem;color:#9A948E;text-align:center;padding:6px 0 2px;" id="sfeerlijn-el"></div>
   </div>
 </div>
 
-<!-- WELKOM SCHERM -->
+<!-- WELKOM -->
 <div id="welkom-screen" style="display:none;position:fixed;inset:0;z-index:950;background:#F0E8E2;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
-  <div id="welkom-avatar" style="width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-weight:800;font-size:1.6rem;color:#fff;margin:0 auto 24px;overflow:hidden;"></div>
-  <div id="welkom-naam" style="font-size:2.4rem;color:#0A0A0A;margin-bottom:10px;"></div>
-  <div id="welkom-sub" style="font-size:0.9rem;color:#6B6560;line-height:1.65;max-width:300px;margin:0 auto 28px;"></div>
-  <button onclick="startApp()" style="padding:14px 36px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Beginnen →</button>
+  <div id="welkom-avatar" style="width:74px;height:74px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-style:italic;font-weight:800;font-size:1.5rem;color:#fff;margin:0 auto 22px;"></div>
+  <div id="welkom-naam" style="font-family:Georgia,serif;font-size:2.2rem;color:#0A0A0A;margin-bottom:10px;"></div>
+  <div id="welkom-sub" style="font-size:0.9rem;color:#6B6560;line-height:1.65;max-width:300px;margin:0 auto 26px;"></div>
+  <button onclick="startApp()" style="padding:14px 36px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Beginnen →</button>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- MATCH OVERLAY -->
-<div class="match-overlay" id="match-overlay">
-  <div class="match-box">
-    <div style="font-size:2rem;margin-bottom:4px;">🌿</div>
-    <div class="match-title">Iedereen wil dit!</div>
-    <div class="match-item" id="match-item-name"></div>
-    <button class="match-close" onclick="closeMatch()">Super! →</button>
-  </div>
-</div>
-
-<!-- ADD MODAL -->
-<div class="modal-overlay" id="add-modal">
+<!-- ADD POTJE MODAL -->
+<div class="modal-ov" id="kv-modal">
   <div class="modal-sheet">
-    <div class="modal-title">Activiteit toevoegen</div>
-    <div class="modal-field">
-      <label>Naam *</label>
-      <input id="add-naam" type="text" placeholder="Naam van plek of activiteit">
-    </div>
-    <div class="modal-field">
-      <label>Categorie</label>
-      <select id="add-cat">
-        <option value="natuur">Natuur</option>
-        <option value="stad">Stad</option>
-        <option value="eten">Eten & Drinken</option>
-        <option value="avontuur">Avontuur</option>
-        <option value="cultuur">Cultuur</option>
-        <option value="strand">Strand / Water</option>
+    <div class="modal-title">Nieuw potje klaverjas</div>
+    <div class="mf">
+      <label>Wie riep troef?</label>
+      <select id="kv-roeper">
+        <option value="Duurt">Duurt</option>
+        <option value="Griette">Griette</option>
+        <option value="Sanne">Sanne</option>
+        <option value="Arjen">Arjen</option>
       </select>
     </div>
-    <div class="modal-field">
-      <label>Locatie</label>
-      <input id="add-wijk" type="text" placeholder="bijv. Bled, Ljubljana, Soča">
+    <div class="mf">
+      <label>Troef kleur</label>
+      <select id="kv-troef">
+        <option value="♠ Schoppen">♠ Schoppen</option>
+        <option value="♥ Harten">♥ Harten</option>
+        <option value="♦ Ruiten">♦ Ruiten</option>
+        <option value="♣ Klaveren">♣ Klaveren</option>
+      </select>
     </div>
-    <div class="modal-field">
-      <label>Tip / verhaal</label>
-      <textarea id="add-verhaal" rows="3" placeholder="Wat maakt dit bijzonder?"></textarea>
+    <div style="margin-bottom:6px;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#6B6560;">Team 1 (Duurt & Sanne)</div>
+    <div class="mf-row">
+      <div class="mf"><label>Roem</label><input id="kv-roem1" type="number" min="0" value="0" placeholder="0"></div>
+      <div class="mf"><label>Slagen</label><input id="kv-slagen1" type="number" min="0" max="162" value="" placeholder="0–162"></div>
     </div>
-    <button class="modal-submit" onclick="submitAdd()">Toevoegen ✓</button>
-    <button class="modal-cancel" onclick="closeModal()">Annuleren</button>
+    <div style="margin-bottom:6px;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#6B6560;">Team 2 (Griette & Arjen)</div>
+    <div class="mf-row">
+      <div class="mf"><label>Roem</label><input id="kv-roem2" type="number" min="0" value="0" placeholder="0"></div>
+      <div class="mf"><label>Slagen</label><input id="kv-slagen2" type="number" min="0" max="162" value="" placeholder="0–162"></div>
+    </div>
+    <div class="mf">
+      <label class="mf-check"><input type="checkbox" id="kv-nat"> <span>Nat gegaan (roepende partij haalde minder dan de helft)</span></label>
+    </div>
+    <div id="kv-modal-preview" style="margin:8px 0;padding:10px 12px;background:rgba(74,158,110,0.08);border-radius:var(--r);font-size:0.8rem;color:#6B6560;min-height:36px;"></div>
+    <button class="modal-submit" onclick="submitPotje()">Opslaan ✓</button>
+    <button class="modal-cancel" onclick="closeKvModal()">Annuleren</button>
   </div>
 </div>
 
 <!-- APP -->
 <div id="app">
 
-  <!-- HOME -->
+  <!-- ── HOME ── -->
   <section id="sec-home" class="section active">
     <div class="reel-wrap" id="reel-wrap" onclick="reelNext()">
       <div class="reel-slide" style="background-image:url('https://images.unsplash.com/photo-1564507592333-c60657eea523?w=700&q=80')"></div>
@@ -378,33 +373,23 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <div class="reel-overlay"></div>
       <div class="reel-progress" id="reel-progress"></div>
       <div class="reel-caption">
-        <div style="font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(240,232,226,0.6);margin-bottom:10px;">⟡ Vroegzat · Slovenië 2026</div>
+        <div style="font-size:0.53rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(240,232,226,0.55);margin-bottom:8px;">⟡ Zomervakantie 2026</div>
         <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;">
-          <div style="flex:1;min-width:0;">
-            <h3 id="reel-h"></h3>
-            <p id="reel-p"></p>
-          </div>
-          <div style="text-align:right;flex-shrink:0;">
-            <div style="display:flex;gap:8px;align-items:baseline;justify-content:flex-end;">
-              <span style="font-family:Georgia,serif;font-size:2.1rem;font-weight:normal;color:#F0E8E2;line-height:1;" id="rcd-d">--</span>
-              <span style="font-size:0.65rem;color:rgba(240,232,226,0.6);">d</span>
-              <span style="font-family:Georgia,serif;font-size:1.35rem;color:rgba(240,232,226,0.85);line-height:1;" id="rcd-h">--</span>
-              <span style="font-size:0.6rem;color:rgba(240,232,226,0.55);">u</span>
-              <span style="font-family:Georgia,serif;font-size:1.35rem;color:rgba(240,232,226,0.85);line-height:1;" id="rcd-m">--</span>
-              <span style="font-size:0.6rem;color:rgba(240,232,226,0.55);">m</span>
-            </div>
+          <div style="flex:1;min-width:0;"><h3 id="reel-h"></h3><p id="reel-p"></p></div>
+          <div class="reel-cd">
+            <span class="big" id="rcd-d">--</span><span class="lbl">d</span>
+            <span class="big" style="font-size:1.3rem;" id="rcd-h">--</span><span class="lbl">u</span>
+            <span class="big" style="font-size:1.3rem;" id="rcd-m">--</span><span class="lbl">m</span>
           </div>
         </div>
       </div>
     </div>
-
     <div class="page-header">
       <div class="page-logo">Vroegzat ✦</div>
       <button class="uitlog-btn" onclick="uitloggen()">Uitloggen</button>
     </div>
-
     <div class="countdown-block">
-      <div class="countdown-label">⏱ Countdown tot Slovenië</div>
+      <div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;opacity:0.5;margin-bottom:10px;">⏱ Countdown tot vertrek</div>
       <div class="countdown-nums">
         <div class="count-unit"><div class="count-num" id="cd-d">--</div><div class="count-lbl">Dagen</div></div>
         <div class="count-sep">:</div>
@@ -412,150 +397,246 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
         <div class="count-sep">:</div>
         <div class="count-unit"><div class="count-num" id="cd-m">--</div><div class="count-lbl">Min</div></div>
       </div>
-      <div class="countdown-badge" id="cd-badge">– – dagen</div>
+      <div class="cd-badge" id="cd-badge">– – –</div>
     </div>
 
-    <div class="home-section-title">Wat staat er op het programma?</div>
-    <div class="home-section-sub">Swipe mee om samen het programma te bouwen</div>
-
-    <div class="weekend-chips">
-      <div class="weekend-chip" onclick="switchTab('swipe')">
-        <div class="chip-emoji">🏔️</div>
-        <div class="chip-info">
-          <div class="chip-name">Swipen</div>
-          <div class="chip-desc">Kies wat jij wil doen — leuk of niet</div>
+    <div class="sec-label" style="margin-top:16px;">Inspiratie</div>
+    <div style="padding:0 20px 4px;">
+      <a href="https://www.instagram.com/reel/DYWeGipMZNZ/?igsh=Ym1kMzhkejgwN29r" target="_blank" rel="noopener" style="text-decoration:none;">
+        <div style="border-radius:var(--r-lg);overflow:hidden;background:#EDE4DC;">
+          <div style="height:160px;background-image:url('https://images.unsplash.com/photo-1564507592333-c60657eea523?w=700&q=80');background-size:cover;background-position:center;position:relative;">
+            <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.72) 0%,rgba(0,0,0,0.1) 60%);"></div>
+            <div style="position:absolute;top:12px;left:12px;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);border-radius:20px;padding:3px 10px;font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;color:#fff;font-weight:700;">📱 Instagram Reel</div>
+            <div style="position:absolute;bottom:12px;left:14px;right:14px;">
+              <div style="font-family:Georgia,serif;font-style:italic;font-size:1.25rem;color:#F0E8E2;line-height:1.2;">Slovenië inspiratie</div>
+              <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(240,232,226,0.65);margin-top:3px;">Bekijk de reel →</div>
+            </div>
+          </div>
+          <div style="padding:11px 14px 13px;">
+            <div style="font-size:0.8rem;color:#6B6560;line-height:1.5;">Influencer-tip voor onze route. Tap om de Instagram reel te bekijken.</div>
+            <div style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:0.72rem;color:#4A9E6E;font-weight:700;padding:5px 12px;border:1.5px solid rgba(74,158,110,0.35);border-radius:16px;">▶ Bekijk op Instagram</div>
+          </div>
         </div>
-        <div class="chip-badge">Nieuw</div>
-      </div>
-      <div class="weekend-chip" onclick="switchTab('top5')">
-        <div class="chip-emoji">⭐</div>
-        <div class="chip-info">
-          <div class="chip-name">Groepsfavorieten</div>
-          <div class="chip-desc">Waar zijn jullie het over eens?</div>
-        </div>
-      </div>
-      <div class="weekend-chip" onclick="switchTab('info')">
-        <div class="chip-emoji">🗺️</div>
-        <div class="chip-info">
-          <div class="chip-name">Reisinfo</div>
-          <div class="chip-desc">Praktische info, inpaklijst & meer</div>
-        </div>
-      </div>
+      </a>
     </div>
 
-    <div class="home-section-title" style="margin-top:8px;">Highlights</div>
-    <div style="padding:0 20px 16px;display:flex;flex-direction:column;gap:0;">
-      <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid rgba(10,10,10,0.08);">
-        <div style="width:60px;height:60px;border-radius:var(--r);background-size:cover;background-position:center;flex-shrink:0;background-image:url('https://images.unsplash.com/photo-1564507592333-c60657eea523?w=200&q=80');"></div>
-        <div style="flex:1;">
-          <div style="font-weight:700;font-size:0.95rem;">Meer Bled</div>
-          <div style="font-size:0.75rem;color:#6B6560;margin-top:2px;">Het mooiste meer van Europa — roeiboot naar het eiland, kasteel op de rots</div>
-        </div>
+    <div class="sec-label" style="margin-top:8px;">Snel naar</div>
+    <div style="padding:0 20px 16px;">
+      <div class="list-item" onclick="switchTab('programma')">
+        <div class="list-emoji">📅</div>
+        <div class="list-info"><div class="list-name">Dag voor dag programma</div><div class="list-desc">27 juli — 14 augustus · wat doen we wanneer?</div></div>
+        <div style="color:#9A948E;font-size:1rem;">›</div>
       </div>
-      <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid rgba(10,10,10,0.08);">
-        <div style="width:60px;height:60px;border-radius:var(--r);background-size:cover;background-position:center;flex-shrink:0;background-image:url('https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=200&q=80');"></div>
-        <div style="flex:1;">
-          <div style="font-weight:700;font-size:0.95rem;">Ljubljana Oude Stad</div>
-          <div style="font-size:0.75rem;color:#6B6560;margin-top:2px;">Café-terrasjes langs de Ljubljanica, kathedraal, Drievoudige Brug</div>
-        </div>
+      <div class="list-item" onclick="switchTab('activiteiten')">
+        <div class="list-emoji">🏔️</div>
+        <div class="list-info"><div class="list-name">Activiteiten swipen</div><div class="list-desc">Stem wat jij wil doen</div></div>
+        <div style="color:#9A948E;font-size:1rem;">›</div>
       </div>
-      <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid rgba(10,10,10,0.08);">
-        <div style="width:60px;height:60px;border-radius:var(--r);background-size:cover;background-position:center;flex-shrink:0;background-image:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&q=80');"></div>
-        <div style="flex:1;">
-          <div style="font-weight:700;font-size:0.95rem;">Soča Vallei</div>
-          <div style="font-size:0.75rem;color:#6B6560;margin-top:2px;">Turkooisblauw bergwater, smaragdgroene natuur</div>
-        </div>
+      <div class="list-item" onclick="switchTab('spellen')">
+        <div class="list-emoji">🃏</div>
+        <div class="list-info"><div class="list-name">Klaverjas scorebord</div><div class="list-desc">Alle potjes bijhouden</div></div>
+        <div style="color:#9A948E;font-size:1rem;">›</div>
+      </div>
+      <div class="list-item" onclick="switchTab('info')">
+        <div class="list-emoji">🗺️</div>
+        <div class="list-info"><div class="list-name">Reisinfo & inpaklijst</div><div class="list-desc">Camping, praktisch, checklist</div></div>
+        <div style="color:#9A948E;font-size:1rem;">›</div>
       </div>
     </div>
   </section>
 
-  <!-- SWIPEN -->
-  <section id="sec-swipe" class="section">
-    <div style="background:#4A9E6E;padding:20px 20px 12px;display:flex;justify-content:space-between;align-items:center;">
-      <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.4rem;color:#F0E8E2;">Swipen</div>
-      <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(240,232,226,0.75);" id="swipe-count-label"></div>
+  <!-- ── PROGRAMMA ── -->
+  <section id="sec-programma" class="section">
+    <div class="sec-photo-header">
+      <img src="https://images.unsplash.com/photo-1564507592333-c60657eea523?w=700&q=80" alt="">
+      <div class="sec-photo-header-grad"></div>
+      <div class="sec-photo-header-text">
+        <div class="sec-photo-header-title">Dag voor dag</div>
+        <div class="sec-photo-header-sub">27 juli — 14 augustus 2026</div>
+      </div>
     </div>
-    <div class="swipe-tabs" id="swipe-tabs"></div>
+    <div style="height:8px;"></div>
+    <div id="programma-list"></div>
+    <div style="height:16px;"></div>
+  </section>
+
+  <!-- ── ACTIVITEITEN ── -->
+  <section id="sec-activiteiten" class="section">
+    <div style="background:#4A9E6E;padding:18px 20px 10px;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-style:italic;font-weight:800;font-size:1.4rem;color:#F0E8E2;">Activiteiten</div>
+      <div style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(240,232,226,0.7);" id="swipe-count-lbl"></div>
+    </div>
+    <div class="swipe-tabs-bar" id="swipe-tabs"></div>
     <div class="swipe-stack" id="swipe-stack"></div>
     <div class="swipe-btns">
-      <button class="sbtn sbtn-pass" onclick="doSwipe('pass')" title="Niet voor mij">✕</button>
-      <button class="sbtn sbtn-like" onclick="doSwipe('like')" title="Ja, wil ik!">♥</button>
+      <button class="sbtn sbtn-pass" onclick="doSwipe('pass')">✕</button>
+      <button class="sbtn sbtn-like" onclick="doSwipe('like')">♥</button>
     </div>
-    <div class="swipe-hint">← Pas &nbsp;·&nbsp; ♥ Wil ik →</div>
+    <div class="swipe-hint">← Niet voor mij &nbsp;·&nbsp; ♥ Wil ik! →</div>
+    <div style="padding:16px 20px 0;" id="match-list-home"></div>
   </section>
 
-  <!-- TOP5 -->
-  <section id="sec-top5" class="section">
-    <div class="sec-photo-header">
-      <img src="https://images.unsplash.com/photo-1564507592333-c60657eea523?w=700&q=80" alt="Bled">
-      <div class="sec-photo-header-grad"></div>
+  <!-- ── SPELLEN ── -->
+  <section id="sec-spellen" class="section">
+    <div class="sec-photo-header" style="height:120px;">
+      <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1A3A2A 0%,#2D5A3D 100%);"></div>
       <div class="sec-photo-header-text">
-        <div class="sec-photo-header-title">Groepsfavorieten</div>
-        <div class="sec-photo-header-sub">Slovenië 2026</div>
+        <div class="sec-photo-header-title">Spellen</div>
+        <div class="sec-photo-header-sub">Klaverjas scorebord</div>
       </div>
     </div>
-    <div class="top5-tabs">
-      <div class="top5-tab active" onclick="showTop5Tab('matches')" id="ttab-matches">Matches</div>
-      <div class="top5-tab" onclick="showTop5Tab('mijn')" id="ttab-mijn">Mijn lijst</div>
-    </div>
-    <div id="top5-matches-content"></div>
-    <div id="top5-mijn-content" style="display:none;"></div>
-    <button class="add-btn" onclick="openModal()">
-      <span style="font-size:1.2rem;">+</span> Activiteit toevoegen
-    </button>
-  </section>
 
-  <!-- GROEP -->
-  <section id="sec-groep" class="section">
-    <div class="sec-photo-header">
-      <img src="https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=700&q=80" alt="Ljubljana">
-      <div class="sec-photo-header-grad"></div>
-      <div class="sec-photo-header-text">
-        <div class="sec-photo-header-title">De Groep</div>
-        <div class="sec-photo-header-sub">Wie wil wat?</div>
+    <div class="sec-label" style="margin-top:4px;">Scorebord</div>
+    <div class="kv-teams" id="kv-teams">
+      <div class="kv-team">
+        <div class="kv-team-score" id="kv-score1" style="color:#4A7CAE;">0</div>
+        <div class="kv-team-name">Team 1</div>
+        <div class="kv-team-sub" id="kv-team1-names">Duurt & Sanne</div>
+      </div>
+      <div style="display:flex;align-items:center;font-size:1.2rem;color:#9A948E;padding:0 4px;">vs</div>
+      <div class="kv-team">
+        <div class="kv-team-score" id="kv-score2" style="color:#D4785A;">0</div>
+        <div class="kv-team-name">Team 2</div>
+        <div class="kv-team-sub" id="kv-team2-names">Griette & Arjen</div>
       </div>
     </div>
-    <div id="groep-content" style="padding:16px 20px;"></div>
+
+    <button class="kv-add-btn" onclick="openKvModal()">+ Potje toevoegen</button>
+
+    <div id="kv-potjes-list"></div>
+
+    <div class="sec-label" style="margin-top:8px;">Uitleg klaverjas</div>
+
+    <div class="uitleg-block">
+      <div class="uitleg-head" onclick="toggleUitleg(this)">
+        <div class="uitleg-title">📋 Basispunten (slagen)</div>
+        <div style="color:#9A948E;font-size:0.85rem;transition:transform 0.2s;" class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <div class="uitleg-row">Elke ronde tellen de punten van de geslagen kaarten op. Totaal is altijd <strong>152 punten</strong> + 10 voor de laatste slag (pit) = <strong>162</strong>.</div>
+        <table class="uitleg-tabel">
+          <tr><th>Kaart (troef)</th><th>Punten</th><th>Kaart (niet troef)</th><th>Punten</th></tr>
+          <tr><td>Boer (J)</td><td>20</td><td>Aas (A)</td><td>11</td></tr>
+          <tr><td>Negen (9)</td><td>14</td><td>Tien (10)</td><td>10</td></tr>
+          <tr><td>Aas (A)</td><td>11</td><td>Heer (K)</td><td>4</td></tr>
+          <tr><td>Tien (10)</td><td>10</td><td>Vrouw (Q)</td><td>3</td></tr>
+          <tr><td>Heer (K)</td><td>4</td><td>Boer (J)</td><td>2</td></tr>
+          <tr><td>Vrouw (Q)</td><td>3</td><td>9, 8, 7</td><td>0</td></tr>
+          <tr><td>8, 7</td><td>0</td><td></td><td></td></tr>
+        </table>
+        <div class="uitleg-row"><span class="tag-groen">Pit</span> Laatste slag = +10 punten extra.</div>
+      </div>
+    </div>
+
+    <div class="uitleg-block">
+      <div class="uitleg-head" onclick="toggleUitleg(this)">
+        <div class="uitleg-title">🏆 Roem</div>
+        <div style="color:#9A948E;font-size:0.85rem;transition:transform 0.2s;" class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <div class="uitleg-row">Roem wordt <em>extra</em> bij de totaalscore opgeteld, bovenop de slagen.</div>
+        <table class="uitleg-tabel">
+          <tr><th>Roem</th><th>Punten</th><th>Uitleg</th></tr>
+          <tr><td>Stuk</td><td>20</td><td>Heer + Vrouw van troef in één hand</td></tr>
+          <tr><td>Drie op rij</td><td>20</td><td>Drie opeenvolgende kaarten zelfde kleur</td></tr>
+          <tr><td>Vier op rij</td><td>50</td><td>Vier opeenvolgende kaarten zelfde kleur</td></tr>
+          <tr><td>Vijf op rij</td><td>100</td><td>Vijf of meer op rij</td></tr>
+          <tr><td>Vier hetzelfde</td><td>100</td><td>Vier kaarten van dezelfde waarde (bijv. vier azen)</td></tr>
+          <tr><td>Vier boeren</td><td>200</td><td>Vier boeren in de hand</td></tr>
+        </table>
+        <div class="uitleg-row">Roem moet je <strong>melden vóór de eerste slag</strong>. Vergeten = telt niet.</div>
+      </div>
+    </div>
+
+    <div class="uitleg-block">
+      <div class="uitleg-head" onclick="toggleUitleg(this)">
+        <div class="uitleg-title">💥 Nat gaan</div>
+        <div style="color:#9A948E;font-size:0.85rem;transition:transform 0.2s;" class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <div class="uitleg-row">De <strong>roepende partij</strong> moet meer dan de helft van de totale slagpunten halen (≥ 82 punten excl. roem). Halen ze dat <em>niet</em>?</div>
+        <div class="uitleg-row"><span class="tag-rood">Nat!</span> De tegenpartij krijgt: <strong>alle 162 slagpunten + ALLE roem van beide teams</strong>. De roepende partij krijgt 0.</div>
+        <div class="uitleg-row"><em>Uitzondering:</em> als de tegenpartij ook nat roept (pit-geval), worden de punten fifty-fifty gedeeld — dit heet "hangen".</div>
+      </div>
+    </div>
+
+    <div class="uitleg-block">
+      <div class="uitleg-head" onclick="toggleUitleg(this)">
+        <div class="uitleg-title">🎯 Spelverloop</div>
+        <div style="color:#9A948E;font-size:0.85rem;transition:transform 0.2s;" class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <div class="uitleg-row"><strong>1.</strong> Deel 8 kaarten per speler (32 kaarten totaal).</div>
+        <div class="uitleg-row"><strong>2.</strong> Reihum mag iemand troef roepen of passen. Degene links van de deler mag als eerste.</div>
+        <div class="uitleg-row"><strong>3.</strong> Meld roem vóór de eerste slag.</div>
+        <div class="uitleg-row"><strong>4.</strong> Speel 8 slagen. Bij troef <em>moet</em> je altijd bekennen of troeven als je dat kunt.</div>
+        <div class="uitleg-row"><strong>5.</strong> Tel slagen en roem op per team. Check of de roeper nat is.</div>
+        <div class="uitleg-row"><strong>6.</strong> Noteer op het scorebord en ga verder. Spel eindigt op een afgesproken totaalscore (bijv. 1500 of 2000 punten).</div>
+      </div>
+    </div>
+
+    <div style="height:20px;"></div>
   </section>
 
-  <!-- REISINFO -->
+  <!-- ── REISINFO ── -->
   <section id="sec-info" class="section">
     <div class="sec-photo-header">
-      <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700&q=80" alt="Slovenië">
+      <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700&q=80" alt="">
       <div class="sec-photo-header-grad"></div>
       <div class="sec-photo-header-text">
         <div class="sec-photo-header-title">Reisinfo</div>
         <div class="sec-photo-header-sub">Alles wat je nodig hebt</div>
       </div>
     </div>
-    <div style="height:8px;"></div>
+    <div style="height:6px;"></div>
 
+    <!-- CAMPING BOHINJ -->
     <div class="collapsible open" onclick="toggleCollapsible(this)">
+      <div class="collapsible-head">
+        <div class="collapsible-title">⛺ Kamp Bohinj — Slovenië</div>
+        <div class="collapsible-arrow">▼</div>
+      </div>
+      <div class="collapsible-body">
+        <div class="info-row"><div class="info-icon">📍</div><div style="flex:1;"><div class="info-label">Locatie</div><div class="info-val">Bohinjska Bistrica 500A, 4264 Bohinjska Bistrica, Slovenië<br><span style="color:#4A9E6E;">2 km van het Bohinj meer · 20 km van Bled</span></div></div></div>
+        <div class="info-row"><div class="info-icon">🌐</div><div style="flex:1;"><div class="info-label">Website</div><div class="info-val"><a href="https://www.camp-bohinj.si/" target="_blank" rel="noopener" style="color:#4A9E6E;font-weight:600;">camp-bohinj.si →</a></div></div></div>
+        <div class="info-row"><div class="info-icon">⭐</div><div style="flex:1;"><div class="info-label">Categorie</div><div class="info-val">4-sterren camping · midden in Triglav Nationaal Park</div></div></div>
+        <div class="info-row"><div class="info-icon">🏊</div><div style="flex:1;"><div class="info-label">Faciliteiten</div><div class="info-val">Zwembad, restaurant, supermarktje, WiFi, wasserette, sportterreinen</div></div></div>
+        <div class="info-row"><div class="info-icon">🚵</div><div style="flex:1;"><div class="info-label">Activiteiten vanuit kamp</div><div class="info-val">Fietsen, SUP, kajak, wandelen Triglav NP, zwemmen Bohinj meer</div></div></div>
+        <div class="info-row"><div class="info-icon">📅</div><div style="flex:1;"><div class="info-label">Reserveren</div><div class="info-val">Verplicht in hoogseizoen — zo snel mogelijk boeken via de website</div></div></div>
+        <div class="info-row"><div class="info-icon">🚗</div><div style="flex:1;"><div class="info-label">Rijden</div><div class="info-val">Vanuit Nederland ~11–12 uur. Via Duitsland (A8) en Oostenrijk (A10/A11) of via Italië.</div></div></div>
+        <div class="info-row"><div class="info-icon">💡</div><div style="flex:1;"><div class="info-label">Tip</div><div class="info-val">De Sava Bohinjka rivier loopt langs het kamp — zelf zwemmen is heerlijk. Vroeg opstaan voor Bled (voor de drukte).</div></div></div>
+      </div>
+    </div>
+
+    <!-- CAMPING OOSTENRIJK -->
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+      <div class="collapsible-head">
+        <div class="collapsible-title">⛺ Camping Oostenrijk</div>
+        <div class="collapsible-arrow">▼</div>
+      </div>
+      <div class="collapsible-body">
+        <div style="padding:10px 0;font-size:0.85rem;color:#9A948E;font-style:italic;">Details volgen — Griette voegt de info toe zodra de camping geboekt is.</div>
+        <div class="info-row"><div class="info-icon">📅</div><div style="flex:1;"><div class="info-label">Periode</div><div class="info-val">Circa 4–5 augustus t/m 14 augustus 2026</div></div></div>
+      </div>
+    </div>
+
+    <!-- PRAKTISCH -->
+    <div class="collapsible" onclick="toggleCollapsible(this)">
       <div class="collapsible-head">
         <div class="collapsible-title">✈️ Praktische info</div>
         <div class="collapsible-arrow">▼</div>
       </div>
       <div class="collapsible-body">
-        <div class="info-row"><div class="info-icon">🗓️</div><div style="flex:1;"><div class="info-label">Datum</div><div class="info-val">27 juli 2026 — vertrek. Exacte duur nog te bepalen.</div></div></div>
-        <div class="info-row"><div class="info-icon">✈️</div><div style="flex:1;"><div class="info-label">Vliegveld</div><div class="info-val">Ljubljana Jože Pučnik Airport (LJU) · 26 km van de stad</div></div></div>
-        <div class="info-row"><div class="info-icon">💶</div><div style="flex:1;"><div class="info-label">Valuta</div><div class="info-val">Euro (€) — Slovenië is EU-land, geen wisselkantoor nodig</div></div></div>
-        <div class="info-row"><div class="info-icon">🌡️</div><div style="flex:1;"><div class="info-label">Weer in juli</div><div class="info-val">25–30°C overdag, aangenaam. Bergen kunnen 's avonds afkoelen. Kans op onweer.</div></div></div>
-        <div class="info-row"><div class="info-icon">🚗</div><div style="flex:1;"><div class="info-label">Vervoer</div><div class="info-val">Huurauto aanbevolen voor de regio. Snelweg vignette verplicht (ca. €15/week)</div></div></div>
-        <div class="info-row"><div class="info-icon">📱</div><div style="flex:1;"><div class="info-label">Apps</div><div class="info-val">Google Maps werkt prima · iOverlander voor wilde kampeerplekken · Komoot voor wandelingen</div></div></div>
+        <div class="info-row"><div class="info-icon">💶</div><div style="flex:1;"><div class="info-label">Valuta</div><div class="info-val">Euro (€) in beide landen — geen wisselkantoor nodig</div></div></div>
+        <div class="info-row"><div class="info-icon">🛣️</div><div style="flex:1;"><div class="info-label">Tolsticker Slovenië</div><div class="info-val">E-vignette verplicht (€15/week of €30/maand) · kopen op asfinag.at</div></div></div>
+        <div class="info-row"><div class="info-icon">🛣️</div><div style="flex:1;"><div class="info-label">Tolsticker Oostenrijk</div><div class="info-val">Vignette verplicht (€16.50/10 dagen) · ook op asfinag.at</div></div></div>
+        <div class="info-row"><div class="info-icon">🌡️</div><div style="flex:1;"><div class="info-label">Weer juli–augustus</div><div class="info-val">25–32°C · bergen koelen s'avonds af · kans op onweer</div></div></div>
+        <div class="info-row"><div class="info-icon">📱</div><div style="flex:1;"><div class="info-label">Handige apps</div><div class="info-val">Google Maps · Komoot (wandelroutes offline) · iD Travel (camping) · wetter.com (bergweer)</div></div></div>
+        <div class="info-row"><div class="info-icon">🏥</div><div style="flex:1;"><div class="info-label">Zorgpas</div><div class="info-val">Europese Gezondheidskaart (EHIC) meenemen — gratis via zorgverzekeraar</div></div></div>
       </div>
     </div>
 
-    <div class="collapsible" onclick="toggleCollapsible(this)">
-      <div class="collapsible-head">
-        <div class="collapsible-title">🏨 Verblijf</div>
-        <div class="collapsible-arrow">▼</div>
-      </div>
-      <div class="collapsible-body">
-        <div class="info-row"><div class="info-icon">🏠</div><div style="flex:1;"><div class="info-label">Accommodatie</div><div class="info-val">Nog te boeken — voeg jullie verblijf hier toe zodra het geboekt is.</div></div></div>
-        <div class="info-row"><div class="info-icon">💡</div><div style="flex:1;"><div class="info-label">Tip</div><div class="info-val">Bled-centraal ideaal als uitvalsbasis. Ljubljana voor cultuurdag. Piran voor kust.</div></div></div>
-      </div>
-    </div>
-
+    <!-- INPAKLIJST -->
     <div class="collapsible" onclick="toggleCollapsible(this)">
       <div class="collapsible-head">
         <div class="collapsible-title">🎒 Inpaklijst</div>
@@ -566,103 +647,107 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       </div>
     </div>
 
-    <div class="collapsible" onclick="toggleCollapsible(this)">
-      <div class="collapsible-head">
-        <div class="collapsible-title">🍽️ Eten & drinken</div>
-        <div class="collapsible-arrow">▼</div>
-      </div>
-      <div class="collapsible-body">
-        <div class="info-row"><div class="info-icon">🥐</div><div style="flex:1;"><div class="info-label">Ontbijt</div><div class="info-val">Štruklji (gevulde deegrolletjes), burek (bladerdeegpastei). Kroegerijtje = kroeg/café.</div></div></div>
-        <div class="info-row"><div class="info-icon">🍖</div><div style="flex:1;"><div class="info-label">Lunch / diner</div><div class="info-val">Kranjska klobasa (worst), žganci (boekweitpap), potica (walnootcake als nagerecht)</div></div></div>
-        <div class="info-row"><div class="info-icon">🍷</div><div style="flex:1;"><div class="info-label">Drinken</div><div class="info-val">Lokale wijn (Primorska regio), Union bier, medica (honinglikeur)</div></div></div>
-        <div class="info-row"><div class="info-icon">💡</div><div style="flex:1;"><div class="info-label">Tip Ljubljana</div><div class="info-val">Odprta Kuhna (Open Kitchen) — vrijdag en zaterdag op Pogačarjev trg. 60+ stands, lokale chefs. Niet missen.</div></div></div>
-      </div>
-    </div>
-
     <div style="height:20px;"></div>
   </section>
 
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <button class="nav-btn active" onclick="switchTab('home')" id="nav-home">
-      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      Home
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
     </button>
-    <button class="nav-btn" onclick="switchTab('swipe')" id="nav-swipe">
-      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-      Swipen
+    <button class="nav-btn" onclick="switchTab('programma')" id="nav-programma">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Programma
     </button>
-    <button class="nav-btn" onclick="switchTab('top5')" id="nav-top5">
-      <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      Top 5
+    <button class="nav-btn" onclick="switchTab('activiteiten')" id="nav-activiteiten">
+      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Activiteiten
     </button>
-    <button class="nav-btn" onclick="switchTab('groep')" id="nav-groep">
-      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Groep
+    <button class="nav-btn" onclick="switchTab('spellen')" id="nav-spellen">
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>Spellen
     </button>
     <button class="nav-btn" onclick="switchTab('info')" id="nav-info">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      Reisinfo
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Info
     </button>
   </nav>
 </div>
 
 <script>
 // ── CONFIG ──────────────────────────────────────────
-const TRIP_DATE = new Date('2026-07-27T08:00:00');
-const GROUP_ID  = 'slov';
+const TRIP_DATE = new Date('2026-07-27T07:00:00');
+const END_DATE  = new Date('2026-08-14T18:00:00');
+const SK = 'slov26'; // storage key prefix
 
 // ── PROFILES ────────────────────────────────────────
 const PROFILES = {
-  griette:   {naam:'Griette',   init:'Gr', color:'#D4785A', img:'img_griette.jpg'},
-  frederike: {naam:'Frederike', init:'Fr', color:'#7A9E82', img:'img_frederike.jpg'},
-  miriam:    {naam:'Miriam',    init:'Mi', color:'#7A8EAD', img:'img_miriam.jpg'},
-  marlinde:  {naam:'Marlinde',  init:'Ma', color:'#AD7A9E', img:'img_marlinde.jpg'},
+  duurt:   {naam:'Duurt',   init:'Du', color:'#4A7CAE'},
+  griette: {naam:'Griette', init:'Gr', color:'#D4785A'},
+  sanne:   {naam:'Sanne',   init:'Sa', color:'#9E7AAD'},
+  arjen:   {naam:'Arjen',   init:'Ar', color:'#5A9E6E'},
 };
-const PROFILE_KEYS = Object.keys(PROFILES);
+const PROFILE_KEYS = ['duurt','griette','sanne','arjen'];
 
-// ── ITEMS ────────────────────────────────────────────
-const ITEMS_BASE = [
-  {id:'bled-meer',cat:'natuur',naam:'Meer van Bled',locatie:'Bled',prijs:'gratis (roeiboot €15)',reserveren:false,must:true,verhaal:'Het meest iconische meer van Slovenië. Een roeiboot huren naar het eilandje met de kerk is een must — jullie roeien beurten (20 min). Het kasteel op de rotswand daarboven geeft een waanzinnig uitzicht.',tip:'Vroeg er zijn (voor 9u) voor minder drukte. Kremna rezina (roomsoesje) bij Park Hotel erna.',img:'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600&q=80'},
-  {id:'bled-eiland',cat:'natuur',naam:'Bled Eilandkerk',locatie:'Bled',prijs:'€8 entree eiland',reserveren:false,must:true,verhaal:'Klokluidend vanuit de kerk op het eiland zou geluk brengen. De 99 treden beklimmen, de klok luiden — het is een van de betoverend mooie momenten van Slovenië.',tip:'Roeiboot bij Mlino. Gondelvaart ook mogelijk. Kerk gratis te bekijken.',img:'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600&q=80'},
-  {id:'bled-kasteel',cat:'cultuur',naam:'Kasteel van Bled',locatie:'Bled',prijs:'€15',reserveren:false,must:false,verhaal:'Op een 130 meter hoge rots boven het meer — het oudste kasteel van Slovenië (11e eeuw). Uitzicht vanuit het restaurant op het meer is onwerkelijk.',tip:'Wandeling omhoog duurt 15 min. Laat in de middag voor gouden licht.',img:'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600&q=80'},
-  {id:'vintgar',cat:'natuur',naam:'Vintgar Kloof',locatie:'Bled (4km)',prijs:'€10',reserveren:false,must:true,verhaal:'Een 1,6 km lang houten pad over het water door een smalle kloof — het turquoise water is onwerkelijk. Aan het einde een waterval. Eén van de mooiste wandelingen van Slovenië.',tip:'Open van 8u. Vroeg gaan = minder druk. Terug via de heuvel voor extra uitzicht.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
-  {id:'ljubljana-staro',cat:'stad',naam:'Ljubljana Oude Stad',locatie:'Ljubljana',prijs:'gratis',reserveren:false,must:true,verhaal:'Terrasjescafés langs de smaragdgroene Ljubljanica rivier, de Drievoudige Brug van Plečnik, kleurrijke art-nouveau gevels. Een van de meest charmante Europese steden die toeristen overstaan.',tip:'Café Čokl voor koffie. Vrij dag of zaterdag = Odprta Kuhna foodmarket op Pogačarjev trg.',img:'https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=600&q=80'},
-  {id:'ljubljana-kasteel',cat:'cultuur',naam:'Kasteel van Ljubljana',locatie:'Ljubljana',prijs:'€13 (met toren)',reserveren:false,must:false,verhaal:'Het kasteel kijkt uit over de complete rode-daken-stad. De uitkijktoren biedt 360° uitzicht. Funiculaire rijdt omhoog voor €6.',tip:'Combineeer met wandeling door de Oude Stad eronder.',img:'https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=600&q=80'},
-  {id:'odprta-kuhna',cat:'eten',naam:'Odprta Kuhna (Open Kitchen)',locatie:'Ljubljana, Pogačarjev trg',prijs:'€–€€',reserveren:false,must:true,verhaal:'Elke vrijdag en zaterdag van maart–oktober. 60+ kraampjes met Sloveense chefs. Straatvoedsel van toprestaurants, lokale wijnen, Sloveense kazen. De beste manier om de culinaire scene te proeven.',tip:'Vrijdag 10u–21u, zaterdag 8u–16u. Kom nuchter. Neem alles om te proberen.',img:'https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=600&q=80'},
-  {id:'soca-vallei',cat:'natuur',naam:'Soča Vallei',locatie:'Bovec/Kobarid',prijs:'gratis',reserveren:false,must:true,verhaal:'Het turkooisblauwe water van de Soča is bijna onwerkelijk — een speciale mineraalsamenstelling geeft het die kleur. Wandelpad langs de rivier, zwemmen in de bergpoelen.',tip:'Kobarid Museum (WO I) is de beste oorlogsmuseum van Slovenië. Hemingway was er. Daarna zwemmen in de Soča.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
-  {id:'predjama',cat:'cultuur',naam:'Predjama Kasteel',locatie:'Predjama (45 min van Bled)',prijs:'€16',reserveren:false,must:false,verhaal:'Een middeleeuws kasteel gebouwd IN een 123 meter hoge rotswand. Sprookjesachtig en surrealistisch tegelijk. Met de Postojna Cave in één dag te combineren.',tip:'Grot én kasteel combineren — samen kaartje is goedkoper.',img:'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=600&q=80'},
-  {id:'postojna',cat:'cultuur',naam:'Grotten van Postojna',locatie:'Postojna',prijs:'€28',reserveren:true,must:false,verhaal:'De grootste grottencomplex van Europa — 24 km aan gangen. Elektische trein neemt je naar binnen. Stalactieten als een kathedraal. De witte grotten-olm (beschermd dier) is echt magisch.',tip:'Boek online — kan vol zijn in het hoogseizoen. Trui mee (12°C in de grot).',img:'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=600&q=80'},
-  {id:'piran',cat:'strand',naam:'Piran — Middellandse Zee',locatie:'Piran (kust)',prijs:'gratis',reserveren:false,must:false,verhaal:'Venetiaans stadje aan de Adriatische kust. Kleurrijke huisjes op een klif, versgezouten vis op het marktplein, de Tartinijev trg als open woonkamer.',tip:'Zwemmen bij Fiesa baai (800m van centrum, kalmer water). Zonsondergang op de muur van de vesting.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
-  {id:'bohinj',cat:'natuur',naam:'Meer van Bohinj',locatie:'Bohinj',prijs:'gratis',reserveren:false,must:false,verhaal:'Het grotere, rustigere zusje van Bled — zonder toeristendrukte. Kristalhelder water, prachtige wandelingen in Triglav NP eromheen. Zwemmen mag.',tip:'Gondelbaan omhoog naar Vogel geeft panorama over heel Triglav.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
-  {id:'logarska',cat:'natuur',naam:'Logarska Dolina',locatie:'Noord-Slovenië',prijs:'€5 entreegebied',reserveren:false,must:false,verhaal:'Een van de meest afgelegen en mooiste valleien van de Alpen — amper toeristen. Waterval, alpenweiden, koeien met bellen. Drie uur rijden maar de moeite.',tip:'Slap van de Rinka waterval is de starter. Vraag bij boerderij om zelfgemaakte kaas.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
-  {id:'kayak-soca',cat:'avontuur',naam:'Kayakken op de Soča',locatie:'Bovec',prijs:'€35–50 pp',reserveren:true,must:false,verhaal:'Het turquoise water van de Soča in een kajak van binnenuit zien. Rustige stretch voor beginners tot white water voor avonturiers. Halve dag activiteit.',tip:'Sport mix Bovec of Soča Outdoor organiseren tours. Boek 1 dag vooraf in hoogseizoen.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
-  {id:'triglav-wandeling',cat:'avontuur',naam:'Wandeling Triglav NP',locatie:'Triglav Nationaal Park',prijs:'gratis',reserveren:false,must:false,verhaal:'Slovenische mannen beklimmen de Triglav (2864m) één keer in hun leven. Voor ons: de prachtige wandelingen in het park — Pokljuka plateau, Zadnja Trenta vallei, alpiene meren.',tip:'Download Komoot routes voor offline gebruik in het park.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
+// ── DAG PROGRAMMA ────────────────────────────────────
+const DAGEN = [
+  {datum:'ma 27 jul',label:'Vertrekdag',kleur:'#4A9E6E',land:'🇸🇮',desc:'Vroeg vertrekken vanuit Nederland. Rijden via Duitsland en Oostenrijk richting Slovenië. Aankomst Camp Bohinj in de avond — tent opzetten, eerste biertje, moe maar gelukkig.',acts:['Rit: ±11–12 uur rijden','Aankomst Kamp Bohinj','Eerste blik op de bergen']},
+  {datum:'di 28 jul',label:'Kamp verkennen',kleur:'#4A9E6E',land:'🇸🇮',desc:'Eerste dag — uitslapen, het kamp ontdekken, zwemmen in de Sava rivier naast het kamp. Rustige dag na de lange rit.',acts:['Zwemmen bij het kamp','Fietsen langs het Bohinj meer','Lokale supermarkt Bohinjska Bistrica']},
+  {datum:'wo 29 jul',label:'Bohinj Meer',kleur:'#4A9E6E',land:'🇸🇮',desc:'Het grotere, rustigere zusje van Bled — minder toeristen, kristalhelder water, prachtige bergomgeving. Wandelen of SUP huren.',acts:['Zwemmen in het Bohinj meer','Gondelbaan naar Vogel (panorama Triglav)','Fietsen om het meer']},
+  {datum:'do 30 jul',label:'Meer van Bled',kleur:'#4A9E6E',land:'🇸🇮',desc:'Vroeg op voor het beroemdste meer van Slovenië. Roeiboot naar het eiland, klokje luiden in de kerk, kasteel op de rots.',acts:['Roeiboot naar Bled eiland (±20 min roeien)','Bled kasteel (uitzicht!)','Kremna rezina proeven bij Park Hotel','Vintgar Kloof wandeling (1.6 km, 10 min rijden)']},
+  {datum:'vr 31 jul',label:'Ljubljana',kleur:'#4A9E6E',land:'🇸🇮',desc:'Dagtrip naar de charmante hoofdstad. Terrasjes langs de rivier, kasteel, Odprta Kuhna foodmarket (vrijdag!). Sloveense culinaire scene op z\'n best.',acts:['Oude Stad slenteren','Odprta Kuhna foodmarket (tot 21u, vrijdag)','Ljubljana kasteel','Terras aan de Ljubljanica']},
+  {datum:'za 1 aug',label:'Soča Vallei',kleur:'#4A9E6E',land:'🇸🇮',desc:'Naar de beroemde turquoise rivier — het water is onwerkelijk van kleur door mineralen. Zwemmen in bergpoelen, wandelen langs de oever.',acts:['Soča rivier wandeling (Bovec/Kobarid)','Zwemmen in de bergpoelen','Kobarid Museum (WO I, optioneel)','Napoleonsburg wandeling']},
+  {datum:'zo 2 aug',label:'Predjama + Postojna',kleur:'#4A9E6E',land:'🇸🇮',desc:'Kasteel in een rotswand + de grootste grottencomplexen van Europa. Volle dag! Trui mee — in de grotten is het 12°C.',acts:['Predjama Kasteel (kasteel ÍN een rots)','Postojna grotten (elektrische trein, 24 km gangen)','Combinatieticket = voordeliger']},
+  {datum:'ma 3 aug',label:'Piran & Adriatische kust',kleur:'#4A9E6E',land:'🇸🇮',desc:'Venetiaans stadje aan de Sloveense kust — maar 47 km kustlijn! Kleurrijke huisjes, versgezouten vis, zwemmen in de Adriatische Zee.',acts:['Piran Oude Stad verkennen','Tartinijev trg (plein)','Zwemmen bij Fiesa baai','Verse vis op de markt']},
+  {datum:'di 4 aug',label:'Reisdag → Oostenrijk',kleur:'#8C6BAE',land:'🇦🇹',desc:'Afscheid van Slovenië. Rijden naar de camping in Oostenrijk. Locatie volgt zodra de camping geboekt is.',acts:['Afbraak kamp Bohinj','Rit naar Oostenrijk','Aankomst camping Oostenrijk']},
+  {datum:'wo 5 aug',label:'Oostenrijk — dag 2',kleur:'#8C6BAE',land:'🇦🇹',desc:'Verkennen van de omgeving. Locatie en activiteiten volgen zodra de camping bekend is.',acts:['Programma volgt']},
+  {datum:'do 6 aug',label:'Oostenrijk — dag 3',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:['Programma volgt']},
+  {datum:'vr 7 aug',label:'Oostenrijk — dag 4',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:['Programma volgt']},
+  {datum:'za 8 aug',label:'Oostenrijk — dag 5',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:['Programma volgt']},
+  {datum:'zo 9 aug',label:'Oostenrijk — dag 6',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:['Programma volgt']},
+  {datum:'ma 10 aug',label:'Oostenrijk — dag 7',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:['Programma volgt']},
+  {datum:'di 11 aug',label:'Oostenrijk — dag 8',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:['Programma volgt']},
+  {datum:'wo 12 aug',label:'Oostenrijk — dag 9',kleur:'#8C6BAE',land:'🇦🇹',desc:'',acts:['Programma volgt']},
+  {datum:'do 13 aug',label:'Laatste dag',kleur:'#8C6BAE',land:'🇦🇹',desc:'Laatste avond — goed eten, klaverjas, herinneringen ophalen.',acts:['Laatste diner buitenshuis','Klaverjas finale','Koffers inpakken']},
+  {datum:'vr 14 aug',label:'Thuisdag',kleur:'#9A948E',land:'🏠',desc:'Rit terug naar Nederland. Dankbaar, moe, en vol mooie herinneringen.',acts:['Afbraak kamp','Rit terug ±10–12 uur','Thuis 🏠']},
 ];
+
+// ── ACTIVITEITEN ────────────────────────────────────
+const ITEMS = [
+  {id:'bled-roeien',cat:'natuur',naam:'Roeiboot naar Bled Eiland',loc:'Bled',prijs:'€15/boot',res:false,must:true,v:'Roeien naar het eilandje (20 min), 99 treden beklimmen, de klok luiden. Één van de meest iconische ervaringen van Slovenië.',img:'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600&q=80'},
+  {id:'vintgar',cat:'natuur',naam:'Vintgar Kloof',loc:'Bled (4 km)',prijs:'€10',res:false,must:true,v:'1,6 km houten pad over turquoise water door smalle kloof. Aan het einde een waterval.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
+  {id:'soca',cat:'natuur',naam:'Soča rivier & zwemmen',loc:'Bovec/Kobarid',prijs:'gratis',res:false,must:true,v:'Het beroemdste turquoise water van Europa. Bergpoelen om in te zwemmen.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
+  {id:'bohinj-meer',cat:'natuur',naam:'Bohinj meer zwemmen',loc:'Bohinj',prijs:'gratis',res:false,must:true,v:'Rustiger dan Bled, even mooi. Kristalhelder bergmeer, wandelingen eromheen.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
+  {id:'vogel-gondel',cat:'natuur',naam:'Gondelbaan Vogel',loc:'Bohinj',prijs:'€22',res:false,must:false,v:'Omhoog per gondel — panorama over het Bohinj meer en de Julische Alpen.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
+  {id:'lj-stad',cat:'stad',naam:'Ljubljana Oude Stad',loc:'Ljubljana',prijs:'gratis',res:false,must:true,v:'Terrasjes langs de rivier, Drievoudige Brug, art-nouveau gevels. Charme van klein Parijs.',img:'https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=600&q=80'},
+  {id:'odprta-kuhna',cat:'eten',naam:'Odprta Kuhna foodmarket',loc:'Ljubljana',prijs:'€–€€',res:false,must:true,v:'Elke vrijdag & zaterdag: 60+ kraampjes, Sloveense topchefs, lokale wijn. Absoluut niet missen.',img:'https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=600&q=80'},
+  {id:'predjama',cat:'cultuur',naam:'Predjama Kasteel',loc:'Predjama',prijs:'€16',res:false,must:false,v:'Middeleeuws kasteel gebouwd ín een 123m hoge rotswand. Surrealistisch.',img:'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=600&q=80'},
+  {id:'postojna',cat:'cultuur',naam:'Grotten van Postojna',loc:'Postojna',prijs:'€28',res:true,must:false,v:'Grootste grottencomplex van Europa. Elektrische trein neemt je mee naar binnen. Trui mee (12°C)!',img:'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=600&q=80'},
+  {id:'piran',cat:'strand',naam:'Piran & Adriatische kust',loc:'Piran',prijs:'gratis',res:false,must:false,v:'Venetiaans stadje aan de Sloveense kust. Zwemmen in de Adriatische Zee bij Fiesa.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
+  {id:'kayak-soca',cat:'avontuur',naam:'Kayakken op de Soča',loc:'Bovec',prijs:'€35–50',res:true,must:false,v:'Het turquoise water van de Soča per kajak beleven. Halve dag activiteit.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
+  {id:'triglav-wandel',cat:'avontuur',naam:'Wandeling Triglav NP',loc:'Triglav NP',prijs:'gratis',res:false,must:false,v:'Prachtige alpine wandelingen — Pokljuka plateau, Zadnja Trenta vallei.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
+  {id:'lj-kasteel',cat:'cultuur',naam:'Ljubljana Kasteel',loc:'Ljubljana',prijs:'€13',res:false,must:false,v:'360° uitzicht over de rode daken. Funiculaire rijdt omhoog.',img:'https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=600&q=80'},
+  {id:'sup-bohinj',cat:'avontuur',naam:'SUP Bohinj meer',loc:'Bohinj',prijs:'€15–20',res:false,must:false,v:'Stand-up paddleboard op het rustige bergmeer. Verhuur bij het kamp.',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80'},
+];
+const CATS = ['alles','natuur','stad','eten','avontuur','cultuur','strand'];
 
 // ── STATE ────────────────────────────────────────────
 let currentUser = null;
 let swipes = {};
-let userItems = [];
-const SFEERTEKSTEN = [
-  'Van Bled tot de Soča.',
-  'Bergen, meren en goed eten.',
-  'Het beste geheime land van Europa.',
-  'Vier vriendinnen. Eén zomeravontuur.',
-];
+let activeSwipeCat = 'alles';
+let dragging = false, startX = 0, curX = 0;
+let swipeQueue = [];
+let packChecked = {};
+let kvPotjes = [];
+let kvScore = {t1:0, t2:0};
 
 // ── REEL ─────────────────────────────────────────────
 const REEL_DATA = [
   {h:'Meer van Bled',p:'Het mooiste meer van Europa'},
-  {h:'Ljubljana',p:'De charme van een kleine Europese hoofdstad'},
-  {h:'Soča Vallei',p:'Turkoois water in de Julische Alpen'},
+  {h:'Ljubljana',p:'De charme van een kleine hoofdstad'},
+  {h:'Soča Vallei',p:'Turkoois water in de Alpen'},
   {h:'Predjama Kasteel',p:'Gebouwd in een rotswand'},
 ];
 let reelIdx = 0, reelTimer = null;
 function initReel() {
   const slides = document.querySelectorAll('.reel-slide');
   const prog = document.getElementById('reel-progress');
-  prog.innerHTML = slides.forEach ? '' : '';
   prog.innerHTML = Array.from(slides).map((_,i) => `<div class="reel-dot${i===0?' active':''}" id="rd${i}"><div class="reel-dot-fill"></div></div>`).join('');
   slides[0].classList.add('active');
   document.getElementById('reel-h').textContent = REEL_DATA[0].h;
@@ -671,41 +756,66 @@ function initReel() {
 }
 function reelNext() {
   const slides = document.querySelectorAll('.reel-slide');
-  const dots = document.querySelectorAll('.reel-dot');
+  const dots   = document.querySelectorAll('.reel-dot');
   slides[reelIdx].classList.remove('active');
-  dots[reelIdx].classList.remove('active');
-  dots[reelIdx].classList.add('done');
-  reelIdx = (reelIdx + 1) % slides.length;
-  if (reelIdx === 0) { dots.forEach(d => { d.classList.remove('done','active'); }); }
+  dots[reelIdx].classList.remove('active'); dots[reelIdx].classList.add('done');
+  reelIdx = (reelIdx+1) % slides.length;
+  if (reelIdx===0) dots.forEach(d=>{d.classList.remove('done','active');});
   slides[reelIdx].classList.add('active');
-  dots[reelIdx].classList.add('active');
-  dots[reelIdx].classList.remove('done');
-  const d = REEL_DATA[reelIdx] || REEL_DATA[0];
+  dots[reelIdx].classList.add('active'); dots[reelIdx].classList.remove('done');
+  const d = REEL_DATA[reelIdx];
   document.getElementById('reel-h').textContent = d.h;
   document.getElementById('reel-p').textContent = d.p;
 }
 
 // ── COUNTDOWN ────────────────────────────────────────
 function tickCountdown() {
-  const now = new Date();
-  const diff = TRIP_DATE - now;
+  const now = new Date(), diff = TRIP_DATE - now;
+  const s = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
   if (diff <= 0) {
-    ['cd-d','cd-h','cd-m'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = '0'; });
-    const b = document.getElementById('cd-badge'); if(b) b.textContent = 'Jullie zijn er!';
-    const r1 = document.getElementById('rcd-d'); if(r1) r1.textContent = '0';
-    const r2 = document.getElementById('rcd-h'); if(r2) r2.textContent = '0';
-    const r3 = document.getElementById('rcd-m'); if(r3) r3.textContent = '0';
+    s('cd-d','0'); s('cd-h','0'); s('cd-m','0');
+    s('cd-badge','Op vakantie!');
+    s('rcd-d','0'); s('rcd-h','00'); s('rcd-m','00');
+    const days = document.getElementById('intro-days-txt');
+    if (days) days.textContent = 'Jullie zijn er!';
     return;
   }
-  const d = Math.floor(diff/86400000);
-  const h = Math.floor((diff%86400000)/3600000);
-  const m = Math.floor((diff%3600000)/60000);
-  const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
-  set('cd-d',d); set('cd-h',h); set('cd-m',m);
-  set('rcd-d',d); set('rcd-h',String(h).padStart(2,'0')); set('rcd-m',String(m).padStart(2,'0'));
-  const b = document.getElementById('cd-badge');
-  if (b) b.textContent = d === 0 ? 'Vandaag!' : d === 1 ? 'Morgen!' : `${d} dagen`;
-  document.getElementById('intro-days-txt').textContent = `Over ${d} dagen staan jullie in Slovenië.`;
+  const d=Math.floor(diff/86400000), h=Math.floor((diff%86400000)/3600000), m=Math.floor((diff%3600000)/60000);
+  s('cd-d',d); s('cd-h',h); s('cd-m',m);
+  s('rcd-d',d); s('rcd-h',String(h).padStart(2,'0')); s('rcd-m',String(m).padStart(2,'0'));
+  s('cd-badge', d===0?'Vandaag!':d===1?'Morgen!':d<7?`${d} dagen!`:`${d} dagen`);
+  const days = document.getElementById('intro-days-txt');
+  if (days) days.textContent = `Over ${d} dagen begint de vakantie.`;
+}
+
+// ── PROFILES RENDER ───────────────────────────────────
+function renderProfileGrid() {
+  const grid = document.getElementById('profile-grid');
+  const extraProfiles = JSON.parse(localStorage.getItem(`${SK}_extra_profiles`) || '[]');
+  const allProfiles = [...PROFILE_KEYS.map(k=>({key:k,...PROFILES[k]})),
+    ...extraProfiles.map(k=>({key:k.key,naam:k.naam,init:k.naam.substring(0,2),color:k.color}))
+  ];
+  grid.innerHTML = allProfiles.map(p=>`
+    <div class="profile-card" onclick="selectProfile('${p.key}','${p.naam}','${p.init}','${p.color}')">
+      <div class="av" style="background:${p.color};">${p.init}</div>
+      <div class="profile-name">${p.naam}</div>
+    </div>`).join('') +
+    `<div class="profile-card add-profile-card" onclick="addKind()">
+      <div class="av" style="background:rgba(10,10,10,0.12);color:#6B6560;font-size:1.6rem;font-style:normal;">+</div>
+      <div class="profile-name" style="color:#9A948E;font-size:0.82rem;">Kind toevoegen</div>
+    </div>`;
+}
+
+function addKind() {
+  const naam = prompt('Naam van het kind?');
+  if (!naam || !naam.trim()) return;
+  const n = naam.trim();
+  const colors = ['#E8A838','#E86060','#60A8E8','#A860E8','#60E8A8'];
+  const extra = JSON.parse(localStorage.getItem(`${SK}_extra_profiles`) || '[]');
+  const color = colors[extra.length % colors.length];
+  extra.push({key: 'kind_'+n.toLowerCase().replace(/\s/g,'_'), naam: n, color});
+  localStorage.setItem(`${SK}_extra_profiles`, JSON.stringify(extra));
+  renderProfileGrid();
 }
 
 // ── LOGIN ─────────────────────────────────────────────
@@ -714,430 +824,406 @@ function checkCode() {
   if (val === 'SLOVENIE') {
     document.getElementById('step1').classList.add('hidden');
     document.getElementById('step2').classList.remove('hidden');
-    const idx = Math.floor(Math.random() * SFEERTEKSTEN.length);
-    document.getElementById('sfeerlijn-el').textContent = SFEERTEKSTEN[idx];
+    renderProfileGrid();
   } else {
-    document.getElementById('code-error').textContent = 'Oeps — probeer opnieuw.';
-    setTimeout(() => document.getElementById('code-error').textContent = '', 2000);
+    const err = document.getElementById('code-error');
+    err.textContent = 'Oeps — probeer opnieuw.';
+    setTimeout(()=>err.textContent='', 2000);
   }
 }
 document.getElementById('code-input').addEventListener('keydown', e => { if(e.key==='Enter') checkCode(); });
 
-const WELKOM_TEKSTEN = {
-  griette:   { groet:'Hey G 🌿', sub:'Jij hebt de basis gebouwd — nu swipe iedereen mee en zien we wat Slovenië wordt.' },
-  frederike: { groet:'Welkom, Fred 👋', sub:'Swipe je voorkeuren, dan weten we meteen welke bergen, meren en steden er inzitten voor jou.' },
-  marlinde:  { groet:'Marlinde! 😘', sub:'Vul je voorkeuren in zodat het programma ook voor jou klopt. Slovenië wacht.' },
-  miriam:    { groet:'Hoi Miriam 😊', sub:'Beginnen maar — swipen, top5 bekijken, en laten zien wat jij wil doen in Slovenië.' },
+const WELKOM = {
+  duurt:   {groet:'Hey Duurt 👋',   sub:'Klaar voor drie weken bergen, meren en klaverjas tot middernacht?'},
+  griette: {groet:'Hey G 🌿',       sub:'Jij hebt de basis gemaakt — nu invullen wat we wanneer gaan doen.'},
+  sanne:   {groet:'Hoi Sanne 😊',   sub:'Swipe mee, stem op activiteiten, en bekijk het programma.'},
+  arjen:   {groet:'Arjen! 🏔️',      sub:'Bergen in zicht. Check het programma en swipe je favorieten.'},
 };
 
-function selectProfile(name) {
-  currentUser = name;
-  swipes = JSON.parse(localStorage.getItem(`slov_swipes_${name}`) || '{}');
-  userItems = JSON.parse(localStorage.getItem(`slov_items_${name}`) || '[]');
-  const p = PROFILES[name];
-  const t = WELKOM_TEKSTEN[name] || { groet:`Welkom, ${p.naam} 👋`, sub:'Swipe mee en bouw het programma.' };
+function selectProfile(key, naam, init, color) {
+  currentUser = key;
+  swipes = JSON.parse(localStorage.getItem(`${SK}_swipes_${key}`) || '{}');
+  packChecked = JSON.parse(localStorage.getItem(`${SK}_pack_${key}`) || '{}');
+  const t = WELKOM[key] || {groet:`Welkom, ${naam} 👋`, sub:'Bekijk het programma en swipe mee.'};
   const av = document.getElementById('welkom-avatar');
-  av.style.background = p.color;
-  av.innerHTML = `<img src="${p.img}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentElement.textContent='${p.init}'">`;
+  av.style.background = color;
+  av.textContent = init;
   document.getElementById('welkom-naam').textContent = t.groet;
   document.getElementById('welkom-sub').textContent = t.sub;
   document.getElementById('login-screen').classList.add('hidden');
   const ws = document.getElementById('welkom-screen');
-  ws.style.display = 'flex';
-  ws.style.opacity = '0';
-  ws.style.transition = 'opacity 0.5s';
-  setTimeout(() => ws.style.opacity = '1', 20);
+  ws.style.display='flex'; ws.style.opacity='0'; ws.style.transition='opacity 0.5s';
+  setTimeout(()=>ws.style.opacity='1', 20);
 }
 
 function startApp() {
-  document.getElementById('welkom-screen').style.display = 'none';
+  document.getElementById('welkom-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
   initReel();
   tickCountdown();
-  setInterval(tickCountdown, 60000);
+  setInterval(tickCountdown, 30000);
   renderPacklist();
-  renderTop5();
-  renderGroep();
+  renderProgramma();
   renderSwipeStack();
-  const saved = localStorage.getItem(`slov_intro_${currentUser}`);
-  if (!saved) {
-    showIntro();
-    localStorage.setItem(`slov_intro_${currentUser}`, '1');
-  }
+  loadKvData();
+  renderKvScores();
+  const seen = localStorage.getItem(`${SK}_intro_${currentUser}`);
+  if (!seen) { showIntro(); localStorage.setItem(`${SK}_intro_${currentUser}`,'1'); }
 }
 
 function uitloggen() {
-  currentUser = null; swipes = {}; userItems = [];
+  currentUser=null; swipes={};
   document.getElementById('app').classList.remove('visible');
   document.getElementById('login-screen').classList.remove('hidden');
   document.getElementById('step1').classList.remove('hidden');
   document.getElementById('step2').classList.add('hidden');
-  document.getElementById('code-input').value = '';
-  if (reelTimer) clearInterval(reelTimer);
+  document.getElementById('code-input').value='';
+  if(reelTimer) clearInterval(reelTimer);
 }
 
 // ── INTRO ─────────────────────────────────────────────
 let introIdx = 0;
 function showIntro() {
-  const ov = document.getElementById('intro-overlay');
-  ov.style.display = 'block';
-  introIdx = 0;
-  updateIntroDots();
-  setTimeout(() => {
-    const big = ov.querySelector('.intro-big');
-    if (big) big.classList.add('show');
-  }, 300);
-  ov.addEventListener('click', introAdvance, {once:false});
+  const ov = document.getElementById('intro-ov');
+  ov.style.display='block'; introIdx=0; updateIntroDots();
+  setTimeout(()=>{ ov.querySelector('.intro-big')?.classList.add('show'); }, 300);
+  ov.addEventListener('click', introAdv);
 }
-function introAdvance(e) {
-  if (e.target.classList.contains('intro-skip') || e.target.classList.contains('intro-cta-btn')) return;
+function introAdv(e) {
+  if(e.target.closest('.intro-skip') || e.target.closest('.intro-cta')) return;
   introIdx++;
-  if (introIdx >= 3) { finishIntro(); return; }
-  const slider = document.getElementById('intro-slider');
-  slider.style.transform = `translateX(-${introIdx * 33.333}%)`;
+  if(introIdx>=3){finishIntro();return;}
+  document.getElementById('intro-slider').style.transform=`translateX(-${introIdx*33.333}%)`;
   updateIntroDots();
-  setTimeout(() => {
-    const screens = document.querySelectorAll('.intro-screen');
-    const texts = screens[introIdx]?.querySelectorAll('.intro-med,.intro-sub,.intro-cta-btn');
-    texts?.forEach(t => t.classList.add('show'));
+  setTimeout(()=>{
+    const sc = document.querySelectorAll('.intro-screen')[introIdx];
+    sc?.querySelectorAll('.intro-med,.intro-sub,.intro-cta').forEach(t=>t.classList.add('show'));
   }, 400);
 }
-function updateIntroDots() {
-  for (let i=0;i<3;i++) {
-    const d = document.getElementById(`idot-${i}`);
-    if (d) d.className = 'intro-dot' + (i===introIdx?' active':'');
-  }
-}
-function finishIntro() {
-  const ov = document.getElementById('intro-overlay');
-  ov.style.display = 'none';
-  ov.removeEventListener('click', introAdvance);
+function updateIntroDots(){for(let i=0;i<3;i++){const d=document.getElementById(`idot-${i}`);if(d)d.className='intro-dot'+(i===introIdx?' active':'');}}
+function finishIntro(){
+  const ov=document.getElementById('intro-ov');
+  ov.style.display='none';
+  ov.removeEventListener('click',introAdv);
 }
 
 // ── TABS ──────────────────────────────────────────────
-const SEC = {home:'sec-home',swipe:'sec-swipe',top5:'sec-top5',groep:'sec-groep',info:'sec-info'};
-const NAV = {home:'nav-home',swipe:'nav-swipe',top5:'nav-top5',groep:'nav-groep',info:'nav-info'};
-function switchTab(tab) {
-  Object.values(SEC).forEach(id => document.getElementById(id)?.classList.remove('active'));
-  Object.values(NAV).forEach(id => document.getElementById(id)?.classList.remove('active'));
-  document.getElementById(SEC[tab])?.classList.add('active');
-  document.getElementById(NAV[tab])?.classList.add('active');
+const SECS={home:'sec-home',programma:'sec-programma',activiteiten:'sec-activiteiten',spellen:'sec-spellen',info:'sec-info'};
+const NAVS={home:'nav-home',programma:'nav-programma',activiteiten:'nav-activiteiten',spellen:'nav-spellen',info:'nav-info'};
+function switchTab(tab){
+  Object.values(SECS).forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  Object.values(NAVS).forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  document.getElementById(SECS[tab])?.classList.add('active');
+  document.getElementById(NAVS[tab])?.classList.add('active');
   window.scrollTo(0,0);
-  if (tab==='top5') renderTop5();
-  if (tab==='groep') renderGroep();
-  if (tab==='swipe') renderSwipeStack();
+  if(tab==='activiteiten') renderSwipeStack();
+}
+
+// ── PROGRAMMA ────────────────────────────────────────
+function renderProgramma() {
+  const el = document.getElementById('programma-list');
+  el.innerHTML = DAGEN.map((dag,i)=>`
+    <div class="dag-item" id="dag-${i}" onclick="toggleDag(${i})">
+      <div class="dag-head">
+        <div class="dag-badge" style="background:${dag.kleur}20;border:2px solid ${dag.kleur}40;">
+          <div class="dag-num" style="color:${dag.kleur};">${dag.land}</div>
+        </div>
+        <div class="dag-info">
+          <div class="dag-title">${dag.label}</div>
+          <div class="dag-datum">${dag.datum}</div>
+        </div>
+        <div class="dag-arrow">▼</div>
+      </div>
+      <div class="dag-body">
+        ${dag.desc ? `<div class="dag-desc">${dag.desc}</div>` : ''}
+        ${dag.acts.length ? `<div class="dag-activiteiten">${dag.acts.map(a=>`<div class="dag-act">${a}</div>`).join('')}</div>` : ''}
+        <div class="dag-loc" style="margin-top:8px;">
+          <span>${dag.land}</span> <span>${dag.datum}</span>
+        </div>
+      </div>
+    </div>`).join('');
+  // Open eerste dag by default
+  const first = document.getElementById('dag-0');
+  if(first){ first.classList.add('open'); }
+}
+function toggleDag(i){
+  const el = document.getElementById(`dag-${i}`);
+  el?.classList.toggle('open');
 }
 
 // ── SWIPE ─────────────────────────────────────────────
-const CATS = ['alles','natuur','stad','eten','avontuur','cultuur','strand'];
-let activeSwipeCat = 'alles';
-let swipeQueue = [];
-let dragging = false, startX = 0, startY = 0, curX = 0;
-let activeCard = null;
-
-function getSwipeItems() {
-  return ITEMS_BASE.filter(i => {
-    if (activeSwipeCat !== 'alles' && i.cat !== activeSwipeCat) return false;
-    if (swipes[i.id]) return false;
-    return true;
-  }).concat(userItems.filter(i => {
-    if (activeSwipeCat !== 'alles' && i.cat !== activeSwipeCat) return false;
-    if (swipes[i.id]) return false;
-    return true;
-  }));
+function getQueue(){
+  return ITEMS.filter(it=>{
+    if(activeSwipeCat!=='alles' && it.cat!==activeSwipeCat) return false;
+    return !swipes[it.id];
+  });
 }
-
-function renderSwipeTabs() {
-  const el = document.getElementById('swipe-tabs');
-  el.innerHTML = CATS.map(c => `<button class="stab${c===activeSwipeCat?' active':''}" onclick="setSwipeCat('${c}')">${c.charAt(0).toUpperCase()+c.slice(1)}</button>`).join('');
+function renderSwipeTabs(){
+  document.getElementById('swipe-tabs').innerHTML = CATS.map(c=>
+    `<button class="stab${c===activeSwipeCat?' active':''}" onclick="setSwipeCat('${c}')">${c.charAt(0).toUpperCase()+c.slice(1)}</button>`
+  ).join('');
 }
-
-function setSwipeCat(cat) {
-  activeSwipeCat = cat;
+function setSwipeCat(c){ activeSwipeCat=c; renderSwipeTabs(); renderSwipeStack(); }
+function renderSwipeStack(){
   renderSwipeTabs();
-  renderSwipeStack();
-}
-
-function renderSwipeStack() {
-  renderSwipeTabs();
-  swipeQueue = getSwipeItems();
+  swipeQueue = getQueue();
   const stack = document.getElementById('swipe-stack');
-  const label = document.getElementById('swipe-count-label');
-  if (label) label.textContent = `${swipeQueue.length} over`;
-  if (!swipeQueue.length) {
-    stack.innerHTML = `<div class="empty-stack"><div style="font-size:2rem;">🌿</div><p>Alles geswiped!</p><button style="padding:10px 24px;border-radius:30px;background:#0A0A0A;color:#F0E8E2;border:none;cursor:pointer;font-size:0.85rem;" onclick="resetSwipes()">Opnieuw beginnen</button></div>`;
+  const lbl   = document.getElementById('swipe-count-lbl');
+  if(lbl) lbl.textContent = `${swipeQueue.length} over`;
+  if(!swipeQueue.length){
+    stack.innerHTML=`<div class="empty-stack"><div style="font-size:2rem;">🌿</div><p>Alles geswiped!</p><button style="padding:10px 22px;border-radius:30px;background:#0A0A0A;color:#F0E8E2;border:none;cursor:pointer;font-size:0.85rem;margin-top:4px;" onclick="resetSwipes()">Opnieuw</button></div>`;
     return;
   }
-  stack.innerHTML = '';
-  const visible = swipeQueue.slice(0, 3).reverse();
-  visible.forEach((item, ri) => {
-    const isTop = ri === visible.length - 1;
-    const scale = 1 - (visible.length - 1 - ri) * 0.04;
-    const yOff  = (visible.length - 1 - ri) * 8;
+  stack.innerHTML='';
+  swipeQueue.slice(0,3).reverse().forEach((item,ri)=>{
+    const isTop = ri===Math.min(swipeQueue.length,3)-1;
+    const scale = 1-(Math.min(swipeQueue.length,3)-1-ri)*0.035;
+    const yOff  = (Math.min(swipeQueue.length,3)-1-ri)*7;
     const card  = document.createElement('div');
-    card.className = 'swipe-card';
-    card.id = `sc-${item.id}`;
-    card.style.transform = `scale(${scale}) translateY(-${yOff}px)`;
-    card.style.zIndex = ri;
-    card.innerHTML = `
+    card.className='swipe-card';
+    card.id=`sc-${item.id}`;
+    card.style.transform=`scale(${scale}) translateY(-${yOff}px)`;
+    card.style.zIndex=ri;
+    card.innerHTML=`
       <div class="card-hero" style="background-image:url('${item.img}')">
         <div class="card-hero-grad"></div>
         <div class="card-badges">
-          ${item.must ? '<span class="badge badge-must">✦ Aanrader</span>' : ''}
+          ${item.must?'<span class="badge badge-must">✦ Aanrader</span>':''}
           <span class="badge badge-cat">${item.cat}</span>
-          ${item.reserveren ? '<span class="badge badge-reserveer">Reserveer</span>' : ''}
+          ${item.res?'<span class="badge badge-res">Reserveer</span>':''}
         </div>
-        <div class="card-like-overlay" id="ov-${item.id}"><span class="overlay-text" id="ovtxt-${item.id}">JA!</span></div>
+        <div class="card-like-ov" id="lov-${item.id}"><span class="ov-txt" id="lovtxt-${item.id}">JA!</span></div>
       </div>
       <div class="card-body">
         <div class="card-naam">${item.naam}</div>
         <div class="card-meta">
-          <span class="card-meta-pill">📍 ${item.locatie}</span>
-          ${item.prijs ? `<span class="card-meta-pill">${item.prijs}</span>` : ''}
+          <span class="card-pill">📍 ${item.loc}</span>
+          ${item.prijs?`<span class="card-pill">${item.prijs}</span>`:''}
         </div>
-        <div style="font-size:0.8rem;color:#6B6560;margin-top:8px;line-height:1.5;">${item.verhaal.substring(0,120)}${item.verhaal.length>120?'…':''}</div>
-      </div>
-    `;
-    if (isTop) {
-      card.addEventListener('touchstart', onTouchStart, {passive:true});
-      card.addEventListener('touchmove', onTouchMove, {passive:false});
-      card.addEventListener('touchend', onTouchEnd);
-      card.addEventListener('mousedown', onMouseDown);
+        <div class="card-verhaal">${item.v.substring(0,130)}${item.v.length>130?'…':''}</div>
+      </div>`;
+    if(isTop){
+      card.addEventListener('touchstart',onTS,{passive:true});
+      card.addEventListener('touchmove',onTM,{passive:false});
+      card.addEventListener('touchend',onTE);
+      card.addEventListener('mousedown',onMD);
     }
     stack.appendChild(card);
-    activeCard = isTop ? card : activeCard;
   });
 }
 
-function onTouchStart(e) { dragging=true; startX=e.touches[0].clientX; startY=e.touches[0].clientY; curX=0; }
-function onTouchMove(e) {
-  if (!dragging) return;
-  curX = e.touches[0].clientX - startX;
-  const curY = e.touches[0].clientY - startY;
-  if (Math.abs(curX) < Math.abs(curY)) return;
+function onTS(e){dragging=true;startX=e.touches[0].clientX;curX=0;}
+function onTM(e){
+  if(!dragging)return;
+  curX=e.touches[0].clientX-startX;
+  const dy=e.touches[0].clientY-(e.touches[0].clientY);
+  if(Math.abs(curX)<10)return;
   e.preventDefault();
   applyDrag(curX);
 }
-function onTouchEnd() { if (dragging) { dragging=false; settleDrag(); } }
-function onMouseDown(e) { dragging=true; startX=e.clientX; curX=0; document.addEventListener('mousemove',onMouseMove); document.addEventListener('mouseup',onMouseUp); }
-function onMouseMove(e) { if (!dragging) return; curX=e.clientX-startX; applyDrag(curX); }
-function onMouseUp() { dragging=false; document.removeEventListener('mousemove',onMouseMove); document.removeEventListener('mouseup',onMouseUp); settleDrag(); }
+function onTE(){if(dragging){dragging=false;settleDrag();}}
+function onMD(e){dragging=true;startX=e.clientX;curX=0;document.addEventListener('mousemove',onMM);document.addEventListener('mouseup',onMU);}
+function onMM(e){if(!dragging)return;curX=e.clientX-startX;applyDrag(curX);}
+function onMU(){dragging=false;document.removeEventListener('mousemove',onMM);document.removeEventListener('mouseup',onMU);settleDrag();}
 
-function applyDrag(dx) {
-  if (!activeCard) return;
-  const rot = dx * 0.08;
-  activeCard.style.transform = `translateX(${dx}px) rotate(${rot}deg)`;
-  const ov = activeCard.querySelector('.card-like-overlay');
-  const ovtxt = activeCard.querySelector('[id^="ovtxt-"]');
-  if (!ov || !ovtxt) return;
-  ov.className = 'card-like-overlay';
-  if (dx > 40) { ov.classList.add('show-like'); ovtxt.textContent = 'JA!'; }
-  else if (dx < -40) { ov.classList.add('show-pass'); ovtxt.textContent = 'NEE'; }
+function applyDrag(dx){
+  const topItem = swipeQueue[0]; if(!topItem)return;
+  const card=document.getElementById(`sc-${topItem.id}`); if(!card)return;
+  card.style.transform=`translateX(${dx}px) rotate(${dx*0.07}deg)`;
+  const ov=document.getElementById(`lov-${topItem.id}`);
+  const ovt=document.getElementById(`lovtxt-${topItem.id}`);
+  if(!ov)return;
+  ov.className='card-like-ov';
+  if(dx>40){ov.classList.add('sl');if(ovt)ovt.textContent='JA!';}
+  else if(dx<-40){ov.classList.add('sp');if(ovt)ovt.textContent='NEE';}
 }
-
-function settleDrag() {
-  if (!activeCard) return;
-  if (curX > 80) doSwipe('like');
-  else if (curX < -80) doSwipe('pass');
-  else { activeCard.style.transform = ''; activeCard.querySelector('.card-like-overlay').className='card-like-overlay'; }
-}
-
-function doSwipe(dir) {
-  const item = swipeQueue[0];
-  if (!item) return;
-  const card = document.getElementById(`sc-${item.id}`);
-  if (card) {
-    card.className = `swipe-card animate-${dir==='like'?'like':'pass'}`;
-    setTimeout(() => { card.remove(); }, 400);
+function settleDrag(){
+  if(curX>80) doSwipe('like');
+  else if(curX<-80) doSwipe('pass');
+  else{
+    const topItem=swipeQueue[0]; if(!topItem)return;
+    const card=document.getElementById(`sc-${topItem.id}`); if(!card)return;
+    card.style.transform='';
+    const ov=document.getElementById(`lov-${topItem.id}`); if(ov)ov.className='card-like-ov';
   }
-  swipes[item.id] = dir;
-  localStorage.setItem(`slov_swipes_${currentUser}`, JSON.stringify(swipes));
+}
+function doSwipe(dir){
+  const item=swipeQueue[0]; if(!item)return;
+  const card=document.getElementById(`sc-${item.id}`);
+  if(card){card.className=`swipe-card ${dir==='like'?'fly-like':'fly-pass'}`;setTimeout(()=>card.remove(),400);}
+  swipes[item.id]=dir;
+  localStorage.setItem(`${SK}_swipes_${currentUser}`,JSON.stringify(swipes));
   swipeQueue.shift();
-  setTimeout(() => {
-    renderSwipeStack();
-    renderTop5();
-    checkMatch(item, dir);
-  }, 420);
+  setTimeout(renderSwipeStack, 420);
 }
+function resetSwipes(){swipes={};localStorage.setItem(`${SK}_swipes_${currentUser}`,JSON.stringify(swipes));renderSwipeStack();}
 
-function checkMatch(item, dir) {
-  if (dir !== 'like') return;
-  const keys = PROFILE_KEYS;
-  const allLiked = keys.every(k => {
-    const s = JSON.parse(localStorage.getItem(`slov_swipes_${k}`) || '{}');
-    return s[item.id] === 'like';
+// ── KLAVERJAS ────────────────────────────────────────
+function loadKvData(){
+  kvPotjes = JSON.parse(localStorage.getItem(`${SK}_kv_potjes`) || '[]');
+  recalcKvScores();
+}
+function recalcKvScores(){
+  kvScore={t1:0,t2:0};
+  kvPotjes.forEach(p=>{
+    kvScore.t1 += p.pts1;
+    kvScore.t2 += p.pts2;
   });
-  if (allLiked) {
-    document.getElementById('match-item-name').textContent = item.naam;
-    document.getElementById('match-overlay').classList.add('show');
-  }
 }
-
-function closeMatch() { document.getElementById('match-overlay').classList.remove('show'); }
-function resetSwipes() { swipes={}; localStorage.setItem(`slov_swipes_${currentUser}`,JSON.stringify(swipes)); renderSwipeStack(); }
-
-// ── TOP5 ──────────────────────────────────────────────
-let top5ActiveTab = 'matches';
-function showTop5Tab(tab) {
-  top5ActiveTab = tab;
-  document.getElementById('ttab-matches').className = 'top5-tab' + (tab==='matches'?' active':'');
-  document.getElementById('ttab-mijn').className = 'top5-tab' + (tab==='mijn'?' active':'');
-  document.getElementById('top5-matches-content').style.display = tab==='matches'?'':'none';
-  document.getElementById('top5-mijn-content').style.display = tab==='mijn'?'':'none';
-  renderTop5();
+function renderKvScores(){
+  recalcKvScores();
+  document.getElementById('kv-score1').textContent = kvScore.t1;
+  document.getElementById('kv-score2').textContent = kvScore.t2;
+  renderKvPotjes();
 }
-
-function renderTop5() {
-  const allItems = [...ITEMS_BASE, ...userItems];
-  // Matches tab
-  const scores = {};
-  allItems.forEach(item => {
-    let count = 0;
-    PROFILE_KEYS.forEach(k => {
-      const s = JSON.parse(localStorage.getItem(`slov_swipes_${k}`) || '{}');
-      if (s[item.id] === 'like') count++;
-    });
-    if (count > 0) scores[item.id] = count;
-  });
-  const sorted = allItems.filter(i => scores[i.id]).sort((a,b) => scores[b.id]-scores[a.id]);
-  const matchEl = document.getElementById('top5-matches-content');
-  if (!sorted.length) {
-    matchEl.innerHTML = '<div class="empty-top5"><p>Nog niemand heeft geswiped.<br>Begin met swipen om matches te zien!</p></div>';
-  } else {
-    const rankColors = ['#4A9E6E','#9A948E','#A0784A'];
-    matchEl.innerHTML = `<div class="top5-list">${sorted.map((item,i) => `
-      <div class="top5-item">
-        <div class="top5-rank${i===1?' silver':i===2?' bronze':''}">${i+1}</div>
-        <div class="top5-item-info">
-          <div class="top5-item-naam">${item.naam}</div>
-          <div class="top5-item-meta">📍 ${item.locatie} · ${scores[item.id]} van 4 willen dit</div>
-        </div>
-        <div style="display:flex;gap:4px;">${PROFILE_KEYS.map(k=>{const s=JSON.parse(localStorage.getItem(`slov_swipes_${k}`)||'{}');const v=s[item.id];return `<div style="width:24px;height:24px;border-radius:50%;background:${v==='like'?PROFILES[k].color:'rgba(10,10,10,0.08)'};display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:#fff;font-weight:700;">${v==='like'?PROFILES[k].init[0]:''}</div>`}).join('')}</div>
-      </div>`).join('')}</div>`;
+function renderKvPotjes(){
+  const el = document.getElementById('kv-potjes-list');
+  if(!kvPotjes.length){
+    el.innerHTML='<div class="kv-empty">Nog geen potjes gespeeld.<br>Tap "+ Potje toevoegen" om te beginnen.</div>';
+    return;
   }
-
-  // Mijn tab
-  const myLikes = allItems.filter(i => swipes[i.id]==='like');
-  const mijnEl = document.getElementById('top5-mijn-content');
-  if (!myLikes.length) {
-    mijnEl.innerHTML = '<div class="empty-top5"><p>Je hebt nog niets geliked.<br>Ga swipen!</p></div>';
-  } else {
-    mijnEl.innerHTML = `<div class="top5-list">${myLikes.map((item,i) => `
-      <div class="top5-item">
-        <div class="top5-rank${i===1?' silver':i===2?' bronze':''}">${i+1}</div>
-        <div class="top5-item-info">
-          <div class="top5-item-naam">${item.naam}</div>
-          <div class="top5-item-meta">📍 ${item.locatie}</div>
-        </div>
-      </div>`).join('')}</div>`;
-  }
-}
-
-// ── GROEP ─────────────────────────────────────────────
-function renderGroep() {
-  const el = document.getElementById('groep-content');
-  const allItems = [...ITEMS_BASE, ...userItems];
-  let html = '';
-  PROFILE_KEYS.forEach(k => {
-    const p = PROFILES[k];
-    const s = JSON.parse(localStorage.getItem(`slov_swipes_${k}`) || '{}');
-    const liked = allItems.filter(i => s[i.id]==='like');
-    const total = Object.keys(s).length;
-    html += `<div style="margin-bottom:20px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-        <div style="width:38px;height:38px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-style:italic;font-weight:700;color:#fff;flex-shrink:0;">${p.init}</div>
-        <div>
-          <div style="font-weight:700;font-size:0.95rem;">${p.naam}</div>
-          <div style="font-size:0.72rem;color:#6B6560;">${total} geswiped · ${liked.length} geliked</div>
-        </div>
+  el.innerHTML = `<div style="display:flex;padding:6px 20px 2px;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;">
+    <div style="width:22px;text-align:right;margin-right:8px;">#</div>
+    <div style="flex:1;">Details</div>
+    <div style="width:42px;text-align:center;">T1</div>
+    <div style="width:42px;text-align:center;margin-left:8px;">T2</div>
+    <div style="width:28px;"></div>
+  </div>` +
+  '<div class="kv-potjes">' +
+  kvPotjes.map((p,i)=>{
+    const win1=p.pts1>p.pts2, win2=p.pts2>p.pts1;
+    return `<div class="kv-potje">
+      <div class="kv-potje-nr">${i+1}</div>
+      <div class="kv-potje-roep"><span>${p.roeper}</span> · ${p.troef}${p.nat?` · <span style="color:#c0392b;font-size:0.72rem;font-weight:700;">NAT</span>`:''}</div>
+      <div class="kv-potje-scores">
+        <div class="kv-pts${win1?' win':''}${p.nat&&p.roepTeam===1?' nat':''}">${p.nat&&p.roepTeam===1?'nat':p.pts1}</div>
+        <div style="margin:0 4px;"></div>
+        <div class="kv-pts${win2?' win':''}${p.nat&&p.roepTeam===2?' nat':''}">${p.nat&&p.roepTeam===2?'nat':p.pts2}</div>
       </div>
-      ${liked.length ? liked.slice(0,5).map(i=>`<div style="padding:6px 0;border-bottom:1px solid rgba(10,10,10,0.05);font-size:0.85rem;display:flex;align-items:center;gap:6px;"><span style="color:#4A9E6E;">♥</span>${i.naam}</div>`).join('')
-      : '<div style="font-size:0.8rem;color:#9A948E;padding:6px 0;">Nog niets geswiped</div>'}
+      <button class="kv-del" onclick="deletePotje(${i});event.stopPropagation()">🗑</button>
     </div>`;
+  }).join('') + '</div>';
+}
+
+function openKvModal(){
+  document.getElementById('kv-modal').classList.add('show');
+  updateKvPreview();
+  ['kv-roem1','kv-roem2','kv-slagen1','kv-slagen2','kv-nat'].forEach(id=>{
+    document.getElementById(id)?.addEventListener('input',updateKvPreview);
+    document.getElementById(id)?.addEventListener('change',updateKvPreview);
   });
-  el.innerHTML = html || '<p style="color:#9A948E;font-size:0.9rem;">Geen data</p>';
+}
+function closeKvModal(){
+  document.getElementById('kv-modal').classList.remove('show');
+}
+function updateKvPreview(){
+  const nat    = document.getElementById('kv-nat')?.checked;
+  const r1     = parseInt(document.getElementById('kv-roem1')?.value)||0;
+  const r2     = parseInt(document.getElementById('kv-roem2')?.value)||0;
+  const s1     = parseInt(document.getElementById('kv-slagen1')?.value)||0;
+  const s2     = parseInt(document.getElementById('kv-slagen2')?.value)||0;
+  const roeper = document.getElementById('kv-roeper')?.value||'';
+  const roepTeam = ['Duurt','Sanne'].includes(roeper)?1:2;
+  let pts1=0, pts2=0;
+  if(nat){
+    const winner = roepTeam===1?2:1;
+    const allPts = 162 + r1 + r2;
+    if(winner===1){pts1=allPts;pts2=0;}else{pts1=0;pts2=allPts;}
+  } else {
+    pts1 = s1+r1; pts2 = s2+r2;
+  }
+  const prev = document.getElementById('kv-modal-preview');
+  if(prev) prev.innerHTML = nat
+    ? `<span style="color:#c0392b;font-weight:700;">NAT</span> — Team ${roepTeam===1?2:1} krijgt alle punten: <strong>${roepTeam===1?pts2:pts1}</strong>`
+    : `Team 1: <strong>${pts1}</strong> &nbsp;·&nbsp; Team 2: <strong>${pts2}</strong>`;
+}
+function submitPotje(){
+  const nat    = document.getElementById('kv-nat')?.checked;
+  const r1     = parseInt(document.getElementById('kv-roem1')?.value)||0;
+  const r2     = parseInt(document.getElementById('kv-roem2')?.value)||0;
+  const s1     = parseInt(document.getElementById('kv-slagen1')?.value)||0;
+  const s2     = parseInt(document.getElementById('kv-slagen2')?.value)||0;
+  const roeper = document.getElementById('kv-roeper')?.value;
+  const troef  = document.getElementById('kv-troef')?.value;
+  const roepTeam = ['Duurt','Sanne'].includes(roeper)?1:2;
+  let pts1,pts2;
+  if(nat){
+    const allPts=162+r1+r2;
+    if(roepTeam===1){pts1=0;pts2=allPts;}else{pts1=allPts;pts2=0;}
+  } else {
+    pts1=s1+r1; pts2=s2+r2;
+  }
+  kvPotjes.push({roeper,troef,roepTeam,r1,r2,s1,s2,nat:!!nat,pts1,pts2,ts:Date.now()});
+  localStorage.setItem(`${SK}_kv_potjes`,JSON.stringify(kvPotjes));
+  closeKvModal();
+  renderKvScores();
+  showToast('Potje opgeslagen!');
+  // Reset form
+  document.getElementById('kv-nat').checked=false;
+  document.getElementById('kv-roem1').value='0';
+  document.getElementById('kv-roem2').value='0';
+  document.getElementById('kv-slagen1').value='';
+  document.getElementById('kv-slagen2').value='';
+}
+function deletePotje(i){
+  if(!confirm('Dit potje verwijderen?')) return;
+  kvPotjes.splice(i,1);
+  localStorage.setItem(`${SK}_kv_potjes`,JSON.stringify(kvPotjes));
+  renderKvScores();
 }
 
-// ── PACKLIST ──────────────────────────────────────────
-const PACK_ITEMS = [
-  {id:'paspoort',label:'Paspoort of ID-kaart',note:'Slovenië is EU — ID-kaart voldoet'},
-  {id:'reisverzekering',label:'Reisverzekering',note:'Europese gezondheidskaart (EHIC) meenemen'},
-  {id:'zonnecrème',label:'Zonnebrandcrème SPF50+',note:'Juli = warm in de bergen'},
-  {id:'wandelschoenen',label:'Stevige wandelschoenen',note:'Voor Vintgar, Soča wandelingen'},
-  {id:'zwemspullen',label:'Zwemkleding',note:'Meer van Bled, Soča rivier'},
-  {id:'trui',label:'Fleece of trui',note:'Grottenbezoek (12°C) + bergen s\'avonds koud'},
-  {id:'powerbank',label:'Powerbank',note:'Lange dagtochten'},
-  {id:'euro',label:'Cash euro',note:'Kleine restaurants, marktjes'},
-  {id:'vignette',label:'Snelwegvignette',note:'Verplicht bij huurauto (€15/week)'},
-  {id:'vertaaldapp',label:'Google Translate app',note:'Offline Sloveens downloaden'},
-  {id:'komoot',label:'Komoot app (offline routes)',note:'Voor wandelingen in Triglav NP'},
-  {id:'regenjack',label:'Lichte regenjack',note:'Onweer in de bergen is normaal in juli'},
-];
-let packChecked = {};
-function renderPacklist() {
-  packChecked = JSON.parse(localStorage.getItem(`slov_pack_${currentUser}`) || '{}');
-  const el = document.getElementById('packlist');
-  el.innerHTML = PACK_ITEMS.map(i => `
-    <div class="pack-item${packChecked[i.id]?' checked':''}" onclick="togglePack('${i.id}',this)">
-      <div class="pack-check">${packChecked[i.id]?'✓':''}</div>
-      <div>
-        <div class="pack-label">${i.label}</div>
-        <div class="pack-note">${i.note}</div>
-      </div>
-    </div>`).join('');
-}
-function togglePack(id, el) {
-  packChecked[id] = !packChecked[id];
-  localStorage.setItem(`slov_pack_${currentUser}`, JSON.stringify(packChecked));
-  el.classList.toggle('checked');
-  const check = el.querySelector('.pack-check');
-  check.textContent = packChecked[id] ? '✓' : '';
+// ── UITLEG TOGGLE ─────────────────────────────────────
+function toggleUitleg(headEl){
+  const body = headEl.nextElementSibling;
+  const arrow = headEl.querySelector('.uitleg-arrow');
+  body.classList.toggle('open');
+  if(arrow) arrow.style.transform = body.classList.contains('open')?'rotate(180deg)':'';
 }
 
-// ── ADD ITEM ──────────────────────────────────────────
-function openModal() {
-  document.getElementById('add-modal').classList.add('show');
-}
-function closeModal() {
-  document.getElementById('add-modal').classList.remove('show');
-}
-function submitAdd() {
-  const naam = document.getElementById('add-naam').value.trim();
-  if (!naam) { showToast('Vul een naam in'); return; }
-  const item = {
-    id: 'custom-' + Date.now(),
-    cat: document.getElementById('add-cat').value,
-    naam,
-    locatie: document.getElementById('add-wijk').value || 'Slovenië',
-    prijs: '',
-    reserveren: false,
-    must: false,
-    verhaal: document.getElementById('add-verhaal').value || '',
-    tip: '',
-    img: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80',
-  };
-  userItems.push(item);
-  localStorage.setItem(`slov_items_${currentUser}`, JSON.stringify(userItems));
-  closeModal();
-  showToast(`"${naam}" toegevoegd!`);
-  renderTop5();
-  renderSwipeStack();
-  document.getElementById('add-naam').value='';
-  document.getElementById('add-wijk').value='';
-  document.getElementById('add-verhaal').value='';
-}
-
-// ── COLLAPSIBLES ──────────────────────────────────────
-function toggleCollapsible(el) {
+// ── COLLAPSIBLE ───────────────────────────────────────
+function toggleCollapsible(el){
   el.classList.toggle('open');
 }
 
+// ── PACKLIST ──────────────────────────────────────────
+const PACK = [
+  {id:'paspoort',l:'Paspoort of ID-kaart',n:'Beide landen zijn EU — ID-kaart voldoet'},
+  {id:'ehic',l:'Europese Gezondheidskaart (EHIC)',n:'Gratis via je zorgverzekeraar'},
+  {id:'vignette',l:'Tolsticker Slovenië + Oostenrijk',n:'Kopen op asfinag.at vóór vertrek'},
+  {id:'tent',l:'Tent + haringen + hamer',n:'Check ook de tent-vloer en regen-fly'},
+  {id:'slaapzak',l:'Slaapzak (zomer)',n:'Juli/aug bergweer: nacht kan 12°C zijn'},
+  {id:'luchtbed',l:'Luchtbed + pomp',n:''},
+  {id:'zwem',l:'Zwemkleding + handdoek',n:'Bled, Bohinj, Soča, Adriatische kust'},
+  {id:'wandel',l:'Stevige wandelschoenen',n:'Vintgar kloof, Soča wandeling, bergen'},
+  {id:'trui',l:'Fleece of trui',n:'Postojna grotten (12°C) + bergavonden'},
+  {id:'regenjas',l:'Lichte regenjack',n:'Onweer in de bergen is normaal in juli'},
+  {id:'zonnebrand',l:'Zonnebrandcrème SPF50+',n:'Bergen + meer = sterke zon'},
+  {id:'muggenspray',l:'Muggenwerende spray',n:'Avonden bij het kamp'},
+  {id:'powerbank',l:'Powerbank groot (20.000 mAh)',n:'Lange dagtochten'},
+  {id:'cash',l:'Cash euro',n:'Kleine restaurants, markten, kampwinkel'},
+  {id:'EHBO',l:'EHBO-kit',n:'Pleisters, paracetamol, ontsmettingsmiddel'},
+  {id:'klaver',l:'Klaverjas kaarten',n:'Of gewoon een normaal kaartspel!'},
+  {id:'spelregel',l:'Spelregels meegenomen?',n:'Bekijk de Spellen tab'},
+];
+function renderPacklist(){
+  document.getElementById('packlist').innerHTML = PACK.map(p=>`
+    <div class="pack-item${packChecked[p.id]?' checked':''}" onclick="togglePack('${p.id}',this)">
+      <div class="pack-check">${packChecked[p.id]?'✓':''}</div>
+      <div><div class="pack-label">${p.l}</div>${p.n?`<div class="pack-note">${p.n}</div>`:''}</div>
+    </div>`).join('');
+}
+function togglePack(id,el){
+  packChecked[id]=!packChecked[id];
+  localStorage.setItem(`${SK}_pack_${currentUser}`,JSON.stringify(packChecked));
+  el.classList.toggle('checked');
+  el.querySelector('.pack-check').textContent=packChecked[id]?'✓':'';
+}
+
 // ── TOAST ─────────────────────────────────────────────
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
 }
 
 // ── INIT ──────────────────────────────────────────────
