@@ -23,6 +23,26 @@
 | 2026-05-25 | U1f | ✅ | 9 Bohinj-markers op kampkaart (hike/eten/strand/kamp) | slovenie.html |
 | 2026-05-25 | extra | ✅ | Afstanden vanaf camp op alle swipekaartjes (te voet/fiets/auto/bus) | slovenie.html |
 | 2026-05-25 | F | ✅ | CLAUDE.slovenie.md + PROGRESS.slovenie.md aangemaakt | CLAUDE.slovenie.md, PROGRESS.slovenie.md |
+| 2026-05-25 | U7a | ✅ | Gedeeld vs. lokaal vastgelegd: Supabase voor profielen/scores/recepten/bingo/quiz, localStorage alleen UI-prefs | CLAUDE.slovenie.md |
+| 2026-05-25 | U7b | ✅ | Supabase-tabellen aangemaakt: slovenie_config, _klaverjas_scores, _packlist, _recipes, _day_meals, _bingo_sessions/players/marks, _quiz_scores | Supabase migration |
+| 2026-05-25 | U7c | ✅ | RLS + anon-policies: lezen + invoegen voor iedereen, buckets slovenie-recipes + slovenie-bingo publiek leesbaar | Supabase |
+| 2026-05-25 | U7d | ✅ | slovenie.html: Supabase client init, klaverjas + inpaklijst async naar Supabase, localStorage-migratie + offline-fallback | slovenie.html |
+
+## Datamodel U7 (aangemaakt in Supabase, project osuqtfsxmquwqsbgzlqn)
+
+| Tabel / bucket | Doel |
+|---|---|
+| `slovenie_config` | key/value store (o.a. kv_teams) |
+| `slovenie_klaverjas_scores` | potjes per ronde (roeper, troef, roep_team, roem, slagen, nat, pts) |
+| `slovenie_packlist` | inpakstatus per profiel + item_id |
+| `slovenie_recipes` | recepten + foto_url (U3) |
+| `slovenie_day_meals` | wat eten we per dag/type (U3) |
+| `slovenie_bingo_sessions` | autobingo-sessies (U5) |
+| `slovenie_bingo_players` | spelers per sessie (U5) |
+| `slovenie_bingo_marks` | afgevinkte vakjes + bewijsfoto (U5) |
+| `slovenie_quiz_scores` | quizscores per profiel (U6) |
+| bucket `slovenie-recipes` | receptfoto's, publiek leesbaar, max 2 MB |
+| bucket `slovenie-bingo` | bingo-bewijsfoto's, publiek leesbaar, max 2 MB |
 
 ## Te verifiëren coördinaten
 
@@ -39,9 +59,23 @@
 | Srednja vas | 46.2882, 13.9342 | te verifiëren (geocode op naam) |
 | Ribčev Laz | 46.2838, 13.9476 | te verifiëren (geocode op naam) |
 
-## Openstaand / later toe te voegen
+## Te doen (uitvoervolgorde)
 
-- Camping Oostenrijk: details volgen zodra geboekt
-- U2 / U3: recepten-module (zelf koken op camping) — apart aangeleverd
-- "Slovenië & Oostenrijk"-quiz — apart aangeleverd
-- Eventueel: kinderen toevoegen als extra profielen
+| Volgorde | ID | Status | Omschrijving |
+|---|---|---|---|
+| 1 | U7 | ✅ | Storage-fundament Supabase — klaar |
+| 2 | U3 | ⬜ | Vertaaltool + gedeelde recepten + dag-maaltijden + camping-kaarten |
+| 3 | U5 | ⬜ | Autospellen, bingo + foto's, kampvuurverhaal, waterspellen, weer-leedvermaak |
+| 4 | U2 | ⬜ | Oostenrijk Appesbach: activiteiten + afstanden + kaart + 🟫-markerlaag |
+| 5 | U4 | ⬜ | Huttentochten Bohinj (1/2 nachten, splitsing, hutten/parkeren/afstand) |
+| 6 | U6 | ⬜ | Quiz Slovenië & Oostenrijk (🟢/🔴, koppelt aan scorelijst) |
+
+## Openstaande beslispunten
+
+- [ ] Meerkeuze A/B/C voor jongste spelers bij quiz (U6)?
+- [ ] Overstap-etappe Bohinj → Appesbach (5 aug) op de route-kaart → toevoegen aan U2 of losse U8?
+
+## Openstaand / later
+
+- Camping Oostenrijk Appesbach: geboekt 5–12 aug
+- Eventueel: kinderen als losse profielen (Lauren, Jort, Silas, Gijs, Ot)
