@@ -847,6 +847,39 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
       </div>
     </div>
 
+    <!-- U3d: Appesbach camping-kaart -->
+    <div class="collapsible" onclick="toggleCollapsibleMap(this,'appesbach-map',initAppesbach)">
+      <div class="collapsible-head">
+        <div class="collapsible-title">🗺️ Kaart Seecamping Appesbach (Wolfgangsee)</div>
+        <div class="collapsible-arrow">▼</div>
+      </div>
+      <div class="collapsible-body">
+        <div id="appesbach-map" style="width:100%;height:220px;border-radius:12px;z-index:0;margin-bottom:8px;"></div>
+        <a href="https://www.google.com/maps/search/?api=1&query=47.742,13.435" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;color:#4A9E6E;font-weight:700;text-decoration:none;border:1.5px solid rgba(74,158,110,0.4);border-radius:16px;padding:6px 14px;margin-bottom:10px;">
+          📍 Open Appesbach in Google Maps
+        </a>
+        <a href="https://www.appesbach.at/" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;color:#6B6560;font-weight:700;text-decoration:none;border:1.5px solid rgba(10,10,10,0.15);border-radius:16px;padding:6px 14px;margin-bottom:10px;margin-left:8px;">
+          🏕️ Plattegrond camping (appesbach.at)
+        </a>
+        <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#9A948E;margin:8px 0 4px;">Afstanden vanaf Appesbach (bij benadering)</div>
+        <div class="bohinj-afst-list">
+          <div class="bohinj-afst-row"><span>🏕️ Strand + SUP-center</span><span>op het terrein</span></div>
+          <div class="bohinj-afst-row"><span>🚶 St. Wolfgang centrum</span><span>ca. 1 km / 12 min</span></div>
+          <div class="bohinj-afst-row"><span>🚶 Wolfgangsee-aanlegsteiger</span><span>ca. 1 km / 12 min</span></div>
+          <div class="bohinj-afst-row"><span>🚶 Schafbergbahn dalstation</span><span>ca. 1,5 km / 18 min</span></div>
+          <div class="bohinj-afst-row"><span>🚗 Bad Ischl + Konditorei Zauner</span><span>ca. 13 km / 15 min</span></div>
+          <div class="bohinj-afst-row"><span>🚗 Zwölferhorn-kabelbaan (St. Gilgen)</span><span>ca. 14 km / 18 min</span></div>
+          <div class="bohinj-afst-row"><span>🚗 Mondsee</span><span>ca. 25 km / 25 min</span></div>
+          <div class="bohinj-afst-row"><span>🚗 Postalm (Strobl)</span><span>ca. 20 km / 25 min</span></div>
+          <div class="bohinj-afst-row"><span>🚗 Hallstatt</span><span>ca. 35 km / 45 min</span></div>
+          <div class="bohinj-afst-row"><span>🚗 Dachstein/Krippenstein</span><span>ca. 40 km / 45 min</span></div>
+          <div class="bohinj-afst-row"><span>🚗 Salzburg</span><span>ca. 50 km / 50 min</span></div>
+        </div>
+      </div>
+    </div>
+
     <!-- U1a: WANDELINGEN -->
     <div class="collapsible" onclick="toggleCollapsible(this)">
       <div class="collapsible-head">
@@ -2214,10 +2247,22 @@ function initBohinjMap(){
   bohinjMap.setView([46.295,13.880],12);
 }
 
+let appesbach=null, appesbach_inited=false;
+function initAppesbach(){
+  if(appesbach_inited) return;
+  appesbach_inited=true;
+  appesbach=L.map('appesbach-map',{scrollWheelZoom:false});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(appesbach);
+  const ico=L.divIcon({className:'',html:'<div style="width:18px;height:18px;background:#8C6BAE;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.3);"></div>',iconSize:[18,18],iconAnchor:[9,9]});
+  L.marker([47.742,13.435],{icon:ico}).addTo(appesbach)
+    .bindPopup('<b>Seecamping Appesbach</b><br>Au 99, St. Wolfgang<br>🏖️ Eigen 300m strand · SUP · Seecafé').openPopup();
+  appesbach.setView([47.742,13.435],14);
+}
+
 function toggleCollapsibleMap(el, mapId, initFn){
   el.classList.toggle('open');
   if(el.classList.contains('open')){
-    setTimeout(()=>{ initFn(); if(mapId==='bohinj-map'&&bohinjMap) bohinjMap.invalidateSize(); },150);
+    setTimeout(()=>{ initFn(); if(mapId==='bohinj-map'&&bohinjMap) bohinjMap.invalidateSize(); if(mapId==='appesbach-map'&&appesbach) appesbach.invalidateSize(); },150);
   }
 }
 
