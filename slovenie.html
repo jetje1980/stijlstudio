@@ -342,15 +342,18 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
 .dag-chip-rm{background:none;border:none;cursor:pointer;color:#9A948E;font-size:0.68rem;padding:0 3px;line-height:1;flex-shrink:0;}
 .dag-add-btn{margin-top:4px;padding:5px 13px;border-radius:20px;border:1.5px dashed rgba(74,158,110,0.45);background:transparent;color:#4A9E6E;font-size:0.76rem;cursor:pointer;font-family:var(--sans);font-weight:600;}
 .dag-sug-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(10,10,10,0.05);border:1px dashed rgba(10,10,10,0.25);border-radius:20px;padding:4px 10px;font-size:0.75rem;color:#6B6560;cursor:pointer;transition:background 0.15s;}
-/* game tiles */
-.game-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 20px 4px;}
-.game-tile{border-radius:14px;overflow:hidden;position:relative;height:88px;cursor:pointer;background:#1A2510;-webkit-tap-highlight-color:transparent;}
-.game-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 0.2s;}
-.game-tile:active img{transform:scale(1.05);}
-.game-tile-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05),rgba(0,0,0,0.72));}
-.game-tile-text{position:absolute;bottom:0;left:0;right:0;padding:8px 8px;}
-.game-tile-title{color:#fff;font-weight:700;font-size:0.78rem;text-shadow:0 1px 4px rgba(0,0,0,0.6);line-height:1.2;}
-.game-tile-sub{color:rgba(255,255,255,0.72);font-size:0.6rem;margin-top:1px;}
+/* game tiles — card style */
+.game-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px 4px;}
+.game-card{background:#fff;border-radius:18px;padding:18px 12px 14px;display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;box-shadow:0 1px 8px rgba(0,0,0,0.07);-webkit-tap-highlight-color:transparent;transition:transform 0.15s;border:none;}
+.game-card:active{transform:scale(0.94);}
+.game-card-icon{font-size:2.4rem;margin-bottom:7px;line-height:1;}
+.game-card-title{font-weight:800;font-style:italic;font-size:0.9rem;color:#0A0A0A;margin-bottom:3px;line-height:1.2;}
+.game-card-sub{font-size:0.68rem;color:#6B6560;line-height:1.4;}
+.game-card.featured{grid-column:1/-1;flex-direction:row;text-align:left;padding:14px 16px;gap:14px;background:linear-gradient(135deg,#1A3A2A,#2D6B4A);}
+.game-card.featured .game-card-icon{font-size:2.2rem;margin-bottom:0;flex-shrink:0;}
+.game-card.featured .game-card-title{color:#E8DDD0;}
+.game-card.featured .game-card-sub{color:rgba(232,221,208,0.75);}
+.game-section-hdr{font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;color:#4A9E6E;padding:12px 0 5px;font-weight:700;grid-column:1/-1;}
 /* vvdg answers */
 .vvdg-ans-btn{padding:7px 10px;border-radius:10px;border:2px solid #ddd;background:#fff;font-family:inherit;font-size:0.8rem;cursor:pointer;text-align:left;transition:all 0.15s;width:100%;}
 .vvdg-ans-btn.gekozen{border-color:#4A9E6E;background:rgba(74,158,110,0.1);font-weight:700;}
@@ -924,52 +927,72 @@ function renderProfileGrid(){
       </div>
     </div>
     <div class="game-grid">
-      <div class="game-tile" onclick="openGame('game-vvdg')">
-        <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=300&q=80" alt="">
-        <div class="game-tile-grad"></div>
-        <div class="game-tile-text"><div class="game-tile-title">❓ Vraag v/d dag</div><div class="game-tile-sub">Iedereen antwoordt live</div></div>
-      </div>
-      <div class="game-tile" onclick="openGame('game-klaverjas')">
-        <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=300&q=80" alt="">
-        <div class="game-tile-grad"></div>
-        <div class="game-tile-text"><div class="game-tile-title">🃏 Klaverjas</div><div class="game-tile-sub">Scorebord &amp; potjes</div></div>
-      </div>
-      <div class="game-tile" onclick="openGame('bingo-block')">
-        <img src="https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=300&q=80" alt="">
-        <div class="game-tile-grad"></div>
-        <div class="game-tile-text"><div class="game-tile-title">🎯 Autobingo</div><div class="game-tile-sub">Spot &amp; foto's delen</div></div>
-      </div>
-      <div class="game-tile" onclick="openGame('game-quiz')">
-        <img src="https://images.unsplash.com/photo-1519817650390-64a93db51149?w=300&q=80" alt="">
-        <div class="game-tile-grad"></div>
-        <div class="game-tile-text"><div class="game-tile-title">🧠 Quiz</div><div class="game-tile-sub">Slovenië &amp; Oostenrijk</div></div>
-      </div>
-      <div class="game-tile" onclick="openGame('game-scores')">
-        <img src="https://images.unsplash.com/photo-1565945887714-d5139f4eb0ce?w=300&q=80" alt="">
-        <div class="game-tile-grad"></div>
-        <div class="game-tile-text"><div class="game-tile-title">🏆 Scores</div><div class="game-tile-sub">Bohnanza &amp; meer</div></div>
-      </div>
-      <div class="game-tile" onclick="openGame('game-kampvuur')">
-        <img src="https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=300&q=80" alt="">
-        <div class="game-tile-grad"></div>
-        <div class="game-tile-text"><div class="game-tile-title">🔥 Kampvuur</div><div class="game-tile-sub">Verhalen &amp; spellen</div></div>
-      </div>
-      <div class="game-tile" onclick="openGame('game-avond')">
-        <img src="https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=300&q=80" alt="">
-        <div class="game-tile-grad"></div>
-        <div class="game-tile-text"><div class="game-tile-title">🌙 Avondspel</div><div class="game-tile-sub">Kies &amp; timer</div></div>
-      </div>
-      <div class="game-tile" onclick="openGame('game-water')">
-        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&q=80" alt="">
-        <div class="game-tile-grad"></div>
-        <div class="game-tile-text"><div class="game-tile-title">🏊 Waterspellen</div><div class="game-tile-sub">SUP &amp; meer</div></div>
-      </div>
-      <div class="game-tile" onclick="openGame('game-leed')">
-        <img src="https://images.unsplash.com/photo-1530908295418-a12e326966ba?w=300&q=80" alt="">
-        <div class="game-tile-grad"></div>
-        <div class="game-tile-text"><div class="game-tile-title">☔ Leedvermaak</div><div class="game-tile-sub">Thuisweer vs. jullie</div></div>
-      </div>
-    </div>
+  <div class="game-section-hdr">🔥 Begin hier — speel nu al</div>
+  <div class="game-card featured" onclick="openGame('game-vvdg')">
+    <div class="game-card-icon">❓</div>
+    <div><div class="game-card-title">Vraag van de dag</div><div class="game-card-sub">Iedereen antwoordt live · dagelijks nieuw</div></div>
+  </div>
+  <div class="game-card featured" onclick="openGame('game-klaverjas')">
+    <div class="game-card-icon">🃏</div>
+    <div><div class="game-card-title">Klaverjas scorebord</div><div class="game-card-sub">Potjes bijhouden · live voor iedereen</div></div>
+  </div>
+
+  <div class="game-section-hdr">🎯 Klassiekers</div>
+  <div class="game-card" onclick="openGame('bingo-block')">
+    <div class="game-card-icon">🎯</div>
+    <div class="game-card-title">Autobingo</div>
+    <div class="game-card-sub">Spot & foto's delen</div>
+  </div>
+  <div class="game-card" onclick="openGame('game-camping-bingo')">
+    <div class="game-card-icon">🏕️</div>
+    <div class="game-card-title">Campingbingo</div>
+    <div class="game-card-sub">Voor de kinderen</div>
+  </div>
+  <div class="game-card" onclick="openGame('game-quiz')">
+    <div class="game-card-icon">🧠</div>
+    <div class="game-card-title">Quiz</div>
+    <div class="game-card-sub">Slovenië & Oostenrijk</div>
+  </div>
+  <div class="game-card" onclick="openGame('game-scores')">
+    <div class="game-card-icon">🏆</div>
+    <div class="game-card-title">Scorelijst</div>
+    <div class="game-card-sub">Bohnanza & meer</div>
+  </div>
+
+  <div class="game-section-hdr">🌙 Avond & kampvuur</div>
+  <div class="game-card" onclick="openGame('game-avond')">
+    <div class="game-card-icon">🎲</div>
+    <div class="game-card-title">Avondspellen</div>
+    <div class="game-card-sub">Picker + countdown timer</div>
+  </div>
+  <div class="game-card" onclick="openGame('game-cheers')">
+    <div class="game-card-icon">🍻</div>
+    <div class="game-card-title">Cheers to the Gov.</div>
+    <div class="game-card-sub">Tellen tot 21 met regels</div>
+  </div>
+  <div class="game-card" onclick="openGame('game-hitster')">
+    <div class="game-card-icon">🎵</div>
+    <div class="game-card-title">Hitster</div>
+    <div class="game-card-sub">Raad het jaar van het liedje</div>
+  </div>
+  <div class="game-card" onclick="openGame('game-kampvuur')">
+    <div class="game-card-icon">🔥</div>
+    <div class="game-card-title">Kampvuurverhaal</div>
+    <div class="game-card-sub">Magisch gegenereerd</div>
+  </div>
+
+  <div class="game-section-hdr">🏊 Buiten & meer</div>
+  <div class="game-card" onclick="openGame('game-water')">
+    <div class="game-card-icon">🏊</div>
+    <div class="game-card-title">Waterspellen</div>
+    <div class="game-card-sub">SUP, keilen & meer</div>
+  </div>
+  <div class="game-card" onclick="openGame('game-leed')">
+    <div class="game-card-icon">☔</div>
+    <div class="game-card-title">Leedvermaak</div>
+    <div class="game-card-sub">Thuisweer vs. jullie</div>
+  </div>
+</div>
 
     <!-- U9: Reis-scorebord + gamification -->
     <div style="margin:14px 20px 0;background:#1A3A2A;border-radius:14px;padding:14px 16px;">
@@ -1312,6 +1335,22 @@ function renderProfileGrid(){
           <div id="leed-nieuws-tekst" style="line-height:1.5;"></div>
         </div>
         <div id="weer-status" style="font-size:0.82rem;color:#6B6560;text-align:center;margin-top:6px;"></div>
+      </div>
+    </div>
+
+    <!-- Campingbingo -->
+    <div class="uitleg-block" id="game-camping-bingo">
+      <div class="uitleg-head" onclick="toggleUitleg(this);initCampingBingo()">
+        <div class="uitleg-title">🏕️ Campingbingo — voor de kinderen</div>
+        <div class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <p style="font-size:0.82rem;color:#6B6560;margin:0 0 10px;">Kruis aan wat je ziet of meemaakt op de camping. Wie als eerste een rij vol heeft roept BINGO!</p>
+        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+          <button onclick="cbReset()" style="padding:6px 14px;background:#F5EFE8;border:none;border-radius:10px;font-family:inherit;font-size:0.78rem;cursor:pointer;">🔄 Nieuwe kaart</button>
+          <div id="cb-bingo-banner" style="display:none;padding:6px 14px;background:#4A9E6E;color:#fff;border-radius:10px;font-size:0.78rem;font-weight:700;">🎉 BINGO!</div>
+        </div>
+        <div id="cb-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;"></div>
       </div>
     </div>
 
