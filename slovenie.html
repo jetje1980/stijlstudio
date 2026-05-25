@@ -2634,10 +2634,25 @@ function initAppesbach(){
   appesbach_inited=true;
   appesbach=L.map('appesbach-map',{scrollWheelZoom:false});
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(appesbach);
-  const ico=L.divIcon({className:'',html:'<div style="width:18px;height:18px;background:#8C6BAE;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.3);"></div>',iconSize:[18,18],iconAnchor:[9,9]});
-  L.marker([47.742,13.435],{icon:ico}).addTo(appesbach)
+  const icoKamp=L.divIcon({className:'',html:'<div style="width:20px;height:20px;background:#8C6BAE;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;font-size:10px;">⛺</div>',iconSize:[20,20],iconAnchor:[10,10]});
+  const icoPoi=L.divIcon({className:'',html:'<div style="width:18px;height:18px;background:#8B5E3C;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.3);"></div>',iconSize:[18,18],iconAnchor:[9,9]});
+  L.marker([47.742,13.435],{icon:icoKamp}).addTo(appesbach)
     .bindPopup('<b>Seecamping Appesbach</b><br>Au 99, St. Wolfgang<br>🏖️ Eigen 300m strand · SUP · Seecafé').openPopup();
-  appesbach.setView([47.742,13.435],14);
+  const pois=[
+    [[47.739,13.448],'St. Wolfgang centrum','🏘️ Kerk, marktplein, Weißes Rössl · 10 min fietsen'],
+    [[47.737,13.446],'Schafbergbahn station','🚂 Stoomtandradtrein naar 1783 m · vertrek hier · ticket ~€50'],
+    [[47.740,13.440],'Wolfgangsee aanlegsteiger','⛵ Veerboot St. Wolfgang · lijn naar St. Gilgen & Strobl'],
+    [[47.731,13.424],'Zwölferhorn Seilbahn','🚡 Kabelbaan 1522 m · panorama over Wolfgangsee · vanuit St. Gilgen'],
+    [[47.758,13.397],'Postalm','🌿 Grootste aaneengesloten alpenweide van Oostenrijk · wandelen & koeien'],
+    [[47.714,13.622],'Bad Ischl','🎂 Keizerstad · Konditorei Zauner · Kaiservilla · 45 min rijden'],
+    [[47.562,13.649],'Hallstatt','🏔️ UNESCO-dorp aan meer · 1,5 uur · vroeg gaan of laat!'],
+    [[47.480,13.606],'Dachstein gletsjer','🧊 Gondel + ijsgrotten + skywalk · 2 uur rijden'],
+    [[47.810,13.055],'Salzburg','🎼 Mozart-geboortestad · Altstadt + Festung · 1,5 uur rijden'],
+  ];
+  pois.forEach(([latlng,naam,info])=>{
+    L.marker(latlng,{icon:icoPoi}).addTo(appesbach).bindPopup(`<b>${naam}</b><br>${info}`);
+  });
+  appesbach.setView([47.72,13.47],11);
 }
 
 function toggleCollapsibleMap(el, mapId, initFn){
