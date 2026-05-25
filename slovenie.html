@@ -385,11 +385,13 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
   <div style="font-size:0.6rem;letter-spacing:0.12em;color:#9A948E;margin-bottom:8px;">Slovenië & Oostenrijk</div>
   <div class="login-divider"></div>
   <div id="step1" class="login-step">
-    <div>
-      <div class="login-label">Groepscode</div>
-      <input id="code-input" class="login-input" type="text" placeholder="••••••••" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off">
-    </div>
-    <button class="login-btn" id="login-btn" onclick="checkCode()">Ga naar de vakantie →</button>
+    <form onsubmit="checkCode();return false;">
+      <div>
+        <div class="login-label">Groepscode</div>
+        <input id="code-input" class="login-input" type="text" placeholder="••••••••" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off">
+      </div>
+      <button class="login-btn" id="login-btn" type="submit" onclick="checkCode();return false;">Ga naar de vakantie →</button>
+    </form>
     <div class="login-error" id="code-error"></div>
   </div>
   <div id="step2" class="login-step hidden">
