@@ -68,12 +68,14 @@
 | 3 | U5 | ⬜ | Autospellen, bingo + foto's, kampvuurverhaal, waterspellen, weer-leedvermaak |
 | 4 | U2 | ⬜ | Oostenrijk Appesbach: activiteiten + afstanden + kaart + 🟫-markerlaag |
 | 5 | U4 | ⬜ | Huttentochten Bohinj (1/2 nachten, splitsing, hutten/parkeren/afstand) |
-| 6 | U6 | ⬜ | Quiz Slovenië & Oostenrijk (🟢/🔴, koppelt aan scorelijst) |
+| 6 | U6 | ⬜ | Quiz Slovenië & Oostenrijk (🟢/🔴 + meerkeuze A/B/C, koppelt aan scorelijst) |
+| 7 | U9 | ⬜ | Gamification: totaalscore + gezin-vs-gezin, badges, dagelijkse uitdaging, foto-galerij |
+| 8 | U8 | ⬜ | Overstap-etappe Bohinj → Appesbach: route + Wörthersee-zwemstop + Villach-boodschappen + Konditorei Zauner |
 
-## Openstaande beslispunten
+## Beslispunten (door Duurt beslist)
 
-- [ ] Meerkeuze A/B/C voor jongste spelers bij quiz (U6)?
-- [ ] Overstap-etappe Bohinj → Appesbach (5 aug) op de route-kaart → toevoegen aan U2 of losse U8?
+- [x] Meerkeuze A/B/C voor jongste spelers bij quiz → ingebouwd in U6a.
+- [x] Overstap-etappe Bohinj → Appesbach (5 aug) → losse brief U8 (Wörthersee-zwemstop + Villach-boodschappen + Konditorei Zauner).
 
 ## Openstaand / later
 
