@@ -50,6 +50,7 @@
 | 2026-05-25 | U9e | ✅ | Supabase: slovenie_points + _badges + _daily_done + RLS; puntenintegratie quiz/bingo/recept | slovenie.html, Supabase |
 | 2026-05-25 | U2-1 | ✅ | Appesbach: activiteiten (4 niveaus), zwemmen (Wolfgangsee), eten (Seecafé/Rössl/Zauner) collapsibles in Info-tab | slovenie.html |
 | 2026-05-25 | U2f | ✅ | 9 🟫 bruine markers op Appesbach-kaart (St. Wolfgang, Schafbergbahn, boot, Zwölferhorn, Postalm, Bad Ischl, Hallstatt, Dachstein, Salzburg) | slovenie.html |
+| 2026-05-25 | U4 | ✅ | Huttentochten Bohinj: 3 routes (Komna/Planina Blato/Triglav) + splitsing-tip + reserveringslinks + 3 🟪 hut-markers op Bohinj-kaart | slovenie.html |
 
 ## Datamodel U7 (aangemaakt in Supabase, project osuqtfsxmquwqsbgzlqn)
 
@@ -90,7 +91,7 @@
 | 2 | U3 | ✅ | Vertaaltool + gedeelde recepten + dag-maaltijden + camping-kaarten |
 | 3 | U5 | ✅ | Autospellen, bingo + foto's, kampvuurverhaal, waterspellen, weer-leedvermaak |
 | 4 | U2 | ✅ | Oostenrijk Appesbach: activiteiten + afstanden + kaart + 🟫-markerlaag |
-| 5 | U4 | ⬜ | Huttentochten Bohinj (1/2 nachten, splitsing, hutten/parkeren/afstand) |
+| 5 | U4 | ✅ | Huttentochten Bohinj (1/2 nachten, splitsing, hutten/parkeren/afstand) |
 | 6 | U6 | ✅ | Quiz Slovenië & Oostenrijk (🟢/🔴 + meerkeuze A/B/C, koppelt aan scorelijst) |
 | 7 | U9 | ✅ | Gamification: totaalscore + gezin-vs-gezin, badges, dagelijkse uitdaging, foto-galerij |
 | 8 | U8 | ⬜ | Overstap-etappe Bohinj → Appesbach: route + Wörthersee-zwemstop + Villach-boodschappen + Konditorei Zauner |
