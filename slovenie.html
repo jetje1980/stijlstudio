@@ -850,6 +850,57 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
       </div>
     </div>
 
+    <!-- U6: Quiz -->
+    <div class="uitleg-block">
+      <div class="uitleg-head" onclick="toggleUitleg(this);initQuiz()">
+        <div class="uitleg-title">🧠 Quiz Slovenië & Oostenrijk</div>
+        <div class="uitleg-arrow">▼</div>
+      </div>
+      <div class="uitleg-body">
+        <!-- Controls -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center;">
+          <select id="quiz-cat-filter" onchange="quizFilter()" style="flex:1;border:1.5px solid #ddd;border-radius:10px;padding:7px 10px;font-family:inherit;font-size:0.82rem;background:#fff;">
+            <option value="">Alle categorieën</option>
+            <option value="Aardrijkskunde">🌍 Aardrijkskunde</option>
+            <option value="Natuur">🐾 Natuur & dieren</option>
+            <option value="Eten">🍽️ Eten & drinken</option>
+            <option value="Taal">🗣️ Taal & weetjes</option>
+            <option value="Afstand">🎯 Raad-de-afstand</option>
+          </select>
+          <select id="quiz-niv-filter" onchange="quizFilter()" style="width:110px;border:1.5px solid #ddd;border-radius:10px;padding:7px 10px;font-family:inherit;font-size:0.82rem;background:#fff;">
+            <option value="">Alle niveaus</option>
+            <option value="makkelijk">🟢 Makkelijk</option>
+            <option value="pittig">🔴 Pittig</option>
+          </select>
+          <label style="display:flex;align-items:center;gap:5px;font-size:0.78rem;color:#6B6560;white-space:nowrap;">
+            <input type="checkbox" id="quiz-kind-toggle" onchange="quizFilter()"> Kindermodus
+          </label>
+        </div>
+
+        <!-- Vraag-kaart -->
+        <div id="quiz-card" style="background:#fff;border:1.5px solid #e0dbd6;border-radius:14px;padding:16px;margin-bottom:10px;min-height:100px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span id="quiz-badge" style="font-size:0.75rem;font-weight:700;padding:3px 8px;border-radius:10px;background:#EDE4DC;"></span>
+            <span id="quiz-teller" style="font-size:0.78rem;color:#9A948E;"></span>
+          </div>
+          <div id="quiz-vraag" style="font-size:0.95rem;font-weight:700;line-height:1.4;margin-bottom:12px;"></div>
+          <!-- Meerkeuze (kindermodus) -->
+          <div id="quiz-keuze" style="display:none;display:grid;gap:7px;"></div>
+          <!-- Normaal toon-antwoord -->
+          <button id="quiz-toon-btn" onclick="quizToonAntwoord()" style="padding:9px 20px;background:#0A0A0A;color:#fff;border:none;border-radius:16px;font-family:inherit;font-size:0.85rem;cursor:pointer;">Toon antwoord</button>
+          <div id="quiz-antwoord" style="display:none;margin-top:10px;background:#4A9E6E;color:#fff;border-radius:10px;padding:10px 12px;font-size:0.88rem;font-weight:700;"></div>
+        </div>
+
+        <!-- Navigatie -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button onclick="quizNav(-1)" style="padding:8px 14px;background:#fff;border:1.5px solid #ddd;border-radius:14px;font-family:inherit;font-size:0.85rem;cursor:pointer;">◀ Vorige</button>
+          <button onclick="quizNav(1)" style="flex:1;padding:8px 14px;background:#4A9E6E;color:#fff;border:none;border-radius:14px;font-family:inherit;font-size:0.88rem;font-weight:700;cursor:pointer;">Volgende ▶</button>
+          <button onclick="quizRandom()" style="padding:8px 14px;background:#fff;border:1.5px solid #ddd;border-radius:14px;font-family:inherit;font-size:0.85rem;cursor:pointer;">🎲</button>
+        </div>
+        <div id="quiz-leeg" style="font-size:0.85rem;color:#9A948E;text-align:center;padding:12px 0;display:none;">Geen vragen voor deze filter.</div>
+      </div>
+    </div>
+
     <!-- U5b: Scorelijst -->
     <div class="uitleg-block">
       <div class="uitleg-head" onclick="toggleUitleg(this);loadScoreGames()">
