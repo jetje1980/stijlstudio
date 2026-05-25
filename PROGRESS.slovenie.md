@@ -39,6 +39,10 @@
 | 2026-05-25 | U5f | ✅ | Waterspellen: 5 spellen (SUP-estafette, king of the board, keilen, duik-schattenjacht, koud-water) | slovenie.html |
 | 2026-05-25 | U5g | ✅ | Kampavond: Wie ben ik, categorieënspel, verhaalstokje, twee waarheden/één leugen + Perseïden-tip | slovenie.html |
 | 2026-05-25 | U5h | ✅ | Weer-leedvermaak: 9 locaties via Open-Meteo, leedvermaak-meter, lazy load bij openen | slovenie.html |
+| 2026-05-25 | fix | ✅ | Login-fix: Supabase-init in try/catch zodat JS-crash login niet meer blokkeert | slovenie.html |
+| 2026-05-25 | U6a | ✅ | Quiz HTML: collapsible met filter (categorie/niveau), vraag-kaart, meerkeuze-grid, navigatie | slovenie.html |
+| 2026-05-25 | U6b | ✅ | 35 quizvragen over Aardrijkskunde/Natuur/Eten/Taal/Afstand, 🟢 makkelijk + 🔴 pittig | slovenie.html |
+| 2026-05-25 | U6c | ✅ | Kindermodus-toggle: 🟢-vragen tonen 3 keuze-knoppen met direct goed/fout-feedback | slovenie.html |
 
 ## Datamodel U7 (aangemaakt in Supabase, project osuqtfsxmquwqsbgzlqn)
 
@@ -80,7 +84,7 @@
 | 3 | U5 | ✅ | Autospellen, bingo + foto's, kampvuurverhaal, waterspellen, weer-leedvermaak |
 | 4 | U2 | ⬜ | Oostenrijk Appesbach: activiteiten + afstanden + kaart + 🟫-markerlaag |
 | 5 | U4 | ⬜ | Huttentochten Bohinj (1/2 nachten, splitsing, hutten/parkeren/afstand) |
-| 6 | U6 | ⬜ | Quiz Slovenië & Oostenrijk (🟢/🔴 + meerkeuze A/B/C, koppelt aan scorelijst) |
+| 6 | U6 | ✅ | Quiz Slovenië & Oostenrijk (🟢/🔴 + meerkeuze A/B/C, koppelt aan scorelijst) |
 | 7 | U9 | ⬜ | Gamification: totaalscore + gezin-vs-gezin, badges, dagelijkse uitdaging, foto-galerij |
 | 8 | U8 | ⬜ | Overstap-etappe Bohinj → Appesbach: route + Wörthersee-zwemstop + Villach-boodschappen + Konditorei Zauner |
 
