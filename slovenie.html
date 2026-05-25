@@ -895,11 +895,30 @@ function renderProfileGrid(){
 
   <!-- ── SPELLEN ── -->
   <section id="sec-spellen" class="section">
-    <div class="sec-photo-header" style="height:120px;">
-      <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1A3A2A 0%,#2D5A3D 100%);"></div>
+    <div class="sec-photo-header" style="height:140px;overflow:hidden;">
+      <img src="https://images.unsplash.com/photo-1585504198199-20277593b94f?w=700&q=80" alt="Spellen" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 60%;">
+      <div class="sec-photo-header-grad"></div>
       <div class="sec-photo-header-text">
         <div class="sec-photo-header-title">Spellen</div>
-        <div class="sec-photo-header-sub">Klaverjas scorebord</div>
+        <div class="sec-photo-header-sub">Klaverjas · Bingo · Quiz · Kampvuur</div>
+      </div>
+    </div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:10px 20px 4px;display:flex;gap:10px;">
+      <div class="reel-card" onclick="toggleUitleg(document.querySelector('#bingo-block .uitleg-head'));document.getElementById('bingo-block').scrollIntoView({behavior:'smooth'})">
+        <img src="https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=200&q=80" alt="Bingo">
+        <div class="reel-cap">🎯 Bingo</div>
+      </div>
+      <div class="reel-card" onclick="toggleUitleg(document.querySelector('#spellen .uitleg-block:nth-child(4) .uitleg-head'))">
+        <img src="https://images.unsplash.com/photo-1519817650390-64a93db51149?w=200&q=80" alt="Quiz">
+        <div class="reel-cap">🧠 Quiz</div>
+      </div>
+      <div class="reel-card" style="cursor:default;">
+        <img src="https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=200&q=80" alt="Kampvuur">
+        <div class="reel-cap">🔥 Kampvuur</div>
+      </div>
+      <div class="reel-card" style="cursor:default;">
+        <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=200&q=80" alt="Klaverjas">
+        <div class="reel-cap">🃏 Klaverjas</div>
       </div>
     </div>
 
@@ -1175,14 +1194,39 @@ function renderProfileGrid(){
         <div class="uitleg-arrow">▼</div>
       </div>
       <div class="uitleg-body">
+        <!-- Random game picker -->
+        <div style="background:#F5EFE8;border-radius:12px;padding:12px 14px;margin-bottom:12px;text-align:center;">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#9A948E;margin-bottom:8px;">🎲 Weet niet wat te spelen?</div>
+          <div id="kv-spel-keuze" style="font-size:1rem;font-weight:700;color:#0A0A0A;min-height:28px;margin-bottom:10px;">Druk op de knop!</div>
+          <button onclick="kiesRandomSpel()" style="padding:9px 20px;background:#1A3A2A;color:#E8DDD0;border:none;border-radius:20px;font-family:inherit;font-size:0.88rem;font-weight:700;cursor:pointer;">🎲 Kies voor ons!</button>
+        </div>
+        <!-- Timer voor categorieënspel -->
+        <div style="background:#fff;border:1.5px solid #e0dbd6;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#9A948E;margin-bottom:6px;">⏱️ Timer (categorieënspel)</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div id="kv-timer-display" style="font-size:2.2rem;font-weight:800;color:#0A0A0A;font-variant-numeric:tabular-nums;min-width:56px;text-align:center;">10</div>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <div style="display:flex;gap:6px;">
+                <button onclick="kvTimerSet(10)" style="padding:5px 10px;background:#F5EFE8;border:none;border-radius:10px;font-family:inherit;font-size:0.78rem;cursor:pointer;">10s</button>
+                <button onclick="kvTimerSet(15)" style="padding:5px 10px;background:#F5EFE8;border:none;border-radius:10px;font-family:inherit;font-size:0.78rem;cursor:pointer;">15s</button>
+                <button onclick="kvTimerSet(30)" style="padding:5px 10px;background:#F5EFE8;border:none;border-radius:10px;font-family:inherit;font-size:0.78rem;cursor:pointer;">30s</button>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <button id="kv-timer-start" onclick="kvTimerToggle()" style="flex:1;padding:6px 12px;background:#4A9E6E;color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:0.82rem;font-weight:700;cursor:pointer;">▶ Start</button>
+                <button onclick="kvTimerReset()" style="padding:6px 12px;background:#F5EFE8;border:none;border-radius:10px;font-family:inherit;font-size:0.82rem;cursor:pointer;">↺</button>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="uitleg-row"><strong>Wie ben ik?</strong> — Iemand denkt aan een persoon (beroemd of uit de groep). De rest stelt om beurten ja/nee-vragen. Degene die het raadt mag de volgende zijn.</div>
-        <div class="uitleg-row"><strong>Categorieënspel met timer</strong> — Kies een categorie (bijv. "dieren op de camping" of "Sloveense steden"). Ieder geeft om beurten een antwoord. Wie herhaalt, te lang nadenkt of een leeg antwoord geeft, valt af. Begin met 10 seconden per persoon.</div>
-        <div class="uitleg-row"><strong>Verhaalstokje</strong> — Iemand begint een zin van een verhaal. De volgende voegt een zin toe, enzovoort. Probeer het spannend te houden — eindig met "En toen…" om door te geven.</div>
-        <div class="uitleg-row"><strong>Twee waarheden, één leugen</strong> — Iedereen zegt drie dingen over zichzelf: twee zijn waar, één is gelogen. De rest raadt welke leugen is. Wie de meeste mensen misleidt, wint.</div>
+        <div class="uitleg-row"><strong>Categorieënspel</strong> — Kies een categorie (bijv. "dieren op de camping"). Ieder geeft om beurten een antwoord. Gebruik de timer! Wie herhaalt of te lang denkt valt af.</div>
+        <div class="uitleg-row"><strong>Verhaalstokje</strong> — Iemand begint een zin van een verhaal. De volgende voegt een zin toe. Eindig met "En toen…" om door te geven.</div>
+        <div class="uitleg-row"><strong>Twee waarheden, één leugen</strong> — Iedereen zegt drie dingen over zichzelf: twee zijn waar, één is gelogen. Wie de meeste mensen misleidt wint.</div>
+        <div class="uitleg-row"><strong>Raad het liedje</strong> — Iemand neuriët of fluit een liedje. Wie het eerst raadt, neuriët de volgende.</div>
         <div style="margin-top:10px;background:#1A3A2A;border-radius:10px;padding:12px 14px;color:#E8DDD0;font-size:0.85rem;">
           <div style="font-weight:700;margin-bottom:6px;">🌠 Perseïden-meteorenregen</div>
-          In augustus piekt de Perseïden-regen — rond <strong>11–13 augustus</strong> (exacte topnacht te verifiëren, verschilt per jaar). Ideaal voor wie bij Appesbach zit, ver van stadslichten.<br><br>
-          <strong>Tip:</strong> Kijk weg van campinglampen, geef je ogen 15 min om te wennen, en doe een wens bij elke vallende ster. Het zijn kleine stukjes komeet die verbranden in de atmosfeer.
+          In augustus piekt de Perseïden-regen — rond <strong>11–13 augustus</strong>. Ideaal voor wie bij Appesbach zit, ver van stadslichten.<br><br>
+          <strong>Tip:</strong> Kijk weg van campinglampen, geef je ogen 15 min om te wennen, en doe een wens bij elke vallende ster.
         </div>
       </div>
     </div>
@@ -3523,6 +3567,57 @@ function vertelVerhaal(){
   const el=document.getElementById('kv-verhaal');
   el.textContent=t(h,s,p,d); el.style.display='block';
 }
+// ── KAMPAVOND SPEL-PICKER & TIMER ────────────────────
+const KAMPSPELLEN = [
+  '🎯 Autobingo — Spot iets op de camping en maak een foto als bewijs',
+  '🤔 Wie ben ik? — Post-it op het hoofd, ja/nee vragen',
+  '📖 Verhaalstokje — Begin een zin, geef door met "En toen…"',
+  '🤥 Twee waarheden, één leugen — Wie misleidt de meeste mensen?',
+  '🎵 Raad het liedje — Neuriën of fluiten, niet zingen',
+  '⏱️ Categorieënspel — Timer op 10 seconden, wie valt er als eerste af?',
+  '🃏 Weerwolven — Wie is de weerwolf? Dorp vs. wolven',
+  '🌟 Complimenten-kring — Elk geeft iedereen één oprecht compliment',
+  '🗺️ Sloveense quiz — Gebruik de Quiz-sectie in de app',
+  '🌙 Sterren kijken — Perseïden zijn er in augustus! Doe een wens',
+  '🧩 Codenames — Twee teams, één geheimzinnig woord tegelijk',
+  '🏆 Kampkampioenschap — Verzonnen Olympische Spelen: blikken stapelen, steentje keilwedstrijd, marmot-nabootsen',
+];
+function kiesRandomSpel(){
+  const el=document.getElementById('kv-spel-keuze');
+  if(!el) return;
+  let c=0;
+  const prev=el.textContent;
+  const int=setInterval(()=>{
+    el.textContent=KAMPSPELLEN[Math.floor(Math.random()*KAMPSPELLEN.length)];
+    if(++c>12) { clearInterval(int); }
+  },80);
+}
+let kvTimerInterval=null, kvTimerSec=10, kvTimerRunning=false;
+function kvTimerSet(s){ kvTimerSec=s; kvTimerRunning=false; clearInterval(kvTimerInterval); const d=document.getElementById('kv-timer-display'); if(d) d.textContent=s; const b=document.getElementById('kv-timer-start'); if(b){b.textContent='▶ Start';b.style.background='#4A9E6E';} }
+function kvTimerReset(){ kvTimerSet(kvTimerSec); }
+function kvTimerToggle(){
+  const d=document.getElementById('kv-timer-display');
+  const b=document.getElementById('kv-timer-start');
+  if(kvTimerRunning){
+    clearInterval(kvTimerInterval); kvTimerRunning=false;
+    if(b){b.textContent='▶ Start';b.style.background='#4A9E6E';}
+    return;
+  }
+  kvTimerRunning=true;
+  if(b){b.textContent='⏸ Pauze';b.style.background='#E8943A';}
+  let t=parseInt(d?.textContent)||kvTimerSec;
+  kvTimerInterval=setInterval(()=>{
+    t--;
+    if(d) d.textContent=t;
+    if(t<=0){
+      clearInterval(kvTimerInterval); kvTimerRunning=false;
+      if(d) d.textContent='⏰';
+      if(b){b.textContent='▶ Opnieuw';b.style.background='#4A9E6E';}
+      if(navigator.vibrate) navigator.vibrate([200,100,200]);
+    }
+  },1000);
+}
+
 function initKvNaamKnoppen(){
   ['kv-held-knoppen','kv-schurk-knoppen'].forEach((id,idx)=>{
     const el=document.getElementById(id); if(!el) return;
