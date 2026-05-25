@@ -43,6 +43,11 @@
 | 2026-05-25 | U6a | ✅ | Quiz HTML: collapsible met filter (categorie/niveau), vraag-kaart, meerkeuze-grid, navigatie | slovenie.html |
 | 2026-05-25 | U6b | ✅ | 35 quizvragen over Aardrijkskunde/Natuur/Eten/Taal/Afstand, 🟢 makkelijk + 🔴 pittig | slovenie.html |
 | 2026-05-25 | U6c | ✅ | Kindermodus-toggle: 🟢-vragen tonen 3 keuze-knoppen met direct goed/fout-feedback | slovenie.html |
+| 2026-05-25 | U9a | ✅ | Reis-scorebord: persoonsranglijst 🥇🥈🥉 + gezin-vs-gezin balk (Vonck vs Sierksma) | slovenie.html |
+| 2026-05-25 | U9b | ✅ | 10 badges met handmatig toekennen (🎖️); auto-punten bij bingo/quiz/recept | slovenie.html |
+| 2026-05-25 | U9c | ✅ | 19 dagelijkse uitdagingen (27 jul–14 aug), streak-teller, +3 pt bij volbracht | slovenie.html |
+| 2026-05-25 | U9d | ✅ | Hall of Fame: bingo-bewijsfoto's in 3-koloms grid (max 30, nieuwste boven) | slovenie.html |
+| 2026-05-25 | U9e | ✅ | Supabase: slovenie_points + _badges + _daily_done + RLS; puntenintegratie quiz/bingo/recept | slovenie.html, Supabase |
 
 ## Datamodel U7 (aangemaakt in Supabase, project osuqtfsxmquwqsbgzlqn)
 
@@ -85,7 +90,7 @@
 | 4 | U2 | ⬜ | Oostenrijk Appesbach: activiteiten + afstanden + kaart + 🟫-markerlaag |
 | 5 | U4 | ⬜ | Huttentochten Bohinj (1/2 nachten, splitsing, hutten/parkeren/afstand) |
 | 6 | U6 | ✅ | Quiz Slovenië & Oostenrijk (🟢/🔴 + meerkeuze A/B/C, koppelt aan scorelijst) |
-| 7 | U9 | ⬜ | Gamification: totaalscore + gezin-vs-gezin, badges, dagelijkse uitdaging, foto-galerij |
+| 7 | U9 | ✅ | Gamification: totaalscore + gezin-vs-gezin, badges, dagelijkse uitdaging, foto-galerij |
 | 8 | U8 | ⬜ | Overstap-etappe Bohinj → Appesbach: route + Wörthersee-zwemstop + Villach-boodschappen + Konditorei Zauner |
 
 ## Beslispunten (door Duurt beslist)
