@@ -341,12 +341,12 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
         <option value="♣ Klaveren">♣ Klaveren</option>
       </select>
     </div>
-    <div style="margin-bottom:6px;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#6B6560;">Team 1 (Duurt & Sanne)</div>
+    <div id="kv-modal-t1-label" style="margin-bottom:6px;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#6B6560;">Team 1 (Sanne & Griette)</div>
     <div class="mf-row">
       <div class="mf"><label>Roem</label><input id="kv-roem1" type="number" min="0" value="0" placeholder="0"></div>
       <div class="mf"><label>Slagen</label><input id="kv-slagen1" type="number" min="0" max="162" value="" placeholder="0–162"></div>
     </div>
-    <div style="margin-bottom:6px;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#6B6560;">Team 2 (Griette & Arjen)</div>
+    <div id="kv-modal-t2-label" style="margin-bottom:6px;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#6B6560;">Team 2 (Arjen & Duurt)</div>
     <div class="mf-row">
       <div class="mf"><label>Roem</label><input id="kv-roem2" type="number" min="0" value="0" placeholder="0"></div>
       <div class="mf"><label>Slagen</label><input id="kv-slagen2" type="number" min="0" max="162" value="" placeholder="0–162"></div>
@@ -489,19 +489,26 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
     <div class="sec-label" style="margin-top:4px;">Scorebord</div>
     <div class="kv-teams" id="kv-teams">
       <div class="kv-team">
-        <div class="kv-team-score" id="kv-score1" style="color:#4A7CAE;">0</div>
+        <div class="kv-team-score" id="kv-score1" style="color:#9E7AAD;">0</div>
         <div class="kv-team-name">Team 1</div>
-        <div class="kv-team-sub" id="kv-team1-names">Duurt & Sanne</div>
+        <div class="kv-team-sub" id="kv-team1-names">Sanne & Griette</div>
       </div>
       <div style="display:flex;align-items:center;font-size:1.2rem;color:#9A948E;padding:0 4px;">vs</div>
       <div class="kv-team">
-        <div class="kv-team-score" id="kv-score2" style="color:#D4785A;">0</div>
+        <div class="kv-team-score" id="kv-score2" style="color:#4A7CAE;">0</div>
         <div class="kv-team-name">Team 2</div>
-        <div class="kv-team-sub" id="kv-team2-names">Griette & Arjen</div>
+        <div class="kv-team-sub" id="kv-team2-names">Arjen & Duurt</div>
       </div>
     </div>
 
-    <button class="kv-add-btn" onclick="openKvModal()">+ Potje toevoegen</button>
+    <!-- teams wisselen -->
+    <div id="teams-wissel-bar" style="display:none;margin:10px 20px 0;background:rgba(10,10,10,0.04);border-radius:var(--r-lg);padding:12px 14px;">
+      <div style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#6B6560;margin-bottom:8px;">Kies een teamindeling</div>
+      <div id="teams-wissel-opties" style="display:flex;flex-direction:column;gap:6px;"></div>
+    </div>
+    <button style="margin:10px 20px 0;display:flex;align-items:center;gap:6px;background:none;border:1.5px solid rgba(10,10,10,0.14);border-radius:20px;padding:7px 14px;font-size:0.78rem;color:#6B6560;cursor:pointer;" onclick="toggleTeamsWissel()">⇄ Teams wisselen</button>
+
+    <button class="kv-add-btn" style="margin-top:12px;" onclick="openKvModal()">+ Potje toevoegen</button>
 
     <div id="kv-potjes-list"></div>
 
@@ -736,6 +743,15 @@ let swipeQueue = [];
 let packChecked = {};
 let kvPotjes = [];
 let kvScore = {t1:0, t2:0};
+
+// teams — elk object heeft {t1:[naam,naam], t2:[naam,naam]}
+const KV_TEAM_PRESETS = [
+  {label:'Sanne & Griette  vs  Arjen & Duurt', t1:['Sanne','Griette'], t2:['Arjen','Duurt']},
+  {label:'Sanne & Arjen  vs  Griette & Duurt',  t1:['Sanne','Arjen'],  t2:['Griette','Duurt']},
+  {label:'Sanne & Duurt  vs  Griette & Arjen',  t1:['Sanne','Duurt'],  t2:['Griette','Arjen']},
+  {label:'Griette & Arjen  vs  Sanne & Duurt',  t1:['Griette','Arjen'],t2:['Sanne','Duurt']},
+];
+let kvTeams = JSON.parse(localStorage.getItem(`${SK}_kv_teams`) || 'null') || KV_TEAM_PRESETS[0];
 
 // ── REEL ─────────────────────────────────────────────
 const REEL_DATA = [
@@ -1061,20 +1077,47 @@ function resetSwipes(){swipes={};localStorage.setItem(`${SK}_swipes_${currentUse
 // ── KLAVERJAS ────────────────────────────────────────
 function loadKvData(){
   kvPotjes = JSON.parse(localStorage.getItem(`${SK}_kv_potjes`) || '[]');
+  kvTeams  = JSON.parse(localStorage.getItem(`${SK}_kv_teams`)  || 'null') || KV_TEAM_PRESETS[0];
   recalcKvScores();
 }
 function recalcKvScores(){
   kvScore={t1:0,t2:0};
-  kvPotjes.forEach(p=>{
-    kvScore.t1 += p.pts1;
-    kvScore.t2 += p.pts2;
-  });
+  kvPotjes.forEach(p=>{ kvScore.t1+=p.pts1; kvScore.t2+=p.pts2; });
 }
 function renderKvScores(){
   recalcKvScores();
   document.getElementById('kv-score1').textContent = kvScore.t1;
   document.getElementById('kv-score2').textContent = kvScore.t2;
+  document.getElementById('kv-team1-names').textContent = kvTeams.t1.join(' & ');
+  document.getElementById('kv-team2-names').textContent = kvTeams.t2.join(' & ');
+  const ml1 = document.getElementById('kv-modal-t1-label');
+  const ml2 = document.getElementById('kv-modal-t2-label');
+  if(ml1) ml1.textContent = `Team 1 (${kvTeams.t1.join(' & ')})`;
+  if(ml2) ml2.textContent = `Team 2 (${kvTeams.t2.join(' & ')})`;
   renderKvPotjes();
+}
+
+function toggleTeamsWissel(){
+  const bar = document.getElementById('teams-wissel-bar');
+  const show = bar.style.display==='none';
+  bar.style.display = show?'block':'none';
+  if(show) renderTeamsWisselOpties();
+}
+function renderTeamsWisselOpties(){
+  const el = document.getElementById('teams-wissel-opties');
+  el.innerHTML = KV_TEAM_PRESETS.map((p,i)=>{
+    const active = p.t1.join('&')===kvTeams.t1.join('&') && p.t2.join('&')===kvTeams.t2.join('&');
+    return `<button onclick="setKvTeam(${i})" style="text-align:left;padding:9px 12px;border-radius:var(--r);border:1.5px solid ${active?'#4A9E6E':'rgba(10,10,10,0.1)'};background:${active?'rgba(74,158,110,0.08)':'transparent'};font-size:0.82rem;color:#0A0A0A;cursor:pointer;">
+      ${active?'<span style="color:#4A9E6E;font-weight:700;">✓ </span>':''}${p.label}
+    </button>`;
+  }).join('');
+}
+function setKvTeam(i){
+  kvTeams = KV_TEAM_PRESETS[i];
+  localStorage.setItem(`${SK}_kv_teams`, JSON.stringify(kvTeams));
+  document.getElementById('teams-wissel-bar').style.display='none';
+  renderKvScores();
+  showToast('Teams gewijzigd!');
 }
 function renderKvPotjes(){
   const el = document.getElementById('kv-potjes-list');
@@ -1123,7 +1166,7 @@ function updateKvPreview(){
   const s1     = parseInt(document.getElementById('kv-slagen1')?.value)||0;
   const s2     = parseInt(document.getElementById('kv-slagen2')?.value)||0;
   const roeper = document.getElementById('kv-roeper')?.value||'';
-  const roepTeam = ['Duurt','Sanne'].includes(roeper)?1:2;
+  const roepTeam = kvTeams.t1.includes(roeper)?1:2;
   let pts1=0, pts2=0;
   if(nat){
     const winner = roepTeam===1?2:1;
@@ -1134,8 +1177,8 @@ function updateKvPreview(){
   }
   const prev = document.getElementById('kv-modal-preview');
   if(prev) prev.innerHTML = nat
-    ? `<span style="color:#c0392b;font-weight:700;">NAT</span> — Team ${roepTeam===1?2:1} krijgt alle punten: <strong>${roepTeam===1?pts2:pts1}</strong>`
-    : `Team 1: <strong>${pts1}</strong> &nbsp;·&nbsp; Team 2: <strong>${pts2}</strong>`;
+    ? `<span style="color:#c0392b;font-weight:700;">NAT</span> — Team ${roepTeam===1?2:1} (${roepTeam===1?kvTeams.t2.join(' & '):kvTeams.t1.join(' & ')}) krijgt alle punten: <strong>${roepTeam===1?pts2:pts1}</strong>`
+    : `${kvTeams.t1.join(' & ')}: <strong>${pts1}</strong> &nbsp;·&nbsp; ${kvTeams.t2.join(' & ')}: <strong>${pts2}</strong>`;
 }
 function submitPotje(){
   const nat    = document.getElementById('kv-nat')?.checked;
@@ -1145,7 +1188,7 @@ function submitPotje(){
   const s2     = parseInt(document.getElementById('kv-slagen2')?.value)||0;
   const roeper = document.getElementById('kv-roeper')?.value;
   const troef  = document.getElementById('kv-troef')?.value;
-  const roepTeam = ['Duurt','Sanne'].includes(roeper)?1:2;
+  const roepTeam = kvTeams.t1.includes(roeper)?1:2;
   let pts1,pts2;
   if(nat){
     const allPts=162+r1+r2;
