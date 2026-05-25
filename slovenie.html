@@ -342,18 +342,20 @@ h1,h2,h3,h4{font-weight:700;font-style:italic;}
 .dag-chip-rm{background:none;border:none;cursor:pointer;color:#9A948E;font-size:0.68rem;padding:0 3px;line-height:1;flex-shrink:0;}
 .dag-add-btn{margin-top:4px;padding:5px 13px;border-radius:20px;border:1.5px dashed rgba(74,158,110,0.45);background:transparent;color:#4A9E6E;font-size:0.76rem;cursor:pointer;font-family:var(--sans);font-weight:600;}
 .dag-sug-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(10,10,10,0.05);border:1px dashed rgba(10,10,10,0.25);border-radius:20px;padding:4px 10px;font-size:0.75rem;color:#6B6560;cursor:pointer;transition:background 0.15s;}
-/* game tiles — card style */
+/* game tiles — photo card style */
 .game-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px 4px;}
-.game-card{background:#fff;border-radius:18px;padding:18px 12px 14px;display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;box-shadow:0 1px 8px rgba(0,0,0,0.07);-webkit-tap-highlight-color:transparent;transition:transform 0.15s;border:none;}
-.game-card:active{transform:scale(0.94);}
-.game-card-icon{font-size:2.4rem;margin-bottom:7px;line-height:1;}
-.game-card-title{font-weight:800;font-style:italic;font-size:0.9rem;color:#0A0A0A;margin-bottom:3px;line-height:1.2;}
-.game-card-sub{font-size:0.68rem;color:#6B6560;line-height:1.4;}
-.game-card.featured{grid-column:1/-1;flex-direction:row;text-align:left;padding:14px 16px;gap:14px;background:linear-gradient(135deg,#1A3A2A,#2D6B4A);}
-.game-card.featured .game-card-icon{font-size:2.2rem;margin-bottom:0;flex-shrink:0;}
-.game-card.featured .game-card-title{color:#E8DDD0;}
-.game-card.featured .game-card-sub{color:rgba(232,221,208,0.75);}
+.game-card{border-radius:16px;overflow:hidden;position:relative;height:120px;cursor:pointer;background:#1A2510;-webkit-tap-highlight-color:transparent;display:block;}
+.game-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 0.22s;}
+.game-card:active img{transform:scale(1.06);}
+.game-card-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.08) 0%,rgba(0,0,0,0.72) 100%);}
+.game-card-text{position:absolute;bottom:0;left:0;right:0;padding:8px 10px;}
+.game-card-icon{position:absolute;top:8px;left:10px;font-size:1.4rem;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5));}
+.game-card-title{color:#fff;font-weight:800;font-style:italic;font-size:0.88rem;text-shadow:0 1px 4px rgba(0,0,0,0.6);line-height:1.2;margin-bottom:1px;}
+.game-card-sub{color:rgba(255,255,255,0.75);font-size:0.62rem;line-height:1.3;}
+.game-card.featured{height:90px;grid-column:1/-1;}
 .game-section-hdr{font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;color:#4A9E6E;padding:12px 0 5px;font-weight:700;grid-column:1/-1;}
+.sage-keuze-btn{padding:10px 14px;border-radius:12px;border:1.5px solid rgba(26,58,42,0.2);background:#fff;font-family:inherit;font-size:0.82rem;cursor:pointer;text-align:left;transition:all 0.15s;font-weight:600;color:#1A3A2A;}
+.sage-keuze-btn:active{background:#F0E8E2;transform:scale(0.97);}
 /* vvdg answers */
 .vvdg-ans-btn{padding:7px 10px;border-radius:10px;border:2px solid #ddd;background:#fff;font-family:inherit;font-size:0.8rem;cursor:pointer;text-align:left;transition:all 0.15s;width:100%;}
 .vvdg-ans-btn.gekozen{border-color:#4A9E6E;background:rgba(74,158,110,0.1);font-weight:700;}
@@ -951,68 +953,82 @@ function renderProfileGrid(){
     <div class="game-grid">
   <div class="game-section-hdr">🔥 Begin hier — speel nu al</div>
   <div class="game-card featured" onclick="openGame('game-vvdg')">
+    <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=700&q=80" alt="">
+    <div class="game-card-grad"></div>
     <div class="game-card-icon">❓</div>
-    <div><div class="game-card-title">Vraag van de dag</div><div class="game-card-sub">Iedereen antwoordt live · dagelijks nieuw</div></div>
+    <div class="game-card-text"><div class="game-card-title">Vraag van de dag</div><div class="game-card-sub">Iedereen antwoordt live · dagelijks nieuw</div></div>
   </div>
   <div class="game-card featured" onclick="openGame('game-klaverjas')">
+    <img src="https://images.unsplash.com/photo-1561731216-c3a4d99437d5?w=700&q=80" alt="">
+    <div class="game-card-grad"></div>
     <div class="game-card-icon">🃏</div>
-    <div><div class="game-card-title">Klaverjas scorebord</div><div class="game-card-sub">Potjes bijhouden · live voor iedereen</div></div>
+    <div class="game-card-text"><div class="game-card-title">Klaverjas scorebord</div><div class="game-card-sub">Potjes bijhouden · live voor iedereen</div></div>
   </div>
 
   <div class="game-section-hdr">🎯 Klassiekers</div>
   <div class="game-card" onclick="openGame('bingo-block')">
+    <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400&q=80" alt="">
+    <div class="game-card-grad"></div>
     <div class="game-card-icon">🎯</div>
-    <div class="game-card-title">Autobingo</div>
-    <div class="game-card-sub">Spot & foto's delen</div>
+    <div class="game-card-text"><div class="game-card-title">Autobingo</div><div class="game-card-sub">Spot & foto's delen</div></div>
   </div>
   <div class="game-card" onclick="openGame('game-camping-bingo')">
+    <img src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&q=80" alt="">
+    <div class="game-card-grad"></div>
     <div class="game-card-icon">🏕️</div>
-    <div class="game-card-title">Campingbingo</div>
-    <div class="game-card-sub">Voor de kinderen</div>
+    <div class="game-card-text"><div class="game-card-title">Campingbingo</div><div class="game-card-sub">Kruis aan wat je meemaakt</div></div>
   </div>
   <div class="game-card" onclick="openGame('game-quiz')">
+    <img src="https://images.unsplash.com/photo-1564507592333-c60657eea523?w=400&q=80" alt="">
+    <div class="game-card-grad"></div>
     <div class="game-card-icon">🧠</div>
-    <div class="game-card-title">Quiz</div>
-    <div class="game-card-sub">Slovenië & Oostenrijk</div>
+    <div class="game-card-text"><div class="game-card-title">Quiz</div><div class="game-card-sub">Slovenië & Oostenrijk</div></div>
   </div>
   <div class="game-card" onclick="openGame('game-scores')">
+    <img src="https://images.unsplash.com/photo-1565945887714-d5139f4eb0ce?w=400&q=80" alt="">
+    <div class="game-card-grad"></div>
     <div class="game-card-icon">🏆</div>
-    <div class="game-card-title">Scorelijst</div>
-    <div class="game-card-sub">Bohnanza & meer</div>
+    <div class="game-card-text"><div class="game-card-title">Scorelijst</div><div class="game-card-sub">Bohnanza & meer</div></div>
   </div>
 
   <div class="game-section-hdr">🌙 Avond & kampvuur</div>
   <div class="game-card" onclick="openGame('game-avond')">
+    <img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=400&q=80" alt="">
+    <div class="game-card-grad"></div>
     <div class="game-card-icon">🎲</div>
-    <div class="game-card-title">Avondspellen</div>
-    <div class="game-card-sub">Picker + countdown timer</div>
+    <div class="game-card-text"><div class="game-card-title">Avondspellen</div><div class="game-card-sub">Picker + countdown timer</div></div>
   </div>
   <div class="game-card" onclick="openGame('game-cheers')">
+    <img src="https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=400&q=80" alt="">
+    <div class="game-card-grad"></div>
     <div class="game-card-icon">🍻</div>
-    <div class="game-card-title">Cheers to the Gov.</div>
-    <div class="game-card-sub">Tellen tot 21 met regels</div>
+    <div class="game-card-text"><div class="game-card-title">Cheers to the Gov.</div><div class="game-card-sub">Tellen tot 21 met regels</div></div>
   </div>
   <div class="game-card" onclick="openGame('game-hitster')">
+    <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&q=80" alt="">
+    <div class="game-card-grad"></div>
     <div class="game-card-icon">🎵</div>
-    <div class="game-card-title">Hitster</div>
-    <div class="game-card-sub">Raad het jaar van het liedje</div>
+    <div class="game-card-text"><div class="game-card-title">Hitster</div><div class="game-card-sub">Raad het jaar van het liedje</div></div>
   </div>
   <div class="game-card" onclick="openGame('game-kampvuur')">
+    <img src="https://images.unsplash.com/photo-1445308394109-4ec2920981b1?w=400&q=80" alt="">
+    <div class="game-card-grad"></div>
     <div class="game-card-icon">🔥</div>
-    <div class="game-card-title">Kampvuurverhaal</div>
-    <div class="game-card-sub">Magisch gegenereerd</div>
+    <div class="game-card-text"><div class="game-card-title">Sagen & Legenden</div><div class="game-card-sub">Echte mythen rond het kampvuur</div></div>
   </div>
 
   <div class="game-section-hdr">🏊 Buiten & meer</div>
   <div class="game-card" onclick="openGame('game-water')">
+    <img src="https://images.unsplash.com/photo-1530549387789-4c1017266635?w=400&q=80" alt="">
+    <div class="game-card-grad"></div>
     <div class="game-card-icon">🏊</div>
-    <div class="game-card-title">Waterspellen</div>
-    <div class="game-card-sub">SUP, keilen & meer</div>
+    <div class="game-card-text"><div class="game-card-title">Waterspellen</div><div class="game-card-sub">SUP, keilen & meer</div></div>
   </div>
   <div class="game-card" onclick="openGame('game-leed')">
+    <img src="https://images.unsplash.com/photo-1530908295418-a12e326966ba?w=400&q=80" alt="">
+    <div class="game-card-grad"></div>
     <div class="game-card-icon">☔</div>
-    <div class="game-card-title">Leedvermaak</div>
-    <div class="game-card-sub">Thuisweer vs. jullie</div>
+    <div class="game-card-text"><div class="game-card-title">Leedvermaak</div><div class="game-card-sub">Thuisweer vs. jullie</div></div>
   </div>
 </div>
 
@@ -1085,7 +1101,10 @@ function renderProfileGrid(){
       </div>
     </div>
 
-    <div id="game-klaverjas" class="sec-label" style="margin-top:4px;">Klaverjas scorebord <span class="score-live" style="display:inline-block;width:7px;height:7px;background:#4A9E6E;border-radius:50%;margin-left:6px;vertical-align:middle;" title="Live"></span></div>
+    <div id="game-klaverjas" class="sec-label" style="margin-top:4px;display:flex;align-items:center;justify-content:space-between;">
+      <span>Klaverjas scorebord <span class="score-live" style="display:inline-block;width:7px;height:7px;background:#4A9E6E;border-radius:50%;margin-left:6px;vertical-align:middle;" title="Live"></span></span>
+      <button onclick="loadKvData().then(()=>{renderKvScores();showToast('Scorebord vernieuwd ✓');})" style="background:none;border:1.5px solid rgba(74,158,110,0.35);border-radius:20px;padding:5px 12px;font-size:0.72rem;font-weight:600;color:#4A9E6E;cursor:pointer;font-family:inherit;">↺ Vernieuwen</button>
+    </div>
     <div class="kv-teams" id="kv-teams">
       <div class="kv-team">
         <div class="kv-team-score" id="kv-score1" style="color:#9E7AAD;">0</div>
@@ -1409,36 +1428,26 @@ function renderProfileGrid(){
       </div>
     </div>
 
-    <!-- U5e: Kampvuurverhaal -->
+    <!-- U5e: Sagen & Legenden -->
     <div class="uitleg-block" id="game-kampvuur">
       <div class="uitleg-head" onclick="toggleUitleg(this)">
-        <div class="uitleg-title">🔥 Kampvuurverhaal — Het Meer van Bohinj</div>
+        <div class="uitleg-title">🔥 Sagen & Legenden — voor het kampvuur</div>
         <div class="uitleg-arrow">▼</div>
       </div>
       <div class="uitleg-body">
-        <p style="font-size:0.84rem;color:#6B6560;margin:0 0 10px;">Vul de namen in en tik "Vertel het verhaal" — elk keer anders!</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;">
-          <div>
-            <div style="font-size:0.75rem;font-weight:700;color:#6B6560;margin-bottom:3px;">Held (naam)</div>
-            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px;" id="kv-held-knoppen"></div>
-            <input id="kv-held" placeholder="bijv. Jort" style="width:100%;box-sizing:border-box;border:1.5px solid #ddd;border-radius:8px;padding:7px 9px;font-family:inherit;font-size:0.88rem;">
-          </div>
-          <div>
-            <div style="font-size:0.75rem;font-weight:700;color:#6B6560;margin-bottom:3px;">Schurk (naam)</div>
-            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px;" id="kv-schurk-knoppen"></div>
-            <input id="kv-schurk" placeholder="bijv. Duurt" style="width:100%;box-sizing:border-box;border:1.5px solid #ddd;border-radius:8px;padding:7px 9px;font-family:inherit;font-size:0.88rem;">
-          </div>
-          <div>
-            <div style="font-size:0.75rem;font-weight:700;color:#6B6560;margin-bottom:3px;">Plek</div>
-            <input id="kv-plek" placeholder="bijv. Savica-waterval" style="width:100%;box-sizing:border-box;border:1.5px solid #ddd;border-radius:8px;padding:7px 9px;font-family:inherit;font-size:0.88rem;" value="Savica-waterval">
-          </div>
-          <div>
-            <div style="font-size:0.75rem;font-weight:700;color:#6B6560;margin-bottom:3px;">Voorwerp</div>
-            <input id="kv-ding" placeholder="bijv. fles stroop" style="width:100%;box-sizing:border-box;border:1.5px solid #ddd;border-radius:8px;padding:7px 9px;font-family:inherit;font-size:0.88rem;" value="kompas">
-          </div>
+        <p style="font-size:0.82rem;color:#6B6560;margin:0 0 12px;">Echte mythen en sagen uit de Julische Alpen en het Salzkammergut. Vertel er één bij het kampvuur.</p>
+        <div id="sage-keuze" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+          <button onclick="toonSage(0)" class="sage-keuze-btn">🦌 Zlatorog — de Goudgehoornd Gems</button>
+          <button onclick="toonSage(1)" class="sage-keuze-btn">🌊 Het Meisje van het Meer (Bohinj)</button>
+          <button onclick="toonSage(2)" class="sage-keuze-btn">🌸 De Narcissen van de Golica</button>
+          <button onclick="toonSage(3)" class="sage-keuze-btn">👹 De Schatzgeist van de Schafberg</button>
+          <button onclick="toonSage(4)" class="sage-keuze-btn">🏔️ De Zeven Meren van Triglav</button>
         </div>
-        <button onclick="vertelVerhaal()" style="padding:10px 22px;background:#4A9E6E;color:#fff;border:none;border-radius:20px;font-family:inherit;font-size:0.9rem;font-weight:700;cursor:pointer;">🔥 Vertel het verhaal</button>
-        <div id="kv-verhaal" style="margin-top:12px;display:none;background:#1A3A2A;color:#E8DDD0;border-radius:12px;padding:16px;font-size:0.88rem;line-height:1.65;white-space:pre-wrap;"></div>
+        <div id="sage-verhaal" style="display:none;background:#1A3A2A;color:#E8DDD0;border-radius:14px;padding:18px 16px;font-size:0.87rem;line-height:1.72;">
+          <div id="sage-titel" style="font-family:Georgia,serif;font-style:italic;font-size:1.1rem;color:#9AC4A8;margin-bottom:10px;"></div>
+          <div id="sage-tekst"></div>
+          <button onclick="document.getElementById('sage-verhaal').style.display='none';document.getElementById('sage-keuze').style.display='flex'" style="margin-top:14px;padding:6px 14px;background:rgba(255,255,255,0.1);color:#E8DDD0;border:none;border-radius:10px;font-family:inherit;font-size:0.78rem;cursor:pointer;">← Andere legende</button>
+        </div>
       </div>
     </div>
 
@@ -1505,40 +1514,13 @@ function renderProfileGrid(){
         <div class="sec-photo-header-sub">Alles wat je nodig hebt</div>
       </div>
     </div>
-    <!-- Quick-jump nav -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px 4px;">
-      <div onclick="document.getElementById('info-bohinj').scrollIntoView({behavior:'smooth'})" style="position:relative;height:80px;border-radius:14px;overflow:hidden;cursor:pointer;">
-        <img src="https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=300&q=80" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
-        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05),rgba(0,0,0,0.65));"></div>
-        <div style="position:absolute;bottom:8px;left:10px;color:#fff;font-weight:700;font-size:0.82rem;text-shadow:0 1px 4px rgba(0,0,0,0.5);">🇸🇮 Slovenië</div>
-      </div>
-      <div onclick="document.getElementById('info-appesbach').scrollIntoView({behavior:'smooth'})" style="position:relative;height:80px;border-radius:14px;overflow:hidden;cursor:pointer;">
-        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&q=80" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
-        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05),rgba(0,0,0,0.65));"></div>
-        <div style="position:absolute;bottom:8px;left:10px;color:#fff;font-weight:700;font-size:0.82rem;text-shadow:0 1px 4px rgba(0,0,0,0.5);">🇦🇹 Oostenrijk</div>
-      </div>
-      <div onclick="document.getElementById('info-wandelen').scrollIntoView({behavior:'smooth'})" style="position:relative;height:70px;border-radius:14px;overflow:hidden;cursor:pointer;">
-        <img src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=300&q=80" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
-        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05),rgba(0,0,0,0.65));"></div>
-        <div style="position:absolute;bottom:6px;left:10px;color:#fff;font-weight:700;font-size:0.75rem;text-shadow:0 1px 4px rgba(0,0,0,0.5);">🥾 Wandelen</div>
-      </div>
-      <div onclick="document.getElementById('info-eten').scrollIntoView({behavior:'smooth'})" style="position:relative;height:70px;border-radius:14px;overflow:hidden;cursor:pointer;">
-        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300&q=80" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
-        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05),rgba(0,0,0,0.65));"></div>
-        <div style="position:absolute;bottom:6px;left:10px;color:#fff;font-weight:700;font-size:0.75rem;text-shadow:0 1px 4px rgba(0,0,0,0.5);">🍽️ Eten</div>
-      </div>
-      <div onclick="document.getElementById('info-vertaal').scrollIntoView({behavior:'smooth'})" style="position:relative;height:60px;border-radius:14px;overflow:hidden;cursor:pointer;">
-        <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=300&q=80" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
-        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05),rgba(0,0,0,0.65));"></div>
-        <div style="position:absolute;bottom:6px;left:10px;color:#fff;font-weight:700;font-size:0.72rem;text-shadow:0 1px 4px rgba(0,0,0,0.5);">💬 Woorden</div>
-      </div>
-      <div onclick="document.getElementById('info-winkels').scrollIntoView({behavior:'smooth'})" style="position:relative;height:60px;border-radius:14px;overflow:hidden;cursor:pointer;">
-        <img src="https://images.unsplash.com/photo-1534723452862-4c874018d66d?w=300&q=80" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
-        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05),rgba(0,0,0,0.65));"></div>
-        <div style="position:absolute;bottom:6px;left:10px;color:#fff;font-weight:700;font-size:0.72rem;text-shadow:0 1px 4px rgba(0,0,0,0.5);">🛒 Winkels</div>
-      </div>
+    <!-- Info tab filter -->
+    <div class="prog-filt">
+      <button class="prog-filt-btn active" id="ifb-si" onclick="setInfoFilter('si')">🇸🇮 Slovenië<br><span style="font-size:0.65rem;font-weight:400;opacity:0.7;">Camp Bohinj</span></button>
+      <button class="prog-filt-btn" id="ifb-at" onclick="setInfoFilter('at')">🇦🇹 Oostenrijk<br><span style="font-size:0.65rem;font-weight:400;opacity:0.7;">Seecamping Appesbach</span></button>
     </div>
 
+    <div id="info-sec-si">
     <!-- U1e: KAMPKAART -->
     <div id="info-bohinj" style="margin-top:8px;padding:6px 20px 4px;font-size:0.62rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4A9E6E;border-top:2px solid rgba(74,158,110,0.2);">🇸🇮 Slovenië · Camp Bohinj</div>
     <div class="collapsible" onclick="toggleCollapsibleMap(this,'bohinj-map',initBohinjMap)">
@@ -1867,7 +1849,9 @@ function renderProfileGrid(){
         <div style="margin-top:10px;font-size:0.75rem;color:#6B6560;">Extra: een eigen "Slovenië & Oostenrijk"-quiz kan apart aangeleverd worden.</div>
       </div>
     </div>
+    </div><!-- /info-sec-si -->
 
+    <div id="info-sec-at" style="display:none;">
     <!-- U3d: Appesbach camping-kaart -->
     <div class="collapsible" onclick="toggleCollapsibleMap(this,'appesbach-map',initAppesbach)">
       <div class="collapsible-head">
@@ -2027,6 +2011,7 @@ function renderProfileGrid(){
         <div class="info-row"><div class="info-icon">💡</div><div style="flex:1;"><div class="info-label">Tip</div><div class="info-val">St. Wolfgang centrum op 1 km lopen. Schafbergbahn vertrek (tandradbaan naar 1783 m) ook nabij.</div></div></div>
       </div>
     </div>
+    </div><!-- /info-sec-at -->
 
     <!-- PRAKTISCH -->
     <div class="collapsible" onclick="toggleCollapsible(this)">
@@ -2146,9 +2131,11 @@ window.onerror = function(msg, src, line) {
 const SB_URL = 'https://osuqtfsxmquwqsbgzlqn.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
 let sb = null;
+let bingoNotifChannel = null;
 function initSupabase() {
   try {
     if (typeof supabase !== 'undefined') sb = supabase.createClient(SB_URL, SB_KEY);
+    startBingoNotifListener();
   } catch(e) { sb = null; }
 }
 (function(){
@@ -2157,6 +2144,36 @@ function initSupabase() {
   scr.onload = initSupabase;
   document.head.appendChild(scr);
 })();
+
+function vraagNotifToestemming(){
+  if(!('Notification' in window)) return;
+  if(Notification.permission==='default'){
+    Notification.requestPermission();
+  }
+}
+
+function startBingoNotifListener(){
+  if(!sb || bingoNotifChannel) return;
+  bingoNotifChannel = sb.channel('bingo-sessies-global')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'slovenie_bingo_sessions'},payload=>{
+      const sess = payload.new;
+      if(!sess || !sess.actief) return;
+      if(bingoSessie && bingoSessie.id===sess.id) return;
+      const naam = currentUser ? (currentUser.charAt(0).toUpperCase()+currentUser.slice(1)) : 'Iemand';
+      stuurBingoNotif(sess.code, naam);
+    })
+    .subscribe();
+}
+
+function stuurBingoNotif(code, starter){
+  const body = `Spelcode: ${code} — open de app en doe mee!`;
+  if(Notification.permission==='granted'){
+    try {
+      new Notification('🎯 Bingo is gestart!', {body, icon:'/favicon.ico', tag:'bingo-start'});
+    } catch{}
+  }
+  showToast(`🎯 Bingo gestart! Code: ${code}`);
+}
 
 // ── CONFIG ──────────────────────────────────────────
 const TRIP_DATE = new Date('2026-07-27T07:00:00');
@@ -2425,6 +2442,7 @@ const WELKOM = {
 function selectProfile(key, naam, init, color) {
   currentUser = key;
   currentFamily = GEZIN1.includes(key) ? 1 : 2;
+  vraagNotifToestemming();
   swipes = JSON.parse(localStorage.getItem(`${SK}_swipes_${key}`) || '{}');
   packChecked = JSON.parse(localStorage.getItem(`${SK}_pack_${key}`) || '{}');
   const t = WELKOM[key] || {groet:`Welkom, ${naam} 👋`, sub:'Bekijk het programma en swipe mee.'};
@@ -2503,6 +2521,22 @@ function finishIntro(){
 const GEZIN1 = ['duurt','griette'];
 let currentFamily = 0;
 
+// ── INFO FILTER ───────────────────────────────────────
+let infoFilter='si';
+function setInfoFilter(f){
+  infoFilter=f;
+  ['si','at'].forEach(k=>{
+    const btn=document.getElementById('ifb-'+k);
+    if(btn) btn.className='prog-filt-btn'+(k===f?' active':'');
+    const sec=document.getElementById('info-sec-'+k);
+    if(sec) sec.style.display=k===f?'block':'none';
+  });
+  const hImg=document.querySelector('#sec-info .sec-photo-header img');
+  if(hImg) hImg.src=f==='si'
+    ?'https://images.unsplash.com/photo-1555990793-da0b9e957cfe?w=700&q=80'
+    :'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700&q=80';
+  window.scrollTo(0,0);
+}
 // ── TABS ──────────────────────────────────────────────
 const SECS={home:'sec-home',heenreis:'sec-heenreis',programma:'sec-programma',activiteiten:'sec-activiteiten',spellen:'sec-spellen',info:'sec-info'};
 const NAVS={home:'nav-home',heenreis:'nav-heenreis',programma:'nav-programma',activiteiten:'nav-activiteiten',spellen:'nav-spellen',info:'nav-info'};
@@ -3763,21 +3797,61 @@ async function loadWeer(){
   toonLeedNieuws();
 }
 
-// ── KAMPVUURVERHAAL U5e ───────────────────────────────
-const ALLE_NAMEN=['Duurt','Griette','Lauren','Jort','Sanne','Arjen','Silas','Gijs','Ot'];
-const VERHAAL_TEMPLATES = [
-  (h,s,p,d)=>`Lang geleden, op een avond dat de maan laag hing boven het ${p}, liep ${h} alleen het pad op. In de tas: alleen een ${d} en veel moed.\n\nMaar ${s} had hetzelfde idee — en was al eerder. "Dat meer is van mij," grijnzde ${s}.\n\n${h} hield het ${d} omhoog. Gouden licht flitste over het water. Een ruis in de struiken — en toen: Zlatorog zelf, de gouden gems, die met één sprong over het pad school en ${s} precies zó aankeek dat die stilstond.\n\n${h} liep rustig verder. Het meer glinsterde, ijskoud en stilletjes. Soms vind je schat niet door te zoeken, maar door gewoon te lopen.`,
-  (h,s,p,d)=>`${h} was naar het ${p} gegaan om één ding te doen: zwemmen vóór iedereen wakker was. Maar naast het water lag een ${d}.\n\nEen briefje eraan: "Niet aanraken — ${s}."\n\n${h} pakte het op. Op hetzelfde moment ruiste er iets in het gras — een marmot, twee marmotten, en toen twaalf. Ze staarden allemaal naar het ${d}.\n\n${s} kwam aanrennen: "Hé! Dat is van mij!"\n\n"Jammer," zei ${h} vrolijk. "De marmotten kozen mij." En dat was, zo bleek, de enige regel die er telde.`,
-  (h,s,p,d)=>`De legende zegt dat Zlatorog zijn goud verborg op de bodem van het meer bij het ${p}. Niemand geloofde het — totdat ${h} met een ${d} in het water sprong en het bij de derde duik terugvond.\n\n${s} wachtte op de oever, klaar om het over te nemen. Maar goud is zwaar, en ${s} kon niet zwemmen.\n\n${h} legde het voorzichtig terug op de bodem. "Voor de volgende die het echt nodig heeft," fluisterde ${h}.\n\nDie nacht zagen ze allebei een gouden glinstering diep in het water. Of misschien was het gewoon de maan.`,
-];
-function vertelVerhaal(){
-  const h=document.getElementById('kv-held').value.trim()||'de held';
-  const s=document.getElementById('kv-schurk').value.trim()||'de schurk';
-  const p=document.getElementById('kv-plek').value.trim()||'meer';
-  const d=document.getElementById('kv-ding').value.trim()||'kompas';
-  const t=VERHAAL_TEMPLATES[Math.floor(Math.random()*VERHAAL_TEMPLATES.length)];
-  const el=document.getElementById('kv-verhaal');
-  el.textContent=t(h,s,p,d); el.style.display='block';
+// ── SAGEN & LEGENDEN U5e ─────────────────────────────
+const SAGEN=[
+{
+  titel:'🦌 Zlatorog — de Goudgehoornd Gems van de Julische Alpen',
+  tekst:`Hoog boven het Bohinj-meer, op de kale rotswanden van de Triglav, leefde een witte gems met gouden hoorns — Zlatorog. Wie zijn hoorns aanraakte, zou de schat der Alpen vinden: een tuin vol edelstenen die 's nachts in het donker gloeide als de zon.
+
+Een jonge jager, verliefd op een meisje uit het dorp, hoorde de verhalen. Hij wilde rijkdom. Hij klom hoger dan ooit een mens had geklommen, en vond de witte gems aan de rand van de afgrond. Zijn pijl trof doel — Zlatorog struikelde.
+
+Maar waar zijn bloed de rotsen raakte, schoten witte bergbloemen op uit de steen. De gems at één bloem, herrees, en keek de jager aan met ogen die de eeuwigheid kenden. Toen stormde hij. De jager viel de afgrond in.
+
+De tuin der edelstenen verdween voor altijd. En de witte bloemen die je nu in de Julische Alpen vindt — de edelweiss en de wilde narcis — dat zijn de tranen van Zlatorog, die tot op de dag van vandaag treurt om wat de hebzucht van mensen heeft verwoest.`
+},{
+  titel:'🌊 Het Meisje van het Meer — de Geest van Bohinj',
+  tekst:`Vissers op het Bohinj-meer wisten het: als de mist 's avonds laag over het water lag en de wind plotseling ophield, moest je naar de oever roeien. Want dan was zij daar.
+
+Ze heette Ajda — een meisje met haar zo donker als het meer in oktober en ogen als het smaragdgroene water bij de waterval. Ze verscheen aan de rand van het water, fluisterde in een taal die niemand kende, en wees altijd naar het oosten.
+
+Eén visser, oud en blind op één oog, begon haar te begrijpen. Ze zei: 'Als het meer stormt in augustus, en de kinderen lachen toch, dan is er niets te vrezen. Maar als een vreemde lacht terwijl het stil is — wees dan op je hoede.'
+
+Tot op de dag van vandaag zeggen de mensen langs het meer: het water onthoudt alles. Gooi er nooit iets in wat je niet kwijt wilt. En als je 's avonds je naam hoort fluisteren, kijk dan niet om.`
+},{
+  titel:'🌸 De Narcissen van de Golica — een liefde die de berg veranderde',
+  tekst:`Hoog op de Golica, een bergkam boven Jesenice, groeiden vroeger alleen stenen en mos. Tot Vesna, een meisje van het dorp, verliefd werd op een herdersjongen die elke zomer met zijn kudde naar de almen trok.
+
+Hij beloofde terug te komen voor de wintersneeuw. Maar hij keerde nooit terug. Ze wachtte, jaar na jaar, op dezelfde rots waar hij haar als laatste had gekust.
+
+De goden hadden medelijden. Uit haar tranen groeiden bloemen — honderden, duizenden narcissen, witgeel en geurig — die elk voorjaar de hele helling bedekken alsof de berg zelf bloeit van verdriet.
+
+Elk jaar in mei is de Golica bedekt met miljoenen wilde narcissen. Mensen komen van overal om ze te zien. En als de wind door de bloemen trekt, zeggen de ouden in het dorp: dat is Vesna, die fluistert dat ze wacht.`
+},{
+  titel:'👹 De Schatzgeist van de Schafberg — het pact met de herder',
+  tekst:`In de tijden dat de Schafbergbahn nog niet bestond, beklommen herders met hun vee de steile flanken van de Schafberg boven het Wolfgangsee. De top was heilig terrein. Niemand overnachtte er vrijwillig.
+
+Maar één herder, Kaspar, was te eigenwijs. Hij hoorde de verhalen over de Schatzgeist — een geest die op de top woonde en schat bewaakte — en lachte erom. Op een oktobernacht bleef hij slapen op de top, alleen met zijn hond.
+
+In de vroege ochtend daalde hij af, het gezicht bleek als sneeuw. Hij sprak nooit meer over die nacht. Maar hij was oud en arm de berg opgelopen, en jong en rijk naar beneden gekomen. En zijn hond was er nooit meer.
+
+Tot op vandaag zeggen de mensen langs het Wolfgangsee: als je de Schafberg beklimt en het mist plotseling optrekt zodat je de hele wereld ziet, dan heeft de Schatzgeist je even zijn schat laten zien. Maar je prijs betaal je later.`
+},{
+  titel:'🏔️ De Zeven Meren van Triglav — tranen van de berggodin',
+  tekst:`Hoog in het hart van de Julische Alpen, in de Vallei van de Zeven Meren, ligt een keten van alpenmeren die zelfs in de heetste zomer ijskoud blijven. De Sloveense legenden zeggen waarom.
+
+Zlata, de godin van de bergen, had zeven kinderen — elk zo wild en ontembaar als de wind over de rotstoppen. Op een dag klommen zij te hoog, te ver, en verdwaalden in een sneeuwstorm. Ze riep en zocht, dag en nacht, maar vond hen nooit meer terug.
+
+Haar verdriet was zo groot dat het bevroor — letterlijk. Haar tranen vielen op de stenen en werden meren: zeven meren, elk voor een kind. En omdat haar verdriet nooit ophoudt, blijven de meren koud, zelfs als de zon schijnt.
+
+Als je bij de Zeven Meren bent en het water rimpelt zonder wind, dan huilt Zlata nog steeds. Gooi een steen in het water — een teken dat je erkent wat zij verloor — en de tocht terug zal veilig zijn.`
+}];
+
+function toonSage(i){
+  const s=SAGEN[i];
+  document.getElementById('sage-titel').textContent=s.titel;
+  document.getElementById('sage-tekst').innerText=s.tekst;
+  document.getElementById('sage-keuze').style.display='none';
+  document.getElementById('sage-verhaal').style.display='block';
 }
 // ── KAMPAVOND SPEL-PICKER & TIMER ────────────────────
 const KAMPSPELLEN = [
