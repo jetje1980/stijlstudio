@@ -620,7 +620,15 @@ function renderProfileGrid(){
       </a>
     </div>
 
-    <div class="sec-label" style="margin-top:8px;">Snel naar</div>
+    <!-- Vraag van de dag — inline op home -->
+    <div style="margin:16px 20px 0;">
+      <div style="font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:#4A9E6E;font-weight:700;margin-bottom:8px;">❓ Vraag van de dag</div>
+      <div id="home-vvdg" style="background:#fff;border:1.5px solid #e0dbd6;border-radius:16px;padding:14px 16px;">
+        <div style="text-align:center;font-size:0.82rem;color:#9A948E;">Laden…</div>
+      </div>
+    </div>
+
+    <div class="sec-label" style="margin-top:16px;">Snel naar</div>
     <div style="padding:0 20px 16px;">
       <div class="list-item" onclick="switchTab('programma')">
         <div class="list-emoji">📅</div>
@@ -2501,6 +2509,7 @@ function startApp() {
   bingoLaadGalerie();
   loadG9();
   renderKvScores();
+  loadVvdgHome();
   const seen = localStorage.getItem(`${SK}_intro_${currentUser}`);
   if (!seen) { showIntro(); localStorage.setItem(`${SK}_intro_${currentUser}`,'1'); }
 }
@@ -2580,6 +2589,7 @@ function switchTab(tab){
     loadScoreGames();
     startSpellenAutoRefresh();
   }
+  if(tab==='home') loadVvdgHome();
 }
 
 // ── PROGRAMMA ────────────────────────────────────────
@@ -4578,9 +4588,66 @@ async function loadVvdg(){
       const eigen=antwoorden?.find(a=>a.speler===currentUser);
       badge.style.display=eigen?'none':'inline';
     }
+    renderVvdgHome(q,antwoorden||[]);
   }catch(e){
     el.innerHTML='<div style="padding:12px;color:#c0392b;font-size:0.82rem;">Kon vraag niet laden.</div>';
   }
+}
+
+async function loadVvdgHome(){
+  const el=document.getElementById('home-vvdg'); if(!el) return;
+  if(!sb){ el.innerHTML='<div style="font-size:0.82rem;color:#9A948E;">Niet beschikbaar offline.</div>'; return; }
+  const q=vvdgVandaag();
+  try{
+    const {data:antwoorden}=await sb.from('slovenie_vvdg').select('*').eq('dag',q.dag).eq('vraag_id',q.id);
+    renderVvdgHome(q,antwoorden||[]);
+  }catch(e){ el.innerHTML='<div style="font-size:0.82rem;color:#9A948E;">Kon vraag niet laden.</div>'; }
+}
+
+function renderVvdgHome(q,antwoorden){
+  const el=document.getElementById('home-vvdg'); if(!el) return;
+  const eigen=antwoorden.find(a=>a.speler===currentUser);
+  let html=`<div style="font-weight:700;font-size:0.9rem;color:#0A0A0A;margin-bottom:10px;line-height:1.4;">${q.vraag}</div>`;
+  if(!eigen){
+    if(q.type==='stemmen'){
+      const namen=['Arjen','Sanne','Duurt','Griette','Jort','Silas','Gijs','Ot','Lauren'];
+      html+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:8px;">`;
+      namen.forEach(n=>{
+        html+=`<button onclick="submitVvdgKeuze('${q.dag}','${q.id}','${n}').then(()=>loadVvdgHome())" style="padding:7px 4px;border:1.5px solid #e0dbd6;border-radius:10px;background:#fff;font-family:inherit;font-size:0.78rem;font-weight:600;color:#1A3A2A;cursor:pointer;">${n}</button>`;
+      });
+      html+=`</div><div style="display:flex;gap:5px;">
+        <input id="home-vvdg-anders" placeholder="Iemand anders…" style="flex:1;border:1.5px solid #ddd;border-radius:10px;padding:6px 10px;font-family:inherit;font-size:0.8rem;outline:none;">
+        <button onclick="(function(){const v=document.getElementById('home-vvdg-anders').value.trim();if(v)submitVvdgKeuze('${q.dag}','${q.id}',v).then(()=>loadVvdgHome());})()" style="padding:6px 12px;background:#4A9E6E;color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;">→</button>
+      </div>`;
+    } else if(q.type==='keuze'){
+      html+=`<div style="display:flex;flex-direction:column;gap:5px;">`;
+      q.opties.forEach(opt=>{
+        html+=`<button onclick="submitVvdgKeuze('${q.dag}','${q.id}','${opt.replace(/'/g,"\\'")}').then(()=>loadVvdgHome())" style="padding:8px 12px;border:1.5px solid #e0dbd6;border-radius:10px;background:#fff;font-family:inherit;font-size:0.82rem;font-weight:600;color:#1A3A2A;cursor:pointer;text-align:left;">${opt}</button>`;
+      });
+      html+=`</div>`;
+    } else {
+      html+=`<div style="display:flex;gap:6px;">
+        <input id="home-vvdg-open" placeholder="Jouw antwoord…" style="flex:1;border:1.5px solid #ddd;border-radius:10px;padding:8px 12px;font-family:inherit;font-size:0.85rem;outline:none;">
+        <button onclick="(function(){const v=document.getElementById('home-vvdg-open').value.trim();if(v)submitVvdgKeuze('${q.dag}','${q.id}',v).then(()=>loadVvdgHome());})()" style="padding:8px 14px;background:#4A9E6E;color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:0.82rem;font-weight:700;cursor:pointer;">→</button>
+      </div>`;
+    }
+  } else {
+    html+=`<div style="background:rgba(74,158,110,0.1);border:1.5px solid rgba(74,158,110,0.3);border-radius:10px;padding:8px 12px;font-size:0.84rem;color:#2D7A52;margin-bottom:8px;">✓ Jouw antwoord: <strong>${eigen.antwoord}</strong></div>`;
+  }
+  if(antwoorden.length){
+    html+=`<div style="margin-top:8px;font-size:0.7rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin-bottom:5px;">${antwoorden.length} antwoord${antwoorden.length!==1?'en':''}</div>`;
+    html+=`<div style="display:flex;flex-wrap:wrap;gap:5px;">`;
+    antwoorden.forEach(a=>{
+      const klr=KLEUREN[a.speler]||'#888';
+      html+=`<div style="display:flex;align-items:center;gap:4px;background:#F5F0EB;border-radius:20px;padding:3px 9px 3px 4px;">
+        <div style="width:18px;height:18px;border-radius:50%;background:${klr};font-size:0.6rem;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;">${a.speler.charAt(0).toUpperCase()}</div>
+        <span style="font-size:0.75rem;font-weight:600;color:#0A0A0A;">${a.antwoord}</span>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+  html+=`<div style="margin-top:10px;text-align:right;"><button onclick="switchTab('spellen');setTimeout(()=>openGame('game-vvdg'),150)" style="font-size:0.72rem;color:#4A9E6E;background:none;border:none;cursor:pointer;font-family:inherit;font-weight:600;">Alle antwoorden bekijken →</button></div>`;
+  el.innerHTML=html;
 }
 
 function renderVvdg(q,antwoorden){
