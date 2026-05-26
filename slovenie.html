@@ -462,8 +462,8 @@ var _jss=document.getElementById('js-status');
 if(_jss) _jss.textContent='js ok';
 
 var _SK='slov26';
-var _PROFILES={duurt:{naam:'Duurt',init:'Du',color:'#4A7CAE'},griette:{naam:'Griette',init:'Gr',color:'#D4785A'},sanne:{naam:'Sanne',init:'Sa',color:'#9E7AAD'},arjen:{naam:'Arjen',init:'Ar',color:'#5A9E6E'}};
-var _KEYS=['duurt','griette','sanne','arjen'];
+var _PROFILES={duurt:{naam:'Duurt',init:'Du',color:'#4A7CAE'},griette:{naam:'Griette',init:'Gr',color:'#D4785A'},lauren:{naam:'Lauren',init:'La',color:'#C4622D'},jort:{naam:'Jort',init:'Jo',color:'#2D6B8A'},steijn:{naam:'Steijn',init:'St',color:'#7B3FA0'},arjen:{naam:'Arjen',init:'Ar',color:'#5A9E6E'},sanne:{naam:'Sanne',init:'Sa',color:'#9E7AAD'},silas:{naam:'Silas',init:'Si',color:'#8A2D2D'},gijs:{naam:'Gijs',init:'Gi',color:'#6B8A2D'},ot:{naam:'Ot',init:'Ot',color:'#2D8A7A'}};
+var _KEYS=['duurt','griette','lauren','jort','steijn','arjen','sanne','silas','gijs','ot'];
 
 function checkCode(){
   var raw=(document.getElementById('code-input').value||'').trim().toUpperCase();
@@ -2196,10 +2196,16 @@ const SK = 'slov26'; // localStorage prefix (alleen lokale UI-state)
 const PROFILES = {
   duurt:   {naam:'Duurt',   init:'Du', color:'#4A7CAE'},
   griette: {naam:'Griette', init:'Gr', color:'#D4785A'},
-  sanne:   {naam:'Sanne',   init:'Sa', color:'#9E7AAD'},
+  lauren:  {naam:'Lauren',  init:'La', color:'#C4622D'},
+  jort:    {naam:'Jort',    init:'Jo', color:'#2D6B8A'},
+  steijn:  {naam:'Steijn',  init:'St', color:'#7B3FA0'},
   arjen:   {naam:'Arjen',   init:'Ar', color:'#5A9E6E'},
+  sanne:   {naam:'Sanne',   init:'Sa', color:'#9E7AAD'},
+  silas:   {naam:'Silas',   init:'Si', color:'#8A2D2D'},
+  gijs:    {naam:'Gijs',    init:'Gi', color:'#6B8A2D'},
+  ot:      {naam:'Ot',      init:'Ot', color:'#2D8A7A'},
 };
-const PROFILE_KEYS = ['duurt','griette','sanne','arjen'];
+const PROFILE_KEYS = ['duurt','griette','lauren','jort','steijn','arjen','sanne','silas','gijs','ot'];
 
 // ── DAG PROGRAMMA ────────────────────────────────────
 const DAGEN = [
@@ -2446,9 +2452,15 @@ document.getElementById('login-btn')?.addEventListener('click', checkCode);
 
 const WELKOM = {
   duurt:   {groet:'Hey Duurt 👋',   sub:'Klaar voor drie weken bergen, meren en klaverjas tot middernacht?'},
-  griette: {groet:'Hey G 🌿',       sub:'Jij hebt de basis gemaakt — nu invullen wat we wanneer gaan doen.'},
-  sanne:   {groet:'Hoi Sanne 😊',   sub:'Swipe mee, stem op activiteiten, en bekijk het programma.'},
+  griette: {groet:'Hey Griette 🌿', sub:'Check het programma, swipe mee en zie wat iedereen doet.'},
+  lauren:  {groet:'Hey Lauren! 🎉', sub:'Jouw vakantie begint hier. Check de spellen en het programma.'},
+  jort:    {groet:'Jort! 🏄',       sub:'Bergen, meren en spellen. Let\'s go!'},
+  steijn:  {groet:'Hey Steijn 🤙',  sub:'Vakantietijd! Check de spellen en het programma.'},
   arjen:   {groet:'Arjen! 🏔️',      sub:'Bergen in zicht. Check het programma en swipe je favorieten.'},
+  sanne:   {groet:'Hoi Sanne 😊',   sub:'Swipe mee, stem op activiteiten, en bekijk het programma.'},
+  silas:   {groet:'Hey Silas! 🎮',  sub:'Klaar voor de vakantie? Check de spellen en het programma.'},
+  gijs:    {groet:'Hey Gijs! 🌊',   sub:'Meren, bergen en bingo. Speel mee!'},
+  ot:      {groet:'Hey Ot! 🦌',     sub:'Op vakantie! Check de bingo en de spellen.'},
 };
 
 function selectProfile(key, naam, init, color) {
@@ -2530,7 +2542,7 @@ function finishIntro(){
 }
 
 // ── FAMILY SPLIT ─────────────────────────────────────
-const GEZIN1 = ['duurt','griette'];
+const GEZIN1 = ['duurt','griette','lauren','jort','steijn'];
 let currentFamily = 0;
 
 // ── INFO FILTER ───────────────────────────────────────
@@ -4590,12 +4602,16 @@ function renderVvdg(q,antwoorden){
       });
       html+=`</div>`;
     } else if(q.type==='stemmen'){
-      const namen=['Duurt','Griette','Arjen','Sanne','Jort','Lenn','Mette','Teun'];
-      html+=`<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">`;
+      const namen=['Arjen','Sanne','Duurt','Griette','Jort','Silas','Gijs','Ot','Lauren'];
+      html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">`;
       namen.forEach(n=>{
         html+=`<button class="vvdg-ans-btn" onclick="submitVvdgKeuze('${q.dag}','${q.id}','${n}')">${n}</button>`;
       });
       html+=`</div>`;
+      html+=`<div style="display:flex;gap:6px;margin-bottom:12px;">
+        <input id="vvdg-anders-inp" placeholder="Iemand anders…" style="flex:1;border:1.5px solid #ddd;border-radius:10px;padding:7px 11px;font-family:inherit;font-size:0.85rem;outline:none;">
+        <button onclick="(function(){const v=document.getElementById('vvdg-anders-inp').value.trim();if(v)submitVvdgKeuze('${q.dag}','${q.id}',v);})()" style="padding:7px 13px;background:#4A9E6E;color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:0.82rem;font-weight:700;cursor:pointer;">→</button>
+      </div>`;
     }
   } else {
     html+=`<div style="background:rgba(74,158,110,0.1);border:1.5px solid rgba(74,158,110,0.3);border-radius:10px;padding:8px 12px;font-size:0.85rem;color:#2D7A52;margin-bottom:12px;">✓ Jouw antwoord: <strong>${eigen.antwoord}</strong></div>`;
@@ -4621,7 +4637,7 @@ function renderVvdg(q,antwoorden){
   antwoorden.forEach(a=>loadReactions('vvdg',a.id));
 }
 
-const KLEUREN={duurt:'#2D4A8A',griette:'#8A2D6B',arjen:'#2D7A52',sanne:'#8A5A2D',jort:'#2D6B8A',lenn:'#8A2D2D',mette:'#6B8A2D',teun:'#6B2D8A'};
+const KLEUREN={duurt:'#4A7CAE',griette:'#D4785A',lauren:'#C4622D',jort:'#2D6B8A',steijn:'#7B3FA0',arjen:'#5A9E6E',sanne:'#9E7AAD',silas:'#8A2D2D',gijs:'#6B8A2D',ot:'#2D8A7A'};
 
 async function submitVvdg(dag,vraagId,type){
   if(!currentUser) return;
