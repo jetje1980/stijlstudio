@@ -1072,7 +1072,7 @@ function renderProfileGrid(){
       </div>
       <!-- Persoonsranglijst -->
       <div id="g9-ranglijst" style="display:flex;flex-direction:column;gap:5px;"></div>
-      <button onclick="loadG9(true)" style="margin-top:10px;padding:5px 12px;background:rgba(255,255,255,0.1);color:#E8DDD0;border:none;border-radius:10px;font-family:inherit;font-size:0.75rem;cursor:pointer;">↻ Vernieuwen</button>
+      <button onclick="loadG9(true).then(()=>showToast('Scorebord vernieuwd ✓'))" style="margin-top:10px;padding:5px 12px;background:rgba(255,255,255,0.1);color:#E8DDD0;border:none;border-radius:10px;font-family:inherit;font-size:0.75rem;cursor:pointer;">↻ Vernieuwen</button>
     </div>
 
     <!-- Game detail panel — hidden until tile is tapped -->
@@ -3063,6 +3063,7 @@ function toggleUitleg(headEl){
 
 // ── COLLAPSIBLE ───────────────────────────────────────
 function toggleCollapsible(el){
+  if(!event.target.closest('.collapsible-head')) return;
   el.classList.toggle('open');
 }
 
@@ -3525,6 +3526,7 @@ function initAppesbach(){
 }
 
 function toggleCollapsibleMap(el, mapId, initFn){
+  if(!event.target.closest('.collapsible-head')) return;
   el.classList.toggle('open');
   if(el.classList.contains('open')){
     setTimeout(()=>{ initFn(); if(mapId==='bohinj-map'&&bohinjMap) bohinjMap.invalidateSize(); if(mapId==='appesbach-map'&&appesbach) appesbach.invalidateSize(); if(mapId==='overstap-map'&&overstapMap) overstapMap.invalidateSize(); },150);
