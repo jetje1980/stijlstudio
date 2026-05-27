@@ -2142,24 +2142,30 @@ function _applyGroupStateRow(key, uid, value) {
   const us = ['griette','frederike','marlinde','miriam'];
   const scalar = v => typeof v === 'object' ? JSON.stringify(v) : String(v);
   if (uid !== 'shared' && us.includes(uid)) {
-    const pU = { voorkeur:'vz_voorkeur_', swipes:'vz_swipes_', planVibes:'vz_planVibes_',
-                 top5favs:'vz_top5favs_', photo:'vz_photo_', profile_bio:'vz_profile_bio_' };
-    if (pU[key])                           localStorage.setItem(pU[key]+uid, scalar(value));
-    else if (key.startsWith('pchain_text_')) localStorage.setItem('vz_pchain_text_'+key.slice(12)+'_'+uid, scalar(value));
-    else if (key.startsWith('pchain_'))     localStorage.setItem('vz_pchain_'+key.slice(7)+'_'+uid, scalar(value));
-    else if (key.startsWith('pp_'))         localStorage.setItem('vz_pp_'+key.slice(3)+'_'+uid, scalar(value));
-    else if (key.startsWith('wvo_')) {
-      localStorage.setItem('vz_wvo_vote_'+key.slice(4)+'_'+uid, scalar(value));
-      if (parseInt(key.slice(4)) === wvoDay) { wvoVotes[uid] = value; }
-    }
+    // Fill memory caches FIRST — localStorage writes can fail (quota) and must not block these
     if (key === 'swipes')      { _allSwipes[uid]    = typeof value==='object' ? value : {}; }
     if (key === 'planVibes')   { _allPlanVibes[uid] = typeof value==='object' ? value : {}; }
     if (key === 'voorkeur')    { _allVoorkeur[uid]  = Array.isArray(value)    ? value : []; }
     if (key === 'profile_bio') { _allBios[uid]      = typeof value==='string'  ? value : ''; }
+    // Then persist to localStorage (best-effort, non-blocking)
+    try {
+      const pU = { voorkeur:'vz_voorkeur_', swipes:'vz_swipes_', planVibes:'vz_planVibes_',
+                   top5favs:'vz_top5favs_', photo:'vz_photo_', profile_bio:'vz_profile_bio_' };
+      if (pU[key])                            localStorage.setItem(pU[key]+uid, scalar(value));
+      else if (key.startsWith('pchain_text_')) localStorage.setItem('vz_pchain_text_'+key.slice(12)+'_'+uid, scalar(value));
+      else if (key.startsWith('pchain_'))      localStorage.setItem('vz_pchain_'+key.slice(7)+'_'+uid, scalar(value));
+      else if (key.startsWith('pp_'))          localStorage.setItem('vz_pp_'+key.slice(3)+'_'+uid, scalar(value));
+      else if (key.startsWith('wvo_')) {
+        localStorage.setItem('vz_wvo_vote_'+key.slice(4)+'_'+uid, scalar(value));
+        if (parseInt(key.slice(4)) === wvoDay) { wvoVotes[uid] = value; }
+      }
+    } catch(e) {}
   } else if (uid === 'shared') {
-    if (key === 'added')           localStorage.setItem('vz_added',          scalar(value));
-    else if (key === 'weekend_events') localStorage.setItem('vz_weekend_events', scalar(value));
-    else if (key === 'bronnen')    localStorage.setItem('vz_bronnen',         scalar(value));
+    try {
+      if (key === 'added')              localStorage.setItem('vz_added',          scalar(value));
+      else if (key === 'weekend_events') localStorage.setItem('vz_weekend_events', scalar(value));
+      else if (key === 'bronnen')        localStorage.setItem('vz_bronnen',         scalar(value));
+    } catch(e) {}
   }
 }
 
