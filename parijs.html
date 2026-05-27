@@ -3136,71 +3136,44 @@ function renderWeekendBlok() {
 // ── POLL CHAIN ────────────────────────────────────
 const POLL_CHAIN = [
   // VRIJDAG 26 JUNI
-  {id:'pvr1', dag:'vr26', dagdeel:'Aankomstmiddag', vraag:'Plan voor de 1e middag — kunnen jullie je hierin vinden?',
-   opties:[
-     '🍽️🚲 Ja! Terminus Nord (lunch recht tegenover station) + Baja Bikes 14:30 — ik ben erbij',
-     '🍽️🌊 Terminus Nord prima, maar na lunch liever rustig slenteren langs Canal Saint-Martin dan fietsen',
-     '🚶 Liever direct naar de buurt van de Airbnb — Rue Montorgueil, passages, op eigen tempo wennen',
-     '🤷 Prima wat de groep doet — ik ga mee!',
-   ]},
-  {id:'pvr2', dag:'vr26', dagdeel:'Na Baja Bikes', vraag:'Na de fietstour (~17:30) en check-in — hoe begin je de avond?',
-   opties:[
-     '🛁 Even douchen en tot rust komen, dan fris het diner in — geen haast',
-     '🍷 Meteen een glas bij Frenchie Bar à Vins (4 min van Airbnb, geen reservering, kleine gerechtjes)',
-     '🌊 Rustig teruglopen langs Canal Saint-Martin richting Airbnb — 20 min, mooi licht om 17u',
-     '☀️ Terrasje bij de Airbnb, eerste Parijse rosé in de zon',
-   ]},
-  {id:'pvr3', dag:'vr26', dagdeel:'Eerste diner', vraag:'Eerste diner in Parijs — voorstel: Rue du Nil (om de hoek). Wat klinkt goed?',
-   opties:[
-     '🍝 Altro Frenchie — Italiaans van sterrenchef Greg Marchand, 4 min lopen · wél even reserveren',
-     '🍷 Frenchie Bar à Vins — wijn + kleine borden, geen reservering, zelfde straat, casual',
-     '🧅 Buvette (Pigalle, 9e) — klassieke Parijse bistro, 20 min lopen of metro · reserveer vooraf',
-     '✨ Verrassing — ik ga mee met wat de groep wil',
-   ]},
-  {id:'pvr4', dag:'vr26', dagdeel:'Na het diner', vraag:'Na het diner — één avondprogramma, vier smaken:',
-   opties:[
-     '🍸 Experimental Cocktail Club — speakeasy op 6 min lopen, één cocktail en dan zien we wel',
-     '🚶 Bar-hoppen in de buurt — kijken waar de avond ons brengt',
-     '😴 Eén drankje en dan bed — morgen is de grote dag',
-     '💃 Doorgaan zolang we kunnen — we zijn maar één keer in Parijs',
-   ]},
+  {id:'pvr1', dag:'vr26', dagdeel:'Aankomstmiddag', icon:'🚲',
+   voorstel:'Terminus Nord + Baja Bikes Highlights',
+   detail:'Lunch bij de klassieke art deco brasserie recht tegenover het station (±€25 pp, geen reservering). Om 14:30 op de fiets langs Eiffeltoren, Notre-Dame en de Seine met een Nederlandstalige gids (3u, €34–39 pp).',
+   bereikbaarheid:'Terminus Nord: 2 min lopen vanuit Gare du Nord. Baja Bikes: Metro 4 → Châtelet + Metro 1 → George V (±25 min). Of eerst langs de Airbnb: 15 min lopen → zelfde metro (±40 min, koffers droppen niet zeker — check bij host!).'},
+  {id:'pvr2', dag:'vr26', dagdeel:'Vroege avond', icon:'🍷',
+   voorstel:'Inchecken + eerste glas bij Frenchie Bar à Vins',
+   detail:'Even douchen en tot rust komen na de fietstour. Dan een eerste Parijse glas bij Frenchie Bar à Vins — wijn + kleine borden, geen reservering nodig, betaalbaar en heerlijk. De perfecte manier om de eerste avond in te glijden.',
+   bereikbaarheid:'4 min lopen vanuit de Airbnb op Rue du Nil — geen vervoer nodig'},
+  {id:'pvr3', dag:'vr26', dagdeel:'Eerste diner', icon:'🍽️',
+   voorstel:'Diner op Rue du Nil — Altro Frenchie of Frenchie Bar',
+   detail:'Onze thuisstraat heeft twee geweldige opties: Altro Frenchie (Italiaans van sterrenchef Greg Marchand, reserveer vooraf) of Frenchie Bar à Vins (wijn + kleine borden, walk-in). Beide zijn 4 minuten lopen.',
+   bereikbaarheid:'4 min lopen vanuit de Airbnb — geen vervoer nodig'},
+  {id:'pvr4', dag:'vr26', dagdeel:'Na het diner', icon:'🍸',
+   voorstel:'Nachtcap bij Experimental Cocktail Club',
+   detail:'Een van de mooiste cocktailbars van Parijs, speakeasy-stijl (1920s interieur). Eén cocktail als afsluiter van de eerste avond — of de start van iets langer. Jij bepaalt het tempo.',
+   bereikbaarheid:'6 min lopen vanuit Rue du Nil — geen metro nodig'},
   // ZATERDAG 27 JUNI
-  {id:'pza1', dag:'za27', dagdeel:'Zaterdagochtend', vraag:'Zaterdagochtend — voorstel: Terroirs d\'Avenir + markt. Hoe begin jij?',
-   opties:[
-     '🥐 Terroirs d\'Avenir (Rue du Nil, 4 min) om 08:30 — beste croissant van de buurt, dan Rue Montorgueil op',
-     '🛒 Marché d\'Aligre (brocante + versmarkt, 12e, 15 min metro lijn 8) — om 09:00 er zijn, vóór 13u weg',
-     '😴 Uitslapen tot 10u, dan zelf koffie halen en bij de groep aansluiten',
-     '🚲 Vélib pakken en zelf een ochtendrit doen richting Canal Saint-Martin of Bastille',
-   ]},
-  {id:'pza2', dag:'za27', dagdeel:'Zaterdagmiddag', vraag:'Zaterdagmiddag — groot weekend, wat spreekt jou aan?',
-   opties:[
-     '🚲 Baja Bikes Hidden Gems — kleinere groep, backstreets van Parijs die toeristen nooit zien, 3u · €34–39 pp',
-     '🎨 Musée d\'Orsay (impressionisten, 7e, 20 min metro) + wandeling langs de Seine terug',
-     '🌈 Le Marais Pride-weekend (4e, 20 min lopen) — terrassen, vintage shops, Place des Vosges',
-     '🚲 Vélib door de Tuileries + Palais-Royal + langs de Seine — zelf fietsen op eigen tempo',
-   ]},
-  {id:'pza3', dag:'za27', dagdeel:'Zaterdagavond', vraag:'Zaterdagavond — de grote avond. Welk gevoel wil jij?',
-   opties:[
-     '💃 Apero-crawl: Frenchie Bar → Little Red Door → Experimental Cocktail Club — dan feesten',
-     '🍷 Diner bij Chez Janou (Provençaals, Marais, 20 min lopen · reserveer vroeg!) en dan verder',
-     '🎵 Solidays avondprogramma (Hippodrome, 16e, 30 min metro) — festival-sfeer en dan zien we wel',
-     '🛋️ Relaxed diner dicht bij huis, vroeg naar bed — zondag is ook een dag',
-   ]},
+  {id:'pza1', dag:'za27', dagdeel:'Zaterdagochtend', icon:'🥐',
+   voorstel:'Croissant bij Terroirs d\'Avenir + Marché d\'Aligre',
+   detail:'Start met de beste croissant van de buurt bij Terroirs d\'Avenir, dan door naar Marché d\'Aligre — de levendigste brocante + versmarkt van Parijs, minder toeristisch dan de Bastille-markt. Vóór 13u dicht, dus: om 08:30 weg.',
+   bereikbaarheid:'Terroirs d\'Avenir: 4 min lopen. Marché d\'Aligre: Metro 8 richting Créteil → Ledru-Rollin (±15 min)'},
+  {id:'pza2', dag:'za27', dagdeel:'Zaterdagmiddag', icon:'🏛️',
+   voorstel:'Le Marais + Place des Vosges + slenteren',
+   detail:'Het oudste plein van Parijs (Place des Vosges), omgeven door galerijen en sfeervolle cafés. Daarna door de straten van Le Marais: vintage shops, Sézane, terrasjes, verborgen binnenplaatsen. Op eigen tempo — geen gids, geen schema.',
+   bereikbaarheid:'Metro 1 richting Vincennes → Saint-Paul (±20 min vanuit Airbnb), of te voet via Rue de Rivoli door de Tuileries (±30 min wandeling)'},
+  {id:'pza3', dag:'za27', dagdeel:'Zaterdagavond', icon:'💃',
+   voorstel:'Apero-crawl: Frenchie Bar → Little Red Door → Experimental',
+   detail:'Begin met een glas bij Frenchie Bar à Vins (onze straat), dan Little Red Door (beste cocktailbar van Parijs, World\'s 50 Best), afsluiten bij Experimental Cocktail Club. Of eerder stoppen — geen schema, geen verplichtingen.',
+   bereikbaarheid:'Frenchie Bar: 4 min lopen. Little Red Door: 8 min lopen (Rue du Bretagne, Marais). Experimental: 6 min terug. Alles op loopafstand — geen metro nodig.'},
   // ZONDAG 28 JUNI
-  {id:'pzo1', dag:'zo28', dagdeel:'Laatste ochtend', vraag:'Laatste ochtend in Parijs (check-out 11u) — hoe geniet jij ervan?',
-   opties:[
-     '🥐 Terroirs d\'Avenir (Rue du Nil, 4 min) vóór 10u — warme croissant als afscheid van de buurt',
-     '🛍️ Sézane (3 min lopen · enige die op zondag open is) + door de passages voor koffie',
-     '🛒 Puces de Vanves (brocante, 14e, 30 min metro lijn 13) — sluit om 14u, dus vóór 9u vertrekken!',
-     '☕ Rustig koffie, inpakken, genieten van de Airbnb — ik hoef niks meer',
-   ]},
-  {id:'pzo2', dag:'zo28', dagdeel:'Zondagmiddag', vraag:'Check-out 11u, trein 16:25 — hoe vul jij de laatste uren?',
-   opties:[
-     '🚲 Coulée Verte (verhoogd fietspad op oude spoorbaan, start Bastille) + lunch onderweg — 90 min, geen haast',
-     '🥗 Lunch bij Stohrer (patisserie 1730, Rue Montorgueil) of terrasje Place des Victoires in de zon',
-     '🚶 Wandeling door de Tuileries + langs de Seine richting Gare du Nord — rustig afscheid nemen',
-     '🚂 Geen risico — rustig richting Gare du Nord (trein 16:25, aanwezig uiterlijk 15:55)',
-   ]},
+  {id:'pzo1', dag:'zo28', dagdeel:'Laatste ochtend', icon:'🛍️',
+   voorstel:'Sézane + koffie in de Passages Couverts',
+   detail:'Sézane op 3 min lopen is een van de weinige zaken in de buurt die op zondag open is (11:30u). Daarna door de overdekte Passages Couverts — Galerie Vivienne, Galerie Véro-Dodat — voor de laatste koffie van het weekend.',
+   bereikbaarheid:'Sézane: 3 min lopen. Passages Couverts: 8 min lopen of Metro 3 → Bourse'},
+  {id:'pzo2', dag:'zo28', dagdeel:'Laatste middag', icon:'🌿',
+   voorstel:'Coulée Verte + lunch onderweg → Gare du Nord',
+   detail:'De Coulée Verte is een verhoogd park op een oude spoorbaan — een van de mooiste rustplekken van Parijs die toeristen bijna nooit zien. Wandel er overheen (±45 min), lunch ergens onderweg, dan rustig naar het station. Trein om 16:25.',
+   bereikbaarheid:'Start Bastille: Metro 1 of 8 → Bastille (±25 min vanuit Airbnb). Naar Gare du Nord: Metro 5 richting Bobigny → Gare du Nord (±20 min)'},
 ];
 
 const ALL_CHAIN_USERS = ['griette','frederike','miriam','marlinde'];
@@ -3260,35 +3233,36 @@ function getDayProgress(dag) {
 function getWinningOption(pollId) {
   const poll = POLL_CHAIN.find(p => p.id === pollId);
   if (!poll) return null;
-  const counts = Array(poll.opties.length).fill(0);
+  const VOTE_LABELS = ['Ja, leuk! ✓', 'Liever iets anders'];
+  const counts = [0, 0];
   let total = 0, customCount = 0;
   ALL_CHAIN_USERS.forEach(u => {
     const v = getChainVote(pollId, u);
     if (v === 'custom') { customCount++; total++; }
-    else if (v !== null) { counts[v]++; total++; }
+    else if (v === 0) { counts[0]++; total++; }
+    else if (v === 1) { counts[1]++; total++; }
   });
   if (total < 2) return null;
-  let maxIdx = 0;
-  counts.forEach((c, i) => { if (c > counts[maxIdx]) maxIdx = i; });
-  if (customCount > counts[maxIdx]) return {optionIdx: -1, count: customCount, total, label: 'Anders'};
-  return {optionIdx: maxIdx, count: counts[maxIdx], total, label: poll.opties[maxIdx]};
+  if (customCount > counts[0] && customCount > counts[1]) return {optionIdx: -1, count: customCount, total, label: 'Eigen voorstel'};
+  const maxIdx = counts[0] >= counts[1] ? 0 : 1;
+  return {optionIdx: maxIdx, count: counts[maxIdx], total, label: VOTE_LABELS[maxIdx]};
 }
 
 function renderPollChainDay(dag) {
   const container = document.getElementById('poll-chain-content');
   if (!container) return;
   const polls = POLL_CHAIN.filter(p => p.dag === dag);
+  const VOTE_LABELS = ['Ja, leuk! ✓', 'Ik doe liever wat anders'];
 
-  // Find first unanswered poll index for current user
   let firstUnanswered = polls.findIndex(p => getChainVote(p.id, currentUser) === null);
-  if (firstUnanswered === -1) firstUnanswered = polls.length; // all answered
+  if (firstUnanswered === -1) firstUnanswered = polls.length;
 
   const progress = getDayProgress(dag);
   let html = '';
 
   if (progress.total > 0) {
     html += `<div style="font-size:0.68rem;color:#6B6560;margin-bottom:10px;">
-      <span style="font-weight:600;color:#0A0A0A;">${progress.answered}</span> van ${progress.total} vragen beantwoord
+      <span style="font-weight:600;color:#0A0A0A;">${progress.answered}</span> van ${progress.total} voorstellen beoordeeld
     </div>`;
   }
 
@@ -3296,28 +3270,35 @@ function renderPollChainDay(dag) {
     const myVote = getChainVote(poll.id, currentUser);
     const isAnswered = myVote !== null;
     const isActive = idx === firstUnanswered;
-    const isLocked = idx > firstUnanswered;
 
-    // Count votes from all users for aggregate display
-    const counts = Array(poll.opties.length).fill(0);
+    const counts = [0, 0];
     let votedCount = 0, customCount = 0;
     ALL_CHAIN_USERS.forEach(u => {
       const v = getChainVote(poll.id, u);
       if (v === 'custom') { customCount++; votedCount++; }
-      else if (v !== null) { counts[v]++; votedCount++; }
+      else if (v === 0) { counts[0]++; votedCount++; }
+      else if (v === 1) { counts[1]++; votedCount++; }
     });
     const total = votedCount || 1;
 
+    const proposalCard = `<div style="background:linear-gradient(135deg,rgba(212,120,90,0.07),rgba(168,159,232,0.07));border-radius:12px;padding:12px 14px;margin-bottom:12px;border:1px solid rgba(168,159,232,0.15);">
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;">
+        <span style="font-size:1.1rem;flex-shrink:0;">${poll.icon || '📍'}</span>
+        <div style="font-size:0.88rem;font-weight:700;color:#0A0A0A;line-height:1.35;">${poll.voorstel}</div>
+      </div>
+      <div style="font-size:0.75rem;color:#4A4440;line-height:1.55;margin-bottom:8px;">${poll.detail}</div>
+      <div style="font-size:0.68rem;color:#9A948E;line-height:1.45;padding-top:6px;border-top:1px solid rgba(10,10,10,0.06);">
+        <span style="font-weight:600;color:#6B6560;">Hoe er komen:</span> ${poll.bereikbaarheid}
+      </div>
+    </div>`;
+
     if (isAnswered && idx < firstUnanswered) {
-      // Answered state
-      const myText = myVote === 'custom' ? (getChainText(poll.id, currentUser) || 'Anders') : null;
-      const myLabel = myText || poll.opties[myVote];
-      const pct = poll.opties.map((_, i) => Math.round(counts[i] / total * 100));
+      const myLabel = myVote === 'custom' ? (getChainText(poll.id, currentUser) || 'Eigen voorstel') : VOTE_LABELS[myVote];
+      const pct = counts.map(c => Math.round(c / total * 100));
       const customPct = Math.round(customCount / total * 100);
 
-      // Avatar chips per option
-      function _avatarChips(optIdx) {
-        return ALL_CHAIN_USERS.filter(u => getChainVote(poll.id, u) === optIdx).map(u => {
+      function _avatarChips(filterFn) {
+        return ALL_CHAIN_USERS.filter(filterFn).map(u => {
           const p = PROFILES[u]; const ph = getUserPhoto(u);
           return ph
             ? `<img src="${ph}" title="${p.naam}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;margin-right:3px;vertical-align:middle;">`
@@ -3325,48 +3306,46 @@ function renderPollChainDay(dag) {
         }).join('');
       }
 
-      const barsHtml = poll.opties.map((opt, i) => `
+      const barColors = ['#7A9E82', '#D4785A'];
+      const barsHtml = VOTE_LABELS.map((label, i) => `
         <div style="margin-bottom:7px;">
           <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;">
-            <span style="${myVote===i?'font-weight:700;color:#0A0A0A;':'color:#6B6560;'}">${opt}</span>
+            <span style="${myVote===i?'font-weight:700;color:#0A0A0A;':'color:#6B6560;'}">${label}</span>
             <span style="font-weight:600;color:#6B6560;">${pct[i]}%</span>
           </div>
-          <div class="poll-bar"><div class="poll-bar-fill" style="width:${pct[i]}%;background:${myVote===i?'#0A0A0A':'#A89FE8'};"></div></div>
-          ${counts[i] > 0 ? `<div style="margin-top:3px;">${_avatarChips(i)}</div>` : ''}
+          <div class="poll-bar"><div class="poll-bar-fill" style="width:${pct[i]}%;background:${barColors[i]};opacity:${myVote===i?1:0.45};"></div></div>
+          ${counts[i] > 0 ? `<div style="margin-top:3px;">${_avatarChips(u => getChainVote(poll.id, u) === i)}</div>` : ''}
         </div>`).join('') + (customCount > 0 ? `
         <div style="margin-bottom:7px;">
           <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;">
-            <span style="${myVote==='custom'?'font-weight:700;color:#0A0A0A;':'color:#6B6560;'}">✏️ Anders</span>
+            <span style="${myVote==='custom'?'font-weight:700;color:#0A0A0A;':'color:#6B6560;'}">✏️ Eigen voorstel</span>
             <span style="font-weight:600;color:#6B6560;">${customPct}%</span>
           </div>
-          <div class="poll-bar"><div class="poll-bar-fill" style="width:${customPct}%;background:${myVote==='custom'?'#0A0A0A':'#A89FE8'};"></div></div>
+          <div class="poll-bar"><div class="poll-bar-fill" style="width:${customPct}%;background:#A89FE8;opacity:${myVote==='custom'?1:0.45};"></div></div>
           ${ALL_CHAIN_USERS.filter(u => getChainVote(poll.id, u) === 'custom').map(u => {
             const t = getChainText(poll.id, u);
             return t ? `<div style="font-size:0.65rem;color:#9A948E;margin-top:2px;padding-left:4px;">↳ ${PROFILES[u]?.naam}: &ldquo;${t}&rdquo;</div>` : '';
           }).join('')}
         </div>` : '');
 
-      // Consensus message
-      const uniqueOpts = new Set(ALL_CHAIN_USERS.map(u => getChainVote(poll.id, u)).filter(v => v !== null));
-      const splitCounts = counts.filter(c => c > 0);
       let consensusMsg = '';
-      if (votedCount >= 4 && uniqueOpts.size === 1) {
-        consensusMsg = `<div style="font-size:0.72rem;color:#7A9E82;font-weight:700;margin-top:6px;">Hier zijn jullie het roerend over eens 🥂</div>`;
+      if (votedCount >= 4 && counts[0] === 4) {
+        consensusMsg = `<div style="font-size:0.72rem;color:#7A9E82;font-weight:700;margin-top:6px;">Iedereen is erbij! 🥂</div>`;
         if (typeof launchConfetti === 'function') setTimeout(() => launchConfetti(), 50);
-      } else if (votedCount >= 4 && splitCounts.length === 2 && splitCounts[0] === splitCounts[1]) {
-        consensusMsg = `<div style="font-size:0.72rem;color:#D4785A;font-weight:600;margin-top:6px;">Spannend — hier moeten jullie nog uitkomen 🤝</div>`;
+      } else if (votedCount >= 4 && counts[0] > 0 && counts[1] > 0) {
+        consensusMsg = `<div style="font-size:0.72rem;color:#D4785A;font-weight:600;margin-top:6px;">Niet iedereen is even enthousiast — even overleggen? 🤝</div>`;
       }
 
       html += `<div class="pchain-block">
         <div class="pchain-answered">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
             <div>
               <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#7A9E82;margin-bottom:2px;">${poll.dagdeel}</div>
-              <div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;">${poll.vraag}</div>
+              <div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;">${poll.voorstel}</div>
             </div>
             <button onclick="localStorage.removeItem('vz_pchain_${poll.id}_'+currentUser);localStorage.removeItem('vz_pchain_text_${poll.id}_'+currentUser);renderPollChainDay('${poll.dag}');" style="flex-shrink:0;margin-left:10px;padding:4px 10px;border:1px solid rgba(10,10,10,0.15);border-radius:20px;background:transparent;font-size:0.65rem;font-weight:600;cursor:pointer;color:#6B6560;font-family:var(--sans);">Wijzig ▸</button>
           </div>
-          <div style="font-size:0.72rem;color:#6B6560;margin-bottom:8px;">Jouw keuze: <strong style="color:#0A0A0A;">${myLabel}</strong></div>
+          <div style="font-size:0.72rem;color:#6B6560;margin-bottom:8px;">Jouw stem: <strong style="color:#0A0A0A;">${myLabel}</strong></div>
           ${barsHtml}
           <div style="font-size:0.65rem;color:#9A948E;margin-top:4px;">${votedCount} van 4 gestemd</div>
           ${consensusMsg}
@@ -3374,28 +3353,28 @@ function renderPollChainDay(dag) {
         </div>
       </div>`;
     } else if (isActive) {
-      // Active state — show options
       html += `<div class="pchain-block">
         <div class="pchain-active">
           <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#A89FE8;margin-bottom:4px;">${poll.dagdeel}</div>
-          <div class="poll-q" style="margin-bottom:12px;">${poll.vraag}</div>
+          <div style="font-size:0.78rem;font-weight:600;color:#6B6560;margin-bottom:8px;">Voorstel van Griette:</div>
+          ${proposalCard}
           <div style="display:flex;flex-direction:column;gap:8px;">
-            ${poll.opties.map((opt, i) => `<button class="poll-opt" style="text-align:left;" onclick="voteChain('${poll.id}',${i})">${opt}</button>`).join('')}
-            <button class="poll-opt" style="text-align:left;color:#9A948E;border-style:dashed;" onclick="showChainCustomInput('${poll.id}')">✏️ Anders, namelijk...</button>
+            <button class="poll-opt" style="text-align:left;background:rgba(122,158,130,0.1);border-color:rgba(122,158,130,0.5);color:#2D5A35;" onclick="voteChain('${poll.id}',0)">✓ Ja, leuk! Ik ben erbij</button>
+            <button class="poll-opt" style="text-align:left;" onclick="voteChain('${poll.id}',1)">🤔 Ik doe liever wat anders</button>
+            <button class="poll-opt" style="text-align:left;color:#9A948E;border-style:dashed;" onclick="showChainCustomInput('${poll.id}')">✏️ Ander voorstel, namelijk...</button>
           </div>
           <div id="pchain-custom-${poll.id}" style="display:none;margin-top:10px;gap:8px;align-items:center;">
-            <input type="text" placeholder="Typ je eigen antwoord..." style="flex:1;padding:10px 12px;border:1.5px solid rgba(168,159,232,0.5);border-radius:var(--r-lg);font-family:var(--sans);font-size:0.88rem;color:#0A0A0A;outline:none;background:#fff;" onkeydown="if(event.key==='Enter')voteChainCustom('${poll.id}')">
+            <input type="text" placeholder="Jouw voorstel voor dit moment..." style="flex:1;padding:10px 12px;border:1.5px solid rgba(168,159,232,0.5);border-radius:var(--r-lg);font-family:var(--sans);font-size:0.88rem;color:#0A0A0A;outline:none;background:#fff;" onkeydown="if(event.key==='Enter')voteChainCustom('${poll.id}')">
             <button onclick="voteChainCustom('${poll.id}')" style="flex-shrink:0;padding:10px 16px;border:none;border-radius:var(--r-lg);background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;">Ok</button>
           </div>
           <div id="cmt-pchain-${poll.id}" style="margin-top:10px;"></div>
         </div>
       </div>`;
     } else {
-      // Locked state
       html += `<div class="pchain-block">
         <div class="pchain-locked">
           <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin-bottom:2px;">${poll.dagdeel}</div>
-          <div style="font-size:0.88rem;font-weight:600;color:#9A948E;">${poll.vraag}</div>
+          <div style="font-size:0.88rem;font-weight:600;color:#9A948E;">${poll.voorstel}</div>
           <div style="font-size:0.72rem;color:#9A948E;margin-top:6px;">🔒 Beantwoord de vorige vraag eerst</div>
         </div>
       </div>`;
@@ -3405,7 +3384,6 @@ function renderPollChainDay(dag) {
   html += _renderCustomPolls(dag);
   container.innerHTML = html;
 
-  // Init comment widgets for answered + active polls
   polls.forEach((poll, idx) => {
     const myVote = getChainVote(poll.id, currentUser);
     const isAnswered = myVote !== null;
@@ -7158,7 +7136,81 @@ function renderPersonalPolls() {
       </div>`;
     }
   });
+  // ── Swipe-based proposals ─────────────────────────────
+  const _liked = {};
+  ALL_CHAIN_USERS.forEach(u => {
+    const us = u === currentUser ? swipes : (_allSwipes[u] || {});
+    Object.entries(us).forEach(([iid, v]) => {
+      if (v === 'like' || v === 'dream') { if (!_liked[iid]) _liked[iid] = []; _liked[iid].push(u); }
+    });
+  });
+  const _groupFavs = Object.entries(_liked).filter(([_, ul]) => ul.length >= 2).sort((a,b) => b[1].length - a[1].length).slice(0, 4);
+  if (_groupFavs.length > 0) {
+    const _allItems = (typeof ITEMS !== 'undefined' && ITEMS.length ? ITEMS : ITEMS_BASE);
+    html += `<div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#D4785A;margin:18px 0 8px;padding-top:4px;font-weight:700;">Jullie gezamenlijke swipe-toppers</div>`;
+    _groupFavs.forEach(([iid, likers]) => {
+      const item = _allItems.find(i => i.id === iid);
+      if (!item) return;
+      const myVote = localStorage.getItem('vz_pp_swipe_' + iid + '_' + currentUser);
+      const votes = ALL_CHAIN_USERS.map(u => ({u, v: localStorage.getItem('vz_pp_swipe_' + iid + '_' + u)})).filter(x => x.v !== null);
+      const likerNames = likers.map(u => PROFILES[u]?.naam || u).join(' + ');
+      if (myVote !== null) {
+        const cnts = [0,1].map(i => votes.filter(x => x.v == i).length);
+        const tot = votes.length || 1;
+        html += `<div class="pp-block pp-answered">
+          <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#D4785A;margin-bottom:2px;">${item.sub || item.cat}</div>
+          <div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;margin-bottom:4px;">${item.naam}</div>
+          <div style="font-size:0.68rem;color:#9A948E;margin-bottom:8px;">❤️ ${likerNames} ${likers.length === 1 ? 'vindt dit leuk' : 'vinden dit leuk'}</div>
+          ${[0,1].map(i => { const lbl=i===0?'Ja, leuk! ✓':'Liever iets anders'; const pct=Math.round(cnts[i]/tot*100); return `<div style="margin-bottom:6px;"><div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;"><span style="${myVote==i?'font-weight:700;':''}">${lbl}</span><span style="color:#9A948E;">${pct}%</span></div><div class="poll-bar"><div class="poll-bar-fill" style="width:${pct}%;background:${i===0?'#7A9E82':'#D4785A'};opacity:${myVote==i?1:0.4};"></div></div></div>`; }).join('')}
+          ${votes.filter(x=>x.v==='2').map(x=>{const t=localStorage.getItem('vz_pp_swipe_text_'+iid+'_'+x.u);return t?`<div style="font-size:0.65rem;color:#9A948E;margin-top:2px;">↳ ${PROFILES[x.u]?.naam}: &ldquo;${t}&rdquo;</div>`:''}).join('')}
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;"><span style="font-size:0.65rem;color:#9A948E;">${votes.length} van 4 gestemd</span><button onclick="localStorage.removeItem('vz_pp_swipe_${iid}_'+currentUser);localStorage.removeItem('vz_pp_swipe_text_${iid}_'+currentUser);renderPersonalPolls();" style="font-size:0.65rem;color:#6B6560;background:none;border:1px solid rgba(10,10,10,0.15);border-radius:20px;padding:3px 10px;cursor:pointer;font-family:var(--sans);">Wijzig ▸</button></div>
+        </div>`;
+      } else {
+        html += `<div class="pp-block">
+          <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#D4785A;margin-bottom:2px;">${item.sub || item.cat}</div>
+          <div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;margin-bottom:4px;">${item.naam}</div>
+          <div style="font-size:0.68rem;color:#9A948E;margin-bottom:6px;">❤️ ${likerNames} ${likers.length===1?'vindt dit leuk':'vinden dit leuk'}</div>
+          <div style="font-size:0.73rem;color:#4A4440;line-height:1.5;margin-bottom:8px;">${(item.verhaal||'').slice(0,130)}${(item.verhaal||'').length>130?'...':''}</div>
+          <div style="font-size:0.68rem;color:#9A948E;margin-bottom:10px;">📍 ${item.wijk}${item.prijs?' · '+item.prijs:''}${item.duur?' · '+item.duur:''}</div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <button class="poll-opt" style="text-align:left;background:rgba(122,158,130,0.1);border-color:rgba(122,158,130,0.4);color:#2D5A35;" onclick="votePpSwipe('${iid}',0)">✓ Ja, leuk! Ik doe mee</button>
+            <button class="poll-opt" style="text-align:left;" onclick="votePpSwipe('${iid}',1)">🤔 Ik doe liever wat anders</button>
+            <button class="poll-opt" style="text-align:left;color:#9A948E;border-style:dashed;" onclick="showPpSwipeCustom('${iid}')">✏️ Ander voorstel, namelijk...</button>
+          </div>
+          <div id="ppswipe-custom-${iid}" style="display:none;margin-top:10px;gap:8px;align-items:center;">
+            <input type="text" placeholder="Jouw alternatief..." style="flex:1;padding:10px 12px;border:1.5px solid rgba(168,159,232,0.5);border-radius:var(--r-lg);font-family:var(--sans);font-size:0.88rem;color:#0A0A0A;outline:none;background:#fff;" onkeydown="if(event.key==='Enter')votePpSwipeCustom('${iid}')">
+            <button onclick="votePpSwipeCustom('${iid}')" style="flex-shrink:0;padding:10px 16px;border:none;border-radius:var(--r-lg);background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;">Ok</button>
+          </div>
+        </div>`;
+      }
+    });
+  }
+
   sec.innerHTML = html;
+}
+
+function votePpSwipe(itemId, optIdx) {
+  syncWrite('vz_pp_swipe_' + itemId + '_' + currentUser, String(optIdx));
+  renderPersonalPolls();
+  saveToast('Stem opgeslagen! 🗳️');
+}
+
+function showPpSwipeCustom(itemId) {
+  const wrap = document.getElementById('ppswipe-custom-' + itemId);
+  if (!wrap) return;
+  const hidden = wrap.style.display === 'none' || !wrap.style.display;
+  wrap.style.display = hidden ? 'flex' : 'none';
+  if (hidden) wrap.querySelector('input')?.focus();
+}
+
+function votePpSwipeCustom(itemId) {
+  const wrap = document.getElementById('ppswipe-custom-' + itemId);
+  const text = wrap?.querySelector('input')?.value?.trim();
+  if (!text) { wrap?.querySelector('input')?.focus(); return; }
+  syncWrite('vz_pp_swipe_' + itemId + '_' + currentUser, '2');
+  syncWrite('vz_pp_swipe_text_' + itemId + '_' + currentUser, text);
+  renderPersonalPolls();
+  saveToast('Eigen voorstel opgeslagen! ✏️');
 }
 
 function votePersonalPoll(pollId, optIdx) {
