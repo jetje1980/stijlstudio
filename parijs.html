@@ -7216,16 +7216,6 @@ function renderPersonalPolls() {
       opties: [`💃 Feesten — ${danst.map(u=>PROFILES[u].naam).join(' + ')} gaat door`, `🛋️ Vroeg naar bed — ${vroegBed.map(u=>PROFILES[u].naam).join(' + ')} wil uitslapen`] });
   }
 
-  // Vaste THIS-OR-THAT: aankomst vrijdag
-  if (done.length >= 2) {
-    polls.push({ id:'pp_aankomst', dag:'vr26', dagdeel:'Vrijdagmiddag',
-      vraag: 'Vrijdagmiddag 12:30–16u: wat doen we met die 3,5 uur?',
-      opties: ['🏛️ Passages verkennen — direct sfeer opsnuiven', '☕ Terrasje en bijkomen — we zijn net aangekomen', '🛍️ Rue Montorgueil + Sézane', '🥗 Goede lunch pakken bij Stohrer of Frenchie'] });
-    polls.push({ id:'pp_croissant', dag:'za27', dagdeel:'Ontbijt',
-      vraag: 'Croissant 🥐 of pain au chocolat 🍫 — definitief antwoord:',
-      opties: ['🥐 Croissant — klassiek en altijd goed', '🍫 Pain au chocolat — team chocolade wint'] });
-  }
-
   if (polls.length === 0) {
     sec.innerHTML = '';
     return;
