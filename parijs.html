@@ -438,6 +438,10 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 .intro-screen:nth-child(3)::before{content:'';position:absolute;inset:0;background:rgba(13,26,14,0.75);}
 .intro-screen:nth-child(3){position:relative;}
 .intro-screen *{position:relative;z-index:1;}
+.chat-bubble{max-width:82%;padding:10px 14px;border-radius:16px;font-size:0.85rem;line-height:1.5;word-break:break-word;}
+.chat-bubble.me{background:#0A0A0A;color:#F0E8E2;border-bottom-right-radius:4px;}
+.chat-bubble.ai{background:rgba(168,159,232,0.18);color:#0A0A0A;border-bottom-left-radius:4px;}
+.chat-bubble.typing{opacity:0.55;font-style:italic;}
 </style>
 </head>
 <body>
@@ -896,6 +900,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     </div>
     <div id="poll-chain-content" style="padding:0 20px 8px;"></div>
     <div style="padding:0 20px 20px;">
+      <div style="font-size:0.76rem;color:#9A948E;line-height:1.5;margin-bottom:10px;">Heb jij een plan? Maak een voorstel en laat de groep meestemmen — of vraag de 🗺️ assistent om ideeën op basis van jullie wensen.</div>
       <button onclick="openCpollSheet()" style="width:100%;padding:12px;border:1.5px dashed rgba(168,159,232,0.4);border-radius:14px;background:transparent;font-family:var(--sans);font-size:0.82rem;font-weight:700;color:#A89FE8;cursor:pointer;letter-spacing:0.04em;">＋ Eigen voorstel toevoegen</button>
     </div>
 
@@ -992,6 +997,9 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
         <div class="sec-photo-header-sub">Jullie Vroegzat weekend</div>
       </div>
     </div>
+
+    <!-- PROFIELEN -->
+    <div id="groep-profielen" style="margin:0;padding:16px 20px 4px;"></div>
 
     <div class="reserveer-block">
       <div class="reserveer-title">📋 Boek dit nog vóór de trip</div>
@@ -1754,6 +1762,38 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
   </div>
 </div>
 
+<!-- FLOATING CHAT BUTTON -->
+<button id="paris-chat-btn" onclick="openParisChatSheet()" title="Reisassistent" style="position:fixed;bottom:78px;right:16px;z-index:300;width:50px;height:50px;border-radius:50%;background:#A89FE8;border:none;box-shadow:0 4px 18px rgba(168,159,232,0.5);cursor:pointer;font-size:1.3rem;display:flex;align-items:center;justify-content:center;">🗺️</button>
+
+<!-- PARIS CHAT SHEET -->
+<div id="paris-chat-sheet" style="display:none;position:fixed;inset:0;z-index:950;background:rgba(10,10,10,0.45);" onclick="if(event.target===this)closeParisChatSheet()">
+  <div style="position:absolute;bottom:0;left:0;right:0;max-width:540px;margin:0 auto;background:#F0E8E2;border-radius:20px 20px 0 0;display:flex;flex-direction:column;max-height:88vh;overflow:hidden;">
+    <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(10,10,10,0.08);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <div>
+        <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.05rem;color:#0A0A0A;">🗺️ Parijs Assistent</div>
+        <div style="font-size:0.68rem;color:#9A948E;margin-top:1px;">Vraag wat je wil — ik ken jullie wensen</div>
+      </div>
+      <button onclick="closeParisChatSheet()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#9A948E;padding:4px 8px;line-height:1;">✕</button>
+    </div>
+    <div id="chat-messages" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-height:160px;"></div>
+    <div style="padding:10px 12px 16px;border-top:1px solid rgba(10,10,10,0.08);display:flex;gap:8px;align-items:flex-end;flex-shrink:0;">
+      <textarea id="chat-input" placeholder="Wat wil je weten of plannen?" rows="1" style="flex:1;padding:10px 12px;border:1.5px solid rgba(10,10,10,0.15);border-radius:14px;font-family:var(--sans);font-size:0.88rem;color:#0A0A0A;outline:none;resize:none;background:#fff;line-height:1.4;max-height:100px;overflow-y:auto;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+      <button onclick="sendChatMessage()" style="flex-shrink:0;width:40px;height:40px;border-radius:50%;background:#0A0A0A;border:none;color:#F0E8E2;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">↑</button>
+    </div>
+  </div>
+</div>
+
+<!-- BIO EDIT SHEET -->
+<div id="bio-edit-sheet" style="display:none;position:fixed;inset:0;z-index:950;background:rgba(10,10,10,0.45);" onclick="if(event.target===this)closeBioEditSheet()">
+  <div style="position:absolute;bottom:0;left:0;right:0;max-width:540px;margin:0 auto;background:#F0E8E2;border-radius:20px 20px 0 0;padding:24px 20px 40px;">
+    <div style="width:36px;height:4px;background:rgba(10,10,10,0.15);border-radius:2px;margin:0 auto 20px;"></div>
+    <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.05rem;color:#0A0A0A;margin-bottom:4px;">✏️ Jouw profiel</div>
+    <div style="font-size:0.78rem;color:#9A948E;margin-bottom:14px;line-height:1.5;">Wat moeten de anderen over jou weten? Denk aan tempo, allergieën, iets wat je écht wilt doen, of gewoon een leuk feitje.</div>
+    <textarea id="bio-textarea" rows="4" placeholder="Bijv: 'Ik ben allergisch voor schaal- en schelpdieren. En ik wil absoluut een echte bistro-avond.'" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid rgba(10,10,10,0.15);border-radius:14px;font-family:var(--sans);font-size:0.88rem;color:#0A0A0A;outline:none;resize:none;background:#fff;margin-bottom:14px;line-height:1.5;"></textarea>
+    <button onclick="saveBio()" style="width:100%;padding:13px;border:none;border-radius:14px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.88rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;">Opslaan ✓</button>
+  </div>
+</div>
+
 <!-- ADMIN PANEL -->
 <div id="admin-panel" style="display:none;position:fixed;inset:0;z-index:1200;background:#F0E8E2;overflow-y:auto;font-family:'DM Sans',sans-serif;">
   <div style="max-width:500px;margin:0 auto;padding:32px 20px 20px;">
@@ -2029,16 +2069,18 @@ const GROUP_ID = 'VROEGZAT';
 let _allSwipes = {};    // {user: {itemId: vote}}
 let _allPlanVibes = {}; // {user: {day: [vibes]}}
 let _allVoorkeur = {};  // {user: answers[]}
+let _allBios = {};      // {user: bioText}
 
 // Map localStorage key → {key, uid} for group_state
 function _keyToState(lsKey) {
   const us = ['griette','frederike','marlinde','miriam'];
   for (const u of us) {
-    if (lsKey === 'vz_voorkeur_' + u)  return { key:'voorkeur',  uid:u };
-    if (lsKey === 'vz_swipes_' + u)    return { key:'swipes',    uid:u };
-    if (lsKey === 'vz_planVibes_' + u) return { key:'planVibes', uid:u };
-    if (lsKey === 'vz_top5favs_' + u)  return { key:'top5favs',  uid:u };
-    if (lsKey === 'vz_photo_' + u)     return { key:'photo',     uid:u };
+    if (lsKey === 'vz_voorkeur_' + u)     return { key:'voorkeur',    uid:u };
+    if (lsKey === 'vz_swipes_' + u)       return { key:'swipes',      uid:u };
+    if (lsKey === 'vz_planVibes_' + u)    return { key:'planVibes',   uid:u };
+    if (lsKey === 'vz_top5favs_' + u)     return { key:'top5favs',    uid:u };
+    if (lsKey === 'vz_photo_' + u)        return { key:'photo',       uid:u };
+    if (lsKey === 'vz_profile_bio_' + u)  return { key:'profile_bio', uid:u };
     if (lsKey.startsWith('vz_pchain_text_') && lsKey.endsWith('_'+u))
       return { key:'pchain_text_'+lsKey.slice(15,-u.length-1), uid:u };
     if (lsKey.startsWith('vz_pchain_') && lsKey.endsWith('_'+u))
@@ -2090,7 +2132,7 @@ function _applyGroupStateRow(key, uid, value) {
   const scalar = v => typeof v === 'object' ? JSON.stringify(v) : String(v);
   if (uid !== 'shared' && us.includes(uid)) {
     const pU = { voorkeur:'vz_voorkeur_', swipes:'vz_swipes_', planVibes:'vz_planVibes_',
-                 top5favs:'vz_top5favs_', photo:'vz_photo_' };
+                 top5favs:'vz_top5favs_', photo:'vz_photo_', profile_bio:'vz_profile_bio_' };
     if (pU[key])                           localStorage.setItem(pU[key]+uid, scalar(value));
     else if (key.startsWith('pchain_text_')) localStorage.setItem('vz_pchain_text_'+key.slice(12)+'_'+uid, scalar(value));
     else if (key.startsWith('pchain_'))     localStorage.setItem('vz_pchain_'+key.slice(7)+'_'+uid, scalar(value));
@@ -2099,9 +2141,10 @@ function _applyGroupStateRow(key, uid, value) {
       localStorage.setItem('vz_wvo_vote_'+key.slice(4)+'_'+uid, scalar(value));
       if (parseInt(key.slice(4)) === wvoDay) { wvoVotes[uid] = value; }
     }
-    if (key === 'swipes')    { _allSwipes[uid]    = typeof value==='object' ? value : {}; }
-    if (key === 'planVibes') { _allPlanVibes[uid] = typeof value==='object' ? value : {}; }
-    if (key === 'voorkeur')  { _allVoorkeur[uid]  = Array.isArray(value)    ? value : []; }
+    if (key === 'swipes')      { _allSwipes[uid]    = typeof value==='object' ? value : {}; }
+    if (key === 'planVibes')   { _allPlanVibes[uid] = typeof value==='object' ? value : {}; }
+    if (key === 'voorkeur')    { _allVoorkeur[uid]  = Array.isArray(value)    ? value : []; }
+    if (key === 'profile_bio') { _allBios[uid]      = typeof value==='string'  ? value : ''; }
   } else if (uid === 'shared') {
     if (key === 'added')           localStorage.setItem('vz_added',          scalar(value));
     else if (key === 'weekend_events') localStorage.setItem('vz_weekend_events', scalar(value));
@@ -2117,6 +2160,7 @@ function _rerenderAfterSync() {
   renderBeginHier();
   buildSwipeStack();
   renderGroep();
+  renderProfileBios();
   renderPollChainDay(_activePollDay);
   renderAankomstVote();
   renderGluurStrip();
@@ -2132,11 +2176,12 @@ async function _syncAllGroupState() {
   const existing = new Set(rows.map(r => r.key+':'+r.user_id));
   // Migrate own local data not yet in Supabase
   const migs = [
-    { ls:'vz_voorkeur_'+currentUser,  k:'voorkeur',       uid:currentUser },
-    { ls:'vz_swipes_'+currentUser,    k:'swipes',         uid:currentUser },
-    { ls:'vz_planVibes_'+currentUser, k:'planVibes',      uid:currentUser },
-    { ls:'vz_top5favs_'+currentUser,  k:'top5favs',       uid:currentUser },
-    { ls:'vz_photo_'+currentUser,     k:'photo',          uid:currentUser },
+    { ls:'vz_voorkeur_'+currentUser,     k:'voorkeur',     uid:currentUser },
+    { ls:'vz_swipes_'+currentUser,       k:'swipes',       uid:currentUser },
+    { ls:'vz_planVibes_'+currentUser,    k:'planVibes',    uid:currentUser },
+    { ls:'vz_top5favs_'+currentUser,     k:'top5favs',     uid:currentUser },
+    { ls:'vz_photo_'+currentUser,        k:'photo',        uid:currentUser },
+    { ls:'vz_profile_bio_'+currentUser,  k:'profile_bio',  uid:currentUser },
     { ls:'vz_added',                  k:'added',          uid:'shared'    },
     { ls:'vz_weekend_events',         k:'weekend_events', uid:'shared'    },
     { ls:'vz_bronnen',                k:'bronnen',        uid:'shared'    },
@@ -2446,6 +2491,7 @@ function initApp() {
   renderPersonalPolls();
   renderAankomstVote();
   renderGluurStrip();
+  renderProfileBios();
   renderBeginHier();
   _updateWarmupBadge();
   initFeed();
@@ -3593,6 +3639,146 @@ function _renderCustomPolls(dag) {
   return h;
 }
 
+// ── PARIS CHAT ──────────────────────────────────────
+let _chatMessages = [];
+
+function _safeJSON(key, def) {
+  try { return JSON.parse(localStorage.getItem(key) || 'null') ?? def; } catch(e) { return def; }
+}
+
+function buildGroupContext() {
+  const VIBES = [
+    ['Lange ochtend koffie','Snel opstaan','Uitslapen'],
+    ['Weinig shoppen','Eén of twee dingen','Shoppen!'],
+    ['Altijd reserveren','Mix goed/spontaan','Eten waar we uitkomen'],
+    ['Actief lopen fietsen','Mix beweging/rust','Terrasjes'],
+    ['Musea graag','Als het uitkomt','Geen musea'],
+    ['Direct stad in','Rustig diner','Vroeg naar bed'],
+    ['Dansen!','Bar + diner','Vroeg slapen'],
+    ['Bewust/selectief','Normaal budget','Dit is een uitje — geef me over'],
+  ];
+  return Object.entries(PROFILES).map(([u, p]) => {
+    const sw = _allSwipes[u] || (u === currentUser ? _safeJSON('vz_swipes_'+u, {}) : {});
+    const liked = Object.entries(sw).filter(([,v]) => v === 1)
+      .map(([id]) => ITEMS_BASE.find(i => i.id === id)?.naam).filter(Boolean).slice(0, 5);
+    const vk = _allVoorkeur[u] || (u === currentUser ? _safeJSON('vz_voorkeur_'+u, []) : []);
+    const vibes = vk.slice(0, 8).map((a, i) =>
+      typeof a === 'number' ? VIBES[i]?.[a] : typeof a === 'string' && a.length > 2 ? a : null
+    ).filter(Boolean).slice(0, 4);
+    const bio = _allBios[u] || localStorage.getItem('vz_profile_bio_'+u) || '';
+    const pvr1 = getChainVote('pvr1', u);
+    const vl = pvr1 === 0 ? 'Ja voor vrijdagplan' : pvr1 === 1 ? 'Liever anders' : pvr1 === 'custom' ? 'Eigen plan' : 'Nog niet gestemd';
+    return `${p.naam}:${bio ? ' info: '+bio+'.' : ''} geliket: ${liked.length ? liked.join(', ') : 'nog niks'}. Vibes: ${vibes.join('; ') || '?'}. Vrijdag: ${vl}.`;
+  }).join('\n');
+}
+
+function openParisChatSheet() {
+  document.getElementById('paris-chat-sheet').style.display = 'block';
+  if (_chatMessages.length === 0) {
+    _chatMessages = [{ role:'assistant', content:'Hoi! 👋 Ik help je met activiteiten kiezen, plannen matchen met de groep, en voorstellen formuleren. Wat wil je weten?' }];
+    renderChatMessages();
+  }
+  setTimeout(() => document.getElementById('chat-input')?.focus(), 150);
+}
+
+function closeParisChatSheet() {
+  document.getElementById('paris-chat-sheet').style.display = 'none';
+}
+
+function renderChatMessages() {
+  const el = document.getElementById('chat-messages');
+  if (!el) return;
+  el.innerHTML = _chatMessages.map(m => {
+    const isMe = m.role === 'user';
+    return `<div style="display:flex;justify-content:${isMe ? 'flex-end' : 'flex-start'};">
+      <div class="chat-bubble ${isMe ? 'me' : 'ai'}">${m.content.replace(/\n/g, '<br>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</div>
+    </div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendChatMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input?.value.trim();
+  if (!text || text.length < 2) return;
+  input.value = '';
+  input.style.height = 'auto';
+  _chatMessages.push({ role:'user', content:text });
+  renderChatMessages();
+  const el = document.getElementById('chat-messages');
+  const typingEl = document.createElement('div');
+  typingEl.style.cssText = 'display:flex;justify-content:flex-start;';
+  typingEl.innerHTML = '<div class="chat-bubble ai typing">Aan het denken… ✨</div>';
+  el?.appendChild(typingEl);
+  if (el) el.scrollTop = el.scrollHeight;
+  try {
+    const resp = await fetch('https://osuqtfsxmquwqsbgzlqn.supabase.co/functions/v1/paris-chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
+      body: JSON.stringify({ messages: _chatMessages, groupContext: buildGroupContext() }),
+    });
+    typingEl.remove();
+    if (!resp.ok) throw new Error('API ' + resp.status);
+    const data = await resp.json();
+    _chatMessages.push({ role:'assistant', content: data.content || 'Hmm, geen antwoord. Probeer opnieuw.' });
+  } catch(e) {
+    typingEl.remove();
+    _chatMessages.push({ role:'assistant', content: 'Oeps — even geen verbinding. Probeer het opnieuw 🙏' });
+  }
+  renderChatMessages();
+}
+
+// ── PROFILE BIO ──────────────────────────────────────
+function renderProfileBios() {
+  const el = document.getElementById('groep-profielen');
+  if (!el) return;
+  const users = ['griette', 'frederike', 'miriam', 'marlinde'];
+  el.innerHTML = `
+    <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.05rem;color:#0A0A0A;margin-bottom:3px;">👤 Wie zijn wij</div>
+    <div style="font-size:0.73rem;color:#9A948E;margin-bottom:10px;">Tap je eigen kaartje om te bewerken.</div>
+    <div style="display:flex;flex-direction:column;gap:7px;">
+      ${users.map(u => {
+        const p = PROFILES[u];
+        const ph = getUserPhoto(u);
+        const bio = _allBios[u] || localStorage.getItem('vz_profile_bio_'+u) || '';
+        const isMe = u === currentUser;
+        const av = ph
+          ? `<img src="${ph}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+          : `<div style="width:36px;height:36px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-style:italic;font-size:0.8rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>`;
+        return `<div onclick="${isMe ? 'openBioEditSheet()' : ''}" style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--r-lg);background:rgba(10,10,10,0.04);${isMe ? 'cursor:pointer;border:1.5px solid rgba(168,159,232,0.25);' : 'border:1.5px solid transparent;'}">
+          ${av}
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:0.76rem;font-weight:700;color:#0A0A0A;margin-bottom:2px;">${p.naam}${isMe ? ' <span style="color:#A89FE8;font-size:0.65rem;font-weight:600;">✏️ bewerk</span>' : ''}</div>
+            <div style="font-size:0.79rem;color:${bio ? '#0A0A0A' : '#B0A9A3'};font-style:${bio ? 'normal' : 'italic'};line-height:1.4;">${bio || 'Nog niks ingevuld'}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+function openBioEditSheet() {
+  const current = _allBios[currentUser] || localStorage.getItem('vz_profile_bio_'+currentUser) || '';
+  const ta = document.getElementById('bio-textarea');
+  if (ta) ta.value = current;
+  document.getElementById('bio-edit-sheet').style.display = 'block';
+  setTimeout(() => ta?.focus(), 150);
+}
+
+function closeBioEditSheet() {
+  document.getElementById('bio-edit-sheet').style.display = 'none';
+}
+
+async function saveBio() {
+  const text = (document.getElementById('bio-textarea')?.value || '').trim();
+  _allBios[currentUser] = text;
+  syncWrite('vz_profile_bio_' + currentUser, JSON.stringify(text));
+  closeBioEditSheet();
+  renderProfileBios();
+  renderGluurStrip();
+  saveToast('Profiel opgeslagen ✓');
+}
+
 function _findAlternatives(text) {
   if (!text || text.length < 4) return [];
   const kws = text.toLowerCase().replace(/[^\w\s]/g,'').split(/\s+/).filter(w => w.length > 3);
@@ -4504,6 +4690,7 @@ function toggleFav(id) {
 // ── GROEP ─────────────────────────────────────────
 function renderGroep() {
   renderSlaapIndeling();
+  renderProfileBios();
   // Must-haves
   const mhDiv = document.getElementById('groep-musthaves');
   if (mhDiv) {
