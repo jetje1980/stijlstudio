@@ -4004,20 +4004,6 @@ function openGluurDetail(u) {
   if (!likedItems.length && !plannedVibes.length) {
     html += `<div style="text-align:center;padding:20px 0;color:var(--t2);font-size:0.88rem;">Nog niks gedeeld 🕑</div>`;
   }
-  // debug panel
-  const lsSwipes = localStorage.getItem('vz_swipes_'+u);
-  const memSwCount = Object.keys(_allSwipes[u]||{}).length;
-  const pvObj = _allPlanVibes[u]||{};
-  const memVbCount = (pvObj.vr26||[]).length + (pvObj.za27||[]).length + (pvObj.zo28||[]).length;
-  const lsSample = lsSwipes ? lsSwipes.slice(0,80) : 'null';
-  html += `<div style="margin-top:12px;padding:10px 12px;background:rgba(10,10,10,0.06);border-radius:10px;font-size:0.6rem;color:var(--t3);line-height:1.6;">
-    <strong>debug</strong><br>
-    sync rows: ${_debugSyncInfo.rowCount} · error: ${_debugSyncInfo.error||'none'}<br>
-    sync users: ${_debugSyncInfo.appliedUsers.join(', ')||'?'}<br>
-    mem _allSwipes[${u}]: ${memSwCount} keys<br>
-    mem _allPlanVibes[${u}]: ${memVbCount} items<br>
-    ls vz_swipes_${u}: ${lsSample}
-  </div>`;
 
   const inner = document.getElementById('gluur-detail-inner');
   if (inner) inner.innerHTML = html;
@@ -7598,7 +7584,7 @@ function renderPersonalPolls() {
   const sec = document.getElementById('personal-polls-section');
   if (!sec) return;
   const allUsers = ['griette','frederike','miriam','marlinde'];
-  const done = allUsers.filter(u => u === 'griette' || !!localStorage.getItem('vz_voorkeur_' + u));
+  const done = allUsers.filter(u => u === 'griette' || (_allVoorkeur[u] && _allVoorkeur[u].length > 0) || !!localStorage.getItem('vz_voorkeur_' + u));
 
   if (done.length < 2) {
     const avatarRow = allUsers.map(u => {
