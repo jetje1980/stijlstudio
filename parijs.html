@@ -3994,9 +3994,9 @@ function openGluurDetail(u) {
   }
   // debug panel
   const lsSwipes = localStorage.getItem('vz_swipes_'+u);
-  const lsVibes = localStorage.getItem('vz_planVibes_'+u);
   const memSwCount = Object.keys(_allSwipes[u]||{}).length;
-  const memVbCount = Object.keys((_allPlanVibes[u]||{})).length > 0 ? Object.values(_allPlanVibes[u]).flat().length : 0;
+  const pvObj = _allPlanVibes[u]||{};
+  const memVbCount = (pvObj.vr26||[]).length + (pvObj.za27||[]).length + (pvObj.zo28||[]).length;
   const lsSample = lsSwipes ? lsSwipes.slice(0,80) : 'null';
   html += `<div style="margin-top:12px;padding:10px 12px;background:rgba(10,10,10,0.06);border-radius:10px;font-size:0.6rem;color:var(--t3);line-height:1.6;">
     <strong>debug</strong><br>
