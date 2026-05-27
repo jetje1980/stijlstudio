@@ -2187,10 +2187,12 @@ async function _syncAllGroupState() {
     { ls:'vz_bronnen',                k:'bronnen',        uid:'shared'    },
   ];
   // Also migrate any pchain/pp/wvo_vote keys already in localStorage
+  // Safety: only migrate data owned by currentUser or 'shared' — never push stale impersonation data
   Object.keys(localStorage).forEach(ls => {
     const m = _keyToState(ls);
     if (!m) return;
-    if (['voorkeur','swipes','planVibes','top5favs','photo','added','weekend_events','bronnen'].includes(m.key)) return;
+    if (m.uid !== currentUser && m.uid !== 'shared') return;
+    if (['voorkeur','swipes','planVibes','top5favs','photo','profile_bio','added','weekend_events','bronnen'].includes(m.key)) return;
     if (!existing.has(m.key+':'+m.uid)) migs.push({ ls, k:m.key, uid:m.uid });
   });
   for (const m of migs) {
