@@ -3682,10 +3682,10 @@ function buildGroupContext() {
     ['Bewust/selectief','Normaal budget','Dit is een uitje — geef me over'],
   ];
   return Object.entries(PROFILES).map(([u, p]) => {
-    const sw = _allSwipes[u] || (u === currentUser ? _safeJSON('vz_swipes_'+u, {}) : {});
-    const liked = Object.entries(sw).filter(([,v]) => v === 1)
+    const sw = _allSwipes[u] || _safeJSON('vz_swipes_'+u, {});
+    const liked = Object.entries(sw).filter(([,v]) => v === 1 || v === 'like' || v === 'dream')
       .map(([id]) => ITEMS_BASE.find(i => i.id === id)?.naam).filter(Boolean).slice(0, 5);
-    const vk = _allVoorkeur[u] || (u === currentUser ? _safeJSON('vz_voorkeur_'+u, []) : []);
+    const vk = _allVoorkeur[u] || _safeJSON('vz_voorkeur_'+u, []);
     const vibes = vk.slice(0, 8).map((a, i) =>
       typeof a === 'number' ? VIBES[i]?.[a] : typeof a === 'string' && a.length > 2 ? a : null
     ).filter(Boolean).slice(0, 4);
@@ -3778,7 +3778,7 @@ function _localChatReply(text) {
   const mySwipes = _allSwipes[currentUser] || _safeJSON('vz_swipes_'+currentUser, {});
   const allSwipesData = {..._allSwipes, [currentUser]: mySwipes};
   Object.values(allSwipesData).forEach(sw => {
-    Object.entries(sw || {}).forEach(([id, v]) => { if (v === 1) groupLiked[id] = (groupLiked[id]||0)+1; });
+    Object.entries(sw || {}).forEach(([id, v]) => { if (v === 1 || v === 'like' || v === 'dream') groupLiked[id] = (groupLiked[id]||0)+1; });
   });
 
   // ── Score ITEMS_BASE ──────────────────────────────
@@ -3827,7 +3827,7 @@ function _localChatReply(text) {
 }
 
 function _fmtItem(item, allSwipesData) {
-  const likedBy = Object.entries(allSwipesData).filter(([,sw]) => sw?.[item.id] === 1).map(([u]) => PROFILES[u]?.naam).filter(Boolean);
+  const likedBy = Object.entries(allSwipesData).filter(([,sw]) => { const v = sw?.[item.id]; return v === 1 || v === 'like' || v === 'dream'; }).map(([u]) => PROFILES[u]?.naam).filter(Boolean);
   const likeStr = likedBy.length ? ` · ❤️ ${likedBy.join(', ')}` : '';
   const desc = item.verhaal ? item.verhaal.slice(0, 110) + (item.verhaal.length > 110 ? '…' : '') : '';
   return `**${item.naam}** (${item.wijk})\n${desc}\n🕐 ${item.tijden||'?'} · ${item.prijs}${likeStr}`;
@@ -3902,9 +3902,9 @@ function renderGluurStrip() {
   const VOTE_MAP = {0:'✓ Vrijdag erbij', 1:'🤔 Liever anders', custom:'💬 Eigen plan'};
   el.innerHTML = Object.entries(PROFILES).map(([u, p]) => {
     const ph = getUserPhoto(u);
-    const rawSwipes = _allSwipes[u] || (u === currentUser ? (()=>{try{return JSON.parse(localStorage.getItem('vz_swipes_'+u)||'{}')}catch(e){return{}}})() : {});
-    const liked = Object.entries(rawSwipes).filter(([,v]) => v === 1);
-    const rawVk = _allVoorkeur[u] || (u === currentUser ? (()=>{try{return JSON.parse(localStorage.getItem('vz_voorkeur_'+u)||'[]')}catch(e){return[]}})() : []);
+    const rawSwipes = _allSwipes[u] || _safeJSON('vz_swipes_'+u, {});
+    const liked = Object.entries(rawSwipes).filter(([,v]) => v === 1 || v === 'like' || v === 'dream');
+    const rawVk = _allVoorkeur[u] || _safeJSON('vz_voorkeur_'+u, []);
     const vibe = typeof rawVk[3] === 'number' ? (VIBES[rawVk[3]] ?? null) : null;
     const pvr1 = getChainVote('pvr1', u);
     const pvLabel = pvr1 !== null ? (VOTE_MAP[pvr1] ?? VOTE_MAP.custom) : null;
@@ -3933,13 +3933,13 @@ function openGluurDetail(u) {
   const sheet = document.getElementById('gluur-detail-sheet');
   if (!sheet) return;
 
-  const rawSwipes = _allSwipes[u] || (u === currentUser ? _safeJSON('vz_swipes_'+u, {}) : {});
+  const rawSwipes = _allSwipes[u] || _safeJSON('vz_swipes_'+u, {});
   const likedItems = Object.entries(rawSwipes)
     .filter(([,v]) => v === 1 || v === 'like' || v === 'dream')
     .map(([id, v]) => ({ item: ITEMS_BASE.find(it => it.id === id), vote: v }))
     .filter(x => x.item);
 
-  const planVibes = _allPlanVibes[u] || (u === currentUser ? _safeJSON('vz_planVibes_'+u, {}) : {});
+  const planVibes = _allPlanVibes[u] || _safeJSON('vz_planVibes_'+u, {});
   const plannedVibeIds = new Set([...(planVibes.vr26||[]), ...(planVibes.za27||[]), ...(planVibes.zo28||[])].map(e => e.id));
   const plannedVibes = [...plannedVibeIds].map(id => VIBES.find(v => v.id === id)).filter(Boolean);
   const vibeDay = {};
