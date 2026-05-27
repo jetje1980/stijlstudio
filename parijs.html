@@ -828,6 +828,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
           </a>
           <button onclick="deelVoorstel()" style="flex:1;padding:11px 8px;background:transparent;border:1.5px solid rgba(10,10,10,0.12);border-radius:12px;font-family:var(--sans);font-size:0.78rem;font-weight:700;color:#0A0A0A;cursor:pointer;letter-spacing:0.02em;">📤 Deel in groepsapp</button>
         </div>
+        <div id="aankomst-vote" style="padding:0 18px 16px;"></div>
       </div>
     </div>
     <div class="stories-row" id="stories-row"></div>
@@ -1741,7 +1742,10 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
   <div style="max-width:500px;margin:0 auto;padding:32px 20px 20px;">
     <div style="font-size:0.6rem;letter-spacing:0.14em;color:#9A948E;margin-bottom:4px;">BEHEER · ALLEEN VOOR GRIETTE</div>
     <div style="font-size:1.7rem;font-weight:800;color:#0A0A0A;font-family:Georgia,serif;margin-bottom:2px;">Dashboard</div>
-    <div style="font-size:0.78rem;color:#9A948E;margin-bottom:28px;">stijlstudio.app/parijs.html?admin=griette</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px;">
+      <div style="font-size:0.78rem;color:#9A948E;">stijlstudio.app/parijs.html?admin=griette</div>
+      <button onclick="document.getElementById('admin-content').style.display='none';document.getElementById('admin-loading').style.display='block';initAdmin();" style="flex-shrink:0;padding:6px 14px;background:#0A0A0A;border:none;border-radius:20px;color:#F0E8E2;font-family:var(--sans);font-size:0.72rem;font-weight:700;cursor:pointer;">↻ Vernieuwen</button>
+    </div>
     <div id="admin-loading" style="text-align:center;padding:60px 0;color:#9A948E;font-size:0.9rem;">Laden uit Supabase…</div>
     <div id="admin-content" style="display:none;"></div>
   </div>
@@ -2096,6 +2100,8 @@ function _rerenderAfterSync() {
   renderBeginHier();
   buildSwipeStack();
   renderGroep();
+  renderPollChainDay(_activePollDay);
+  renderAankomstVote();
   if (document.getElementById('sec-top5')?.classList.contains('active')) renderProgramma();
 }
 
@@ -2152,6 +2158,9 @@ function _initRealtime() {
         _applyGroupStateRow(r.key, r.user_id, r.value);
         _rerenderAfterSync();
         if (r.key === 'swipes') renderGroep();
+        if (r.key === 'custom_polls' || r.key.startsWith('cpvote_')) {
+          loadCustomPolls().then(() => renderPollChainDay(_activePollDay));
+        }
       }
     ).subscribe();
 }
@@ -2417,6 +2426,7 @@ function initApp() {
   initPollChain();
   loadCustomPolls();
   renderPersonalPolls();
+  renderAankomstVote();
   renderBeginHier();
   _updateWarmupBadge();
   initFeed();
@@ -3135,45 +3145,11 @@ function renderWeekendBlok() {
 
 // ── POLL CHAIN ────────────────────────────────────
 const POLL_CHAIN = [
-  // VRIJDAG 26 JUNI
-  {id:'pvr1', dag:'vr26', dagdeel:'Aankomstmiddag', icon:'🚲',
+  // pvr1 is used for the arrival card vote on the home screen (not in poll section)
+  {id:'pvr1', dag:'vr26', dagdeel:'Aankomstmiddag', icon:'🚲', homeCard: true,
    voorstel:'Terminus Nord + Baja Bikes Highlights',
    detail:'Lunch bij de klassieke art deco brasserie recht tegenover het station (±€25 pp, geen reservering). Om 14:30 op de fiets langs Eiffeltoren, Notre-Dame en de Seine met een Nederlandstalige gids (3u, €34–39 pp).',
    bereikbaarheid:'Terminus Nord: 2 min lopen vanuit Gare du Nord. Baja Bikes: Metro 4 → Châtelet + Metro 1 → George V (±25 min). Of eerst langs de Airbnb: 15 min lopen → zelfde metro (±40 min, koffers droppen niet zeker — check bij host!).'},
-  {id:'pvr2', dag:'vr26', dagdeel:'Vroege avond', icon:'🍷',
-   voorstel:'Inchecken + eerste glas bij Frenchie Bar à Vins',
-   detail:'Even douchen en tot rust komen na de fietstour. Dan een eerste Parijse glas bij Frenchie Bar à Vins — wijn + kleine borden, geen reservering nodig, betaalbaar en heerlijk. De perfecte manier om de eerste avond in te glijden.',
-   bereikbaarheid:'4 min lopen vanuit de Airbnb op Rue du Nil — geen vervoer nodig'},
-  {id:'pvr3', dag:'vr26', dagdeel:'Eerste diner', icon:'🍽️',
-   voorstel:'Diner op Rue du Nil — Altro Frenchie of Frenchie Bar',
-   detail:'Onze thuisstraat heeft twee geweldige opties: Altro Frenchie (Italiaans van sterrenchef Greg Marchand, reserveer vooraf) of Frenchie Bar à Vins (wijn + kleine borden, walk-in). Beide zijn 4 minuten lopen.',
-   bereikbaarheid:'4 min lopen vanuit de Airbnb — geen vervoer nodig'},
-  {id:'pvr4', dag:'vr26', dagdeel:'Na het diner', icon:'🍸',
-   voorstel:'Nachtcap bij Experimental Cocktail Club',
-   detail:'Een van de mooiste cocktailbars van Parijs, speakeasy-stijl (1920s interieur). Eén cocktail als afsluiter van de eerste avond — of de start van iets langer. Jij bepaalt het tempo.',
-   bereikbaarheid:'6 min lopen vanuit Rue du Nil — geen metro nodig'},
-  // ZATERDAG 27 JUNI
-  {id:'pza1', dag:'za27', dagdeel:'Zaterdagochtend', icon:'🥐',
-   voorstel:'Croissant bij Terroirs d\'Avenir + Marché d\'Aligre',
-   detail:'Start met de beste croissant van de buurt bij Terroirs d\'Avenir, dan door naar Marché d\'Aligre — de levendigste brocante + versmarkt van Parijs, minder toeristisch dan de Bastille-markt. Vóór 13u dicht, dus: om 08:30 weg.',
-   bereikbaarheid:'Terroirs d\'Avenir: 4 min lopen. Marché d\'Aligre: Metro 8 richting Créteil → Ledru-Rollin (±15 min)'},
-  {id:'pza2', dag:'za27', dagdeel:'Zaterdagmiddag', icon:'🏛️',
-   voorstel:'Le Marais + Place des Vosges + slenteren',
-   detail:'Het oudste plein van Parijs (Place des Vosges), omgeven door galerijen en sfeervolle cafés. Daarna door de straten van Le Marais: vintage shops, Sézane, terrasjes, verborgen binnenplaatsen. Op eigen tempo — geen gids, geen schema.',
-   bereikbaarheid:'Metro 1 richting Vincennes → Saint-Paul (±20 min vanuit Airbnb), of te voet via Rue de Rivoli door de Tuileries (±30 min wandeling)'},
-  {id:'pza3', dag:'za27', dagdeel:'Zaterdagavond', icon:'💃',
-   voorstel:'Apero-crawl: Frenchie Bar → Little Red Door → Experimental',
-   detail:'Begin met een glas bij Frenchie Bar à Vins (onze straat), dan Little Red Door (beste cocktailbar van Parijs, World\'s 50 Best), afsluiten bij Experimental Cocktail Club. Of eerder stoppen — geen schema, geen verplichtingen.',
-   bereikbaarheid:'Frenchie Bar: 4 min lopen. Little Red Door: 8 min lopen (Rue du Bretagne, Marais). Experimental: 6 min terug. Alles op loopafstand — geen metro nodig.'},
-  // ZONDAG 28 JUNI
-  {id:'pzo1', dag:'zo28', dagdeel:'Laatste ochtend', icon:'🛍️',
-   voorstel:'Sézane + koffie in de Passages Couverts',
-   detail:'Sézane op 3 min lopen is een van de weinige zaken in de buurt die op zondag open is (11:30u). Daarna door de overdekte Passages Couverts — Galerie Vivienne, Galerie Véro-Dodat — voor de laatste koffie van het weekend.',
-   bereikbaarheid:'Sézane: 3 min lopen. Passages Couverts: 8 min lopen of Metro 3 → Bourse'},
-  {id:'pzo2', dag:'zo28', dagdeel:'Laatste middag', icon:'🌿',
-   voorstel:'Coulée Verte + lunch onderweg → Gare du Nord',
-   detail:'De Coulée Verte is een verhoogd park op een oude spoorbaan — een van de mooiste rustplekken van Parijs die toeristen bijna nooit zien. Wandel er overheen (±45 min), lunch ergens onderweg, dan rustig naar het station. Trein om 16:25.',
-   bereikbaarheid:'Start Bastille: Metro 1 of 8 → Bastille (±25 min vanuit Airbnb). Naar Gare du Nord: Metro 5 richting Bobigny → Gare du Nord (±20 min)'},
 ];
 
 const ALL_CHAIN_USERS = ['griette','frederike','miriam','marlinde'];
@@ -3225,7 +3201,7 @@ function voteChainCustom(pollId) {
 }
 
 function getDayProgress(dag) {
-  const polls = POLL_CHAIN.filter(p => p.dag === dag);
+  const polls = POLL_CHAIN.filter(p => p.dag === dag && !p.homeCard);
   const answered = polls.filter(p => getChainVote(p.id, currentUser) !== null).length;
   return {answered, total: polls.length};
 }
@@ -3251,7 +3227,7 @@ function getWinningOption(pollId) {
 function renderPollChainDay(dag) {
   const container = document.getElementById('poll-chain-content');
   if (!container) return;
-  const polls = POLL_CHAIN.filter(p => p.dag === dag);
+  const polls = POLL_CHAIN.filter(p => p.dag === dag && !p.homeCard);
   const VOTE_LABELS = ['Ja, leuk! ✓', 'Ik doe liever wat anders'];
 
   let firstUnanswered = polls.findIndex(p => getChainVote(p.id, currentUser) === null);
@@ -3555,6 +3531,111 @@ function _renderCustomPolls(dag) {
     }
   });
   return h;
+}
+
+function _findAlternatives(text) {
+  if (!text || text.length < 4) return [];
+  const kws = text.toLowerCase().replace(/[^\w\s]/g,'').split(/\s+/).filter(w => w.length > 3);
+  if (!kws.length) return [];
+  const allItems = typeof ITEMS !== 'undefined' && ITEMS.length ? ITEMS : ITEMS_BASE;
+  return allItems.filter(item => {
+    const hay = (item.naam + ' ' + (item.sub||'') + ' ' + item.cat + ' ' + (item.verhaal||'')).toLowerCase();
+    return kws.some(kw => hay.includes(kw));
+  }).slice(0, 3);
+}
+
+function renderAankomstVote() {
+  const el = document.getElementById('aankomst-vote');
+  if (!el) return;
+  const VOTE_LABELS = ['Ja, leuk! ✓', 'Liever iets anders'];
+  const myVote = getChainVote('pvr1', currentUser);
+  const counts = [0, 0];
+  let votedCount = 0, customCount = 0;
+  ALL_CHAIN_USERS.forEach(u => {
+    const v = getChainVote('pvr1', u);
+    if (v === 'custom') { customCount++; votedCount++; }
+    else if (v === 0) { counts[0]++; votedCount++; }
+    else if (v === 1) { counts[1]++; votedCount++; }
+  });
+  const total = votedCount || 1;
+
+  function _avChips(filterFn) {
+    return ALL_CHAIN_USERS.filter(filterFn).map(u => {
+      const p = PROFILES[u]; const ph = getUserPhoto(u);
+      return ph
+        ? `<img src="${ph}" title="${p.naam}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;margin-right:3px;vertical-align:middle;">`
+        : `<span title="${p.naam}" style="display:inline-flex;width:20px;height:20px;border-radius:50%;background:${p.color};align-items:center;justify-content:center;font-size:0.5rem;color:#fff;font-style:italic;font-weight:700;margin-right:2px;">${p.init}</span>`;
+    }).join('');
+  }
+
+  if (myVote === null) {
+    const alreadyChips = ALL_CHAIN_USERS.filter(u => getChainVote('pvr1', u) !== null).map(u => {
+      const p = PROFILES[u]; const ph = getUserPhoto(u); const v = getChainVote('pvr1', u);
+      const lbl = v === 'custom' ? '✏️' : v === 0 ? '✓' : '✗';
+      return ph
+        ? `<img src="${ph}" title="${p.naam}: ${lbl}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;margin-right:3px;vertical-align:middle;">`
+        : `<span title="${p.naam}" style="display:inline-flex;width:20px;height:20px;border-radius:50%;background:${p.color};align-items:center;justify-content:center;font-size:0.5rem;color:#fff;font-style:italic;font-weight:700;margin-right:2px;">${p.init}</span>`;
+    }).join('');
+    el.innerHTML = `<div style="border-top:1px solid rgba(10,10,10,0.07);padding-top:14px;">
+      <div style="font-size:0.72rem;font-weight:700;color:#6B6560;margin-bottom:8px;">Wat vind jij van dit plan?${votedCount > 0 ? ` <span style="font-weight:400;color:#9A948E;">${votedCount} van 4 gestemd</span>` : ''}</div>
+      ${alreadyChips ? `<div style="margin-bottom:10px;">${alreadyChips}</div>` : ''}
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <button class="poll-opt" style="text-align:left;background:rgba(122,158,130,0.1);border-color:rgba(122,158,130,0.4);color:#2D5A35;" onclick="voteChain('pvr1',0);renderAankomstVote();">✓ Ja, leuk! Ik ben erbij</button>
+        <button class="poll-opt" style="text-align:left;" onclick="voteChain('pvr1',1);renderAankomstVote();">🤔 Liever iets anders</button>
+        <button class="poll-opt" style="text-align:left;color:#9A948E;border-style:dashed;" onclick="showChainCustomInput('pvr1_av')">✏️ Ander voorstel, namelijk...</button>
+      </div>
+      <div id="pchain-custom-pvr1_av" style="display:none;margin-top:10px;gap:8px;align-items:center;">
+        <input type="text" placeholder="Jouw alternatief voor de aankomstmiddag..." style="flex:1;padding:10px 12px;border:1.5px solid rgba(168,159,232,0.5);border-radius:12px;font-family:var(--sans);font-size:0.85rem;color:#0A0A0A;outline:none;background:#fff;" onkeydown="if(event.key==='Enter'){voteChainCustom('pvr1');renderAankomstVote();}">
+        <button onclick="voteChainCustom('pvr1');renderAankomstVote();" style="flex-shrink:0;padding:10px 16px;border:none;border-radius:12px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;">Ok</button>
+      </div>
+    </div>`;
+  } else {
+    const myLabel = myVote === 'custom' ? (getChainText('pvr1', currentUser) || 'Eigen voorstel') : VOTE_LABELS[myVote];
+    const pct = counts.map(c => Math.round(c / total * 100));
+    const customPct = Math.round(customCount / total * 100);
+    const myText = myVote === 'custom' ? getChainText('pvr1', currentUser) : null;
+    const alts = myText ? _findAlternatives(myText) : [];
+
+    const barsHtml = VOTE_LABELS.map((lbl, i) => `
+      <div style="margin-bottom:7px;">
+        <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;">
+          <span style="${myVote===i?'font-weight:700;color:#0A0A0A;':'color:#6B6560;'}">${lbl}</span>
+          <span style="font-weight:600;color:#6B6560;">${pct[i]}%</span>
+        </div>
+        <div class="poll-bar"><div class="poll-bar-fill" style="width:${pct[i]}%;background:${i===0?'#7A9E82':'#D4785A'};opacity:${myVote===i?1:0.45};"></div></div>
+        ${counts[i] > 0 ? `<div style="margin-top:3px;">${_avChips(u => getChainVote('pvr1', u) === i)}</div>` : ''}
+      </div>`).join('') + (customCount > 0 ? `
+      <div style="margin-bottom:7px;">
+        <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;">
+          <span style="${myVote==='custom'?'font-weight:700;color:#0A0A0A;':'color:#6B6560;'}">✏️ Eigen voorstel</span>
+          <span style="font-weight:600;color:#6B6560;">${customPct}%</span>
+        </div>
+        <div class="poll-bar"><div class="poll-bar-fill" style="width:${customPct}%;background:#A89FE8;opacity:${myVote==='custom'?1:0.45};"></div></div>
+        ${ALL_CHAIN_USERS.filter(u => getChainVote('pvr1', u) === 'custom').map(u => {
+          const t = getChainText('pvr1', u);
+          return t ? `<div style="font-size:0.65rem;color:#9A948E;margin-top:2px;padding-left:4px;">↳ ${PROFILES[u]?.naam}: &ldquo;${t}&rdquo;</div>` : '';
+        }).join('')}
+      </div>` : '');
+
+    let consensusHtml = '';
+    if (votedCount >= 4 && counts[0] === 4) {
+      consensusHtml = `<div style="font-size:0.72rem;color:#7A9E82;font-weight:700;margin-top:6px;">Iedereen is erbij! 🥂</div>`;
+      if (typeof launchConfetti === 'function') setTimeout(() => launchConfetti(), 50);
+    } else if (votedCount >= 4 && (counts[1] > 0 || customCount > 0)) {
+      consensusHtml = `<div style="font-size:0.72rem;color:#D4785A;font-weight:600;margin-top:6px;">Niet iedereen is even enthousiast — even overleggen? 🤝</div>`;
+    }
+
+    const altsHtml = alts.length > 0 ? `<div style="margin-top:10px;padding:10px 12px;background:rgba(168,159,232,0.06);border-radius:10px;border:1px solid rgba(168,159,232,0.15);">
+      <div style="font-size:0.65rem;font-weight:700;color:#A89FE8;margin-bottom:6px;">Alternatieven uit de app:</div>
+      ${alts.map(item => `<div style="font-size:0.73rem;color:#0A0A0A;margin-bottom:3px;">→ <strong>${item.naam}</strong> <span style="color:#9A948E;">· ${item.wijk}</span></div>`).join('')}
+    </div>` : '';
+
+    el.innerHTML = `<div style="border-top:1px solid rgba(10,10,10,0.07);padding-top:12px;">
+      <div style="font-size:0.72rem;color:#6B6560;margin-bottom:6px;">Jouw stem: <strong style="color:#0A0A0A;">${myLabel}</strong> · ${votedCount} van 4 gestemd</div>
+      ${barsHtml}${consensusHtml}${altsHtml}
+      <button onclick="localStorage.removeItem('vz_pchain_pvr1_'+currentUser);localStorage.removeItem('vz_pchain_text_pvr1_'+currentUser);renderAankomstVote();" style="margin-top:8px;font-size:0.65rem;color:#6B6560;background:none;border:1px solid rgba(10,10,10,0.15);border-radius:20px;padding:3px 10px;cursor:pointer;font-family:var(--sans);">Wijzig ▸</button>
+    </div>`;
+  }
 }
 
 let _activePollDay = 'vr26';
