@@ -748,16 +748,45 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
             </div>
           </div>
 
-          <!-- 13:15 -->
+          <!-- 13:30 routes -->
           <div style="display:flex;gap:12px;margin-bottom:0;">
             <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
               <div style="width:9px;height:9px;border-radius:50%;background:#C8A882;margin-top:3px;flex-shrink:0;"></div>
               <div style="width:1.5px;flex:1;background:rgba(10,10,10,0.09);margin:4px 0;"></div>
             </div>
             <div style="flex:1;padding-bottom:16px;">
-              <div style="font-size:0.6rem;font-weight:700;color:#C8A882;letter-spacing:0.07em;margin-bottom:3px;">13:15 — 20 min</div>
-              <div style="font-size:0.9rem;font-weight:800;color:#0A0A0A;margin-bottom:3px;">🧳 Koffers droppen bij Airbnb</div>
-              <div style="font-size:0.75rem;color:#6B6560;line-height:1.55;">Even langs Rue de la Lune — koffers laten is vrijwel altijd ok ook vóór officieel check-in om 16u. Dan terug richting vertrekpunt Baja Bikes.</div>
+              <div style="font-size:0.6rem;font-weight:700;color:#C8A882;letter-spacing:0.07em;margin-bottom:6px;">13:30 — KIES JE ROUTE</div>
+
+              <!-- Route A -->
+              <div style="background:rgba(122,158,130,0.08);border:1.5px solid rgba(122,158,130,0.2);border-radius:12px;padding:11px 12px;margin-bottom:8px;">
+                <div style="font-size:0.7rem;font-weight:800;color:#7A9E82;margin-bottom:6px;letter-spacing:0.04em;">ROUTE A — Direct naar Baja Bikes</div>
+                <div style="font-size:0.73rem;color:#0A0A0A;line-height:1.7;">
+                  🚶 3 min lopen naar <strong>Gare du Nord</strong><br>
+                  🚇 <strong>Metro 4</strong> richting Montrouge → uitstappen <strong>Châtelet</strong> (4 stops, ±8 min)<br>
+                  🔄 Overstap → <strong>Metro 1</strong> richting La Défense → uitstappen <strong>George V</strong> (2 stops, ±4 min)<br>
+                  🚶 5 min lopen naar Baja Bikes startpunt
+                </div>
+                <div style="margin-top:7px;display:flex;gap:6px;align-items:center;">
+                  <span style="font-size:0.65rem;color:#7A9E82;font-weight:700;">⏱ ±25 min · aankomst ~14:00</span>
+                </div>
+                <div style="margin-top:5px;font-size:0.68rem;color:#6B6560;font-style:italic;">Koffers? Baja Bikes heeft een bagageplek, of neem ze mee op de fiets.</div>
+              </div>
+
+              <!-- Route B -->
+              <div style="background:rgba(168,159,232,0.07);border:1.5px solid rgba(168,159,232,0.2);border-radius:12px;padding:11px 12px;">
+                <div style="font-size:0.7rem;font-weight:800;color:#A89FE8;margin-bottom:6px;letter-spacing:0.04em;">ROUTE B — Eerst langs Airbnb</div>
+                <div style="font-size:0.73rem;color:#0A0A0A;line-height:1.7;">
+                  🚶 15 min lopen naar <strong>Rue de la Lune</strong> (Bonne Nouvelle)<br>
+                  🧳 Koffers achterlaten — <em>vraag vooraf aan host!</em><br>
+                  🚇 <strong>Metro 4</strong> vanaf Strasbourg-Saint-Denis → <strong>Châtelet</strong> (3 stops, ±6 min)<br>
+                  🔄 Overstap → <strong>Metro 1</strong> richting La Défense → <strong>George V</strong> (2 stops, ±4 min)<br>
+                  🚶 5 min lopen naar Baja Bikes startpunt
+                </div>
+                <div style="margin-top:7px;display:flex;gap:6px;align-items:center;">
+                  <span style="font-size:0.65rem;color:#A89FE8;font-weight:700;">⏱ ±40 min · aankomst ~14:10</span>
+                </div>
+                <div style="margin-top:5px;padding:5px 8px;background:rgba(212,120,90,0.08);border-radius:7px;font-size:0.67rem;color:#D4785A;font-weight:600;">⚠️ Bagagedrop vóór check-in is niet zeker — even bevestigen bij de host</div>
+              </div>
             </div>
           </div>
 
@@ -3735,7 +3764,7 @@ const PROGRAMMA = {
     {time:'08:10',type:'fixed',icon:'🚂',label:'Vertrek',naam:'Eurostar Amsterdam CS → Paris Gare du Nord',detail:'Instappen uiterlijk 07:40 · Paspoort verplicht · Perron A'},
     {time:'11:56',type:'fixed',icon:'🗼',label:'Aankomst Parijs',naam:'Gare du Nord — welkom in Parijs!',detail:'Optie A: 10 min lopen via Rue du Faubourg-Poissonnière · Optie B: Metro 4 → Strasbourg-Saint-Denis + 5 min lopen'},
     {time:'12:15',type:'fixed',icon:'🍽️',label:'Lunch',naam:'Terminus Nord — klassieke Parijse brasserie',detail:'23 Rue de Dunkerque · 2 min van Gare du Nord · Art deco · steak-frites · moules · ±€25 pp · geen reservering nodig'},
-    {time:'13:15',type:'fixed',icon:'🧳',label:'Koffers droppen',naam:'Even langs Airbnb Rue de la Lune',detail:'Koffers achterlaten vóór check-in is vrijwel altijd ok · officieel check-in om 16:00'},
+    {time:'13:30',type:'fixed',icon:'🗺️',label:'Route keuze',naam:'Route A: direct → Baja Bikes  ·  Route B: eerst Airbnb',detail:'A: Metro 4 Gare du Nord → Châtelet + Metro 1 → George V (±25 min) · B: 15 min lopen naar Airbnb, koffers droppen (NIET ZEKER — check bij host!), dan zelfde metro (±40 min)'},
     {time:'14:30',type:'fixed',icon:'🚲',label:'Baja Bikes Highlights',naam:'Fietsrondleiding Parijs met Nederlandse gids',detail:'Eiffeltoren · Louvre · Notre-Dame · Seine · 3 uur · €34–39 pp · vertrek Champs-Élysées · bajabikes.eu'},
     {time:'17:30',type:'fixed',icon:'🏠',label:'Check-in Airbnb',naam:'Airbnb Rue de la Lune · Bonne Nouvelle (2e)',detail:'Even ademen, douchen, eerste borrel op het terras'},
     {time:'19:30',type:'open',icon:'🥂',label:'Eerste borrel Parijs',cat:'borrel',hint:'Swipe borrel →'},
