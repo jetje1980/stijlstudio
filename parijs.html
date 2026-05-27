@@ -2080,6 +2080,7 @@ let _allSwipes = {};    // {user: {itemId: vote}}
 let _allPlanVibes = {}; // {user: {day: [vibes]}}
 let _allVoorkeur = {};  // {user: answers[]}
 let _allBios = {};      // {user: bioText}
+let _debugSyncInfo = { rowCount: 0, error: null, appliedUsers: [] }; // debug only
 
 // Map localStorage key → {key, uid} for group_state
 function _keyToState(lsKey) {
@@ -2215,8 +2216,11 @@ async function _syncAllGroupState() {
     }
   }
   // Re-fetch after migration and apply everything
-  const { data:fresh } = await supa.from('group_state')
+  const { data:fresh, error:freshErr } = await supa.from('group_state')
     .select('key,user_id,value').eq('group_id', GROUP_ID);
+  _debugSyncInfo.rowCount = (fresh||[]).length;
+  _debugSyncInfo.error = freshErr ? freshErr.message : null;
+  _debugSyncInfo.appliedUsers = [...new Set((fresh||[]).map(r => r.user_id))];
   (fresh||[]).forEach(r => _applyGroupStateRow(r.key, r.user_id, r.value));
   _rerenderAfterSync();
 }
@@ -4000,8 +4004,10 @@ function openGluurDetail(u) {
   const lsSample = lsSwipes ? lsSwipes.slice(0,80) : 'null';
   html += `<div style="margin-top:12px;padding:10px 12px;background:rgba(10,10,10,0.06);border-radius:10px;font-size:0.6rem;color:var(--t3);line-height:1.6;">
     <strong>debug</strong><br>
-    mem _allSwipes: ${memSwCount} keys<br>
-    mem _allPlanVibes: ${memVbCount} items<br>
+    sync rows: ${_debugSyncInfo.rowCount} · error: ${_debugSyncInfo.error||'none'}<br>
+    sync users: ${_debugSyncInfo.appliedUsers.join(', ')||'?'}<br>
+    mem _allSwipes[${u}]: ${memSwCount} keys<br>
+    mem _allPlanVibes[${u}]: ${memVbCount} items<br>
     ls vz_swipes_${u}: ${lsSample}
   </div>`;
 
