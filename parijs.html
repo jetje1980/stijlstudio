@@ -1727,12 +1727,23 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     </div>
     <div style="font-size:0.6rem;font-weight:700;color:#9A948E;letter-spacing:0.1em;margin-bottom:8px;">VOORSTEL OF VRAAG</div>
     <input id="cpoll-vraag" type="text" placeholder="Bijv: Zin in de Coulée Verte zondagochtend?" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid rgba(10,10,10,0.15);border-radius:12px;font-family:var(--sans);font-size:0.88rem;color:#0A0A0A;background:#fff;outline:none;margin-bottom:18px;">
-    <div style="font-size:0.6rem;font-weight:700;color:#9A948E;letter-spacing:0.1em;margin-bottom:8px;">OPTIES <span style="font-weight:400;text-transform:none;letter-spacing:0;">(min. 2, max. 4)</span></div>
-    <div id="cpoll-opts-wrap" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
-      <input class="cpoll-opt" type="text" placeholder="✅ Ja, goed plan!" style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid rgba(10,10,10,0.15);border-radius:12px;font-family:var(--sans);font-size:0.85rem;color:#0A0A0A;background:#fff;outline:none;">
-      <input class="cpoll-opt" type="text" placeholder="🤷 Liever iets anders" style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid rgba(10,10,10,0.15);border-radius:12px;font-family:var(--sans);font-size:0.85rem;color:#0A0A0A;background:#fff;outline:none;">
+    <div style="font-size:0.6rem;font-weight:700;color:#9A948E;letter-spacing:0.1em;margin-bottom:8px;">VOEG ONDERDELEN TOE</div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;">
+      <button onclick="document.getElementById('cpoll-free').style.display='block';document.getElementById('cpoll-picker').style.display='none';this.style.background='#0A0A0A';this.style.color='#F0E8E2';document.getElementById('cpoll-tab-pick').style.background='transparent';document.getElementById('cpoll-tab-pick').style.color='#6B6560';" id="cpoll-tab-free" style="flex:1;padding:7px;border:1.5px solid rgba(10,10,10,0.15);border-radius:10px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.72rem;font-weight:700;cursor:pointer;">✏️ Eigen tekst</button>
+      <button onclick="document.getElementById('cpoll-picker').style.display='block';document.getElementById('cpoll-free').style.display='none';this.style.background='#0A0A0A';this.style.color='#F0E8E2';document.getElementById('cpoll-tab-free').style.background='transparent';document.getElementById('cpoll-tab-free').style.color='#6B6560';filterCpollItems('');" id="cpoll-tab-pick" style="flex:1;padding:7px;border:1.5px solid rgba(10,10,10,0.15);border-radius:10px;background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:700;cursor:pointer;">🔍 Kies uit de app</button>
     </div>
-    <button onclick="addCpollOpt()" style="font-size:0.8rem;color:#A89FE8;background:none;border:none;cursor:pointer;font-family:var(--sans);font-weight:700;padding:0 0 18px;display:block;">＋ Optie toevoegen</button>
+    <div id="cpoll-free">
+      <div id="cpoll-opts-wrap" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
+        <input class="cpoll-opt" type="text" placeholder="Optie 1 — bijv. Ja, leuk plan!" style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid rgba(10,10,10,0.15);border-radius:12px;font-family:var(--sans);font-size:0.85rem;color:#0A0A0A;background:#fff;outline:none;">
+        <input class="cpoll-opt" type="text" placeholder="Optie 2 — bijv. Liever iets anders" style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid rgba(10,10,10,0.15);border-radius:12px;font-family:var(--sans);font-size:0.85rem;color:#0A0A0A;background:#fff;outline:none;">
+      </div>
+      <button onclick="addCpollOpt()" style="font-size:0.8rem;color:#A89FE8;background:none;border:none;cursor:pointer;font-family:var(--sans);font-weight:700;padding:0 0 14px;display:block;">＋ Optie toevoegen</button>
+    </div>
+    <div id="cpoll-picker" style="display:none;margin-bottom:14px;">
+      <input type="text" id="cpoll-item-search" placeholder="Zoek activiteit, restaurant..." oninput="filterCpollItems(this.value)" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid rgba(10,10,10,0.12);border-radius:10px;font-family:var(--sans);font-size:0.85rem;color:#0A0A0A;background:#fff;outline:none;margin-bottom:8px;">
+      <div id="cpoll-item-results" style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;"></div>
+      <div id="cpoll-selected-items" style="margin-top:8px;display:flex;flex-direction:column;gap:5px;"></div>
+    </div>
     <button onclick="submitCpoll()" style="width:100%;padding:14px;background:#0A0A0A;border:none;border-radius:14px;color:#F0E8E2;font-family:var(--sans);font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;">Delen met de groep →</button>
   </div>
 </div>
@@ -3459,6 +3470,47 @@ function setCpollDay(el, day) {
   const dayMap = {vr26:0,za27:1,zo28:2};
   if (el) el.classList.add('active');
   else if (btns[dayMap[day]]) btns[dayMap[day]].classList.add('active');
+}
+
+function filterCpollItems(q) {
+  const el = document.getElementById('cpoll-item-results');
+  if (!el) return;
+  const allItems = typeof ITEMS !== 'undefined' && ITEMS.length ? ITEMS : ITEMS_BASE;
+  const lower = (q || '').toLowerCase();
+  const results = allItems.filter(i => {
+    const hay = (i.naam + ' ' + (i.sub||'') + ' ' + i.cat + ' ' + (i.wijk||'')).toLowerCase();
+    return !lower || hay.includes(lower);
+  }).slice(0, 10);
+  el.innerHTML = results.map(i =>
+    `<button onclick="addCpollItem('${i.id.replace(/'/g,"\\'")}','${i.naam.replace(/'/g,"\\'")}')" style="text-align:left;width:100%;padding:8px 11px;border:1px solid rgba(10,10,10,0.1);border-radius:9px;background:#fff;font-family:var(--sans);cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;">
+      <div><div style="font-size:0.8rem;font-weight:700;color:#0A0A0A;">${i.naam}</div><div style="font-size:0.68rem;color:#9A948E;">${i.sub||i.cat} · ${i.wijk}</div></div>
+      <span style="font-size:0.75rem;color:#A89FE8;flex-shrink:0;">＋</span>
+    </button>`
+  ).join('');
+}
+
+function addCpollItem(itemId, itemNaam) {
+  const wrap = document.getElementById('cpoll-opts-wrap');
+  const selected = document.getElementById('cpoll-selected-items');
+  // Add to free-text opts-wrap so submitCpoll() picks it up
+  const existing = [...wrap.querySelectorAll('.cpoll-opt')].map(i => i.value.trim());
+  if (existing.includes(itemNaam)) { showToast('Al toegevoegd'); return; }
+  if (wrap.children.length >= 4) { showToast('Max 4 opties'); return; }
+  const inp = document.createElement('input');
+  inp.className = 'cpoll-opt';
+  inp.type = 'text';
+  inp.value = itemNaam;
+  inp.style.cssText = 'width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid rgba(168,159,232,0.4);border-radius:12px;font-family:var(--sans);font-size:0.85rem;color:#0A0A0A;background:#fff;outline:none;';
+  wrap.appendChild(inp);
+  if (selected) {
+    const chip = document.createElement('div');
+    chip.style.cssText = 'display:flex;align-items:center;gap:6px;padding:5px 10px;background:rgba(168,159,232,0.1);border-radius:8px;font-family:var(--sans);font-size:0.75rem;color:#0A0A0A;';
+    chip.innerHTML = `✓ ${itemNaam}`;
+    selected.appendChild(chip);
+  }
+  document.getElementById('cpoll-item-search').value = '';
+  document.getElementById('cpoll-item-results').innerHTML = '';
+  showToast('✓ ' + itemNaam + ' toegevoegd als optie');
 }
 
 function addCpollOpt() {
