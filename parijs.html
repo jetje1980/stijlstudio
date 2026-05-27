@@ -1796,6 +1796,14 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:300;font-style:italic;font-vari
   </div>
 </div>
 
+<!-- GLUUR DETAIL SHEET -->
+<div id="gluur-detail-sheet" style="display:none;position:fixed;inset:0;z-index:950;background:rgba(27,27,35,0.5);" onclick="if(event.target===this)closeGluurDetail()">
+  <div style="position:absolute;bottom:0;left:0;right:0;max-width:540px;margin:0 auto;background:var(--bg);border-radius:20px 20px 0 0;padding:20px 20px 48px;max-height:88vh;overflow-y:auto;">
+    <div id="gluur-detail-inner"></div>
+    <button onclick="closeGluurDetail()" style="width:100%;margin-top:16px;padding:13px;border:1.5px solid rgba(27,27,35,0.12);border-radius:14px;background:transparent;font-family:var(--sans);font-size:0.85rem;font-weight:600;cursor:pointer;color:var(--t2);">Sluiten</button>
+  </div>
+</div>
+
 <!-- ADMIN PANEL -->
 <div id="admin-panel" style="display:none;position:fixed;inset:0;z-index:1200;background:#F0E8E2;overflow-y:auto;font-family:'DM Sans',sans-serif;">
   <div style="max-width:500px;margin:0 auto;padding:32px 20px 20px;">
@@ -3891,7 +3899,7 @@ function renderGluurStrip() {
     const topItem = liked.length ? ITEMS_BASE.find(it => it.id === liked[0][0]) : null;
     const hasData = liked.length > 0 || vibe || pvLabel;
     const isMe = u === currentUser;
-    return `<div style="flex-shrink:0;width:132px;background:rgba(240,232,226,${isMe?'0.1':'0.05'});border:1px solid rgba(240,232,226,${isMe?'0.18':'0.1'});border-radius:16px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;">
+    return `<div onclick="openGluurDetail('${u}')" style="flex-shrink:0;width:132px;background:rgba(240,232,226,${isMe?'0.1':'0.05'});border:1px solid rgba(240,232,226,${isMe?'0.18':'0.1'});border-radius:16px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;cursor:pointer;active:opacity:0.8;">
       <div style="width:34px;height:34px;border-radius:50%;overflow:hidden;background:${p.color};display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-bottom:2px;">
         ${ph ? `<img src="${ph}" style="width:100%;height:100%;object-fit:cover;">` : `<span style="font-size:0.72rem;font-weight:800;font-style:italic;color:#fff;">${p.init}</span>`}
       </div>
@@ -3902,8 +3910,97 @@ function renderGluurStrip() {
         ${vibe ? `<div style="font-size:0.6rem;color:#A89FE8;">${vibe}</div>` : ''}
         ${pvLabel ? `<div style="font-size:0.58rem;color:#7A9E82;background:rgba(122,158,130,0.13);border-radius:10px;padding:2px 7px;margin-top:1px;">${pvLabel}</div>` : ''}
       ` : `<div style="font-size:0.6rem;color:rgba(240,232,226,0.28);margin-top:4px;line-height:1.4;">Nog niks<br>gedeeld</div>`}
+      <div style="font-size:0.55rem;color:rgba(240,232,226,0.3);margin-top:3px;">tikken →</div>
     </div>`;
   }).join('');
+}
+
+function openGluurDetail(u) {
+  const p = PROFILES[u];
+  const ph = getUserPhoto(u);
+  const sheet = document.getElementById('gluur-detail-sheet');
+  if (!sheet) return;
+
+  const rawSwipes = _allSwipes[u] || (u === currentUser ? _safeJSON('vz_swipes_'+u, {}) : {});
+  const likedItems = Object.entries(rawSwipes)
+    .filter(([,v]) => v === 1 || v === 'like' || v === 'dream')
+    .map(([id, v]) => ({ item: ITEMS_BASE.find(it => it.id === id), vote: v }))
+    .filter(x => x.item);
+
+  const planVibes = _allPlanVibes[u] || (u === currentUser ? _safeJSON('vz_planVibes_'+u, {}) : {});
+  const plannedVibeIds = new Set([...(planVibes.vr26||[]), ...(planVibes.za27||[]), ...(planVibes.zo28||[])].map(e => e.id));
+  const plannedVibes = [...plannedVibeIds].map(id => VIBES.find(v => v.id === id)).filter(Boolean);
+  const vibeDay = {};
+  ['vr26','za27','zo28'].forEach(d => (planVibes[d]||[]).forEach(e => { vibeDay[e.id] = {vr26:'Vr 26',za27:'Za 27',zo28:'Zo 28'}[d]; }));
+
+  const VIBE_LABELS = ['🏃 Actief','⚖️ Mix','☀️ Terras'];
+  const rawVk = _allVoorkeur[u] || (u === currentUser ? _safeJSON('vz_voorkeur_'+u, []) : []);
+  const tempoLabel = typeof rawVk[3] === 'number' ? (VIBE_LABELS[rawVk[3]] ?? null) : null;
+  const pvr1 = getChainVote('pvr1', u);
+  const VOTE_MAP = {0:'✓ Vrijdag erbij', 1:'🤔 Liever anders', custom:'💬 Eigen plan'};
+  const pvLabel = pvr1 !== null ? (VOTE_MAP[pvr1] ?? VOTE_MAP.custom) : null;
+  const bio = _allBios[u] || '';
+
+  const avEl = ph
+    ? `<img src="${ph}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;">`
+    : `<div style="width:52px;height:52px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.1rem;color:#fff;">${p.init}</div>`;
+
+  const isMe = u === currentUser;
+
+  let html = `
+    <div style="width:36px;height:4px;background:rgba(27,27,35,0.12);border-radius:2px;margin:0 auto 20px;"></div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+      ${avEl}
+      <div>
+        <div style="font-family:var(--serif);font-size:1.2rem;color:var(--t1);font-weight:400;">${p.naam}${isMe?' (jij)':''}</div>
+        ${tempoLabel ? `<div style="font-size:0.75rem;color:var(--gold);margin-top:2px;">${tempoLabel} · voorkeursstijl</div>` : ''}
+        ${pvLabel ? `<div style="font-size:0.72rem;color:#7A9E82;margin-top:2px;">${pvLabel}</div>` : ''}
+      </div>
+    </div>
+    ${bio ? `<div style="margin-bottom:18px;padding:12px 14px;background:rgba(142,140,222,0.08);border-radius:12px;border-left:3px solid var(--gold);font-size:0.82rem;color:var(--t1);line-height:1.55;font-style:italic;">"${bio}"</div>` : ''}`;
+
+  if (plannedVibes.length) {
+    html += `<div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Geplande belevingen</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+      ${plannedVibes.map(v => `
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(142,140,222,0.08);border-radius:12px;padding:8px 10px;">
+          <div style="width:48px;height:48px;border-radius:8px;background-image:url('${v.img}');background-size:cover;flex-shrink:0;"></div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:var(--serif);font-size:0.92rem;color:var(--t1);">${v.emojis} ${v.naam}</div>
+            <div style="font-size:0.68rem;color:var(--t2);margin-top:2px;">${v.wijk} · ${vibeDay[v.id]||''}</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  if (likedItems.length) {
+    html += `<div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Gelikte activiteiten (${likedItems.length})</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      ${likedItems.map(({item, vote}) => {
+        const icon = vote === 'dream' ? '★' : '♥';
+        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(27,27,35,0.06);">
+          ${item.img ? `<div style="width:44px;height:44px;border-radius:8px;background-image:url('${item.img}');background-size:cover;flex-shrink:0;"></div>` : `<div style="width:44px;height:44px;border-radius:8px;background:rgba(142,140,222,0.15);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">${icon}</div>`}
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:var(--serif);font-size:0.9rem;color:var(--t1);">${icon} ${item.naam}</div>
+            <div style="font-size:0.68rem;color:var(--t2);margin-top:1px;">${item.wijk} · ${item.prijs}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  if (!likedItems.length && !plannedVibes.length) {
+    html += `<div style="text-align:center;padding:30px 0;color:var(--t2);font-size:0.88rem;">Nog niks gedeeld 🕑</div>`;
+  }
+
+  const inner = document.getElementById('gluur-detail-inner');
+  if (inner) inner.innerHTML = html;
+  sheet.style.display = 'flex';
+}
+
+function closeGluurDetail() {
+  const sheet = document.getElementById('gluur-detail-sheet');
+  if (sheet) sheet.style.display = 'none';
 }
 
 function renderAankomstVote() {
