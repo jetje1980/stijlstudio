@@ -711,6 +711,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 
     <!-- AANKOMSTDAG VOORSTEL -->
     <div id="voorstel-aankomst" style="margin:12px 20px 0;">
+      <div style="font-size:0.78rem;color:#6B6560;line-height:1.6;margin-bottom:10px;padding:0 2px;">Ha, onze app is hopelijk leuk maar ook wat veel&nbsp;😅. Daarom alvast een voorstel voor de 1e middag. Wat denken jullie ervan? Of liever iets anders?</div>
       <div style="background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 2px 20px rgba(10,10,10,0.08);">
         <div style="background:linear-gradient(135deg,#D4785A 0%,#B85840 100%);padding:16px 18px 14px;">
           <div style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,235,228,0.7);margin-bottom:5px;">Voorstel · Vrijdag 26 juni</div>
@@ -823,7 +824,7 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
           <a href="https://www.bajabikes.eu/nl/paris-city-tours/" target="_blank" rel="noopener" style="flex:1;display:flex;align-items:center;justify-content:center;padding:11px 8px;background:#0A0A0A;border-radius:12px;text-decoration:none;gap:5px;">
             <span style="font-size:0.78rem;font-weight:700;color:#F0E8E2;letter-spacing:0.04em;">🚲 Boek Baja Bikes</span>
           </a>
-          <button onclick="showToast('📋 Bespreek dit plan in de groepschat!')" style="flex:1;padding:11px 8px;background:transparent;border:1.5px solid rgba(10,10,10,0.12);border-radius:12px;font-family:var(--sans);font-size:0.78rem;font-weight:700;color:#6B6560;cursor:pointer;letter-spacing:0.02em;">💬 Bespreken</button>
+          <button onclick="deelVoorstel()" style="flex:1;padding:11px 8px;background:transparent;border:1.5px solid rgba(10,10,10,0.12);border-radius:12px;font-family:var(--sans);font-size:0.78rem;font-weight:700;color:#0A0A0A;cursor:pointer;letter-spacing:0.02em;">📤 Deel in groepsapp</button>
         </div>
       </div>
     </div>
@@ -2193,6 +2194,16 @@ function kopieerUitnodiging() {
   navigator.clipboard.writeText(tekst).then(() => showToast('✓ Uitnodiging gekopieerd!')).catch(() => {
     prompt('Kopieer deze tekst:', tekst);
   });
+}
+function deelVoorstel() {
+  const tekst = `Ha! Onze Parijs-app is hopelijk leuk maar ook wat veel 😅. Daarom alvast een concreet voorstel voor onze eerste middag — wat denken jullie ervan? Of liever iets anders?\n\n🚂 11:56 Aankomst Gare du Nord\n🍽️ 12:15 Lunch bij Terminus Nord (klassieke brasserie recht tegenover het station, ~€25 pp)\n🚲 14:30 Baja Bikes Highlights tour (3 uur fietsen langs Eiffeltoren, Notre-Dame, Louvre — €45 pp)\n🏠 17:30 Check-in Airbnb + eerste borrel\n\nDetails + routes in de app: stijlstudio.app/parijs.html`;
+  if (navigator.share) {
+    navigator.share({ title: 'Voorstel aankomstdag Parijs', text: tekst }).catch(() => {});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(tekst).then(() => showToast('✅ Tekst gekopieerd — plak in de groepsapp!'));
+  } else {
+    showToast('Kopieer de link: stijlstudio.app/parijs.html');
+  }
 }
 function showToast(msg) {
   const t = document.getElementById('toast');
