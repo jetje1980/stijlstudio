@@ -2190,6 +2190,8 @@ async function _syncAllGroupState() {
     .select('key,user_id,value').eq('group_id', GROUP_ID);
   if (error) { console.warn('sync error:', error.message); return; }
   const rows = data || [];
+  // Apply first fetch immediately — all other users' data is available now
+  rows.forEach(r => _applyGroupStateRow(r.key, r.user_id, r.value));
   const existing = new Set(rows.map(r => r.key+':'+r.user_id));
   // Migrate own local data not yet in Supabase
   const migs = [
