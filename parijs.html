@@ -3990,7 +3990,12 @@ function openGluurDetail(u) {
   }
 
   if (!likedItems.length && !plannedVibes.length) {
-    html += `<div style="text-align:center;padding:30px 0;color:var(--t2);font-size:0.88rem;">Nog niks gedeeld 🕑</div>`;
+    const rawKeys = Object.keys(rawSwipes);
+    const rawSample = rawKeys.slice(0,3).map(k => `${k}:${rawSwipes[k]}`).join(', ');
+    html += `<div style="text-align:center;padding:20px 0;color:var(--t2);font-size:0.88rem;">Nog niks gedeeld 🕑</div>`;
+    if (rawKeys.length) {
+      html += `<div style="font-size:0.65rem;color:var(--t3);text-align:center;padding:0 0 10px;">debug: ${rawKeys.length} swipes gevonden · ${rawSample}</div>`;
+    }
   }
 
   const inner = document.getElementById('gluur-detail-inner');
