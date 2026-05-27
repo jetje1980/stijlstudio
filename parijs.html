@@ -3713,21 +3713,102 @@ async function sendChatMessage() {
   typingEl.innerHTML = '<div class="chat-bubble ai typing">Aan het denken… ✨</div>';
   el?.appendChild(typingEl);
   if (el) el.scrollTop = el.scrollHeight;
-  try {
-    const resp = await fetch('https://osuqtfsxmquwqsbgzlqn.supabase.co/functions/v1/paris-chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
-      body: JSON.stringify({ messages: _chatMessages, groupContext: buildGroupContext() }),
-    });
-    typingEl.remove();
-    if (!resp.ok) throw new Error('API ' + resp.status);
-    const data = await resp.json();
-    _chatMessages.push({ role:'assistant', content: data.content || 'Hmm, geen antwoord. Probeer opnieuw.' });
-  } catch(e) {
-    typingEl.remove();
-    _chatMessages.push({ role:'assistant', content: 'Oeps — even geen verbinding. Probeer het opnieuw 🙏' });
-  }
+  await new Promise(r => setTimeout(r, 500));
+  typingEl.remove();
+  _chatMessages.push({ role:'assistant', content: _localChatReply(text) });
   renderChatMessages();
+}
+
+function _localChatReply(text) {
+  const t = text.toLowerCase().replace(/[''`]/g, "'");
+  const words = t.split(/\s+/).filter(w => w.length > 3);
+
+  // ── Intent detection ──────────────────────────────
+  const dag = /vrijdag|^vr\b/.test(t) ? 'vr' : /zaterdag|^za\b/.test(t) ? 'za' : /zondag|^zo\b/.test(t) ? 'zo' : null;
+  const tijd = /ochtend|vroeg|ontbijt/.test(t) ? 'ochtend' : /\bmiddag\b|lunch/.test(t) ? 'middag' : /avond|vanavond|diner|nacht/.test(t) ? 'avond' : null;
+
+  const wantOntbijt  = /ontbijt|croissant|bakker|brunch/.test(t);
+  const wantKoffie   = /koffie|coffee|caf[eé]/.test(t);
+  const wantEten     = /\beten\b|restaurant|bistro|brasserie|lunch|diner|eetplek/.test(t) && !wantOntbijt;
+  const wantActief   = /wandel|lopen|actief|fietsen|beweging/.test(t);
+  const wantShoppen  = /shopp|winkelen|s[eé]zane|markt|brocante|march[eé]|puces/.test(t);
+  const wantCultuur  = /museum|musea|kunst|expo|atelier|louvre|orsay/.test(t);
+  const wantBar      = /borrel|aperitief|wijn|cocktail|drinken|bar\b|uitgaan|dans/.test(t);
+  const wantDichtbij = /dichtbij|airbnb|bastille|buurt/.test(t);
+  const wantGeheim   = /verborg|hidden|bijzonder|geheim|onbekend|niemand/.test(t);
+  const wantMatches  = /groep|samen|iedereen|match|geliked|favoriet|populair/.test(t);
+
+  let cats = [];
+  if (wantOntbijt) cats.push('ontbijt');
+  if (wantKoffie)  cats.push('koffie');
+  if (wantEten)    cats.push('lunch', 'diner');
+  if (wantActief)  cats.push('wandelen', 'activiteit');
+  if (wantShoppen) cats.push('markt');
+  if (wantCultuur) cats.push('activiteit');
+  if (wantBar)     cats.push('borrel', 'uitgaan');
+  if (!cats.length && tijd === 'ochtend') cats = ['ontbijt', 'koffie', 'wandelen'];
+  if (!cats.length && tijd === 'middag')  cats = ['lunch', 'activiteit', 'wandelen'];
+  if (!cats.length && tijd === 'avond')   cats = ['diner', 'borrel', 'uitgaan'];
+  if (!cats.length) cats = ['wandelen', 'activiteit', 'lunch', 'koffie', 'ontbijt', 'borrel'];
+
+  // ── Group like counts ─────────────────────────────
+  const groupLiked = {};
+  const mySwipes = _allSwipes[currentUser] || _safeJSON('vz_swipes_'+currentUser, {});
+  const allSwipesData = {..._allSwipes, [currentUser]: mySwipes};
+  Object.values(allSwipesData).forEach(sw => {
+    Object.entries(sw || {}).forEach(([id, v]) => { if (v === 1) groupLiked[id] = (groupLiked[id]||0)+1; });
+  });
+
+  // ── Score ITEMS_BASE ──────────────────────────────
+  const nearWijken = ['11e','12e','3e','4e','10e'];
+  const scored = ITEMS_BASE.map(item => {
+    let score = 0;
+    const hay = (item.naam+' '+(item.sub||'')+' '+(item.verhaal||'')+' '+item.cat+' '+item.wijk).toLowerCase();
+    if (cats.includes(item.cat)) score += 4;
+    words.forEach(w => { if (hay.includes(w)) score += 3; });
+    const tijden = (item.tijden||'').toLowerCase();
+    if (dag === 'za') {
+      if (tijden.includes('za') || tijden.includes('dagelijks') || tijden.includes('hele dag')) score += 2;
+      if (/gesloten.*za|za.*gesloten/.test(tijden)) score -= 12;
+      if (item.weekend_special) score += 3;
+    }
+    if (dag === 'zo') {
+      if (tijden.includes('zo') || tijden.includes('dagelijks') || tijden.includes('hele dag')) score += 2;
+      if (/gesloten.*zo|zo.*gesloten/.test(tijden)) score -= 12;
+    }
+    if (dag === 'vr') {
+      if (tijden.includes('vr') || tijden.includes('dagelijks') || tijden.includes('ma')) score += 1;
+    }
+    if (tijd === 'ochtend' && (item.cat === 'ontbijt' || item.cat === 'koffie')) score += 2;
+    if (tijd === 'avond' && (item.cat === 'diner' || item.cat === 'borrel' || item.cat === 'uitgaan')) score += 2;
+    const gl = groupLiked[item.id] || 0;
+    score += gl * 5;
+    if (wantDichtbij && nearWijken.some(w => item.wijk.includes(w))) score += 3;
+    if (wantGeheim && (hay.includes('verborg') || hay.includes('geheim') || hay.includes('niemand') || hay.includes('lokaal'))) score += 4;
+    return { item, score, gl };
+  }).filter(x => x.score > 0).sort((a, b) => b.score - a.score);
+
+  // ── Group matches shortcut ────────────────────────
+  if (wantMatches) {
+    const gm = scored.filter(x => x.gl >= 2).slice(0, 3);
+    if (gm.length) return '❤️ **Jullie groepsfavorieten** — 2+ mensen hebben dit geliked:\n\n' + gm.map(x => _fmtItem(x.item, allSwipesData)).join('\n\n');
+    return 'Nog niet genoeg overlapping in de swipes — laat de anderen ook wat swipen! Hier zijn aanbevolen opties:\n\n' + scored.slice(0,3).map(x => _fmtItem(x.item, allSwipesData)).join('\n\n');
+  }
+
+  const top = scored.slice(0, 3);
+  if (!top.length) return 'Ik vind niks passendsmet die zoekterm. Probeer: "zaterdagochtend dichtbij airbnb", "avondeten tip", "verborgen plek", of "wat wil de groep doen".';
+
+  const dagLabel = dag === 'vr' ? 'vrijdag' : dag === 'za' ? 'zaterdag' : dag === 'zo' ? 'zondag' : '';
+  const tijdLabel = tijd || '';
+  const intro = [dagLabel, tijdLabel].filter(Boolean).join(' ');
+  return (intro ? `Op ${intro} passen deze goed bij jullie:\n\n` : 'Dit past goed bij jullie groep:\n\n') + top.map(x => _fmtItem(x.item, allSwipesData)).join('\n\n');
+}
+
+function _fmtItem(item, allSwipesData) {
+  const likedBy = Object.entries(allSwipesData).filter(([,sw]) => sw?.[item.id] === 1).map(([u]) => PROFILES[u]?.naam).filter(Boolean);
+  const likeStr = likedBy.length ? ` · ❤️ ${likedBy.join(', ')}` : '';
+  const desc = item.verhaal ? item.verhaal.slice(0, 110) + (item.verhaal.length > 110 ? '…' : '') : '';
+  return `**${item.naam}** (${item.wijk})\n${desc}\n🕐 ${item.tijden||'?'} · ${item.prijs}${likeStr}`;
 }
 
 // ── PROFILE BIO ──────────────────────────────────────
