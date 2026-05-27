@@ -388,6 +388,8 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 /* ── POLL CHAIN ── */
 .poll-day-tab{padding:7px 16px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.15s;flex-shrink:0;}
 .poll-day-tab.active{border-color:#0A0A0A;background:#0A0A0A;color:#F0E8E2;}
+.cpoll-day-btn{padding:7px 16px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.15);background:transparent;color:#6B6560;font-family:var(--sans);font-size:0.72rem;font-weight:600;cursor:pointer;transition:all 0.15s;}
+.cpoll-day-btn.active{border-color:#A89FE8;background:#A89FE8;color:#fff;}
 .pchain-block{margin-bottom:12px;border-radius:var(--r-lg);overflow:hidden;}
 .pchain-answered{background:rgba(122,158,130,0.08);border:1px solid rgba(122,158,130,0.2);padding:12px 14px;}
 .pchain-active{background:#fff;border:2px solid #A89FE8;padding:14px 16px;box-shadow:0 2px 12px rgba(168,159,232,0.15);}
@@ -886,6 +888,9 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
       <button class="poll-day-tab" onclick="switchPollDay('zo28',this)">Zo 28</button>
     </div>
     <div id="poll-chain-content" style="padding:0 20px 8px;"></div>
+    <div style="padding:0 20px 20px;">
+      <button onclick="openCpollSheet()" style="width:100%;padding:12px;border:1.5px dashed rgba(168,159,232,0.4);border-radius:14px;background:transparent;font-family:var(--sans);font-size:0.82rem;font-weight:700;color:#A89FE8;cursor:pointer;letter-spacing:0.04em;">＋ Eigen voorstel toevoegen</button>
+    </div>
 
   </section>
 
@@ -1707,6 +1712,30 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
 
 <div class="game-overlay" id="game-warmup" style="display:none;flex-direction:column;overflow-y:auto;"></div>
 
+<!-- CUSTOM POLL SHEET -->
+<div id="cpoll-sheet" style="display:none;position:fixed;inset:0;z-index:950;background:rgba(10,10,10,0.45);" onclick="if(event.target===this)closeCpollSheet()">
+  <div style="position:absolute;bottom:0;left:0;right:0;max-width:540px;margin:0 auto;background:#F0E8E2;border-radius:20px 20px 0 0;padding:24px 20px 48px;max-height:88vh;overflow-y:auto;">
+    <div style="width:36px;height:4px;background:rgba(10,10,10,0.15);border-radius:2px;margin:0 auto 20px;"></div>
+    <div style="font-size:1.05rem;font-weight:800;color:#0A0A0A;margin-bottom:3px;">Maak een voorstel</div>
+    <div style="font-size:0.78rem;color:#6B6560;margin-bottom:18px;">De hele groep kan erop stemmen</div>
+    <div style="font-size:0.6rem;font-weight:700;color:#9A948E;letter-spacing:0.1em;margin-bottom:8px;">DAG</div>
+    <div style="display:flex;gap:8px;margin-bottom:18px;">
+      <button class="cpoll-day-btn active" onclick="setCpollDay(this,'vr26')">Vr 26</button>
+      <button class="cpoll-day-btn" onclick="setCpollDay(this,'za27')">Za 27</button>
+      <button class="cpoll-day-btn" onclick="setCpollDay(this,'zo28')">Zo 28</button>
+    </div>
+    <div style="font-size:0.6rem;font-weight:700;color:#9A948E;letter-spacing:0.1em;margin-bottom:8px;">VOORSTEL OF VRAAG</div>
+    <input id="cpoll-vraag" type="text" placeholder="Bijv: Zin in de Coulée Verte zondagochtend?" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid rgba(10,10,10,0.15);border-radius:12px;font-family:var(--sans);font-size:0.88rem;color:#0A0A0A;background:#fff;outline:none;margin-bottom:18px;">
+    <div style="font-size:0.6rem;font-weight:700;color:#9A948E;letter-spacing:0.1em;margin-bottom:8px;">OPTIES <span style="font-weight:400;text-transform:none;letter-spacing:0;">(min. 2, max. 4)</span></div>
+    <div id="cpoll-opts-wrap" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
+      <input class="cpoll-opt" type="text" placeholder="✅ Ja, goed plan!" style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid rgba(10,10,10,0.15);border-radius:12px;font-family:var(--sans);font-size:0.85rem;color:#0A0A0A;background:#fff;outline:none;">
+      <input class="cpoll-opt" type="text" placeholder="🤷 Liever iets anders" style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid rgba(10,10,10,0.15);border-radius:12px;font-family:var(--sans);font-size:0.85rem;color:#0A0A0A;background:#fff;outline:none;">
+    </div>
+    <button onclick="addCpollOpt()" style="font-size:0.8rem;color:#A89FE8;background:none;border:none;cursor:pointer;font-family:var(--sans);font-weight:700;padding:0 0 18px;display:block;">＋ Optie toevoegen</button>
+    <button onclick="submitCpoll()" style="width:100%;padding:14px;background:#0A0A0A;border:none;border-radius:14px;color:#F0E8E2;font-family:var(--sans);font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;">Delen met de groep →</button>
+  </div>
+</div>
+
 <!-- ADMIN PANEL -->
 <div id="admin-panel" style="display:none;position:fixed;inset:0;z-index:1200;background:#F0E8E2;overflow-y:auto;font-family:'DM Sans',sans-serif;">
   <div style="max-width:500px;margin:0 auto;padding:32px 20px 20px;">
@@ -2386,6 +2415,7 @@ function initApp() {
   showPreTripNudge();
   renderWeekendBlok();
   initPollChain();
+  loadCustomPolls();
   renderPersonalPolls();
   renderBeginHier();
   _updateWarmupBadge();
@@ -3372,6 +3402,7 @@ function renderPollChainDay(dag) {
     }
   });
 
+  html += _renderCustomPolls(dag);
   container.innerHTML = html;
 
   // Init comment widgets for answered + active polls
@@ -3388,6 +3419,164 @@ function renderPollChainDay(dag) {
       }
     }
   });
+}
+
+// ── CUSTOM POLLS ──────────────────────────────────
+let _customPolls = [];
+let _customVotes = {};
+let _cpollDay = 'vr26';
+
+async function loadCustomPolls() {
+  const { data } = await supa.from('group_state').select('user_id,value').eq('key','custom_polls');
+  _customPolls = [];
+  if (data) data.forEach(row => { if (Array.isArray(row.value)) _customPolls.push(...row.value); });
+  _customPolls.sort((a,b) => a.created_at < b.created_at ? -1 : 1);
+  if (!_customPolls.length) return;
+  const voteKeys = _customPolls.map(p => 'cpvote_' + p.id);
+  const { data: vd } = await supa.from('group_state').select('user_id,key,value').in('key', voteKeys);
+  _customVotes = {};
+  if (vd) vd.forEach(r => {
+    const pid = r.key.replace('cpvote_','');
+    if (!_customVotes[pid]) _customVotes[pid] = {};
+    _customVotes[pid][r.user_id] = r.value;
+  });
+}
+
+function getCpVote(pollId, user) {
+  return _customVotes[pollId]?.[user ?? currentUser] ?? null;
+}
+
+async function voteCustomPoll(pollId, optIdx) {
+  if (!_customVotes[pollId]) _customVotes[pollId] = {};
+  _customVotes[pollId][currentUser] = optIdx;
+  supa.from('group_state').upsert({ user_id:currentUser, key:'cpvote_'+pollId, value:optIdx }, { onConflict:'user_id,key' }).then(()=>{});
+  renderPollChainDay(_activePollDay);
+  saveToast('Stem opgeslagen! 🗳️');
+}
+
+async function resetCpVote(pollId) {
+  if (_customVotes[pollId]) delete _customVotes[pollId][currentUser];
+  supa.from('group_state').delete().eq('user_id',currentUser).eq('key','cpvote_'+pollId).then(()=>{});
+  renderPollChainDay(_activePollDay);
+}
+
+async function saveCustomPoll(poll) {
+  const { data } = await supa.from('group_state').select('value').eq('user_id',currentUser).eq('key','custom_polls').maybeSingle();
+  const list = Array.isArray(data?.value) ? data.value : [];
+  list.push(poll);
+  await supa.from('group_state').upsert({ user_id:currentUser, key:'custom_polls', value:list }, { onConflict:'user_id,key' });
+  _customPolls.push(poll);
+  renderPollChainDay(_activePollDay);
+  showToast('Voorstel gedeeld met de groep! 🗳️');
+}
+
+async function deleteCustomPoll(pollId) {
+  const poll = _customPolls.find(p => p.id === pollId);
+  if (!poll || poll.author !== currentUser) return;
+  const { data } = await supa.from('group_state').select('value').eq('user_id',currentUser).eq('key','custom_polls').maybeSingle();
+  const list = (Array.isArray(data?.value) ? data.value : []).filter(p => p.id !== pollId);
+  await supa.from('group_state').upsert({ user_id:currentUser, key:'custom_polls', value:list }, { onConflict:'user_id,key' });
+  _customPolls = _customPolls.filter(p => p.id !== pollId);
+  renderPollChainDay(_activePollDay);
+  showToast('Voorstel verwijderd');
+}
+
+function openCpollSheet() {
+  document.getElementById('cpoll-sheet').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  // reset
+  document.getElementById('cpoll-vraag').value = '';
+  const wrap = document.getElementById('cpoll-opts-wrap');
+  [...wrap.querySelectorAll('.cpoll-opt')].forEach(i => i.value = '');
+  while (wrap.children.length > 2) wrap.removeChild(wrap.lastChild);
+  setCpollDay(document.querySelector('.cpoll-day-btn'), _activePollDay);
+}
+
+function closeCpollSheet() {
+  document.getElementById('cpoll-sheet').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function setCpollDay(el, day) {
+  _cpollDay = day;
+  document.querySelectorAll('.cpoll-day-btn').forEach(b => b.classList.remove('active'));
+  // find the button matching the day
+  const btns = document.querySelectorAll('.cpoll-day-btn');
+  const dayMap = {vr26:0,za27:1,zo28:2};
+  if (el) el.classList.add('active');
+  else if (btns[dayMap[day]]) btns[dayMap[day]].classList.add('active');
+}
+
+function addCpollOpt() {
+  const wrap = document.getElementById('cpoll-opts-wrap');
+  if (wrap.children.length >= 4) { showToast('Max 4 opties'); return; }
+  const inp = document.createElement('input');
+  inp.className = 'cpoll-opt';
+  inp.type = 'text';
+  inp.placeholder = 'Optie ' + (wrap.children.length + 1) + '...';
+  inp.style.cssText = 'width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid rgba(10,10,10,0.15);border-radius:12px;font-family:var(--sans);font-size:0.85rem;color:#0A0A0A;background:#fff;outline:none;';
+  wrap.appendChild(inp);
+  inp.focus();
+}
+
+async function submitCpoll() {
+  const vraag = document.getElementById('cpoll-vraag').value.trim();
+  const opties = [...document.querySelectorAll('.cpoll-opt')].map(i => i.value.trim()).filter(Boolean);
+  if (!vraag) { showToast('Vul een vraag of voorstel in'); return; }
+  if (opties.length < 2) { showToast('Voeg minimaal 2 opties toe'); return; }
+  closeCpollSheet();
+  await saveCustomPoll({ id:'cp_'+Date.now(), dag:_cpollDay, vraag, opties, author:currentUser, created_at:new Date().toISOString() });
+  // switch to correct day tab
+  const tabEl = [...document.querySelectorAll('.poll-day-tab')].find(b => b.getAttribute('onclick')?.includes(_cpollDay));
+  switchPollDay(_cpollDay, tabEl);
+}
+
+function _renderCustomPolls(dag) {
+  const dayPolls = _customPolls.filter(p => p.dag === dag);
+  if (!dayPolls.length) return '';
+  let h = `<div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#A89FE8;margin:16px 0 8px;font-weight:700;">Eigen voorstellen</div>`;
+  dayPolls.forEach(poll => {
+    const ap = PROFILES[poll.author];
+    const myVote = getCpVote(poll.id);
+    const isMe = poll.author === currentUser;
+    const counts = Array(poll.opties.length).fill(0);
+    let voted = 0;
+    ALL_CHAIN_USERS.forEach(u => { const v = getCpVote(poll.id, u); if (v !== null) { counts[v]++; voted++; } });
+    const tot = voted || 1;
+    const authorHtml = ap ? `<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+      <div style="width:18px;height:18px;border-radius:50%;background:${ap.color};display:flex;align-items:center;justify-content:center;font-size:0.5rem;color:#fff;font-style:italic;font-weight:700;flex-shrink:0;">${ap.init}</div>
+      <span style="font-size:0.65rem;color:#9A948E;">Voorstel van ${ap.naam}</span>
+      ${isMe ? `<button onclick="deleteCustomPoll('${poll.id}')" style="margin-left:auto;font-size:0.65rem;color:#9A948E;background:none;border:none;cursor:pointer;padding:0;">✕ Verwijder</button>` : ''}
+    </div>` : '';
+    if (myVote !== null) {
+      const pct = poll.opties.map((_,i) => Math.round(counts[i]/tot*100));
+      h += `<div class="pchain-block"><div class="pchain-answered">
+        ${authorHtml}
+        <div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;margin-bottom:8px;">${poll.vraag}</div>
+        ${poll.opties.map((o,i)=>`<div style="margin-bottom:6px;">
+          <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;">
+            <span style="${myVote===i?'font-weight:700;color:#0A0A0A':'color:#6B6560'}">${o}</span>
+            <span style="font-weight:600;color:#6B6560;">${pct[i]}%</span>
+          </div>
+          <div class="poll-bar"><div class="poll-bar-fill" style="width:${pct[i]}%;background:${myVote===i?'#A89FE8':'rgba(168,159,232,0.3)'};"></div></div>
+          ${counts[i]>0?`<div style="margin-top:2px;">${ALL_CHAIN_USERS.filter(u=>getCpVote(poll.id,u)===i).map(u=>{const p=PROFILES[u];return p?`<span title="${p.naam}" style="display:inline-flex;width:18px;height:18px;border-radius:50%;background:${p.color};align-items:center;justify-content:center;font-size:0.45rem;color:#fff;font-style:italic;font-weight:700;margin-right:2px;">${p.init}</span>`:''}).join('')}</div>`:''}
+        </div>`).join('')}
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+          <span style="font-size:0.65rem;color:#9A948E;">${voted} van 4 gestemd</span>
+          <button onclick="resetCpVote('${poll.id}')" style="font-size:0.65rem;color:#6B6560;background:none;border:1px solid rgba(10,10,10,0.15);border-radius:20px;padding:3px 10px;cursor:pointer;font-family:var(--sans);">Wijzig ▸</button>
+        </div>
+      </div></div>`;
+    } else {
+      h += `<div class="pchain-block"><div class="pchain-active">
+        ${authorHtml}
+        <div class="poll-q" style="margin-bottom:12px;">${poll.vraag}</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          ${poll.opties.map((o,i)=>`<button class="poll-opt" style="text-align:left;" onclick="voteCustomPoll('${poll.id}',${i})">${o}</button>`).join('')}
+        </div>
+      </div></div>`;
+    }
+  });
+  return h;
 }
 
 let _activePollDay = 'vr26';
