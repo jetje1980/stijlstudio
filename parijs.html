@@ -833,6 +833,12 @@ h1,h2,h3,h4{font-family:var(--sans);font-weight:700;font-style:italic;}
     </div>
     <div class="stories-row" id="stories-row"></div>
 
+    <!-- GLUUR STRIP -->
+    <div id="gluur-section" style="margin:10px 0 2px;">
+      <div style="padding:0 20px 6px;"><span style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(240,232,226,0.4);">👀 Gluur mee</span></div>
+      <div id="gluur-strip" style="display:flex;gap:10px;padding:0 20px 4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
+    </div>
+
     <!-- COUNTDOWN -->
     <div class="countdown-block">
       <div class="countdown-label" id="cd-label">⏱ Countdown tot vertrek</div>
@@ -2113,6 +2119,7 @@ function _rerenderAfterSync() {
   renderGroep();
   renderPollChainDay(_activePollDay);
   renderAankomstVote();
+  renderGluurStrip();
   if (document.getElementById('sec-top5')?.classList.contains('active')) renderProgramma();
 }
 
@@ -2438,6 +2445,7 @@ function initApp() {
   loadCustomPolls();
   renderPersonalPolls();
   renderAankomstVote();
+  renderGluurStrip();
   renderBeginHier();
   _updateWarmupBadge();
   initFeed();
@@ -3594,6 +3602,37 @@ function _findAlternatives(text) {
     const hay = (item.naam + ' ' + (item.sub||'') + ' ' + item.cat + ' ' + (item.verhaal||'')).toLowerCase();
     return kws.some(kw => hay.includes(kw));
   }).slice(0, 3);
+}
+
+function renderGluurStrip() {
+  const el = document.getElementById('gluur-strip');
+  if (!el) return;
+  const VIBES = ['🏃 Actief','⚖️ Mix','☀️ Terras'];
+  const VOTE_MAP = {0:'✓ Vrijdag erbij', 1:'🤔 Liever anders', custom:'💬 Eigen plan'};
+  el.innerHTML = Object.entries(PROFILES).map(([u, p]) => {
+    const ph = getUserPhoto(u);
+    const rawSwipes = _allSwipes[u] || (u === currentUser ? (()=>{try{return JSON.parse(localStorage.getItem('vz_swipes_'+u)||'{}')}catch(e){return{}}})() : {});
+    const liked = Object.entries(rawSwipes).filter(([,v]) => v === 1);
+    const rawVk = _allVoorkeur[u] || (u === currentUser ? (()=>{try{return JSON.parse(localStorage.getItem('vz_voorkeur_'+u)||'[]')}catch(e){return[]}})() : []);
+    const vibe = typeof rawVk[3] === 'number' ? (VIBES[rawVk[3]] ?? null) : null;
+    const pvr1 = getChainVote('pvr1', u);
+    const pvLabel = pvr1 !== null ? (VOTE_MAP[pvr1] ?? VOTE_MAP.custom) : null;
+    const topItem = liked.length ? ITEMS_BASE.find(it => it.id === liked[0][0]) : null;
+    const hasData = liked.length > 0 || vibe || pvLabel;
+    const isMe = u === currentUser;
+    return `<div style="flex-shrink:0;width:132px;background:rgba(240,232,226,${isMe?'0.1':'0.05'});border:1px solid rgba(240,232,226,${isMe?'0.18':'0.1'});border-radius:16px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;">
+      <div style="width:34px;height:34px;border-radius:50%;overflow:hidden;background:${p.color};display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-bottom:2px;">
+        ${ph ? `<img src="${ph}" style="width:100%;height:100%;object-fit:cover;">` : `<span style="font-size:0.72rem;font-weight:800;font-style:italic;color:#fff;">${p.init}</span>`}
+      </div>
+      <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:0.78rem;color:#F0E8E2;">${p.naam}${isMe?' (jij)':''}</div>
+      ${hasData ? `
+        ${liked.length ? `<div style="font-size:0.63rem;color:rgba(240,232,226,0.65);">❤️ ${liked.length} plek${liked.length===1?'':'ken'}</div>` : ''}
+        ${topItem ? `<div style="font-size:0.57rem;color:rgba(240,232,226,0.42);line-height:1.3;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${topItem.naam}</div>` : ''}
+        ${vibe ? `<div style="font-size:0.6rem;color:#A89FE8;">${vibe}</div>` : ''}
+        ${pvLabel ? `<div style="font-size:0.58rem;color:#7A9E82;background:rgba(122,158,130,0.13);border-radius:10px;padding:2px 7px;margin-top:1px;">${pvLabel}</div>` : ''}
+      ` : `<div style="font-size:0.6rem;color:rgba(240,232,226,0.28);margin-top:4px;line-height:1.4;">Nog niks<br>gedeeld</div>`}
+    </div>`;
+  }).join('');
 }
 
 function renderAankomstVote() {
