@@ -509,6 +509,12 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:300;font-style:italic;font-vari
       </div>
     </div>
     <div class="sfeerlijn" id="sfeerlijn-el">Van dansen tot Parijs.</div>
+    <!-- Group progress strip — filled by _preloadLoginStatus() -->
+    <div style="display:none;margin-top:20px;padding:12px 16px;background:rgba(10,10,10,0.04);border-radius:16px;">
+      <div style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;color:#9A948E;margin-bottom:10px;text-align:center;">WIE IS ER AL KLAAR?</div>
+      <div id="login-group-status" style="display:flex;justify-content:space-around;"></div>
+      <div style="font-size:0.55rem;color:#B0A9A3;text-align:center;margin-top:8px;">✓ voorkeuren · 👆 geswipet · 🗓 gepland</div>
+    </div>
   </div>
 </div>
 
@@ -2446,7 +2452,9 @@ function selectProfile(name) {
 async function startApp() {
   document.getElementById('welkom-screen').style.display = 'none';
   await _syncAllGroupState();
-  const hasVoorkeur = localStorage.getItem('vz_voorkeur_' + currentUser);
+  // Require voorkeur to be confirmed in Supabase — not just localStorage.
+  // This forces anyone whose data never reached the cloud to redo the questionnaire.
+  const hasVoorkeur = _allVoorkeur[currentUser] && _allVoorkeur[currentUser].length > 0;
   if (!hasVoorkeur) {
     showVoorkeurScherm();
   } else {
@@ -3927,6 +3935,29 @@ function renderGluurStrip() {
   }).join('');
 }
 
+// Extracts readable answer text for voorkeur question qi of user u
+function _vkAnsText(vkData, qi) {
+  if (!vkData || qi >= vkData.length) return null;
+  const q = VOORKEUR_VRAGEN[qi];
+  if (!q) return null;
+  const raw = vkData[qi];
+  if (raw === null || raw === undefined) return null;
+  const indices = Array.isArray(raw) ? raw : [raw];
+  if (!indices.length || (indices.length === 1 && (indices[0] === -1 || indices[0] === '-1'))) return null;
+  if (q.type === 'text') {
+    const t = String(indices[0] || '').replace('musthave:','').trim();
+    return t || null;
+  }
+  const parts = indices.map(idx => {
+    if (idx === -1 || idx === '-1') return null;
+    if (typeof idx === 'string' && idx.startsWith('anders:')) return idx.slice(7).trim();
+    if (typeof idx === 'string' && idx.startsWith('musthave:')) return idx.slice(9).trim();
+    const i = parseInt(idx);
+    return (!isNaN(i) && q.opties[i]) ? q.opties[i] : null;
+  }).filter(Boolean);
+  return parts.length ? parts.join(' · ') : null;
+}
+
 function openGluurDetail(u) {
   const p = PROFILES[u];
   const ph = getUserPhoto(u);
@@ -3946,8 +3977,10 @@ function openGluurDetail(u) {
   ['vr26','za27','zo28'].forEach(d => (planVibes[d]||[]).forEach(e => { vibeDay[e.id] = {vr26:'Vr 26',za27:'Za 27',zo28:'Zo 28'}[d]; }));
 
   const VIBE_LABELS = ['🏃 Actief','⚖️ Mix','☀️ Terras'];
-  const rawVk = _allVoorkeur[u] || (u === currentUser ? _safeJSON('vz_voorkeur_'+u, []) : []);
-  const tempoLabel = typeof rawVk[3] === 'number' ? (VIBE_LABELS[rawVk[3]] ?? null) : null;
+  const rawVk = _allVoorkeur[u] || _safeJSON('vz_voorkeur_'+u, []);
+  // Handle both flat (old) and nested (new) voorkeur formats
+  const _tempoRaw = Array.isArray(rawVk[3]) ? rawVk[3][0] : rawVk[3];
+  const tempoLabel = typeof _tempoRaw === 'number' && _tempoRaw >= 0 ? (VIBE_LABELS[_tempoRaw] ?? null) : null;
   const pvr1 = getChainVote('pvr1', u);
   const VOTE_MAP = {0:'✓ Vrijdag erbij', 1:'🤔 Liever anders', custom:'💬 Eigen plan'};
   const pvLabel = pvr1 !== null ? (VOTE_MAP[pvr1] ?? VOTE_MAP.custom) : null;
@@ -4002,7 +4035,32 @@ function openGluurDetail(u) {
   }
 
   if (!likedItems.length && !plannedVibes.length) {
-    html += `<div style="text-align:center;padding:20px 0;color:var(--t2);font-size:0.88rem;">Nog niks gedeeld 🕑</div>`;
+    html += `<div style="text-align:center;padding:20px 0;color:var(--t2);font-size:0.88rem;">Nog niks geswipet of gepland 🕑</div>`;
+  }
+
+  // Voorkeur answers section
+  const vkData = _allVoorkeur[u] || _safeJSON('vz_voorkeur_'+u, null);
+  if (vkData && vkData.length) {
+    const vkRows = VOORKEUR_VRAGEN.map((q, i) => {
+      const ans = _vkAnsText(vkData, i);
+      return ans ? `<div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid rgba(27,27,35,0.06);">
+        <span style="flex-shrink:0;font-size:0.95rem;line-height:1.6;">${q.emoji}</span>
+        <div><div style="font-size:0.59rem;color:var(--t3);line-height:1.3;">${q.vraag}</div>
+        <div style="font-size:0.74rem;color:var(--t1);font-weight:600;line-height:1.4;margin-top:1px;">${ans}</div></div>
+      </div>` : null;
+    }).filter(Boolean);
+    if (vkRows.length) {
+      const isCollapsed = vkRows.length > 3;
+      const visibleRows = isCollapsed ? vkRows.slice(0, 3) : vkRows;
+      html += `<div style="margin-top:22px;">
+        <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Persoonlijke voorkeuren (${vkRows.length})</div>
+        <div id="vk-rows-${u}">${visibleRows.join('')}</div>
+        ${isCollapsed ? `<div id="vk-rows-more-${u}" style="display:none;">${vkRows.slice(3).join('')}</div>
+        <button onclick="document.getElementById('vk-rows-more-${u}').style.display='block';this.style.display='none'" style="margin-top:6px;font-size:0.68rem;color:var(--gold);background:none;border:none;cursor:pointer;padding:0;">Toon alles (${vkRows.length - 3} meer) ↓</button>` : ''}
+      </div>`;
+    }
+  } else if (u !== currentUser) {
+    html += `<div style="margin-top:16px;font-size:0.72rem;color:var(--t3);font-style:italic;">Voorkeur nog niet ingevuld.</div>`;
   }
 
   const inner = document.getElementById('gluur-detail-inner');
@@ -8048,13 +8106,17 @@ async function initAdmin() {
   const users = ['frederike','griette','marlinde','miriam'];
   const NAMEN = {frederike:'Frederike',griette:'Griette',marlinde:'Marlinde',miriam:'Miriam'};
   const ud = {};
-  users.forEach(u => ud[u] = {swipes:{},hasVoorkeur:false,lastActive:null});
+  users.forEach(u => ud[u] = {swipes:{},planVibes:{},voorkeur:null,bio:'',pvr1:null,pvr1Text:null,hasVoorkeur:false,lastActive:null});
   states.forEach(r => {
-    if (!ud[r.user_id]) return;
-    if (r.key === 'voorkeur') ud[r.user_id].hasVoorkeur = true;
-    if (r.key === 'swipes') ud[r.user_id].swipes = r.value || {};
+    const d = ud[r.user_id]; if (!d) return;
+    if (r.key === 'voorkeur')          { d.hasVoorkeur = true; d.voorkeur = r.value; }
+    if (r.key === 'swipes')            d.swipes    = r.value || {};
+    if (r.key === 'planVibes')         d.planVibes = r.value || {};
+    if (r.key === 'profile_bio')       d.bio       = typeof r.value === 'string' ? r.value : '';
+    if (r.key === 'pchain_pvr1')       d.pvr1      = r.value === 'custom' ? 'custom' : parseInt(r.value);
+    if (r.key === 'pchain_text_pvr1')  d.pvr1Text  = r.value;
     const t = new Date(r.updated_at);
-    if (!ud[r.user_id].lastActive || t > ud[r.user_id].lastActive) ud[r.user_id].lastActive = t;
+    if (!d.lastActive || t > d.lastActive) d.lastActive = t;
   });
   const loginCount = {};
   sessions.forEach(s => { loginCount[s.user_code] = (loginCount[s.user_code]||0) + 1; });
@@ -8067,66 +8129,184 @@ async function initAdmin() {
     return d.toLocaleDateString('nl-NL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
   };
   const fmtFull = d => d ? new Date(d).toLocaleString('nl-NL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+
   let html = '<div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:#9A948E;margin-bottom:12px;">ACTIVITEIT PER PERSOON</div>';
   users.forEach(u => {
     const d = ud[u]; const p = PROFILES[u];
+    const ph = getUserPhoto(u);
+    const av = ph
+      ? `<img src="${ph}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+      : `<div style="width:40px;height:40px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-style:italic;font-weight:700;color:#fff;font-size:0.9rem;flex-shrink:0;">${p.init}</div>`;
     const sv = Object.values(d.swipes);
-    const likes = sv.filter(v=>v==='like').length, dreams = sv.filter(v=>v==='dream').length, nopes = sv.filter(v=>v==='nope').length;
+    const likes = sv.filter(v=>v==='like'||v===1).length;
+    const dreams = sv.filter(v=>v==='dream').length;
+    const nopes = sv.filter(v=>v==='nope'||v==='pass').length;
     const logins = loginCount[u]||0;
-    html += `<div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;">
+
+    // Vrijdag vote
+    const pvMap = {0:'✓ Vrijdag erbij', 1:'🤔 Liever anders', custom:'✏️ Eigen plan'};
+    const pvLabel = d.pvr1 !== null && d.pvr1 !== undefined ? (pvMap[d.pvr1] ?? pvMap.custom) : null;
+    const pvText  = d.pvr1 === 'custom' ? (d.pvr1Text ? ` — "${d.pvr1Text}"` : '') : '';
+
+    // Liked / dreamed items
+    const likedIds = Object.entries(d.swipes).filter(([,v])=>v==='like'||v==='dream'||v===1).map(([id,v])=>({id,v}));
+    const likedHtml = likedIds.length ? likedIds.map(({id,v}) => {
+      const it = ITEMS_BASE.find(x=>x.id===id);
+      const icon = v==='dream'?'✨':'💚';
+      return it ? `<div style="font-size:0.72rem;color:#0A0A0A;padding:3px 0;border-bottom:1px solid rgba(10,10,10,0.05);">${icon} <strong>${it.naam}</strong> <span style="color:#9A948E;">· ${it.wijk}</span></div>` : '';
+    }).join('') : '<div style="font-size:0.72rem;color:#9A948E;font-style:italic;">Nog niks geliket</div>';
+
+    // PlanVibes
+    const pvDays = ['vr26','za27','zo28']; const pvLabels = {vr26:'Vr',za27:'Za',zo28:'Zo'};
+    const pvVibes = pvDays.flatMap(day => (d.planVibes[day]||[]).map(e => {
+      const vb = VIBES.find(v=>v.id===e.id);
+      return vb ? `<span style="font-size:0.65rem;background:rgba(168,159,232,0.12);border-radius:8px;padding:2px 6px;margin:2px 2px 0 0;display:inline-block;">${pvLabels[day]} ${vb.naam}</span>` : '';
+    })).filter(Boolean).join('');
+
+    // Voorkeur answers
+    const vkRowsHtml = d.voorkeur ? VOORKEUR_VRAGEN.map((q, i) => {
+      const ans = _vkAnsText(d.voorkeur, i);
+      return ans ? `<div style="display:flex;gap:6px;padding:4px 0;border-bottom:1px solid rgba(10,10,10,0.04);">
+        <span style="font-size:0.75rem;flex-shrink:0;">${q.emoji}</span>
+        <div><div style="font-size:0.6rem;color:#9A948E;">${q.vraag}</div><div style="font-size:0.72rem;color:#0A0A0A;font-weight:600;">${ans}</div></div>
+      </div>` : '';
+    }).join('') : '';
+
+    html += `<div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:14px;">
+      <!-- Header -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-        <div style="width:36px;height:36px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-style:italic;font-weight:700;color:#fff;font-size:0.85rem;flex-shrink:0;">${p.init}</div>
+        ${av}
         <div style="flex:1;">
           <div style="font-weight:700;font-size:0.95rem;color:#0A0A0A;">${NAMEN[u]}</div>
-          <div style="font-size:0.72rem;color:#9A948E;">${logins>0?logins+'× ingelogd · ':'Nog niet ingelogd · '}${fmt(d.lastActive)}</div>
+          <div style="font-size:0.7rem;color:#9A948E;">${logins>0?logins+'× ingelogd · ':'Nog niet ingelogd · '}${fmt(d.lastActive)}</div>
         </div>
-        <div style="font-size:1.3rem;">${d.hasVoorkeur?'✅':'⬜'}</div>
+        <div style="text-align:right;">
+          <div style="font-size:1.2rem;">${d.hasVoorkeur?'✅':'⬜'}</div>
+          <div style="font-size:0.6rem;color:#9A948E;">${d.hasVoorkeur?'voorkeuren':'nog niet'}</div>
+        </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;text-align:center;">
-        <div style="background:#F0E8E2;border-radius:10px;padding:8px 4px;"><div style="font-size:1rem;font-weight:800;color:#0A0A0A;">${sv.length}</div><div style="font-size:0.6rem;color:#9A948E;letter-spacing:0.06em;">SWIPES</div></div>
-        <div style="background:rgba(122,158,130,0.12);border-radius:10px;padding:8px 4px;"><div style="font-size:1rem;font-weight:800;color:#7A9E82;">💚 ${likes}</div><div style="font-size:0.6rem;color:#9A948E;">likes</div></div>
-        <div style="background:rgba(168,159,232,0.12);border-radius:10px;padding:8px 4px;"><div style="font-size:1rem;font-weight:800;color:#A89FE8;">✨ ${dreams}</div><div style="font-size:0.6rem;color:#9A948E;">dreams</div></div>
-        <div style="background:rgba(10,10,10,0.05);border-radius:10px;padding:8px 4px;"><div style="font-size:1rem;font-weight:800;color:#9A948E;">✗ ${nopes}</div><div style="font-size:0.6rem;color:#9A948E;">nopes</div></div>
-      </div></div>`;
+      <!-- Swipe stats -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;text-align:center;margin-bottom:12px;">
+        <div style="background:#F0E8E2;border-radius:10px;padding:7px 4px;"><div style="font-size:0.95rem;font-weight:800;color:#0A0A0A;">${sv.length}</div><div style="font-size:0.58rem;color:#9A948E;">SWIPES</div></div>
+        <div style="background:rgba(122,158,130,0.12);border-radius:10px;padding:7px 4px;"><div style="font-size:0.95rem;font-weight:800;color:#7A9E82;">💚${likes}</div><div style="font-size:0.58rem;color:#9A948E;">likes</div></div>
+        <div style="background:rgba(168,159,232,0.12);border-radius:10px;padding:7px 4px;"><div style="font-size:0.95rem;font-weight:800;color:#A89FE8;">✨${dreams}</div><div style="font-size:0.58rem;color:#9A948E;">dreams</div></div>
+        <div style="background:rgba(10,10,10,0.05);border-radius:10px;padding:7px 4px;"><div style="font-size:0.95rem;font-weight:800;color:#9A948E;">✗${nopes}</div><div style="font-size:0.58rem;color:#9A948E;">nopes</div></div>
+      </div>
+      <!-- Bio -->
+      ${d.bio ? `<div style="font-size:0.75rem;color:#6B6560;font-style:italic;border-left:3px solid #D4785A;padding-left:8px;margin-bottom:10px;">"${d.bio}"</div>` : ''}
+      <!-- Vrijdag vote -->
+      ${pvLabel ? `<div style="font-size:0.72rem;margin-bottom:10px;padding:6px 10px;background:rgba(122,158,130,0.08);border-radius:8px;color:#0A0A0A;">🗳️ Vrijdagplan: <strong>${pvLabel}</strong>${pvText}</div>` : '<div style="font-size:0.68rem;color:#9A948E;margin-bottom:8px;">Vrijdag: nog niet gestemd</div>'}
+      <!-- Liked items -->
+      <details style="margin-bottom:8px;">
+        <summary style="font-size:0.65rem;font-weight:700;color:#6B6560;cursor:pointer;letter-spacing:0.06em;padding:4px 0;">GELIKETE PLEKKEN (${likedIds.length})</summary>
+        <div style="margin-top:6px;">${likedHtml}</div>
+      </details>
+      <!-- PlanVibes -->
+      ${pvVibes ? `<details style="margin-bottom:8px;"><summary style="font-size:0.65rem;font-weight:700;color:#6B6560;cursor:pointer;letter-spacing:0.06em;padding:4px 0;">GEPLANDE BELEVINGEN</summary><div style="margin-top:6px;">${pvVibes}</div></details>` : ''}
+      <!-- Voorkeur answers -->
+      ${vkRowsHtml ? `<details><summary style="font-size:0.65rem;font-weight:700;color:#6B6560;cursor:pointer;letter-spacing:0.06em;padding:4px 0;">PERSOONLIJKE VOORKEUREN</summary><div style="margin-top:8px;">${vkRowsHtml}</div></details>` : (d.hasVoorkeur ? '<div style="font-size:0.65rem;color:#9A948E;">Voorkeuren aanwezig maar niet leesbaar</div>' : '')}
+    </div>`;
   });
-  // Top plekken
+
+  // Top plekken consensus
   const scores = {};
   users.forEach(u => Object.entries(ud[u].swipes).forEach(([id,v]) => {
     if (!scores[id]) scores[id] = {like:0,dream:0,nope:0};
-    if (v==='like') scores[id].like++; else if (v==='dream') scores[id].dream++; else if (v==='nope') scores[id].nope++;
+    if (v==='like'||v===1) scores[id].like++; else if (v==='dream') scores[id].dream++; else if (v==='nope'||v==='pass') scores[id].nope++;
   }));
   const ranked = Object.entries(scores).map(([id,s]) => ({id,score:s.dream*2+s.like-s.nope,...s})).sort((a,b)=>b.score-a.score).slice(0,10);
   html += '<div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:#9A948E;margin-top:24px;margin-bottom:12px;">TOP 10 PLEKKEN (CONSENSUS)</div><div style="background:#fff;border-radius:16px;overflow:hidden;">';
-  ranked.forEach((item,i) => {
-    const naam = (ITEMS_BASE.find(x=>x.id===item.id)||{}).naam||item.id;
-    html += `<div style="display:flex;align-items:center;gap:12px;padding:11px 16px;${i>0?'border-top:1px solid rgba(10,10,10,0.06)':''}">
-      <div style="font-size:0.8rem;font-weight:800;color:#9A948E;width:20px;text-align:center;">${i+1}</div>
-      <div style="flex:1;"><div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;">${naam}</div><div style="font-size:0.7rem;color:#9A948E;">✨${item.dream} 💚${item.like} ✗${item.nope}</div></div>
-      <div style="font-size:0.75rem;font-weight:700;color:${item.score>=4?'#7A9E82':item.score>=2?'#D4785A':'#9A948E'};">${item.score>0?'+':''}${item.score}</div></div>`;
-  });
+  if (!ranked.length) {
+    html += '<div style="padding:20px;text-align:center;font-size:0.8rem;color:#9A948E;">Nog geen swipes</div>';
+  } else {
+    ranked.forEach((item,i) => {
+      const it = ITEMS_BASE.find(x=>x.id===item.id);
+      const naam = it ? it.naam : item.id;
+      const wikers = users.filter(u => ud[u].swipes[item.id]==='like'||ud[u].swipes[item.id]==='dream'||ud[u].swipes[item.id]===1)
+        .map(u => PROFILES[u].naam.split(' ')[0]).join(', ');
+      html += `<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;${i>0?'border-top:1px solid rgba(10,10,10,0.06)':''}">
+        <div style="font-size:0.8rem;font-weight:800;color:#9A948E;width:18px;text-align:center;">${i+1}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.83rem;font-weight:700;color:#0A0A0A;">${naam}</div>
+          <div style="font-size:0.65rem;color:#9A948E;">✨${item.dream} 💚${item.like} ✗${item.nope}${wikers?' · '+wikers:''}</div>
+        </div>
+        <div style="font-size:0.75rem;font-weight:700;color:${item.score>=4?'#7A9E82':item.score>=2?'#D4785A':'#9A948E'};">${item.score>0?'+':''}${item.score}</div>
+      </div>`;
+    });
+  }
   html += '</div>';
+
+  // Chain votes overview
+  const pvr1Counts = [{label:'✓ Vrijdag erbij',n:0},{label:'🤔 Liever anders',n:0},{label:'✏️ Eigen plan',n:0}];
+  users.forEach(u => { const v = ud[u].pvr1; if (v===0) pvr1Counts[0].n++; else if (v===1) pvr1Counts[1].n++; else if (v==='custom') pvr1Counts[2].n++; });
+  const pvr1Voted = users.filter(u => ud[u].pvr1 !== null && ud[u].pvr1 !== undefined).length;
+  html += `<div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:#9A948E;margin-top:24px;margin-bottom:12px;">VRIJDAG PLAN — STEMMING</div>
+  <div style="background:#fff;border-radius:16px;padding:14px;">${pvr1Voted ? pvr1Counts.map(c => `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <div style="font-size:0.78rem;flex:1;color:#0A0A0A;">${c.label}</div>
+      <div style="font-size:0.8rem;font-weight:700;color:#6B6560;">${c.n} / 4</div>
+    </div>`).join('') : '<div style="font-size:0.8rem;color:#9A948E;font-style:italic;">Nog niemand gestemd</div>'}
+  </div>`;
+
   // Login log
-  html += `<div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:#9A948E;margin-top:24px;margin-bottom:12px;">LOGIN GESCHIEDENIS (${sessions.length} sessies)</div>`;
+  html += `<div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:#9A948E;margin-top:24px;margin-bottom:12px;">LOGIN GESCHIEDENIS (${sessions.length})</div>`;
   if (!sessions.length) {
     html += '<div style="background:#fff;border-radius:16px;padding:20px;text-align:center;color:#9A948E;font-size:0.8rem;">Wordt bijgehouden vanaf nu</div>';
   } else {
     html += '<div style="background:#fff;border-radius:16px;overflow:hidden;">';
     sessions.slice(0,60).forEach((s,i) => {
-      const p = PROFILES[s.user_code]||{color:'#ccc',init:'?'};
+      const pr = PROFILES[s.user_code]||{color:'#ccc',init:'?'};
       const ua = s.metadata?.ua||'';
-      const dev = ua.includes('iPhone')||ua.includes('iPad')?'📱 iOS':ua.includes('Android')?'📱 Android':ua.includes('Mac')?'💻 Mac':ua.includes('Windows')?'💻 Windows':'🌐 Browser';
-      html += `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;${i>0?'border-top:1px solid rgba(10,10,10,0.06)':''}">
-        <div style="width:28px;height:28px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-style:italic;font-weight:700;color:#fff;font-size:0.7rem;flex-shrink:0;">${p.init}</div>
-        <div style="flex:1;"><div style="font-size:0.82rem;font-weight:600;color:#0A0A0A;">${NAMEN[s.user_code]||s.user_code}</div><div style="font-size:0.68rem;color:#9A948E;">${dev}</div></div>
-        <div style="font-size:0.72rem;color:#9A948E;">${fmtFull(s.created_at)}</div></div>`;
+      const dev = ua.includes('iPhone')||ua.includes('iPad')?'📱 iOS':ua.includes('Android')?'📱 And':ua.includes('Mac')?'💻 Mac':ua.includes('Windows')?'💻 Win':'🌐';
+      html += `<div style="display:flex;align-items:center;gap:10px;padding:9px 16px;${i>0?'border-top:1px solid rgba(10,10,10,0.06)':''}">
+        <div style="width:26px;height:26px;border-radius:50%;background:${pr.color};display:flex;align-items:center;justify-content:center;font-style:italic;font-weight:700;color:#fff;font-size:0.65rem;flex-shrink:0;">${pr.init}</div>
+        <div style="flex:1;font-size:0.8rem;font-weight:600;color:#0A0A0A;">${NAMEN[s.user_code]||s.user_code}</div>
+        <div style="font-size:0.65rem;color:#9A948E;">${dev}</div>
+        <div style="font-size:0.68rem;color:#9A948E;">${fmtFull(s.created_at)}</div>
+      </div>`;
     });
     html += '</div>';
-    if (sessions.length>60) html += `<div style="text-align:center;font-size:0.72rem;color:#9A948E;margin-top:8px;">+${sessions.length-60} oudere sessies</div>`;
+    if (sessions.length>60) html += `<div style="text-align:center;font-size:0.7rem;color:#9A948E;margin-top:6px;">+${sessions.length-60} oudere sessies</div>`;
   }
   html += '<div style="height:48px;"></div>';
   document.getElementById('admin-loading').style.display = 'none';
   document.getElementById('admin-content').innerHTML = html;
   document.getElementById('admin-content').style.display = 'block';
+}
+
+// Preload group status for login screen (light fetch, no auth needed)
+async function _preloadLoginStatus() {
+  try {
+    const { data } = await supa.from('group_state')
+      .select('user_id,key').eq('group_id', GROUP_ID).in('key',['voorkeur','swipes','planVibes']);
+    if (!data) return;
+    const status = {};
+    data.forEach(r => {
+      if (!status[r.user_id]) status[r.user_id] = {};
+      status[r.user_id][r.key] = true;
+    });
+    const users = ['griette','frederike','marlinde','miriam'];
+    const el = document.getElementById('login-group-status');
+    if (!el) return;
+    el.innerHTML = users.map(u => {
+      const p = PROFILES[u];
+      const ph = getUserPhoto(u);
+      const s = status[u] || {};
+      const done = s.voorkeur;
+      const swiped = s.swipes;
+      const planned = s.planVibes;
+      const avEl = ph
+        ? `<img src="${ph}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid ${done?p.color:'rgba(10,10,10,0.1)'};">`
+        : `<div style="width:36px;height:36px;border-radius:50%;background:${done?p.color:'rgba(10,10,10,0.1)'};display:flex;align-items:center;justify-content:center;font-style:italic;font-weight:700;color:${done?'#fff':'#9A948E'};font-size:0.7rem;">${p.init}</div>`;
+      const badges = [done?'✓':'', swiped?'👆':'', planned?'🗓':''].filter(Boolean).join(' ');
+      return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        ${avEl}
+        <div style="font-size:0.58rem;font-weight:700;color:${done?'#0A0A0A':'#B0A9A3'};">${p.naam.split(' ')[0]}</div>
+        <div style="font-size:0.55rem;color:${done?'#7A9E82':'#D4785A'};">${badges || '○'}</div>
+      </div>`;
+    }).join('');
+    el.parentElement.style.display = 'block';
+  } catch(e) {}
 }
 
 // ── BOOT ─────────────────────────────────────────
@@ -8140,6 +8320,7 @@ if (new URLSearchParams(window.location.search).get('admin') === 'griette') {
     initApp();
   } else {
     document.getElementById('login-screen').classList.remove('hidden');
+    _preloadLoginStatus();
   }
 }
 </script>
