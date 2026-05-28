@@ -7655,9 +7655,13 @@ setInterval(_rotateSfeer, 3500);
 
 // ── PERSONAL POLLS ────────────────────────────────
 function _vkOpt(user, qIdx) {
-  const raw = localStorage.getItem('vz_voorkeur_' + user);
-  if (!raw) return -1;
-  try { const a = JSON.parse(raw)[qIdx]; return (a && a.length > 0 && typeof a[0] === 'number') ? a[0] : -1; } catch(e) { return -1; }
+  const vkData = _allVoorkeur[user] || _safeJSON('vz_voorkeur_' + user, null);
+  if (!vkData || !Array.isArray(vkData)) return -1;
+  const a = vkData[qIdx];
+  if (!a) return -1;
+  const idxs = Array.isArray(a) ? a : [a];
+  const first = idxs[0];
+  return typeof first === 'number' ? first : -1;
 }
 
 function renderPersonalPolls() {
@@ -7667,21 +7671,29 @@ function renderPersonalPolls() {
   const done = allUsers.filter(u => u === 'griette' || (_allVoorkeur[u] && _allVoorkeur[u].length > 0) || !!localStorage.getItem('vz_voorkeur_' + u));
 
   if (done.length < 2) {
+    const iMeNotDone = !done.includes(currentUser);
     const avatarRow = allUsers.map(u => {
       const p = PROFILES[u]; const isDone = done.includes(u);
+      const isMe = u === currentUser;
       const ph = getUserPhoto(u);
       const avEl = ph
-        ? `<img src="${ph}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;opacity:${isDone?1:0.35};">`
-        : `<span style="width:28px;height:28px;border-radius:50%;background:${isDone?p.color:'rgba(10,10,10,0.1)'};display:inline-flex;align-items:center;justify-content:center;font-size:0.62rem;color:${isDone?'#fff':'#9A948E'};font-style:italic;font-weight:700;">${p.init}</span>`;
-      return `<span style="display:inline-flex;flex-direction:column;align-items:center;gap:3px;margin-right:10px;">
+        ? `<img src="${ph}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;opacity:${isDone?1:0.32};border:2px solid ${isDone?p.color:'rgba(10,10,10,0.1)'};">`
+        : `<span style="width:32px;height:32px;border-radius:50%;background:${isDone?p.color:'rgba(10,10,10,0.1)'};display:inline-flex;align-items:center;justify-content:center;font-size:0.65rem;color:${isDone?'#fff':'#9A948E'};font-style:italic;font-weight:700;">${p.init}</span>`;
+      const label = isDone ? `<span style="font-size:0.58rem;color:#7A9E82;font-weight:700;">✓</span>`
+        : isMe ? `<span style="font-size:0.58rem;color:#D4785A;font-weight:700;">← jij</span>`
+        : `<span style="font-size:0.58rem;color:#B0A9A3;">...</span>`;
+      const clickAttr = !isDone && isMe ? `onclick="herbeginVoorkeur()" style="cursor:pointer;"` : !isDone ? `onclick="showToast('Stuur ${p.naam} een berichtje 💬')" style="cursor:pointer;"` : '';
+      return `<span ${clickAttr} style="display:inline-flex;flex-direction:column;align-items:center;gap:3px;margin-right:12px;">
         ${avEl}
-        <span style="font-size:0.58rem;color:${isDone?'#0A0A0A':'#9A948E'};">${isDone?'✓':''} ${p.naam}</span>
+        <span style="font-size:0.6rem;color:${isDone?'#0A0A0A':'#9A948E'};">${p.naam.split(' ')[0]}</span>
+        ${label}
       </span>`;
     }).join('');
     sec.innerHTML = `<div class="pp-nudge">
-      <div style="font-size:0.78rem;font-weight:700;color:#0A0A0A;margin-bottom:6px;">📊 Persoonlijke polls worden aangemaakt zodra 2 van jullie klaar zijn.</div>
-      <div style="font-size:0.72rem;color:#6B6560;margin-bottom:10px;">Nu: ${done.length} van 4 ingevuld.</div>
-      <div style="display:flex;flex-wrap:wrap;">${avatarRow}</div>
+      <div style="font-size:0.78rem;font-weight:700;color:#0A0A0A;margin-bottom:4px;">📊 Persoonlijke polls — ${done.length} van 4 ingevuld</div>
+      <div style="font-size:0.72rem;color:#6B6560;margin-bottom:12px;">Polls verschijnen als 2+ mensen klaar zijn. Tik op een naam om te nudgen.</div>
+      <div style="display:flex;flex-wrap:wrap;align-items:flex-end;">${avatarRow}</div>
+      ${iMeNotDone ? `<button onclick="herbeginVoorkeur()" style="margin-top:14px;width:100%;padding:11px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.85rem;font-weight:700;cursor:pointer;letter-spacing:0.05em;">✏️ Vul jouw voorkeuren in →</button>` : ''}
     </div>`;
     return;
   }
@@ -7932,7 +7944,7 @@ function _renderWuScreen() {
   let inputHtml = '';
   if (q.type === 'text') {
     inputHtml = `<div style="margin-bottom:12px;">
-      <input id="wu-text-input" type="text" placeholder="${q.placeholder}" maxlength="60" style="width:100%;box-sizing:border-box;padding:11px 14px;border:1.5px solid rgba(168,159,232,0.4);border-radius:var(--r-lg);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;" onkeydown="if(event.key==='Enter')_wuSubmitText()">
+      <input id="wu-text-input-${_wuCurrentQ}" type="text" autocomplete="off" placeholder="${q.placeholder}" maxlength="60" style="width:100%;box-sizing:border-box;padding:11px 14px;border:1.5px solid rgba(168,159,232,0.4);border-radius:var(--r-lg);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;" onkeydown="if(event.key==='Enter')_wuSubmitText()">
       <button onclick="_wuSubmitText()" style="margin-top:8px;width:100%;padding:11px;border:none;border-radius:var(--r-lg);background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;">Bevestigen →</button>
     </div>`;
   } else if (q.type === 'choice') {
@@ -7958,11 +7970,11 @@ function _renderWuScreen() {
       <button onclick="_wuSkip()" style="width:100%;padding:8px;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:0.75rem;color:#9A948E;cursor:pointer;">Overslaan (pas later)</button>
     </div>
   </div>`;
-  if (q.type === 'text') setTimeout(() => { const inp = document.getElementById('wu-text-input'); if(inp) inp.focus(); }, 100);
+  if (q.type === 'text') setTimeout(() => { const inp = document.getElementById('wu-text-input-' + _wuCurrentQ); if(inp) inp.focus(); }, 100);
 }
 
 async function _wuSubmitText() {
-  const inp = document.getElementById('wu-text-input');
+  const inp = document.getElementById('wu-text-input-' + _wuCurrentQ);
   if (!inp || !inp.value.trim()) return;
   await _wuSaveAnswer(_wuCurrentQ, inp.value.trim());
   _wuCurrentQ++;
