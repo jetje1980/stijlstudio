@@ -3832,47 +3832,83 @@ async function sendChatMessage() {
 async function _getAIReply(userText) {
   const apiKey = localStorage.getItem('claude_api_key') || '';
   if (!apiKey) return _localChatReply(userText);
-  const systemPrompt = `Je bent de reisassistent van een vriendinnengroep van 4 (Griette, Frederike, Miriam, Marlinde). Parijs 26–28 juni 2026. Verblijf: Rue de la Lune, Bonne Nouvelle, 2e arr.
 
-HARDE REGELS — nooit overtreden:
-1. De groep gaat ALTIJD samen. Splits nooit in subgroepen of duo's.
-2. Geef maximaal 2 concrete aanbevelingen per antwoord. Geen lijsten van 5+.
-3. Stel geen vragen terug. Geef een concreet advies.
-4. Gebruik ALLEEN items uit de app-catalogus hieronder. Verzin NOOIT plekken die er niet in staan.
-5. Geef voorkeur aan items die de groep al geliked/gedroomd heeft. Als er geen match is, gebruik dan andere items uit de catalogus.
-6. Houd rekening met dagflow. Na Baja Bikes fietstocht (vrijdagmiddag 13:30–16:30) = eerst douchen/verkleden bij Airbnb, dan pas de avond in.
-7. Max 120 woorden.
+  const systemPrompt = `Je bent de reisassistent van een vriendinnengroep van 4 (Griette, Frederike, Miriam, Marlinde). Parijs 26–28 juni 2026. Verblijf: Rue de la Lune, Bonne Nouvelle, 2e arr (Le Marais buurt).
 
-ALLE BESCHIKBARE ITEMS IN DE APP (je mag hier altijd uit kiezen):
+HARDE REGELS:
+1. De groep gaat ALTIJD samen. Splits nooit.
+2. Max 2 concrete aanbevelingen. Geen lijst van 5+.
+3. Geen vragen terug — geef direct advies.
+4. Gebruik items uit de catalogus. Als iets niet in de catalogus staat maar wél relevant is (bijv. openingstijden, of een restaurant dat past bij de sfeer die gevraagd wordt), gebruik dan web search om het te checken.
+5. Geef voorkeur aan gelikte/gedroomde items. Gebruik anders andere catalogus-items.
+6. Na Baja Bikes (vrijdag 13:30–16:30): eerst Airbnb, dan avond in.
+7. Max 120 woorden. Schrijf in het Nederlands.
+
+ITEMS IN DE APP (verhalen en sfeer meenemen bij aanbevelingen):
 ${_buildItemsCatalog()}
 
 ${buildGroupContext()}`;
+
+  const tools = [{ type: 'web_search_20250305', name: 'web_search' }];
+  let messages = _chatMessages.slice(-10).map(m => ({ role: m.role, content: m.content }));
+
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 400,
-        system: systemPrompt,
-        messages: _chatMessages.slice(-10).map(m => ({ role: m.role, content: m.content })),
-      }),
-    });
-    if (!resp.ok) {
-      const err = await resp.json().catch(() => ({}));
-      if (resp.status === 401) return '🔑 API-sleutel klopt niet. Pas hem aan via het admin-scherm (🔧 knop als Griette).';
-      return _localChatReply(userText);
+    for (let round = 0; round < 4; round++) {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-beta': 'web-search-2025-03-05',
+          'content-type': 'application/json',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 600,
+          tools,
+          system: systemPrompt,
+          messages,
+        }),
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        if (resp.status === 401) return '🔑 API-sleutel klopt niet. Pas hem aan via het admin-scherm (🔧 knop als Griette).';
+        return _localChatReply(userText);
+      }
+
+      const data = await resp.json();
+
+      if (data.stop_reason === 'end_turn') {
+        const text = (data.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim();
+        return text || _localChatReply(userText);
+      }
+
+      if (data.stop_reason === 'tool_use') {
+        const toolUses = (data.content || []).filter(c => c.type === 'tool_use');
+        messages = [
+          ...messages,
+          { role: 'assistant', content: data.content },
+          {
+            role: 'user',
+            content: toolUses.map(tu => ({
+              type: 'tool_result',
+              tool_use_id: tu.id,
+              content: '',
+            })),
+          },
+        ];
+        continue;
+      }
+
+      // stop_reason = 'max_tokens' or unexpected — return whatever text we have
+      const text = (data.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim();
+      return text || _localChatReply(userText);
     }
-    const data = await resp.json();
-    return data.content?.[0]?.text || _localChatReply(userText);
-  } catch(e) {
-    return _localChatReply(userText);
-  }
+  } catch(e) {}
+
+  return _localChatReply(userText);
 }
 
 // ── BOOKING SYSTEM ────────────────────────────────────────────────────────
@@ -5057,17 +5093,10 @@ async function _genDagdeel(day, deel, prefix) {
 }
 
 function _buildItemsCatalog() {
-  const byCat = {};
-  (ITEMS_BASE || []).forEach(i => {
-    const cat = i.cat || 'overig';
-    if (!byCat[cat]) byCat[cat] = [];
-    const tijden = i.tijden ? ` · ${i.tijden}` : '';
-    const reserv = i.reserveren ? ' · reserveren nodig' : '';
-    byCat[cat].push(`${i.naam} (${i.wijk}, ${i.prijs}${tijden}${reserv})`);
-  });
-  return Object.entries(byCat)
-    .map(([cat, items]) => `${cat.toUpperCase()}: ${items.join(' | ')}`)
-    .join('\n');
+  return (ITEMS_BASE || []).map(i => {
+    const meta = [i.wijk, i.prijs, i.tijden, i.reserveren ? 'reserveren nodig' : null].filter(Boolean).join(' · ');
+    return `• ${i.naam} [${i.cat}] (${meta})${i.verhaal ? '\n  → ' + i.verhaal : ''}`;
+  }).join('\n');
 }
 
 async function generateDagdeel(day, deel) {
