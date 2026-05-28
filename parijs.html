@@ -2176,6 +2176,16 @@ function _applyGroupStateRow(key, uid, value) {
         _allBookings = typeof value === 'object' ? value : {};
         localStorage.setItem('vz_bookings', scalar(value));
       }
+      else if (key.startsWith('dagprog_react_')) {
+        const dk = key.slice('dagprog_react_'.length);
+        if (!_allDagReactions[dk]) _allDagReactions[dk] = {};
+        if (value) _allDagReactions[dk][uid] = value;
+        else delete _allDagReactions[dk][uid];
+        const merged = { ..._allDagReactions[dk] };
+        localStorage.setItem('vz_dagprog_react_' + dk, JSON.stringify(merged));
+        renderDagprogrammaBar();
+        renderHomeDagprog();
+      }
       else if (key.startsWith('dagprog_')) {
         if (typeof value === 'object' && value.text) {
           localStorage.setItem('vz_' + key, JSON.stringify(value));
@@ -2553,6 +2563,7 @@ function initApp() {
   initHomeVoorkeurBanner();
   updateVoorkeurNudge();
   _allBookings = _safeJSON('vz_bookings', {});
+  _loadDagReactions();
   renderDagvoorstel();
   renderHomeDagprog();
   renderReserveerList();
@@ -5155,6 +5166,115 @@ ${buildGroupContext()}`,
   } catch(e) {}
 }
 
+// ── DAGDEEL REACTIONS ─────────────────────────────────────────────────────
+let _allDagReactions = {};
+
+function _loadDagReactions() {
+  ['vr26','za27','zo28'].forEach(day => {
+    ['ochtend','middag','avond'].forEach(deel => {
+      const dk = `${day}_${deel}`;
+      _allDagReactions[dk] = _safeJSON('vz_dagprog_react_' + dk, {});
+    });
+  });
+}
+
+async function _setDagReaction(day, deel, emoji) {
+  const dk = `${day}_${deel}`;
+  if (!_allDagReactions[dk]) _allDagReactions[dk] = {};
+  const existing = _allDagReactions[dk][currentUser];
+  const same = existing?.emoji === emoji && !existing?.note;
+  if (same) {
+    delete _allDagReactions[dk][currentUser];
+  } else {
+    _allDagReactions[dk][currentUser] = { emoji, note: existing?.note || '' };
+  }
+  localStorage.setItem('vz_dagprog_react_' + dk, JSON.stringify(_allDagReactions[dk]));
+  renderDagprogrammaBar();
+  renderHomeDagprog();
+  const supaKey = `dagprog_react_${dk}`;
+  if (!same) {
+    supa.from('group_state').upsert(
+      { group_id: GROUP_ID, user_id: currentUser, key: supaKey, value: _allDagReactions[dk][currentUser], updated_at: new Date().toISOString() },
+      { onConflict: 'group_id,user_id,key' }
+    ).then(() => {});
+  } else {
+    supa.from('group_state').delete()
+      .eq('group_id', GROUP_ID).eq('user_id', currentUser).eq('key', supaKey).then(() => {});
+  }
+}
+
+function _openDagComment(day, deel, prefix) {
+  const el = document.getElementById(`dgc-${prefix}-${day}-${deel}`);
+  if (!el) return;
+  el.style.display = el.style.display === 'none' ? 'flex' : 'none';
+  const inp = document.getElementById(`dgci-${prefix}-${day}-${deel}`);
+  const dk = `${day}_${deel}`;
+  if (inp) inp.value = _allDagReactions[dk]?.[currentUser]?.note || '';
+  if (inp) inp.focus();
+}
+
+async function _saveDagComment(day, deel, prefix) {
+  const inp = document.getElementById(`dgci-${prefix}-${day}-${deel}`);
+  const note = (inp?.value || '').trim().slice(0, 50);
+  const dk = `${day}_${deel}`;
+  if (!_allDagReactions[dk]) _allDagReactions[dk] = {};
+  const existing = _allDagReactions[dk][currentUser] || {};
+  const updated = { emoji: existing.emoji || '👍', note };
+  _allDagReactions[dk][currentUser] = updated;
+  localStorage.setItem('vz_dagprog_react_' + dk, JSON.stringify(_allDagReactions[dk]));
+  const supaKey = `dagprog_react_${dk}`;
+  supa.from('group_state').upsert(
+    { group_id: GROUP_ID, user_id: currentUser, key: supaKey, value: updated, updated_at: new Date().toISOString() },
+    { onConflict: 'group_id,user_id,key' }
+  ).then(() => {});
+  renderDagprogrammaBar();
+  renderHomeDagprog();
+}
+
+function _detectReservations(text) {
+  return (ITEMS_BASE || []).filter(i =>
+    i.reserveren && text.toLowerCase().includes(i.naam.toLowerCase())
+  );
+}
+
+function _renderReactionBar(day, deel, prefix, forHome) {
+  const dk = `${day}_${deel}`;
+  const reactions = _allDagReactions[dk] || {};
+  const myR = reactions[currentUser];
+  const sz = forHome ? '0.66rem' : '0.7rem';
+
+  const chips = Object.entries(reactions).map(([u, r]) => {
+    if (!r?.emoji) return '';
+    const p = PROFILES[u];
+    if (!p) return '';
+    return `<div style="display:inline-flex;align-items:center;gap:3px;background:rgba(10,10,10,0.05);border-radius:20px;padding:2px 8px 2px 3px;margin:2px 2px 0 0;">
+      <div style="width:16px;height:16px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>
+      <span style="font-size:0.78rem;line-height:1;">${r.emoji}</span>
+      ${r.note ? `<span style="font-size:${sz};color:#6B6560;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.note}</span>` : ''}
+    </div>`;
+  }).join('');
+
+  const likedStyle = `background:#A89FE8;color:#fff;`;
+  const baseStyle = `background:rgba(10,10,10,0.05);color:#6B6560;`;
+  const btnBase = `border:none;border-radius:20px;padding:4px 10px;font-size:${sz};cursor:pointer;font-family:var(--sans);font-weight:600;`;
+
+  return `<div style="margin-top:8px;">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-bottom:5px;">${chips}</div>
+    <div style="display:flex;gap:5px;align-items:center;">
+      <button onclick="_setDagReaction('${day}','${deel}','👍')" style="${btnBase}${myR?.emoji ? likedStyle : baseStyle}">
+        👍 ${myR?.emoji ? 'Vind ik goed ✓' : 'Vind ik goed'}
+      </button>
+      <button onclick="_openDagComment('${day}','${deel}','${prefix}')" style="${btnBase}${baseStyle}">💬</button>
+    </div>
+    <div id="dgc-${prefix}-${day}-${deel}" style="display:none;gap:6px;align-items:center;margin-top:6px;">
+      <input id="dgci-${prefix}-${day}-${deel}" type="text" maxlength="50" placeholder="Korte reactie (max 50 tekens)"
+        style="flex:1;padding:6px 10px;border:1.5px solid rgba(10,10,10,0.12);border-radius:20px;font-size:${sz};font-family:var(--sans);outline:none;"
+        onkeydown="if(event.key==='Enter')_saveDagComment('${day}','${deel}','${prefix}')">
+      <button onclick="_saveDagComment('${day}','${deel}','${prefix}')" style="${btnBase}background:#0A0A0A;color:#F0E8E2;">Ok</button>
+    </div>
+  </div>`;
+}
+
 function _renderDagdeelCard(day, deel, forHome) {
   const ctx = _DAGDEEL_CTX[day]?.[deel];
   if (!ctx) return '';
@@ -5178,11 +5298,27 @@ function _renderDagdeelCard(day, deel, forHome) {
         .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
         .replace(/⏰/g,'<span style="color:#A89FE8;">⏰</span>');
       const byName = cached.by ? (PROFILES[cached.by]?.naam || cached.by) : null;
-      const byLabel = byName ? `door ${byName} · ` : '';
+
+      // Reservation detection
+      const mustBook = _detectReservations(cached.text);
+      const reservBanner = mustBook.length ? mustBook.map(i => {
+        const ri = (typeof RESERVEER_ITEMS !== 'undefined' ? RESERVEER_ITEMS : []).find(r => r.id === i.id);
+        return `<div style="display:flex;align-items:flex-start;gap:6px;margin-top:8px;padding:8px 10px;background:rgba(200,168,130,0.12);border-left:3px solid #C8A882;border-radius:0 8px 8px 0;">
+          <span style="font-size:0.8rem;">📌</span>
+          <div>
+            <div style="font-size:0.72rem;font-weight:700;color:#8B6914;">${i.naam} — reserveren nodig</div>
+            ${ri?.note ? `<div style="font-size:0.67rem;color:#9A7B2E;margin-top:1px;">${ri.note}</div>` : ''}
+            ${ri?.url ? `<a href="${ri.url}" target="_blank" rel="noopener" style="font-size:0.67rem;color:#C8A882;text-decoration:none;">Boek via website →</a>` : ''}
+          </div>
+        </div>`;
+      }).join('') : '';
+
       content = `<div style="font-size:${sz};color:#0A0A0A;line-height:1.75;white-space:pre-wrap;">${fmt}</div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:5px;">
-          ${byName ? `<span style="font-size:0.66rem;color:#B0AAA5;">${byLabel}</span>` : ''}
-          <button onclick="_clearDagDeelCache('${day}','${deel}')" style="background:none;border:none;font-size:0.66rem;color:#B0AAA5;cursor:pointer;padding:0;">↺ Nieuw genereren</button>
+        ${reservBanner}
+        ${_renderReactionBar(day, deel, prefix, forHome)}
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          ${byName ? `<span style="font-size:0.62rem;color:#C0BBB7;">door ${byName}</span>` : ''}
+          <button onclick="_clearDagDeelCache('${day}','${deel}')" style="background:none;border:none;font-size:0.62rem;color:#C0BBB7;cursor:pointer;padding:0;">↺ Nieuw genereren</button>
         </div>`;
     } else if (apiKey) {
       content = `<button id="${btnId}" onclick="_genDagdeel('${day}','${deel}','${prefix}')"
