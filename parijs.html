@@ -3685,7 +3685,8 @@ function _safeJSON(key, def) {
 }
 
 function buildGroupContext() {
-  const VIBES = [
+  const users = ['griette','frederike','miriam','marlinde'];
+  const VIBES_NAMES = [
     ['Lange ochtend koffie','Snel opstaan','Uitslapen'],
     ['Weinig shoppen','Eén of twee dingen','Shoppen!'],
     ['Altijd reserveren','Mix goed/spontaan','Eten waar we uitkomen'],
@@ -3695,19 +3696,60 @@ function buildGroupContext() {
     ['Dansen!','Bar + diner','Vroeg slapen'],
     ['Bewust/selectief','Normaal budget','Dit is een uitje — geef me over'],
   ];
-  return Object.entries(PROFILES).map(([u, p]) => {
+
+  // Exact like counts per item across the whole group
+  const groupLiked = {};
+  users.forEach(u => {
     const sw = _allSwipes[u] || _safeJSON('vz_swipes_'+u, {});
-    const liked = Object.entries(sw).filter(([,v]) => v === 1 || v === 'like' || v === 'dream')
+    Object.entries(sw || {}).forEach(([id, v]) => {
+      if (v === 1 || v === 'like' || v === 'dream') {
+        if (!groupLiked[id]) groupLiked[id] = [];
+        groupLiked[id].push(PROFILES[u]?.naam || u);
+      }
+    });
+  });
+  const groupMatches = Object.entries(groupLiked)
+    .filter(([, names]) => names.length >= 2)
+    .sort((a, b) => b[1].length - a[1].length)
+    .slice(0, 8)
+    .map(([id, names]) => {
+      const item = ITEMS_BASE.find(i => i.id === id);
+      return item ? `${item.naam} [${names.join('+')}]` : null;
+    }).filter(Boolean);
+
+  // Per-person
+  const perPerson = users.map(u => {
+    const sw = _allSwipes[u] || _safeJSON('vz_swipes_'+u, {});
+    const liked = Object.entries(sw)
+      .filter(([, v]) => v === 1 || v === 'like' || v === 'dream')
       .map(([id]) => ITEMS_BASE.find(i => i.id === id)?.naam).filter(Boolean).slice(0, 5);
     const vk = _allVoorkeur[u] || _safeJSON('vz_voorkeur_'+u, []);
-    const vibes = vk.slice(0, 8).map((a, i) =>
-      typeof a === 'number' ? VIBES[i]?.[a] : typeof a === 'string' && a.length > 2 ? a : null
-    ).filter(Boolean).slice(0, 4);
+    const vibes = vk.slice(0, 8).map((a, i) => {
+      const idx = Array.isArray(a) ? a[0] : a;
+      return typeof idx === 'number' ? VIBES_NAMES[i]?.[idx] : null;
+    }).filter(Boolean).slice(0, 3);
     const bio = _allBios[u] || localStorage.getItem('vz_profile_bio_'+u) || '';
-    const pvr1 = getChainVote('pvr1', u);
-    const vl = pvr1 === 0 ? 'Ja voor vrijdagplan' : pvr1 === 1 ? 'Liever anders' : pvr1 === 'custom' ? 'Eigen plan' : 'Nog niet gestemd';
-    return `${p.naam}:${bio ? ' info: '+bio+'.' : ''} geliket: ${liked.length ? liked.join(', ') : 'nog niks'}. Vibes: ${vibes.join('; ') || '?'}. Vrijdag: ${vl}.`;
-  }).join('\n');
+    return `${PROFILES[u]?.naam}: likes=[${liked.join('; ')}] voorkeuren=[${vibes.join('; ')}]${bio ? ' info='+bio : ''}`;
+  });
+
+  // Bookings
+  const bookings = Object.entries(_allBookings || {}).map(([id, b]) => {
+    const r = RESERVEER_ITEMS?.find(r => r.id === id);
+    return r ? `${r.naam} (geboekt door ${PROFILES[b.by]?.naam || b.by})` : null;
+  }).filter(Boolean);
+
+  return `GROEPSMATCHES (exact, alleen items met 2+ likes):
+${groupMatches.length ? groupMatches.join('\n') : 'Nog onvoldoende data'}
+
+PER PERSOON (alleen echte data, niet aanvullen):
+${perPerson.join('\n')}
+
+AL GEBOEKT: ${bookings.length ? bookings.join(', ') : 'nog niks'}
+
+VASTE PLANNEN:
+- Vrijdag 26/6: aankomst Gare du Nord 11:56 → lunch → Baja Bikes fietstocht ~13:30–16:30 → check-in Airbnb → vrijdagavond vrij
+- Zaterdag 27/6: volledig vrij
+- Zondag 28/6: check-out voor 11u, vertrek`;
 }
 
 function openParisChatSheet() {
@@ -3776,12 +3818,17 @@ async function sendChatMessage() {
 async function _getAIReply(userText) {
   const apiKey = localStorage.getItem('claude_api_key') || '';
   if (!apiKey) return _localChatReply(userText);
-  const systemPrompt = `Je bent een slimme Parijs-reisassistent voor een groep van 4 vriendinnen: Griette, Frederike, Miriam en Marlinde. Ze verblijven van 26–28 juni 2026 in Le Marais, Parijs (Rue de la Lune · Bonne Nouvelle · 2e arr).
+  const systemPrompt = `Je bent de reisassistent van een vriendinnengroep van 4 (Griette, Frederike, Miriam, Marlinde). Parijs 26–28 juni 2026. Verblijf: Rue de la Lune, Bonne Nouvelle, 2e arr.
 
-Groepsdata:
-${buildGroupContext()}
+HARDE REGELS — nooit overtreden:
+1. De groep gaat ALTIJD samen. Splits nooit in subgroepen of duo's.
+2. Geef maximaal 2 concrete aanbevelingen per antwoord. Geen lijsten van 5+.
+3. Stel geen vragen terug. Geef een concreet advies.
+4. Gebruik ALLEEN items die voorkomen in de groepsdata hieronder. Verzin geen items.
+5. Houd rekening met dagflow en stemming. Na Baja Bikes fietstocht (vrijdagmiddag) wil je rusten, drinken, eten — niet weer actief.
+6. Max 120 woorden.
 
-Geef concrete, persoonlijke adviezen op basis van hun voorkeuren en likes. Noem specifieke namen als dat relevant is. Reageer altijd in het Nederlands. Wees enthousiast, direct en to-the-point. Max 180 woorden per antwoord.`;
+${buildGroupContext()}`;
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -4017,14 +4064,17 @@ function _renderChatChips() {
     { label: '🌙 Vrijdagavond', q: 'Vrijdagavond plan na aankomst' },
     { label: '🚴 Actief idee', q: 'Actieve activiteiten voor de groep' },
   ];
-  el.innerHTML = chips.map(c =>
-    `<button onclick="_sendChatChip(${JSON.stringify(c.q)})" style="flex-shrink:0;padding:6px 12px;border-radius:20px;border:1.5px solid rgba(168,159,232,0.35);background:rgba(168,159,232,0.08);font-family:var(--sans);font-size:0.73rem;font-weight:600;color:#6B5FA8;cursor:pointer;white-space:nowrap;">${c.label}</button>`
+  window._chatChips = chips;
+  el.innerHTML = chips.map((c, i) =>
+    `<button onclick="_sendChatChip(${i})" style="flex-shrink:0;padding:6px 12px;border-radius:20px;border:1.5px solid rgba(168,159,232,0.35);background:rgba(168,159,232,0.08);font-family:var(--sans);font-size:0.73rem;font-weight:600;color:#6B5FA8;cursor:pointer;white-space:nowrap;">${c.label}</button>`
   ).join('');
 }
 
-function _sendChatChip(query) {
+function _sendChatChip(idx) {
+  const q = window._chatChips?.[idx]?.q;
+  if (!q) return;
   const input = document.getElementById('chat-input');
-  if (input) { input.value = query; }
+  if (input) input.value = q;
   sendChatMessage();
 }
 
