@@ -899,6 +899,9 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:300;font-style:italic;font-vari
       <a href="https://www.timetomomo.com/nl/ontdek/parijs/" target="_blank" rel="noopener" style="font-size:0.75rem;font-weight:700;color:#A89FE8;text-decoration:none;letter-spacing:0.04em;">Bekijk TtM routes →</a>
     </div>
 
+    <!-- AI DAGPROGRAMMA OP HOME -->
+    <div id="home-dagprog-section" style="margin:4px 20px 12px;"></div>
+
     <!-- POLLS -->
     <div class="home-section-title" style="margin-top:8px;">Stem mee</div>
     <div id="personal-polls-section" style="padding:0 20px 4px;"></div>
@@ -2190,6 +2193,7 @@ function _rerenderAfterSync() {
   renderAankomstVote();
   renderGluurStrip();
   renderDagvoorstel();
+  renderHomeDagprog();
   renderReserveerList();
   if (document.getElementById('sec-top5')?.classList.contains('active')) renderProgramma();
 }
@@ -2543,6 +2547,7 @@ function initApp() {
   updateVoorkeurNudge();
   _allBookings = _safeJSON('vz_bookings', {});
   renderDagvoorstel();
+  renderHomeDagprog();
   renderReserveerList();
   initWeekendEvents();
   // Sync all group state from Supabase, migrate local data, enable realtime
@@ -4998,6 +5003,54 @@ const PROG_CONTEXT = {
     ]
   }
 };
+
+// ── AI DAGPROGRAMMA — HOME SECTION ────────────────────────────────────────
+let _homeDagDay = 'vr26';
+
+function renderHomeDagprog() {
+  const el = document.getElementById('home-dagprog-section');
+  if (!el) return;
+  const apiKey = localStorage.getItem('claude_api_key') || '';
+  if (!apiKey) { el.innerHTML = ''; return; }
+  const cached = _safeJSON('vz_dagprog_' + _homeDagDay, null);
+  const tabs = ['vr26','za27','zo28'].map(d =>
+    `<button onclick="_homeDagSwitch('${d}')" style="flex:1;padding:7px 4px;border:none;border-radius:8px;font-family:var(--sans);font-size:0.72rem;font-weight:700;cursor:pointer;transition:all 0.15s;${_homeDagDay===d ? 'background:#0A0A0A;color:#F0E8E2;' : 'background:rgba(10,10,10,0.05);color:#6B6560;'}">${{vr26:'Vr 26',za27:'Za 27',zo28:'Zo 28'}[d]}</button>`
+  ).join('');
+  el.innerHTML = `
+    <div style="background:#fff;border-radius:var(--r-lg);box-shadow:0 2px 12px rgba(10,10,10,0.07);overflow:hidden;">
+      <div style="padding:12px 14px 10px;border-bottom:1px solid rgba(10,10,10,0.06);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:0.92rem;color:#0A0A0A;">🗓️ Dagprogramma met AI</div>
+          ${cached ? `<button onclick="_homeDagClear()" style="background:none;border:none;font-size:0.68rem;color:#9A948E;cursor:pointer;">↺ Nieuw</button>` : ''}
+        </div>
+        <div style="display:flex;gap:4px;">${tabs}</div>
+      </div>
+      ${cached ? `
+        <div style="padding:14px;font-size:0.8rem;color:#0A0A0A;line-height:1.75;white-space:pre-wrap;max-height:260px;overflow-y:auto;">${cached.text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^(OCHTEND|MIDDAG|AVOND)$/gm,'<div style="font-size:0.57rem;letter-spacing:0.12em;color:#C8A882;font-weight:700;margin:10px 0 4px;">$1</div>').replace(/⏰/g,'<span style="color:#A89FE8;">⏰</span>')}</div>
+      ` : `
+        <div style="padding:14px;">
+          <button onclick="generateDagprogrammaHome('${_homeDagDay}')" id="home-dagprog-btn" style="width:100%;padding:11px;border:none;border-radius:10px;background:#A89FE8;color:#fff;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;letter-spacing:0.03em;">✨ Genereer programma voor ${_DAG_LABELS[_homeDagDay]}</button>
+        </div>
+      `}
+    </div>`;
+}
+
+function _homeDagSwitch(day) {
+  _homeDagDay = day;
+  renderHomeDagprog();
+}
+
+function _homeDagClear() {
+  localStorage.removeItem('vz_dagprog_' + _homeDagDay);
+  renderHomeDagprog();
+}
+
+async function generateDagprogrammaHome(day) {
+  const btn = document.getElementById('home-dagprog-btn');
+  if (btn) { btn.innerHTML = '⏳ Claude denkt na…'; btn.disabled = true; }
+  await generateDagprogramma(day);
+  renderHomeDagprog();
+}
 
 // ── AI DAGPROGRAMMA GENERATOR ─────────────────────────────────────────────
 const _DAG_LABELS = {vr26:'Vrijdag 26 juni', za27:'Zaterdag 27 juni', zo28:'Zondag 28 juni'};
