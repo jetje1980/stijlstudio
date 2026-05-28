@@ -3802,35 +3802,51 @@ function renderDagvoorstel() {
     });
   });
 
-  // Cards: group matches (2+ likes) + 1 suggestion others liked but I haven't voted on yet
-  const groupMatches = ITEMS_BASE
-    .filter(i => (groupLiked[i.id] || []).length >= 2 && !_homeCardDismissed['item_' + i.id])
-    .sort((a, b) => (groupLiked[b.id] || []).length - (groupLiked[a.id] || []).length)
-    .slice(0, 2);
+  // Voorkeur category boost
+  const vkCatBoost = {};
+  ['griette','frederike','miriam','marlinde'].forEach(u => {
+    const vk = _allVoorkeur[u] || _safeJSON('vz_voorkeur_'+u, []);
+    if (!vk || !vk.length) return;
+    const q2 = Array.isArray(vk[2]) ? vk[2][0] : vk[2]; // restaurant pref
+    if (q2 === 0) ['diner','lunch'].forEach(c => { vkCatBoost[c] = (vkCatBoost[c]||0)+1; });
+    const q3 = Array.isArray(vk[3]) ? vk[3][0] : vk[3]; // actief vs. terras
+    if (q3 === 0) ['wandelen','activiteit'].forEach(c => { vkCatBoost[c] = (vkCatBoost[c]||0)+2; });
+    const q6 = Array.isArray(vk[6]) ? vk[6][0] : vk[6]; // avond
+    if (q6 === 0) ['borrel','uitgaan'].forEach(c => { vkCatBoost[c] = (vkCatBoost[c]||0)+1; });
+  });
 
-  const othersLiked = groupMatches.length < 2 ? ITEMS_BASE.filter(i => {
-    if (_homeCardDismissed['item_' + i.id]) return false;
-    if (mySwipes[i.id]) return false;
-    return (groupLiked[i.id] || []).some(u => u !== currentUser);
-  }).sort((a, b) => (groupLiked[b.id] || []).length - (groupLiked[a.id] || []).length).slice(0, 1) : [];
+  // Score all non-dismissed items: group likes weigh most, voorkeur adds flavour
+  const scored = ITEMS_BASE
+    .filter(i => !_homeCardDismissed['item_' + i.id])
+    .map(i => {
+      const likers = groupLiked[i.id] || [];
+      const score = likers.length * 6 + (vkCatBoost[i.cat] || 0);
+      return { item: i, likers, score };
+    })
+    .sort((a, b) => b.score - a.score);
 
-  const cards = [...groupMatches, ...othersLiked];
+  const cards = scored.slice(0, 2);
   if (!cards.length) { el.innerHTML = ''; el.style.display = 'none'; return; }
+
+  const topLikerCount = cards[0].likers.length;
+  const sectionTitle = topLikerCount >= 2 ? '❤️ Groepsmatches' : topLikerCount === 1 ? '✨ Slim voorstel' : '✨ Voor jullie uitgezocht';
+  const sectionSub = topLikerCount >= 2 ? 'Beide geliked door meerdere mensen' : 'Op basis van jullie voorkeuren &amp; likes';
 
   el.style.display = 'block';
   el.innerHTML = `
-    <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.05rem;color:#0A0A0A;padding:0 0 3px;">✨ Slim voorstel</div>
-    <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin-bottom:10px;">Op basis van jullie likes &amp; voorkeuren</div>
-    ${cards.map(item => {
-      const likers = groupLiked[item.id] || [];
+    <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.05rem;color:#0A0A0A;padding:0 0 3px;">${sectionTitle}</div>
+    <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin-bottom:10px;">${sectionSub}</div>
+    ${cards.map(({item, likers}) => {
       const names = likers.map(u => PROFILES[u]?.naam).filter(Boolean);
       const iMeLiked = likers.includes(currentUser);
       const othersNames = names.filter(n => n !== PROFILES[currentUser]?.naam);
       let ctx;
       if (likers.length >= 3) ctx = `Jullie zijn er allemaal enthousiast over — ${names.join(', ')} hebben dit geliked. 💛`;
-      else if (iMeLiked && othersNames.length) ctx = `Jij én ${othersNames.join(' en ')} willen dit allebei. Zou mooi zijn!`;
+      else if (likers.length >= 2 && iMeLiked) ctx = `Jij én ${othersNames.join(' en ')} willen dit allebei. Zou mooi zijn!`;
+      else if (likers.length >= 2) ctx = `${names.join(' en ')} hebben dit allebei geliked — een echte groepsfavoriet!`;
+      else if (iMeLiked && !othersNames.length) ctx = `Jij hebt dit geliked. De anderen hebben nog niet geswipet — misschien ook iets voor hen?`;
       else if (!iMeLiked && othersNames.length) ctx = `${othersNames.join(' en ')} ${othersNames.length > 1 ? 'hebben' : 'heeft'} dit geliked. Wat vind jij?`;
-      else ctx = `Past goed bij jullie groepswensen.`;
+      else ctx = `Past goed bij jullie voorkeuren — een plek om te overwegen.`;
       const desc = item.verhaal ? item.verhaal.slice(0, 120) + (item.verhaal.length > 120 ? '…' : '') : '';
       return `<div id="homecard-${item.id}" style="background:#fff;border-radius:var(--r-lg);overflow:hidden;box-shadow:0 2px 12px rgba(10,10,10,0.07);margin-bottom:10px;transition:opacity 0.2s;">
         <div style="height:3px;background:${_hcCatColor(item.cat)};opacity:0.6;"></div>
