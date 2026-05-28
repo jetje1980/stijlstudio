@@ -5072,12 +5072,12 @@ const _DAGDEEL_CTX = {
   vr26: {
     ochtend: { vast: true,  label:'🚂 Eurostar richting Parijs', detail:'Instappen 07:40 · Aankomst Gare du Nord 11:56' },
     middag:  { vast: true,  label:'12:30 Terminus Nord · 13:30–16:30 Baja Bikes · 17:00 check-in', detail:'Vaste tijden — al geregeld ✓' },
-    avond:   { vast: false, ai: 'Vrijdagavond in Parijs. Na Baja Bikes zijn ze ingecheckt (17:00, Rue de la Lune, 2e arr) en hebben ze gedoucht en omgekleed. Ze willen de stad écht in — het is vrijdagavond Parijs, dat vier je. Opties: diner dicht bij Marais met goede sfeer, OF ergens naartoe met muziek/dans/vertier. Vrijdagavond = levendig, terrassen vol. Leg eerst een aperitief voor en dan een concreet dineradres. Ze vinden het leuk om echt ergens naartoe te gaan, niet thuishangen. Max 2 activiteiten.' }
+    avond:   { vast: false, ai: 'Vrijdagavond Parijs. Na Baja Bikes (13:30-16:30) en check-in om 17:00 hebben ze gedoucht en omgekleed. Ze willen de stad écht in — het is vrijdagavond. Geef 3 opties met verschillende vibes: A) aperitief + sfeervol diner dicht bij Le Marais (loopafstand), B) ergens naartoe met muziek of dancing (zoek floating bar op de Seine of live muziek venue in Marais via web search), C) iets totaal anders verassends. Max 2 activiteiten per optie. Vrijdagavond = ze zijn moe maar willen er toch echt iets van maken — de intensiteit mag meebewegen.', multiOptie: true }
   },
   za27: {
     ochtend: { vast: false, ai: 'Zaterdag ochtend, eerste volledige dag Parijs. Energie is hoog. Marché d\'Aligre open 8–13u (vers marktje, bloemen, brocante — 20 min lopen van Marais). Café Pli is een bijzonder concept: je schrijft een brief aan jezelf of een vriendin die je over 1, 5 of 20 jaar terugkrijgt. Stationery en koffie/thee inbegrepen. Opent 10u. Duurt ~1u. Griette heeft dit als droomitem aangemerkt — over 20 jaar ontvangen wij post uit Parijs 2026. Max 2–3 activiteiten.' },
     middag:  { vast: false, ai: 'Zaterdagmiddag in Le Marais / Parijs. Fris en vrij. Veel keuze: musea, vintage winkels (Le Marais = beste vintage buurt), Canal Saint-Martin wandeling, terrasje. Café Pli is ook op de middag goed als het ochtend niet lukte (open tot 21u). Max 2–3 activiteiten.' },
-    avond:   { vast: false, ai: 'Zaterdagavond — dé avond voor een écht Parijs diner. Feestelijk maar niet overdreven. Aperitief op een terrasje, dan diner. Chez Janou (reservering nodig) staat hoog bij de groep — Provençaals, terrasje, gezellig. Max 2 activiteiten: aperitief + diner.' }
+    avond:   { vast: false, ai: 'Zaterdagavond — dé avond in Parijs. Geef 3 opties met totaal verschillende vibes:\nA) Dansen & vertier: floating bar of dancing op de Seine (bijv. Cargo Queen op de Seine, Batofar, of dancing in Le Marais) — zoek via web search wat er op 27 juni 2026 open is en past\nB) Lang tafelen: aperitief + echt Parijs diner, bijv. Chez Janou (Provençaals, reservering nodig, pastis), of Le Mary Celeste (cocktails + sharing plates, donker en sfeervol)\nC) Zonsondergang Montmartre: ~21:30 is het magisch goud bij Sacré-Cœur (juni = laat licht), gevolgd door diner in de buurt. 30 min metro vanuit Marais.\nMax 2 activiteiten per optie. Airbnb: Rue de la Lune, 2e arr.', multiOptie: true }
   },
   zo28: {
     ochtend: { vast: false, ai: 'Zondagochtend, laatste dag. Check-out voor 11u dus compact. Croissant-ritueel bij de boulangerie past perfect — Parijzenaren nemen 2u voor ontbijt op zondag. Café Pli opent 10u maar check-out is 11u, dus te krap voor een brief. Rustige wandeling kan wel. Max 1–2 activiteiten vóór 11u.' },
@@ -5110,58 +5110,108 @@ function _buildItemsCatalog() {
   }).join('\n');
 }
 
+function _parseOpties(text) {
+  // Detect multi-option format: --- OPTIE A: ... --- or **OPTIE A** or OPTIE A:
+  const marker = /(?:^|\n)\s*(?:---\s*)?(?:\*\*)?OPTIE\s+([ABC])[:\s—*]+([^\n]*)/gi;
+  const matches = [...text.matchAll(marker)];
+  if (matches.length < 2) return null;
+  const parts = text.split(/(?:^|\n)\s*(?:---\s*)?(?:\*\*)?OPTIE\s+[ABC][:\s—*]+[^\n]*/i).slice(1);
+  return matches.map((m, i) => ({
+    letter: m[1].toUpperCase(),
+    header: m[2].replace(/\*\*$/, '').trim(),
+    body: (parts[i] || '').trim(),
+  }));
+}
+
 async function generateDagdeel(day, deel) {
   const apiKey = localStorage.getItem('claude_api_key') || '';
   if (!apiKey) return;
   const ctx = _DAGDEEL_CTX[day]?.[deel];
   if (!ctx || ctx.vast) return;
 
-  const prompt = `Maak een programma voor de ${deel} van ${_DAG_LABELS[day]} voor onze vriendinnengroep van 4.
+  const isAvond = deel === 'avond';
+  const systemBase = `Je bent reisassistent voor een vriendinnengroep (Griette, Frederike, Miriam, Marlinde) in Parijs 26–28 juni 2026. Airbnb: Rue de la Lune, 2e arr (Le Marais).
+REGELS: Groep gaat altijd samen. Geen vragen. Reageer in het Nederlands. Café Pli = brief schrijven die je over 1/5/20 jaar terugkrijgt — Griette's droomitem.
+Geef voorkeur aan gelikte items maar gebruik ook andere catalogus-items of web search als dat beter past.
 
-Context voor dit dagdeel: ${ctx.ai}
-
-Geef voorkeur aan gelikte/gedroomde plekken uit de groepsdata, maar gebruik indien nodig ook andere items uit de app-catalogus. Verzin NOOIT plekken die niet in de catalogus staan.
-Schrijf max 3 activiteiten, elk op een eigen regel:
-⏰ HH:MM — Naam plek — één zin waarom dit nu past
-
-Geen headers, geen bullets, geen extra uitleg.`;
-
-  try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 350,
-        system: `Je bent reisassistent voor een vriendinnengroep (Griette, Frederike, Miriam, Marlinde) in Parijs 26–28 juni 2026. Airbnb: Rue de la Lune, 2e arr (Le Marais).
-REGELS: Groep gaat altijd samen. Geen vragen. Nederlands. Café Pli = brief schrijven die je over 1/5/20 jaar terugkrijgt — Griette's droomitem.
-Gebruik ALLEEN items die voorkomen in de catalogus hieronder. Geef voorkeur aan gelikte/gedroomde items.
-
-ALLE BESCHIKBARE ITEMS IN DE APP:
+APP CATALOGUS:
 ${_buildItemsCatalog()}
 
-GROEPSDATA (geliked / geboekt):
-${buildGroupContext()}`,
-        messages: [{ role: 'user', content: prompt }],
-      }),
-    });
-    if (resp.ok) {
+GROEPSDATA:
+${buildGroupContext()}`;
+
+  const promptEnkel = `Maak een programma voor de ${deel} van ${_DAG_LABELS[day]} voor onze vriendinnengroep van 4.
+Context: ${ctx.ai}
+Schrijf max 3 activiteiten, elk op een eigen regel:
+⏰ HH:MM — Naam plek — één zin waarom dit nu past
+Geen headers, geen bullets, geen extra uitleg.`;
+
+  const promptMulti = `Genereer 3 avondopties voor ${_DAG_LABELS[day]} voor onze vriendinnengroep van 4.
+Context: ${ctx.ai}
+
+Gebruik EXACT dit format:
+--- OPTIE A: [emoji] [korte vibe naam] ---
+⏰ HH:MM — Naam plek — één zin
+⏰ HH:MM — Naam plek — één zin
+
+--- OPTIE B: [emoji] [korte vibe naam] ---
+⏰ HH:MM — Naam plek — één zin
+⏰ HH:MM — Naam plek — één zin
+
+--- OPTIE C: [emoji] [korte vibe naam] ---
+⏰ HH:MM — Naam plek — één zin
+⏰ HH:MM — Naam plek — één zin
+
+Max 2 activiteiten per optie. Geen extra tekst buiten het format. Als je een venue niet zeker weet, gebruik web search om openingstijden te checken.`;
+
+  const fetchOpts = (msgs) => ({
+    method: 'POST',
+    headers: {
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      ...(isAvond ? { 'anthropic-beta': 'web-search-2025-03-05' } : {}),
+      'content-type': 'application/json',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model: isAvond ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001',
+      max_tokens: isAvond ? 700 : 350,
+      ...(isAvond ? { tools: [{ type: 'web_search_20250305', name: 'web_search' }] } : {}),
+      system: systemBase,
+      messages: msgs,
+    }),
+  });
+
+  try {
+    let messages = [{ role: 'user', content: isAvond ? promptMulti : promptEnkel }];
+    let finalText = '';
+
+    for (let round = 0; round < 4; round++) {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', fetchOpts(messages));
+      if (!resp.ok) break;
       const data = await resp.json();
-      const text = data.content?.[0]?.text?.trim();
-      if (text) {
-        const record = { text, ts: Date.now(), by: currentUser };
-        localStorage.setItem(_dagDeelCacheKey(day, deel), JSON.stringify(record));
-        const supaKey = `dagprog_${day}_${deel}`;
-        supa.from('group_state').upsert(
-          { group_id: GROUP_ID, user_id: 'shared', key: supaKey, value: record, updated_at: new Date().toISOString() },
-          { onConflict: 'group_id,user_id,key' }
-        ).then(() => {});
+
+      if (data.stop_reason === 'tool_use') {
+        const toolUses = (data.content || []).filter(c => c.type === 'tool_use');
+        messages = [
+          ...messages,
+          { role: 'assistant', content: data.content },
+          { role: 'user', content: toolUses.map(tu => ({ type: 'tool_result', tool_use_id: tu.id, content: '' })) },
+        ];
+        continue;
       }
+
+      finalText = (data.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim();
+      break;
+    }
+
+    if (finalText) {
+      const record = { text: finalText, ts: Date.now(), by: currentUser };
+      localStorage.setItem(_dagDeelCacheKey(day, deel), JSON.stringify(record));
+      supa.from('group_state').upsert(
+        { group_id: GROUP_ID, user_id: 'shared', key: `dagprog_${day}_${deel}`, value: record, updated_at: new Date().toISOString() },
+        { onConflict: 'group_id,user_id,key' }
+      ).then(() => {});
     }
   } catch(e) {}
 }
@@ -5232,9 +5282,34 @@ async function _saveDagComment(day, deel, prefix) {
 }
 
 function _detectReservations(text) {
-  return (ITEMS_BASE || []).filter(i =>
-    i.reserveren && text.toLowerCase().includes(i.naam.toLowerCase())
-  );
+  return (ITEMS_BASE || [])
+    .filter(i => i.reserveren && text.toLowerCase().includes(i.naam.toLowerCase()))
+    .map(i => ({
+      ...i,
+      booked: _allBookings?.[i.id] || null,
+    }));
+}
+
+function _renderReservBanner(items) {
+  if (!items.length) return '';
+  return items.map(i => {
+    const ri = (typeof RESERVEER_ITEMS !== 'undefined' ? RESERVEER_ITEMS : []).find(r => r.id === i.id);
+    if (i.booked) {
+      const booker = PROFILES[i.booked.by]?.naam || i.booked.by;
+      return `<div style="display:flex;align-items:flex-start;gap:6px;margin-top:8px;padding:7px 10px;background:rgba(80,180,120,0.1);border-left:3px solid #4CAF50;border-radius:0 8px 8px 0;">
+        <span style="font-size:0.8rem;">✅</span>
+        <div style="font-size:0.7rem;color:#2E7D32;font-weight:600;">${i.naam} — gereserveerd door ${booker}</div>
+      </div>`;
+    }
+    return `<div style="display:flex;align-items:flex-start;gap:6px;margin-top:8px;padding:7px 10px;background:rgba(212,120,90,0.1);border-left:3px solid #D4785A;border-radius:0 8px 8px 0;">
+      <span style="font-size:0.8rem;">⚠️</span>
+      <div>
+        <div style="font-size:0.7rem;font-weight:700;color:#A0462A;">${i.naam} — nog niet gereserveerd!</div>
+        ${ri?.note ? `<div style="font-size:0.66rem;color:#C05830;margin-top:1px;">${ri.note}</div>` : ''}
+        ${ri?.url ? `<a href="${ri.url}" target="_blank" rel="noopener" style="font-size:0.66rem;color:#D4785A;text-decoration:none;">→ Boek nu</a>` : ''}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function _renderReactionBar(day, deel, prefix, forHome) {
@@ -5294,27 +5369,36 @@ function _renderDagdeelCard(day, deel, forHome) {
   } else {
     const cached = _safeJSON(_dagDeelCacheKey(day, deel), null);
     if (cached) {
-      const fmt = cached.text
-        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-        .replace(/⏰/g,'<span style="color:#A89FE8;">⏰</span>');
       const byName = cached.by ? (PROFILES[cached.by]?.naam || cached.by) : null;
+      const opties = _parseOpties(cached.text);
+      const accentColors = ['#A89FE8','#C8A882','#D4785A'];
+      const bgColors = ['rgba(168,159,232,0.07)','rgba(200,168,130,0.07)','rgba(212,120,90,0.07)'];
 
-      // Reservation detection
-      const mustBook = _detectReservations(cached.text);
-      const reservBanner = mustBook.length ? mustBook.map(i => {
-        const ri = (typeof RESERVEER_ITEMS !== 'undefined' ? RESERVEER_ITEMS : []).find(r => r.id === i.id);
-        return `<div style="display:flex;align-items:flex-start;gap:6px;margin-top:8px;padding:8px 10px;background:rgba(200,168,130,0.12);border-left:3px solid #C8A882;border-radius:0 8px 8px 0;">
-          <span style="font-size:0.8rem;">📌</span>
-          <div>
-            <div style="font-size:0.72rem;font-weight:700;color:#8B6914;">${i.naam} — reserveren nodig</div>
-            ${ri?.note ? `<div style="font-size:0.67rem;color:#9A7B2E;margin-top:1px;">${ri.note}</div>` : ''}
-            ${ri?.url ? `<a href="${ri.url}" target="_blank" rel="noopener" style="font-size:0.67rem;color:#C8A882;text-decoration:none;">Boek via website →</a>` : ''}
-          </div>
-        </div>`;
-      }).join('') : '';
+      let mainHtml = '';
+      if (opties && opties.length >= 2) {
+        mainHtml = opties.map((opt, i) => {
+          const color = accentColors[i] || '#A89FE8';
+          const bg = bgColors[i] || 'rgba(168,159,232,0.07)';
+          const fmt = opt.body
+            .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+            .replace(/⏰/g,`<span style="color:${color};">⏰</span>`)
+            .replace(/^---.*---\n?/gm,'');
+          const reservBanner = _renderReservBanner(_detectReservations(opt.body));
+          return `<div style="border-radius:10px;background:${bg};border-left:3px solid ${color};padding:10px 12px;margin-bottom:8px;">
+            <div style="font-size:0.6rem;letter-spacing:0.08em;font-weight:700;color:${color};margin-bottom:5px;text-transform:uppercase;">OPTIE ${opt.letter} — ${opt.header}</div>
+            <div style="font-size:${sz};color:#0A0A0A;line-height:1.75;white-space:pre-wrap;">${fmt}</div>
+            ${reservBanner}
+          </div>`;
+        }).join('');
+      } else {
+        const fmt = cached.text
+          .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+          .replace(/⏰/g,'<span style="color:#A89FE8;">⏰</span>');
+        mainHtml = `<div style="font-size:${sz};color:#0A0A0A;line-height:1.75;white-space:pre-wrap;">${fmt}</div>
+          ${_renderReservBanner(_detectReservations(cached.text))}`;
+      }
 
-      content = `<div style="font-size:${sz};color:#0A0A0A;line-height:1.75;white-space:pre-wrap;">${fmt}</div>
-        ${reservBanner}
+      content = `${mainHtml}
         ${_renderReactionBar(day, deel, prefix, forHome)}
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
           ${byName ? `<span style="font-size:0.62rem;color:#C0BBB7;">door ${byName}</span>` : ''}
