@@ -6304,13 +6304,33 @@ function bevestigVoorkeur() {
   }
 }
 
-function finishVoorkeur() {
-  syncWrite('vz_voorkeur_' + currentUser, JSON.stringify(vkAnswers));
+async function finishVoorkeur() {
+  // Save to localStorage immediately
+  localStorage.setItem('vz_voorkeur_' + currentUser, JSON.stringify(vkAnswers));
+  _allVoorkeur[currentUser] = vkAnswers;
+
+  // Show saving state
   document.getElementById('vk-bar').style.width = '100%';
+  document.getElementById('vk-counter').textContent = '💾';
+  document.getElementById('vk-body').innerHTML = `
+    <div style="text-align:center;padding:40px 0;color:#6B6560;font-size:0.9rem;">Opslaan…</div>
+  `;
+
+  // Await Supabase write — retry once on failure
+  let saved = false;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const { error } = await supa.from('group_state').upsert(
+      { group_id:GROUP_ID, user_id:currentUser, key:'voorkeur', value:vkAnswers, updated_at:new Date().toISOString() },
+      { onConflict:'group_id,user_id,key' }
+    );
+    if (!error) { saved = true; break; }
+    if (attempt === 0) await new Promise(r => setTimeout(r, 1500));
+  }
+
   document.getElementById('vk-counter').textContent = '✓';
   const allUsers = ['griette','frederike','miriam','marlinde'];
   const statusHtml = allUsers.map(u => {
-    const done = u === 'griette' || !!localStorage.getItem('vz_voorkeur_' + u);
+    const done = u === 'griette' || (_allVoorkeur[u] && _allVoorkeur[u].length > 0) || !!localStorage.getItem('vz_voorkeur_' + u);
     const p = PROFILES[u];
     const ph = getUserPhoto(u);
     const avEl = ph
@@ -6327,6 +6347,7 @@ function finishVoorkeur() {
       <div style="font-size:3rem;margin-bottom:12px;">🎉</div>
       <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:800;font-size:1.8rem;color:#0A0A0A;margin-bottom:6px;">Merci, ${PROFILES[currentUser].naam}!</div>
       <div style="font-size:0.88rem;color:#6B6560;line-height:1.5;max-width:280px;margin:0 auto;">Griette kan nu het programma beter op jullie afstemmen.</div>
+      ${!saved ? `<div style="margin-top:10px;font-size:0.75rem;color:#D4785A;">⚠️ Opslaan mislukt — je antwoorden staan wel lokaal. Probeer later opnieuw in te loggen.</div>` : ''}
     </div>
     <div style="margin-bottom:24px;">
       <div style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:#A89FE8;margin-bottom:8px;">Wie heeft er ingevuld?</div>
@@ -6343,13 +6364,14 @@ function gaVanVoorkeurNaarApp() {
 
 function initHomeVoorkeurBanner() {
   const allUsers = ['griette','frederike','miriam','marlinde'];
-  const missing = allUsers.filter(u => u !== 'griette' && !localStorage.getItem('vz_voorkeur_' + u));
+  const _vkDone = u => u === 'griette' || (_allVoorkeur[u] && _allVoorkeur[u].length > 0) || !!localStorage.getItem('vz_voorkeur_' + u);
+  const missing = allUsers.filter(u => !_vkDone(u));
   const banner = document.getElementById('voorkeur-home-banner');
   if (!banner) return;
   if (missing.length === 0) { banner.style.display = 'none'; return; }
   const statusEl = document.getElementById('voorkeur-home-status');
   statusEl.innerHTML = allUsers.map(u => {
-    const done = u === 'griette' || !!localStorage.getItem('vz_voorkeur_' + u);
+    const done = _vkDone(u);
     const p = PROFILES[u];
     const ph = getUserPhoto(u);
     const avEl = ph
