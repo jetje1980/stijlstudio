@@ -5052,6 +5052,20 @@ async function _genDagdeel(day, deel, prefix) {
   renderHomeDagprog();
 }
 
+function _buildItemsCatalog() {
+  const byCat = {};
+  (ITEMS_BASE || []).forEach(i => {
+    const cat = i.cat || 'overig';
+    if (!byCat[cat]) byCat[cat] = [];
+    const tijden = i.tijden ? ` · ${i.tijden}` : '';
+    const reserv = i.reserveren ? ' · reserveren nodig' : '';
+    byCat[cat].push(`${i.naam} (${i.wijk}, ${i.prijs}${tijden}${reserv})`);
+  });
+  return Object.entries(byCat)
+    .map(([cat, items]) => `${cat.toUpperCase()}: ${items.join(' | ')}`)
+    .join('\n');
+}
+
 async function generateDagdeel(day, deel) {
   const apiKey = localStorage.getItem('claude_api_key') || '';
   if (!apiKey) return;
@@ -5062,7 +5076,7 @@ async function generateDagdeel(day, deel) {
 
 Context voor dit dagdeel: ${ctx.ai}
 
-Gebruik ALLEEN plekken die voorkomen in de groepsdata (geliked of geboekt). Verzin geen nieuwe plekken.
+Geef voorkeur aan gelikte/gedroomde plekken uit de groepsdata, maar gebruik indien nodig ook andere items uit de app-catalogus. Verzin NOOIT plekken die niet in de catalogus staan.
 Schrijf max 3 activiteiten, elk op een eigen regel:
 ⏰ HH:MM — Naam plek — één zin waarom dit nu past
 
@@ -5079,9 +5093,15 @@ Geen headers, geen bullets, geen extra uitleg.`;
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 300,
+        max_tokens: 350,
         system: `Je bent reisassistent voor een vriendinnengroep (Griette, Frederike, Miriam, Marlinde) in Parijs 26–28 juni 2026. Airbnb: Rue de la Lune, 2e arr (Le Marais).
-REGELS: Groep gaat altijd samen. Gebruik ALLEEN items uit groepsdata. Geen vragen. Nederlands. Café Pli = bijzonder concept: brief schrijven die je over 1/5/20 jaar terugkrijgt — Griette's droomitem, past perfect in een rustig ochtend- of middagmoment.
+REGELS: Groep gaat altijd samen. Geen vragen. Nederlands. Café Pli = brief schrijven die je over 1/5/20 jaar terugkrijgt — Griette's droomitem.
+Gebruik ALLEEN items die voorkomen in de catalogus hieronder. Geef voorkeur aan gelikte/gedroomde items.
+
+ALLE BESCHIKBARE ITEMS IN DE APP:
+${_buildItemsCatalog()}
+
+GROEPSDATA (geliked / geboekt):
 ${buildGroupContext()}`,
         messages: [{ role: 'user', content: prompt }],
       }),
