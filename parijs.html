@@ -896,6 +896,9 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:300;font-style:italic;font-vari
       <a href="https://www.timetomomo.com/nl/ontdek/parijs/" target="_blank" rel="noopener" style="font-size:0.75rem;font-weight:700;color:#A89FE8;text-decoration:none;letter-spacing:0.04em;">Bekijk TtM routes →</a>
     </div>
 
+    <!-- AI DAGVOORSTEL -->
+    <div id="home-ai-tips" style="margin:0 20px 8px;display:none;"></div>
+
     <!-- POLLS -->
     <div class="home-section-title" style="margin-top:8px;">Stem mee</div>
     <div id="personal-polls-section" style="padding:0 20px 4px;"></div>
@@ -1784,7 +1787,8 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:300;font-style:italic;font-vari
       <button onclick="closeParisChatSheet()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#9A948E;padding:4px 8px;line-height:1;">✕</button>
     </div>
     <div id="chat-messages" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-height:160px;"></div>
-    <div style="padding:10px 12px 16px;border-top:1px solid rgba(10,10,10,0.08);display:flex;gap:8px;align-items:flex-end;flex-shrink:0;">
+    <div id="chat-chips" style="padding:6px 12px 0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;-webkit-overflow-scrolling:touch;"></div>
+    <div style="padding:8px 12px 16px;border-top:1px solid rgba(10,10,10,0.08);display:flex;gap:8px;align-items:flex-end;flex-shrink:0;">
       <textarea id="chat-input" placeholder="Wat wil je weten of plannen?" rows="1" style="flex:1;padding:10px 12px;border:1.5px solid rgba(10,10,10,0.15);border-radius:14px;font-family:var(--sans);font-size:0.88rem;color:#0A0A0A;outline:none;resize:none;background:#fff;line-height:1.4;max-height:100px;overflow-y:auto;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
       <button onclick="sendChatMessage()" style="flex-shrink:0;width:40px;height:40px;border-radius:50%;background:#0A0A0A;border:none;color:#F0E8E2;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">↑</button>
     </div>
@@ -2187,6 +2191,7 @@ function _rerenderAfterSync() {
   renderPollChainDay(_activePollDay);
   renderAankomstVote();
   renderGluurStrip();
+  renderDagvoorstel();
   if (document.getElementById('sec-top5')?.classList.contains('active')) renderProgramma();
 }
 
@@ -2536,6 +2541,7 @@ function initApp() {
   checkGrietteErkenning();
   initHomeVoorkeurBanner();
   updateVoorkeurNudge();
+  renderDagvoorstel();
   initWeekendEvents();
   // Sync all group state from Supabase, migrate local data, enable realtime
   _syncAllGroupState();
@@ -3707,9 +3713,27 @@ function buildGroupContext() {
 function openParisChatSheet() {
   document.getElementById('paris-chat-sheet').style.display = 'block';
   if (_chatMessages.length === 0) {
-    _chatMessages = [{ role:'assistant', content:'Hoi! 👋 Ik help je met activiteiten kiezen, plannen matchen met de groep, en voorstellen formuleren. Wat wil je weten?' }];
+    // Build contextual opener based on group state
+    const mySwipes = _allSwipes[currentUser] || _safeJSON('vz_swipes_' + currentUser, {});
+    const allSwipesData = { ...(_allSwipes || {}), [currentUser]: mySwipes };
+    const groupLiked = {};
+    Object.values(allSwipesData).forEach(sw => {
+      Object.entries(sw || {}).forEach(([id, v]) => { if (v === 1 || v === 'like' || v === 'dream') groupLiked[id] = (groupLiked[id]||0)+1; });
+    });
+    const topMatch = ITEMS_BASE.filter(i => (groupLiked[i.id]||0) >= 2).sort((a,b) => groupLiked[b.id]-groupLiked[a.id])[0];
+    const voorkeurDone = ['griette','frederike','miriam','marlinde'].filter(u => (_allVoorkeur[u]||[]).length > 0);
+    let opener = 'Hoi! 👋 ';
+    if (voorkeurDone.length >= 3 && topMatch) {
+      opener += `Ik zie dat ${voorkeurDone.length} van jullie hun voorkeuren hebben ingevuld. **${topMatch.naam}** staat hoog op de lijst. Kan ik iets uitwerken — een dagprogramma, dineradvies, of een wandelroute?`;
+    } else if (topMatch) {
+      opener += `Ik ken jullie likes en wensen. **${topMatch.naam}** is een groepsfavoriet. Wil je een concreet voorstel voor een dag, dineradvies, of tips voor een dagdeel?`;
+    } else {
+      opener += `Ik ken jullie wensen en swipt-gedrag. Vraag me om een dagprogramma, dineradvies, of een verborgen plek in Le Marais. Wat zoek je?`;
+    }
+    _chatMessages = [{ role:'assistant', content: opener }];
     renderChatMessages();
   }
+  _renderChatChips();
   setTimeout(() => document.getElementById('chat-input')?.focus(), 150);
 }
 
@@ -3747,6 +3771,152 @@ async function sendChatMessage() {
   typingEl.remove();
   _chatMessages.push({ role:'assistant', content: _localChatReply(text) });
   renderChatMessages();
+}
+
+// ── DAGVOORSTEL: Home AI suggestion cards ─────────────────────────────────
+let _homeCardDismissed = {};
+
+function _hcCatColor(cat) {
+  return {ontbijt:'#D4785A',koffie:'#C8A882',lunch:'#7A9E82',diner:'#A89FE8',borrel:'#D4785A',activiteit:'#4A90A4',wandelen:'#7A9E82',markt:'#C8A882',shoppen:'#A89FE8',uitgaan:'#D4785A'}[cat] || '#9A948E';
+}
+function _hcCatLabel(cat) {
+  return {ontbijt:'Ontbijt',koffie:'Koffie',lunch:'Lunch',diner:'Diner',borrel:'Borrel',activiteit:'Activiteit',wandelen:'Wandelen',markt:'Markt',shoppen:'Shoppen',uitgaan:'Uitgaan'}[cat] || cat;
+}
+
+function renderDagvoorstel() {
+  const el = document.getElementById('home-ai-tips');
+  if (!el) return;
+  _homeCardDismissed = _safeJSON('vz_homecard_dismissed_' + currentUser, {});
+
+  const mySwipes = _allSwipes[currentUser] || _safeJSON('vz_swipes_' + currentUser, {});
+  const allSwipesData = { ...(_allSwipes || {}), [currentUser]: mySwipes };
+
+  // Build grouped like map: itemId → [uid, ...]
+  const groupLiked = {};
+  Object.entries(allSwipesData).forEach(([uid, sw]) => {
+    Object.entries(sw || {}).forEach(([id, v]) => {
+      if (v === 1 || v === 'like' || v === 'dream') {
+        if (!groupLiked[id]) groupLiked[id] = [];
+        if (!groupLiked[id].includes(uid)) groupLiked[id].push(uid);
+      }
+    });
+  });
+
+  // Cards: group matches (2+ likes) + 1 suggestion others liked but I haven't voted on yet
+  const groupMatches = ITEMS_BASE
+    .filter(i => (groupLiked[i.id] || []).length >= 2 && !_homeCardDismissed['item_' + i.id])
+    .sort((a, b) => (groupLiked[b.id] || []).length - (groupLiked[a.id] || []).length)
+    .slice(0, 2);
+
+  const othersLiked = groupMatches.length < 2 ? ITEMS_BASE.filter(i => {
+    if (_homeCardDismissed['item_' + i.id]) return false;
+    if (mySwipes[i.id]) return false;
+    return (groupLiked[i.id] || []).some(u => u !== currentUser);
+  }).sort((a, b) => (groupLiked[b.id] || []).length - (groupLiked[a.id] || []).length).slice(0, 1) : [];
+
+  const cards = [...groupMatches, ...othersLiked];
+  if (!cards.length) { el.innerHTML = ''; el.style.display = 'none'; return; }
+
+  el.style.display = 'block';
+  el.innerHTML = `
+    <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.05rem;color:#0A0A0A;padding:0 0 3px;">✨ Slim voorstel</div>
+    <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin-bottom:10px;">Op basis van jullie likes &amp; voorkeuren</div>
+    ${cards.map(item => {
+      const likers = groupLiked[item.id] || [];
+      const names = likers.map(u => PROFILES[u]?.naam).filter(Boolean);
+      const iMeLiked = likers.includes(currentUser);
+      const othersNames = names.filter(n => n !== PROFILES[currentUser]?.naam);
+      let ctx;
+      if (likers.length >= 3) ctx = `Jullie zijn er allemaal enthousiast over — ${names.join(', ')} hebben dit geliked. 💛`;
+      else if (iMeLiked && othersNames.length) ctx = `Jij én ${othersNames.join(' en ')} willen dit allebei. Zou mooi zijn!`;
+      else if (!iMeLiked && othersNames.length) ctx = `${othersNames.join(' en ')} ${othersNames.length > 1 ? 'hebben' : 'heeft'} dit geliked. Wat vind jij?`;
+      else ctx = `Past goed bij jullie groepswensen.`;
+      const desc = item.verhaal ? item.verhaal.slice(0, 120) + (item.verhaal.length > 120 ? '…' : '') : '';
+      return `<div id="homecard-${item.id}" style="background:#fff;border-radius:var(--r-lg);overflow:hidden;box-shadow:0 2px 12px rgba(10,10,10,0.07);margin-bottom:10px;transition:opacity 0.2s;">
+        <div style="height:3px;background:${_hcCatColor(item.cat)};opacity:0.6;"></div>
+        <div style="padding:14px 16px 12px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px;">
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:${_hcCatColor(item.cat)};margin-bottom:3px;">${_hcCatLabel(item.cat)} · ${item.wijk}</div>
+              <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1rem;color:#0A0A0A;line-height:1.2;">${item.naam}</div>
+            </div>
+            <button onclick="_dismissHomeCard('${item.id}')" style="background:none;border:none;font-size:1rem;color:#C8BBAA;cursor:pointer;padding:0;flex-shrink:0;line-height:1;margin-top:1px;" title="Verberg">✕</button>
+          </div>
+          <div style="font-size:0.76rem;color:#6B6560;line-height:1.55;margin-bottom:6px;">${ctx}</div>
+          ${desc ? `<div style="font-size:0.72rem;color:#9A948E;line-height:1.5;margin-bottom:10px;">${desc}</div>` : ''}
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <div style="flex:1;font-size:0.67rem;color:#9A948E;min-width:0;">🕐 ${item.tijden || '?'} · ${item.prijs}</div>
+            ${!iMeLiked
+              ? `<button onclick="_homeReact('${item.id}','skip')" style="padding:7px 14px;border-radius:20px;border:1.5px solid rgba(10,10,10,0.12);background:transparent;font-family:var(--sans);font-size:0.78rem;font-weight:600;color:#9A948E;cursor:pointer;flex-shrink:0;">✕ Skip</button>
+                 <button onclick="_homeReact('${item.id}','like')" style="padding:7px 14px;border-radius:20px;border:none;background:#A89FE8;font-family:var(--sans);font-size:0.78rem;font-weight:600;color:#fff;cursor:pointer;flex-shrink:0;">❤️ Like</button>`
+              : `<div style="font-size:0.75rem;color:#A89FE8;font-weight:700;">✓ Jij hebt dit al geliked</div>`}
+          </div>
+        </div>
+      </div>`;
+    }).join('')}
+    <button onclick="openParisChatSheetWith('Geef een slim voorstel voor de groep op basis van onze likes')" style="width:100%;padding:10px;border:1.5px dashed rgba(168,159,232,0.4);border-radius:14px;background:transparent;font-family:var(--sans);font-size:0.8rem;font-weight:600;color:#A89FE8;cursor:pointer;letter-spacing:0.03em;margin-top:2px;">🗺️ Vraag de assistent om een persoonlijk voorstel →</button>
+  `;
+}
+
+function _dismissHomeCard(itemId) {
+  _homeCardDismissed['item_' + itemId] = true;
+  localStorage.setItem('vz_homecard_dismissed_' + currentUser, JSON.stringify(_homeCardDismissed));
+  const cardEl = document.getElementById('homecard-' + itemId);
+  if (cardEl) { cardEl.style.opacity = '0'; setTimeout(() => renderDagvoorstel(), 220); }
+}
+
+function _homeReact(itemId, vote) {
+  if (!swipes) swipes = {};
+  swipes[itemId] = vote === 'like' ? 1 : -1;
+  _allSwipes[currentUser] = swipes;
+  syncWrite('vz_swipes_' + currentUser, JSON.stringify(swipes));
+  const cardEl = document.getElementById('homecard-' + itemId);
+  if (cardEl) {
+    cardEl.style.opacity = '0';
+    if (vote === 'like') showToast('❤️ Geliked!');
+    setTimeout(() => renderDagvoorstel(), 220);
+  }
+}
+
+function openParisChatSheetWith(prefill) {
+  openParisChatSheet();
+  setTimeout(() => {
+    const input = document.getElementById('chat-input');
+    if (!input) return;
+    input.value = prefill;
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 100) + 'px';
+    input.focus();
+  }, 120);
+}
+
+function _renderChatChips() {
+  const el = document.getElementById('chat-chips');
+  if (!el) return;
+  const mySwipes = _allSwipes[currentUser] || _safeJSON('vz_swipes_' + currentUser, {});
+  const allSwipesData = { ...(_allSwipes || {}), [currentUser]: mySwipes };
+  const groupLiked = {};
+  Object.values(allSwipesData).forEach(sw => {
+    Object.entries(sw || {}).forEach(([id, v]) => { if (v === 1 || v === 'like' || v === 'dream') groupLiked[id] = (groupLiked[id]||0)+1; });
+  });
+  const hasGroupLikes = Object.values(groupLiked).some(c => c >= 2);
+  const chips = [
+    { label: '☀️ Zaterdagochtend', q: 'Wat kunnen we zaterdagochtend doen?' },
+    { label: '🍽️ Diner tip', q: 'Geef een diner aanbeveling voor de groep' },
+    { label: '🛍️ Markt + vintage', q: 'Markt of vintage winkelen in Le Marais' },
+    hasGroupLikes ? { label: '❤️ Groepsmatches', q: 'Wat willen we allemaal graag doen?' } : { label: '🗺️ Verborgen plekken', q: 'Verborgen plekken die niemand kent in Parijs' },
+    { label: '🌙 Vrijdagavond', q: 'Vrijdagavond plan na aankomst' },
+    { label: '🚴 Actief idee', q: 'Actieve activiteiten voor de groep' },
+  ];
+  el.innerHTML = chips.map(c =>
+    `<button onclick="_sendChatChip(${JSON.stringify(c.q)})" style="flex-shrink:0;padding:6px 12px;border-radius:20px;border:1.5px solid rgba(168,159,232,0.35);background:rgba(168,159,232,0.08);font-family:var(--sans);font-size:0.73rem;font-weight:600;color:#6B5FA8;cursor:pointer;white-space:nowrap;">${c.label}</button>`
+  ).join('');
+}
+
+function _sendChatChip(query) {
+  const input = document.getElementById('chat-input');
+  if (input) { input.value = query; }
+  sendChatMessage();
 }
 
 function _localChatReply(text) {
@@ -3818,20 +3988,62 @@ function _localChatReply(text) {
     return { item, score, gl };
   }).filter(x => x.score > 0).sort((a, b) => b.score - a.score);
 
+  // ── Voorkeur-based context ────────────────────────
+  // Boost items matching group voorkeur: tempo, activiteiten, maaltijdstijl
+  const VK_CATS = {
+    0: ['ontbijt','koffie'],       // ochtend tempo
+    3: ['wandelen','activiteit'],  // actief vs. terras
+    4: ['activiteit'],             // musea
+    6: ['borrel','uitgaan'],       // avond / dansen
+  };
+  const users = ['griette','frederike','miriam','marlinde'];
+  const vkBoost = {};
+  users.forEach(u => {
+    const vk = _allVoorkeur[u] || _safeJSON('vz_voorkeur_'+u, []);
+    if (!vk || !vk.length) return;
+    // Q0: ochtend tempo → 0=lange koffie boost ontbijt/koffie, 2=uitslapen penalize ochtend
+    const q0 = Array.isArray(vk[0]) ? vk[0][0] : vk[0];
+    if (q0 === 0) (VK_CATS[0]||[]).forEach(c => { vkBoost[c] = (vkBoost[c]||0)+1; });
+    // Q3: actief vs. terras → 0=actief boost wandelen/activiteit
+    const q3 = Array.isArray(vk[3]) ? vk[3][0] : vk[3];
+    if (q3 === 0) (VK_CATS[3]||[]).forEach(c => { vkBoost[c] = (vkBoost[c]||0)+1; });
+    // Q4: musea → 0=graag boost activiteit
+    const q4 = Array.isArray(vk[4]) ? vk[4][0] : vk[4];
+    if (q4 === 0) (VK_CATS[4]||[]).forEach(c => { vkBoost[c] = (vkBoost[c]||0)+1; });
+    // Q6: avond → 0=dansen boost uitgaan, 2=vroeg slapen penalize
+    const q6 = Array.isArray(vk[6]) ? vk[6][0] : vk[6];
+    if (q6 === 0) (VK_CATS[6]||[]).forEach(c => { vkBoost[c] = (vkBoost[c]||0)+1; });
+  });
+  // Apply voorkeur boost to scored items
+  scored.forEach(x => { x.score += (vkBoost[x.item.cat]||0) * 2; });
+  scored.sort((a, b) => b.score - a.score);
+
+  // ── Voorkeur context string ───────────────────────
+  function _vkContext() {
+    const actief = users.filter(u => {
+      const vk = _allVoorkeur[u] || _safeJSON('vz_voorkeur_'+u, []);
+      const q3 = Array.isArray(vk[3]) ? vk[3][0] : vk[3];
+      return q3 === 0;
+    }).map(u => PROFILES[u]?.naam).filter(Boolean);
+    if (actief.length >= 2) return `\n\n💡 ${actief.join(' en ')} ${actief.length > 2 ? 'hebben' : 'heeft'} "actief" als voorkeur — wandelen en fietsen passen goed bij de groep.`;
+    return '';
+  }
+
   // ── Group matches shortcut ────────────────────────
   if (wantMatches) {
     const gm = scored.filter(x => x.gl >= 2).slice(0, 3);
-    if (gm.length) return '❤️ **Jullie groepsfavorieten** — 2+ mensen hebben dit geliked:\n\n' + gm.map(x => _fmtItem(x.item, allSwipesData)).join('\n\n');
-    return 'Nog niet genoeg overlapping in de swipes — laat de anderen ook wat swipen! Hier zijn aanbevolen opties:\n\n' + scored.slice(0,3).map(x => _fmtItem(x.item, allSwipesData)).join('\n\n');
+    if (gm.length) return '❤️ **Jullie groepsfavorieten** — 2+ mensen hebben dit geliked:\n\n' + gm.map(x => _fmtItem(x.item, allSwipesData)).join('\n\n') + _vkContext();
+    return 'Nog niet genoeg overlapping in de swipes — laat de anderen ook wat swipen! Hier zijn aanbevolen opties op basis van jullie wensen:\n\n' + scored.slice(0,3).map(x => _fmtItem(x.item, allSwipesData)).join('\n\n');
   }
 
   const top = scored.slice(0, 3);
-  if (!top.length) return 'Ik vind niks passendsmet die zoekterm. Probeer: "zaterdagochtend dichtbij airbnb", "avondeten tip", "verborgen plek", of "wat wil de groep doen".';
+  if (!top.length) return 'Ik vind niks passend met die zoekterm. Probeer: "zaterdagochtend dichtbij airbnb", "avondeten tip", "verborgen plek", of "wat wil de groep doen".';
 
   const dagLabel = dag === 'vr' ? 'vrijdag' : dag === 'za' ? 'zaterdag' : dag === 'zo' ? 'zondag' : '';
   const tijdLabel = tijd || '';
   const intro = [dagLabel, tijdLabel].filter(Boolean).join(' ');
-  return (intro ? `Op ${intro} passen deze goed bij jullie:\n\n` : 'Dit past goed bij jullie groep:\n\n') + top.map(x => _fmtItem(x.item, allSwipesData)).join('\n\n');
+  const vkCtx = (wantActief || tijd === 'ochtend') ? _vkContext() : '';
+  return (intro ? `Op ${intro} passen deze goed bij jullie:\n\n` : 'Dit past goed bij jullie groep:\n\n') + top.map(x => _fmtItem(x.item, allSwipesData)).join('\n\n') + vkCtx;
 }
 
 function _fmtItem(item, allSwipesData) {
