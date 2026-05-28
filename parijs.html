@@ -5004,100 +5004,62 @@ const PROG_CONTEXT = {
   }
 };
 
-// ── AI DAGPROGRAMMA — HOME SECTION ────────────────────────────────────────
-let _homeDagDay = 'vr26';
-
-function renderHomeDagprog() {
-  const el = document.getElementById('home-dagprog-section');
-  if (!el) return;
-  const apiKey = localStorage.getItem('claude_api_key') || '';
-  if (!apiKey) { el.innerHTML = ''; return; }
-  const cached = _safeJSON('vz_dagprog_' + _homeDagDay, null);
-  const tabs = ['vr26','za27','zo28'].map(d =>
-    `<button onclick="_homeDagSwitch('${d}')" style="flex:1;padding:7px 4px;border:none;border-radius:8px;font-family:var(--sans);font-size:0.72rem;font-weight:700;cursor:pointer;transition:all 0.15s;${_homeDagDay===d ? 'background:#0A0A0A;color:#F0E8E2;' : 'background:rgba(10,10,10,0.05);color:#6B6560;'}">${{vr26:'Vr 26',za27:'Za 27',zo28:'Zo 28'}[d]}</button>`
-  ).join('');
-  el.innerHTML = `
-    <div style="background:#fff;border-radius:var(--r-lg);box-shadow:0 2px 12px rgba(10,10,10,0.07);overflow:hidden;">
-      <div style="padding:12px 14px 10px;border-bottom:1px solid rgba(10,10,10,0.06);">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:0.92rem;color:#0A0A0A;">🗓️ Dagprogramma met AI</div>
-          ${cached ? `<button onclick="_homeDagClear()" style="background:none;border:none;font-size:0.68rem;color:#9A948E;cursor:pointer;">↺ Nieuw</button>` : ''}
-        </div>
-        <div style="display:flex;gap:4px;">${tabs}</div>
-      </div>
-      ${cached ? `
-        <div style="padding:14px;font-size:0.8rem;color:#0A0A0A;line-height:1.75;white-space:pre-wrap;max-height:260px;overflow-y:auto;">${cached.text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^(OCHTEND|MIDDAG|AVOND)$/gm,'<div style="font-size:0.57rem;letter-spacing:0.12em;color:#C8A882;font-weight:700;margin:10px 0 4px;">$1</div>').replace(/⏰/g,'<span style="color:#A89FE8;">⏰</span>')}</div>
-      ` : `
-        <div style="padding:14px;">
-          <button onclick="generateDagprogrammaHome('${_homeDagDay}')" id="home-dagprog-btn" style="width:100%;padding:11px;border:none;border-radius:10px;background:#A89FE8;color:#fff;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;letter-spacing:0.03em;">✨ Genereer programma voor ${_DAG_LABELS[_homeDagDay]}</button>
-        </div>
-      `}
-    </div>`;
-}
-
-function _homeDagSwitch(day) {
-  _homeDagDay = day;
-  renderHomeDagprog();
-}
-
-function _homeDagClear() {
-  localStorage.removeItem('vz_dagprog_' + _homeDagDay);
-  renderHomeDagprog();
-}
-
-async function generateDagprogrammaHome(day) {
-  const btn = document.getElementById('home-dagprog-btn');
-  if (btn) { btn.innerHTML = '⏳ Claude denkt na…'; btn.disabled = true; }
-  await generateDagprogramma(day);
-  renderHomeDagprog();
-}
-
 // ── AI DAGPROGRAMMA GENERATOR ─────────────────────────────────────────────
 const _DAG_LABELS = {vr26:'Vrijdag 26 juni', za27:'Zaterdag 27 juni', zo28:'Zondag 28 juni'};
-const _DAG_NOTES  = {
-  vr26: 'Vaste tijden: aankomst Gare du Nord 11:56. Lunch ca 12:30. Baja Bikes fietstocht ca 13:30–16:30. Check-in Airbnb ca 17:00. Vrijdagavond vrij — moe van de reis, rustige start.',
-  za27: 'Volledige vrije zaterdag. Geen vaste tijden. Marché d\'Aligre open 8–13u. Vanves brocante 7–14u.',
-  zo28: 'Check-out voor 11u. Ochtend vrij, daarna richting station. Rustige start — geen druk programma.',
+const _DEEL_LABELS = {ochtend:'Ochtend', middag:'Middag', avond:'Avond'};
+const _DEEL_ICONS  = {ochtend:'🌅', middag:'☀️', avond:'🌙'};
+
+// Per dagdeel: vast = hardcoded plan, ai = context voor Claude
+const _DAGDEEL_CTX = {
+  vr26: {
+    ochtend: { vast: true,  label:'🚂 Eurostar richting Parijs', detail:'Instappen 07:40 · Aankomst Gare du Nord 11:56' },
+    middag:  { vast: true,  label:'12:30 Terminus Nord · 13:30–16:30 Baja Bikes · 17:00 check-in', detail:'Vaste tijden — al geregeld ✓' },
+    avond:   { vast: false, ai: 'Vrijdagavond in Parijs. De groep heeft net 3u gefietst (Baja Bikes) en is om 17:00 ingecheckt in Airbnb Rue de la Lune, 2e arr (Le Marais buurt). Ze zijn moe maar blij — eerste avond Parijs. Rustige avond: max 2 activiteiten dicht bij huis. Aperitief + diner. Geen lange reistijden.' }
+  },
+  za27: {
+    ochtend: { vast: false, ai: 'Zaterdag ochtend, eerste volledige dag Parijs. Energie is hoog. Marché d\'Aligre open 8–13u (vers marktje, bloemen, brocante — 20 min lopen van Marais). Café Pli is een bijzonder concept: je schrijft een brief aan jezelf of een vriendin die je over 1, 5 of 20 jaar terugkrijgt. Stationery en koffie/thee inbegrepen. Opent 10u. Duurt ~1u. Griette heeft dit als droomitem aangemerkt — over 20 jaar ontvangen wij post uit Parijs 2026. Max 2–3 activiteiten.' },
+    middag:  { vast: false, ai: 'Zaterdagmiddag in Le Marais / Parijs. Fris en vrij. Veel keuze: musea, vintage winkels (Le Marais = beste vintage buurt), Canal Saint-Martin wandeling, terrasje. Café Pli is ook op de middag goed als het ochtend niet lukte (open tot 21u). Max 2–3 activiteiten.' },
+    avond:   { vast: false, ai: 'Zaterdagavond — dé avond voor een écht Parijs diner. Feestelijk maar niet overdreven. Aperitief op een terrasje, dan diner. Chez Janou (reservering nodig) staat hoog bij de groep — Provençaals, terrasje, gezellig. Max 2 activiteiten: aperitief + diner.' }
+  },
+  zo28: {
+    ochtend: { vast: false, ai: 'Zondagochtend, laatste dag. Check-out voor 11u dus compact. Croissant-ritueel bij de boulangerie past perfect — Parijzenaren nemen 2u voor ontbijt op zondag. Café Pli opent 10u maar check-out is 11u, dus te krap voor een brief. Rustige wandeling kan wel. Max 1–2 activiteiten vóór 11u.' },
+    middag:  { vast: false, ai: 'Zondagmiddag na check-out (11u). Koffers gestald bij Airbnb of meegenomen. Laatste uren in Parijs. Wandelen, souvenirs, laatste terrasje, afscheid nemen. Canal de l\'Ourq of Promenade Plantée zijn rustige opties. Max 2 activiteiten.' },
+    avond:   { vast: true,  label:'🚂 Terugreis naar huis', detail:'Afhankelijk van gekozen trein — einde citytrip' }
+  }
 };
 
-function renderDagprogrammaBar() {
-  const el = document.getElementById('dagprog-ai-section');
-  if (!el) return;
-  const apiKey = localStorage.getItem('claude_api_key') || '';
-  const cacheKey = 'vz_dagprog_' + progDay;
-  const cached = _safeJSON(cacheKey, null);
+function _dagDeelCacheKey(day, deel) { return `vz_dagprog_${day}_${deel}`; }
 
-  const resultHtml = cached ? `
-    <div style="margin-bottom:12px;padding:16px;background:#fff;border-radius:var(--r-lg);box-shadow:0 2px 12px rgba(10,10,10,0.07);">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;">
-        <div style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:#A89FE8;font-weight:700;">🗓️ AI dagprogramma · ${_DAG_LABELS[progDay]}</div>
-        <button onclick="localStorage.removeItem('${cacheKey}');renderDagprogrammaBar()" style="background:none;border:none;font-size:0.7rem;color:#9A948E;cursor:pointer;flex-shrink:0;">↺ Nieuw</button>
-      </div>
-      <div style="font-size:0.82rem;color:#0A0A0A;line-height:1.75;white-space:pre-wrap;">${cached.text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^(OCHTEND|MIDDAG|AVOND)$/gm,'<div style="font-size:0.58rem;letter-spacing:0.12em;color:#C8A882;font-weight:700;margin:12px 0 6px;">$1</div>').replace(/⏰/g,'<span style="color:#A89FE8;">⏰</span>')}</div>
-    </div>` : '';
-
-  if (!apiKey) { el.innerHTML = resultHtml; return; }
-  el.innerHTML = resultHtml + `
-    <button onclick="generateDagprogramma('${progDay}')" id="dagprog-gen-btn" style="width:100%;padding:12px;border:1.5px dashed rgba(168,159,232,0.4);border-radius:14px;background:rgba(168,159,232,0.05);font-family:var(--sans);font-size:0.82rem;font-weight:700;color:#A89FE8;cursor:pointer;letter-spacing:0.03em;">
-      🗓️ ${cached ? 'Nieuw programma genereren' : 'Genereer dagprogramma voor ' + _DAG_LABELS[progDay]}
-    </button>`;
+function _clearDagDeelCache(day, deel) {
+  localStorage.removeItem(_dagDeelCacheKey(day, deel));
+  renderDagprogrammaBar();
+  renderHomeDagprog();
 }
 
-async function generateDagprogramma(day) {
-  const btn = document.getElementById('dagprog-gen-btn');
-  if (btn) { btn.innerHTML = '⏳ Claude denkt na…'; btn.disabled = true; }
+async function _genDagdeel(day, deel, prefix) {
+  const btnId = `dg-btn-${prefix}-${deel}`;
+  const btn = document.getElementById(btnId);
+  if (btn) { btn.textContent = '⏳ Claude denkt na…'; btn.disabled = true; }
+  await generateDagdeel(day, deel);
+  renderDagprogrammaBar();
+  renderHomeDagprog();
+}
+
+async function generateDagdeel(day, deel) {
   const apiKey = localStorage.getItem('claude_api_key') || '';
   if (!apiKey) return;
+  const ctx = _DAGDEEL_CTX[day]?.[deel];
+  if (!ctx || ctx.vast) return;
 
-  const userPrompt = `Maak een concreet dagprogramma voor ${_DAG_LABELS[day]} voor onze groep van 4.
+  const prompt = `Maak een programma voor de ${deel} van ${_DAG_LABELS[day]} voor onze vriendinnengroep van 4.
 
-Dag: ${_DAG_NOTES[day]}
+Context voor dit dagdeel: ${ctx.ai}
 
-Gebruik ALLEEN plekken die in de groepsdata voorkomen (geliked of geboekt). Verzin niets.
-Schrijf per dagdeel (OCHTEND / MIDDAG / AVOND) op een nieuwe regel:
+Gebruik ALLEEN plekken die voorkomen in de groepsdata (geliked of geboekt). Verzin geen nieuwe plekken.
+Schrijf max 3 activiteiten, elk op een eigen regel:
 ⏰ HH:MM — Naam plek — één zin waarom dit nu past
 
-Max 7 activiteiten totaal. Houd rekening met loopafstanden (max 20 min) en openingstijden.`;
+Geen headers, geen bullets, geen extra uitleg.`;
 
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
@@ -5110,20 +5072,101 @@ Max 7 activiteiten totaal. Houd rekening met loopafstanden (max 20 min) en openi
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 700,
-        system: `Je bent de reisassistent van een vriendinnengroep van 4 (Griette, Frederike, Miriam, Marlinde). Parijs 26–28 juni 2026. Verblijf: Rue de la Lune, 2e arr.
-REGELS: Nooit groep opsplitsen. Gebruik alleen items uit groepsdata. Geen vragen. Reageer in Nederlands.
+        max_tokens: 300,
+        system: `Je bent reisassistent voor een vriendinnengroep (Griette, Frederike, Miriam, Marlinde) in Parijs 26–28 juni 2026. Airbnb: Rue de la Lune, 2e arr (Le Marais).
+REGELS: Groep gaat altijd samen. Gebruik ALLEEN items uit groepsdata. Geen vragen. Nederlands. Café Pli = bijzonder concept: brief schrijven die je over 1/5/20 jaar terugkrijgt — Griette's droomitem, past perfect in een rustig ochtend- of middagmoment.
 ${buildGroupContext()}`,
-        messages: [{ role: 'user', content: userPrompt }],
+        messages: [{ role: 'user', content: prompt }],
       }),
     });
     if (resp.ok) {
       const data = await resp.json();
       const text = data.content?.[0]?.text?.trim();
-      if (text) localStorage.setItem('vz_dagprog_' + day, JSON.stringify({ text, ts: Date.now() }));
+      if (text) localStorage.setItem(_dagDeelCacheKey(day, deel), JSON.stringify({ text, ts: Date.now() }));
     }
   } catch(e) {}
-  renderDagprogrammaBar();
+}
+
+function _renderDagdeelCard(day, deel, forHome) {
+  const ctx = _DAGDEEL_CTX[day]?.[deel];
+  if (!ctx) return '';
+  const apiKey = localStorage.getItem('claude_api_key') || '';
+  const icon = _DEEL_ICONS[deel];
+  const label = _DEEL_LABELS[deel];
+  const prefix = forHome ? 'h' : 'p';
+  const btnId = `dg-btn-${prefix}-${deel}`;
+  const sz = forHome ? '0.78rem' : '0.83rem';
+
+  let content = '';
+  if (ctx.vast) {
+    content = `<div style="padding:8px 10px;background:rgba(10,10,10,0.04);border-radius:9px;">
+        <div style="font-size:${sz};font-weight:600;color:#3D3835;">${ctx.label}</div>
+        ${ctx.detail ? `<div style="font-size:0.7rem;color:#9A948E;margin-top:2px;">${ctx.detail}</div>` : ''}
+      </div>`;
+  } else {
+    const cached = _safeJSON(_dagDeelCacheKey(day, deel), null);
+    if (cached) {
+      const fmt = cached.text
+        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+        .replace(/⏰/g,'<span style="color:#A89FE8;">⏰</span>');
+      content = `<div style="font-size:${sz};color:#0A0A0A;line-height:1.75;white-space:pre-wrap;">${fmt}</div>
+        <button onclick="_clearDagDeelCache('${day}','${deel}')" style="background:none;border:none;font-size:0.66rem;color:#B0AAA5;cursor:pointer;padding:4px 0 0;display:block;">↺ Nieuw genereren</button>`;
+    } else if (apiKey) {
+      content = `<button id="${btnId}" onclick="_genDagdeel('${day}','${deel}','${prefix}')"
+          style="padding:8px 12px;border:1.5px dashed rgba(168,159,232,0.45);border-radius:9px;background:rgba(168,159,232,0.05);font-family:var(--sans);font-size:0.74rem;font-weight:700;color:#A89FE8;cursor:pointer;width:100%;text-align:left;">
+          ✨ Genereer ${label.toLowerCase()} met AI
+        </button>`;
+    }
+  }
+
+  if (!content) return '';
+  return `<div style="padding:${forHome ? '10px 14px' : '12px 16px'};border-bottom:1px solid rgba(10,10,10,0.06);">
+      <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:#C8A882;margin-bottom:7px;">${icon} ${label}</div>
+      ${content}
+    </div>`;
+}
+
+function renderDagprogrammaBar() {
+  const el = document.getElementById('dagprog-ai-section');
+  if (!el) return;
+  const deelCards = ['ochtend','middag','avond'].map(d => _renderDagdeelCard(progDay, d, false)).join('');
+  el.innerHTML = `
+    <div style="background:#fff;border-radius:var(--r-lg);box-shadow:0 2px 12px rgba(10,10,10,0.07);overflow:hidden;margin-bottom:16px;">
+      <div style="padding:12px 16px 10px;border-bottom:1px solid rgba(10,10,10,0.06);">
+        <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#A89FE8;font-weight:700;">🗓️ AI dagprogramma · ${_DAG_LABELS[progDay]}</div>
+      </div>
+      ${deelCards || '<div style="padding:14px;font-size:0.8rem;color:#9A948E;">Geen API key ingesteld.</div>'}
+    </div>`;
+}
+
+// ── AI DAGPROGRAMMA — HOME SECTION ────────────────────────────────────────
+let _homeDagDay = 'vr26';
+
+function renderHomeDagprog() {
+  const el = document.getElementById('home-dagprog-section');
+  if (!el) return;
+  const apiKey = localStorage.getItem('claude_api_key') || '';
+  if (!apiKey) { el.innerHTML = ''; return; }
+
+  const tabs = ['vr26','za27','zo28'].map(d =>
+    `<button onclick="_homeDagSwitch('${d}')" style="flex:1;padding:7px 4px;border:none;border-radius:8px;font-family:var(--sans);font-size:0.72rem;font-weight:700;cursor:pointer;transition:all 0.15s;${_homeDagDay===d ? 'background:#0A0A0A;color:#F0E8E2;' : 'background:rgba(10,10,10,0.05);color:#6B6560;'}">${{vr26:'Vr 26',za27:'Za 27',zo28:'Zo 28'}[d]}</button>`
+  ).join('');
+
+  const deelCards = ['ochtend','middag','avond'].map(d => _renderDagdeelCard(_homeDagDay, d, true)).join('');
+
+  el.innerHTML = `
+    <div style="background:#fff;border-radius:var(--r-lg);box-shadow:0 2px 12px rgba(10,10,10,0.07);overflow:hidden;">
+      <div style="padding:12px 14px 10px;border-bottom:1px solid rgba(10,10,10,0.06);">
+        <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:0.9rem;color:#0A0A0A;margin-bottom:8px;">🗓️ Dagprogramma met AI</div>
+        <div style="display:flex;gap:4px;">${tabs}</div>
+      </div>
+      ${deelCards}
+    </div>`;
+}
+
+function _homeDagSwitch(day) {
+  _homeDagDay = day;
+  renderHomeDagprog();
 }
 
 // ── AI HOME CONTEXT (1 zin boven dagvoorstel cards) ───────────────────────
