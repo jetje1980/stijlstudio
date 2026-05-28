@@ -3364,6 +3364,38 @@ function renderPollChainDay(dag) {
   const progress = getDayProgress(dag);
   let html = '';
 
+  // AI multi-option avond proposals — show as first item so group can vote
+  const avondCached = _safeJSON(_dagDeelCacheKey(dag, 'avond'), null);
+  if (avondCached?.text) {
+    const opties = _parseOpties(avondCached.text);
+    if (opties && opties.length >= 2) {
+      const dk = `${dag}_avond`;
+      const reactions = _allDagReactions[dk] || {};
+      const accentColors = ['#A89FE8','#C8A882','#D4785A'];
+      html += `<div style="margin-bottom:14px;padding:12px 14px;background:#fff;border-radius:var(--r-lg);box-shadow:0 1px 8px rgba(10,10,10,0.07);">
+        <div style="font-size:0.58rem;letter-spacing:0.1em;font-weight:700;color:#A89FE8;margin-bottom:10px;text-transform:uppercase;">🌙 AI-avondopties — welke kies jij?</div>
+        ${opties.map((opt, i) => {
+          const color = accentColors[i] || '#A89FE8';
+          const voters = Object.entries(reactions).filter(([u,r]) => r?.optie === opt.letter);
+          const isChosen = reactions[currentUser]?.optie === opt.letter;
+          const chips = voters.map(([u]) => {
+            const p = PROFILES[u]; if (!p) return '';
+            return `<div style="width:17px;height:17px;border-radius:50%;background:${p.color};display:inline-flex;align-items:center;justify-content:center;font-size:0.52rem;color:#fff;font-weight:700;">${p.init}</div>`;
+          }).join('');
+          return `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:9px;margin-bottom:5px;background:${isChosen ? `color-mix(in srgb,${color} 12%,white)` : 'rgba(10,10,10,0.03)'};border:1.5px solid ${isChosen ? color : 'transparent'};">
+            <div style="width:20px;height:20px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:0.62rem;font-weight:800;color:#fff;flex-shrink:0;">${opt.letter}</div>
+            <div style="flex:1;font-size:0.76rem;font-weight:${isChosen ? '700' : '500'};color:#0A0A0A;">${opt.header}</div>
+            ${chips ? `<div style="display:flex;gap:2px;">${chips}</div>` : ''}
+            <button onclick="_setDagOptie('${dag}','avond','${opt.letter}')" style="border:none;border-radius:20px;padding:4px 10px;font-size:0.68rem;font-weight:700;cursor:pointer;white-space:nowrap;background:${isChosen ? color : 'rgba(10,10,10,0.06)'};color:${isChosen ? '#fff' : '#6B6560'};">
+              ${isChosen ? '✓' : 'Kies'}
+            </button>
+          </div>`;
+        }).join('')}
+        <div style="font-size:0.62rem;color:#C0BBB7;margin-top:6px;text-align:center;">Volledige opties in het dagprogramma ↑</div>
+      </div>`;
+    }
+  }
+
   if (progress.total > 0) {
     html += `<div style="font-size:0.68rem;color:#6B6560;margin-bottom:10px;">
       <span style="font-weight:600;color:#0A0A0A;">${progress.answered}</span> van ${progress.total} voorstellen beoordeeld
@@ -3771,10 +3803,10 @@ ${perPerson.join('\n')}
 
 AL GEBOEKT: ${bookings.length ? bookings.join(', ') : 'nog niks'}
 
-VASTE PLANNEN:
-- Vrijdag 26/6: aankomst Gare du Nord 11:56 → lunch → Baja Bikes fietstocht ~13:30–16:30 → check-in Airbnb → vrijdagavond vrij
-- Zaterdag 27/6: volledig vrij
-- Zondag 28/6: check-out voor 11u, vertrek`;
+VASTE PLANNEN & HARDE CONSTRAINTS:
+- Vrijdag 26/6: aankomst Gare du Nord 11:56 → Terminus Nord lunch → Baja Bikes 13:30–16:30 → check-in Airbnb ~17:00 → vrijdagavond vrij
+- Zaterdag 27/6: volledig vrij — geen vaste tijden
+- Zondag 28/6: check-out Airbnb VÓÓR 11:00 · Eurostar VERTREKT 16:25 Gare du Nord · check-in sluit 15:55 · uiterlijk 15:30 aanwezig op station · dus MAXIMAAL activiteiten tot 14:30–15:00 · koffers ophalen ~15:00 bij host`;
 }
 
 function openParisChatSheet() {
@@ -5081,7 +5113,7 @@ const _DAGDEEL_CTX = {
   },
   zo28: {
     ochtend: { vast: false, ai: 'Zondagochtend, laatste dag. Check-out voor 11u dus compact. Croissant-ritueel bij de boulangerie past perfect — Parijzenaren nemen 2u voor ontbijt op zondag. Café Pli opent 10u maar check-out is 11u, dus te krap voor een brief. Rustige wandeling kan wel. Max 1–2 activiteiten vóór 11u.' },
-    middag:  { vast: false, ai: 'Zondagmiddag na check-out (11u). Koffers gestald bij Airbnb of meegenomen. Laatste uren in Parijs. Wandelen, souvenirs, laatste terrasje, afscheid nemen. Canal de l\'Ourq of Promenade Plantée zijn rustige opties. Max 2 activiteiten.' },
+    middag:  { vast: false, ai: 'Zondagmiddag na check-out (11u). HARDE DEADLINE: Eurostar vertrekt 16:25 van Gare du Nord. Check-in sluit 15:55, dus uiterlijk 15:30 op station aanwezig. Koffers ophalen bij host om ~15:00. Activiteiten kunnen MAXIMAAL tot 14:30. Dus: rustige afscheidslunch + eventueel één korte wandeling. Geen museums, geen ver weg. Blijf in de buurt van Le Marais. Max 2 activiteiten.' },
     avond:   { vast: true,  label:'🚂 Terugreis naar huis', detail:'Afhankelijk van gekozen trein — einde citytrip' }
   }
 };
@@ -5110,6 +5142,39 @@ function _buildItemsCatalog() {
   }).join('\n');
 }
 
+function _getAlreadyPlannedVenues(excludeDay, excludeDeel) {
+  const found = [];
+  ['vr26','za27','zo28'].forEach(day => {
+    ['ochtend','middag','avond'].forEach(deel => {
+      if (day === excludeDay && deel === excludeDeel) return;
+      const cached = _safeJSON(_dagDeelCacheKey(day, deel), null);
+      if (!cached?.text) return;
+      (ITEMS_BASE || []).forEach(i => {
+        if (cached.text.toLowerCase().includes(i.naam.toLowerCase())) {
+          found.push(`${i.naam} (${_DAG_LABELS[day]} ${_DEEL_LABELS[deel]})`);
+        }
+      });
+    });
+  });
+  return [...new Set(found)];
+}
+
+async function _setDagOptie(day, deel, optie) {
+  const dk = `${day}_${deel}`;
+  if (!_allDagReactions[dk]) _allDagReactions[dk] = {};
+  const existing = _allDagReactions[dk][currentUser] || {};
+  const newVal = existing.optie === optie ? { ...existing, optie: null } : { ...existing, optie };
+  _allDagReactions[dk][currentUser] = newVal;
+  localStorage.setItem('vz_dagprog_react_' + dk, JSON.stringify(_allDagReactions[dk]));
+  supa.from('group_state').upsert(
+    { group_id: GROUP_ID, user_id: currentUser, key: `dagprog_react_${dk}`, value: newVal, updated_at: new Date().toISOString() },
+    { onConflict: 'group_id,user_id,key' }
+  ).then(() => {});
+  renderDagprogrammaBar();
+  renderHomeDagprog();
+  renderPollChainDay(_activePollDay);
+}
+
 function _parseOpties(text) {
   // Detect multi-option format: --- OPTIE A: ... --- or **OPTIE A** or OPTIE A:
   const marker = /(?:^|\n)\s*(?:---\s*)?(?:\*\*)?OPTIE\s+([ABC])[:\s—*]+([^\n]*)/gi;
@@ -5130,9 +5195,11 @@ async function generateDagdeel(day, deel) {
   if (!ctx || ctx.vast) return;
 
   const isAvond = deel === 'avond';
+  const alreadyPlanned = _getAlreadyPlannedVenues(day, deel);
   const systemBase = `Je bent reisassistent voor een vriendinnengroep (Griette, Frederike, Miriam, Marlinde) in Parijs 26–28 juni 2026. Airbnb: Rue de la Lune, 2e arr (Le Marais).
 REGELS: Groep gaat altijd samen. Geen vragen. Reageer in het Nederlands. Café Pli = brief schrijven die je over 1/5/20 jaar terugkrijgt — Griette's droomitem.
 Geef voorkeur aan gelikte items maar gebruik ook andere catalogus-items of web search als dat beter past.
+${alreadyPlanned.length ? `\nAL INGEPLAND OP ANDERE DAGEN (NIET herhalen — elk restaurant/plek slechts 1x tijdens de trip):\n${alreadyPlanned.join('\n')}` : ''}
 
 APP CATALOGUS:
 ${_buildItemsCatalog()}
@@ -5376,6 +5443,8 @@ function _renderDagdeelCard(day, deel, forHome) {
 
       let mainHtml = '';
       if (opties && opties.length >= 2) {
+        const dk = `${day}_${deel}`;
+        const reactions = _allDagReactions[dk] || {};
         mainHtml = opties.map((opt, i) => {
           const color = accentColors[i] || '#A89FE8';
           const bg = bgColors[i] || 'rgba(168,159,232,0.07)';
@@ -5384,10 +5453,22 @@ function _renderDagdeelCard(day, deel, forHome) {
             .replace(/⏰/g,`<span style="color:${color};">⏰</span>`)
             .replace(/^---.*---\n?/gm,'');
           const reservBanner = _renderReservBanner(_detectReservations(opt.body));
+          const voters = Object.entries(reactions).filter(([u,r]) => r?.optie === opt.letter);
+          const isChosen = reactions[currentUser]?.optie === opt.letter;
+          const voterChips = voters.map(([u]) => {
+            const p = PROFILES[u]; if (!p) return '';
+            return `<div style="width:18px;height:18px;border-radius:50%;background:${p.color};display:inline-flex;align-items:center;justify-content:center;font-size:0.55rem;color:#fff;font-weight:700;">${p.init}</div>`;
+          }).join('');
           return `<div style="border-radius:10px;background:${bg};border-left:3px solid ${color};padding:10px 12px;margin-bottom:8px;">
             <div style="font-size:0.6rem;letter-spacing:0.08em;font-weight:700;color:${color};margin-bottom:5px;text-transform:uppercase;">OPTIE ${opt.letter} — ${opt.header}</div>
             <div style="font-size:${sz};color:#0A0A0A;line-height:1.75;white-space:pre-wrap;">${fmt}</div>
             ${reservBanner}
+            <div style="display:flex;align-items:center;gap:6px;margin-top:8px;">
+              <button onclick="_setDagOptie('${day}','${deel}','${opt.letter}')" style="border:none;border-radius:20px;padding:5px 12px;font-size:0.7rem;font-weight:700;cursor:pointer;background:${isChosen ? color : 'rgba(10,10,10,0.06)'};color:${isChosen ? '#fff' : '#6B6560'};">
+                ${isChosen ? '✓ Jouw keuze' : '🙋 Kies dit'}
+              </button>
+              ${voterChips ? `<div style="display:flex;gap:3px;align-items:center;">${voterChips}</div>` : ''}
+            </div>
           </div>`;
         }).join('');
       } else {
