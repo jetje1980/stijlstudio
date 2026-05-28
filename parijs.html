@@ -2176,6 +2176,13 @@ function _applyGroupStateRow(key, uid, value) {
         _allBookings = typeof value === 'object' ? value : {};
         localStorage.setItem('vz_bookings', scalar(value));
       }
+      else if (key.startsWith('dagprog_')) {
+        if (typeof value === 'object' && value.text) {
+          localStorage.setItem('vz_' + key, JSON.stringify(value));
+          renderDagprogrammaBar();
+          renderHomeDagprog();
+        }
+      }
     } catch(e) {}
   }
 }
@@ -5014,7 +5021,7 @@ const _DAGDEEL_CTX = {
   vr26: {
     ochtend: { vast: true,  label:'🚂 Eurostar richting Parijs', detail:'Instappen 07:40 · Aankomst Gare du Nord 11:56' },
     middag:  { vast: true,  label:'12:30 Terminus Nord · 13:30–16:30 Baja Bikes · 17:00 check-in', detail:'Vaste tijden — al geregeld ✓' },
-    avond:   { vast: false, ai: 'Vrijdagavond in Parijs. De groep heeft net 3u gefietst (Baja Bikes) en is om 17:00 ingecheckt in Airbnb Rue de la Lune, 2e arr (Le Marais buurt). Ze zijn moe maar blij — eerste avond Parijs. Rustige avond: max 2 activiteiten dicht bij huis. Aperitief + diner. Geen lange reistijden.' }
+    avond:   { vast: false, ai: 'Vrijdagavond in Parijs. Na Baja Bikes zijn ze ingecheckt (17:00, Rue de la Lune, 2e arr) en hebben ze gedoucht en omgekleed. Ze willen de stad écht in — het is vrijdagavond Parijs, dat vier je. Opties: diner dicht bij Marais met goede sfeer, OF ergens naartoe met muziek/dans/vertier. Vrijdagavond = levendig, terrassen vol. Leg eerst een aperitief voor en dan een concreet dineradres. Ze vinden het leuk om echt ergens naartoe te gaan, niet thuishangen. Max 2 activiteiten.' }
   },
   za27: {
     ochtend: { vast: false, ai: 'Zaterdag ochtend, eerste volledige dag Parijs. Energie is hoog. Marché d\'Aligre open 8–13u (vers marktje, bloemen, brocante — 20 min lopen van Marais). Café Pli is een bijzonder concept: je schrijft een brief aan jezelf of een vriendin die je over 1, 5 of 20 jaar terugkrijgt. Stationery en koffie/thee inbegrepen. Opent 10u. Duurt ~1u. Griette heeft dit als droomitem aangemerkt — over 20 jaar ontvangen wij post uit Parijs 2026. Max 2–3 activiteiten.' },
@@ -5082,7 +5089,15 @@ ${buildGroupContext()}`,
     if (resp.ok) {
       const data = await resp.json();
       const text = data.content?.[0]?.text?.trim();
-      if (text) localStorage.setItem(_dagDeelCacheKey(day, deel), JSON.stringify({ text, ts: Date.now() }));
+      if (text) {
+        const record = { text, ts: Date.now(), by: currentUser };
+        localStorage.setItem(_dagDeelCacheKey(day, deel), JSON.stringify(record));
+        const supaKey = `dagprog_${day}_${deel}`;
+        supa.from('group_state').upsert(
+          { group_id: GROUP_ID, user_id: 'shared', key: supaKey, value: record, updated_at: new Date().toISOString() },
+          { onConflict: 'group_id,user_id,key' }
+        ).then(() => {});
+      }
     }
   } catch(e) {}
 }
@@ -5109,8 +5124,13 @@ function _renderDagdeelCard(day, deel, forHome) {
       const fmt = cached.text
         .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
         .replace(/⏰/g,'<span style="color:#A89FE8;">⏰</span>');
+      const byName = cached.by ? (PROFILES[cached.by]?.naam || cached.by) : null;
+      const byLabel = byName ? `door ${byName} · ` : '';
       content = `<div style="font-size:${sz};color:#0A0A0A;line-height:1.75;white-space:pre-wrap;">${fmt}</div>
-        <button onclick="_clearDagDeelCache('${day}','${deel}')" style="background:none;border:none;font-size:0.66rem;color:#B0AAA5;cursor:pointer;padding:4px 0 0;display:block;">↺ Nieuw genereren</button>`;
+        <div style="display:flex;align-items:center;gap:8px;margin-top:5px;">
+          ${byName ? `<span style="font-size:0.66rem;color:#B0AAA5;">${byLabel}</span>` : ''}
+          <button onclick="_clearDagDeelCache('${day}','${deel}')" style="background:none;border:none;font-size:0.66rem;color:#B0AAA5;cursor:pointer;padding:0;">↺ Nieuw genereren</button>
+        </div>`;
     } else if (apiKey) {
       content = `<button id="${btnId}" onclick="_genDagdeel('${day}','${deel}','${prefix}')"
           style="padding:8px 12px;border:1.5px dashed rgba(168,159,232,0.45);border-radius:9px;background:rgba(168,159,232,0.05);font-family:var(--sans);font-size:0.74rem;font-weight:700;color:#A89FE8;cursor:pointer;width:100%;text-align:left;">
