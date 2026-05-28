@@ -959,6 +959,8 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:300;font-style:italic;font-vari
       <button class="stab" onclick="switchProgDay('zo28',this)">Zo 28 juni</button>
     </div>
     <div id="prog-content" style="padding:12px 16px 32px;"></div>
+    <!-- AI DAGPROGRAMMA GENERATOR -->
+    <div id="dagprog-ai-section" style="padding:0 16px 16px;"></div>
     <!-- GROEPSPLAN CHIPS -->
     <div id="groepsplan-block" style="padding:0 16px 16px;display:none;">
       <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Groepskeuze</div>
@@ -3975,7 +3977,8 @@ function renderDagvoorstel() {
   el.style.display = 'block';
   el.innerHTML = `
     <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.05rem;color:#0A0A0A;padding:0 0 3px;">${sectionTitle}</div>
-    <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin-bottom:10px;">${sectionSub}</div>
+    <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin-bottom:8px;">${sectionSub}</div>
+    <div id="ai-home-context" style="display:none;"></div>
     ${cards.map(({item, likers}) => {
       const names = likers.map(u => PROFILES[u]?.naam).filter(Boolean);
       const iMeLiked = likers.includes(currentUser);
@@ -4012,6 +4015,12 @@ function renderDagvoorstel() {
     }).join('')}
     <button onclick="openParisChatSheetWith('Geef een slim voorstel voor de groep op basis van onze likes')" style="width:100%;padding:10px;border:1.5px dashed rgba(168,159,232,0.4);border-radius:14px;background:transparent;font-family:var(--sans);font-size:0.8rem;font-weight:600;color:#A89FE8;cursor:pointer;letter-spacing:0.03em;margin-top:2px;">🗺️ Vraag de assistent om een persoonlijk voorstel →</button>
   `;
+  // Async: enrich top card with a Claude-generated context sentence (cached 12h)
+  if (cards[0]) {
+    const { item, likers } = cards[0];
+    const lNames = likers.map(u => PROFILES[u]?.naam).filter(Boolean).join(', ');
+    _refreshAiHomeContext(item.id, item.naam, lNames || 'de groep');
+  }
 }
 
 function _dismissHomeCard(itemId) {
@@ -4990,6 +4999,123 @@ const PROG_CONTEXT = {
   }
 };
 
+// ── AI DAGPROGRAMMA GENERATOR ─────────────────────────────────────────────
+const _DAG_LABELS = {vr26:'Vrijdag 26 juni', za27:'Zaterdag 27 juni', zo28:'Zondag 28 juni'};
+const _DAG_NOTES  = {
+  vr26: 'Vaste tijden: aankomst Gare du Nord 11:56. Lunch ca 12:30. Baja Bikes fietstocht ca 13:30–16:30. Check-in Airbnb ca 17:00. Vrijdagavond vrij — moe van de reis, rustige start.',
+  za27: 'Volledige vrije zaterdag. Geen vaste tijden. Marché d\'Aligre open 8–13u. Vanves brocante 7–14u.',
+  zo28: 'Check-out voor 11u. Ochtend vrij, daarna richting station. Rustige start — geen druk programma.',
+};
+
+function renderDagprogrammaBar() {
+  const el = document.getElementById('dagprog-ai-section');
+  if (!el) return;
+  const apiKey = localStorage.getItem('claude_api_key') || '';
+  const cacheKey = 'vz_dagprog_' + progDay;
+  const cached = _safeJSON(cacheKey, null);
+
+  const resultHtml = cached ? `
+    <div style="margin-bottom:12px;padding:16px;background:#fff;border-radius:var(--r-lg);box-shadow:0 2px 12px rgba(10,10,10,0.07);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;">
+        <div style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:#A89FE8;font-weight:700;">🗓️ AI dagprogramma · ${_DAG_LABELS[progDay]}</div>
+        <button onclick="localStorage.removeItem('${cacheKey}');renderDagprogrammaBar()" style="background:none;border:none;font-size:0.7rem;color:#9A948E;cursor:pointer;flex-shrink:0;">↺ Nieuw</button>
+      </div>
+      <div style="font-size:0.82rem;color:#0A0A0A;line-height:1.75;white-space:pre-wrap;">${cached.text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^(OCHTEND|MIDDAG|AVOND)$/gm,'<div style="font-size:0.58rem;letter-spacing:0.12em;color:#C8A882;font-weight:700;margin:12px 0 6px;">$1</div>').replace(/⏰/g,'<span style="color:#A89FE8;">⏰</span>')}</div>
+    </div>` : '';
+
+  if (!apiKey) { el.innerHTML = resultHtml; return; }
+  el.innerHTML = resultHtml + `
+    <button onclick="generateDagprogramma('${progDay}')" id="dagprog-gen-btn" style="width:100%;padding:12px;border:1.5px dashed rgba(168,159,232,0.4);border-radius:14px;background:rgba(168,159,232,0.05);font-family:var(--sans);font-size:0.82rem;font-weight:700;color:#A89FE8;cursor:pointer;letter-spacing:0.03em;">
+      🗓️ ${cached ? 'Nieuw programma genereren' : 'Genereer dagprogramma voor ' + _DAG_LABELS[progDay]}
+    </button>`;
+}
+
+async function generateDagprogramma(day) {
+  const btn = document.getElementById('dagprog-gen-btn');
+  if (btn) { btn.innerHTML = '⏳ Claude denkt na…'; btn.disabled = true; }
+  const apiKey = localStorage.getItem('claude_api_key') || '';
+  if (!apiKey) return;
+
+  const userPrompt = `Maak een concreet dagprogramma voor ${_DAG_LABELS[day]} voor onze groep van 4.
+
+Dag: ${_DAG_NOTES[day]}
+
+Gebruik ALLEEN plekken die in de groepsdata voorkomen (geliked of geboekt). Verzin niets.
+Schrijf per dagdeel (OCHTEND / MIDDAG / AVOND) op een nieuwe regel:
+⏰ HH:MM — Naam plek — één zin waarom dit nu past
+
+Max 7 activiteiten totaal. Houd rekening met loopafstanden (max 20 min) en openingstijden.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 700,
+        system: `Je bent de reisassistent van een vriendinnengroep van 4 (Griette, Frederike, Miriam, Marlinde). Parijs 26–28 juni 2026. Verblijf: Rue de la Lune, 2e arr.
+REGELS: Nooit groep opsplitsen. Gebruik alleen items uit groepsdata. Geen vragen. Reageer in Nederlands.
+${buildGroupContext()}`,
+        messages: [{ role: 'user', content: userPrompt }],
+      }),
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      const text = data.content?.[0]?.text?.trim();
+      if (text) localStorage.setItem('vz_dagprog_' + day, JSON.stringify({ text, ts: Date.now() }));
+    }
+  } catch(e) {}
+  renderDagprogrammaBar();
+}
+
+// ── AI HOME CONTEXT (1 zin boven dagvoorstel cards) ───────────────────────
+async function _refreshAiHomeContext(itemId, itemNaam, likerNames) {
+  const apiKey = localStorage.getItem('claude_api_key') || '';
+  if (!apiKey) return;
+  const cacheKey = 'vz_ai_hctx_' + itemId;
+  const cached = _safeJSON(cacheKey, null);
+  if (cached && cached.ts && (Date.now() - cached.ts) < 43200000) {
+    _showAiHomeContext(cached.text); return;
+  }
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 80,
+        system: `Je geeft KORTE (max 25 woorden, 1 zin) persoonlijke context voor Parijs-activiteiten. Reageer in het Nederlands. ${buildGroupContext()}`,
+        messages: [{ role: 'user', content: `Één zin waarom "${itemNaam}" nu perfect past voor onze groep. Geliked door: ${likerNames}. Focus op het moment/de sfeer, niet de feiten.` }],
+      }),
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      const text = data.content?.[0]?.text?.trim().replace(/^["']|["']$/g, '');
+      if (text) {
+        localStorage.setItem(cacheKey, JSON.stringify({ text, ts: Date.now() }));
+        _showAiHomeContext(text);
+      }
+    }
+  } catch(e) {}
+}
+
+function _showAiHomeContext(text) {
+  const el = document.getElementById('ai-home-context');
+  if (!el || !text) return;
+  el.style.display = 'block';
+  el.innerHTML = `<div style="font-size:0.78rem;color:#6B5FA8;line-height:1.55;padding:9px 12px;background:rgba(168,159,232,0.08);border-radius:10px;border-left:2px solid rgba(168,159,232,0.4);margin-bottom:10px;font-style:italic;">✨ ${text}</div>`;
+}
+
 function renderProgramma() {
   const container = document.getElementById('prog-content');
   if (!container) return;
@@ -5021,6 +5147,7 @@ function renderProgramma() {
       </div>
     </div>`;
     renderGroepsplan();
+    renderDagprogrammaBar();
     return;
   }
 
@@ -5036,6 +5163,7 @@ function renderProgramma() {
 
   container.innerHTML = ctxHtml + fixedHtml + vibeHtml;
   renderGroepsplan();
+  renderDagprogrammaBar();
 }
 
 function toggleProgDone(slotKey) {
