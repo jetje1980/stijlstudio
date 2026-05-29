@@ -1,0 +1,1026 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Huisstijl Sheet — Reismerk Stedentrips</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,30..100,0..1;1,9..144,300..900,30..100,0..1&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ──────────────────────────────────────────────── */
+:root {
+  --lila:      #8E8CDE;
+  --lila-deep: #5B58B8;
+  --lila-soft: #E7E6F7;
+  --mint:      #C9E4D4;
+  --koraal:    #F2B7A4;
+  --boter:     #F4E3A1;
+  --hemel:     #BEDBE8;
+  --rose:      #EBC9D3;
+  --ivoor:     #FBF8F2;
+  --papier:    #F4EFE6;
+  --inkt:      #1B1B23;
+  --grijs:     #6B6B73;
+  --lijn:      #E0D9CE;
+}
+
+/* ─── RESET ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+/* ─── BASE ────────────────────────────────────────────────── */
+body {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--inkt);
+  background: var(--ivoor);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── TYPE SCALE ──────────────────────────────────────────── */
+h1, h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  line-height: 0.93;
+}
+h1 {
+  font-size: clamp(52px, 11vw, 104px);
+  font-variation-settings: "opsz" 144, "SOFT" 90, "WONK" 1;
+}
+h2 {
+  font-size: clamp(36px, 6vw, 58px);
+  font-variation-settings: "opsz" 72, "SOFT" 60;
+}
+
+.eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--lila-deep);
+}
+
+.lead {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(19px, 2.8vw, 24px);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.42;
+  color: var(--grijs);
+  font-variation-settings: "opsz" 60, "SOFT" 80;
+}
+
+/* ─── LAYOUT ──────────────────────────────────────────────── */
+.wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* Full-bleed helper — breaks out of .wrap */
+.bleed {
+  margin-left: -32px;
+  margin-right: -32px;
+}
+
+/* ─── HERO ────────────────────────────────────────────────── */
+.hero {
+  background: var(--lila-soft);
+  padding: 72px 32px 0;
+}
+.hero-inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.hero .eyebrow {
+  display: block;
+  margin-bottom: 36px;
+}
+.hero h1 .accent {
+  color: var(--lila-deep);
+}
+.hero-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 11px;
+  color: var(--grijs);
+  letter-spacing: 0.04em;
+  margin-top: 52px;
+  padding: 18px 0;
+  border-top: 1px solid rgba(91,88,184,0.18);
+}
+
+/* ─── SECTIONS ────────────────────────────────────────────── */
+.section {
+  padding: 80px 0 72px;
+  border-top: 1px solid var(--lijn);
+}
+.section:first-of-type { border-top: none; }
+
+/* Two-column section header: big italic number + title */
+.sec-row {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 0 28px;
+  align-items: start;
+  margin-bottom: 44px;
+}
+.sec-num {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(60px, 10vw, 88px);
+  line-height: 0.82;
+  color: var(--lila);
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  user-select: none;
+}
+.sec-title { }
+.sec-title h2 { margin-bottom: 10px; }
+.sec-sub {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--grijs);
+  margin-top: 6px;
+}
+
+/* Sub-heading inside section body */
+.body-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--grijs);
+  display: block;
+  margin: 40px 0 14px;
+}
+.body-label:first-child { margin-top: 0; }
+
+/* ─── SWATCHES ────────────────────────────────────────────── */
+/* Flush grid — hairline border as separator, no radius */
+.swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border: 1px solid var(--lijn);
+  background: var(--lijn);
+  gap: 1px;
+  margin-bottom: 32px;
+}
+@media (min-width: 540px) { .swatch-grid { grid-template-columns: repeat(4, 1fr); } }
+
+.swatch { background: var(--ivoor); }
+.swatch .chip { aspect-ratio: 5/4; }
+.swatch .meta {
+  padding: 10px 13px 13px;
+  border-top: 1px solid var(--lijn);
+}
+.swatch .name { font-size: 12px; font-weight: 600; }
+.swatch .hex {
+  font-size: 10px;
+  color: var(--grijs);
+  letter-spacing: 0.06em;
+  margin-top: 3px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Lila accent note */
+.color-note {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--grijs);
+  padding: 16px 18px;
+  border-left: 2px solid var(--lila);
+  background: var(--lila-soft);
+}
+.color-note strong { color: var(--inkt); }
+
+/* ─── TYPE CARDS ──────────────────────────────────────────── */
+/* No radius, minimal — label as header strip */
+.type-card {
+  border: 1px solid var(--lijn);
+  overflow: hidden;
+  background: white;
+  margin-bottom: 2px;
+}
+.type-card-label {
+  background: var(--papier);
+  border-bottom: 1px solid var(--lijn);
+  padding: 11px 20px;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--grijs);
+  font-weight: 600;
+}
+.type-card-body { padding: 28px 22px 26px; }
+
+.specimen-display {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(46px, 9vw, 80px);
+  line-height: 0.92;
+  font-weight: 300;
+  font-style: italic;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  color: var(--inkt);
+  margin-bottom: 18px;
+}
+.specimen-body {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--inkt);
+}
+
+.type-specs {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--lijn);
+  font-size: 11px;
+  color: var(--grijs);
+}
+.type-specs span {
+  padding: 2px 14px 2px 0;
+  margin-right: 14px;
+  border-right: 1px solid var(--lijn);
+}
+.type-specs span:last-child { border-right: none; }
+
+/* ─── CARDS GRID ──────────────────────────────────────────── */
+/* Flush-border grid — no gap, hairline separator, no radius */
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  background: var(--lijn);
+  border: 1px solid var(--lijn);
+  gap: 1px;
+}
+@media (min-width: 580px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+
+.card {
+  background: white;
+  padding: 24px 22px 26px;
+}
+.card.tint-lila  { background: var(--lila-soft); }
+.card.tint-papier { background: var(--papier); }
+.card.tint-inkt  { background: var(--inkt); }
+
+.card .k {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--lila-deep);
+  margin-bottom: 12px;
+}
+.card.tint-inkt .k { color: var(--lila); }
+
+.card p {
+  font-size: 14px;
+  line-height: 1.68;
+  color: var(--inkt);
+}
+.card.tint-inkt p { color: rgba(255,255,255,0.72); }
+.card p + p { margin-top: 10px; }
+
+/* ─── WOORDMERK ───────────────────────────────────────────── */
+.logo-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  background: var(--lijn);
+  border: 1px solid var(--lijn);
+  gap: 1px;
+  margin-top: 22px;
+}
+@media (min-width: 480px) { .logo-grid { grid-template-columns: 1fr 1fr; } }
+
+.logo-panel {
+  padding: 56px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.logo-panel.on-papier { background: var(--papier); }
+.logo-panel.on-foto   { background: linear-gradient(135deg, #697a62 0%, #a49372 55%, #c9a87c 100%); }
+
+.wordmark-demo {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(24px, 3.5vw, 34px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+.wordmark-demo.dark  { color: var(--inkt); }
+.wordmark-demo.light { color: #fff; }
+
+/* ─── COVERS — dark strip ─────────────────────────────────── */
+.covers-band {
+  background: #141418;
+  padding: 52px 32px 44px;
+  margin: 0 -32px;
+}
+.covers-band-inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.covers {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (min-width: 500px) { .covers { grid-template-columns: repeat(4, 1fr); } }
+
+.cover {
+  aspect-ratio: 0.64 / 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 14px 18px;
+  /* subtle noise texture */
+  background-image:
+    radial-gradient(circle at 28% 18%, rgba(255,255,255,0.28) 0, rgba(255,255,255,0) 52%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.3' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.055 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-blend-mode: multiply;
+  /* offset shadow: gives book-stack depth */
+  box-shadow:
+    4px 6px 0 0 rgba(0,0,0,0.45),
+    8px 12px 0 0 rgba(0,0,0,0.18);
+}
+.cover.c1 { background-color: var(--mint); }
+.cover.c2 { background-color: var(--koraal); }
+.cover.c3 { background-color: var(--boter); }
+.cover.c4 { background-color: var(--lila); }
+
+.cover .small {
+  font-size: 7px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(27,27,35,0.5);
+  font-weight: 600;
+}
+.cover .city {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(28px, 5.5vw, 38px);
+  line-height: 0.88;
+  color: var(--inkt);
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+.cover .elastic {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 7px;
+  background: rgba(27,27,35,0.25);
+  border-left: 1px solid rgba(255,255,255,0.3);
+}
+.covers-caption {
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255,255,255,0.28);
+  letter-spacing: 0.08em;
+  margin-top: 22px;
+}
+
+/* ─── WEBSITE MOCK ────────────────────────────────────────── */
+.site-mock {
+  border: 1px solid var(--lijn);
+  overflow: hidden;
+  background: white;
+  margin-bottom: 32px;
+}
+.mock-bar {
+  background: var(--papier);
+  padding: 10px 14px;
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--lijn);
+}
+.mock-bar i {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--lijn);
+  display: block;
+}
+.mock-hero {
+  aspect-ratio: 16/9;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0) 48%, rgba(0,0,0,0.44) 100%),
+    linear-gradient(135deg, #8a9a7a 0%, #c4ad8a 60%, #e0c194 100%);
+  position: relative;
+  padding: 18px;
+  color: white;
+}
+.mock-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+.mock-wordmark {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 15px;
+  font-variation-settings: "opsz" 60, "SOFT" 100, "WONK" 1;
+}
+.mock-title {
+  position: absolute;
+  bottom: 20px; left: 18px; right: 18px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(22px, 4vw, 34px);
+  line-height: 0.98;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+}
+.mock-body { padding: 18px 18px 22px; }
+.mock-sec-label {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-size: 18px;
+  margin-bottom: 10px;
+  font-variation-settings: "opsz" 60, "SOFT" 100;
+}
+.mock-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.mock-tile {
+  aspect-ratio: 1;
+  position: relative;
+  overflow: hidden;
+}
+.mock-tile.t1 { background: linear-gradient(135deg, #c5b9a1, #8a7560); }
+.mock-tile.t2 { background: linear-gradient(135deg, #a8c0b8, #5a7a6e); }
+.mock-tile.t3 { background: linear-gradient(135deg, #d4a89a, #94614f); }
+.mock-tile.t4 { background: linear-gradient(135deg, #e0c994, #a8854a); }
+.mock-tile-lbl {
+  position: absolute;
+  bottom: 5px; left: 6px;
+  font-size: 7px;
+  color: white;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+.mock-btn {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 8px 18px;
+  background: var(--inkt);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  border-radius: 999px;
+}
+.mock-portraits { display: flex; gap: 5px; margin-top: 13px; }
+.mock-portrait {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, #d6b89a, #a37c5c);
+}
+.mock-portrait:nth-child(2) { background: linear-gradient(135deg, #b9a8c8, #6e5a8a); }
+.mock-portrait:nth-child(3) { background: linear-gradient(135deg, #c8b89a, #8a755c); }
+.mock-portrait:nth-child(4) { background: linear-gradient(135deg, #a8b8c8, #5c7a8a); }
+
+/* ─── BULLET LISTS ────────────────────────────────────────── */
+ul.points {
+  list-style: none;
+  border-top: 1px solid var(--lijn);
+}
+ul.points li {
+  position: relative;
+  padding: 14px 0 14px 22px;
+  border-bottom: 1px solid var(--lijn);
+  font-size: 14px;
+  line-height: 1.65;
+}
+ul.points li::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 22px;
+  width: 9px; height: 1px;
+  background: var(--lila);
+}
+ul.points strong { font-weight: 600; }
+
+/* ─── QUOTE — dark full-bleed ─────────────────────────────── */
+.quote-band {
+  background: var(--inkt);
+  padding: 60px 32px;
+  margin: 0 -32px;
+}
+.quote-band-inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.quote-text {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(26px, 4.5vw, 42px);
+  line-height: 1.12;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  color: var(--lila-soft);
+  max-width: 720px;
+}
+.quote-source {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.28);
+  margin-top: 24px;
+}
+
+/* ─── TONE DO / DON'T ─────────────────────────────────────── */
+.tone-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  background: var(--lijn);
+  border: 1px solid var(--lijn);
+  gap: 1px;
+}
+@media (min-width: 540px) { .tone-grid { grid-template-columns: 1fr 1fr; } }
+
+.tone-col { background: white; padding: 24px 22px; }
+.tone-col h4 {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1.5px solid currentColor;
+}
+.tone-col.do   h4 { color: #2d6e4a; }
+.tone-col.dont h4 { color: #943434; }
+.tone-col p { font-size: 14px; line-height: 1.65; margin-bottom: 10px; }
+.tone-col p:last-child { margin-bottom: 0; }
+
+/* ─── SAMENVATTING — lila-soft full-bleed ─────────────────── */
+.samen-band {
+  background: var(--lila-soft);
+  padding: 64px 32px 72px;
+  margin: 72px -32px 0;
+  border-top: 1px solid rgba(91,88,184,0.14);
+}
+.samen-band-inner { max-width: 900px; margin: 0 auto; }
+
+/* ─── FOOTER ──────────────────────────────────────────────── */
+footer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 22px 32px 56px;
+  border-top: 1px solid var(--lijn);
+  font-size: 11px;
+  color: var(--grijs);
+  letter-spacing: 0.04em;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+footer .dot { color: var(--lila); }
+
+/* ─── UTILS ───────────────────────────────────────────────── */
+.note {
+  font-size: 11px;
+  color: var(--grijs);
+  letter-spacing: 0.03em;
+}
+.mt-sm { margin-top: 24px; }
+.mt-md { margin-top: 40px; }
+.mt-lg { margin-top: 56px; }
+
+/* ─── PRINT ───────────────────────────────────────────────── */
+@media print {
+  body { background: white; }
+  .covers-band, .quote-band, .samen-band { margin: 0; }
+  .section { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════════════════ -->
+<header class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">Huisstijl Sheet · Stedentrip-merk</span>
+    <h1>
+      Lokaal,<br>
+      <span class="accent">persoonlijk</span><br>
+      &amp; ongepolijst.
+    </h1>
+    <div class="hero-meta">
+      <span>Visuele identiteit · samenvatting</span>
+      <span>v1.0</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ══════════════════════════════════════════════════════════
+     01 ESSENTIE
+══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-row">
+    <div class="sec-num">01</div>
+    <div class="sec-title">
+      <h2>Essentie</h2>
+    </div>
+  </div>
+
+  <p class="lead">Een reismerk dat de stad teruggeeft aan de bewoner. Niet de top-tien, maar de zijstraat. Niet de mooiste foto, maar de echte. De huisstijl voelt aan als een papieren boekje in je achterzak: warm, tactiel, een beetje verweerd, met de hand samengesteld.</p>
+
+  <div class="grid2 mt-lg">
+    <div class="card tint-lila">
+      <span class="k">Karakter</span>
+      <p><strong>Authentiek</strong> — lokaal, zonder commerciële glans.</p>
+      <p><strong>Persoonlijk</strong> — jij bepaalt, wij doen het voorwerk.</p>
+      <p><strong>Betrokken</strong> — respect voor stad en bewoners.</p>
+    </div>
+    <div class="card tint-papier">
+      <span class="k">Aanvoelen</span>
+      <p>Warm papier, daglicht, koffie van een onbekend tentje. Geen glossy reisfolder, geen neon-marketingtaal. Het merk fluistert tipjes in je oor in plaats van te schreeuwen.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     02 KLEUR
+══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-row">
+    <div class="sec-num">02</div>
+    <div class="sec-title">
+      <h2>Kleur</h2>
+      <p class="sec-sub">Een rustig pasteltapijt met één onverwacht digitaal accent: een zacht lila dat overal als signaalkleur terugkeert.</p>
+    </div>
+  </div>
+
+  <span class="body-label">Primair</span>
+  <div class="swatch-grid">
+    <div class="swatch">
+      <div class="chip" style="background:var(--lila)"></div>
+      <div class="meta"><div class="name">Lila Signaal</div><div class="hex">#8E8CDE</div></div>
+    </div>
+    <div class="swatch">
+      <div class="chip" style="background:var(--lila-deep)"></div>
+      <div class="meta"><div class="name">Diep Lila</div><div class="hex">#5B58B8</div></div>
+    </div>
+    <div class="swatch">
+      <div class="chip" style="background:var(--ivoor); border-bottom:1px solid var(--lijn);"></div>
+      <div class="meta"><div class="name">Papier-ivoor</div><div class="hex">#FBF8F2</div></div>
+    </div>
+    <div class="swatch">
+      <div class="chip" style="background:var(--inkt)"></div>
+      <div class="meta"><div class="name">Inkt</div><div class="hex">#1B1B23</div></div>
+    </div>
+  </div>
+
+  <span class="body-label">Pastels — covers &amp; accenten</span>
+  <div class="swatch-grid">
+    <div class="swatch">
+      <div class="chip" style="background:var(--mint)"></div>
+      <div class="meta"><div class="name">Mint</div><div class="hex">#C9E4D4</div></div>
+    </div>
+    <div class="swatch">
+      <div class="chip" style="background:var(--koraal)"></div>
+      <div class="meta"><div class="name">Koraal</div><div class="hex">#F2B7A4</div></div>
+    </div>
+    <div class="swatch">
+      <div class="chip" style="background:var(--boter)"></div>
+      <div class="meta"><div class="name">Boterzon</div><div class="hex">#F4E3A1</div></div>
+    </div>
+    <div class="swatch">
+      <div class="chip" style="background:var(--hemel)"></div>
+      <div class="meta"><div class="name">Hemel</div><div class="hex">#BEDBE8</div></div>
+    </div>
+  </div>
+
+  <div class="color-note">
+    <strong>Kleurprincipe: één pastel per drager.</strong> Pastels strijden nooit — ze worden geïsoleerd ingezet. Lila is het enige dat zich over alle dragers uitstrekt, als verbindend digitaal anker.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     03 TYPOGRAFIE
+══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-row">
+    <div class="sec-num">03</div>
+    <div class="sec-title">
+      <h2>Typografie</h2>
+      <p class="sec-sub">Een warme, humanistische schreef voor karakter — een neutrale grotesk voor leesbaarheid.</p>
+    </div>
+  </div>
+
+  <div class="type-card">
+    <div class="type-card-label">Display · Humanistische schreef</div>
+    <div class="type-card-body">
+      <div class="specimen-display">Onbekende<br>straatjes</div>
+      <p style="color:var(--grijs);font-size:13px;line-height:1.65;">Gebruikt voor titels, paginakoppen en boekomslagen. Vaak in <em>cursief</em> voor extra warmte. Lichte gewichten domineren — nooit fet of geforceerd.</p>
+      <div class="type-specs">
+        <span>Fraunces · Recoleta · DM Serif Display</span>
+        <span>Gewicht 300–400</span>
+        <span>Vooral italic</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="type-card">
+    <div class="type-card-label">Body · Geometrische sans</div>
+    <div class="type-card-body">
+      <p class="specimen-body" style="font-size:17px;line-height:1.62;">Hier woont de uitleg. Geen pretentie, geen marketingtaal — gewoon korte zinnen die je in een gesprek óók zou gebruiken. Tweede persoon. Veel werkwoorden.</p>
+      <div class="type-specs">
+        <span>Manrope · DM Sans · GT Walsheim</span>
+        <span>400 regulier · 600 semi-bold</span>
+        <span>Geen schreef</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2 mt-md">
+    <div class="card">
+      <span class="k">Hiërarchie</span>
+      <p>Groot–klein contrast. Het oog springt van koerswoord direct naar lopende tekst. Tussenniveaus zijn schaars; subkoppen alleen waar nodig.</p>
+    </div>
+    <div class="card">
+      <span class="k">Houding</span>
+      <p>Lowercase waar het kan. Veel lucht. Geen onderstrepingen, geen kapitalen voor nadruk — alleen vet of cursief, spaarzaam.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     04 WOORDMERK
+══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-row">
+    <div class="sec-num">04</div>
+    <div class="sec-title">
+      <h2>Woordmerk</h2>
+    </div>
+  </div>
+
+  <p style="font-size:14px;line-height:1.72;color:var(--grijs);max-width:580px;">Een puur typografisch logo. Drie woorden, lowercase, in dezelfde humanistische schreef als de display-typografie. Geen icoon, geen symbool, geen monogram — het merk leunt volledig op zijn naam en zijn fotografie. Zowel diapositief als positief toegepast. Geen vaste lockup met tagline.</p>
+
+  <div class="logo-grid">
+    <div class="logo-panel on-papier">
+      <div class="wordmark-demo dark">woordmerk in inkt</div>
+    </div>
+    <div class="logo-panel on-foto">
+      <div class="wordmark-demo light">woordmerk in wit</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     05 GIDSCOVERS
+══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-row">
+    <div class="sec-num">05</div>
+    <div class="sec-title">
+      <h2>Gidscovers</h2>
+      <p class="sec-sub">Het meest tactiele onderdeel van de huisstijl — rij macarons in de boekhandel.</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap — covers full-bleed -->
+
+<div class="covers-band bleed">
+  <div class="covers-band-inner">
+    <div class="covers">
+      <div class="cover c1">
+        <span class="small">stedengids</span>
+        <span class="city">Stad<br>één</span>
+        <div class="elastic"></div>
+      </div>
+      <div class="cover c2">
+        <span class="small">stedengids</span>
+        <span class="city">Stad<br>twee</span>
+        <div class="elastic"></div>
+      </div>
+      <div class="cover c3">
+        <span class="small">stedengids</span>
+        <span class="city">Stad<br>drie</span>
+        <div class="elastic"></div>
+      </div>
+      <div class="cover c4">
+        <span class="small">stedengids</span>
+        <span class="city">Stad<br>vier</span>
+        <div class="elastic"></div>
+      </div>
+    </div>
+    <p class="covers-caption">Indicatieve mockups · echte gidsfoto's weggelaten.</p>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div style="padding-top:56px;">
+    <span class="body-label">Formaat &amp; materiaal</span>
+    <ul class="points">
+      <li><strong>Pocket-formaat</strong> — circa 12 × 18 cm, past in een jaszak. Bewust kleiner dan een gemiddeld reisboek.</li>
+      <li><strong>Linnen-look kaft</strong> in jubileumedities: een geweven papierstructuur. Geen gladde glanslak.</li>
+      <li><strong>Elastiek</strong> in toon-op-toon kleur, aan de rug bevestigd. Functioneel én visueel handschrift van het merk.</li>
+      <li><strong>Stickervel</strong> en <strong>notitiepagina's</strong> binnenin — de gids is iets dat de reiziger zelf invult.</li>
+    </ul>
+
+    <span class="body-label mt-md" style="display:block;">Kleur per cover</span>
+    <p style="font-size:14px;line-height:1.72;">Elke stad krijgt één eigen pasteltint. Geen wet die zegt "Parijs is roze" — maar wel een vaste familie: <strong>frisse, ontspannen pastels</strong> (mint, koraal, zachtgeel, lila, hemelblauw). De kleur staat alleen, vlak, zonder verloop. Daardoor staan de boekjes naast elkaar als een rij macarons.</p>
+
+    <span class="body-label mt-md" style="display:block;">Wat de cover bewust niét doet</span>
+    <ul class="points">
+      <li>Geen iconische stadsfoto op de voorkant. Het beeld zit binnenín — de cover blijft een rustig vlak.</li>
+      <li>Geen logo-explosie. Uitgeverslogo klein onderaan of op de rug.</li>
+      <li>Geen schreeuwerige stickers ("Nieuw!", "Bestseller").</li>
+    </ul>
+    <p style="font-size:14px;line-height:1.72;margin-top:24px;">Op een tafel met concurrenten valt het juist op door <em>terughouding</em>. Waar Lonely Planet en DK schreeuwen met fullbleed foto's en gele banden, doet deze reeks het tegenovergestelde: één kleur, één naam, één elastiek. Die rust is het hele commerciële argument.</p>
+  </div>
+
+<!-- ══════════════════════════════════════════════════════════
+     06 WEBSITE-OPMAAK
+══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-row">
+    <div class="sec-num">06</div>
+    <div class="sec-title">
+      <h2>Website</h2>
+      <p class="sec-sub">Hoe de identiteit zich digitaal uitvouwt.</p>
+    </div>
+  </div>
+
+  <div class="site-mock">
+    <div class="mock-bar"><i></i><i></i><i></i></div>
+    <div class="mock-hero">
+      <div class="mock-nav">
+        <div class="mock-wordmark">woordmerk</div>
+        <div style="font-size:9px;letter-spacing:0.18em;">MENU</div>
+      </div>
+      <div class="mock-title">Tijd voor jouw<br>stedentrip.</div>
+    </div>
+    <div class="mock-body">
+      <div class="mock-sec-label">Populaire bestemmingen</div>
+      <div class="mock-tiles">
+        <div class="mock-tile t1"><span class="mock-tile-lbl">STAD</span></div>
+        <div class="mock-tile t2"><span class="mock-tile-lbl">STAD</span></div>
+        <div class="mock-tile t3"><span class="mock-tile-lbl">STAD</span></div>
+        <div class="mock-tile t4"><span class="mock-tile-lbl">STAD</span></div>
+      </div>
+      <div style="margin-top:18px;">
+        <div class="mock-sec-label">Onze locals</div>
+        <div class="mock-portraits">
+          <div class="mock-portrait"></div>
+          <div class="mock-portrait"></div>
+          <div class="mock-portrait"></div>
+          <div class="mock-portrait"></div>
+        </div>
+      </div>
+      <a class="mock-btn">Kies je stad</a>
+    </div>
+  </div>
+  <p class="note" style="margin-bottom:36px;">Schematische weergave · fotografie weggelaten.</p>
+
+  <span class="body-label">Layoutprincipes</span>
+  <ul class="points">
+    <li><strong>Foto's regeren.</strong> De homepage opent met een grote, paginabrede stadsfoto. Tekst erbovenop in wit, gradient onderaan voor leesbaarheid.</li>
+    <li><strong>Vierkante tegels.</strong> Bestemmingen en locals in vierkante miniaturen. Vierkant = democratisch — elke stad krijgt evenveel ruimte.</li>
+    <li><strong>Horizontaal scrollen op mobiel.</strong> Lijstjes zijn carrousels die je naar rechts veegt.</li>
+    <li><strong>Veel papier-ivoor</strong> tussen secties. De pagina ademt — geen volgepropte boven-de-vouw.</li>
+  </ul>
+
+  <span class="body-label mt-md" style="display:block;">Lila als digitaal anker</span>
+  <p style="font-size:14px;line-height:1.72;">Online verschijnt het lila (#8E8CDE) als browser-themakleur, in subtiele highlightvakken, hover-states en gemarkeerde citaten. Het is het enige element dat de website een eigen digitale signatuur geeft naast de fotografie. Op print blijft het lila ondergeschikt aan de stadskleur van de cover.</p>
+
+  <span class="body-label mt-md" style="display:block;">Navigatie &amp; interactie</span>
+  <ul class="points">
+    <li><strong>Pilvormige knoppen</strong> — zwart, witte tekst, geen schaduw. Één per sectie.</li>
+    <li>Top-balk minimaal: woordmerk links, hamburger rechts. Geen megamenu's.</li>
+    <li>Hover-effecten discreet: lichte opacity-shift of onderstrepinkje. Geen wapperende animaties.</li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     07 BEELDTAAL
+══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-row">
+    <div class="sec-num">07</div>
+    <div class="sec-title">
+      <h2>Beeldtaal</h2>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <span class="k">Fotografie</span>
+      <p>Daglicht, natuurlijke kleuren, geen zware filters of HDR. Het beeld voelt aan als <em>"daar stond ik gisteren"</em> — niet als een commerciële campagne.</p>
+      <p>Liever de bijkeuken dan de gevel. Liever de barista dan de espressomachine.</p>
+    </div>
+    <div class="card">
+      <span class="k">Portretten</span>
+      <p>De lokale gids krijgt een eigen vierkant portret in haar of zijn eigen omgeving. Recht in de camera, vriendelijk, geen pose. Het merk wordt menselijk.</p>
+    </div>
+    <div class="card">
+      <span class="k">Composities</span>
+      <p>Op ooghoogte. Geen drones, geen panorama-glamour. Lichte over-belichting in interieurs is toegestaan — het werkt als "memorie-look".</p>
+    </div>
+    <div class="card">
+      <span class="k">Cropping</span>
+      <p>Vierkant voor mensen en plekken; landschap voor sfeer-headers. Geen extreme close-ups, geen vignet. Foto's blijven adembaar.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     08 TOON
+══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-row">
+    <div class="sec-num">08</div>
+    <div class="sec-title">
+      <h2>Toon van schrijven</h2>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap — quote full-bleed -->
+
+<div class="quote-band bleed">
+  <div class="quote-band-inner">
+    <p class="quote-text">"Jij bepaalt waar je overnacht, wat je ziet, en op welk tempo. Wij doen het voorwerk."</p>
+    <div class="quote-source">Voorbeeld · typisch merkzin</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div style="padding-top:48px;">
+    <div class="tone-grid">
+      <div class="tone-col do">
+        <h4>Wel</h4>
+        <p>Tweede persoon enkelvoud — jij, je, jouw. Altijd.</p>
+        <p>Korte zinnen. Veel werkwoorden. Concrete voorbeelden.</p>
+        <p>Lowercase waar het mag. Een knipoog mag.</p>
+        <p>Zeg "we" als merk — geen "Time to" of "ons platform".</p>
+      </div>
+      <div class="tone-col dont">
+        <h4>Niet</h4>
+        <p>Geen u-vorm, geen formeel bedrijfsjargon.</p>
+        <p>Geen superlatiefenstapeling ("absolute must-do!").</p>
+        <p>Geen hashtags in lopende tekst. Geen emoji-overdaad.</p>
+        <p>Geen mysterieuze marketing-zinnen zonder concrete inhoud.</p>
+      </div>
+    </div>
+  </div>
+
+<!-- ══════════════════════════════════════════════════════════
+     09 SAMENVATTING
+══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-row">
+    <div class="sec-num">09</div>
+    <div class="sec-title">
+      <h2>Eén alinea</h2>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap — samenvatting full-bleed -->
+
+<div class="samen-band bleed">
+  <div class="samen-band-inner">
+    <p class="lead">Een warme, papieren huisstijl met één digitale signatuurkleur. Pasteltinten dragen de print, lila draagt het scherm. De typografie is humanistisch en cursief waar het kan; de toon is bondig en in de tweede persoon. Fotografie is daglicht en op ooghoogte. Het logo doet weinig — het systeem doet alles.</p>
+  </div>
+</div>
+
+<footer>
+  <span>Huisstijl Sheet <span class="dot">·</span> visuele analyse</span>
+  <span>Reverse-engineered uit publiek waarneembare uitingen</span>
+</footer>
+
+</body>
+</html>
