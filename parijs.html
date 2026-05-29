@@ -878,6 +878,28 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
 .home-ai-sub { font-family:var(--sans);font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px; }
 .home-ai-arrow { margin-left:auto;color:rgba(255,255,255,0.4);font-size:1.1rem;flex-shrink:0; }
 
+/* Probleem 4: groep-header */
+.groep-header {
+  padding:20px 20px 16px;border-bottom:1px solid var(--lijn);
+  background:var(--ivoor);position:sticky;top:0;z-index:80;
+}
+.groep-header-title {
+  font-family:var(--serif);font-style:italic;font-weight:300;
+  font-size:28px;color:var(--inkt);line-height:1.1;margin-bottom:4px;
+  font-variation-settings:"opsz" 72,"SOFT" 60,"WONK" 1;
+}
+.groep-header-sub { font-family:var(--sans);font-size:12px;color:var(--grijs); }
+.groep-status-row {
+  display:flex;gap:10px;padding:12px 20px 4px;
+  overflow-x:auto;scrollbar-width:none;
+}
+.groep-stat-chip {
+  flex-shrink:0;padding:8px 14px;background:var(--papier);
+  border:1px solid var(--lijn);border-radius:100px;
+  font-family:var(--sans);font-size:12px;color:var(--inkt);white-space:nowrap;
+}
+.groep-stat-chip strong { color:var(--lila-deep); }
+
 /* Probleem 3: streak-legenda */
 .home-streak-legend {
   font-family:var(--sans);font-size:10px;color:var(--grijs);
@@ -1281,14 +1303,13 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
 
   <!-- GROEP -->
   <section id="sec-groep" class="section">
-    <div class="sec-photo-header">
-      <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=75" loading="lazy" alt="">
-      <div class="sec-photo-header-grad"></div>
-      <div class="sec-photo-header-text">
-        <div class="sec-photo-header-title">Groep</div>
-        <div class="sec-photo-header-sub">Jullie Vroegzat weekend</div>
-      </div>
+    <div class="groep-header">
+      <span class="eyebrow">Vroegzat</span>
+      <div class="groep-header-title">Jullie trip, jullie keuzes</div>
+      <div class="groep-header-sub">Matches · verlanglijstje · kosten</div>
     </div>
+
+    <div class="groep-status-row" id="groep-status-row"></div>
 
     <!-- PROFIELEN -->
     <div id="groep-profielen" style="margin:0;padding:16px 20px 4px;"></div>
@@ -1728,7 +1749,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
     </button>
     <button class="nav-btn" onclick="switchTab('swipe',this)">
       <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
-      Beleef
+      Swipe
     </button>
     <button class="nav-btn" onclick="switchTab('groep',this)">
       <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
@@ -1740,7 +1761,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
     </button>
     <button class="nav-btn" onclick="switchTab('meer',this)">
       <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
-      Meer
+      Plan
     </button>
   </nav>
 </div>
@@ -6314,7 +6335,21 @@ function toggleFav(id) {
 }
 
 // ── GROEP ─────────────────────────────────────────
+function renderGroepStatus() {
+  const el = document.getElementById('groep-status-row');
+  if (!el) return;
+  const users = ['griette','frederike','miriam','marlinde'];
+  const matchCount = document.querySelectorAll('#groep-matches .match-card').length;
+  const swipedCount = users.filter(u => Object.keys(_allSwipes[u] || {}).length > 0).length;
+  el.innerHTML = `
+    <div class="groep-stat-chip">👆 <strong>${swipedCount}/4</strong> geswipet</div>
+    <div class="groep-stat-chip">💜 <strong>${matchCount}</strong> matches</div>
+    <div class="groep-stat-chip">📅 26–28 juni · Le Marais</div>
+  `;
+}
+
 function renderGroep() {
+  renderGroepStatus();
   renderSlaapIndeling();
   renderProfileBios();
   // Must-haves
