@@ -3754,7 +3754,7 @@ function buildGroupContext() {
     ['Bewust/selectief','Normaal budget','Dit is een uitje — geef me over'],
   ];
 
-  // Exact like counts per item across the whole group
+  // Group likes per item
   const groupLiked = {};
   users.forEach(u => {
     const sw = _allSwipes[u] || _safeJSON('vz_swipes_'+u, {});
@@ -3774,31 +3774,56 @@ function buildGroupContext() {
       return item ? `${item.naam} [${names.join('+')}]` : null;
     }).filter(Boolean);
 
-  // Per-person
+  // Shared vibes: find per-category answers agreed by 2+ people
+  const personVibes = {};
+  users.forEach(u => {
+    const vk = _allVoorkeur[u] || _safeJSON('vz_voorkeur_'+u, []);
+    personVibes[u] = vk.slice(0, 8).map(a => Array.isArray(a) ? a[0] : (typeof a === 'number' ? a : null));
+  });
+  const sharedVibes = [];
+  for (let cat = 0; cat < 8; cat++) {
+    const byAnswer = {};
+    users.forEach(u => {
+      const idx = personVibes[u]?.[cat];
+      if (typeof idx === 'number') {
+        if (!byAnswer[idx]) byAnswer[idx] = [];
+        byAnswer[idx].push(PROFILES[u]?.naam || u);
+      }
+    });
+    Object.entries(byAnswer).forEach(([idx, names]) => {
+      if (names.length >= 2) {
+        const label = VIBES_NAMES[cat]?.[parseInt(idx)];
+        if (label) sharedVibes.push(`"${label}" [${names.join('+')}]`);
+      }
+    });
+  }
+
+  // Per-person likes + individual vibes that differ from the group
   const perPerson = users.map(u => {
     const sw = _allSwipes[u] || _safeJSON('vz_swipes_'+u, {});
     const liked = Object.entries(sw)
       .filter(([, v]) => v === 1 || v === 'like' || v === 'dream')
       .map(([id]) => ITEMS_BASE.find(i => i.id === id)?.naam).filter(Boolean).slice(0, 5);
-    const vk = _allVoorkeur[u] || _safeJSON('vz_voorkeur_'+u, []);
-    const vibes = vk.slice(0, 8).map((a, i) => {
-      const idx = Array.isArray(a) ? a[0] : a;
-      return typeof idx === 'number' ? VIBES_NAMES[i]?.[idx] : null;
-    }).filter(Boolean).slice(0, 3);
+    const vibes = (personVibes[u] || []).map((idx, cat) =>
+      typeof idx === 'number' ? VIBES_NAMES[cat]?.[idx] : null
+    ).filter(Boolean).slice(0, 3);
     const bio = _allBios[u] || localStorage.getItem('vz_profile_bio_'+u) || '';
-    return `${PROFILES[u]?.naam}: likes=[${liked.join('; ')}] voorkeuren=[${vibes.join('; ')}]${bio ? ' info='+bio : ''}`;
+    return `${PROFILES[u]?.naam}: likes=[${liked.join('; ') || '—'}] vibes=[${vibes.join('; ') || '—'}]${bio ? ' · ' + bio : ''}`;
   });
 
   // Bookings
   const bookings = Object.entries(_allBookings || {}).map(([id, b]) => {
     const r = RESERVEER_ITEMS?.find(r => r.id === id);
-    return r ? `${r.naam} (geboekt door ${PROFILES[b.by]?.naam || b.by})` : null;
+    return r ? `${r.naam} (door ${PROFILES[b.by]?.naam || b.by})` : null;
   }).filter(Boolean);
 
-  return `GROEPSMATCHES (exact, alleen items met 2+ likes):
+  return `GEDEELDE GROEPSVOORKEUREN (meeste mensen hetzelfde gekozen — weeg dit zwaar mee):
+${sharedVibes.length ? sharedVibes.join('\n') : 'Nog niet genoeg data'}
+
+GROEPSMATCHES (items die 2+ mensen hebben geliked):
 ${groupMatches.length ? groupMatches.join('\n') : 'Nog onvoldoende data'}
 
-PER PERSOON (alleen echte data, niet aanvullen):
+PER PERSOON:
 ${perPerson.join('\n')}
 
 AL GEBOEKT: ${bookings.length ? bookings.join(', ') : 'nog niks'}
@@ -5107,7 +5132,7 @@ const _DAGDEEL_CTX = {
     avond:   { vast: false, ai: 'Vrijdagavond Parijs. Na Baja Bikes (13:30-16:30) en check-in om 17:00 hebben ze gedoucht en omgekleed. Ze willen de stad écht in — het is vrijdagavond. Geef 3 opties met verschillende vibes: A) aperitief + sfeervol diner dicht bij Le Marais (loopafstand), B) ergens naartoe met muziek of dancing (zoek floating bar op de Seine of live muziek venue in Marais via web search), C) iets totaal anders verassends. Max 2 activiteiten per optie. Vrijdagavond = ze zijn moe maar willen er toch echt iets van maken — de intensiteit mag meebewegen.', multiOptie: true }
   },
   za27: {
-    ochtend: { vast: false, ai: 'Zaterdag ochtend, eerste volledige dag Parijs. Energie is hoog. Marché d\'Aligre open 8–13u (vers marktje, bloemen, brocante — 20 min lopen van Marais). Café Pli is een bijzonder concept: je schrijft een brief aan jezelf of een vriendin die je over 1, 5 of 20 jaar terugkrijgt. Stationery en koffie/thee inbegrepen. Opent 10u. Duurt ~1u. Griette heeft dit als droomitem aangemerkt — over 20 jaar ontvangen wij post uit Parijs 2026. Max 2–3 activiteiten.' },
+    ochtend: { vast: false, ai: 'Zaterdag ochtend, eerste volledige dag Parijs. Energie is hoog. Marché d\'Aligre open 8–13u (vers marktje, bloemen, brocante — 20 min lopen van Marais). Café Pli is een bijzonder concept: je schrijft een brief aan jezelf of een vriendin die je over 1, 5 of 20 jaar terugkrijgt. Stationery en koffie/thee inbegrepen. Opent 10u. Duurt ~1u. Over 20 jaar ontvangen wij post uit Parijs 2026. Max 2–3 activiteiten.' },
     middag:  { vast: false, ai: 'Zaterdagmiddag in Le Marais / Parijs. Fris en vrij. Veel keuze: musea, vintage winkels (Le Marais = beste vintage buurt), Canal Saint-Martin wandeling, terrasje. Café Pli is ook op de middag goed als het ochtend niet lukte (open tot 21u). Max 2–3 activiteiten.' },
     avond:   { vast: false, ai: 'Zaterdagavond — dé avond in Parijs. Geef 3 opties met totaal verschillende vibes:\nA) Dansen & vertier: floating bar of dancing op de Seine (bijv. Cargo Queen op de Seine, Batofar, of dancing in Le Marais) — zoek via web search wat er op 27 juni 2026 open is en past\nB) Lang tafelen: aperitief + echt Parijs diner, bijv. Chez Janou (Provençaals, reservering nodig, pastis), of Le Mary Celeste (cocktails + sharing plates, donker en sfeervol)\nC) Zonsondergang Montmartre: ~21:30 is het magisch goud bij Sacré-Cœur (juni = laat licht), gevolgd door diner in de buurt. 30 min metro vanuit Marais.\nMax 2 activiteiten per optie. Airbnb: Rue de la Lune, 2e arr.', multiOptie: true }
   },
@@ -5197,7 +5222,7 @@ async function generateDagdeel(day, deel) {
   const isAvond = deel === 'avond';
   const alreadyPlanned = _getAlreadyPlannedVenues(day, deel);
   const systemBase = `Je bent reisassistent voor een vriendinnengroep (Griette, Frederike, Miriam, Marlinde) in Parijs 26–28 juni 2026. Airbnb: Rue de la Lune, 2e arr (Le Marais).
-REGELS: Groep gaat altijd samen. Geen vragen. Reageer in het Nederlands. Café Pli = brief schrijven die je over 1/5/20 jaar terugkrijgt — Griette's droomitem.
+REGELS: Groep gaat altijd samen. Geen vragen. Reageer in het Nederlands. Café Pli = bijzonder concept: brief schrijven die je over 1/5/20 jaar terugkrijgt.
 Geef voorkeur aan gelikte items maar gebruik ook andere catalogus-items of web search als dat beter past.
 ${alreadyPlanned.length ? `\nAL INGEPLAND OP ANDERE DAGEN (NIET herhalen — elk restaurant/plek slechts 1x tijdens de trip):\n${alreadyPlanned.join('\n')}` : ''}
 
