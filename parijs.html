@@ -540,6 +540,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:300;font-style:italic;font-vari
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+<div id="newq-popup" style="display:none;opacity:0;transition:opacity 0.3s;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);width:calc(100% - 40px);max-width:480px;background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(10,10,10,0.15);padding:14px 16px;z-index:900;border:1.5px solid rgba(168,159,232,0.3);"></div>
 
 <!-- PROFIELFOTO UPLOAD -->
 <input type="file" id="photo-upload-input" accept="image/*" style="display:none;" onchange="handlePhotoUpload(this)">
@@ -2176,6 +2177,11 @@ function _applyGroupStateRow(key, uid, value) {
         _allBookings = typeof value === 'object' ? value : {};
         localStorage.setItem('vz_bookings', scalar(value));
       }
+      else if (key === 'claude_api_key') {
+        if (typeof value === 'string' && value.startsWith('sk-')) {
+          localStorage.setItem('claude_api_key', value);
+        }
+      }
       else if (key.startsWith('dagprog_react_')) {
         const dk = key.slice('dagprog_react_'.length);
         if (!_allDagReactions[dk]) _allDagReactions[dk] = {};
@@ -2362,6 +2368,59 @@ function deelVoorstel() {
     showToast('Kopieer de link: stijlstudio.app/parijs.html');
   }
 }
+function _checkNewQuestionsPopup() {
+  // Count unanswered chain polls
+  const unansweredPolls = POLL_CHAIN.filter(p => !p.homeCard && getChainVote(p.id, currentUser) === null);
+  // Count dagprogramma proposals without my reaction
+  const dagKeys = ['vr26_ochtend','vr26_middag','vr26_avond','za27_ochtend','za27_middag','za27_avond','zo28_ochtend','zo28_middag','zo28_avond'];
+  const unreactedDag = dagKeys.filter(dk => {
+    const cached = _safeJSON('vz_dagprog_' + dk, null);
+    if (!cached?.text) return false;
+    const myR = (_allDagReactions[dk] || {})[currentUser];
+    return !myR;
+  });
+  // Also check custom polls
+  const unansweredCustom = (_customPolls || []).filter(p => {
+    const v = localStorage.getItem('vz_cpvote_' + p.id + '_' + currentUser);
+    return v === null;
+  });
+
+  const total = unansweredPolls.length + unansweredCustom.length + unreactedDag.length;
+  if (total === 0) return;
+
+  const lastDismiss = localStorage.getItem('vz_newq_dismiss_' + currentUser);
+  if (lastDismiss && (Date.now() - parseInt(lastDismiss)) < 3600000) return; // once per hour
+
+  const el = document.getElementById('newq-popup');
+  if (!el) return;
+  let lines = [];
+  if (unansweredPolls.length + unansweredCustom.length > 0)
+    lines.push(`🗳️ ${unansweredPolls.length + unansweredCustom.length} poll${unansweredPolls.length + unansweredCustom.length > 1 ? 's' : ''} om op te stemmen`);
+  if (unreactedDag.length > 0)
+    lines.push(`🗓️ ${unreactedDag.length} dagvoorstel${unreactedDag.length > 1 ? 'len' : ''} wachten op jouw reactie`);
+  el.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:0.88rem;color:#0A0A0A;margin-bottom:4px;">Nieuw voor jou! 👋</div>
+        <div style="font-size:0.8rem;color:#444;line-height:1.5;">${lines.join('<br>')}</div>
+      </div>
+      <button onclick="_dismissNewQPopup()" style="flex-shrink:0;background:none;border:none;font-size:1.2rem;cursor:pointer;padding:0;line-height:1;">✕</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button onclick="switchTab('stem');_dismissNewQPopup();" style="flex:1;padding:9px 12px;background:#0A0A0A;color:#F0E8E2;border:none;border-radius:10px;font-family:var(--sans);font-size:0.8rem;font-weight:700;cursor:pointer;">Naar Stem mee →</button>
+      <button onclick="_dismissNewQPopup()" style="padding:9px 14px;background:transparent;border:1.5px solid rgba(10,10,10,0.15);border-radius:10px;font-family:var(--sans);font-size:0.8rem;cursor:pointer;color:#6B6560;">Later</button>
+    </div>`;
+  el.style.display = 'block';
+  setTimeout(() => el.style.opacity = '1', 20);
+}
+function _dismissNewQPopup() {
+  localStorage.setItem('vz_newq_dismiss_' + currentUser, String(Date.now()));
+  const el = document.getElementById('newq-popup');
+  if (!el) return;
+  el.style.opacity = '0';
+  setTimeout(() => { el.style.display = 'none'; }, 300);
+}
+
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -2478,8 +2537,14 @@ function selectProfile(name) {
 async function startApp() {
   document.getElementById('welkom-screen').style.display = 'none';
   await _syncAllGroupState();
-  // Require voorkeur to be confirmed in Supabase — not just localStorage.
-  // This forces anyone whose data never reached the cloud to redo the questionnaire.
+  // If we have an API key locally but it's not in Supabase yet, push it now
+  const localKey = localStorage.getItem('claude_api_key');
+  if (localKey && localKey.startsWith('sk-')) {
+    supa.from('group_state').upsert(
+      { group_id: GROUP_ID, user_id: 'shared', key: 'claude_api_key', value: localKey, updated_at: new Date().toISOString() },
+      { onConflict: 'group_id,user_id,key' }
+    ).catch(() => {});
+  }
   const hasVoorkeur = _allVoorkeur[currentUser] && _allVoorkeur[currentUser].length > 0;
   if (!hasVoorkeur) {
     showVoorkeurScherm();
@@ -2571,6 +2636,7 @@ function initApp() {
   // Sync all group state from Supabase, migrate local data, enable realtime
   _syncAllGroupState();
   _initRealtime();
+  setTimeout(_checkNewQuestionsPopup, 1800);
   _wuLoadMyAnswers().then(() => renderBeginHier());
   // Init map: direct call after paint, plus IntersectionObserver fallback for below-fold loads
   setTimeout(initMap, 150);
@@ -5562,8 +5628,6 @@ let _homeDagDay = 'vr26';
 function renderHomeDagprog() {
   const el = document.getElementById('home-dagprog-section');
   if (!el) return;
-  const apiKey = localStorage.getItem('claude_api_key') || '';
-  if (!apiKey) { el.innerHTML = ''; return; }
 
   const tabs = ['vr26','za27','zo28'].map(d =>
     `<button onclick="_homeDagSwitch('${d}')" style="flex:1;padding:7px 4px;border:none;border-radius:8px;font-family:var(--sans);font-size:0.72rem;font-weight:700;cursor:pointer;transition:all 0.15s;${_homeDagDay===d ? 'background:#0A0A0A;color:#F0E8E2;' : 'background:rgba(10,10,10,0.05);color:#6B6560;'}">${{vr26:'Vr 26',za27:'Za 27',zo28:'Zo 28'}[d]}</button>`
@@ -9315,8 +9379,12 @@ function saveClaudeKey() {
   const k = document.getElementById('claude-key-input')?.value.trim();
   if (!k) { showToast('Voer een sleutel in'); return; }
   localStorage.setItem('claude_api_key', k);
+  // Share with group via Supabase so everyone gets the key on next sync
+  supa.from('group_state').upsert(
+    { group_id: GROUP_ID, user_id: 'shared', key: 'claude_api_key', value: k, updated_at: new Date().toISOString() },
+    { onConflict: 'group_id,user_id,key' }
+  ).then(({error}) => { if (error) console.warn('key sync:', error.message); });
   showToast('✓ Claude API-sleutel opgeslagen!');
-  // Reset chat so opener is regenerated
   _chatMessages = [];
   initAdmin();
 }
