@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <title>Vroegzat — Parijs 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,30..100,0..1;1,9..144,300..900,30..100,0..1&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -452,8 +454,12 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:300;font-style:italic;font-vari
 /* Base */
 body{font-size:15.5px;}
 
-/* Reel: compact hero, not a full viewport */
-.reel-wrap{height:clamp(190px,52vw,260px)!important;}
+/* Reel: thin decorative photo strip — content starts high */
+.reel-wrap{height:90px!important;cursor:default!important;}
+.reel-caption{display:none!important;}
+.reel-overlay{background:linear-gradient(to bottom,rgba(0,0,0,0.18) 0%,rgba(0,0,0,0.45) 100%)!important;}
+.reel-progress{top:6px!important;left:8px!important;right:8px!important;}
+#reel-cd-overlay{display:none!important;}
 
 /* Bottom nav: white with soft shadow, purple active */
 .bottom-nav{background:#fff!important;border-top:1px solid rgba(27,27,35,0.06)!important;box-shadow:0 -2px 18px rgba(27,27,35,0.07);padding:6px 10px!important;}
@@ -742,7 +748,16 @@ body{font-size:15.5px;}
 <div id="app">
   <!-- HOME -->
   <section id="sec-home" class="section active">
-    <!-- REEL -->
+    <!-- HEADER — sticky clean bar, always visible first -->
+    <div class="page-header" style="background:#fff;position:sticky;top:0;z-index:80;border-bottom:1px solid rgba(27,27,35,0.06);padding:14px 20px 12px;">
+      <div class="page-logo">Vroegzat ✦</div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="uitlog-btn" onclick="herbeginVoorkeur()" id="herbegin-btn" style="color:#A89FE8;">✏️ Voorkeuren</button>
+        <button class="uitlog-btn" onclick="uitloggen()">Uitloggen</button>
+      </div>
+    </div>
+
+    <!-- REEL — thin decorative Paris photo strip -->
     <div class="reel-wrap" id="reel-wrap" onclick="reelNext()">
       <div class="reel-slide" style="background-image:url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=700&q=80')"></div>
       <div class="reel-slide" style="background-image:url('https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=700&q=80')"></div>
@@ -768,15 +783,6 @@ body{font-size:15.5px;}
             </div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- HEADER (after reel) -->
-    <div class="page-header">
-      <div class="page-logo">Vroegzat ✦</div>
-      <div style="display:flex;gap:12px;align-items:center;">
-        <button class="uitlog-btn" onclick="herbeginVoorkeur()" id="herbegin-btn" style="color:#A89FE8;">✏️ Voorkeuren</button>
-        <button class="uitlog-btn" onclick="uitloggen()">Uitloggen</button>
       </div>
     </div>
 
@@ -2646,6 +2652,17 @@ async function startApp() {
       { onConflict: 'group_id,user_id,key' }
     ).catch(() => {});
   }
+  // Push any pchain/pp/wvo votes in localStorage to Supabase — catches votes saved before sync was set up
+  const keysToSync = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k) continue;
+    if ((k.startsWith('vz_pchain_') || k.startsWith('vz_pp_swipe_') || k.startsWith('vz_wvo_vote_'))
+        && k.endsWith('_' + currentUser)) {
+      keysToSync.push(k);
+    }
+  }
+  keysToSync.forEach(k => { const v = localStorage.getItem(k); if (v !== null) syncWrite(k, v); });
   const hasVoorkeur = _allVoorkeur[currentUser] && _allVoorkeur[currentUser].length > 0;
   if (!hasVoorkeur) {
     showVoorkeurScherm();
