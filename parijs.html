@@ -2889,7 +2889,7 @@ function initStories() {
       ? `<img src="${photo}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;display:block;border:2px solid #F0E8E2;" alt="${p.naam}">`
       : `<div class="story-avatar" style="background:${p.color};">${p.init}</div>`;
     const cameraOverlay = isMe ? `<div style="position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:#0A0A0A;color:#F0E8E2;font-size:0.6rem;display:flex;align-items:center;justify-content:center;border:2px solid #F0E8E2;">📷</div>` : '';
-    return `<div class="story-item" onclick="${isMe ? 'openPhotoUpload()' : `showToast('${p.naam} — profiel binnenkort 🔜')`}" style="position:relative;">
+    return `<div class="story-item" onclick="${isMe ? 'openPhotoUpload()' : `openGluurDetail('${k}')`}" style="position:relative;">
       <div class="story-ring" style="position:relative;">
         ${avatarInner}
         ${cameraOverlay}
@@ -4368,10 +4368,10 @@ function renderProfileBios() {
         const av = ph
           ? `<img src="${ph}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
           : `<div style="width:36px;height:36px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-style:italic;font-size:0.8rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>`;
-        return `<div onclick="${isMe ? 'openBioEditSheet()' : ''}" style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--r-lg);background:rgba(10,10,10,0.04);${isMe ? 'cursor:pointer;border:1.5px solid rgba(168,159,232,0.25);' : 'border:1.5px solid transparent;'}">
+        return `<div onclick="${isMe ? 'openBioEditSheet()' : `openGluurDetail('${u}')`}" style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--r-lg);background:rgba(10,10,10,0.04);cursor:pointer;${isMe ? 'border:1.5px solid rgba(168,159,232,0.25);' : 'border:1.5px solid transparent;'}">
           ${av}
           <div style="flex:1;min-width:0;">
-            <div style="font-size:0.76rem;font-weight:700;color:#0A0A0A;margin-bottom:2px;">${p.naam}${isMe ? ' <span style="color:#A89FE8;font-size:0.65rem;font-weight:600;">✏️ bewerk</span>' : ''}</div>
+            <div style="font-size:0.76rem;font-weight:700;color:#0A0A0A;margin-bottom:2px;">${p.naam}${isMe ? ' <span style="color:#A89FE8;font-size:0.65rem;font-weight:600;">✏️ bewerk</span>' : ' <span style="color:#9A948E;font-size:0.6rem;font-weight:500;">👁 bekijk</span>'}</div>
             <div style="font-size:0.79rem;color:${bio ? '#0A0A0A' : '#B0A9A3'};font-style:${bio ? 'normal' : 'italic'};line-height:1.4;">${bio || 'Nog niks ingevuld'}</div>
           </div>
         </div>`;
