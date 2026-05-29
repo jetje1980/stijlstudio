@@ -3765,8 +3765,15 @@ function buildGroupContext() {
       }
     });
   });
-  const groupMatches = Object.entries(groupLiked)
-    .filter(([, names]) => names.length >= 2)
+  const groupMatches3 = Object.entries(groupLiked)
+    .filter(([, names]) => names.length >= 3)
+    .sort((a, b) => b[1].length - a[1].length)
+    .map(([id, names]) => {
+      const item = ITEMS_BASE.find(i => i.id === id);
+      return item ? `⭐ ${item.naam} [${names.join('+')}]` : null;
+    }).filter(Boolean);
+  const groupMatches2 = Object.entries(groupLiked)
+    .filter(([, names]) => names.length === 2)
     .sort((a, b) => b[1].length - a[1].length)
     .slice(0, 8)
     .map(([id, names]) => {
@@ -3820,8 +3827,11 @@ function buildGroupContext() {
   return `GEDEELDE GROEPSVOORKEUREN (meeste mensen hetzelfde gekozen — weeg dit zwaar mee):
 ${sharedVibes.length ? sharedVibes.join('\n') : 'Nog niet genoeg data'}
 
-GROEPSMATCHES (items die 2+ mensen hebben geliked):
-${groupMatches.length ? groupMatches.join('\n') : 'Nog onvoldoende data'}
+ALLE 3 GELIKED — absolute topprioriteit voor voorstellen:
+${groupMatches3.length ? groupMatches3.join('\n') : 'Nog geen items door alle 3 geliked'}
+
+OOK POPULAIR (2 mensen geliked):
+${groupMatches2.length ? groupMatches2.join('\n') : 'Nog onvoldoende data'}
 
 PER PERSOON:
 ${perPerson.join('\n')}
