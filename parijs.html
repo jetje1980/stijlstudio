@@ -743,6 +743,77 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
 .drawer-actions{display:flex;gap:10px;flex-wrap:wrap;}
 
 /* Border-radius: al gezet in :root — geen override nodig */
+
+/* ═══════════════════════════════════════════════
+   REDESIGN Stap 5–8
+   ═══════════════════════════════════════════════ */
+
+/* Stap 5: Dagprogramma tijdlijn */
+#sec-top5 .page-header{
+  background:var(--ivoor);position:sticky;top:0;z-index:80;
+  border-bottom:1px solid var(--lijn);padding:14px 20px 12px;
+}
+.tl-row{
+  display:flex;align-items:flex-start;
+  border-bottom:1px solid var(--lijn);
+  padding:14px 0;
+}
+.tl-row:last-child{border-bottom:none;}
+.tl-tappable{cursor:pointer;}
+.tl-time{
+  font-family:var(--sans);font-size:11px;color:var(--grijs);
+  font-variant-numeric:tabular-nums;min-width:44px;
+  padding-right:12px;line-height:1.4;flex-shrink:0;padding-top:2px;
+}
+.tl-line{width:1px;background:var(--lijn);align-self:stretch;flex-shrink:0;}
+.tl-content{flex:1;padding-left:12px;}
+.tl-name{
+  font-family:var(--sans);font-size:14px;font-weight:500;
+  color:var(--inkt);line-height:1.35;
+}
+.tl-detail{
+  font-family:var(--sans);font-size:12px;color:var(--grijs);
+  line-height:1.5;margin-top:4px;
+}
+.tl-open .tl-name{color:var(--grijs)!important;font-weight:400!important;}
+
+/* Stap 7: Polls – schone kaarten + pill-knoppen */
+.pchain-block{margin-bottom:16px;}
+.pchain-answered,.pchain-active,.pchain-locked{
+  background:#fff!important;
+  border:1px solid var(--lijn)!important;
+  border-radius:4px!important;
+  padding:20px!important;
+  box-shadow:none!important;
+}
+.pchain-locked{opacity:0.5!important;}
+.pchain-voorstel{
+  font-family:var(--serif)!important;font-style:italic!important;font-weight:300!important;
+  font-size:20px!important;line-height:1.25!important;color:var(--inkt)!important;
+  font-variation-settings:"opsz" 72,"SOFT" 60!important;
+  margin:8px 0 16px!important;
+}
+.poll-opt{
+  font-family:var(--sans)!important;font-weight:500!important;font-size:13px!important;
+  letter-spacing:0.04em!important;border-radius:100px!important;
+  padding:10px 18px!important;cursor:pointer!important;
+  border:1px solid var(--lijn)!important;
+  background:transparent!important;color:var(--inkt)!important;
+  transition:opacity 0.15s!important;display:block!important;width:100%!important;
+  text-align:left!important;
+}
+.poll-opt.selected,.poll-opt:has(+*){color:var(--inkt)!important;}
+.poll-bar{height:3px!important;background:var(--lijn)!important;border-radius:2px!important;margin-top:4px!important;}
+.poll-bar-fill{background:var(--lila)!important;}
+
+/* Stap 8: Swipe-tabs op ivoor */
+.swipe-tabs{background:var(--ivoor)!important;border-bottom:1px solid var(--lijn)!important;}
+.stab{
+  color:var(--grijs)!important;border-radius:4px!important;font-size:12px!important;
+  font-family:var(--sans)!important;letter-spacing:0.04em!important;
+  text-transform:none!important;padding:8px 16px!important;font-weight:500!important;
+}
+.stab.active{background:var(--inkt)!important;color:#fff!important;}
 </style>
 </head>
 <body>
@@ -1076,23 +1147,20 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
   <!-- PROGRAMMA -->
   <section id="sec-top5" class="section">
     <div class="page-header">
-      <div class="page-logo">Programma</div>
-    </div>
-    <div style="margin:0 16px 12px;padding:14px 16px;background:rgba(168,159,232,0.1);border-radius:var(--r-lg);border-left:3px solid #A89FE8;">
-      <div style="font-size:0.78rem;color:#6B6560;line-height:1.6;">Dit is een voorstel, geen verplichting. Alles is aanpasbaar, niets is gepland zonder dat jullie het zelf gekozen hebben. Bewaak je eigen grenzen — als je een ochtend voor jezelf wilt, plan dat in. De app is overzicht, niet wetgeving.</div>
-      <button onclick="showToast('⏸️ Noteer het in de chat met Griette — zij past het programma aan.')" style="margin-top:10px;width:100%;padding:10px;border:1.5px solid #A89FE8;border-radius:20px;background:transparent;color:#A89FE8;font-family:var(--sans);font-size:0.78rem;font-weight:700;cursor:pointer;letter-spacing:0.05em;">⏸️ Reserveer een dagdeel voor mezelf</button>
+      <span class="eyebrow" style="margin-bottom:2px;">Dagprogramma</span>
+      <div class="page-logo" style="margin-bottom:0;">Parijs</div>
     </div>
     <div class="swipe-tabs" id="prog-day-tabs" style="-webkit-overflow-scrolling:touch;">
       <button class="stab active" onclick="switchProgDay('vr26',this)">Vr 26 juni</button>
       <button class="stab" onclick="switchProgDay('za27',this)">Za 27 juni</button>
       <button class="stab" onclick="switchProgDay('zo28',this)">Zo 28 juni</button>
     </div>
-    <div id="prog-content" style="padding:12px 16px 32px;"></div>
+    <div id="prog-content" style="padding:4px 20px 32px;"></div>
     <!-- AI DAGPROGRAMMA GENERATOR -->
     <div id="dagprog-ai-section" style="padding:0 16px 16px;"></div>
     <!-- GROEPSPLAN CHIPS -->
     <div id="groepsplan-block" style="padding:0 16px 16px;display:none;">
-      <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Groepskeuze</div>
+      <span class="eyebrow">Groepskeuze</span>
       <div id="groepsplan-chips" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
     </div>
 
@@ -1120,7 +1188,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
     <div style="margin:0 16px 16px;font-size:0.65rem;color:var(--t3);letter-spacing:0.06em;text-align:center;">Typisch Parijs juni · licht jasje mee</div>
 
     <!-- WEEKEND EVENTS -->
-    <div class="home-section-title" style="margin-top:4px;">Wat speelt dit weekend</div>
+    <div style="margin:16px 20px 4px;"><span class="eyebrow">Dit weekend in Parijs</span></div>
     <div class="home-section-sub">26–28 juni 2026 in Parijs</div>
     <div id="weekend-blok"></div>
     <div id="custom-event-chips"></div>
@@ -1149,24 +1217,25 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
     </div>
 
     <!-- MUST-HAVES PER PERSOON -->
-    <div style="margin:0 20px 16px;padding:16px 0;border-top:1px solid rgba(10,10,10,0.08);">
-      <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.1rem;color:#0A0A0A;margin-bottom:4px;">💌 Dit mag niet missen</div>
-      <div style="font-size:0.78rem;color:#6B6560;margin-bottom:12px;line-height:1.4;">Wat elke vriendin echt wil dit weekend — ingevuld bij de voorkeuren.</div>
+    <div style="margin:0 20px 16px;padding:16px 0;border-top:1px solid var(--lijn);">
+      <span class="eyebrow">Dit mag niet missen</span>
+      <div style="font-family:var(--serif);font-style:italic;font-weight:300;font-size:22px;color:var(--inkt);line-height:1.2;margin-bottom:6px;">Jullie verlanglijstje</div>
+      <div style="font-family:var(--sans);font-size:13px;color:var(--grijs);margin-bottom:12px;line-height:1.5;">Wat elke vriendin echt wil dit weekend.</div>
       <div id="groep-musthaves" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
 
-    <div class="groep-section-head" style="display:flex;align-items:center;gap:8px;">Jullie matches <span style="font-size:0.7rem;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;">3+ stemmen</span></div>
-    <div class="groep-sub">Swipe allebei 'wil ik' — dan verschijnt het hier ✨</div>
+    <div style="padding:0 20px 4px;"><span class="eyebrow">Jullie matches</span></div>
+    <div class="groep-sub" style="padding:0 20px 8px;font-family:var(--sans);font-size:13px;color:var(--grijs);">Swipe allebei 'wil ik' — dan verschijnt het hier</div>
     <div class="groep-matches" id="groep-matches"></div>
 
-    <div class="groep-section-head">Bijna-matches</div>
-    <div class="groep-sub">Nog één stem nodig — bijna een match 🤞</div>
+    <div style="padding:8px 20px 4px;"><span class="eyebrow">Bijna-matches</span></div>
+    <div class="groep-sub" style="padding:0 20px 8px;font-family:var(--sans);font-size:13px;color:var(--grijs);">Nog één stem nodig</div>
     <div class="groep-matches" id="groep-near"></div>
 
     <!-- KOSTEN BIJHOUDEN -->
-    <div style="margin:0 20px 16px;padding:16px 0;border-top:1px solid rgba(10,10,10,0.08);">
-      <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.1rem;color:#0A0A0A;margin-bottom:4px;">💰 Kosten bijhouden</div>
-      <div style="font-size:0.78rem;color:#6B6560;margin-bottom:12px;line-height:1.4;">Frederike regelt Splitwise — dat weten we allemaal.</div>
+    <div style="margin:0 20px 16px;padding:16px 0;border-top:1px solid var(--lijn);">
+      <span class="eyebrow">Kosten</span>
+      <div style="font-family:var(--sans);font-size:13px;color:var(--grijs);margin-bottom:12px;line-height:1.5;">Frederike regelt Splitwise — dat weten we allemaal.</div>
       <div style="display:flex;gap:10px;">
         <a href="https://splitwise.com" target="_blank" rel="noopener" style="flex:1;padding:11px 0;text-align:center;background:#0A0A0A;color:#F0E8E2;border-radius:30px;font-size:0.78rem;font-weight:700;text-decoration:none;letter-spacing:0.06em;">📊 Open Splitwise</a>
         <button onclick="showToast('Tikkie stuur je gewoon via je eigen bank-app 😄')" style="flex:1;padding:11px 0;border:1.5px solid rgba(10,10,10,0.12);border-radius:30px;background:transparent;font-size:0.78rem;font-weight:600;cursor:pointer;color:#0A0A0A;">💸 Tikkie sturen</button>
@@ -1187,7 +1256,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
       </div>
     </div>
 
-    <div style="padding:0 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:#D4785A;">🔥 Begin hier — speel nu al</div>
+    <div style="padding:12px 20px 4px;"><span class="eyebrow" style="color:var(--koraal);">Begin hier</span></div>
     <div class="spellen-grid" style="padding-bottom:4px;">
       <div style="grid-column:1/-1;border:2px solid rgba(212,120,90,0.3);background:rgba(212,120,90,0.06);border-radius:var(--r-lg);padding:20px 16px;">
         <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="openGame('warmup')">
@@ -1205,7 +1274,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
       </div>
     </div>
 
-    <div style="padding:0 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Elke dag — async</div>
+    <div style="padding:12px 20px 4px;"><span class="eyebrow">Elke dag</span></div>
     <div class="spellen-grid">
       <div class="spel-card" onclick="openGame('wie-van-ons')" style="grid-column:1/-1;">
         <div style="display:flex;align-items:center;gap:12px;">
@@ -1228,7 +1297,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
       </div>
     </div>
 
-    <div style="padding:8px 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Voor de airbnb-avond</div>
+    <div style="padding:12px 20px 4px;"><span class="eyebrow">Voor de airbnb-avond</span></div>
     <div class="spellen-grid">
       <div class="spel-card" onclick="openGame('nev')" style="grid-column:1/-1;">
         <div style="display:flex;align-items:center;gap:12px;">
@@ -1251,7 +1320,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
       </div>
     </div>
 
-    <div style="padding:8px 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Klassiekers</div>
+    <div style="padding:12px 20px 4px;"><span class="eyebrow">Klassiekers</span></div>
     <div class="spellen-grid">
       <div class="spel-card" onclick="openGame('quiz')">
         <div class="spel-emoji">🗺️</div>
@@ -1280,7 +1349,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
       </div>
     </div>
 
-    <div style="padding:16px 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Herinneringen</div>
+    <div style="padding:16px 20px 4px;"><span class="eyebrow">Herinneringen</span></div>
     <div style="padding:0 16px 8px;font-size:0.78rem;color:var(--t2);line-height:1.5;">Voeg hier je hoogtepunten toe per dag. Aan het eind van elke dag een korte terugblik.</div>
 
     <div class="swipe-tabs" id="herin-day-tabs" style="-webkit-overflow-scrolling:touch;">
@@ -1290,7 +1359,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
     </div>
     <div id="herin-content" style="padding:16px;"></div>
 
-    <div style="padding:0 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-top:8px;">Muziek voor de reis</div>
+    <div style="padding:8px 20px 4px;"><span class="eyebrow">Muziek voor de reis</span></div>
     <div style="padding:0 16px 6px;font-size:0.7rem;color:var(--t3);">▶ Afspelen in Spotify</div>
     <div style="display:flex;gap:10px;padding:4px 16px 24px;overflow-x:auto;scrollbar-width:none;">
       <a href="https://open.spotify.com/search/jazz%20cafe%20paris" target="_blank" rel="noopener" style="flex:0 0 140px;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:14px 12px;text-decoration:none;display:block;">
@@ -3630,101 +3699,93 @@ function renderPollChainDay(dag) {
     });
     const total = votedCount || 1;
 
-    const proposalCard = `<div style="background:linear-gradient(135deg,rgba(212,120,90,0.07),rgba(168,159,232,0.07));border-radius:12px;padding:12px 14px;margin-bottom:12px;border:1px solid rgba(168,159,232,0.15);">
-      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;">
-        <span style="font-size:1.1rem;flex-shrink:0;">${poll.icon || '📍'}</span>
-        <div style="font-size:0.88rem;font-weight:700;color:#0A0A0A;line-height:1.35;">${poll.voorstel}</div>
-      </div>
-      <div style="font-size:0.75rem;color:#4A4440;line-height:1.55;margin-bottom:8px;">${poll.detail}</div>
-      <div style="font-size:0.68rem;color:#9A948E;line-height:1.45;padding-top:6px;border-top:1px solid rgba(10,10,10,0.06);">
-        <span style="font-weight:600;color:#6B6560;">Hoe er komen:</span> ${poll.bereikbaarheid}
-      </div>
+    const proposalCard = `<div style="margin-bottom:16px;">
+      <div class="pchain-voorstel">${poll.icon || '📍'} ${poll.voorstel}</div>
+      ${poll.detail ? `<div style="font-family:var(--sans);font-size:13px;color:var(--grijs);line-height:1.6;margin-bottom:6px;">${poll.detail}</div>` : ''}
+      ${poll.bereikbaarheid ? `<div style="font-family:var(--sans);font-size:12px;color:var(--grijs);">🚇 ${poll.bereikbaarheid}</div>` : ''}
     </div>`;
+
+    function _avatarChips(filterFn) {
+      return ALL_CHAIN_USERS.filter(filterFn).map(u => {
+        const p = PROFILES[u]; const ph = getUserPhoto(u);
+        return ph
+          ? `<img src="${ph}" title="${p.naam}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;margin-right:2px;vertical-align:middle;">`
+          : `<span title="${p.naam}" style="display:inline-flex;width:24px;height:24px;border-radius:50%;background:${p.color};align-items:center;justify-content:center;font-size:0.6rem;color:#fff;font-weight:700;margin-right:2px;">${p.init}</span>`;
+      }).join('');
+    }
 
     if (isAnswered && idx < firstUnanswered) {
       const myLabel = myVote === 'custom' ? (getChainText(poll.id, currentUser) || 'Eigen voorstel') : VOTE_LABELS[myVote];
       const pct = counts.map(c => Math.round(c / total * 100));
       const customPct = Math.round(customCount / total * 100);
 
-      function _avatarChips(filterFn) {
-        return ALL_CHAIN_USERS.filter(filterFn).map(u => {
-          const p = PROFILES[u]; const ph = getUserPhoto(u);
-          return ph
-            ? `<img src="${ph}" title="${p.naam}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;margin-right:3px;vertical-align:middle;">`
-            : `<span title="${p.naam}" style="display:inline-flex;width:20px;height:20px;border-radius:50%;background:${p.color};align-items:center;justify-content:center;font-size:0.55rem;color:#fff;font-style:italic;font-weight:700;margin-right:3px;">${p.init}</span>`;
-        }).join('');
-      }
-
-      const barColors = ['#7A9E82', '#D4785A'];
       const barsHtml = VOTE_LABELS.map((label, i) => `
-        <div style="margin-bottom:7px;">
-          <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;">
-            <span style="${myVote===i?'font-weight:700;color:#0A0A0A;':'color:#6B6560;'}">${label}</span>
-            <span style="font-weight:600;color:#6B6560;">${pct[i]}%</span>
+        <div style="margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;font-family:var(--sans);font-size:12px;margin-bottom:3px;">
+            <span style="color:${myVote===i ? 'var(--inkt)' : 'var(--grijs)'};font-weight:${myVote===i ? 600 : 400};">${label}</span>
+            <span style="color:var(--grijs);">${pct[i]}%</span>
           </div>
-          <div class="poll-bar"><div class="poll-bar-fill" style="width:${pct[i]}%;background:${barColors[i]};opacity:${myVote===i?1:0.45};"></div></div>
-          ${counts[i] > 0 ? `<div style="margin-top:3px;">${_avatarChips(u => getChainVote(poll.id, u) === i)}</div>` : ''}
+          <div class="poll-bar"><div class="poll-bar-fill" style="width:${pct[i]}%;"></div></div>
+          ${counts[i] > 0 ? `<div style="margin-top:4px;">${_avatarChips(u => getChainVote(poll.id, u) === i)}</div>` : ''}
         </div>`).join('') + (customCount > 0 ? `
-        <div style="margin-bottom:7px;">
-          <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;">
-            <span style="${myVote==='custom'?'font-weight:700;color:#0A0A0A;':'color:#6B6560;'}">✏️ Eigen voorstel</span>
-            <span style="font-weight:600;color:#6B6560;">${customPct}%</span>
+        <div style="margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;font-family:var(--sans);font-size:12px;margin-bottom:3px;">
+            <span style="color:${myVote==='custom' ? 'var(--inkt)' : 'var(--grijs)'};font-weight:${myVote==='custom' ? 600 : 400};">✏️ Eigen voorstel</span>
+            <span style="color:var(--grijs);">${customPct}%</span>
           </div>
-          <div class="poll-bar"><div class="poll-bar-fill" style="width:${customPct}%;background:#A89FE8;opacity:${myVote==='custom'?1:0.45};"></div></div>
+          <div class="poll-bar"><div class="poll-bar-fill" style="width:${customPct}%;"></div></div>
           ${ALL_CHAIN_USERS.filter(u => getChainVote(poll.id, u) === 'custom').map(u => {
             const t = getChainText(poll.id, u);
-            return t ? `<div style="font-size:0.65rem;color:#9A948E;margin-top:2px;padding-left:4px;">↳ ${PROFILES[u]?.naam}: &ldquo;${t}&rdquo;</div>` : '';
+            return t ? `<div style="font-family:var(--sans);font-size:11px;color:var(--grijs);margin-top:2px;">↳ ${PROFILES[u]?.naam}: &ldquo;${t}&rdquo;</div>` : '';
           }).join('')}
         </div>` : '');
 
       let consensusMsg = '';
       if (votedCount >= 4 && counts[0] === 4) {
-        consensusMsg = `<div style="font-size:0.72rem;color:#7A9E82;font-weight:700;margin-top:6px;">Iedereen is erbij! 🥂</div>`;
+        consensusMsg = `<div style="font-family:var(--sans);font-size:12px;color:var(--mint);font-weight:600;margin-top:8px;">Iedereen is erbij! 🥂</div>`;
         if (typeof launchConfetti === 'function') setTimeout(() => launchConfetti(), 50);
       } else if (votedCount >= 4 && counts[0] > 0 && counts[1] > 0) {
-        consensusMsg = `<div style="font-size:0.72rem;color:#D4785A;font-weight:600;margin-top:6px;">Niet iedereen is even enthousiast — even overleggen? 🤝</div>`;
+        consensusMsg = `<div style="font-family:var(--sans);font-size:12px;color:var(--koraal);font-weight:500;margin-top:8px;">Niet iedereen is even enthousiast — even overleggen? 🤝</div>`;
       }
 
       html += `<div class="pchain-block">
         <div class="pchain-answered">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
             <div>
-              <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#7A9E82;margin-bottom:2px;">${poll.dagdeel}</div>
-              <div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;">${poll.voorstel}</div>
+              <span class="eyebrow">${poll.dagdeel}</span>
+              <div class="pchain-voorstel" style="margin-top:0;">${poll.voorstel}</div>
             </div>
-            <button onclick="syncDelete('vz_pchain_${poll.id}_'+currentUser);syncDelete('vz_pchain_text_${poll.id}_'+currentUser);renderPollChainDay('${poll.dag}');" style="flex-shrink:0;margin-left:10px;padding:4px 10px;border:1px solid rgba(10,10,10,0.15);border-radius:20px;background:transparent;font-size:0.65rem;font-weight:600;cursor:pointer;color:#6B6560;font-family:var(--sans);">Wijzig ▸</button>
+            <button onclick="syncDelete('vz_pchain_${poll.id}_'+currentUser);syncDelete('vz_pchain_text_${poll.id}_'+currentUser);renderPollChainDay('${poll.dag}');" style="flex-shrink:0;margin-left:12px;padding:4px 12px;border:1px solid var(--lijn);border-radius:100px;background:transparent;font-family:var(--sans);font-size:11px;font-weight:500;cursor:pointer;color:var(--grijs);white-space:nowrap;">Wijzig</button>
           </div>
-          <div style="font-size:0.72rem;color:#6B6560;margin-bottom:8px;">Jouw stem: <strong style="color:#0A0A0A;">${myLabel}</strong></div>
+          <div style="font-family:var(--sans);font-size:12px;color:var(--grijs);margin-bottom:10px;">Jouw stem: <strong style="color:var(--inkt);">${myLabel}</strong> · ${votedCount} van 4 gestemd</div>
           ${barsHtml}
-          <div style="font-size:0.65rem;color:#9A948E;margin-top:4px;">${votedCount} van 4 gestemd</div>
           ${consensusMsg}
-          <div id="cmt-pchain-${poll.id}" style="margin-top:8px;"></div>
+          <div id="cmt-pchain-${poll.id}" style="margin-top:10px;"></div>
         </div>
       </div>`;
     } else if (isActive) {
       html += `<div class="pchain-block">
         <div class="pchain-active">
-          <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#A89FE8;margin-bottom:4px;">${poll.dagdeel}</div>
-          <div style="font-size:0.78rem;font-weight:600;color:#6B6560;margin-bottom:8px;">Voorstel van Griette:</div>
+          <span class="eyebrow">${poll.dagdeel}</span>
           ${proposalCard}
           <div style="display:flex;flex-direction:column;gap:8px;">
-            <button class="poll-opt" style="text-align:left;background:rgba(122,158,130,0.1);border-color:rgba(122,158,130,0.5);color:#2D5A35;" onclick="voteChain('${poll.id}',0)">✓ Ja, leuk! Ik ben erbij</button>
-            <button class="poll-opt" style="text-align:left;" onclick="voteChain('${poll.id}',1)">🤔 Ik doe liever wat anders</button>
-            <button class="poll-opt" style="text-align:left;color:#9A948E;border-style:dashed;" onclick="showChainCustomInput('${poll.id}')">✏️ Ander voorstel, namelijk...</button>
+            <button class="poll-opt" onclick="voteChain('${poll.id}',0)">✓ Ja, leuk! Ik ben erbij</button>
+            <button class="poll-opt" onclick="voteChain('${poll.id}',1)">🤔 Ik doe liever wat anders</button>
+            <button class="poll-opt" onclick="showChainCustomInput('${poll.id}')">✏️ Ander voorstel, namelijk...</button>
           </div>
-          <div id="pchain-custom-${poll.id}" style="display:none;margin-top:10px;gap:8px;align-items:center;">
-            <input type="text" placeholder="Jouw voorstel voor dit moment..." style="flex:1;padding:10px 12px;border:1.5px solid rgba(168,159,232,0.5);border-radius:var(--r-lg);font-family:var(--sans);font-size:0.88rem;color:#0A0A0A;outline:none;background:#fff;" onkeydown="if(event.key==='Enter')voteChainCustom('${poll.id}')">
-            <button onclick="voteChainCustom('${poll.id}')" style="flex-shrink:0;padding:10px 16px;border:none;border-radius:var(--r-lg);background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;">Ok</button>
+          <div id="pchain-custom-${poll.id}" style="display:none;margin-top:12px;gap:8px;align-items:center;flex-direction:column;">
+            <input type="text" placeholder="Jouw voorstel voor dit moment..." style="flex:1;padding:10px 14px;border:1px solid var(--lijn);border-radius:100px;font-family:var(--sans);font-size:13px;color:var(--inkt);outline:none;background:#fff;width:100%;box-sizing:border-box;" onkeydown="if(event.key==='Enter')voteChainCustom('${poll.id}')">
+            <button onclick="voteChainCustom('${poll.id}')" class="btn-primary" style="margin-top:8px;">Ok</button>
           </div>
-          <div id="cmt-pchain-${poll.id}" style="margin-top:10px;"></div>
+          <div id="cmt-pchain-${poll.id}" style="margin-top:12px;"></div>
         </div>
       </div>`;
     } else {
       html += `<div class="pchain-block">
         <div class="pchain-locked">
-          <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin-bottom:2px;">${poll.dagdeel}</div>
-          <div style="font-size:0.88rem;font-weight:600;color:#9A948E;">${poll.voorstel}</div>
-          <div style="font-size:0.72rem;color:#9A948E;margin-top:6px;">🔒 Beantwoord de vorige vraag eerst</div>
+          <span class="eyebrow" style="color:var(--grijs);">${poll.dagdeel}</span>
+          <div style="font-family:var(--sans);font-size:14px;font-weight:500;color:var(--grijs);margin-top:4px;">${poll.voorstel}</div>
+          <div style="font-family:var(--sans);font-size:12px;color:var(--grijs);margin-top:6px;">🔒 Beantwoord de vorige vraag eerst</div>
         </div>
       </div>`;
     }
@@ -5859,51 +5920,43 @@ function _showAiHomeContext(text) {
 function renderProgramma() {
   const container = document.getElementById('prog-content');
   if (!container) return;
-  const plan = getPlanVibes();
-  const dayVibes = plan[progDay] || [];
-  const fixedSlots = (PROGRAMMA[progDay] || []).filter(s => s.type === 'fixed');
-  const ctx = PROG_CONTEXT[progDay];
+  const entries = PROGRAMMA[progDay] || [];
 
-  const ctxHtml = ctx ? `<div style="margin-bottom:16px;padding:14px 16px;background:rgba(10,10,10,0.04);border-radius:var(--r-lg);border-left:3px solid ${ctx.kleur};">
-    <div style="font-family:var(--sans);font-style:italic;font-weight:700;font-size:0.92rem;color:#0A0A0A;margin-bottom:8px;">🗺 ${ctx.titel}</div>
-    ${ctx.blokken.map(b=>`<div style="font-size:0.75rem;color:#6B6560;line-height:1.5;margin-bottom:6px;display:flex;gap:8px;"><span style="flex-shrink:0;">${b.icon}</span><span>${b.tekst}</span></div>`).join('')}
-  </div>` : '';
-
-  const fixedHtml = fixedSlots.length ? `<div style="margin-bottom:16px;">
-    <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Vaste tijden</div>
-    ${fixedSlots.map(slot=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
-      <span style="font-size:0.65rem;color:var(--gold);font-weight:700;flex-shrink:0;min-width:36px;margin-top:2px;">${slot.time}</span>
-      <div style="flex:1;"><div style="font-size:0.85rem;color:#0A0A0A;font-weight:600;">${slot.icon} ${slot.naam}</div>${slot.detail?`<div style="font-size:0.7rem;color:#6B6560;margin-top:2px;line-height:1.4;">${slot.detail}</div>`:''}</div>
-    </div>`).join('')}
-  </div>` : '';
-
-  if (dayVibes.length === 0) {
-    container.innerHTML = ctxHtml + fixedHtml + `<div style="padding:24px 0 16px;text-align:center;">
-      <div style="font-size:2.5rem;margin-bottom:10px;">✨</div>
-      <div style="font-size:0.88rem;color:#6B6560;line-height:1.6;margin-bottom:18px;">Kies belevingen bij <strong>Belevingen</strong><br>om jouw dag te vullen</div>
-      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
-        <button onclick="switchTab('swipe',document.querySelectorAll('.nav-btn')[1])" style="padding:11px 20px;border:none;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;">✨ Belevingen</button>
-        <button onclick="openPlanAddSheet()" style="padding:11px 20px;border:1.5px solid rgba(10,10,10,0.15);border-radius:20px;background:transparent;color:#0A0A0A;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;">＋ Losse plek</button>
+  const rows = entries.map((slot, i, arr) => {
+    const isFixed = slot.type === 'fixed';
+    const isLast = i === arr.length - 1;
+    const rowClass = ['tl-row', isFixed ? 'tl-tappable' : 'tl-open', isLast ? 'tl-last' : ''].join(' ');
+    const onclick = isFixed ? ` onclick="openProgSlotDetail('${progDay}',${i})"` : '';
+    return `<div class="${rowClass}"${onclick}>
+      <div class="tl-time">${slot.time}</div>
+      <div class="tl-line"></div>
+      <div class="tl-content">
+        <div class="tl-name">${slot.icon} ${isFixed ? slot.naam : slot.hint}</div>
+        ${isFixed && slot.detail ? `<div class="tl-detail">${slot.detail}</div>` : ''}
       </div>
     </div>`;
-    renderGroepsplan();
-    renderDagprogrammaBar();
-    return;
-  }
+  }).join('');
 
-  const vibeHtml = `<div style="margin-bottom:16px;">
-    <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Jouw belevingen</div>
-    ${dayVibes.map((entry, idx) => {
-      if (entry.type === 'item') return renderItemPlanBlock(entry, idx, progDay);
-      if (entry.type === 'custom') return renderCustomPlanBlock(entry, idx, progDay);
-      return renderVibePlanBlock(entry, idx, progDay);
-    }).join('')}
-    <button onclick="openPlanAddSheet()" style="margin-top:6px;width:100%;padding:10px;border:1.5px dashed rgba(168,159,232,0.4);border-radius:var(--r-lg);background:rgba(168,159,232,0.05);color:#A89FE8;font-family:var(--sans);font-size:0.78rem;font-weight:600;cursor:pointer;">＋ Voeg toe — plek, beleving of eigen</button>
-  </div>`;
-
-  container.innerHTML = ctxHtml + fixedHtml + vibeHtml;
+  container.innerHTML = rows;
   renderGroepsplan();
   renderDagprogrammaBar();
+}
+
+function openProgSlotDetail(day, idx) {
+  const slot = (PROGRAMMA[day] || [])[idx];
+  if (!slot || slot.type !== 'fixed') return;
+  const drawer = document.getElementById('card-detail-drawer');
+  const backdrop = document.getElementById('card-detail-backdrop');
+  if (!drawer) return;
+  document.getElementById('drawer-img-wrap').innerHTML = '';
+  document.getElementById('drawer-eyebrow').textContent = slot.time + ' · ' + (slot.label || '');
+  document.getElementById('drawer-title').textContent = slot.naam;
+  document.getElementById('drawer-desc').innerHTML = slot.detail ? `<p>${slot.detail}</p>` : '';
+  document.getElementById('drawer-attrib').textContent = '';
+  document.getElementById('drawer-actions').innerHTML = '';
+  drawer.classList.add('open');
+  backdrop.classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
 function toggleProgDone(slotKey) {
