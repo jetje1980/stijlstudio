@@ -528,6 +528,77 @@ body{font-size:15.5px;}
 
 /* Stories gluur label */
 #gluur-section .sec-lbl{color:var(--t3);}
+
+/* ═══════════════════════════════════════════════
+   HUISSTIJL REFINEMENT — hairline borders, minder radius,
+   lila als accent (niet dominant vlak)
+   ═══════════════════════════════════════════════ */
+
+/* Kleiner border-radius: editorial, niet generiek web */
+:root{--r:8px!important;--r-lg:12px!important;}
+
+/* Swipe-tabs: wit met lila als active accent */
+.swipe-tabs{background:#fff!important;border-bottom:1px solid var(--lijn)!important;}
+.stab{color:var(--t2)!important;border-radius:8px!important;}
+.stab.active{background:var(--lila-deep)!important;color:#fff!important;}
+
+/* Swipe-card: witte achtergrond, subtiele border */
+.swipe-card{background:#fff!important;box-shadow:none!important;border:1px solid var(--lijn)!important;}
+.card-body{background:#fff!important;border-top:1px solid var(--lijn)!important;}
+.card-votes{background:#fff!important;}
+.card-meta-pill{background:rgba(27,27,35,0.05)!important;border-radius:6px!important;}
+
+/* Poll-chain: border i.p.v. shadow */
+.pchain-active{box-shadow:none!important;border:1.5px solid var(--lila)!important;}
+.pchain-answered{box-shadow:none!important;}
+.pchain-locked{box-shadow:none!important;}
+.pp-block{box-shadow:none!important;}
+
+/* Match-cards: border i.p.v. shadow */
+.match-card{box-shadow:none!important;border:1px solid var(--lijn)!important;}
+.near-card{box-shadow:none!important;border:1px solid var(--lijn)!important;}
+
+/* Collapsibles: border i.p.v. shadow */
+.collapsible{box-shadow:none!important;border:1px solid var(--lijn)!important;}
+
+/* Missie-block: border i.p.v. shadow */
+.missie-block{box-shadow:none!important;border:1px solid var(--lijn)!important;}
+
+/* Peaks-card: border i.p.v. shadow */
+.peaks-card{box-shadow:none!important;border:1px solid var(--lijn)!important;}
+
+/* Spellen-cards: wit met border */
+.spel-card{background:#fff!important;box-shadow:none!important;border:1px solid var(--lijn)!important;}
+.spel-card:active{background:var(--lila-soft)!important;}
+
+/* Profielkaarten login: wit met border */
+.profile-card{background:#fff!important;border:1px solid var(--lijn)!important;}
+.profile-card:hover,.profile-card:active{background:var(--lila-soft)!important;border-color:var(--lila)!important;transform:none!important;}
+
+/* Match-overlay box */
+.match-box{background:#fff!important;box-shadow:none!important;border:1px solid var(--lijn)!important;}
+.match-title{color:var(--lila-deep)!important;}
+
+/* Poll-day-tab active: lila-deep (was al goed, verstevig) */
+.poll-day-tab.active{background:var(--lila-deep)!important;border-color:var(--lila-deep)!important;}
+
+/* Game-kaarten: wit */
+.wzd-statement,.trein-card,.quiz-opt:not(.correct):not(.wrong){background:#fff!important;border:1px solid var(--lijn)!important;box-shadow:none!important;}
+.hoofd-cat-btn{background:#fff!important;border:1px solid var(--lijn)!important;}
+
+/* Lila-deep als primaire accentkleur voor knoppen */
+.sbtn-dream{background:var(--lila-deep)!important;}
+.sbtn-like{background:var(--inkt)!important;}
+.match-close,.quiz-next-btn,.trein-btn.primary{background:var(--inkt)!important;}
+
+/* Countdown nog sterker op-merk */
+.countdown-block{border:1px solid rgba(91,88,184,0.15)!important;}
+
+/* Section-foto headers: kleiner en schoner */
+.sec-photo-header{height:130px!important;}
+
+/* Groep-section foto-badges: lila tint */
+.match-card-hero-grad{background:rgba(91,88,184,0.18)!important;}
 </style>
 </head>
 <body>
