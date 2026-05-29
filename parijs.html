@@ -4120,6 +4120,46 @@ function _safeJSON(key, def) {
 
 function buildGroupContext() {
   const users = ['griette','frederike','miriam','marlinde'];
+  const allSwipesData = {..._allSwipes};
+
+  // Build groupLiked map: id → [names]
+  const groupLiked = {};
+  Object.entries(allSwipesData).forEach(([uid, sw]) => {
+    Object.entries(sw || {}).forEach(([id, v]) => {
+      if (v === 1 || v === 'like' || v === 'dream') {
+        if (!groupLiked[id]) groupLiked[id] = [];
+        groupLiked[id].push(PROFILES[uid]?.naam || uid);
+      }
+    });
+  });
+
+  const matches = Object.entries(groupLiked)
+    .filter(([, names]) => names.length >= 2)
+    .sort((a, b) => b[1].length - a[1].length)
+    .map(([id, names]) => {
+      const item = ITEMS_BASE.find(i => i.id === id);
+      if (!item) return null;
+      const isDream = Object.entries(allSwipesData).some(([, sw]) => sw?.[id] === 'dream');
+      return `${isDream ? '🌟 DROOM' : '❤️ MATCH'} (${names.length}x geliked door ${names.join(', ')}): ${item.naam} [${item.cat}] — ${item.wijk}`;
+    }).filter(Boolean);
+
+  const singles = Object.entries(groupLiked)
+    .filter(([, names]) => names.length === 1)
+    .map(([id, names]) => {
+      const item = ITEMS_BASE.find(i => i.id === id);
+      return item ? `• ${names[0]} wil: ${item.naam} [${item.cat}]` : null;
+    }).filter(Boolean).slice(0, 8);
+
+  // Voorkeur per person
+  const vkLines = users.map(u => {
+    const vk = _allVoorkeur[u] || _safeJSON('vz_voorkeur_'+u, []);
+    if (!vk?.length) return null;
+    const answers = VOORKEUR_VRAGEN.map((q, i) => _vkAnsText(vk, i)).filter(Boolean);
+    if (!answers.length) return null;
+    return `${PROFILES[u]?.naam}: ${answers.slice(0, 4).join(' · ')}`;
+  }).filter(Boolean);
+
+  // Shared vibes (2+ agree)
   const VIBES_NAMES = [
     ['Lange ochtend koffie','Snel opstaan','Uitslapen'],
     ['Weinig shoppen','Eén of twee dingen','Shoppen!'],
@@ -4130,35 +4170,6 @@ function buildGroupContext() {
     ['Dansen!','Bar + diner','Vroeg slapen'],
     ['Bewust/selectief','Normaal budget','Dit is een uitje — geef me over'],
   ];
-
-  // Group likes per item
-  const groupLiked = {};
-  users.forEach(u => {
-    const sw = _allSwipes[u] || _safeJSON('vz_swipes_'+u, {});
-    Object.entries(sw || {}).forEach(([id, v]) => {
-      if (v === 1 || v === 'like' || v === 'dream') {
-        if (!groupLiked[id]) groupLiked[id] = [];
-        groupLiked[id].push(PROFILES[u]?.naam || u);
-      }
-    });
-  });
-  const groupMatches3 = Object.entries(groupLiked)
-    .filter(([, names]) => names.length >= 3)
-    .sort((a, b) => b[1].length - a[1].length)
-    .map(([id, names]) => {
-      const item = ITEMS_BASE.find(i => i.id === id);
-      return item ? `⭐ ${item.naam} [${names.join('+')}]` : null;
-    }).filter(Boolean);
-  const groupMatches2 = Object.entries(groupLiked)
-    .filter(([, names]) => names.length === 2)
-    .sort((a, b) => b[1].length - a[1].length)
-    .slice(0, 8)
-    .map(([id, names]) => {
-      const item = ITEMS_BASE.find(i => i.id === id);
-      return item ? `${item.naam} [${names.join('+')}]` : null;
-    }).filter(Boolean);
-
-  // Shared vibes: find per-category answers agreed by 2+ people
   const personVibes = {};
   users.forEach(u => {
     const vk = _allVoorkeur[u] || _safeJSON('vz_voorkeur_'+u, []);
@@ -4169,31 +4180,12 @@ function buildGroupContext() {
     const byAnswer = {};
     users.forEach(u => {
       const idx = personVibes[u]?.[cat];
-      if (typeof idx === 'number') {
-        if (!byAnswer[idx]) byAnswer[idx] = [];
-        byAnswer[idx].push(PROFILES[u]?.naam || u);
-      }
+      if (typeof idx === 'number') { if (!byAnswer[idx]) byAnswer[idx] = []; byAnswer[idx].push(PROFILES[u]?.naam || u); }
     });
     Object.entries(byAnswer).forEach(([idx, names]) => {
-      if (names.length >= 2) {
-        const label = VIBES_NAMES[cat]?.[parseInt(idx)];
-        if (label) sharedVibes.push(`"${label}" [${names.join('+')}]`);
-      }
+      if (names.length >= 2) { const label = VIBES_NAMES[cat]?.[parseInt(idx)]; if (label) sharedVibes.push(`"${label}" [${names.join('+')}]`); }
     });
   }
-
-  // Per-person likes + individual vibes that differ from the group
-  const perPerson = users.map(u => {
-    const sw = _allSwipes[u] || _safeJSON('vz_swipes_'+u, {});
-    const liked = Object.entries(sw)
-      .filter(([, v]) => v === 1 || v === 'like' || v === 'dream')
-      .map(([id]) => ITEMS_BASE.find(i => i.id === id)?.naam).filter(Boolean).slice(0, 5);
-    const vibes = (personVibes[u] || []).map((idx, cat) =>
-      typeof idx === 'number' ? VIBES_NAMES[cat]?.[idx] : null
-    ).filter(Boolean).slice(0, 3);
-    const bio = _allBios[u] || localStorage.getItem('vz_profile_bio_'+u) || '';
-    return `${PROFILES[u]?.naam}: likes=[${liked.join('; ') || '—'}] vibes=[${vibes.join('; ') || '—'}]${bio ? ' · ' + bio : ''}`;
-  });
 
   // Bookings
   const bookings = Object.entries(_allBookings || {}).map(([id, b]) => {
@@ -4201,17 +4193,13 @@ function buildGroupContext() {
     return r ? `${r.naam} (door ${PROFILES[b.by]?.naam || b.by})` : null;
   }).filter(Boolean);
 
-  return `GEDEELDE GROEPSVOORKEUREN (meeste mensen hetzelfde gekozen — weeg dit zwaar mee):
-${sharedVibes.length ? sharedVibes.join('\n') : 'Nog niet genoeg data'}
+  let ctx = '';
+  if (matches.length) ctx += `\nGROEPSMATCHES (prioriteit in het programma!):\n${matches.join('\n')}`;
+  if (singles.length) ctx += `\n\nINDIVIDUELE LIKES (ook meewegen):\n${singles.join('\n')}`;
+  if (sharedVibes.length) ctx += `\n\nGEDEELDE VOORKEUREN:\n${sharedVibes.join('\n')}`;
+  if (vkLines.length) ctx += `\n\nVOORKEUR PER PERSOON:\n${vkLines.join('\n')}`;
 
-ALLE 3 GELIKED — absolute topprioriteit voor voorstellen:
-${groupMatches3.length ? groupMatches3.join('\n') : 'Nog geen items door alle 3 geliked'}
-
-OOK POPULAIR (2 mensen geliked):
-${groupMatches2.length ? groupMatches2.join('\n') : 'Nog onvoldoende data'}
-
-PER PERSOON:
-${perPerson.join('\n')}
+  return (ctx || 'Nog geen swipe-data beschikbaar.') + `
 
 AL GEBOEKT: ${bookings.length ? bookings.join(', ') : 'nog niks'}
 
@@ -4693,6 +4681,28 @@ function _localChatReply(text) {
   scored.forEach(x => { x.score += (vkBoost[x.item.cat]||0) * 2; });
   scored.sort((a, b) => b.score - a.score);
 
+  // Items met 3+ groepslikes altijd vooraan
+  scored.sort((a, b) => {
+    const aGl = a.gl || 0; const bGl = b.gl || 0;
+    if (bGl >= 3 && aGl < 3) return 1;
+    if (aGl >= 3 && bGl < 3) return -1;
+    return b.score - a.score;
+  });
+
+  // Urgency prefix: als er een item is met 3+ groepslikes
+  {
+    const allWant = scored.filter(x => (x.gl || 0) >= 3);
+    if (allWant.length) {
+      const first = allWant[0];
+      const names = Object.entries(allSwipesData)
+        .filter(([,sw]) => { const v = sw?.[first.item.id]; return v === 1 || v === 'like' || v === 'dream'; })
+        .map(([u]) => PROFILES[u]?.naam).filter(Boolean);
+      window._urgentPrefix = `🔥 **${names.length} van jullie willen hetzelfde:** ${first.item.naam} — ${names.join(', ')} hebben dit geliked. Dit moet in het programma.\n\n`;
+    } else {
+      window._urgentPrefix = '';
+    }
+  }
+
   // ── Voorkeur context string ───────────────────────
   function _vkContext() {
     const actief = users.filter(u => {
@@ -4705,10 +4715,11 @@ function _localChatReply(text) {
   }
 
   // ── Group matches shortcut ────────────────────────
+  const up = window._urgentPrefix || '';
   if (wantMatches) {
     const gm = scored.filter(x => x.gl >= 2).slice(0, 3);
-    if (gm.length) return '❤️ **Jullie groepsfavorieten** — 2+ mensen hebben dit geliked:\n\n' + gm.map(x => _fmtItem(x.item, allSwipesData)).join('\n\n') + _vkContext();
-    return 'Nog niet genoeg overlapping in de swipes — laat de anderen ook wat swipen! Hier zijn aanbevolen opties op basis van jullie wensen:\n\n' + scored.slice(0,3).map(x => _fmtItem(x.item, allSwipesData)).join('\n\n');
+    if (gm.length) return up + '❤️ **Jullie groepsfavorieten** — 2+ mensen hebben dit geliked:\n\n' + gm.map(x => _fmtItem(x.item, allSwipesData)).join('\n\n') + _vkContext();
+    return up + 'Nog niet genoeg overlapping in de swipes — laat de anderen ook wat swipen! Hier zijn aanbevolen opties op basis van jullie wensen:\n\n' + scored.slice(0,3).map(x => _fmtItem(x.item, allSwipesData)).join('\n\n');
   }
 
   const top = scored.slice(0, 3);
@@ -4718,12 +4729,22 @@ function _localChatReply(text) {
   const tijdLabel = tijd || '';
   const intro = [dagLabel, tijdLabel].filter(Boolean).join(' ');
   const vkCtx = (wantActief || tijd === 'ochtend') ? _vkContext() : '';
-  return (intro ? `Op ${intro} passen deze goed bij jullie:\n\n` : 'Dit past goed bij jullie groep:\n\n') + top.map(x => _fmtItem(x.item, allSwipesData)).join('\n\n') + vkCtx;
+  return up + (intro ? `Op ${intro} passen deze goed bij jullie:\n\n` : 'Dit past goed bij jullie groep:\n\n') + top.map(x => _fmtItem(x.item, allSwipesData)).join('\n\n') + vkCtx;
 }
 
 function _fmtItem(item, allSwipesData) {
-  const likedBy = Object.entries(allSwipesData).filter(([,sw]) => { const v = sw?.[item.id]; return v === 1 || v === 'like' || v === 'dream'; }).map(([u]) => PROFILES[u]?.naam).filter(Boolean);
-  const likeStr = likedBy.length ? ` · ❤️ ${likedBy.join(', ')}` : '';
+  const likedBy = Object.entries(allSwipesData)
+    .filter(([,sw]) => { const v = sw?.[item.id]; return v === 1 || v === 'like' || v === 'dream'; })
+    .map(([u]) => PROFILES[u]?.naam).filter(Boolean);
+  const dreamBy = Object.entries(allSwipesData)
+    .filter(([,sw]) => sw?.[item.id] === 'dream')
+    .map(([u]) => PROFILES[u]?.naam).filter(Boolean);
+  const lc = likedBy.length;
+  let likeStr = '';
+  if (lc >= 3) likeStr = ` · ❤️ Jullie willen dit ALLEMAAL: ${likedBy.join(', ')}`;
+  else if (lc === 2) likeStr = ` · ❤️ ${likedBy.join(' én ')} willen dit beiden`;
+  else if (lc === 1) likeStr = ` · ❤️ ${likedBy[0]} heeft dit geliked`;
+  if (dreamBy.length) likeStr += ` · 🌟 DROOM van ${dreamBy.join(', ')}`;
   const desc = item.verhaal ? item.verhaal.slice(0, 110) + (item.verhaal.length > 110 ? '…' : '') : '';
   return `**${item.naam}** (${item.wijk})\n${desc}\n🕐 ${item.tijden||'?'} · ${item.prijs}${likeStr}`;
 }
@@ -5554,6 +5575,85 @@ function _clearDagDeelCache(day, deel) {
   renderHomeDagprog();
 }
 
+function _editDagdeel(day, deel) {
+  const cached = _safeJSON(_dagDeelCacheKey(day, deel), null);
+  if (!cached) return;
+  let sheet = document.getElementById('dag-edit-sheet');
+  if (!sheet) {
+    sheet = document.createElement('div');
+    sheet.id = 'dag-edit-sheet';
+    sheet.style.cssText = 'position:fixed;inset:0;z-index:700;display:none;flex-direction:column;background:var(--ivoor);';
+    sheet.innerHTML = `
+      <div style="padding:16px 20px;border-bottom:1px solid var(--lijn);display:flex;align-items:center;gap:12px;">
+        <button onclick="document.getElementById('dag-edit-sheet').style.display='none'" style="background:none;border:none;font-size:1.4rem;cursor:pointer;line-height:1;">←</button>
+        <div style="font-family:var(--sans);font-weight:700;font-size:1.05rem;">Programma aanpassen</div>
+      </div>
+      <div style="flex:1;padding:20px;overflow-y:auto;">
+        <div style="font-size:0.75rem;color:var(--grijs);margin-bottom:10px;">Typ je wens — de AI past het programma aan voor de groep.</div>
+        <textarea id="dag-edit-input" style="width:100%;box-sizing:border-box;min-height:80px;padding:10px;border:1.5px solid var(--lijn);border-radius:10px;font-family:var(--sans);font-size:0.9rem;resize:none;outline:none;background:#fff;" placeholder="Bijv: 'Geen Louvre, liever een wandeling' of 'Kan Café Pli hier inpassen?'"></textarea>
+        <div id="dag-edit-preview" style="margin-top:12px;font-size:0.82rem;color:var(--grijs);line-height:1.6;white-space:pre-wrap;"></div>
+      </div>
+      <div style="padding:16px 20px;border-top:1px solid var(--lijn);">
+        <button id="dag-edit-submit" onclick="_submitDagEdit()" style="width:100%;padding:13px;background:var(--inkt);color:#fff;border:none;border-radius:100px;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:var(--sans);">Pas programma aan →</button>
+      </div>`;
+    document.body.appendChild(sheet);
+  }
+  window._dagEditCtx = { day, deel };
+  document.getElementById('dag-edit-input').value = '';
+  document.getElementById('dag-edit-preview').textContent = '';
+  sheet.style.display = 'flex';
+  setTimeout(() => document.getElementById('dag-edit-input')?.focus(), 150);
+}
+
+async function _submitDagEdit() {
+  const ctx = window._dagEditCtx;
+  if (!ctx) return;
+  const input = document.getElementById('dag-edit-input')?.value?.trim();
+  if (!input) return;
+  const btn = document.getElementById('dag-edit-submit');
+  btn.textContent = '⏳ Claude past aan…';
+  btn.disabled = true;
+  const apiKey = localStorage.getItem('claude_api_key') || '';
+  if (!apiKey) { document.getElementById('dag-edit-preview').textContent = 'Geen API key — stel die in bij Mij → API.'; btn.textContent = 'Pas programma aan →'; btn.disabled = false; return; }
+  const cached = _safeJSON(_dagDeelCacheKey(ctx.day, ctx.deel), null);
+  const alreadyPlanned = _getAlreadyPlannedVenues(ctx.day, ctx.deel);
+  const system = `Je bent reisassistent voor Vroegzat (Griette, Frederike, Miriam, Marlinde) in Parijs 26–28 juni 2026. Airbnb: Rue de la Lune, 2e arr. Je past een bestaand dagprogramma aan op basis van een wens. Houd hetzelfde format aan. Reageer in het Nederlands.${alreadyPlanned.length ? `\nAL INGEPLAND ELDERS (niet herhalen): ${alreadyPlanned.join(', ')}` : ''}
+
+APP CATALOGUS:
+${_buildItemsCatalog()}
+
+GROEPSDATA:
+${buildGroupContext()}`;
+  const userMsg = `Bestaand programma voor ${_DAG_LABELS[ctx.day] || ctx.day} ${_DEEL_LABELS[ctx.deel] || ctx.deel}:\n${cached?.text || '(leeg)'}\n\nAanpassing gewenst door ${PROFILES[currentUser]?.naam}: "${input}"\n\nPas het programma aan. Houd hetzelfde format (⏰ HH:MM — Naam — uitleg). Max 3 activiteiten.`;
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 500, system, messages: [{ role: 'user', content: userMsg }] })
+    });
+    const data = await resp.json();
+    const text = (data.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim();
+    if (text) {
+      const record = { text, ts: Date.now(), by: cached?.by || currentUser, editedBy: currentUser };
+      localStorage.setItem(_dagDeelCacheKey(ctx.day, ctx.deel), JSON.stringify(record));
+      supa.from('group_state').upsert(
+        { group_id: GROUP_ID, user_id: 'shared', key: `dagprog_${ctx.day}_${ctx.deel}`, value: record, updated_at: new Date().toISOString() },
+        { onConflict: 'group_id,user_id,key' }
+      ).then(() => {});
+      document.getElementById('dag-edit-sheet').style.display = 'none';
+      renderDagprogrammaBar();
+      renderHomeDagprog();
+      showToast(`✓ ${PROFILES[currentUser]?.naam} heeft het programma aangepast`);
+    } else {
+      document.getElementById('dag-edit-preview').textContent = 'Geen antwoord ontvangen — probeer opnieuw.';
+    }
+  } catch(e) {
+    document.getElementById('dag-edit-preview').textContent = 'Fout — controleer je verbinding en API key.';
+  }
+  btn.textContent = 'Pas programma aan →';
+  btn.disabled = false;
+}
+
 async function _genDagdeel(day, deel, prefix) {
   const btnId = `dg-btn-${prefix}-${deel}`;
   const btn = document.getElementById(btnId);
@@ -5915,10 +6015,18 @@ function _renderDagdeelCard(day, deel, forHome) {
           ${_renderReservBanner(_detectReservations(cached.text))}`;
       }
 
+      const editedByName = cached.editedBy && cached.editedBy !== cached.by ? (PROFILES[cached.editedBy]?.naam || cached.editedBy) : null;
+      const byLine = editedByName
+        ? `<span style="font-size:0.62rem;color:#D4785A;">✏️ Aangepast door ${editedByName}</span>`
+        : (byName ? `<span style="font-size:0.62rem;color:#C0BBB7;">door ${byName}</span>` : '');
+      const editBtn = !ctx.vast && apiKey
+        ? `<button onclick="_editDagdeel('${day}','${deel}','${prefix}')" style="background:none;border:1.5px dashed rgba(10,10,10,0.14);border-radius:20px;font-family:var(--sans);font-size:0.62rem;color:#9A948E;cursor:pointer;padding:3px 9px;">✏️ Aanpassen</button>`
+        : '';
       content = `${mainHtml}
         ${_renderReactionBar(day, deel, prefix, forHome)}
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          ${byName ? `<span style="font-size:0.62rem;color:#C0BBB7;">door ${byName}</span>` : ''}
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">
+          ${byLine}
+          ${editBtn}
           <button onclick="_clearDagDeelCache('${day}','${deel}')" style="background:none;border:none;font-size:0.62rem;color:#C0BBB7;cursor:pointer;padding:0;">↺ Nieuw genereren</button>
         </div>`;
     } else if (apiKey) {
