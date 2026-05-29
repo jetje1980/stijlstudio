@@ -415,9 +415,9 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:300;font-style:italic;font-vari
 .intro-med.show{opacity:1;}
 .intro-sub{font-family:Georgia,serif;color:#B8A890;font-size:0.95rem;margin-bottom:28px;opacity:0;transition:opacity 0.6s 0.2s;}
 .intro-sub.show{opacity:1;}
-.intro-cta-btn{padding:13px 36px;border:none;border-radius:30px;background:#F0E8E2;color:#0D1A0E;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;opacity:0;transition:opacity 0.5s;margin-top:4px;}
+.intro-cta-btn{padding:13px 36px;border:none;border-radius:30px;background:#F0E8E2;color:#0D1A0E;font-family:var(--sans);font-size:0.88rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;opacity:0;transition:opacity 0.5s;margin-top:4px;}
 .intro-cta-btn.show{opacity:1;}
-.intro-skip{position:absolute;top:20px;right:20px;background:transparent;border:none;color:rgba(240,232,226,0.45);font-family:'DM Sans',sans-serif;font-size:0.75rem;cursor:pointer;padding:8px;letter-spacing:0.04em;}
+.intro-skip{position:absolute;top:20px;right:20px;background:transparent;border:none;color:rgba(240,232,226,0.45);font-family:var(--sans);font-size:0.75rem;cursor:pointer;padding:8px;letter-spacing:0.04em;}
 .intro-dots{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;gap:6px;}
 .intro-dot{width:6px;height:6px;border-radius:3px;background:rgba(240,232,226,0.25);transition:all 0.35s;}
 .intro-dot.active{width:22px;background:rgba(240,232,226,0.85);}
@@ -433,7 +433,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:300;font-style:italic;font-vari
 .pp-nudge{background:rgba(10,10,10,0.04);border:1.5px dashed rgba(10,10,10,0.1);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:10px;}
 /* ── WARMUP */
 .wu-q{font-family:Georgia,serif;font-size:1.1rem;color:#0A0A0A;line-height:1.5;text-align:center;margin-bottom:16px;}
-.wu-opt{width:100%;padding:11px 16px;border:1.5px solid rgba(10,10,10,0.12);border-radius:var(--r-lg);background:#fff;font-family:'DM Sans',sans-serif;font-size:0.88rem;cursor:pointer;text-align:left;transition:all 0.15s;margin-bottom:7px;display:block;}
+.wu-opt{width:100%;padding:11px 16px;border:1.5px solid rgba(10,10,10,0.12);border-radius:var(--r-lg);background:#fff;font-family:var(--sans);font-size:0.88rem;cursor:pointer;text-align:left;transition:all 0.15s;margin-bottom:7px;display:block;}
 .wu-opt:active,.wu-opt.picked{background:#0A0A0A;color:#F0E8E2;border-color:#0A0A0A;}
 .wu-reveal{display:flex;align-items:flex-start;gap:9px;padding:9px 11px;background:rgba(10,10,10,0.04);border-radius:10px;margin-bottom:6px;}
 .wu-bar{height:3px;background:rgba(168,159,232,0.2);border-radius:2px;overflow:hidden;margin-bottom:18px;}
@@ -814,6 +814,75 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
   text-transform:none!important;padding:8px 16px!important;font-weight:500!important;
 }
 .stab.active{background:var(--inkt)!important;color:#fff!important;}
+
+/* ═══════════════════════════════════
+   FINAL FIXES — redesign brief
+   ═══════════════════════════════════ */
+
+/* Probleem 1: DM Sans overrides neutraliseren */
+#welkom-screen, #welkom-screen * { font-family:var(--sans)!important; }
+#welkom-naam {
+  font-family:var(--serif)!important;font-style:italic!important;font-weight:300!important;
+  font-size:2.2rem!important;font-variation-settings:"opsz" 144,"SOFT" 90,"WONK" 1!important;
+}
+#welkom-btn {
+  font-family:var(--sans)!important;border-radius:100px!important;background:var(--inkt)!important;
+}
+
+/* Fix: missie-title → serif italic */
+.missie-title,#missie-title {
+  font-family:var(--serif)!important;font-style:italic!important;font-weight:300!important;
+  font-size:1.6rem!important;font-variation-settings:"opsz" 72,"SOFT" 60,"WONK" 1!important;
+}
+
+/* Fix: game-overlay titels */
+.game-title {
+  font-family:var(--serif)!important;font-style:italic!important;font-weight:300!important;
+  font-variation-settings:"opsz" 72,"SOFT" 60,"WONK" 1!important;
+}
+
+/* Fix: spel-naam → serif italic */
+.spel-naam {
+  font-family:var(--serif)!important;font-style:italic!important;font-weight:300!important;
+  font-size:1.1rem!important;font-variation-settings:"opsz" 60,"SOFT" 60,"WONK" 1!important;
+}
+
+/* Fix: poll/quiz/kaarten vraag-tekst */
+.poll-q,.quiz-question,.wzd-quote,.trein-card-text {
+  font-family:var(--serif)!important;font-style:italic!important;font-weight:300!important;
+  font-variation-settings:"opsz" 60,"SOFT" 60,"WONK" 1!important;
+}
+
+/* Fix: sec-photo-header kleiner */
+.sec-photo-header { height:90px!important; }
+
+/* Fix: home action-title font-weight */
+.home-action-title { font-weight:300!important; }
+
+/* Fix: missie-btn pill */
+.missie-done-btn,#missie-btn {
+  border-radius:100px!important;font-family:var(--sans)!important;
+  font-size:13px!important;font-weight:500!important;letter-spacing:0.06em!important;
+}
+
+/* Probleem 2: AI-knop op home */
+.home-ai-strip { padding:0 20px 24px; }
+.home-ai-btn {
+  width:100%;display:flex;align-items:center;gap:14px;
+  padding:16px 20px;background:var(--inkt);border:none;
+  border-radius:8px;cursor:pointer;text-align:left;
+}
+.home-ai-icon { font-size:1.4rem;color:var(--lila);flex-shrink:0; }
+.home-ai-text { flex:1; }
+.home-ai-title { font-family:var(--sans);font-size:14px;font-weight:600;color:#fff;line-height:1.2; }
+.home-ai-sub { font-family:var(--sans);font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px; }
+.home-ai-arrow { margin-left:auto;color:rgba(255,255,255,0.4);font-size:1.1rem;flex-shrink:0; }
+
+/* Probleem 3: streak-legenda */
+.home-streak-legend {
+  font-family:var(--sans);font-size:10px;color:var(--grijs);
+  text-align:center;padding:0 20px 8px;letter-spacing:0.04em;
+}
 </style>
 </head>
 <body>
@@ -890,10 +959,10 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
 
 <!-- WELKOM SCHERM -->
 <div id="welkom-screen" style="display:none;position:fixed;inset:0;z-index:950;background:#F0E8E2;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;">
-  <div id="welkom-avatar" style="width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-weight:800;font-size:1.6rem;color:#fff;margin:0 auto 24px;"></div>
+  <div id="welkom-avatar" style="width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.6rem;color:#fff;margin:0 auto 24px;"></div>
   <div id="welkom-naam" style="font-size:2.4rem;color:#0A0A0A;margin-bottom:10px;"></div>
   <div id="welkom-sub" style="font-size:0.9rem;color:#6B6560;line-height:1.65;max-width:300px;margin:0 auto 28px;"></div>
-  <button id="welkom-btn" onclick="startApp()" style="padding:14px 36px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Beginnen →</button>
+  <button id="welkom-btn" onclick="startApp()" style="padding:14px 36px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Beginnen →</button>
   <div id="welkom-nota" style="font-size:0.7rem;color:#9A948E;margin-top:16px;max-width:280px;line-height:1.5;"></div>
 </div>
 
@@ -995,7 +1064,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
 <!-- EVENT TOEVOEGEN MODAL -->
 <div id="event-modal" style="display:none;position:fixed;inset:0;z-index:700;background:rgba(10,10,10,0.3);align-items:flex-end;">
   <div style="background:#F0E8E2;border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-height:80vh;overflow-y:auto;">
-    <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.4rem;margin-bottom:4px;color:#0A0A0A;">Evenement toevoegen</div>
+    <div style="font-family:var(--sans);font-style:italic;font-weight:700;font-size:1.4rem;margin-bottom:4px;color:#0A0A0A;">Evenement toevoegen</div>
     <div style="font-size:0.72rem;color:#6B6560;margin-bottom:14px;">Iets gevonden dat dit weekend speelt? Zet het hier.</div>
 
     <!-- Bron-tips -->
@@ -1066,6 +1135,19 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
 
     <!-- BLOCK 2: AVATARS (populated by initStories) -->
     <div class="home-avatar-row" id="stories-row"></div>
+    <div class="home-streak-legend">🔥 = dagen missie voltooid</div>
+
+    <!-- AI KNOP -->
+    <div class="home-ai-strip">
+      <button class="home-ai-btn" onclick="openParisChatSheet()">
+        <span class="home-ai-icon">✦</span>
+        <div class="home-ai-text">
+          <div class="home-ai-title">Genereer ons dagprogramma</div>
+          <div class="home-ai-sub">AI maakt een plan op basis van jullie swipes</div>
+        </div>
+        <span class="home-ai-arrow">→</span>
+      </button>
+    </div>
 
     <!-- BLOCK 3: ACTION CARD (content populated by renderMissie) -->
     <div class="home-action-card">
@@ -1268,8 +1350,8 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
           <div id="warmup-badge" style="font-size:0.65rem;color:#D4785A;font-weight:700;white-space:nowrap;"></div>
         </div>
         <div style="margin-top:12px;border-top:1px solid rgba(212,120,90,0.2);padding-top:12px;display:flex;gap:8px;">
-          <button onclick="openGame('warmup')" style="flex:1;padding:9px;border:none;border-radius:var(--r-lg);background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;">Speel mee →</button>
-          <button onclick="_wuShare()" style="padding:9px 14px;border:1.5px solid rgba(212,120,90,0.4);border-radius:var(--r-lg);background:transparent;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;color:#D4785A;">💬 Stuur via WhatsApp</button>
+          <button onclick="openGame('warmup')" style="flex:1;padding:9px;border:none;border-radius:var(--r-lg);background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;">Speel mee →</button>
+          <button onclick="_wuShare()" style="padding:9px 14px;border:1.5px solid rgba(212,120,90,0.4);border-radius:var(--r-lg);background:transparent;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;color:#D4785A;">💬 Stuur via WhatsApp</button>
         </div>
       </div>
     </div>
@@ -1627,7 +1709,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
       </div>
       <div style="margin:0 20px 4px;padding:16px 0;border-top:1px solid rgba(10,10,10,0.08);display:flex;align-items:center;justify-content:space-between;gap:12px;">
         <div style="font-size:0.82rem;color:#6B6560;line-height:1.4;">Nog niet iedereen erbij?</div>
-        <button onclick="kopieerUitnodiging()" style="flex-shrink:0;padding:9px 18px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;">📤 Kopieer uitnodiging</button>
+        <button onclick="kopieerUitnodiging()" style="flex-shrink:0;padding:9px 18px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;">📤 Kopieer uitnodiging</button>
       </div>
       <div class="alarm-banner">🔔 <strong>Vergeet niet te reserveren:</strong> Chez Janou, Bouillon Racine, Baja Bikes, Atelier des Lumières, Louvre tijdslot</div>
     </div>
@@ -1965,7 +2047,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
 </div>
 
 <!-- FLOATING CHAT BUTTON -->
-<button id="paris-chat-btn" onclick="openParisChatSheet()" title="Reisassistent" style="position:fixed;bottom:78px;right:16px;z-index:300;width:50px;height:50px;border-radius:50%;background:#A89FE8;border:none;box-shadow:0 4px 18px rgba(168,159,232,0.5);cursor:pointer;font-size:1.3rem;display:flex;align-items:center;justify-content:center;">🗺️</button>
+<!-- paris-chat-btn verwijderd: vervangen door home-ai-btn op homescherm -->
 
 <!-- PARIS CHAT SHEET -->
 <div id="paris-chat-sheet" style="display:none;position:fixed;inset:0;z-index:950;background:rgba(10,10,10,0.45);" onclick="if(event.target===this)closeParisChatSheet()">
@@ -2006,7 +2088,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
 </div>
 
 <!-- ADMIN PANEL -->
-<div id="admin-panel" style="display:none;position:fixed;inset:0;z-index:1200;background:#F0E8E2;overflow-y:auto;font-family:'DM Sans',sans-serif;">
+<div id="admin-panel" style="display:none;position:fixed;inset:0;z-index:1200;background:#F0E8E2;overflow-y:auto;font-family:var(--sans);">
   <div style="max-width:500px;margin:0 auto;padding:32px 20px 20px;">
     <div style="font-size:0.6rem;letter-spacing:0.14em;color:#9A948E;margin-bottom:4px;">BEHEER · ALLEEN VOOR GRIETTE</div>
     <div style="font-size:1.7rem;font-weight:800;color:#0A0A0A;font-family:Georgia,serif;margin-bottom:2px;">Dashboard</div>
@@ -2962,7 +3044,7 @@ function initMap() {
     iconSize: [size, size], iconAnchor: [size/2, size/2], popupAnchor: [0, -size/2-2]
   });
 
-  const popStyle = 'font-family:DM Sans,sans-serif;font-size:13px;line-height:1.4;';
+  const popStyle = 'font-family:var(--sans);font-size:13px;line-height:1.4;';
 
   // Special locations
   L.marker([48.8696, 2.3490], {icon: pin('#0A0A0A', 16)}).addTo(map)
@@ -5055,7 +5137,7 @@ function renderOverzicht() {
             <span style="font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--t3);">${item.sub}</span>
             ${item.verborgen ? `<span style="font-size:0.6rem;color:#A89FE8;">✨</span>` : ''}
           </div>
-          <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:0.98rem;color:#0A0A0A;margin-bottom:2px;">${item.naam}</div>
+          <div style="font-family:var(--sans);font-style:italic;font-weight:700;font-size:0.98rem;color:#0A0A0A;margin-bottom:2px;">${item.naam}</div>
           ${item.hook ? `<div style="font-size:0.78rem;font-weight:600;color:#0A0A0A;margin-bottom:5px;line-height:1.3;">${item.hook}</div>` : ''}
           ${item.verhaal ? `<div style="font-size:0.75rem;color:var(--t2);line-height:1.5;margin-bottom:6px;border-left:2px solid var(--gold);padding-left:8px;font-style:italic;">${item.verhaal.substring(0,120)}${item.verhaal.length>120?'…':''}</div>` : ''}
           <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
@@ -6257,7 +6339,7 @@ function renderGroep() {
       const ph = getUserPhoto(u);
       const avEl = ph
         ? `<img src="${ph}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
-        : `<div style="width:32px;height:32px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.8rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>`;
+        : `<div style="width:32px;height:32px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-style:italic;font-size:0.8rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>`;
       return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--r-lg);background:rgba(10,10,10,0.04);">
         ${avEl}
         <div style="flex:1;">
@@ -6334,7 +6416,7 @@ function renderSlaapIndeling() {
       const ph = getUserPhoto(u);
       const avEl = ph
         ? `<img src="${ph}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
-        : `<div style="width:28px;height:28px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.65rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>`;
+        : `<div style="width:28px;height:28px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-style:italic;font-size:0.65rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>`;
       return `<div onclick="wisselslaap('${u}')" style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:var(--r);cursor:pointer;background:rgba(10,10,10,0.04);transition:background 0.15s;" title="Tap om te wisselen">
         ${avEl}
         <div style="font-size:0.85rem;color:#0A0A0A;">${p.naam}${warning}</div>
@@ -7570,9 +7652,9 @@ function renderVoorkeurIntro() {
   const intro = VOORKEUR_INTRO[currentUser] || 'Jouw antwoorden helpen Griette het programma op jou af te stemmen.';
   document.getElementById('vk-body').innerHTML = `
     <div style="font-size:3rem;text-align:center;margin-bottom:20px;">${p.color === '#D4785A' ? '🥐' : p.color === '#7A9E82' ? '📋' : p.color === '#7A8EAD' ? '🍽️' : '✨'}</div>
-    <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:800;font-size:1.5rem;text-align:center;color:#0A0A0A;margin-bottom:12px;">Jouw voorkeuren</div>
+    <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.5rem;text-align:center;color:#0A0A0A;margin-bottom:12px;">Jouw voorkeuren</div>
     <div style="font-size:0.92rem;color:#6B6560;line-height:1.6;text-align:center;max-width:300px;margin:0 auto 32px;">${intro}</div>
-    <button onclick="vkIdx=0;renderVoorkeurVraag();" style="width:100%;padding:14px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Starten →</button>
+    <button onclick="vkIdx=0;renderVoorkeurVraag();" style="width:100%;padding:14px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Starten →</button>
   `;
 }
 
@@ -7585,27 +7667,27 @@ function renderVoorkeurVraag() {
   if (v.type === 'text') {
     document.getElementById('vk-body').innerHTML = `
       <div style="font-size:3rem;text-align:center;margin-bottom:20px;">${v.emoji}</div>
-      <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.35rem;text-align:center;line-height:1.3;color:#0A0A0A;margin-bottom:6px;">${v.vraag}</div>
+      <div style="font-family:var(--sans);font-style:italic;font-weight:700;font-size:1.35rem;text-align:center;line-height:1.3;color:#0A0A0A;margin-bottom:6px;">${v.vraag}</div>
       <div style="font-size:0.72rem;color:#9A948E;text-align:center;margin-bottom:20px;">Schrijf in je eigen woorden — dit is voor jou</div>
       <textarea id="vk-musthave-text" placeholder="${v.placeholder}" rows="4" style="width:100%;padding:14px;border:1.5px solid rgba(10,10,10,0.12);border-radius:var(--r-lg);background:rgba(10,10,10,0.04);font-family:var(--sans);font-size:0.9rem;color:#0A0A0A;outline:none;resize:none;line-height:1.5;box-sizing:border-box;"></textarea>
       <div style="font-size:0.7rem;color:#9A948E;margin-top:8px;line-height:1.5;">Mag je ook overslaan — dan telt het als "alles is goed".</div>
-      <button onclick="bevestigVoorkeur()" style="margin-top:16px;width:100%;padding:14px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Afronden →</button>
+      <button onclick="bevestigVoorkeur()" style="margin-top:16px;width:100%;padding:14px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Afronden →</button>
     `;
   } else {
     document.getElementById('vk-body').innerHTML = `
       <div style="font-size:3rem;text-align:center;margin-bottom:20px;">${v.emoji}</div>
-      <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.35rem;text-align:center;line-height:1.3;color:#0A0A0A;margin-bottom:6px;">${v.vraag}</div>
+      <div style="font-family:var(--sans);font-style:italic;font-weight:700;font-size:1.35rem;text-align:center;line-height:1.3;color:#0A0A0A;margin-bottom:6px;">${v.vraag}</div>
       <div style="font-size:0.72rem;color:#9A948E;text-align:center;margin-bottom:20px;">Kies wat past — ook meerdere antwoorden zijn goed</div>
       <div style="display:flex;flex-direction:column;gap:10px;" id="vk-opties">
         ${v.opties.map((opt, i) => `
-          <button id="vkopt-${i}" onclick="toggleVoorkeurOpt(${i})" style="padding:14px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;text-align:left;color:#0A0A0A;transition:all 0.15s;line-height:1.4;">${opt}</button>
+          <button id="vkopt-${i}" onclick="toggleVoorkeurOpt(${i})" style="padding:14px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);font-family:var(--sans);font-size:0.9rem;cursor:pointer;text-align:left;color:#0A0A0A;transition:all 0.15s;line-height:1.4;">${opt}</button>
         `).join('')}
-        <button id="vkopt-anders" onclick="toggleVoorkeurAnders()" style="padding:14px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;text-align:left;color:#9A948E;transition:all 0.15s;line-height:1.4;">✏️ Anders, namelijk…</button>
+        <button id="vkopt-anders" onclick="toggleVoorkeurAnders()" style="padding:14px 18px;border-radius:var(--r-lg);border:1.5px solid rgba(10,10,10,0.1);background:rgba(10,10,10,0.04);font-family:var(--sans);font-size:0.9rem;cursor:pointer;text-align:left;color:#9A948E;transition:all 0.15s;line-height:1.4;">✏️ Anders, namelijk…</button>
         <div id="vk-anders-input" style="display:none;">
           <input id="vk-anders-text" type="text" placeholder="Typ je eigen antwoord…" style="width:100%;padding:12px 14px;border:1.5px solid var(--bd2);border-radius:var(--r);background:rgba(10,10,10,0.04);font-family:var(--sans);font-size:0.9rem;color:#0A0A0A;outline:none;">
         </div>
       </div>
-      <button onclick="bevestigVoorkeur()" style="margin-top:16px;width:100%;padding:14px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Volgende →</button>
+      <button onclick="bevestigVoorkeur()" style="margin-top:16px;width:100%;padding:14px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Volgende →</button>
     `;
   }
 }
@@ -7685,7 +7767,7 @@ async function finishVoorkeur() {
     const ph = getUserPhoto(u);
     const avEl = ph
       ? `<img src="${ph}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
-      : `<div style="width:36px;height:36px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-style:italic;font-size:0.85rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>`;
+      : `<div style="width:36px;height:36px;border-radius:50%;background:${p.color};display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-style:italic;font-size:0.85rem;color:#fff;font-weight:700;flex-shrink:0;">${p.init}</div>`;
     return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(10,10,10,0.06);">
       ${avEl}
       <div style="flex:1;font-size:0.88rem;color:#0A0A0A;">${p.naam}</div>
@@ -7695,7 +7777,7 @@ async function finishVoorkeur() {
   document.getElementById('vk-body').innerHTML = `
     <div style="text-align:center;margin-bottom:28px;">
       <div style="font-size:3rem;margin-bottom:12px;">🎉</div>
-      <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:800;font-size:1.8rem;color:#0A0A0A;margin-bottom:6px;">Merci, ${PROFILES[currentUser].naam}!</div>
+      <div style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:1.8rem;color:#0A0A0A;margin-bottom:6px;">Merci, ${PROFILES[currentUser].naam}!</div>
       <div style="font-size:0.88rem;color:#6B6560;line-height:1.5;max-width:280px;margin:0 auto;">Griette kan nu het programma beter op jullie afstemmen.</div>
       ${!saved ? `<div style="margin-top:10px;font-size:0.75rem;color:#D4785A;">⚠️ Opslaan mislukt — je antwoorden staan wel lokaal. Probeer later opnieuw in te loggen.</div>` : ''}
     </div>
@@ -7703,7 +7785,7 @@ async function finishVoorkeur() {
       <div style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:#A89FE8;margin-bottom:8px;">Wie heeft er ingevuld?</div>
       ${statusHtml}
     </div>
-    <button onclick="gaVanVoorkeurNaarApp()" style="width:100%;padding:14px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Start je Parijs-avontuur →</button>
+    <button onclick="gaVanVoorkeurNaarApp()" style="width:100%;padding:14px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.08em;">Start je Parijs-avontuur →</button>
   `;
 }
 
@@ -8728,7 +8810,7 @@ function initVervoer() {
       L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(_vmap);
       L.control.zoom({position:'bottomright'}).addTo(_vmap);
       const pin = (color, size) => L.divIcon({className:'',html:`<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};border:2.5px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.2);"></div>`,iconSize:[size,size],iconAnchor:[size/2,size/2]});
-      const ps = 'font-family:DM Sans,sans-serif;font-size:13px;';
+      const ps = 'font-family:var(--sans);font-size:13px;';
       L.marker([48.8696,2.3490],{icon:pin('#0A0A0A',16)}).addTo(_vmap).bindPopup(`<div style="${ps}"><strong>🏠 Airbnb</strong><br><span style="font-size:11px;color:#6B6560;">Rue de la Lune · Bonne Nouvelle (2e)</span></div>`);
       L.marker([48.881,2.355],{icon:pin('#D4785A',13)}).addTo(_vmap).bindPopup(`<div style="${ps}"><strong>🚂 Gare du Nord</strong></div>`);
       Object.entries(VERVOER_DESTS).forEach(([id,d]) => {
@@ -8777,7 +8859,7 @@ function _drawRouteOnMap(routeId) {
     const label = stop.type === 'start' ? '▶' : (stop.type === 'end' ? '⌂' : String(i));
     const sz = isEnd ? 18 : 22;
     const icon = L.divIcon({className:'',html:`<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:${isEnd ? '#0A0A0A' : route.color};border:2.5px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:${isEnd ? '7' : '9'}px;font-weight:800;color:${isEnd ? '#fff' : '#0A0A0A'};line-height:1;">${label}</div>`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
-    const ps2 = 'font-family:DM Sans,sans-serif;font-size:12px;min-width:160px;line-height:1.4;';
+    const ps2 = 'font-family:var(--sans);font-size:12px;min-width:160px;line-height:1.4;';
     const mapsUrl = `https://maps.google.com/?q=${stop.lat},${stop.lng}`;
     const popupHtml = `<div style="${ps2}"><strong>${stop.name}</strong>${stop.address ? `<br><span style="font-size:10px;color:#6B6560;">${stop.address}</span>` : ''}${stop.tip ? `<br><span style="font-size:10px;color:#4a4540;">${stop.tip}</span>` : ''}${stop.address ? `<br><a href="${mapsUrl}" target="_blank" rel="noopener" style="font-size:10px;color:#A89FE8;">📍 Maps →</a>` : ''}</div>`;
     _routeStopMarkers.push(L.marker([stop.lat, stop.lng], {icon}).addTo(_vmap).bindPopup(popupHtml));
@@ -9207,14 +9289,14 @@ function _renderWuScreen() {
           <div style="font-size:2.5rem;margin-bottom:12px;">🔥</div>
           <div style="font-family:Georgia,serif;font-size:1.4rem;color:#0A0A0A;margin-bottom:8px;">Jullie zijn warmgedraaid.</div>
           <div style="font-size:0.88rem;color:#6B6560;line-height:1.5;margin-bottom:24px;">Nu het echte werk — swipen en het programma samenstellen.</div>
-          <button onclick="closeGame('warmup');switchTab('swipe',document.querySelectorAll('.nav-btn')[1]);" style="padding:13px 32px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;">Swipen 🔥</button>
+          <button onclick="closeGame('warmup');switchTab('swipe',document.querySelectorAll('.nav-btn')[1]);" style="padding:13px 32px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.88rem;font-weight:700;cursor:pointer;">Swipen 🔥</button>
         </div>
         <div style="border-top:1px solid rgba(10,10,10,0.08);padding-top:14px;">
           <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin-bottom:8px;">Jullie antwoorden</div>
           ${WU_VRAGEN.map(q => `<div style="margin-bottom:10px;"><div style="font-size:0.72rem;font-weight:600;color:#6B6560;margin-bottom:4px;">${q.emoji} ${q.vraag}</div><div id="wu-done-${q.id}" style="font-size:0.78rem;color:#0A0A0A;"></div></div>`).join('')}
         </div>
         <div style="padding:16px 0 8px;">
-          <button onclick="_wuShare()" style="width:100%;padding:11px;border:1.5px solid rgba(10,10,10,0.15);border-radius:var(--r-lg);background:transparent;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;color:#0A0A0A;">💬 Stuur via WhatsApp</button>
+          <button onclick="_wuShare()" style="width:100%;padding:11px;border:1.5px solid rgba(10,10,10,0.15);border-radius:var(--r-lg);background:transparent;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;color:#0A0A0A;">💬 Stuur via WhatsApp</button>
         </div>
       </div>
     </div>`;
@@ -9236,8 +9318,8 @@ function _renderWuScreen() {
   let inputHtml = '';
   if (q.type === 'text') {
     inputHtml = `<div style="margin-bottom:12px;">
-      <input id="wu-text-input-${_wuCurrentQ}" type="text" autocomplete="off" placeholder="${q.placeholder}" maxlength="60" style="width:100%;box-sizing:border-box;padding:11px 14px;border:1.5px solid rgba(168,159,232,0.4);border-radius:var(--r-lg);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;" onkeydown="if(event.key==='Enter')_wuSubmitText()">
-      <button onclick="_wuSubmitText()" style="margin-top:8px;width:100%;padding:11px;border:none;border-radius:var(--r-lg);background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;">Bevestigen →</button>
+      <input id="wu-text-input-${_wuCurrentQ}" type="text" autocomplete="off" placeholder="${q.placeholder}" maxlength="60" style="width:100%;box-sizing:border-box;padding:11px 14px;border:1.5px solid rgba(168,159,232,0.4);border-radius:var(--r-lg);font-family:var(--sans);font-size:0.9rem;outline:none;" onkeydown="if(event.key==='Enter')_wuSubmitText()">
+      <button onclick="_wuSubmitText()" style="margin-top:8px;width:100%;padding:11px;border:none;border-radius:var(--r-lg);background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.88rem;font-weight:700;cursor:pointer;">Bevestigen →</button>
     </div>`;
   } else if (q.type === 'choice') {
     inputHtml = q.opties.map((opt, i) => `<button class="wu-opt" onclick="_wuSubmitChoice(${i})">${opt}</button>`).join('');
@@ -9246,7 +9328,7 @@ function _renderWuScreen() {
       q.opties.map(u => { const p = PROFILES[u];
         return `<button onclick="_wuSubmitAvatar('${u}')" style="padding:14px 10px;border:1.5px solid rgba(10,10,10,0.12);border-radius:var(--r-lg);background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all 0.15s;">
           ${_wuAvatarHtml(u, 42)}
-          <span style="font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;">${p.naam}</span>
+          <span style="font-family:var(--sans);font-size:0.82rem;font-weight:600;">${p.naam}</span>
         </button>`;
       }).join('') + `</div>`;
   }
@@ -9259,7 +9341,7 @@ function _renderWuScreen() {
       <div style="font-size:2rem;text-align:center;margin-bottom:10px;">${q.emoji}</div>
       <div class="wu-q">${q.vraag}</div>
       ${inputHtml}
-      <button onclick="_wuSkip()" style="width:100%;padding:8px;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:0.75rem;color:#9A948E;cursor:pointer;">Overslaan (pas later)</button>
+      <button onclick="_wuSkip()" style="width:100%;padding:8px;border:none;background:transparent;font-family:var(--sans);font-size:0.75rem;color:#9A948E;cursor:pointer;">Overslaan (pas later)</button>
     </div>
   </div>`;
   if (q.type === 'text') setTimeout(() => { const inp = document.getElementById('wu-text-input-' + _wuCurrentQ); if(inp) inp.focus(); }, 100);
@@ -9313,7 +9395,7 @@ async function _showWuReveal(qId) {
       <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#A89FE8;margin-bottom:12px;">${q.emoji} ${q.vraag}</div>
       ${revealHtml}
       <div style="font-size:0.65rem;color:#9A948E;margin-bottom:16px;">${all.length} van 4 geantwoord</div>
-      <button onclick="_renderWuScreen()" style="width:100%;padding:12px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;">Volgende vraag →</button>
+      <button onclick="_renderWuScreen()" style="width:100%;padding:12px;border:none;border-radius:30px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.88rem;font-weight:700;cursor:pointer;">Volgende vraag →</button>
     </div>
   </div>`;
 }
