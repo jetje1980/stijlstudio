@@ -2218,6 +2218,17 @@ function syncWrite(lsKey, valueJson) {
   ).then(({error}) => { if (error) console.warn('syncWrite:', error.message); });
 }
 
+// Remove from localStorage AND Supabase — use this instead of bare localStorage.removeItem for synced keys
+function syncDelete(lsKey) {
+  localStorage.removeItem(lsKey);
+  if (!currentUser) return;
+  const m = _keyToState(lsKey);
+  if (!m) return;
+  supa.from('group_state').delete()
+    .eq('group_id', GROUP_ID).eq('user_id', m.uid).eq('key', m.key)
+    .then(({error}) => { if (error) console.warn('syncDelete:', error.message); });
+}
+
 // Backwards-compat helpers (used by warming-up etc.)
 async function setShared(key, value) {
   if (!currentUser) return;
@@ -3452,11 +3463,11 @@ function getChainText(pollId, user) {
 function voteChain(pollId, optIdx) {
   const current = getChainVote(pollId, currentUser);
   if (current === optIdx) {
-    localStorage.removeItem('vz_pchain_' + pollId + '_' + currentUser);
-    localStorage.removeItem('vz_pchain_text_' + pollId + '_' + currentUser);
+    syncDelete('vz_pchain_' + pollId + '_' + currentUser);
+    syncDelete('vz_pchain_text_' + pollId + '_' + currentUser);
   } else {
     syncWrite('vz_pchain_' + pollId + '_' + currentUser, String(optIdx));
-    localStorage.removeItem('vz_pchain_text_' + pollId + '_' + currentUser);
+    syncDelete('vz_pchain_text_' + pollId + '_' + currentUser);
   }
   const poll = POLL_CHAIN.find(p => p.id === pollId);
   if (poll) renderPollChainDay(poll.dag);
@@ -3635,7 +3646,7 @@ function renderPollChainDay(dag) {
               <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#7A9E82;margin-bottom:2px;">${poll.dagdeel}</div>
               <div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;">${poll.voorstel}</div>
             </div>
-            <button onclick="localStorage.removeItem('vz_pchain_${poll.id}_'+currentUser);localStorage.removeItem('vz_pchain_text_${poll.id}_'+currentUser);renderPollChainDay('${poll.dag}');" style="flex-shrink:0;margin-left:10px;padding:4px 10px;border:1px solid rgba(10,10,10,0.15);border-radius:20px;background:transparent;font-size:0.65rem;font-weight:600;cursor:pointer;color:#6B6560;font-family:var(--sans);">Wijzig ▸</button>
+            <button onclick="syncDelete('vz_pchain_${poll.id}_'+currentUser);syncDelete('vz_pchain_text_${poll.id}_'+currentUser);renderPollChainDay('${poll.dag}');" style="flex-shrink:0;margin-left:10px;padding:4px 10px;border:1px solid rgba(10,10,10,0.15);border-radius:20px;background:transparent;font-size:0.65rem;font-weight:600;cursor:pointer;color:#6B6560;font-family:var(--sans);">Wijzig ▸</button>
           </div>
           <div style="font-size:0.72rem;color:#6B6560;margin-bottom:8px;">Jouw stem: <strong style="color:#0A0A0A;">${myLabel}</strong></div>
           ${barsHtml}
@@ -4828,7 +4839,7 @@ function renderAankomstVote() {
     el.innerHTML = `<div style="border-top:1px solid rgba(10,10,10,0.07);padding-top:12px;">
       <div style="font-size:0.72rem;color:#6B6560;margin-bottom:6px;">Jouw stem: <strong style="color:#0A0A0A;">${myLabel}</strong> · ${votedCount} van 4 gestemd</div>
       ${barsHtml}${consensusHtml}${altsHtml}
-      <button onclick="localStorage.removeItem('vz_pchain_pvr1_'+currentUser);localStorage.removeItem('vz_pchain_text_pvr1_'+currentUser);renderAankomstVote();" style="margin-top:8px;font-size:0.65rem;color:#6B6560;background:none;border:1px solid rgba(10,10,10,0.15);border-radius:20px;padding:3px 10px;cursor:pointer;font-family:var(--sans);">Wijzig ▸</button>
+      <button onclick="syncDelete('vz_pchain_pvr1_'+currentUser);syncDelete('vz_pchain_text_pvr1_'+currentUser);renderAankomstVote();" style="margin-top:8px;font-size:0.65rem;color:#6B6560;background:none;border:1px solid rgba(10,10,10,0.15);border-radius:20px;padding:3px 10px;cursor:pointer;font-family:var(--sans);">Wijzig ▸</button>
     </div>`;
   }
 }
@@ -8964,7 +8975,7 @@ function renderPersonalPolls() {
           <div style="font-size:0.68rem;color:#9A948E;margin-bottom:8px;">❤️ ${likerNames} ${likers.length === 1 ? 'vindt dit leuk' : 'vinden dit leuk'}</div>
           ${[0,1].map(i => { const lbl=i===0?'Ja, leuk! ✓':'Liever iets anders'; const pct=Math.round(cnts[i]/tot*100); return `<div style="margin-bottom:6px;"><div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;"><span style="${myVote==i?'font-weight:700;':''}">${lbl}</span><span style="color:#9A948E;">${pct}%</span></div><div class="poll-bar"><div class="poll-bar-fill" style="width:${pct}%;background:${i===0?'#7A9E82':'#D4785A'};opacity:${myVote==i?1:0.4};"></div></div></div>`; }).join('')}
           ${votes.filter(x=>x.v==='2').map(x=>{const t=localStorage.getItem('vz_pp_swipe_text_'+iid+'_'+x.u);return t?`<div style="font-size:0.65rem;color:#9A948E;margin-top:2px;">↳ ${PROFILES[x.u]?.naam}: &ldquo;${t}&rdquo;</div>`:''}).join('')}
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;"><span style="font-size:0.65rem;color:#9A948E;">${votes.length} van 4 gestemd</span><button onclick="localStorage.removeItem('vz_pp_swipe_${iid}_'+currentUser);localStorage.removeItem('vz_pp_swipe_text_${iid}_'+currentUser);renderPersonalPolls();" style="font-size:0.65rem;color:#6B6560;background:none;border:1px solid rgba(10,10,10,0.15);border-radius:20px;padding:3px 10px;cursor:pointer;font-family:var(--sans);">Wijzig ▸</button></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;"><span style="font-size:0.65rem;color:#9A948E;">${votes.length} van 4 gestemd</span><button onclick="syncDelete('vz_pp_swipe_${iid}_'+currentUser);syncDelete('vz_pp_swipe_text_${iid}_'+currentUser);renderPersonalPolls();" style="font-size:0.65rem;color:#6B6560;background:none;border:1px solid rgba(10,10,10,0.15);border-radius:20px;padding:3px 10px;cursor:pointer;font-family:var(--sans);">Wijzig ▸</button></div>
         </div>`;
       } else {
         html += `<div class="pp-block">
