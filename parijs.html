@@ -5396,20 +5396,28 @@ function _renderReactionBar(day, deel, prefix, forHome) {
     </div>`;
   }).join('');
 
-  const likedStyle = `background:#A89FE8;color:#fff;`;
-  const baseStyle = `background:rgba(10,10,10,0.05);color:#6B6560;`;
-  const btnBase = `border:none;border-radius:20px;padding:4px 10px;font-size:${sz};cursor:pointer;font-family:var(--sans);font-weight:600;`;
+  const btnBase = `border:none;border-radius:20px;padding:5px 11px;font-size:${sz};cursor:pointer;font-family:var(--sans);font-weight:600;transition:all 0.12s;`;
+  const isUp   = myR?.emoji === '👍';
+  const isDown = myR?.emoji === '👎';
 
   return `<div style="margin-top:8px;">
-    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-bottom:5px;">${chips}</div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-bottom:6px;">${chips}</div>
     <div style="display:flex;gap:5px;align-items:center;">
-      <button onclick="_setDagReaction('${day}','${deel}','👍')" style="${btnBase}${myR?.emoji ? likedStyle : baseStyle}">
-        👍 ${myR?.emoji ? 'Vind ik goed ✓' : 'Vind ik goed'}
+      <button onclick="_setDagReaction('${day}','${deel}','👍')"
+        style="${btnBase}background:${isUp ? '#A89FE8' : 'rgba(10,10,10,0.05)'};color:${isUp ? '#fff' : '#6B6560'};">
+        👍${isUp ? ' ✓' : ''}
       </button>
-      <button onclick="_openDagComment('${day}','${deel}','${prefix}')" style="${btnBase}${baseStyle}">💬</button>
+      <button onclick="_setDagReaction('${day}','${deel}','👎')"
+        style="${btnBase}background:${isDown ? '#D4785A' : 'rgba(10,10,10,0.05)'};color:${isDown ? '#fff' : '#6B6560'};">
+        👎${isDown ? ' ✓' : ''}
+      </button>
+      <button onclick="_openDagComment('${day}','${deel}','${prefix}')"
+        style="${btnBase}background:${myR?.note ? '#C8A882' : 'rgba(10,10,10,0.05)'};color:${myR?.note ? '#fff' : '#9A948E'};">
+        💬${myR?.note ? ' ✓' : ''}
+      </button>
     </div>
     <div id="dgc-${prefix}-${day}-${deel}" style="display:none;gap:6px;align-items:center;margin-top:6px;">
-      <input id="dgci-${prefix}-${day}-${deel}" type="text" maxlength="50" placeholder="Korte reactie (max 50 tekens)"
+      <input id="dgci-${prefix}-${day}-${deel}" type="text" maxlength="50" placeholder="Korte reactie..."
         style="flex:1;padding:6px 10px;border:1.5px solid rgba(10,10,10,0.12);border-radius:20px;font-size:${sz};font-family:var(--sans);outline:none;"
         onkeydown="if(event.key==='Enter')_saveDagComment('${day}','${deel}','${prefix}')">
       <button onclick="_saveDagComment('${day}','${deel}','${prefix}')" style="${btnBase}background:#0A0A0A;color:#F0E8E2;">Ok</button>
