@@ -12,21 +12,28 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
-  --bg:#FBF8F2;--s1:#F4EFE6;--s2:#F4EFE6;--s3:#EDE8DF;--s4:#E4DDD4;
-  --bd:#DDD7CB;--bd2:#C8C2B8;
-  --t1:#1B1B23;--t2:#6B6B73;--t3:#9A949E;
-  --gold:#8E8CDE;--gold2:rgba(142,140,222,0.12);
-  --red:#c0392b;
-  --terra:#8E8CDE;--mosterd:#8E8CDE;--vert:#1B1B23;
-  --rose:rgba(142,140,222,0.15);--creme:#FBF8F2;--zand:rgba(27,27,35,0.05);
-  --ink:#1B1B23;--bruin:#6B6B73;--lavender:#8E8CDE;
-  --lila:#8E8CDE;--lila-deep:#5B58B8;--lila-soft:#E7E6F7;
-  --papier:#F4EFE6;--ivoor:#FBF8F2;--lijn:#DDD7CB;
+  --lila:      #8E8CDE;
+  --lila-deep: #5B58B8;
+  --lila-soft: #E7E6F7;
+  --mint:      #C9E4D4;
+  --koraal:    #F2B7A4;
+  --boter:     #F4E3A1;
+  --hemel:     #BEDBE8;
+  --rose:      #EBC9D3;
+  --ivoor:     #FBF8F2;
+  --papier:    #F4EFE6;
+  --inkt:      #1B1B23;
+  --grijs:     #6B6B73;
+  --lijn:      #E0D9CE;
   --serif:'Fraunces',Georgia,serif;
   --sans:'Manrope',system-ui,sans-serif;
-  --r:12px;--r-lg:20px;
-  --shadow:0 1px 3px rgba(27,27,35,0.06);
-  --shadow-lg:0 2px 10px rgba(27,27,35,0.08);
+  --r:8px;
+  --r-lg:12px;
+  /* legacy aliases */
+  --t1:var(--inkt);--t2:var(--grijs);--t3:#9A949E;
+  --bg:var(--ivoor);--s1:var(--papier);--bd:var(--lijn);--bd2:#C8C2B8;
+  --gold:var(--lila);--gold2:rgba(142,140,222,0.12);--red:#c0392b;--ink:var(--inkt);
+  --shadow:0 1px 3px rgba(27,27,35,0.06);--shadow-lg:0 2px 10px rgba(27,27,35,0.08);
 }
 html{font-size:16px;scroll-behavior:smooth;}
 body{background:#FBF8F2;font-family:var(--sans);color:#1B1B23;overflow-x:hidden;min-height:100svh;padding-bottom:80px;}
@@ -534,8 +541,7 @@ body{font-size:15.5px;}
    lila als accent (niet dominant vlak)
    ═══════════════════════════════════════════════ */
 
-/* Kleiner border-radius: editorial, niet generiek web */
-:root{--r:8px!important;--r-lg:12px!important;}
+/* border-radius: al gezet in :root */
 
 /* Swipe-tabs: wit met lila als active accent */
 .swipe-tabs{background:#fff!important;border-bottom:1px solid var(--lijn)!important;}
@@ -599,6 +605,215 @@ body{font-size:15.5px;}
 
 /* Groep-section foto-badges: lila tint */
 .match-card-hero-grad{background:rgba(91,88,184,0.18)!important;}
+
+/* ═══════════════════════════════════════════════
+   VOLLEDIG REDESIGN — Stap 1–4
+   ═══════════════════════════════════════════════ */
+
+/* Stap 1: basis */
+body{background:var(--ivoor);color:var(--inkt);}
+h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
+
+/* Stap 2: knoppen — twee varianten, niets anders */
+.btn-primary,.btn-secondary{
+  font-family:var(--sans);font-weight:500;font-size:13px;
+  letter-spacing:0.06em;border-radius:100px;padding:12px 22px;
+  cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  box-shadow:none;transition:opacity 0.15s;white-space:nowrap;
+}
+.btn-primary{background:var(--inkt);color:#fff;border:none;}
+.btn-secondary{background:transparent;color:var(--inkt);border:1px solid var(--lijn);}
+.btn-primary.done{background:var(--grijs);border:none;}
+.btn-primary:active,.btn-secondary:active{opacity:0.75;}
+
+/* Stap 8: eyebrow — overal consistent */
+.eyebrow{
+  font-family:var(--sans);font-size:10px;font-weight:700;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--lila-deep);display:block;margin-bottom:12px;
+}
+
+/* Navigatiebalk: ivoor + lijn, geen box-shadow */
+.bottom-nav{background:var(--ivoor)!important;border-top:1px solid var(--lijn)!important;box-shadow:none!important;}
+.nav-btn{border-radius:0!important;background:none!important;gap:4px!important;}
+.nav-btn.active{background:none!important;color:var(--lila-deep)!important;}
+.nav-btn.active svg{stroke:var(--lila-deep)!important;}
+.nav-btn:not(.active){color:var(--grijs)!important;}
+.nav-btn:not(.active) svg{stroke:var(--grijs)!important;}
+
+/* Stap 3: Home page-header clean */
+#sec-home .page-header{
+  background:var(--ivoor);position:sticky;top:0;z-index:80;
+  border-bottom:1px solid var(--lijn);padding:14px 20px 12px;
+}
+
+/* Block 1: Countdown groot gecentreerd, geen kader */
+.home-cd-block{padding:48px 20px 32px;text-align:center;}
+.home-cd-num{
+  font-family:var(--serif);font-style:italic;font-weight:300;
+  font-size:clamp(52px,11vw,80px);color:var(--inkt);line-height:1;
+  font-variation-settings:"opsz" 144,"SOFT" 90,"WONK" 1;display:block;
+}
+.home-cd-label{font-family:var(--sans);font-size:14px;color:var(--grijs);margin-top:10px;}
+
+/* Block 2: Vier avatar-cirkels gecentreerd, geen card eromheen */
+.home-avatar-row{
+  display:flex!important;justify-content:center;gap:24px;
+  padding:4px 20px 32px;overflow:hidden!important;
+}
+.home-avatar-row .story-item{cursor:pointer;}
+.home-avatar-row .story-ring{
+  background:none!important;padding:0!important;border-radius:50%!important;
+  width:56px;height:56px;border:1px solid var(--lijn)!important;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.home-avatar-row .story-ring img,
+.home-avatar-row .story-avatar{width:52px;height:52px;border:none!important;border-radius:50%;object-fit:cover;}
+.home-avatar-row .story-name{font-family:var(--sans);font-size:12px!important;color:var(--inkt)!important;margin-top:6px;}
+.home-avatar-row .story-streak{font-size:11px!important;color:var(--grijs)!important;}
+
+/* Block 3: Één actie-kaart */
+.home-action-card{
+  margin:0 20px 40px;background:var(--papier);
+  border:1px solid var(--lijn);border-radius:4px;padding:20px;
+}
+.home-action-title{
+  font-family:var(--serif);font-style:italic;font-weight:300;
+  font-size:24px;color:var(--inkt);line-height:1.2;margin-bottom:8px;
+  font-variation-settings:"opsz" 72,"SOFT" 60;
+}
+.home-action-sub{
+  font-family:var(--sans);font-size:13px;color:var(--grijs);line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;
+}
+.home-action-btn-row{display:flex;justify-content:flex-end;margin-top:16px;}
+
+/* Stap 4: Activiteitskaart — foto 3/4 + minimale kaart-body */
+.card-hero{
+  aspect-ratio:3/4!important;height:auto!important;width:100%;
+  background-size:cover;background-position:center;position:relative;
+  background-color:var(--papier);cursor:pointer;
+}
+.card-hero-placeholder{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-style:italic;font-weight:300;font-size:3rem;
+  color:var(--grijs);font-variation-settings:"opsz" 72,"SOFT" 60;
+}
+.card-hero-grad{display:none!important;}
+.card-body{padding:16px!important;background:#fff!important;border-top:1px solid var(--lijn)!important;cursor:pointer;}
+.card-naam{
+  font-family:var(--serif)!important;font-style:italic!important;font-weight:300!important;
+  font-size:28px!important;line-height:1.15!important;color:var(--inkt)!important;
+  font-variation-settings:"opsz" 72,"SOFT" 60!important;margin-bottom:6px!important;
+}
+.card-eyebrow{
+  font-family:var(--sans);font-size:10px;font-weight:700;
+  letter-spacing:0.22em;text-transform:uppercase;color:var(--lila-deep);
+  display:block;margin-bottom:10px;
+}
+.card-plumet{font-family:var(--sans);font-size:12px;color:var(--grijs);display:flex;gap:10px;flex-wrap:wrap;}
+.card-votes{display:none!important;}
+
+/* Detail drawer (bottom sheet) */
+#card-detail-drawer{
+  position:fixed;bottom:0;left:0;right:0;z-index:600;
+  background:#fff;border-radius:16px 16px 0 0;
+  max-height:85vh;overflow-y:auto;
+  transform:translateY(100%);transition:transform 0.35s cubic-bezier(.4,0,.2,1);
+  padding-bottom:env(safe-area-inset-bottom,16px);
+}
+#card-detail-drawer.open{transform:translateY(0);}
+#card-detail-backdrop{
+  position:fixed;inset:0;z-index:599;
+  background:rgba(27,27,35,0.4);
+  opacity:0;pointer-events:none;transition:opacity 0.3s;
+}
+#card-detail-backdrop.open{opacity:1;pointer-events:auto;}
+.drawer-handle{width:36px;height:4px;background:var(--lijn);border-radius:2px;margin:12px auto 4px;}
+.drawer-close{position:absolute;top:16px;right:16px;background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--grijs);padding:4px;line-height:1;}
+.drawer-img{width:100%;aspect-ratio:3/2;object-fit:cover;background:var(--papier);display:block;}
+.drawer-body{padding:20px;}
+.drawer-title{
+  font-family:var(--serif);font-style:italic;font-weight:300;
+  font-size:28px;color:var(--inkt);line-height:1.1;margin-bottom:12px;
+  font-variation-settings:"opsz" 72,"SOFT" 60;
+}
+.drawer-desc{font-family:var(--sans);font-size:14px;color:var(--inkt);line-height:1.6;margin-bottom:16px;}
+.drawer-attrib{font-family:var(--sans);font-size:11px;color:var(--grijs);margin-bottom:20px;}
+.drawer-actions{display:flex;gap:10px;flex-wrap:wrap;}
+
+/* Border-radius: al gezet in :root — geen override nodig */
+
+/* ═══════════════════════════════════════════════
+   REDESIGN Stap 5–8
+   ═══════════════════════════════════════════════ */
+
+/* Stap 5: Dagprogramma tijdlijn */
+#sec-top5 .page-header{
+  background:var(--ivoor);position:sticky;top:0;z-index:80;
+  border-bottom:1px solid var(--lijn);padding:14px 20px 12px;
+}
+.tl-row{
+  display:flex;align-items:flex-start;
+  border-bottom:1px solid var(--lijn);
+  padding:14px 0;
+}
+.tl-row:last-child{border-bottom:none;}
+.tl-tappable{cursor:pointer;}
+.tl-time{
+  font-family:var(--sans);font-size:11px;color:var(--grijs);
+  font-variant-numeric:tabular-nums;min-width:44px;
+  padding-right:12px;line-height:1.4;flex-shrink:0;padding-top:2px;
+}
+.tl-line{width:1px;background:var(--lijn);align-self:stretch;flex-shrink:0;}
+.tl-content{flex:1;padding-left:12px;}
+.tl-name{
+  font-family:var(--sans);font-size:14px;font-weight:500;
+  color:var(--inkt);line-height:1.35;
+}
+.tl-detail{
+  font-family:var(--sans);font-size:12px;color:var(--grijs);
+  line-height:1.5;margin-top:4px;
+}
+.tl-open .tl-name{color:var(--grijs)!important;font-weight:400!important;}
+
+/* Stap 7: Polls – schone kaarten + pill-knoppen */
+.pchain-block{margin-bottom:16px;}
+.pchain-answered,.pchain-active,.pchain-locked{
+  background:#fff!important;
+  border:1px solid var(--lijn)!important;
+  border-radius:4px!important;
+  padding:20px!important;
+  box-shadow:none!important;
+}
+.pchain-locked{opacity:0.5!important;}
+.pchain-voorstel{
+  font-family:var(--serif)!important;font-style:italic!important;font-weight:300!important;
+  font-size:20px!important;line-height:1.25!important;color:var(--inkt)!important;
+  font-variation-settings:"opsz" 72,"SOFT" 60!important;
+  margin:8px 0 16px!important;
+}
+.poll-opt{
+  font-family:var(--sans)!important;font-weight:500!important;font-size:13px!important;
+  letter-spacing:0.04em!important;border-radius:100px!important;
+  padding:10px 18px!important;cursor:pointer!important;
+  border:1px solid var(--lijn)!important;
+  background:transparent!important;color:var(--inkt)!important;
+  transition:opacity 0.15s!important;display:block!important;width:100%!important;
+  text-align:left!important;
+}
+.poll-opt.selected,.poll-opt:has(+*){color:var(--inkt)!important;}
+.poll-bar{height:3px!important;background:var(--lijn)!important;border-radius:2px!important;margin-top:4px!important;}
+.poll-bar-fill{background:var(--lila)!important;}
+
+/* Stap 8: Swipe-tabs op ivoor */
+.swipe-tabs{background:var(--ivoor)!important;border-bottom:1px solid var(--lijn)!important;}
+.stab{
+  color:var(--grijs)!important;border-radius:4px!important;font-size:12px!important;
+  font-family:var(--sans)!important;letter-spacing:0.04em!important;
+  text-transform:none!important;padding:8px 16px!important;font-weight:500!important;
+}
+.stab.active{background:var(--inkt)!important;color:#fff!important;}
 </style>
 </head>
 <body>
@@ -815,275 +1030,89 @@ body{font-size:15.5px;}
   </div>
 </div>
 
+<!-- CARD DETAIL DRAWER -->
+<div id="card-detail-backdrop" onclick="closeCardDrawer()"></div>
+<div id="card-detail-drawer">
+  <div class="drawer-handle"></div>
+  <button class="drawer-close" onclick="closeCardDrawer()">✕</button>
+  <div id="drawer-img-wrap"></div>
+  <div class="drawer-body">
+    <span class="eyebrow" id="drawer-eyebrow"></span>
+    <div class="drawer-title" id="drawer-title"></div>
+    <div class="drawer-desc" id="drawer-desc"></div>
+    <div class="drawer-attrib" id="drawer-attrib"></div>
+    <div class="drawer-actions" id="drawer-actions"></div>
+  </div>
+</div>
+
 <!-- APP -->
 <div id="app">
   <!-- HOME -->
   <section id="sec-home" class="section active">
-    <!-- HEADER — sticky clean bar, always visible first -->
-    <div class="page-header" style="background:#fff;position:sticky;top:0;z-index:80;border-bottom:1px solid rgba(27,27,35,0.06);padding:14px 20px 12px;">
+    <!-- HEADER -->
+    <div class="page-header">
       <div class="page-logo">Vroegzat ✦</div>
       <div style="display:flex;gap:10px;align-items:center;">
-        <button class="uitlog-btn" onclick="herbeginVoorkeur()" id="herbegin-btn" style="color:#A89FE8;">✏️ Voorkeuren</button>
+        <button class="uitlog-btn" onclick="herbeginVoorkeur()" id="herbegin-btn" style="color:var(--lila-deep);">✏️ Voorkeuren</button>
         <button class="uitlog-btn" onclick="uitloggen()">Uitloggen</button>
       </div>
     </div>
 
-    <!-- REEL — thin decorative Paris photo strip -->
-    <div class="reel-wrap" id="reel-wrap" onclick="reelNext()">
-      <div class="reel-slide" style="background-image:url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=700&q=80')"></div>
-      <div class="reel-slide" style="background-image:url('https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=700&q=80')"></div>
-      <div class="reel-slide" style="background-image:url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=700&q=80')"></div>
-      <div class="reel-slide" style="background-image:url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=700&q=80')"></div>
-      <div class="reel-overlay"></div>
-      <div class="reel-progress" id="reel-progress"></div>
-      <div class="reel-caption">
-        <div style="font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(240,232,226,0.6);margin-bottom:10px;">⟡ Vroegzat · Parijs 2026</div>
-        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;">
-          <div style="flex:1;min-width:0;">
-            <h3 id="reel-h"></h3>
-            <p id="reel-p"></p>
-          </div>
-          <div class="reel-countdown" id="reel-cd-overlay">
-            <div style="display:flex;gap:8px;align-items:baseline;justify-content:flex-end;">
-              <span style="font-family:Georgia,serif;font-size:2.1rem;font-weight:normal;color:#F0E8E2;line-height:1;" id="rcd-d">--</span>
-              <span style="font-size:0.65rem;color:rgba(240,232,226,0.6);">d</span>
-              <span style="font-family:Georgia,serif;font-size:1.35rem;color:rgba(240,232,226,0.85);line-height:1;" id="rcd-h">--</span>
-              <span style="font-size:0.6rem;color:rgba(240,232,226,0.55);">u</span>
-              <span style="font-family:Georgia,serif;font-size:1.35rem;color:rgba(240,232,226,0.85);line-height:1;" id="rcd-m">--</span>
-              <span style="font-size:0.6rem;color:rgba(240,232,226,0.55);">m</span>
-            </div>
-          </div>
+    <!-- BLOCK 1: COUNTDOWN -->
+    <div class="home-cd-block">
+      <span class="home-cd-num" id="cd-d">--</span>
+      <div class="home-cd-label">dagen tot Parijs</div>
+    </div>
+
+    <!-- BLOCK 2: AVATARS (populated by initStories) -->
+    <div class="home-avatar-row" id="stories-row"></div>
+
+    <!-- BLOCK 3: ACTION CARD (content populated by renderMissie) -->
+    <div class="home-action-card">
+      <span class="eyebrow">Missie van de dag</span>
+      <div class="home-action-title" id="missie-title">De beste croissant van Parijs</div>
+      <div class="home-action-sub" id="missie-context">Du Pain et des Idées bakt al 150 jaar op dezelfde manier.</div>
+      <div class="home-action-btn-row">
+        <button class="btn-primary" id="missie-btn" onclick="toggleMissie()">✓ Gedaan!</button>
+      </div>
+    </div>
+
+    <!-- HIDDEN: functional containers that JS uses -->
+    <div style="display:none;" aria-hidden="true">
+      <div class="reel-wrap" id="reel-wrap">
+        <div class="reel-slide" style="background-image:url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=700&q=80')"></div>
+        <div class="reel-slide" style="background-image:url('https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=700&q=80')"></div>
+        <div class="reel-slide" style="background-image:url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=700&q=80')"></div>
+        <div class="reel-slide" style="background-image:url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=700&q=80')"></div>
+        <div class="reel-overlay"></div>
+        <div class="reel-progress" id="reel-progress"></div>
+        <h3 id="reel-h"></h3><p id="reel-p"></p>
+        <span id="rcd-d"></span><span id="rcd-h"></span><span id="rcd-m"></span>
+      </div>
+      <div id="intro-banner"></div>
+      <div id="voorkeur-home-banner"><div id="voorkeur-home-status"></div></div>
+      <div id="marlinde-tz-note"></div>
+      <div id="begin-hier-card"></div>
+      <div id="pretip-nudge"></div>
+      <div id="home-dagprog-section"></div>
+      <div id="personal-polls-section"></div>
+      <div id="poll-chain-content"></div>
+      <div id="missie-desc"></div>
+      <div id="missie-tip"></div>
+      <div id="streak-row"></div>
+      <div id="gluur-strip"></div>
+      <div id="home-ai-tips"></div>
+      <div id="voorstel-aankomst"></div>
+      <div id="aankomst-vote"></div>
+      <div id="upcoming-strip">
+        <div id="upcoming-content">
+          <div id="upcoming-name"></div><div id="upcoming-meta"></div>
         </div>
+        <div id="upcoming-time"></div>
       </div>
-    </div>
-
-    <!-- INTRO BANNER (eenmalig) -->
-    <div id="intro-banner" style="display:none;margin:12px 20px 0;padding:14px 16px;background:rgba(168,159,232,0.12);border-radius:var(--r-lg);position:relative;">
-      <button onclick="sluitIntroBanner()" style="position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.1rem;cursor:pointer;color:#6B6560;line-height:1;">×</button>
-      <div style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:0.85rem;color:#0A0A0A;margin-bottom:4px;">👋 Dit is jullie gedeelde Parijs-app</div>
-      <div style="font-size:0.8rem;color:#6B6560;line-height:1.5;padding-right:16px;">Griette heeft de basis ingevuld. Jij vult aan, swipt mee en stemt. Het programma is van jullie samen.</div>
-    </div>
-
-    <!-- VOORKEUR BANNER (als niet iedereen heeft ingevuld) -->
-    <div id="voorkeur-home-banner" style="display:none;margin:12px 20px 0;padding:14px 16px;background:rgba(212,120,90,0.08);border-left:3px solid #D4785A;border-radius:0 var(--r-lg) var(--r-lg) 0;">
-      <div style="font-weight:700;font-size:0.82rem;color:#0A0A0A;margin-bottom:6px;">📋 Niet iedereen heeft ingevuld</div>
-      <div id="voorkeur-home-status" style="font-size:0.75rem;color:#6B6560;line-height:1.8;flex-wrap:wrap;display:flex;gap:4px;"></div>
-    </div>
-
-    <!-- MARLINDE TIMEZONE NOTE (shown pre-trip als Marlinde inlogt) -->
-    <div id="marlinde-tz-note" style="display:none;margin:8px 20px 0;padding:10px 14px;background:rgba(168,159,232,0.1);border-radius:var(--r);font-size:0.75rem;color:#6B6560;">⏰ Jouw tijd: we rekenen met +6 uur (Penang → Parijs)</div>
-
-    <!-- BEGIN HIER -->
-    <div id="begin-hier-card" style="display:none;margin:12px 20px 0;background:rgba(168,159,232,0.08);border:1.5px solid rgba(168,159,232,0.18);border-radius:var(--r-lg);padding:16px 16px 12px;"></div>
-
-    <!-- PRE-TRIP NUDGE -->
-    <div id="pretip-nudge" style="display:none;position:relative;margin:8px 20px 0;padding:14px 16px;background:rgba(122,158,130,0.12);border-left:3px solid #7A9E82;border-radius:0 var(--r-lg) var(--r-lg) 0;"></div>
-
-    <!-- STORIES (direct na header — wie is er al in) -->
-    <div class="stories-row" id="stories-row"></div>
-
-    <!-- COUNTDOWN (prominent, boven de fold) -->
-    <div class="countdown-block">
-      <div class="countdown-label" id="cd-label">⏱ Countdown tot vertrek</div>
-      <div class="countdown-nums">
-        <div class="count-unit"><div class="count-num" id="cd-d">--</div><div class="count-lbl">Dagen</div></div>
-        <div class="count-sep">:</div>
-        <div class="count-unit"><div class="count-num" id="cd-h">--</div><div class="count-lbl">Uren</div></div>
-        <div class="count-sep">:</div>
-        <div class="count-unit"><div class="count-num" id="cd-m">--</div><div class="count-lbl">Min</div></div>
-      </div>
-      <div class="countdown-badge" id="cd-badge">– – dagen</div>
-      <div id="cd-trein-info" style="margin-top:10px;"></div>
-    </div>
-
-    <!-- AI DAGPROGRAMMA — primaire widget, boven de fold -->
-    <div class="peaks-section">
-      <span class="sec-lbl">🗓 Dagprogramma</span>
-      <div id="home-dagprog-section" style="margin:0 16px 8px;"></div>
-    </div>
-
-    <!-- POLLS — direct zichtbaar -->
-    <div class="peaks-section">
-      <div class="peaks-divider"></div>
-      <span class="sec-lbl">🗳 Stem mee</span>
-      <span class="sec-ttl">Dagindeling</span>
-      <div id="personal-polls-section" style="padding:0 20px 4px;"></div>
-      <div style="display:flex;gap:8px;padding:0 20px 12px;overflow-x:auto;scrollbar-width:none;">
-        <button class="poll-day-tab active" onclick="switchPollDay('vr26',this)">Vr 26</button>
-        <button class="poll-day-tab" onclick="switchPollDay('za27',this)">Za 27</button>
-        <button class="poll-day-tab" onclick="switchPollDay('zo28',this)">Zo 28</button>
-      </div>
-      <div id="poll-chain-content" style="padding:0 20px 8px;"></div>
-      <div style="padding:0 20px 16px;">
-        <button onclick="openCpollSheet()" style="width:100%;padding:12px;border:1.5px dashed rgba(168,159,232,0.4);border-radius:14px;background:transparent;font-family:var(--sans);font-size:0.82rem;font-weight:700;color:#A89FE8;cursor:pointer;letter-spacing:0.04em;">＋ Eigen voorstel toevoegen</button>
-      </div>
-    </div>
-
-    <!-- MISSIE VAN DE DAG -->
-    <div class="peaks-divider"></div>
-    <div class="missie-block" id="missie-block">
-      <div class="missie-label">✦ <span>Missie van de dag</span></div>
-      <div class="missie-title" id="missie-title">De beste croissant van Parijs</div>
-      <div class="missie-context" id="missie-context">Du Pain et des Idées bakt al 150 jaar op dezelfde manier — in een oven die nooit uitgaat. Voor 12u is alles op.</div>
-      <div class="missie-desc" id="missie-desc">Loop op vrijdagochtend langs op weg vanuit Gare du Nord. Neem een croissant én een escargot pistache-chocolade.</div>
-      <div class="missie-tip" id="missie-tip">💡 Ma–vr 7–20u, gesloten in het weekend. Plan dit voor de trein!</div>
-      <button class="missie-done-btn" id="missie-btn" onclick="toggleMissie()">✓ Gedaan!</button>
-      <div class="streak-row" id="streak-row"></div>
-    </div>
-
-    <!-- DE GROEP — gluur strip -->
-    <div class="peaks-divider"></div>
-    <div id="gluur-section" style="margin:0 0 4px;">
-      <span class="sec-lbl">👁 De groep</span>
-      <div id="gluur-strip" style="display:flex;gap:10px;padding:0 20px 8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
-    </div>
-
-    <!-- AANKOMST VRIJDAG — uitgebreid plan onderaan -->
-    <div class="peaks-divider"></div>
-    <span class="sec-lbl">🚂 Aankomst vrijdag 26 juni</span>
-    <!-- AI DAGVOORSTEL (prominent position, right below nudges) -->
-    <div id="home-ai-tips" style="margin:10px 20px 4px;display:none;"></div>
-
-    <!-- AANKOMSTDAG VOORSTEL -->
-    <div id="voorstel-aankomst" style="margin:12px 20px 0;">
-      <div style="font-size:0.78rem;color:#6B6560;line-height:1.6;margin-bottom:10px;padding:0 2px;">Ha, onze app is hopelijk leuk maar ook wat veel&nbsp;😅. Daarom alvast een voorstel voor de 1e middag. Wat denken jullie ervan? Of liever iets anders?</div>
-      <div style="background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 2px 20px rgba(10,10,10,0.08);">
-        <div style="background:linear-gradient(135deg,#D4785A 0%,#B85840 100%);padding:16px 18px 14px;">
-          <div style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,235,228,0.7);margin-bottom:5px;">Voorstel · Vrijdag 26 juni</div>
-          <div style="font-family:Georgia,serif;font-size:1.35rem;color:#fff;line-height:1.15;margin-bottom:3px;">Van trein tot fiets</div>
-          <div style="font-size:0.73rem;color:rgba(255,235,228,0.85);">Aankomstdag · een concreet plan</div>
-        </div>
-        <div style="padding:18px 18px 4px;">
-
-          <!-- 11:56 -->
-          <div style="display:flex;gap:12px;margin-bottom:0;">
-            <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
-              <div style="width:9px;height:9px;border-radius:50%;background:#D4785A;margin-top:3px;flex-shrink:0;"></div>
-              <div style="width:1.5px;flex:1;background:rgba(10,10,10,0.09);margin:4px 0;"></div>
-            </div>
-            <div style="flex:1;padding-bottom:16px;">
-              <div style="font-size:0.6rem;font-weight:700;color:#D4785A;letter-spacing:0.07em;margin-bottom:3px;">11:56</div>
-              <div style="font-size:0.9rem;font-weight:800;color:#0A0A0A;margin-bottom:3px;">🚂 Aankomst Gare du Nord</div>
-              <div style="font-size:0.75rem;color:#6B6560;line-height:1.55;">Tas voor je, ogen wijd open. We zijn in Parijs.</div>
-            </div>
-          </div>
-
-          <!-- 12:15 -->
-          <div style="display:flex;gap:12px;margin-bottom:0;">
-            <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
-              <div style="width:9px;height:9px;border-radius:50%;background:#D4785A;margin-top:3px;flex-shrink:0;"></div>
-              <div style="width:1.5px;flex:1;background:rgba(10,10,10,0.09);margin:4px 0;"></div>
-            </div>
-            <div style="flex:1;padding-bottom:16px;">
-              <div style="font-size:0.6rem;font-weight:700;color:#D4785A;letter-spacing:0.07em;margin-bottom:3px;">12:15 — ±1 uur</div>
-              <div style="font-size:0.9rem;font-weight:800;color:#0A0A0A;margin-bottom:3px;">🍽️ Lunch: Terminus Nord</div>
-              <div style="font-size:0.75rem;color:#6B6560;line-height:1.55;margin-bottom:7px;">Klassieke brasserie uit 1925, recht tegenover de uitgang van Gare du Nord. Art deco interieur, steak-frites, moules marinières. Geen reservering nodig voor lunch. Meteen Parijs-gevoel. ±€22–28 pp.</div>
-              <div style="background:rgba(212,120,90,0.07);border-radius:9px;padding:6px 9px;display:inline-flex;align-items:center;gap:5px;">
-                <span style="font-size:0.65rem;color:#D4785A;font-weight:600;">📍 23 Rue de Dunkerque · 10e · 2 min lopen</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 13:30 routes -->
-          <div style="display:flex;gap:12px;margin-bottom:0;">
-            <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
-              <div style="width:9px;height:9px;border-radius:50%;background:#C8A882;margin-top:3px;flex-shrink:0;"></div>
-              <div style="width:1.5px;flex:1;background:rgba(10,10,10,0.09);margin:4px 0;"></div>
-            </div>
-            <div style="flex:1;padding-bottom:16px;">
-              <div style="font-size:0.6rem;font-weight:700;color:#C8A882;letter-spacing:0.07em;margin-bottom:6px;">13:30 — KIES JE ROUTE</div>
-
-              <!-- Route A -->
-              <div style="background:rgba(122,158,130,0.08);border:1.5px solid rgba(122,158,130,0.2);border-radius:12px;padding:11px 12px;margin-bottom:8px;">
-                <div style="font-size:0.7rem;font-weight:800;color:#7A9E82;margin-bottom:6px;letter-spacing:0.04em;">ROUTE A — Direct naar Baja Bikes</div>
-                <div style="font-size:0.73rem;color:#0A0A0A;line-height:1.7;">
-                  🚶 3 min lopen naar <strong>Gare du Nord</strong><br>
-                  🚇 <strong>Metro 4</strong> richting Montrouge → uitstappen <strong>Châtelet</strong> (4 stops, ±8 min)<br>
-                  🔄 Overstap → <strong>Metro 1</strong> richting La Défense → uitstappen <strong>George V</strong> (2 stops, ±4 min)<br>
-                  🚶 5 min lopen naar Baja Bikes startpunt
-                </div>
-                <div style="margin-top:7px;display:flex;gap:6px;align-items:center;">
-                  <span style="font-size:0.65rem;color:#7A9E82;font-weight:700;">⏱ ±25 min · aankomst ~14:00</span>
-                </div>
-                <div style="margin-top:5px;font-size:0.68rem;color:#6B6560;font-style:italic;">Koffers? Baja Bikes heeft een bagageplek, of neem ze mee op de fiets.</div>
-              </div>
-
-              <!-- Route B -->
-              <div style="background:rgba(168,159,232,0.07);border:1.5px solid rgba(168,159,232,0.2);border-radius:12px;padding:11px 12px;">
-                <div style="font-size:0.7rem;font-weight:800;color:#A89FE8;margin-bottom:6px;letter-spacing:0.04em;">ROUTE B — Eerst langs Airbnb</div>
-                <div style="font-size:0.73rem;color:#0A0A0A;line-height:1.7;">
-                  🚶 15 min lopen naar <strong>Rue de la Lune</strong> (Bonne Nouvelle)<br>
-                  🧳 Koffers achterlaten — <em>vraag vooraf aan host!</em><br>
-                  🚇 <strong>Metro 4</strong> vanaf Strasbourg-Saint-Denis → <strong>Châtelet</strong> (3 stops, ±6 min)<br>
-                  🔄 Overstap → <strong>Metro 1</strong> richting La Défense → <strong>George V</strong> (2 stops, ±4 min)<br>
-                  🚶 5 min lopen naar Baja Bikes startpunt
-                </div>
-                <div style="margin-top:7px;display:flex;gap:6px;align-items:center;">
-                  <span style="font-size:0.65rem;color:#A89FE8;font-weight:700;">⏱ ±40 min · aankomst ~14:10</span>
-                </div>
-                <div style="margin-top:5px;padding:5px 8px;background:rgba(212,120,90,0.08);border-radius:7px;font-size:0.67rem;color:#D4785A;font-weight:600;">⚠️ Bagagedrop vóór check-in is niet zeker — even bevestigen bij de host</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 14:30 -->
-          <div style="display:flex;gap:12px;margin-bottom:0;">
-            <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
-              <div style="width:9px;height:9px;border-radius:50%;background:#7A9E82;margin-top:3px;flex-shrink:0;"></div>
-              <div style="width:1.5px;flex:1;background:rgba(10,10,10,0.09);margin:4px 0;"></div>
-            </div>
-            <div style="flex:1;padding-bottom:16px;">
-              <div style="font-size:0.6rem;font-weight:700;color:#7A9E82;letter-spacing:0.07em;margin-bottom:3px;">14:30 — 3 uur</div>
-              <div style="font-size:0.9rem;font-weight:800;color:#0A0A0A;margin-bottom:3px;">🚲 Baja Bikes Highlights tour</div>
-              <div style="font-size:0.75rem;color:#6B6560;line-height:1.55;margin-bottom:7px;">Eiffeltoren · Louvre · Notre-Dame · Seine-kades — op de fiets met Nederlandse gids. Beste manier om Parijs in één klap te leren kennen. Kleine groep, 3 uur. Vertrek bij Champs-Élysées. €34–39 pp.</div>
-              <div style="background:rgba(122,158,130,0.09);border-radius:9px;padding:6px 9px;display:inline-flex;align-items:center;gap:5px;">
-                <span style="font-size:0.65rem;color:#7A9E82;font-weight:600;">⚡ Reserveren vóór de trip — bajabikes.eu</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 17:30 -->
-          <div style="display:flex;gap:12px;">
-            <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
-              <div style="width:9px;height:9px;border-radius:50%;background:#A89FE8;margin-top:3px;flex-shrink:0;"></div>
-            </div>
-            <div style="flex:1;padding-bottom:4px;">
-              <div style="font-size:0.6rem;font-weight:700;color:#A89FE8;letter-spacing:0.07em;margin-bottom:3px;">17:30 — en dan?</div>
-              <div style="font-size:0.9rem;font-weight:800;color:#0A0A0A;margin-bottom:3px;">🏠 Check-in · eerste borrel · diner</div>
-              <div style="font-size:0.75rem;color:#6B6560;line-height:1.55;">Douchen, even ademen, terrasje. Diner om 19:30 — de stad ligt voor ons.</div>
-            </div>
-          </div>
-
-        </div>
-        <div style="padding:14px 18px 16px;display:flex;gap:8px;">
-          <a href="https://www.bajabikes.eu/nl/steden/parijs/" target="_blank" rel="noopener" style="flex:1;display:flex;align-items:center;justify-content:center;padding:11px 8px;background:#0A0A0A;border-radius:12px;text-decoration:none;gap:5px;">
-            <span style="font-size:0.78rem;font-weight:700;color:#F0E8E2;letter-spacing:0.04em;">🚲 Boek Baja Bikes</span>
-          </a>
-          <button onclick="deelVoorstel()" style="flex:1;padding:11px 8px;background:transparent;border:1.5px solid rgba(10,10,10,0.12);border-radius:12px;font-family:var(--sans);font-size:0.78rem;font-weight:700;color:#0A0A0A;cursor:pointer;letter-spacing:0.02em;">📤 Deel in groepsapp</button>
-        </div>
-        <div id="aankomst-vote" style="padding:0 18px 16px;"></div>
-      </div>
-    </div>
-
-    <!-- UPCOMING STRIP -->
-    <div id="upcoming-strip" style="display:none;margin:4px 16px 8px;background:#0A0A0A;border-radius:var(--r-lg);padding:12px 14px;cursor:pointer;" onclick="switchTab('top5',null)">
-      <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(240,232,226,0.5);margin-bottom:3px;">Straks op het programma</div>
-      <div id="upcoming-content" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-        <div style="flex:1;">
-          <div id="upcoming-name" style="font-family:var(--sans);font-style:italic;font-weight:800;font-size:0.95rem;color:#F0E8E2;line-height:1.2;"></div>
-          <div id="upcoming-meta" style="font-size:0.7rem;color:rgba(240,232,226,0.6);margin-top:2px;"></div>
-        </div>
-        <div id="upcoming-time" style="font-size:0.75rem;color:var(--gold);font-weight:700;flex-shrink:0;text-align:right;"></div>
-      </div>
-    </div>
-
-    <!-- MAP — onderaan, altijd beschikbaar -->
-    <div class="peaks-divider" style="margin-top:8px;"></div>
-    <span class="sec-lbl">📍 Onze plekken</span>
-    <span class="sec-ttl" style="padding-bottom:8px;">Op de kaart</span>
-    <div style="margin:0 16px 8px;border-radius:18px;overflow:hidden;height:270px;box-shadow:0 2px 14px rgba(27,27,35,0.08);"><div id="paris-map" style="width:100%;height:100%;"></div></div>
-    <div style="padding:0 20px 24px;display:flex;justify-content:flex-end;">
-      <a href="https://www.timetomomo.com/nl/ontdek/parijs/" target="_blank" rel="noopener" style="font-size:0.75rem;font-weight:700;color:#A89FE8;text-decoration:none;letter-spacing:0.04em;">Bekijk TtM routes →</a>
+      <div id="paris-map" style="width:1px;height:1px;"></div>
+      <span id="cd-h"></span><span id="cd-m"></span>
+      <div id="cd-badge"></div><div id="cd-label"></div><div id="cd-trein-info"></div>
     </div>
 
   </section>
@@ -1118,23 +1147,20 @@ body{font-size:15.5px;}
   <!-- PROGRAMMA -->
   <section id="sec-top5" class="section">
     <div class="page-header">
-      <div class="page-logo">Programma</div>
-    </div>
-    <div style="margin:0 16px 12px;padding:14px 16px;background:rgba(168,159,232,0.1);border-radius:var(--r-lg);border-left:3px solid #A89FE8;">
-      <div style="font-size:0.78rem;color:#6B6560;line-height:1.6;">Dit is een voorstel, geen verplichting. Alles is aanpasbaar, niets is gepland zonder dat jullie het zelf gekozen hebben. Bewaak je eigen grenzen — als je een ochtend voor jezelf wilt, plan dat in. De app is overzicht, niet wetgeving.</div>
-      <button onclick="showToast('⏸️ Noteer het in de chat met Griette — zij past het programma aan.')" style="margin-top:10px;width:100%;padding:10px;border:1.5px solid #A89FE8;border-radius:20px;background:transparent;color:#A89FE8;font-family:var(--sans);font-size:0.78rem;font-weight:700;cursor:pointer;letter-spacing:0.05em;">⏸️ Reserveer een dagdeel voor mezelf</button>
+      <span class="eyebrow" style="margin-bottom:2px;">Dagprogramma</span>
+      <div class="page-logo" style="margin-bottom:0;">Parijs</div>
     </div>
     <div class="swipe-tabs" id="prog-day-tabs" style="-webkit-overflow-scrolling:touch;">
       <button class="stab active" onclick="switchProgDay('vr26',this)">Vr 26 juni</button>
       <button class="stab" onclick="switchProgDay('za27',this)">Za 27 juni</button>
       <button class="stab" onclick="switchProgDay('zo28',this)">Zo 28 juni</button>
     </div>
-    <div id="prog-content" style="padding:12px 16px 32px;"></div>
+    <div id="prog-content" style="padding:4px 20px 32px;"></div>
     <!-- AI DAGPROGRAMMA GENERATOR -->
     <div id="dagprog-ai-section" style="padding:0 16px 16px;"></div>
     <!-- GROEPSPLAN CHIPS -->
     <div id="groepsplan-block" style="padding:0 16px 16px;display:none;">
-      <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Groepskeuze</div>
+      <span class="eyebrow">Groepskeuze</span>
       <div id="groepsplan-chips" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
     </div>
 
@@ -1162,7 +1188,7 @@ body{font-size:15.5px;}
     <div style="margin:0 16px 16px;font-size:0.65rem;color:var(--t3);letter-spacing:0.06em;text-align:center;">Typisch Parijs juni · licht jasje mee</div>
 
     <!-- WEEKEND EVENTS -->
-    <div class="home-section-title" style="margin-top:4px;">Wat speelt dit weekend</div>
+    <div style="margin:16px 20px 4px;"><span class="eyebrow">Dit weekend in Parijs</span></div>
     <div class="home-section-sub">26–28 juni 2026 in Parijs</div>
     <div id="weekend-blok"></div>
     <div id="custom-event-chips"></div>
@@ -1191,24 +1217,25 @@ body{font-size:15.5px;}
     </div>
 
     <!-- MUST-HAVES PER PERSOON -->
-    <div style="margin:0 20px 16px;padding:16px 0;border-top:1px solid rgba(10,10,10,0.08);">
-      <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.1rem;color:#0A0A0A;margin-bottom:4px;">💌 Dit mag niet missen</div>
-      <div style="font-size:0.78rem;color:#6B6560;margin-bottom:12px;line-height:1.4;">Wat elke vriendin echt wil dit weekend — ingevuld bij de voorkeuren.</div>
+    <div style="margin:0 20px 16px;padding:16px 0;border-top:1px solid var(--lijn);">
+      <span class="eyebrow">Dit mag niet missen</span>
+      <div style="font-family:var(--serif);font-style:italic;font-weight:300;font-size:22px;color:var(--inkt);line-height:1.2;margin-bottom:6px;">Jullie verlanglijstje</div>
+      <div style="font-family:var(--sans);font-size:13px;color:var(--grijs);margin-bottom:12px;line-height:1.5;">Wat elke vriendin echt wil dit weekend.</div>
       <div id="groep-musthaves" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
 
-    <div class="groep-section-head" style="display:flex;align-items:center;gap:8px;">Jullie matches <span style="font-size:0.7rem;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;">3+ stemmen</span></div>
-    <div class="groep-sub">Swipe allebei 'wil ik' — dan verschijnt het hier ✨</div>
+    <div style="padding:0 20px 4px;"><span class="eyebrow">Jullie matches</span></div>
+    <div class="groep-sub" style="padding:0 20px 8px;font-family:var(--sans);font-size:13px;color:var(--grijs);">Swipe allebei 'wil ik' — dan verschijnt het hier</div>
     <div class="groep-matches" id="groep-matches"></div>
 
-    <div class="groep-section-head">Bijna-matches</div>
-    <div class="groep-sub">Nog één stem nodig — bijna een match 🤞</div>
+    <div style="padding:8px 20px 4px;"><span class="eyebrow">Bijna-matches</span></div>
+    <div class="groep-sub" style="padding:0 20px 8px;font-family:var(--sans);font-size:13px;color:var(--grijs);">Nog één stem nodig</div>
     <div class="groep-matches" id="groep-near"></div>
 
     <!-- KOSTEN BIJHOUDEN -->
-    <div style="margin:0 20px 16px;padding:16px 0;border-top:1px solid rgba(10,10,10,0.08);">
-      <div style="font-family:'DM Sans',sans-serif;font-style:italic;font-weight:700;font-size:1.1rem;color:#0A0A0A;margin-bottom:4px;">💰 Kosten bijhouden</div>
-      <div style="font-size:0.78rem;color:#6B6560;margin-bottom:12px;line-height:1.4;">Frederike regelt Splitwise — dat weten we allemaal.</div>
+    <div style="margin:0 20px 16px;padding:16px 0;border-top:1px solid var(--lijn);">
+      <span class="eyebrow">Kosten</span>
+      <div style="font-family:var(--sans);font-size:13px;color:var(--grijs);margin-bottom:12px;line-height:1.5;">Frederike regelt Splitwise — dat weten we allemaal.</div>
       <div style="display:flex;gap:10px;">
         <a href="https://splitwise.com" target="_blank" rel="noopener" style="flex:1;padding:11px 0;text-align:center;background:#0A0A0A;color:#F0E8E2;border-radius:30px;font-size:0.78rem;font-weight:700;text-decoration:none;letter-spacing:0.06em;">📊 Open Splitwise</a>
         <button onclick="showToast('Tikkie stuur je gewoon via je eigen bank-app 😄')" style="flex:1;padding:11px 0;border:1.5px solid rgba(10,10,10,0.12);border-radius:30px;background:transparent;font-size:0.78rem;font-weight:600;cursor:pointer;color:#0A0A0A;">💸 Tikkie sturen</button>
@@ -1229,7 +1256,7 @@ body{font-size:15.5px;}
       </div>
     </div>
 
-    <div style="padding:0 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:#D4785A;">🔥 Begin hier — speel nu al</div>
+    <div style="padding:12px 20px 4px;"><span class="eyebrow" style="color:var(--koraal);">Begin hier</span></div>
     <div class="spellen-grid" style="padding-bottom:4px;">
       <div style="grid-column:1/-1;border:2px solid rgba(212,120,90,0.3);background:rgba(212,120,90,0.06);border-radius:var(--r-lg);padding:20px 16px;">
         <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="openGame('warmup')">
@@ -1247,7 +1274,7 @@ body{font-size:15.5px;}
       </div>
     </div>
 
-    <div style="padding:0 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Elke dag — async</div>
+    <div style="padding:12px 20px 4px;"><span class="eyebrow">Elke dag</span></div>
     <div class="spellen-grid">
       <div class="spel-card" onclick="openGame('wie-van-ons')" style="grid-column:1/-1;">
         <div style="display:flex;align-items:center;gap:12px;">
@@ -1270,7 +1297,7 @@ body{font-size:15.5px;}
       </div>
     </div>
 
-    <div style="padding:8px 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Voor de airbnb-avond</div>
+    <div style="padding:12px 20px 4px;"><span class="eyebrow">Voor de airbnb-avond</span></div>
     <div class="spellen-grid">
       <div class="spel-card" onclick="openGame('nev')" style="grid-column:1/-1;">
         <div style="display:flex;align-items:center;gap:12px;">
@@ -1293,7 +1320,7 @@ body{font-size:15.5px;}
       </div>
     </div>
 
-    <div style="padding:8px 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Klassiekers</div>
+    <div style="padding:12px 20px 4px;"><span class="eyebrow">Klassiekers</span></div>
     <div class="spellen-grid">
       <div class="spel-card" onclick="openGame('quiz')">
         <div class="spel-emoji">🗺️</div>
@@ -1322,7 +1349,7 @@ body{font-size:15.5px;}
       </div>
     </div>
 
-    <div style="padding:16px 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);">Herinneringen</div>
+    <div style="padding:16px 20px 4px;"><span class="eyebrow">Herinneringen</span></div>
     <div style="padding:0 16px 8px;font-size:0.78rem;color:var(--t2);line-height:1.5;">Voeg hier je hoogtepunten toe per dag. Aan het eind van elke dag een korte terugblik.</div>
 
     <div class="swipe-tabs" id="herin-day-tabs" style="-webkit-overflow-scrolling:touch;">
@@ -1332,7 +1359,7 @@ body{font-size:15.5px;}
     </div>
     <div id="herin-content" style="padding:16px;"></div>
 
-    <div style="padding:0 16px 4px;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-top:8px;">Muziek voor de reis</div>
+    <div style="padding:8px 20px 4px;"><span class="eyebrow">Muziek voor de reis</span></div>
     <div style="padding:0 16px 6px;font-size:0.7rem;color:var(--t3);">▶ Afspelen in Spotify</div>
     <div style="display:flex;gap:10px;padding:4px 16px 24px;overflow-x:auto;scrollbar-width:none;">
       <a href="https://open.spotify.com/search/jazz%20cafe%20paris" target="_blank" rel="noopener" style="flex:0 0 140px;background:rgba(10,10,10,0.05);border-radius:var(--r-lg);padding:14px 12px;text-decoration:none;display:block;">
@@ -3672,101 +3699,93 @@ function renderPollChainDay(dag) {
     });
     const total = votedCount || 1;
 
-    const proposalCard = `<div style="background:linear-gradient(135deg,rgba(212,120,90,0.07),rgba(168,159,232,0.07));border-radius:12px;padding:12px 14px;margin-bottom:12px;border:1px solid rgba(168,159,232,0.15);">
-      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;">
-        <span style="font-size:1.1rem;flex-shrink:0;">${poll.icon || '📍'}</span>
-        <div style="font-size:0.88rem;font-weight:700;color:#0A0A0A;line-height:1.35;">${poll.voorstel}</div>
-      </div>
-      <div style="font-size:0.75rem;color:#4A4440;line-height:1.55;margin-bottom:8px;">${poll.detail}</div>
-      <div style="font-size:0.68rem;color:#9A948E;line-height:1.45;padding-top:6px;border-top:1px solid rgba(10,10,10,0.06);">
-        <span style="font-weight:600;color:#6B6560;">Hoe er komen:</span> ${poll.bereikbaarheid}
-      </div>
+    const proposalCard = `<div style="margin-bottom:16px;">
+      <div class="pchain-voorstel">${poll.icon || '📍'} ${poll.voorstel}</div>
+      ${poll.detail ? `<div style="font-family:var(--sans);font-size:13px;color:var(--grijs);line-height:1.6;margin-bottom:6px;">${poll.detail}</div>` : ''}
+      ${poll.bereikbaarheid ? `<div style="font-family:var(--sans);font-size:12px;color:var(--grijs);">🚇 ${poll.bereikbaarheid}</div>` : ''}
     </div>`;
+
+    function _avatarChips(filterFn) {
+      return ALL_CHAIN_USERS.filter(filterFn).map(u => {
+        const p = PROFILES[u]; const ph = getUserPhoto(u);
+        return ph
+          ? `<img src="${ph}" title="${p.naam}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;margin-right:2px;vertical-align:middle;">`
+          : `<span title="${p.naam}" style="display:inline-flex;width:24px;height:24px;border-radius:50%;background:${p.color};align-items:center;justify-content:center;font-size:0.6rem;color:#fff;font-weight:700;margin-right:2px;">${p.init}</span>`;
+      }).join('');
+    }
 
     if (isAnswered && idx < firstUnanswered) {
       const myLabel = myVote === 'custom' ? (getChainText(poll.id, currentUser) || 'Eigen voorstel') : VOTE_LABELS[myVote];
       const pct = counts.map(c => Math.round(c / total * 100));
       const customPct = Math.round(customCount / total * 100);
 
-      function _avatarChips(filterFn) {
-        return ALL_CHAIN_USERS.filter(filterFn).map(u => {
-          const p = PROFILES[u]; const ph = getUserPhoto(u);
-          return ph
-            ? `<img src="${ph}" title="${p.naam}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;margin-right:3px;vertical-align:middle;">`
-            : `<span title="${p.naam}" style="display:inline-flex;width:20px;height:20px;border-radius:50%;background:${p.color};align-items:center;justify-content:center;font-size:0.55rem;color:#fff;font-style:italic;font-weight:700;margin-right:3px;">${p.init}</span>`;
-        }).join('');
-      }
-
-      const barColors = ['#7A9E82', '#D4785A'];
       const barsHtml = VOTE_LABELS.map((label, i) => `
-        <div style="margin-bottom:7px;">
-          <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;">
-            <span style="${myVote===i?'font-weight:700;color:#0A0A0A;':'color:#6B6560;'}">${label}</span>
-            <span style="font-weight:600;color:#6B6560;">${pct[i]}%</span>
+        <div style="margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;font-family:var(--sans);font-size:12px;margin-bottom:3px;">
+            <span style="color:${myVote===i ? 'var(--inkt)' : 'var(--grijs)'};font-weight:${myVote===i ? 600 : 400};">${label}</span>
+            <span style="color:var(--grijs);">${pct[i]}%</span>
           </div>
-          <div class="poll-bar"><div class="poll-bar-fill" style="width:${pct[i]}%;background:${barColors[i]};opacity:${myVote===i?1:0.45};"></div></div>
-          ${counts[i] > 0 ? `<div style="margin-top:3px;">${_avatarChips(u => getChainVote(poll.id, u) === i)}</div>` : ''}
+          <div class="poll-bar"><div class="poll-bar-fill" style="width:${pct[i]}%;"></div></div>
+          ${counts[i] > 0 ? `<div style="margin-top:4px;">${_avatarChips(u => getChainVote(poll.id, u) === i)}</div>` : ''}
         </div>`).join('') + (customCount > 0 ? `
-        <div style="margin-bottom:7px;">
-          <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px;">
-            <span style="${myVote==='custom'?'font-weight:700;color:#0A0A0A;':'color:#6B6560;'}">✏️ Eigen voorstel</span>
-            <span style="font-weight:600;color:#6B6560;">${customPct}%</span>
+        <div style="margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;font-family:var(--sans);font-size:12px;margin-bottom:3px;">
+            <span style="color:${myVote==='custom' ? 'var(--inkt)' : 'var(--grijs)'};font-weight:${myVote==='custom' ? 600 : 400};">✏️ Eigen voorstel</span>
+            <span style="color:var(--grijs);">${customPct}%</span>
           </div>
-          <div class="poll-bar"><div class="poll-bar-fill" style="width:${customPct}%;background:#A89FE8;opacity:${myVote==='custom'?1:0.45};"></div></div>
+          <div class="poll-bar"><div class="poll-bar-fill" style="width:${customPct}%;"></div></div>
           ${ALL_CHAIN_USERS.filter(u => getChainVote(poll.id, u) === 'custom').map(u => {
             const t = getChainText(poll.id, u);
-            return t ? `<div style="font-size:0.65rem;color:#9A948E;margin-top:2px;padding-left:4px;">↳ ${PROFILES[u]?.naam}: &ldquo;${t}&rdquo;</div>` : '';
+            return t ? `<div style="font-family:var(--sans);font-size:11px;color:var(--grijs);margin-top:2px;">↳ ${PROFILES[u]?.naam}: &ldquo;${t}&rdquo;</div>` : '';
           }).join('')}
         </div>` : '');
 
       let consensusMsg = '';
       if (votedCount >= 4 && counts[0] === 4) {
-        consensusMsg = `<div style="font-size:0.72rem;color:#7A9E82;font-weight:700;margin-top:6px;">Iedereen is erbij! 🥂</div>`;
+        consensusMsg = `<div style="font-family:var(--sans);font-size:12px;color:var(--mint);font-weight:600;margin-top:8px;">Iedereen is erbij! 🥂</div>`;
         if (typeof launchConfetti === 'function') setTimeout(() => launchConfetti(), 50);
       } else if (votedCount >= 4 && counts[0] > 0 && counts[1] > 0) {
-        consensusMsg = `<div style="font-size:0.72rem;color:#D4785A;font-weight:600;margin-top:6px;">Niet iedereen is even enthousiast — even overleggen? 🤝</div>`;
+        consensusMsg = `<div style="font-family:var(--sans);font-size:12px;color:var(--koraal);font-weight:500;margin-top:8px;">Niet iedereen is even enthousiast — even overleggen? 🤝</div>`;
       }
 
       html += `<div class="pchain-block">
         <div class="pchain-answered">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
             <div>
-              <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#7A9E82;margin-bottom:2px;">${poll.dagdeel}</div>
-              <div style="font-size:0.85rem;font-weight:700;color:#0A0A0A;">${poll.voorstel}</div>
+              <span class="eyebrow">${poll.dagdeel}</span>
+              <div class="pchain-voorstel" style="margin-top:0;">${poll.voorstel}</div>
             </div>
-            <button onclick="syncDelete('vz_pchain_${poll.id}_'+currentUser);syncDelete('vz_pchain_text_${poll.id}_'+currentUser);renderPollChainDay('${poll.dag}');" style="flex-shrink:0;margin-left:10px;padding:4px 10px;border:1px solid rgba(10,10,10,0.15);border-radius:20px;background:transparent;font-size:0.65rem;font-weight:600;cursor:pointer;color:#6B6560;font-family:var(--sans);">Wijzig ▸</button>
+            <button onclick="syncDelete('vz_pchain_${poll.id}_'+currentUser);syncDelete('vz_pchain_text_${poll.id}_'+currentUser);renderPollChainDay('${poll.dag}');" style="flex-shrink:0;margin-left:12px;padding:4px 12px;border:1px solid var(--lijn);border-radius:100px;background:transparent;font-family:var(--sans);font-size:11px;font-weight:500;cursor:pointer;color:var(--grijs);white-space:nowrap;">Wijzig</button>
           </div>
-          <div style="font-size:0.72rem;color:#6B6560;margin-bottom:8px;">Jouw stem: <strong style="color:#0A0A0A;">${myLabel}</strong></div>
+          <div style="font-family:var(--sans);font-size:12px;color:var(--grijs);margin-bottom:10px;">Jouw stem: <strong style="color:var(--inkt);">${myLabel}</strong> · ${votedCount} van 4 gestemd</div>
           ${barsHtml}
-          <div style="font-size:0.65rem;color:#9A948E;margin-top:4px;">${votedCount} van 4 gestemd</div>
           ${consensusMsg}
-          <div id="cmt-pchain-${poll.id}" style="margin-top:8px;"></div>
+          <div id="cmt-pchain-${poll.id}" style="margin-top:10px;"></div>
         </div>
       </div>`;
     } else if (isActive) {
       html += `<div class="pchain-block">
         <div class="pchain-active">
-          <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#A89FE8;margin-bottom:4px;">${poll.dagdeel}</div>
-          <div style="font-size:0.78rem;font-weight:600;color:#6B6560;margin-bottom:8px;">Voorstel van Griette:</div>
+          <span class="eyebrow">${poll.dagdeel}</span>
           ${proposalCard}
           <div style="display:flex;flex-direction:column;gap:8px;">
-            <button class="poll-opt" style="text-align:left;background:rgba(122,158,130,0.1);border-color:rgba(122,158,130,0.5);color:#2D5A35;" onclick="voteChain('${poll.id}',0)">✓ Ja, leuk! Ik ben erbij</button>
-            <button class="poll-opt" style="text-align:left;" onclick="voteChain('${poll.id}',1)">🤔 Ik doe liever wat anders</button>
-            <button class="poll-opt" style="text-align:left;color:#9A948E;border-style:dashed;" onclick="showChainCustomInput('${poll.id}')">✏️ Ander voorstel, namelijk...</button>
+            <button class="poll-opt" onclick="voteChain('${poll.id}',0)">✓ Ja, leuk! Ik ben erbij</button>
+            <button class="poll-opt" onclick="voteChain('${poll.id}',1)">🤔 Ik doe liever wat anders</button>
+            <button class="poll-opt" onclick="showChainCustomInput('${poll.id}')">✏️ Ander voorstel, namelijk...</button>
           </div>
-          <div id="pchain-custom-${poll.id}" style="display:none;margin-top:10px;gap:8px;align-items:center;">
-            <input type="text" placeholder="Jouw voorstel voor dit moment..." style="flex:1;padding:10px 12px;border:1.5px solid rgba(168,159,232,0.5);border-radius:var(--r-lg);font-family:var(--sans);font-size:0.88rem;color:#0A0A0A;outline:none;background:#fff;" onkeydown="if(event.key==='Enter')voteChainCustom('${poll.id}')">
-            <button onclick="voteChainCustom('${poll.id}')" style="flex-shrink:0;padding:10px 16px;border:none;border-radius:var(--r-lg);background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;">Ok</button>
+          <div id="pchain-custom-${poll.id}" style="display:none;margin-top:12px;gap:8px;align-items:center;flex-direction:column;">
+            <input type="text" placeholder="Jouw voorstel voor dit moment..." style="flex:1;padding:10px 14px;border:1px solid var(--lijn);border-radius:100px;font-family:var(--sans);font-size:13px;color:var(--inkt);outline:none;background:#fff;width:100%;box-sizing:border-box;" onkeydown="if(event.key==='Enter')voteChainCustom('${poll.id}')">
+            <button onclick="voteChainCustom('${poll.id}')" class="btn-primary" style="margin-top:8px;">Ok</button>
           </div>
-          <div id="cmt-pchain-${poll.id}" style="margin-top:10px;"></div>
+          <div id="cmt-pchain-${poll.id}" style="margin-top:12px;"></div>
         </div>
       </div>`;
     } else {
       html += `<div class="pchain-block">
         <div class="pchain-locked">
-          <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#9A948E;margin-bottom:2px;">${poll.dagdeel}</div>
-          <div style="font-size:0.88rem;font-weight:600;color:#9A948E;">${poll.voorstel}</div>
-          <div style="font-size:0.72rem;color:#9A948E;margin-top:6px;">🔒 Beantwoord de vorige vraag eerst</div>
+          <span class="eyebrow" style="color:var(--grijs);">${poll.dagdeel}</span>
+          <div style="font-family:var(--sans);font-size:14px;font-weight:500;color:var(--grijs);margin-top:4px;">${poll.voorstel}</div>
+          <div style="font-family:var(--sans);font-size:12px;color:var(--grijs);margin-top:6px;">🔒 Beantwoord de vorige vraag eerst</div>
         </div>
       </div>`;
     }
@@ -5099,56 +5118,22 @@ function makeCard(item, zOffset) {
   el.style.transform = `scale(${1 - zOffset * 0.03}) translateY(${zOffset * 8}px)`;
   el.style.pointerEvents = zOffset === 0 ? 'auto' : 'none';
 
-  const votes = getAllVotes(item.id);
-  const others = Object.entries(votes).filter(([u]) => u !== currentUser);
-  const otherVotesHtml = others.map(([u, v]) => {
-    if (!v) return '';
-    const p = PROFILES[u];
-    const icon = v === 'like' ? '♥' : '★';
-    return `<div class="vote-chip">${avatarImg(u, 18)}<span>${p.naam.split('').slice(0,4).join('')}.. ${icon}</span></div>`;
-  }).filter(Boolean).join('');
-
-  const badges = [];
-  if (item.must_van) {
-    const bronNaam = PROFILES[item.must_van]?.naam || item.must_van;
-    badges.push(`<span class="badge badge-must">✏️ ${bronNaam}${item.bron_note ? ' (' + item.bron_note + ')' : ''}</span>`);
-  }
-  if (item.weekend_special) badges.push(`<span class="badge badge-weekend">🎉 Weekend</span>`);
-  if (item.reserveren) badges.push(`<span class="badge badge-reserveer">📋 Reserveer</span>`);
-  if (item.added) badges.push(`<span class="badge badge-added">+ ${item.added_by || 'Toegevoegd'}</span>`);
-
-  const bron = item.must_van ? `Via ${PROFILES[item.must_van]?.naam || item.must_van}` : null;
-  const verhaalText = item.verhaal || item.voor_ons || '';
-
-  const typeIcon = {ervaring:'🪄', plek:'📍', moment:'⏰'}[item.type] || '';
+  const eyebrowText = [item.sub, item.wijk].filter(Boolean).join(' · ');
+  const plumetParts = [item.prijs, item.duur].filter(Boolean).join(' · ');
+  const heroStyle = item.img
+    ? `background-image:url('${item.img}');background-size:cover;background-position:center;`
+    : `background-color:var(--papier);`;
 
   el.innerHTML = `
-    <div class="card-hero" style="background-image:url('${item.img || ''}');">
-      <div class="card-hero-grad"></div>
-      <div class="card-badges">
-        ${badges.join('')}
-        <span class="badge badge-cat">${typeIcon ? typeIcon + ' ' : ''}${item.sub}</span>
-        ${bron ? `<span class="badge" style="background:var(--gold2);color:var(--gold);border:1px solid rgba(201,169,110,0.3);">${bron}</span>` : ''}
-        ${item.verborgen ? `<span class="badge" style="background:rgba(168,159,232,0.2);color:#A89FE8;border:1px solid rgba(168,159,232,0.3);">✨ Verborgen</span>` : ''}
-      </div>
-      <div style="position:absolute;bottom:14px;left:16px;right:16px;">
-        <div style="font-family:var(--serif);font-style:italic;font-size:1.4rem;color:#fff;line-height:1.1;text-shadow:0 2px 8px rgba(0,0,0,0.5);">${item.naam}</div>
-        ${item.hook ? `<div style="font-size:0.8rem;font-weight:700;color:#fff;margin-top:5px;text-shadow:0 1px 6px rgba(0,0,0,0.6);letter-spacing:0.01em;">${item.hook}</div>` : `<div style="font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.75);margin-top:4px;">${item.wijk}</div>`}
-      </div>
+    <div class="card-hero" style="${heroStyle}" onclick="openCardDrawer('${item.id}')">
+      ${!item.img ? `<div class="card-hero-placeholder">${item.naam.charAt(0)}</div>` : ''}
       <div class="card-like-overlay" id="ov-${item.id}"></div>
     </div>
-    <div class="card-body" style="padding:12px 16px 10px;">
-      ${item.hook ? `<div style="font-size:0.7rem;color:var(--t3);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:7px;">${item.wijk}</div>` : ''}
-      <div class="card-meta" style="margin-bottom:${verhaalText ? '10px' : '0'};">
-        <span class="card-meta-pill">💶 ${item.prijs}</span>
-        ${item.duur ? `<span class="card-meta-pill">⏱ ${item.duur}</span>` : ''}
-        ${item.tijden ? `<span class="card-meta-pill">🕐 ${item.tijden.substring(0,28)}</span>` : ''}
-        ${item.reserveren ? `<span class="card-meta-pill" style="color:#e88;border-color:rgba(220,100,100,0.3);">📋 Reserveer</span>` : ''}
-      </div>
-      ${verhaalText ? `<div style="font-size:0.82rem;color:var(--t2);line-height:1.55;border-left:2px solid var(--gold);padding-left:10px;font-style:italic;">${verhaalText.substring(0,180)}${verhaalText.length>180?'…':''}</div>` : ''}
-      ${item.tip ? `<div style="font-size:0.75rem;color:var(--gold);margin-top:8px;line-height:1.4;">💡 ${item.tip.substring(0,110)}${item.tip.length>110?'…':''}</div>` : ''}
+    <div class="card-body" onclick="openCardDrawer('${item.id}')">
+      <span class="card-eyebrow">${eyebrowText}</span>
+      <div class="card-naam">${item.naam}</div>
+      ${plumetParts ? `<div class="card-plumet">${plumetParts}</div>` : ''}
     </div>
-    ${otherVotesHtml ? `<div class="card-votes" style="border-top:1px solid var(--bd);padding-top:8px;">${otherVotesHtml}</div>` : ''}
   `;
   return el;
 }
@@ -5195,6 +5180,9 @@ function attachDrag(card) {
     else {
       card.style.transform = '';
       if (overlay) overlay.className = 'card-like-overlay';
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) {
+        openCardDrawer(card.dataset.id);
+      }
     }
   }
   card.addEventListener('touchstart', onStart, {passive:true});
@@ -5203,6 +5191,53 @@ function attachDrag(card) {
   card.addEventListener('mousedown', onStart);
   document.addEventListener('mousemove', onMove);
   document.addEventListener('mouseup', onEnd);
+}
+
+// ── CARD DETAIL DRAWER ────────────────────────────
+function openCardDrawer(itemId) {
+  const item = ITEMS.find(it => it.id === itemId);
+  if (!item) return;
+  const drawer = document.getElementById('card-detail-drawer');
+  const backdrop = document.getElementById('card-detail-backdrop');
+  if (!drawer) return;
+
+  document.getElementById('drawer-img-wrap').innerHTML = item.img
+    ? `<img class="drawer-img" src="${item.img}" alt="${item.naam}" loading="lazy">`
+    : `<div class="drawer-img" style="display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:3rem;color:var(--grijs);">${item.naam.charAt(0)}</div>`;
+
+  document.getElementById('drawer-eyebrow').textContent = [item.sub, item.wijk].filter(Boolean).join(' · ');
+  document.getElementById('drawer-title').textContent = item.naam;
+
+  const verhaal = item.verhaal || item.voor_ons || '';
+  const tip = item.tip || '';
+  document.getElementById('drawer-desc').innerHTML = [verhaal, tip ? `💡 ${tip}` : '']
+    .filter(Boolean).map(t => `<p style="margin-bottom:10px;">${t}</p>`).join('');
+
+  const attribParts = [];
+  if (item.must_van) attribParts.push(`✏️ ${PROFILES[item.must_van]?.naam || item.must_van}`);
+  if (item.prijs) attribParts.push(`💶 ${item.prijs}`);
+  if (item.duur) attribParts.push(`⏱ ${item.duur}`);
+  if (item.tijden) attribParts.push(`🕐 ${item.tijden}`);
+  if (item.reserveren) attribParts.push('📋 Reservering aanbevolen');
+  document.getElementById('drawer-attrib').textContent = attribParts.join(' · ');
+
+  document.getElementById('drawer-actions').innerHTML = `
+    <button class="btn-primary" onclick="doSwipe('like');closeCardDrawer()">♥ Wil ik</button>
+    <button class="btn-secondary" onclick="doSwipe('dream');closeCardDrawer()">★ Droom</button>
+    <button class="btn-secondary" onclick="doSwipe('pass');closeCardDrawer()">✕ Pas</button>
+  `;
+
+  drawer.classList.add('open');
+  backdrop.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCardDrawer() {
+  const drawer = document.getElementById('card-detail-drawer');
+  const backdrop = document.getElementById('card-detail-backdrop');
+  if (drawer) drawer.classList.remove('open');
+  if (backdrop) backdrop.classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 function doSwipe(type) {
@@ -5885,51 +5920,43 @@ function _showAiHomeContext(text) {
 function renderProgramma() {
   const container = document.getElementById('prog-content');
   if (!container) return;
-  const plan = getPlanVibes();
-  const dayVibes = plan[progDay] || [];
-  const fixedSlots = (PROGRAMMA[progDay] || []).filter(s => s.type === 'fixed');
-  const ctx = PROG_CONTEXT[progDay];
+  const entries = PROGRAMMA[progDay] || [];
 
-  const ctxHtml = ctx ? `<div style="margin-bottom:16px;padding:14px 16px;background:rgba(10,10,10,0.04);border-radius:var(--r-lg);border-left:3px solid ${ctx.kleur};">
-    <div style="font-family:var(--sans);font-style:italic;font-weight:700;font-size:0.92rem;color:#0A0A0A;margin-bottom:8px;">🗺 ${ctx.titel}</div>
-    ${ctx.blokken.map(b=>`<div style="font-size:0.75rem;color:#6B6560;line-height:1.5;margin-bottom:6px;display:flex;gap:8px;"><span style="flex-shrink:0;">${b.icon}</span><span>${b.tekst}</span></div>`).join('')}
-  </div>` : '';
-
-  const fixedHtml = fixedSlots.length ? `<div style="margin-bottom:16px;">
-    <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Vaste tijden</div>
-    ${fixedSlots.map(slot=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;">
-      <span style="font-size:0.65rem;color:var(--gold);font-weight:700;flex-shrink:0;min-width:36px;margin-top:2px;">${slot.time}</span>
-      <div style="flex:1;"><div style="font-size:0.85rem;color:#0A0A0A;font-weight:600;">${slot.icon} ${slot.naam}</div>${slot.detail?`<div style="font-size:0.7rem;color:#6B6560;margin-top:2px;line-height:1.4;">${slot.detail}</div>`:''}</div>
-    </div>`).join('')}
-  </div>` : '';
-
-  if (dayVibes.length === 0) {
-    container.innerHTML = ctxHtml + fixedHtml + `<div style="padding:24px 0 16px;text-align:center;">
-      <div style="font-size:2.5rem;margin-bottom:10px;">✨</div>
-      <div style="font-size:0.88rem;color:#6B6560;line-height:1.6;margin-bottom:18px;">Kies belevingen bij <strong>Belevingen</strong><br>om jouw dag te vullen</div>
-      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
-        <button onclick="switchTab('swipe',document.querySelectorAll('.nav-btn')[1])" style="padding:11px 20px;border:none;border-radius:20px;background:#0A0A0A;color:#F0E8E2;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;letter-spacing:0.06em;">✨ Belevingen</button>
-        <button onclick="openPlanAddSheet()" style="padding:11px 20px;border:1.5px solid rgba(10,10,10,0.15);border-radius:20px;background:transparent;color:#0A0A0A;font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;">＋ Losse plek</button>
+  const rows = entries.map((slot, i, arr) => {
+    const isFixed = slot.type === 'fixed';
+    const isLast = i === arr.length - 1;
+    const rowClass = ['tl-row', isFixed ? 'tl-tappable' : 'tl-open', isLast ? 'tl-last' : ''].join(' ');
+    const onclick = isFixed ? ` onclick="openProgSlotDetail('${progDay}',${i})"` : '';
+    return `<div class="${rowClass}"${onclick}>
+      <div class="tl-time">${slot.time}</div>
+      <div class="tl-line"></div>
+      <div class="tl-content">
+        <div class="tl-name">${slot.icon} ${isFixed ? slot.naam : slot.hint}</div>
+        ${isFixed && slot.detail ? `<div class="tl-detail">${slot.detail}</div>` : ''}
       </div>
     </div>`;
-    renderGroepsplan();
-    renderDagprogrammaBar();
-    return;
-  }
+  }).join('');
 
-  const vibeHtml = `<div style="margin-bottom:16px;">
-    <div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Jouw belevingen</div>
-    ${dayVibes.map((entry, idx) => {
-      if (entry.type === 'item') return renderItemPlanBlock(entry, idx, progDay);
-      if (entry.type === 'custom') return renderCustomPlanBlock(entry, idx, progDay);
-      return renderVibePlanBlock(entry, idx, progDay);
-    }).join('')}
-    <button onclick="openPlanAddSheet()" style="margin-top:6px;width:100%;padding:10px;border:1.5px dashed rgba(168,159,232,0.4);border-radius:var(--r-lg);background:rgba(168,159,232,0.05);color:#A89FE8;font-family:var(--sans);font-size:0.78rem;font-weight:600;cursor:pointer;">＋ Voeg toe — plek, beleving of eigen</button>
-  </div>`;
-
-  container.innerHTML = ctxHtml + fixedHtml + vibeHtml;
+  container.innerHTML = rows;
   renderGroepsplan();
   renderDagprogrammaBar();
+}
+
+function openProgSlotDetail(day, idx) {
+  const slot = (PROGRAMMA[day] || [])[idx];
+  if (!slot || slot.type !== 'fixed') return;
+  const drawer = document.getElementById('card-detail-drawer');
+  const backdrop = document.getElementById('card-detail-backdrop');
+  if (!drawer) return;
+  document.getElementById('drawer-img-wrap').innerHTML = '';
+  document.getElementById('drawer-eyebrow').textContent = slot.time + ' · ' + (slot.label || '');
+  document.getElementById('drawer-title').textContent = slot.naam;
+  document.getElementById('drawer-desc').innerHTML = slot.detail ? `<p>${slot.detail}</p>` : '';
+  document.getElementById('drawer-attrib').textContent = '';
+  document.getElementById('drawer-actions').innerHTML = '';
+  drawer.classList.add('open');
+  backdrop.classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
 function toggleProgDone(slotKey) {
