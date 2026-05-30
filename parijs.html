@@ -6027,7 +6027,10 @@ function _renderDagdeelCard(day, deel, forHome) {
         ${_renderReactionBar(day, deel, prefix, forHome)}
         <div style="display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;">
           ${byLine}${editBtn}
-          <button onclick="_clearDagDeelCache('${day}','${deel}')" style="background:none;border:none;font-size:0.65rem;color:#C0BBB7;cursor:pointer;padding:0;">↺ Opnieuw</button>
+          ${forHome
+            ? `<button onclick="_clearDagDeelCache('${day}','${deel}')" style="background:none;border:none;font-size:0.65rem;color:#C0BBB7;cursor:pointer;padding:0;">↺ Opnieuw</button>`
+            : `<button onclick="_clearDagDeelCache('${day}','${deel}')" style="background:none;border:1.5px solid var(--lijn);border-radius:100px;font-family:var(--sans);font-size:0.85rem;color:var(--grijs);cursor:pointer;padding:10px 20px;font-weight:500;">↺ Opnieuw genereren</button>`
+          }
         </div>`;
     } else if (apiKey) {
       if (forHome) {
