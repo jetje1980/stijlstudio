@@ -1161,7 +1161,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
 
     <!-- AI KNOP -->
     <div class="home-ai-strip">
-      <button class="home-ai-btn" onclick="switchTab('meer',document.querySelector('.nav-btn[onclick*=meer]'));setTimeout(()=>document.getElementById('dagprog-ai-section')?.scrollIntoView({behavior:'smooth',block:'start'}),200)">
+      <button class="home-ai-btn" onclick="(function(){switchTab('top5',null);const b=document.querySelector('.nav-btn[onclick*=meer]');if(b){document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));b.classList.add('active');}setTimeout(()=>document.getElementById('dagprog-ai-section')?.scrollIntoView({behavior:'smooth',block:'start'}),250);})()">
         <span class="home-ai-icon">✦</span>
         <div class="home-ai-text">
           <div class="home-ai-title">Genereer ons dagprogramma</div>
@@ -5961,13 +5961,14 @@ function _renderDagdeelCard(day, deel, forHome) {
   const label = _DEEL_LABELS[deel];
   const prefix = forHome ? 'h' : 'p';
   const btnId = `dg-btn-${prefix}-${deel}`;
-  const sz = forHome ? '0.78rem' : '0.83rem';
+  const sz    = forHome ? '0.78rem' : '1rem';
+  const pad   = forHome ? '10px 14px' : '20px 20px 16px';
 
   let content = '';
   if (ctx.vast) {
-    content = `<div style="padding:8px 10px;background:rgba(10,10,10,0.04);border-radius:9px;">
+    content = `<div style="padding:${forHome ? '8px 10px' : '14px 16px'};background:rgba(10,10,10,0.04);border-radius:10px;">
         <div style="font-size:${sz};font-weight:600;color:#3D3835;">${ctx.label}</div>
-        ${ctx.detail ? `<div style="font-size:0.7rem;color:#9A948E;margin-top:2px;">${ctx.detail}</div>` : ''}
+        ${ctx.detail ? `<div style="font-size:${forHome?'0.7rem':'0.85rem'};color:#9A948E;margin-top:4px;">${ctx.detail}</div>` : ''}
       </div>`;
   } else {
     const cached = _safeJSON(_dagDeelCacheKey(day, deel), null);
@@ -5993,14 +5994,14 @@ function _renderDagdeelCard(day, deel, forHome) {
           const isChosen = reactions[currentUser]?.optie === opt.letter;
           const voterChips = voters.map(([u]) => {
             const p = PROFILES[u]; if (!p) return '';
-            return `<div style="width:18px;height:18px;border-radius:50%;background:${p.color};display:inline-flex;align-items:center;justify-content:center;font-size:0.55rem;color:#fff;font-weight:700;">${p.init}</div>`;
+            return `<div style="width:${forHome?'18px':'22px'};height:${forHome?'18px':'22px'};border-radius:50%;background:${p.color};display:inline-flex;align-items:center;justify-content:center;font-size:0.55rem;color:#fff;font-weight:700;">${p.init}</div>`;
           }).join('');
-          return `<div style="border-radius:10px;background:${bg};border-left:3px solid ${color};padding:10px 12px;margin-bottom:8px;">
-            <div style="font-size:0.6rem;letter-spacing:0.08em;font-weight:700;color:${color};margin-bottom:5px;text-transform:uppercase;">OPTIE ${opt.letter} — ${opt.header}</div>
-            <div style="font-size:${sz};color:#0A0A0A;line-height:1.75;white-space:pre-wrap;">${fmt}</div>
+          return `<div style="border-radius:12px;background:${bg};border-left:3px solid ${color};padding:${forHome?'10px 12px':'16px 16px'};margin-bottom:${forHome?'8':'12'}px;">
+            <div style="font-size:${forHome?'0.6rem':'0.72rem'};letter-spacing:0.08em;font-weight:700;color:${color};margin-bottom:${forHome?5:8}px;text-transform:uppercase;">OPTIE ${opt.letter}${opt.header ? ' — '+opt.header : ''}</div>
+            <div style="font-size:${sz};color:#0A0A0A;line-height:1.8;white-space:pre-wrap;">${fmt}</div>
             ${reservBanner}
-            <div style="display:flex;align-items:center;gap:6px;margin-top:8px;">
-              <button onclick="_setDagOptie('${day}','${deel}','${opt.letter}')" style="border:none;border-radius:20px;padding:5px 12px;font-size:0.7rem;font-weight:700;cursor:pointer;background:${isChosen ? color : 'rgba(10,10,10,0.06)'};color:${isChosen ? '#fff' : '#6B6560'};">
+            <div style="display:flex;align-items:center;gap:6px;margin-top:${forHome?8:12}px;">
+              <button onclick="_setDagOptie('${day}','${deel}','${opt.letter}')" style="border:none;border-radius:100px;padding:${forHome?'5px 12px':'9px 18px'};font-size:${forHome?'0.7rem':'0.82rem'};font-weight:700;cursor:pointer;background:${isChosen ? color : 'rgba(10,10,10,0.06)'};color:${isChosen ? '#fff' : '#6B6560'};">
                 ${isChosen ? '✓ Jouw keuze' : '🙋 Kies dit'}
               </button>
               ${voterChips ? `<div style="display:flex;gap:3px;align-items:center;">${voterChips}</div>` : ''}
@@ -6011,35 +6012,47 @@ function _renderDagdeelCard(day, deel, forHome) {
         const fmt = cached.text
           .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
           .replace(/⏰/g,'<span style="color:#A89FE8;">⏰</span>');
-        mainHtml = `<div style="font-size:${sz};color:#0A0A0A;line-height:1.75;white-space:pre-wrap;">${fmt}</div>
+        mainHtml = `<div style="font-size:${sz};color:#0A0A0A;line-height:1.8;white-space:pre-wrap;">${fmt}</div>
           ${_renderReservBanner(_detectReservations(cached.text))}`;
       }
 
       const editedByName = cached.editedBy && cached.editedBy !== cached.by ? (PROFILES[cached.editedBy]?.naam || cached.editedBy) : null;
       const byLine = editedByName
-        ? `<span style="font-size:0.62rem;color:#D4785A;">✏️ Aangepast door ${editedByName}</span>`
-        : (byName ? `<span style="font-size:0.62rem;color:#C0BBB7;">door ${byName}</span>` : '');
+        ? `<span style="font-size:0.65rem;color:#D4785A;">✏️ Aangepast door ${editedByName}</span>`
+        : (byName ? `<span style="font-size:0.65rem;color:#C0BBB7;">door ${byName}</span>` : '');
       const editBtn = !ctx.vast && apiKey
-        ? `<button onclick="_editDagdeel('${day}','${deel}','${prefix}')" style="background:none;border:1.5px dashed rgba(10,10,10,0.14);border-radius:20px;font-family:var(--sans);font-size:0.62rem;color:#9A948E;cursor:pointer;padding:3px 9px;">✏️ Aanpassen</button>`
+        ? `<button onclick="_editDagdeel('${day}','${deel}','${prefix}')" style="background:none;border:1.5px dashed rgba(10,10,10,0.14);border-radius:100px;font-family:var(--sans);font-size:0.65rem;color:#9A948E;cursor:pointer;padding:4px 12px;">✏️ Aanpassen</button>`
         : '';
       content = `${mainHtml}
         ${_renderReactionBar(day, deel, prefix, forHome)}
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">
-          ${byLine}
-          ${editBtn}
-          <button onclick="_clearDagDeelCache('${day}','${deel}')" style="background:none;border:none;font-size:0.62rem;color:#C0BBB7;cursor:pointer;padding:0;">↺ Nieuw genereren</button>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;">
+          ${byLine}${editBtn}
+          <button onclick="_clearDagDeelCache('${day}','${deel}')" style="background:none;border:none;font-size:0.65rem;color:#C0BBB7;cursor:pointer;padding:0;">↺ Opnieuw</button>
         </div>`;
     } else if (apiKey) {
-      content = `<button id="${btnId}" onclick="_genDagdeel('${day}','${deel}','${prefix}')"
-          style="padding:8px 12px;border:1.5px dashed rgba(168,159,232,0.45);border-radius:9px;background:rgba(168,159,232,0.05);font-family:var(--sans);font-size:0.74rem;font-weight:700;color:#A89FE8;cursor:pointer;width:100%;text-align:left;">
-          ✨ Genereer ${label.toLowerCase()} met AI
-        </button>`;
+      if (forHome) {
+        content = `<button id="${btnId}" onclick="_genDagdeel('${day}','${deel}','${prefix}')"
+            style="padding:8px 12px;border:1.5px dashed rgba(168,159,232,0.45);border-radius:9px;background:rgba(168,159,232,0.05);font-family:var(--sans);font-size:0.74rem;font-weight:700;color:#A89FE8;cursor:pointer;width:100%;text-align:left;">
+            ✨ Genereer ${label.toLowerCase()} met AI
+          </button>`;
+      } else {
+        content = `<button id="${btnId}" onclick="_genDagdeel('${day}','${deel}','${prefix}')"
+            style="display:flex;align-items:center;gap:14px;width:100%;padding:18px 20px;background:var(--inkt);border:none;border-radius:10px;cursor:pointer;text-align:left;">
+            <span style="font-size:1.4rem;color:var(--lila);flex-shrink:0;">✦</span>
+            <div style="flex:1;">
+              <div style="font-family:var(--sans);font-size:1rem;font-weight:600;color:#fff;line-height:1.2;">Genereer ${label.toLowerCase()}</div>
+              <div style="font-family:var(--sans);font-size:0.8rem;color:rgba(255,255,255,0.5);margin-top:3px;">AI maakt een plan op basis van jullie swipes</div>
+            </div>
+            <span style="color:rgba(255,255,255,0.35);font-size:1.2rem;flex-shrink:0;">→</span>
+          </button>`;
+      }
     }
   }
 
   if (!content) return '';
-  return `<div style="padding:${forHome ? '10px 14px' : '12px 16px'};border-bottom:1px solid rgba(10,10,10,0.06);">
-      <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:#C8A882;margin-bottom:7px;">${icon} ${label}</div>
+  const eyebrowSz = forHome ? '0.6rem' : '0.7rem';
+  return `<div style="padding:${pad};border-bottom:1px solid rgba(10,10,10,0.06);">
+      <div style="font-size:${eyebrowSz};letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:#C8A882;margin-bottom:${forHome?7:10}px;">${icon} ${label}</div>
       ${content}
     </div>`;
 }
@@ -6049,11 +6062,12 @@ function renderDagprogrammaBar() {
   if (!el) return;
   const deelCards = ['ochtend','middag','avond'].map(d => _renderDagdeelCard(progDay, d, false)).join('');
   el.innerHTML = `
-    <div style="background:#fff;border-radius:var(--r-lg);box-shadow:0 2px 12px rgba(10,10,10,0.07);overflow:hidden;margin-bottom:16px;">
-      <div style="padding:12px 16px 10px;border-bottom:1px solid rgba(10,10,10,0.06);">
-        <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#A89FE8;font-weight:700;">🗓️ AI dagprogramma · ${_DAG_LABELS[progDay]}</div>
+    <div style="background:#fff;border-radius:var(--r-lg);overflow:hidden;margin-bottom:24px;">
+      <div style="padding:20px 20px 16px;border-bottom:1px solid var(--lijn);">
+        <span style="font-family:var(--sans);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--lila);font-weight:700;">✦ AI dagprogramma</span>
+        <div style="font-family:var(--serif);font-style:italic;font-weight:300;font-size:1.6rem;color:var(--inkt);line-height:1.1;margin-top:4px;font-variation-settings:'opsz' 72,'SOFT' 60,'WONK' 1;">${_DAG_LABELS[progDay]}</div>
       </div>
-      ${deelCards || '<div style="padding:14px;font-size:0.8rem;color:#9A948E;">Geen API key ingesteld.</div>'}
+      ${deelCards || '<div style="padding:24px 20px;font-family:var(--sans);font-size:0.9rem;color:var(--grijs);">Stel een API key in via Mij → API om dagprogramma\'s te genereren.</div>'}
     </div>`;
 }
 
@@ -7003,7 +7017,7 @@ function switchTab(name, el) {
   if (el) el.classList.add('active');
   if (name === 'home') { showPreTripNudge(); renderUpcomingStrip(); initPollChain(); renderPersonalPolls(); renderBeginHier(); setTimeout(initMap, 120); setTimeout(initMap, 600); }
   if (name === 'groep') { renderGroep(); }
-  if (name === 'top5') { renderProgramma(); renderWeekendBlok(); renderCustomEvents(); }
+  if (name === 'top5') { renderProgramma(); renderWeekendBlok(); renderCustomEvents(); renderDagprogrammaBar(); }
   if (name === 'spellen') { renderHerinneringen(); _updateWarmupBadge(); }
   if (name === 'inspiratie') { initInspiratie(); }
   if (name === 'swipe') { renderBelevingen(belActiveFilter || 'all'); }
