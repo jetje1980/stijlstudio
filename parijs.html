@@ -1161,7 +1161,7 @@ h1,h2,h3,h4{font-family:var(--serif);font-style:italic;font-weight:300;}
 
     <!-- AI KNOP -->
     <div class="home-ai-strip">
-      <button class="home-ai-btn" onclick="openParisChatSheet()">
+      <button class="home-ai-btn" onclick="switchTab('meer',document.querySelector('.nav-btn[onclick*=meer]'));setTimeout(()=>document.getElementById('dagprog-ai-section')?.scrollIntoView({behavior:'smooth',block:'start'}),200)">
         <span class="home-ai-icon">✦</span>
         <div class="home-ai-text">
           <div class="home-ai-title">Genereer ons dagprogramma</div>
