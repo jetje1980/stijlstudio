@@ -2845,17 +2845,30 @@ function loadInspoGallery() {
 
 function saveInspoGallery() {
   try { localStorage.setItem('griette-inspo-gallery-v1', JSON.stringify(inspoGallery)); } catch(e) {}
-  supabaseSet('inspo-gallery', inspoGallery.map(i => ({id:i.id, label:i.label, result:i.result}))).catch(()=>{});
+  supabaseSet('inspo-gallery', inspoGallery.map(i => ({id:i.id, label:i.label, result:i.result, cloudUrl:i.dataUrl && !i.dataUrl.startsWith('data:') ? i.dataUrl : null}))).catch(()=>{});
 }
 
-function saveInspoToGallery() {
+async function saveInspoToGallery() {
   if (!inspoDataUrl) return;
   const label = new Date().toLocaleDateString('nl-NL', {day:'numeric',month:'short'});
-  const entry = { id: 'inspo-' + Date.now(), dataUrl: inspoDataUrl, label, result: null };
+  const entryId = 'inspo-' + Date.now();
+  const entry = { id: entryId, dataUrl: inspoDataUrl, label, result: inspoLastResult || null };
   inspoGallery.unshift(entry);
   saveInspoGallery();
   renderInspoGallery();
   showToast('Look opgeslagen in galerij ✓');
+  // Upload naar Cloudinary voor cloud-persistentie
+  try {
+    var arr = inspoDataUrl.split(','); var mime = arr[0].match(/:(.*?);/)[1];
+    var bstr = atob(arr[1]); var n = bstr.length; var u8 = new Uint8Array(n);
+    while (n--) u8[n] = bstr.charCodeAt(n);
+    var blob = new Blob([u8], { type: mime });
+    var file = new File([blob], entryId + '.jpg', { type: mime });
+    var cloudUrl = await uploadToCloudinary(file, entryId);
+    entry.dataUrl = cloudUrl;
+    saveInspoGallery();
+    renderInspoGallery();
+  } catch(e) {}
 }
 
 function renderInspoGallery() {
@@ -3197,12 +3210,27 @@ async function loadAppDataFromSupabase() {
       localStorage.setItem('griette-tags-v3', JSON.stringify(itemTags));
     } catch(e) {}
 
-    // Load inspo gallery from Supabase (metadata only, images stay local)
+    // Load inspo gallery from Supabase (including cloudUrl for cross-device access)
     if (inspoData) {
+      let changed = false;
       inspoData.forEach(entry => {
         const existing = inspoGallery.find(i => i.id === entry.id);
-        if (existing) { existing.result = entry.result; existing.label = entry.label; }
+        if (existing) {
+          if (entry.result) existing.result = entry.result;
+          if (entry.label) existing.label = entry.label;
+          if (entry.cloudUrl && existing.dataUrl && existing.dataUrl.startsWith('data:')) {
+            existing.dataUrl = entry.cloudUrl; changed = true;
+          }
+        } else if (entry.cloudUrl) {
+          // Entry bestaat niet lokaal maar wel in Supabase met cloud foto — toevoegen
+          inspoGallery.push({ id: entry.id, dataUrl: entry.cloudUrl, label: entry.label || '', result: entry.result || null });
+          changed = true;
+        }
       });
+      if (changed) {
+        inspoGallery.sort(function(a,b){ return b.id.localeCompare(a.id); });
+        try { localStorage.setItem('griette-inspo-gallery-v1', JSON.stringify(inspoGallery)); } catch(e) {}
+      }
       renderInspoGallery();
     }
     // Load custom occasions from Supabase
@@ -5087,6 +5115,7 @@ function checkUnwornItems() {
 // ============ INSPIRATION SCAN FEATURE ============
 let inspoDataUrl = null;
 let inspoBase64 = null;
+let inspoLastResult = null;
 
 function inspoDropOver(e) { e.preventDefault(); document.getElementById('inspo-drop').classList.add('drag-over'); }
 function inspoDropLeave(e) { document.getElementById('inspo-drop').classList.remove('drag-over'); }
@@ -5107,6 +5136,7 @@ function processInspoFile(file) {
   reader.onload = ev => {
     inspoDataUrl = ev.target.result;
     inspoBase64 = inspoDataUrl.split(',')[1];
+    inspoLastResult = null;
     document.getElementById('inspo-preview-img').src = inspoDataUrl;
     document.getElementById('inspo-drop').style.display = 'none';
     document.getElementById('inspo-preview-wrap').style.display = 'block';
@@ -5215,6 +5245,7 @@ Geef maximaal 4 matches. Gebruik alleen items die EXACT in de lijst staan.`;
       }
     }
 
+    inspoLastResult = result;
     renderInspoResult(result, allItems);  } catch(e) {
     console.error('analyzeInspo error:', e);
     const isFile = window.location.protocol === 'file:';
