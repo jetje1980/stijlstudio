@@ -365,6 +365,30 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 .bi-export-bar{display:flex;gap:8px;margin-top:14px;padding-bottom:20px;}
 .bi-export-btn{flex:1;padding:11px 10px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:11px;font-family:Jost,sans-serif;cursor:pointer;color:var(--brown);touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 @media print{body>*{display:none!important;}#bi-overlay{display:flex!important;position:static!important;transform:none!important;}.bi-back,.bi-upload-tile,.bi-analyze-btn,.bi-export-bar{display:none!important;}}
+.sp-overlay{position:fixed;inset:0;background:var(--cream);z-index:600;display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);}
+.sp-overlay.open{transform:translateY(0);}
+.sp-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid var(--cream-dark);flex-shrink:0;}
+.sp-ttl{font-family:'Bodoni Moda',serif;font-size:18px;color:var(--brown);font-weight:400;}
+.sp-back{background:none;border:none;font-size:22px;cursor:pointer;color:var(--brown);padding:4px 8px 4px 0;touch-action:manipulation;}
+.sp-tabs{display:flex;gap:0;border-bottom:1px solid var(--cream-dark);flex-shrink:0;}
+.sp-tab{flex:1;padding:11px 4px;background:none;border:none;font-size:11px;font-family:'Jost',sans-serif;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;touch-action:manipulation;}
+.sp-tab.active{color:var(--brown);border-bottom-color:var(--brown);font-weight:500;}
+.sp-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 100px;}
+.sp-upload-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.sp-photo{position:relative;aspect-ratio:3/4;border-radius:10px;overflow:hidden;background:var(--cream-dark);}
+.sp-photo img{width:100%;height:100%;object-fit:cover;}
+.sp-photo-del{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(46,26,14,0.75);border:none;color:white;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;}
+.sp-upload-add{aspect-ratio:3/4;border-radius:10px;border:2px dashed var(--cream-dark);background:var(--white);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;touch-action:manipulation;}
+.sp-profile-card{background:var(--brown);border-radius:14px;padding:16px;margin-bottom:14px;color:var(--cream);}
+.sp-rank-item{background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;padding:12px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;touch-action:manipulation;}
+.sp-rank-item.top-pick{border-color:var(--brown);background:rgba(46,26,14,0.04);}
+.sp-rank-photo{width:52px;height:62px;border-radius:8px;overflow:hidden;background:var(--cream-dark);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.sp-rank-photo img{width:100%;height:100%;object-fit:cover;}
+.sp-stars{color:var(--brown-warm);font-size:11px;letter-spacing:1px;margin-bottom:2px;}
+.sp-detail-overlay{position:fixed;inset:0;background:rgba(28,26,24,0.5);z-index:700;display:flex;align-items:flex-end;}
+.sp-detail-sheet{background:var(--cream);border-radius:20px 20px 0 0;padding:20px 16px calc(40px + env(safe-area-inset-bottom,0));max-height:80vh;overflow-y:auto;width:100%;}
+.sp-analyze-btn{width:100%;padding:14px;background:var(--brown);color:var(--cream);border:none;border-radius:12px;font-size:12px;font-family:'Jost',sans-serif;cursor:pointer;letter-spacing:0.5px;margin-top:4px;touch-action:manipulation;}
+.sp-analyze-btn:disabled{opacity:0.4;cursor:not-allowed;}
 </style>
 </head>
 <body>
@@ -525,6 +549,15 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
       <span class="tile-label">Stylist</span>
     </button>
   </div>
+
+  <button type="button" onclick="openStijlSpiegel()" style="width:100%;padding:12px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:14px;font-size:12px;font-family:'Jost',sans-serif;cursor:pointer;display:flex;align-items:center;gap:10px;margin-bottom:20px;color:var(--brown);-webkit-tap-highlight-color:transparent;touch-action:manipulation;">
+    <span style="font-size:20px;flex-shrink:0;">👤</span>
+    <div style="flex:1;text-align:left;">
+      <div style="font-weight:500;letter-spacing:0.3px;">Stijl Spiegel</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:1px;">welke kleding staat het beste op jou</div>
+    </div>
+    <span style="color:var(--muted);">›</span>
+  </button>
 
   <!-- Kledingkast sectie -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
@@ -12115,6 +12148,387 @@ async function analyzeBoardInspo(boardId) {
   } finally {
     var btn = document.querySelector('.bi-analyze-btn');
     if (btn) { btn.disabled = false; btn.textContent = '✦ Opnieuw · 3 nieuwe looks'; }
+  }
+}
+
+// ===== STIJL SPIEGEL =====
+var _sp = { photos: [], profile: null, rankings: { tops: null, onderstukken: null }, activeTab: 'lichaam' };
+
+function _spLoad() { try { var d = JSON.parse(localStorage.getItem('griette-spiegel') || 'null'); if (d) { _sp.photos = d.photos || []; _sp.profile = d.profile || null; _sp.rankings = d.rankings || { tops: null, onderstukken: null }; } } catch(e) {} }
+function _spSave() { try { localStorage.setItem('griette-spiegel', JSON.stringify({ photos: _sp.photos, profile: _sp.profile, rankings: _sp.rankings })); } catch(e) {} }
+
+function openStijlSpiegel() {
+  _spLoad();
+  var ex = document.getElementById('sp-overlay');
+  if (ex) ex.remove();
+  var ov = document.createElement('div');
+  ov.id = 'sp-overlay';
+  ov.className = 'sp-overlay';
+
+  var hdr = document.createElement('div');
+  hdr.className = 'sp-hdr';
+  hdr.innerHTML = '<button class="sp-back" id="sp-back">←</button>'
+    + '<div class="sp-ttl">👤 Stijl Spiegel</div>'
+    + '<div style="width:36px;"></div>';
+  ov.appendChild(hdr);
+
+  var tabs = document.createElement('div');
+  tabs.className = 'sp-tabs';
+  tabs.innerHTML = '<button class="sp-tab active" data-sp-tab="lichaam">Mijn lichaam</button>'
+    + '<button class="sp-tab" data-sp-tab="tops">Beste Tops</button>'
+    + '<button class="sp-tab" data-sp-tab="onderstukken">Beste Onderstukken</button>';
+  ov.appendChild(tabs);
+
+  var body = document.createElement('div');
+  body.className = 'sp-body';
+  body.id = 'sp-body';
+  ov.appendChild(body);
+
+  document.body.appendChild(ov);
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ ov.classList.add('open'); }); });
+
+  hdr.querySelector('#sp-back').addEventListener('click', function() {
+    ov.classList.remove('open');
+    setTimeout(function(){ ov.remove(); }, 370);
+  });
+  tabs.querySelectorAll('.sp-tab').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      tabs.querySelectorAll('.sp-tab').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      _sp.activeTab = btn.dataset.spTab;
+      _spRenderTab();
+    });
+  });
+  _spRenderTab();
+}
+
+function _spRenderTab() {
+  var body = document.getElementById('sp-body');
+  if (!body) return;
+  body.innerHTML = '';
+  if (_sp.activeTab === 'lichaam') _spRenderLichaam(body);
+  else if (_sp.activeTab === 'tops') _spRenderRanking(body, 'tops');
+  else _spRenderRanking(body, 'onderstukken');
+}
+
+function _spRenderLichaam(body) {
+  var intro = document.createElement('div');
+  intro.style.cssText = 'font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:14px;';
+  intro.textContent = 'Upload 1-3 foto\'s van jezelf (volledige body, bijv. spiegelfoto). Ik analyseer je lichaamsvorm en proporties zodat ik kan bepalen welke kleding het beste bij jou past.';
+  body.appendChild(intro);
+
+  var grid = document.createElement('div');
+  grid.className = 'sp-upload-grid';
+  grid.id = 'sp-photo-grid';
+
+  _sp.photos.forEach(function(photo, idx) {
+    var tile = document.createElement('div');
+    tile.className = 'sp-photo';
+    tile.innerHTML = '<img src="' + photo.dataUrl + '" alt=""><button class="sp-photo-del" data-idx="' + idx + '">&times;</button>';
+    tile.querySelector('.sp-photo-del').addEventListener('click', (function(i){ return function() {
+      _sp.photos.splice(i, 1); _spSave(); _spRenderTab();
+    }; })(idx));
+    grid.appendChild(tile);
+  });
+
+  if (_sp.photos.length < 3) {
+    var addLabel = document.createElement('label');
+    addLabel.className = 'sp-upload-add';
+    addLabel.innerHTML = '<span style="font-size:26px;">👤</span><span style="font-size:9px;color:var(--muted);text-align:center;line-height:1.4;">Voeg<br>foto toe</span>';
+    var inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = true; inp.style.display = 'none';
+    inp.addEventListener('change', function() {
+      var files = Array.from(inp.files).slice(0, 3 - _sp.photos.length);
+      if (!files.length) return;
+      var pending = files.length;
+      files.forEach(function(file) {
+        _biCompressImage(file, function(dataUrl) {
+          _sp.photos.push({ dataUrl: dataUrl, id: Date.now() + '_' + Math.random().toString(36).slice(2) });
+          if (--pending === 0) { _spSave(); _spRenderTab(); }
+        });
+      });
+      inp.value = '';
+    });
+    addLabel.appendChild(inp);
+    grid.appendChild(addLabel);
+  }
+  body.appendChild(grid);
+
+  if (_sp.photos.length > 0) {
+    var analyzeBtn = document.createElement('button');
+    analyzeBtn.className = 'sp-analyze-btn';
+    analyzeBtn.textContent = '✦ Analyseer mijn lichaamsbouw';
+    analyzeBtn.addEventListener('click', function() { _spAnalyzeBody(analyzeBtn, body); });
+    body.appendChild(analyzeBtn);
+  }
+
+  if (_sp.profile) {
+    body.appendChild(_spBuildProfileCard());
+    var resetBtn = document.createElement('button');
+    resetBtn.style.cssText = 'width:100%;padding:10px;background:transparent;border:1.5px solid var(--cream-dark);border-radius:12px;font-size:11px;font-family:Jost,sans-serif;cursor:pointer;color:var(--muted);margin-top:8px;touch-action:manipulation;';
+    resetBtn.textContent = '↺ Opnieuw analyseren';
+    resetBtn.addEventListener('click', function() { _sp.profile = null; _sp.rankings = { tops: null, onderstukken: null }; _spSave(); _spRenderTab(); });
+    body.appendChild(resetBtn);
+  }
+}
+
+function _spBuildProfileCard() {
+  var p = _sp.profile;
+  var card = document.createElement('div');
+  card.className = 'sp-profile-card';
+  var html = '<div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(245,242,238,0.6);margin-bottom:8px;">Jouw lichaamsprofiel</div>';
+  if (p.beschrijving) html += '<div style="font-family:\'Bodoni Moda\',serif;font-size:15px;font-style:italic;line-height:1.7;margin-bottom:12px;">' + _biEscape(p.beschrijving) + '</div>';
+  if (p.lichaamsvorm) html += '<div style="font-size:10px;opacity:0.8;margin-bottom:10px;">Lichaamsvorm: <strong>' + _biEscape(p.lichaamsvorm) + '</strong></div>';
+  if (p.principes && p.principes.length) {
+    html += '<div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;opacity:0.6;margin-bottom:6px;">Stijlprincipes</div>';
+    html += p.principes.map(function(t){ return '<div style="font-size:11px;padding:4px 0;border-bottom:1px solid rgba(245,242,238,0.15);">✦ ' + _biEscape(t) + '</div>'; }).join('');
+  }
+  card.innerHTML = html;
+  return card;
+}
+
+async function _spAnalyzeBody(btn, body) {
+  if (!_sp.photos.length) return;
+  btn.disabled = true; btn.textContent = 'Analyseren...';
+
+  var parts = [{
+    type: 'text',
+    text: 'Je bent een professionele personal stylist en bodystylist. Analyseer Griette\'s lichaamsbouw van deze ' + _sp.photos.length + ' foto\'s.\n\nGeef:\n1. Lichaamsvorm en proporties (schouderbreed vs heupbreed, taillehoogte, beenlengte)\n2. Beste tops voor haar figuur (halslijn, pasvorm, lengte)\n3. Beste onderstukken (taille hoogte, snit, lengte — specifieke vormen)\n4. 3 kernprincipes speciaal voor haar lichaam\n5. Wat NIET werkt voor haar silhouet\n\nAntwoord in het Nederlands. Return exact JSON:\n{"lichaamsvorm":"...","beschrijving":"2-3 zinnen persoonlijk over haar unieke figuur","beste_tops":["..."],"beste_onderstukken":["..."],"niet_werkt":["..."],"principes":["3 kernpunten"]}'
+  }];
+  _sp.photos.forEach(function(photo) {
+    var mt = photo.dataUrl.startsWith('data:image/png') ? 'image/png' : 'image/jpeg';
+    parts.push({ type: 'image', source: { type: 'base64', media_type: mt, data: photo.dataUrl.split(',')[1] } });
+  });
+
+  var loadDiv = document.createElement('div');
+  loadDiv.className = 'sv-ai-load';
+  loadDiv.textContent = '✦ Lichaamsprofiel wordt gemaakt...';
+  body.appendChild(loadDiv);
+
+  try {
+    var resp = await fetch('https://griette-stylist.griette.workers.dev', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 900, messages: [{ role: 'user', content: parts }] })
+    });
+    var data = await resp.json();
+    var raw = (data.content && data.content[0] && data.content[0].text) || '';
+    var m = raw.match(/\{[\s\S]*\}/);
+    if (m) { try { _sp.profile = JSON.parse(m[0]); } catch(e) { _sp.profile = { beschrijving: raw.slice(0, 300), lichaamsvorm: '', principes: [] }; } }
+    else { _sp.profile = { beschrijving: raw.slice(0, 300), lichaamsvorm: '', principes: [] }; }
+    _sp.rankings = { tops: null, onderstukken: null };
+    _spSave();
+    _spRenderTab();
+  } catch(e) {
+    loadDiv.textContent = 'Analyse mislukt. Probeer opnieuw.';
+    btn.disabled = false; btn.textContent = '✦ Analyseer mijn lichaamsbouw';
+  }
+}
+
+function _spRenderRanking(body, cat) {
+  if (!_sp.profile) {
+    body.innerHTML = '<div style="padding:30px 0;text-align:center;color:var(--muted);font-size:12px;line-height:1.8;">Analyseer eerst je lichaamsbouw via het tabblad<br>"Mijn lichaam".<br><br><button type="button" onclick="document.querySelector(\'[data-sp-tab=lichaam]\').click()" style="padding:9px 18px;background:var(--brown);color:var(--cream);border:none;border-radius:10px;font-size:11px;font-family:Jost,sans-serif;cursor:pointer;touch-action:manipulation;">→ Naar lichaam analyse</button></div>';
+    return;
+  }
+
+  var catLabel = cat === 'tops' ? 'Tops' : 'Onderstukken (rokken & broeken)';
+  var wardrobeItems = cat === 'tops' ? (window.items && window.items.tops ? window.items.tops.map(function(i){ return Object.assign({}, i, {cat:'tops'}); }) : [])
+    : [].concat(window.items && window.items.bottoms ? window.items.bottoms.map(function(i){ return Object.assign({}, i, {cat:'bottoms'}); }) : [],
+               window.items && window.items.jurken ? window.items.jurken.map(function(i){ return Object.assign({}, i, {cat:'jurken'}); }) : []);
+
+  if (_sp.rankings[cat]) {
+    _spShowRankedList(body, cat, wardrobeItems);
+    return;
+  }
+
+  var intro = document.createElement('div');
+  intro.style.cssText = 'font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:14px;';
+  intro.textContent = 'Ik analyseer alle ' + catLabel.toLowerCase() + ' uit je kast en rangschik ze op hoe goed ze bij jouw lichaamsbouw passen. Dit kan even duren.';
+  body.appendChild(intro);
+
+  var analyzeBtn = document.createElement('button');
+  analyzeBtn.className = 'sp-analyze-btn';
+  analyzeBtn.textContent = '✦ Rangschik mijn ' + catLabel.toLowerCase() + ' voor mijn figuur';
+  analyzeBtn.addEventListener('click', function() { _spRankItems(cat, wardrobeItems, analyzeBtn, body); });
+  body.appendChild(analyzeBtn);
+}
+
+async function _spRankItems(cat, wardrobeItems, btn, body) {
+  btn.disabled = true; btn.textContent = 'Analyseren...';
+
+  var profileTxt = 'Lichaamsvorm: ' + (_sp.profile.lichaamsvorm || '') + '\n'
+    + 'Beschrijving: ' + (_sp.profile.beschrijving || '') + '\n'
+    + 'Beste tops: ' + ((_sp.profile.beste_tops || []).join(', ')) + '\n'
+    + 'Beste onderstukken: ' + ((_sp.profile.beste_onderstukken || []).join(', ')) + '\n'
+    + 'Stijlprincipes: ' + ((_sp.profile.principes || []).join(' · '));
+
+  var catLabel = cat === 'tops' ? 'tops' : 'onderstukken';
+
+  var itemsList = wardrobeItems.map(function(it) {
+    var t = (window.itemTags && window.itemTags[it.id]) || (window.defaultTags && window.defaultTags[it.id]) || {};
+    var tags = [t.kleur, t.pasvorm, t.lengte, t.hals].filter(Boolean).join(', ');
+    return '- ' + it.id + ': ' + it.name + (tags ? ' [' + tags + ']' : '');
+  }).join('\n');
+
+  var parts = [{
+    type: 'text',
+    text: 'Je bent een professionele personal stylist. Dit is Griette\'s lichaamsprofiel:\n' + profileTxt + '\n\nRangschik deze ' + catLabel + ' op hoe goed ze bij haar lichaamsbouw passen. Score 1-5 (5=perfect). Geef voor elk item een korte reden (max 10 woorden) in het Nederlands.\n\nItems:\n' + itemsList + '\n\nReturn exact JSON:\n{"rankings":[{"id":"...","score":5,"reden":"..."}]}'
+  }];
+
+  // Include body reference photos (first 2 to save tokens)
+  _sp.photos.slice(0, 2).forEach(function(photo) {
+    var mt = photo.dataUrl.startsWith('data:image/png') ? 'image/png' : 'image/jpeg';
+    parts.push({ type: 'image', source: { type: 'base64', media_type: mt, data: photo.dataUrl.split(',')[1] } });
+  });
+
+  var loadDiv = document.createElement('div');
+  loadDiv.className = 'sv-ai-load';
+  loadDiv.textContent = '✦ Items worden geanalyseerd voor jouw figuur...';
+  body.appendChild(loadDiv);
+
+  try {
+    var resp = await fetch('https://griette-stylist.griette.workers.dev', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1200, messages: [{ role: 'user', content: parts }] })
+    });
+    var data = await resp.json();
+    var raw = (data.content && data.content[0] && data.content[0].text) || '';
+    var m = raw.match(/\{[\s\S]*\}/);
+    var result = null;
+    if (m) { try { result = JSON.parse(m[0]); } catch(e) {} }
+    if (result && result.rankings) {
+      _sp.rankings[cat] = result.rankings;
+      _spSave();
+      loadDiv.remove();
+      _spShowRankedList(body, cat, wardrobeItems);
+    } else {
+      loadDiv.textContent = 'Analyse mislukt. Probeer opnieuw.';
+      btn.disabled = false; btn.textContent = '✦ Probeer opnieuw';
+    }
+  } catch(e) {
+    loadDiv.textContent = 'Geen verbinding. Probeer opnieuw.';
+    btn.disabled = false;
+  }
+}
+
+function _spShowRankedList(body, cat, wardrobeItems) {
+  body.innerHTML = '';
+
+  var refreshBtn = document.createElement('button');
+  refreshBtn.style.cssText = 'padding:7px 14px;background:transparent;border:1.5px solid var(--cream-dark);border-radius:20px;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:var(--muted);margin-bottom:14px;touch-action:manipulation;';
+  refreshBtn.textContent = '↺ Opnieuw analyseren';
+  refreshBtn.addEventListener('click', function() { _sp.rankings[cat] = null; _spSave(); _spRenderTab(); });
+  body.appendChild(refreshBtn);
+
+  var rankings = _sp.rankings[cat] || [];
+  // Sort by score descending
+  var sorted = rankings.slice().sort(function(a, b){ return (b.score || 0) - (a.score || 0); });
+
+  sorted.forEach(function(rank) {
+    var item = wardrobeItems.find(function(it){ return it.id === rank.id; });
+    if (!item) return;
+    var photoUrl = window.photos && window.photos[item.id];
+    var score = Math.max(1, Math.min(5, rank.score || 3));
+    var stars = '★'.repeat(score) + '☆'.repeat(5 - score);
+    var isTop = score >= 4;
+
+    var card = document.createElement('div');
+    card.className = 'sp-rank-item' + (isTop ? ' top-pick' : '');
+
+    var photoDiv = document.createElement('div');
+    photoDiv.className = 'sp-rank-photo';
+    if (photoUrl) {
+      photoDiv.innerHTML = '<img src="' + photoUrl + '" alt="">';
+    } else {
+      photoDiv.innerHTML = '<span style="font-size:9px;color:var(--muted);text-align:center;padding:3px;">' + item.name.split(' ')[0] + '</span>';
+    }
+
+    var info = document.createElement('div');
+    info.style.cssText = 'flex:1;min-width:0;';
+    info.innerHTML = '<div class="sp-stars">' + stars + '</div>'
+      + '<div style="font-size:12px;color:var(--brown);font-weight:500;margin-bottom:3px;">' + _biEscape(item.name) + '</div>'
+      + '<div style="font-size:11px;color:var(--muted);line-height:1.5;">' + _biEscape(rank.reden || '') + '</div>'
+      + (isTop ? '<div style="font-size:9px;color:var(--brown-warm);margin-top:4px;letter-spacing:0.5px;">✦ TOP KEUZE</div>' : '');
+
+    card.appendChild(photoDiv);
+    card.appendChild(info);
+
+    // Tap for detail
+    card.addEventListener('click', function() { _spOpenDetail(item, rank); });
+    body.appendChild(card);
+  });
+}
+
+function _spOpenDetail(item, rank) {
+  var existing = document.querySelector('.sp-detail-overlay');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.className = 'sp-detail-overlay';
+  overlay.addEventListener('click', function(e){ if (e.target === overlay) overlay.remove(); });
+
+  var photoUrl = window.photos && window.photos[item.id];
+  var score = Math.max(1, Math.min(5, rank.score || 3));
+  var stars = '★'.repeat(score) + '☆'.repeat(5 - score);
+
+  var sheet = document.createElement('div');
+  sheet.className = 'sp-detail-sheet';
+  sheet.innerHTML = '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;">'
+    + (photoUrl ? '<div style="width:80px;height:96px;border-radius:10px;overflow:hidden;flex-shrink:0;"><img src="' + photoUrl + '" style="width:100%;height:100%;object-fit:cover;"></div>' : '')
+    + '<div style="flex:1;">'
+    + '<div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">' + (item.cat === 'tops' ? 'Top' : item.cat === 'bottoms' ? 'Onderstuk' : 'Jurk') + '</div>'
+    + '<div style="font-family:\'Bodoni Moda\',serif;font-size:18px;color:var(--brown);margin-bottom:4px;">' + _biEscape(item.name) + '</div>'
+    + '<div class="sp-stars" style="font-size:14px;">' + stars + '</div>'
+    + '</div></div>'
+    + '<div style="font-size:12px;color:var(--brown);line-height:1.7;margin-bottom:14px;">' + _biEscape(rank.reden || '') + '</div>'
+    + '<div id="sp-detail-ai" style="font-size:11px;color:var(--muted);">Tik op "Hoe staat dit op mij?" voor een uitgebreide analyse.</div>'
+    + '<button id="sp-detail-ask" class="sp-analyze-btn" style="margin-top:12px;">👤 Hoe staat dit op mij?</button>'
+    + '<button onclick="this.closest(\'.sp-detail-overlay\').remove()" style="width:100%;padding:10px;margin-top:8px;background:transparent;border:1.5px solid var(--cream-dark);border-radius:12px;font-size:11px;font-family:Jost,sans-serif;cursor:pointer;color:var(--muted);touch-action:manipulation;">Sluiten</button>';
+
+  overlay.appendChild(sheet);
+  document.body.appendChild(overlay);
+
+  sheet.querySelector('#sp-detail-ask').addEventListener('click', function() {
+    _spAskHowItLooks(item, rank, sheet.querySelector('#sp-detail-ai'), sheet.querySelector('#sp-detail-ask'));
+  });
+}
+
+async function _spAskHowItLooks(item, rank, resultDiv, btn) {
+  btn.disabled = true; btn.textContent = 'Analyseren...';
+  resultDiv.textContent = '✦ Bezig met analyseren...';
+
+  var photoUrl = window.photos && window.photos[item.id];
+  var t = (window.itemTags && window.itemTags[item.id]) || (window.defaultTags && window.defaultTags[item.id]) || {};
+  var tags = [t.kleur, t.pasvorm, t.lengte, t.hals, t.materiaal].filter(Boolean).join(', ');
+
+  var parts = [{
+    type: 'text',
+    text: 'Je bent een personal stylist. Beschrijf uitgebreid hoe het item "' + item.name + '" (' + (tags || 'zie foto') + ') staat op Griette\'s figuur.\n\nLichaamsprofiel: ' + (_sp.profile ? _sp.profile.beschrijving : '') + '\n\nVertel:\n1. Hoe de pasvorm uitkomt op haar specifieke lichaamsbouw\n2. Welke stijldetails werken (of niet) voor haar proportions\n3. Hoe te stylen om het maximale eruit te halen\n4. Met welke items combineren voor het beste effect\n\nWees specifiek en persoonlijk. Max 150 woorden. Nederlands.'
+  }];
+
+  // Include body photos
+  _sp.photos.slice(0, 2).forEach(function(photo) {
+    var mt = photo.dataUrl.startsWith('data:image/png') ? 'image/png' : 'image/jpeg';
+    parts.push({ type: 'image', source: { type: 'base64', media_type: mt, data: photo.dataUrl.split(',')[1] } });
+  });
+
+  // Include item photo if available
+  if (photoUrl && photoUrl.startsWith('data:')) {
+    var imt = photoUrl.startsWith('data:image/png') ? 'image/png' : 'image/jpeg';
+    parts.push({ type: 'image', source: { type: 'base64', media_type: imt, data: photoUrl.split(',')[1] } });
+  }
+
+  try {
+    var resp = await fetch('https://griette-stylist.griette.workers.dev', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 500, messages: [{ role: 'user', content: parts }] })
+    });
+    var data = await resp.json();
+    var reply = (data.content && data.content[0] && data.content[0].text) || '';
+    resultDiv.innerHTML = reply.replace(/\n/g,'<br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    btn.style.display = 'none';
+  } catch(e) {
+    resultDiv.textContent = 'Analyse mislukt. Probeer opnieuw.';
+    btn.disabled = false; btn.textContent = '👤 Hoe staat dit op mij?';
   }
 }
 
