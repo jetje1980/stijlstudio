@@ -12331,9 +12331,9 @@ function _spRenderRanking(body, cat) {
   }
 
   var catLabel = cat === 'tops' ? 'Tops' : 'Onderstukken (rokken & broeken)';
-  var wardrobeItems = cat === 'tops' ? (window.items && window.items.tops ? window.items.tops.map(function(i){ return Object.assign({}, i, {cat:'tops'}); }) : [])
-    : [].concat(window.items && window.items.bottoms ? window.items.bottoms.map(function(i){ return Object.assign({}, i, {cat:'bottoms'}); }) : [],
-               window.items && window.items.jurken ? window.items.jurken.map(function(i){ return Object.assign({}, i, {cat:'jurken'}); }) : []);
+  var wardrobeItems = cat === 'tops' ? (items && items.tops ? items.tops.map(function(i){ return Object.assign({}, i, {cat:'tops'}); }) : [])
+    : [].concat(items && items.bottoms ? items.bottoms.map(function(i){ return Object.assign({}, i, {cat:'bottoms'}); }) : [],
+               items && items.jurken ? items.jurken.map(function(i){ return Object.assign({}, i, {cat:'jurken'}); }) : []);
 
   if (_sp.rankings[cat]) {
     _spShowRankedList(body, cat, wardrobeItems);
@@ -12364,7 +12364,7 @@ async function _spRankItems(cat, wardrobeItems, btn, body) {
   var catLabel = cat === 'tops' ? 'tops' : 'onderstukken';
 
   var itemsList = wardrobeItems.map(function(it) {
-    var t = (window.itemTags && window.itemTags[it.id]) || (window.defaultTags && window.defaultTags[it.id]) || {};
+    var t = itemTags[it.id] || defaultTags[it.id] || {};
     var tags = [t.kleur, t.pasvorm, t.lengte, t.hals].filter(Boolean).join(', ');
     return '- ' + it.id + ': ' + it.name + (tags ? ' [' + tags + ']' : '');
   }).join('\n');
@@ -12426,7 +12426,7 @@ function _spShowRankedList(body, cat, wardrobeItems) {
   sorted.forEach(function(rank) {
     var item = wardrobeItems.find(function(it){ return it.id === rank.id; });
     if (!item) return;
-    var photoUrl = window.photos && window.photos[item.id];
+    var photoUrl = photos[item.id];
     var score = Math.max(1, Math.min(5, rank.score || 3));
     var stars = '★'.repeat(score) + '☆'.repeat(5 - score);
     var isTop = score >= 4;
@@ -12497,7 +12497,7 @@ async function _spAskHowItLooks(item, rank, resultDiv, btn) {
   resultDiv.textContent = '✦ Bezig met analyseren...';
 
   var photoUrl = window.photos && window.photos[item.id];
-  var t = (window.itemTags && window.itemTags[item.id]) || (window.defaultTags && window.defaultTags[item.id]) || {};
+  var t = itemTags[item.id] || defaultTags[item.id] || {};
   var tags = [t.kleur, t.pasvorm, t.lengte, t.hals, t.materiaal].filter(Boolean).join(', ');
 
   var parts = [{
