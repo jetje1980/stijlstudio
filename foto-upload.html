@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foto Upload — Garderobe</title>
+<style>
+  body { font-family: 'Segoe UI', sans-serif; background: #f9f6f2; margin: 0; padding: 20px; color: #2e1a0e; }
+  h1 { font-size: 18px; margin-bottom: 4px; }
+  p.sub { font-size: 12px; color: #8a7060; margin-bottom: 24px; }
+  .grid { display: flex; flex-direction: column; gap: 10px; max-width: 500px; }
+  .row { display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 12px; padding: 10px 14px; border: 1.5px solid #e8e0d8; }
+  .thumb { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; background: #f0ebe4; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+  .info { flex: 1; min-width: 0; }
+  .iname { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .iid { font-size: 10px; color: #8a7060; }
+  .status { font-size: 10px; margin-top: 2px; }
+  .status.ok { color: #2d7a4f; }
+  .status.err { color: #c0392b; }
+  label.upload-btn { padding: 7px 12px; background: #2e1a0e; color: #f9f6f2; border-radius: 8px; font-size: 11px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  label.upload-btn.done { background: #2d7a4f; }
+  input[type=file] { display: none; }
+  .section-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #8a7060; margin: 16px 0 6px; font-weight: 600; }
+  .note { font-size: 11px; color: #8a7060; margin-top: 20px; max-width: 500px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<h1>📷 Foto's toevoegen aan garderobe</h1>
+<p class="sub">Selecteer een foto per item — wordt direct geüpload naar Cloudinary en verschijnt daarna in de app.</p>
+
+<div class="grid" id="grid"></div>
+<p class="note">Na het uploaden: ververs <a href="/griette.html">griette.html</a> en de foto's verschijnen automatisch bij elk item.</p>
+
+<script>
+const CLOUD = 'dhggari0g';
+const PRESET = 'griette-photos';
+
+const ALL_ITEMS = [
+  // Nieuwe items
+  {id:'bershka-raglan', name:'Bershka raglan trui bruin/roze', cat:'tops'},
+  {id:'second-female-grijs', name:'Second Female crop sweater grijs', cat:'tops'},
+  {id:'adidas-blauw-crop', name:'Adidas crop t-shirt blauw', cat:'tops'},
+  {id:'only-sons-blauw', name:'Only & Sons t-shirt koningsblauw', cat:'tops'},
+  {id:'mbym-leopard-top', name:'MbyM Rihne top luipaardprint', cat:'tops'},
+  {id:'av-crop-longsleeve', name:'American Vintage crop longsleeve blauw', cat:'tops'},
+  {id:'av-remytown-turquoise', name:'American Vintage Remytown t-shirt turquoise', cat:'tops'},
+  {id:'zara-turquoise-sweater', name:'Turquoise Zara sweater', cat:'tops'},
+  {id:'khaki-bloemenprint', name:'Khaki bloemenprint wide leg broek', cat:'bottoms'},
+  {id:'bordeaux-stripe-broek', name:'Bordeaux wide leg broek met zijstreep', cat:'bottoms'},
+  {id:'pullbear-balloon-jeans', name:'Pull&Bear ballonpijpen jeans blauw', cat:'bottoms'},
+  {id:'groen-barrel-broek', name:'Groene barrel-broek katoen Zara', cat:'bottoms'},
+  {id:'second-female-cardigan', name:'Second Female cardigan beige gouden knopen', cat:'layers'},
+  {id:'hm-beige-jas', name:'H&M cropped jas lichtbeige', cat:'layers'},
+  {id:'groen-tote-zara', name:'Groene geweven Zara tote bag', cat:'bags'},
+  // Bestaande items (ook foto's toevoegen als die er nog niet zijn)
+  {id:'wit-oversized', name:'Wit oversized t-shirt', cat:'tops'},
+  {id:'wit-basic', name:'Wit basic t-shirt', cat:'tops'},
+  {id:'geel-shirt', name:'Geel Stieglitz t-shirt', cat:'tops'},
+  {id:'oranje-shirt', name:'Oranje/zalm Stieglitz t-shirt', cat:'tops'},
+  {id:'gestreept', name:'Zwart-wit gestreepte longsleeve', cat:'tops'},
+  {id:'blauwe-blouse', name:'Lichtblauwe oversized blouse', cat:'tops'},
+  {id:'kanten-top', name:'Witte kanten top', cat:'tops'},
+  {id:'zwart-peplum', name:'Zwart peplum top', cat:'tops'},
+  {id:'blauw-spaghet', name:'Donkerblauw spaghettitopje', cat:'tops'},
+  {id:'bruin-spaghet', name:'Donkerbruin spaghettitopje', cat:'tops'},
+  {id:'bruin-longsleeve', name:'Donkerbruin longsleeve aansluitend', cat:'tops'},
+  {id:'roze-maxi', name:'Felroze maxi rok', cat:'bottoms'},
+  {id:'print-mini', name:'Kleurrijke print mini rok', cat:'bottoms'},
+  {id:'bruin-maxi', name:'Bruin satijnen maxi rok', cat:'bottoms'},
+  {id:'rood-rok', name:'Rood mini rokje met gesp', cat:'bottoms'},
+  {id:'witte-shorts', name:'Witte denim shorts', cat:'bottoms'},
+  {id:'lichtblauwe-shorts', name:'Lichtblauwe denim shorts', cat:'bottoms'},
+  {id:'adidas-broek', name:'Adidas Firebird broek marineblauw', cat:'bottoms'},
+  {id:'bruin-shorts', name:'Bruine shorts', cat:'bottoms'},
+  {id:'cargo-jasje', name:'Bruin cropped cargo jasje', cat:'layers'},
+  {id:'paarse-cardigan', name:'Paarse cardigan', cat:'layers'},
+  {id:'witte-cardigan', name:'Gebroken witte cardigan', cat:'layers'},
+  {id:'zwart-gilet', name:'Zwart gilet goudknopen', cat:'layers'},
+  {id:'hemdjurk', name:'Gebroken witte hemdjurk', cat:'jurken'},
+  {id:'bruin-jurk', name:'Donkerbruin longsleeve jurk', cat:'jurken'},
+  {id:'blauwe-tas', name:'Blauwe tweed kettingtas', cat:'bags'},
+  {id:'leonie-bag', name:'Bruine suède Leonie bag', cat:'bags'},
+  {id:'gele-bag', name:'Gele stippen bucket bag', cat:'bags'},
+];
+
+const CATS = {tops:'Tops', bottoms:'Bottoms & Rokken', layers:'Laagjes', jurken:'Jurken', bags:'Tassen'};
+const grid = document.getElementById('grid');
+
+// Load existing cloud map from localStorage
+let cloudMap = {};
+try {
+  const s = localStorage.getItem('griette-cloud-photos-v1');
+  if (s) cloudMap = JSON.parse(s);
+} catch(e) {}
+
+let lastCat = null;
+ALL_ITEMS.forEach(function(item) {
+  if (item.cat !== lastCat) {
+    const t = document.createElement('div');
+    t.className = 'section-title';
+    t.textContent = CATS[item.cat] || item.cat;
+    grid.appendChild(t);
+    lastCat = item.cat;
+  }
+
+  const row = document.createElement('div');
+  row.className = 'row';
+
+  const thumb = document.createElement('div');
+  thumb.className = 'thumb';
+  const existingUrl = cloudMap[item.id];
+  if (existingUrl) {
+    thumb.innerHTML = '<img src="' + existingUrl + '" alt="">';
+  } else {
+    thumb.textContent = '👗';
+  }
+
+  const info = document.createElement('div');
+  info.className = 'info';
+  info.innerHTML = '<div class="iname">' + item.name + '</div>'
+    + '<div class="iid">' + item.id + '</div>'
+    + '<div class="status' + (existingUrl ? ' ok' : '') + '" id="st-' + item.id + '">'
+    + (existingUrl ? '✓ foto aanwezig' : '') + '</div>';
+
+  const lbl = document.createElement('label');
+  lbl.className = 'upload-btn' + (existingUrl ? ' done' : '');
+  lbl.textContent = existingUrl ? '↺ Wijzig' : '+ Foto';
+  lbl.htmlFor = 'inp-' + item.id;
+
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/*';
+  inp.id = 'inp-' + item.id;
+  inp.addEventListener('change', function() {
+    const file = inp.files[0];
+    if (!file) return;
+    const st = document.getElementById('st-' + item.id);
+    st.className = 'status';
+    st.textContent = '⏳ Uploaden...';
+    lbl.style.opacity = '0.5';
+
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', PRESET);
+    fd.append('public_id', 'griette_' + item.id);
+    fd.append('folder', 'griette-wardrobe');
+
+    fetch('https://api.cloudinary.com/v1_1/' + CLOUD + '/image/upload', {method:'POST', body:fd})
+      .then(function(r){ return r.json(); })
+      .then(function(d) {
+        if (d.secure_url) {
+          cloudMap[item.id] = d.secure_url;
+          try { localStorage.setItem('griette-cloud-photos-v1', JSON.stringify(cloudMap)); } catch(e) {}
+          st.className = 'status ok';
+          st.textContent = '✓ Geüpload!';
+          lbl.className = 'upload-btn done';
+          lbl.textContent = '↺ Wijzig';
+          const img = document.createElement('img');
+          img.src = d.secure_url;
+          thumb.innerHTML = '';
+          thumb.appendChild(img);
+        } else {
+          st.className = 'status err';
+          st.textContent = '✗ ' + (d.error && d.error.message || 'Mislukt');
+          lbl.style.opacity = '1';
+        }
+      })
+      .catch(function(e) {
+        st.className = 'status err';
+        st.textContent = '✗ Netwerk fout';
+        lbl.style.opacity = '1';
+      });
+  });
+
+  row.appendChild(thumb);
+  row.appendChild(info);
+  row.appendChild(lbl);
+  row.appendChild(inp);
+  grid.appendChild(row);
+});
+</script>
+</body>
+</html>
