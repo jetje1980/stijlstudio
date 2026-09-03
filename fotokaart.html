@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Griette Garderobe — Fotokaart</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root {
+  --bg:         #F8F5F1;
+  --surface:    #FFFFFF;
+  --border:     #E8DDD2;
+  --text:       #1C140E;
+  --text-2:     #8A7060;
+  --accent:     #9B7B5C;
+  --cat-rule:   #D4C2AE;
+  --ph-bg:      #EDE5DA;
+  --ph-text:    #B09A86;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:       #1A1410;
+    --surface:  #231C16;
+    --border:   #342620;
+    --text:     #F0E6D8;
+    --text-2:   #9A7E68;
+    --accent:   #C4976A;
+    --cat-rule: #4A3428;
+    --ph-bg:    #2C2018;
+    --ph-text:  #7A6050;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg:       #1A1410;
+  --surface:  #231C16;
+  --border:   #342620;
+  --text:     #F0E6D8;
+  --text-2:   #9A7E68;
+  --accent:   #C4976A;
+  --cat-rule: #4A3428;
+  --ph-bg:    #2C2018;
+  --ph-text:  #7A6050;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding: 28px 24px 40px;
+  min-height: 100vh;
+}
+
+.page-header {
+  max-width: 960px;
+  margin: 0 auto 28px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.page-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  line-height: 1;
+}
+
+.page-title span {
+  color: var(--accent);
+}
+
+.page-meta {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.main {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.cat-block {
+  margin-bottom: 24px;
+}
+
+.cat-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.cat-label::before {
+  content: '';
+  display: block;
+  height: 1px;
+  width: 18px;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.cat-label-text {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.cat-label::after {
+  content: '';
+  display: block;
+  height: 1px;
+  flex: 1;
+  background: var(--cat-rule);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.photo-wrap {
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  position: relative;
+  background: var(--ph-bg);
+}
+
+.photo-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--ph-bg);
+}
+
+.placeholder .ph-icon {
+  font-size: 24px;
+  line-height: 1;
+  opacity: 0.55;
+}
+
+.placeholder .ph-label {
+  font-size: 7.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ph-text);
+  text-align: center;
+  padding: 0 6px;
+  line-height: 1.3;
+}
+
+.card-label {
+  padding: 6px 7px 8px;
+}
+
+.iname {
+  font-size: 9.5px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.iid {
+  font-size: 8px;
+  color: var(--text-2);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.footer {
+  max-width: 960px;
+  margin: 32px auto 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-note {
+  font-size: 10px;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+
+.print-btn {
+  padding: 7px 14px;
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  border-radius: 5px;
+  font-size: 11px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+}
+
+.print-btn:hover { opacity: 0.8; }
+
+@media print {
+  body { padding: 12px; background: white; color: black; }
+  .footer { display: none; }
+  .grid { grid-template-columns: repeat(6, 1fr); gap: 5px; }
+  .cat-label { break-after: avoid; }
+  .card { break-inside: avoid; border-color: #ddd; }
+}
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <h1 class="page-title">Griette<span>'s</span> Garderobe</h1>
+  <span class="page-meta" id="count-meta">— items —</span>
+</header>
+
+<main class="main" id="main"></main>
+
+<footer class="footer">
+  <p class="footer-note">
+    Foto's via Cloudinary · Afbeeldingen zonder foto tonen een plaatshouder.<br>
+    <a href="/foto-upload.html" style="color:var(--accent)">Foto's toevoegen</a> om de kaart compleet te maken.
+  </p>
+  <button class="print-btn" onclick="window.print()">Afdrukken / Opslaan als PDF</button>
+</footer>
+
+<script>
+const CDN = 'https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_';
+
+const CATS = {
+  tops:    { label: 'Tops', icon: '👕' },
+  bottoms: { label: 'Bottoms & Rokken', icon: '👖' },
+  layers:  { label: 'Laagjes', icon: '🧥' },
+  jurken:  { label: 'Jurken', icon: '👗' },
+  bags:    { label: 'Tassen', icon: '👜' },
+};
+
+const ITEMS = [
+  // Tops
+  {id:'bershka-raglan',      name:'Bershka raglan trui bruin/roze',          cat:'tops'},
+  {id:'second-female-grijs', name:'Second Female crop sweater grijs',         cat:'tops'},
+  {id:'adidas-blauw-crop',   name:'Adidas crop t-shirt blauw',                cat:'tops'},
+  {id:'only-sons-blauw',     name:'Only & Sons t-shirt koningsblauw',         cat:'tops'},
+  {id:'mbym-leopard-top',    name:'MbyM Rihne top luipaardprint',             cat:'tops'},
+  {id:'av-crop-longsleeve',  name:'American Vintage crop longsleeve blauw',   cat:'tops'},
+  {id:'av-remytown-turquoise',name:'American Vintage Remytown t-shirt turquoise', cat:'tops'},
+  {id:'zara-turquoise-sweater',name:'Turquoise Zara sweater',                 cat:'tops'},
+  {id:'wit-oversized',       name:'Wit oversized t-shirt',                    cat:'tops'},
+  {id:'wit-basic',           name:'Wit basic t-shirt',                        cat:'tops'},
+  {id:'geel-shirt',          name:'Geel Stieglitz t-shirt',                   cat:'tops'},
+  {id:'oranje-shirt',        name:'Oranje/zalm Stieglitz t-shirt',            cat:'tops'},
+  {id:'gestreept',           name:'Zwart-wit gestreepte longsleeve',          cat:'tops'},
+  {id:'blauwe-blouse',       name:'Lichtblauwe oversized blouse',             cat:'tops'},
+  {id:'kanten-top',          name:'Witte kanten top',                         cat:'tops'},
+  {id:'zwart-peplum',        name:'Zwart peplum top',                         cat:'tops'},
+  {id:'blauw-spaghet',       name:'Donkerblauw spaghettitopje',               cat:'tops'},
+  {id:'bruin-spaghet',       name:'Donkerbruin spaghettitopje',               cat:'tops'},
+  {id:'bruin-longsleeve',    name:'Donkerbruin longsleeve aansluitend',       cat:'tops'},
+  // Bottoms
+  {id:'khaki-bloemenprint',  name:'Khaki bloemenprint wide leg broek',        cat:'bottoms'},
+  {id:'bordeaux-stripe-broek',name:'Bordeaux wide leg broek met zijstreep',   cat:'bottoms'},
+  {id:'pullbear-balloon-jeans',name:'Pull&Bear ballonpijpen jeans blauw',     cat:'bottoms'},
+  {id:'groen-barrel-broek',  name:'Groene barrel-broek katoen Zara',          cat:'bottoms'},
+  {id:'zara-cargo-khaki',    name:'Zara cargo broek khaki',                   cat:'bottoms'},
+  {id:'roze-maxi',           name:'Felroze maxi rok',                         cat:'bottoms'},
+  {id:'print-mini',          name:'Kleurrijke print mini rok',                cat:'bottoms'},
+  {id:'bruin-maxi',          name:'Bruin satijnen maxi rok',                  cat:'bottoms'},
+  {id:'rood-rok',            name:'Rood mini rokje met gesp',                 cat:'bottoms'},
+  {id:'witte-shorts',        name:'Witte denim shorts',                       cat:'bottoms'},
+  {id:'lichtblauwe-shorts',  name:'Lichtblauwe denim shorts',                 cat:'bottoms'},
+  {id:'adidas-broek',        name:'Adidas Firebird broek marineblauw',        cat:'bottoms'},
+  {id:'bruin-shorts',        name:'Bruine shorts',                            cat:'bottoms'},
+  // Layers
+  {id:'second-female-cardigan',name:'Second Female cardigan beige gouden knopen', cat:'layers'},
+  {id:'hm-beige-jas',        name:'H&M cropped jas lichtbeige',               cat:'layers'},
+  {id:'cargo-jasje',         name:'Bruin cropped cargo jasje',                cat:'layers'},
+  {id:'paarse-cardigan',     name:'Paarse cardigan',                          cat:'layers'},
+  {id:'witte-cardigan',      name:'Gebroken witte cardigan',                  cat:'layers'},
+  {id:'zwart-gilet',         name:'Zwart gilet goudknopen',                   cat:'layers'},
+  // Jurken
+  {id:'hemdjurk',            name:'Gebroken witte hemdjurk',                  cat:'jurken'},
+  {id:'bruin-jurk',          name:'Donkerbruin longsleeve jurk',              cat:'jurken'},
+  // Bags
+  {id:'groen-tote-zara',     name:'Groene geweven Zara tote bag',             cat:'bags'},
+  {id:'blauwe-tas',          name:'Blauwe tweed kettingtas',                  cat:'bags'},
+  {id:'leonie-bag',          name:'Bruine suède Leonie bag',                  cat:'bags'},
+  {id:'gele-bag',            name:'Gele stippen bucket bag',                  cat:'bags'},
+];
+
+document.getElementById('count-meta').textContent = ITEMS.length + ' items';
+
+// Build by category
+const catOrder = ['tops','bottoms','layers','jurken','bags'];
+const bycat = {};
+ITEMS.forEach(i => { (bycat[i.cat] = bycat[i.cat] || []).push(i); });
+
+const main = document.getElementById('main');
+
+catOrder.forEach(catKey => {
+  const catItems = bycat[catKey];
+  if (!catItems || catItems.length === 0) return;
+  const info = CATS[catKey] || { label: catKey, icon: '🗂' };
+
+  const block = document.createElement('div');
+  block.className = 'cat-block';
+
+  const catLabel = document.createElement('div');
+  catLabel.className = 'cat-label';
+  catLabel.innerHTML = '<span class="cat-label-text">' + info.label + ' — ' + catItems.length + '</span>';
+  block.appendChild(catLabel);
+
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+
+  catItems.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'photo-wrap';
+
+    // Placeholder always present underneath
+    const ph = document.createElement('div');
+    ph.className = 'placeholder';
+    ph.innerHTML = '<span class="ph-icon">' + info.icon + '</span>'
+      + '<span class="ph-label">' + item.name + '</span>';
+    wrap.appendChild(ph);
+
+    // Image on top; if it loads it covers placeholder
+    const img = document.createElement('img');
+    img.alt = item.name;
+    img.style.position = 'absolute';
+    img.style.inset = '0';
+    img.style.opacity = '0';
+    img.style.transition = 'opacity 0.25s';
+    img.onload = function() { img.style.opacity = '1'; };
+    img.onerror = function() { img.style.display = 'none'; };
+    img.src = CDN + item.id + '.jpg';
+    wrap.appendChild(img);
+
+    const lbl = document.createElement('div');
+    lbl.className = 'card-label';
+    lbl.innerHTML = '<div class="iname">' + item.name + '</div>'
+      + '<div class="iid">' + item.id + '</div>';
+
+    card.appendChild(wrap);
+    card.appendChild(lbl);
+    grid.appendChild(card);
+  });
+
+  block.appendChild(grid);
+  main.appendChild(block);
+});
+</script>
+</body>
+</html>
