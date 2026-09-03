@@ -33,9 +33,11 @@
 <p class="sub">Selecteer een foto per item — wordt direct geüpload naar Cloudinary en verschijnt daarna in de app.</p>
 
 <div class="export-bar">
+  <button id="check-btn" class="export-btn sec" onclick="runAvailabilityCheck()">🔍 Controleer foto-beschikbaarheid</button>
   <button class="export-btn" onclick="exportWardrobeJson()">⬇ Download wardrobe.json</button>
   <button class="export-btn sec" onclick="window.open('/wardrobe.json')">📄 Bekijk wardrobe.json</button>
 </div>
+<div id="check-status" style="font-size:11px;color:#8a7060;margin-bottom:12px;max-width:500px;"></div>
 <div class="grid" id="grid"></div>
 <p class="note">Na het uploaden: ververs <a href="/griette.html">griette.html</a> en de foto's verschijnen automatisch bij elk item.<br>
 Klik op "Download wardrobe.json" om een bijgewerkte export te downloaden met alle Cloudinary-URLs.</p>
@@ -45,33 +47,84 @@ const CLOUD = 'dhggari0g';
 const PRESET = 'griette-photos';
 const CDN_BASE = 'https://res.cloudinary.com/' + CLOUD + '/image/upload/griette-wardrobe/';
 
-function exportWardrobeJson() {
-  fetch('/wardrobe.json').then(r => r.json()).then(function(base) {
-    // Merge uploaded Cloudinary URLs into the base wardrobe.json
-    let updated = Object.assign({}, base);
-    updated._meta = Object.assign({}, base._meta, { generated: new Date().toISOString().slice(0,10) });
+// photo_available results from HEAD checks
+var photoAvailable = {};
+
+async function checkPhotoUrl(id) {
+  var url = 'https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_' + id + '.jpg';
+  // Also check if user uploaded via this session (cloudMap)
+  if (cloudMap[id]) { photoAvailable[id] = true; return true; }
+  try {
+    var resp = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
+    // no-cors = opaque response, can't read status; use img test instead
+  } catch(e) {}
+  // Use Image element to test — works cross-origin without CORS restriction
+  return new Promise(function(resolve) {
+    var img = new Image();
+    img.onload = function() { photoAvailable[id] = true; resolve(true); };
+    img.onerror = function() { photoAvailable[id] = false; resolve(false); };
+    img.src = url + '?_t=' + Date.now();
+  });
+}
+
+async function runAvailabilityCheck() {
+  var btn = document.getElementById('check-btn');
+  btn.disabled = true; btn.textContent = '⏳ Controleren...';
+  var statusEl = document.getElementById('check-status');
+  statusEl.textContent = '';
+  var ids = ALL_ITEMS.map(function(i) { return i.id; });
+  var done = 0;
+  // Check in batches of 6
+  for (var i = 0; i < ids.length; i += 6) {
+    var batch = ids.slice(i, i + 6);
+    await Promise.all(batch.map(function(id) { return checkPhotoUrl(id); }));
+    done += batch.length;
+    statusEl.textContent = done + '/' + ids.length + ' gecontroleerd...';
+  }
+  var ok = Object.values(photoAvailable).filter(Boolean).length;
+  statusEl.textContent = '✓ Klaar: ' + ok + '/' + ids.length + ' foto\'s beschikbaar';
+  btn.disabled = false; btn.textContent = '🔍 Controleer foto-beschikbaarheid';
+  // Update row status indicators
+  ALL_ITEMS.forEach(function(item) {
+    var el = document.getElementById('st-' + item.id);
+    if (!el) return;
+    if (photoAvailable[item.id] === true) {
+      el.className = 'status ok'; el.textContent = '✓ foto beschikbaar';
+    } else if (photoAvailable[item.id] === false) {
+      el.className = 'status err'; el.textContent = '✗ geen foto';
+    }
+  });
+}
+
+async function exportWardrobeJson() {
+  var btn = event && event.target;
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Laden...'; }
+  try {
+    var base = await fetch('/wardrobe.json').then(r => r.json());
+    var updated = Object.assign({}, base);
+    updated._meta = Object.assign({}, base._meta, {
+      generated: new Date().toISOString().slice(0, 10),
+      photo_check_timestamp: new Date().toISOString()
+    });
     updated.items = base.items.map(function(item) {
       var uploadedUrl = cloudMap[item.id];
+      var cdnUrl = 'https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_' + item.id + '.jpg';
+      var avail = photoAvailable[item.id];
       return Object.assign({}, item, {
-        image_url: uploadedUrl || (CDN_BASE + 'griette_' + item.id),
-        image: 'assets/wardrobe/' + item.id + '.jpg'
+        image_url: uploadedUrl || cdnUrl,
+        image: 'assets/wardrobe/' + item.id + '.jpg',
+        photo_available: avail !== undefined ? avail : (uploadedUrl ? true : null)
       });
     });
-    var blob = new Blob([JSON.stringify(updated, null, 2)], {type: 'application/json'});
+    var blob = new Blob([JSON.stringify(updated, null, 2)], { type: 'application/json' });
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = 'wardrobe.json';
     a.click();
-  }).catch(function() {
-    // Fallback: build from ALL_ITEMS
-    var items = ALL_ITEMS.map(function(item) {
-      return { id: item.id, name: item.name, category: item.cat,
-        image: 'assets/wardrobe/' + item.id + '.jpg',
-        image_url: cloudMap[item.id] || (CDN_BASE + 'griette_' + item.id) };
-    });
-    var blob = new Blob([JSON.stringify({generated: new Date().toISOString().slice(0,10), items: items}, null, 2)], {type:'application/json'});
-    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'wardrobe.json'; a.click();
-  });
+  } catch(e) {
+    alert('Export mislukt: ' + e.message);
+  }
+  if (btn) { btn.disabled = false; btn.textContent = '⬇ Download wardrobe.json'; }
 }
 
 const ALL_ITEMS = [

@@ -3,8 +3,9 @@
     "generated": "2026-09-03",
     "source": "https://stijlstudio.app/griette.html",
     "owner": "Griette",
-    "note": "Photo images are hosted on Cloudinary CDN. image_url links are publicly accessible. assets/wardrobe/ contains local copies where available.",
-    "cloudinary_base": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/"
+    "note": "image_url uses Cloudinary CDN with f_auto,q_auto delivery. photo_available is set by the browser-based checker in foto-upload.html. assets/wardrobe/ contains local copies where available.",
+    "cloudinary_base": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/",
+    "image_url_format": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_{id}.jpg"
   },
   "items": [
     {
@@ -15,7 +16,8 @@
       "fit": "wijd",
       "material": "katoen",
       "image": "assets/wardrobe/wit-oversized.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_wit-oversized"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_wit-oversized.jpg",
+      "photo_available": null
     },
     {
       "id": "wit-basic",
@@ -25,7 +27,8 @@
       "fit": "aansluitend",
       "material": "katoen",
       "image": "assets/wardrobe/wit-basic.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_wit-basic"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_wit-basic.jpg",
+      "photo_available": null
     },
     {
       "id": "geel-shirt",
@@ -36,7 +39,8 @@
       "fit": "wijd",
       "material": "katoen",
       "image": "assets/wardrobe/geel-shirt.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_geel-shirt"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_geel-shirt.jpg",
+      "photo_available": null
     },
     {
       "id": "oranje-shirt",
@@ -47,7 +51,8 @@
       "fit": "wijd",
       "material": "katoen",
       "image": "assets/wardrobe/oranje-shirt.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_oranje-shirt"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_oranje-shirt.jpg",
+      "photo_available": null
     },
     {
       "id": "gestreept",
@@ -57,7 +62,8 @@
       "fit": "wijd",
       "material": "katoen",
       "image": "assets/wardrobe/gestreept.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_gestreept"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_gestreept.jpg",
+      "photo_available": null
     },
     {
       "id": "blauwe-blouse",
@@ -67,7 +73,8 @@
       "fit": "wijd",
       "material": "katoen",
       "image": "assets/wardrobe/blauwe-blouse.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_blauwe-blouse"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_blauwe-blouse.jpg",
+      "photo_available": null
     },
     {
       "id": "kanten-top",
@@ -77,7 +84,8 @@
       "fit": "wijd",
       "neckline": "open",
       "image": "assets/wardrobe/kanten-top.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_kanten-top"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_kanten-top.jpg",
+      "photo_available": null
     },
     {
       "id": "zwart-peplum",
@@ -87,7 +95,8 @@
       "fit": "aansluitend",
       "neckline": "open",
       "image": "assets/wardrobe/zwart-peplum.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_zwart-peplum"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_zwart-peplum.jpg",
+      "photo_available": null
     },
     {
       "id": "blauw-spaghet",
@@ -98,7 +107,8 @@
       "neckline": "open",
       "material": "viscose",
       "image": "assets/wardrobe/blauw-spaghet.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_blauw-spaghet"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_blauw-spaghet.jpg",
+      "photo_available": null
     },
     {
       "id": "bruin-spaghet",
@@ -109,7 +119,8 @@
       "neckline": "open",
       "material": "viscose",
       "image": "assets/wardrobe/bruin-spaghet.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_bruin-spaghet"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_bruin-spaghet.jpg",
+      "photo_available": null
     },
     {
       "id": "bruin-longsleeve",
@@ -118,7 +129,8 @@
       "color": "bruin",
       "fit": "aansluitend",
       "image": "assets/wardrobe/bruin-longsleeve.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_bruin-longsleeve"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_bruin-longsleeve.jpg",
+      "photo_available": null
     },
     {
       "id": "bershka-raglan",
@@ -128,9 +140,14 @@
       "color": "bruin",
       "fit": "wijd",
       "material": "katoen",
-      "tags": ["raglan", "crop", "colorblock"],
+      "tags": [
+        "raglan",
+        "crop",
+        "colorblock"
+      ],
       "image": "assets/wardrobe/bershka-raglan.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_bershka-raglan"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_bershka-raglan.jpg",
+      "photo_available": null
     },
     {
       "id": "second-female-grijs",
@@ -140,9 +157,13 @@
       "color": "grijs",
       "fit": "wijd",
       "material": "katoen",
-      "tags": ["crop", "sweater"],
+      "tags": [
+        "crop",
+        "sweater"
+      ],
       "image": "assets/wardrobe/second-female-grijs.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_second-female-grijs"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_second-female-grijs.jpg",
+      "photo_available": null
     },
     {
       "id": "adidas-blauw-crop",
@@ -152,9 +173,13 @@
       "color": "donkerblauw",
       "fit": "wijd",
       "material": "katoen",
-      "tags": ["crop", "sport"],
+      "tags": [
+        "crop",
+        "sport"
+      ],
       "image": "assets/wardrobe/adidas-blauw-crop.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_adidas-blauw-crop"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_adidas-blauw-crop.jpg",
+      "photo_available": null
     },
     {
       "id": "only-sons-blauw",
@@ -165,7 +190,8 @@
       "fit": "wijd",
       "material": "katoen",
       "image": "assets/wardrobe/only-sons-blauw.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_only-sons-blauw"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_only-sons-blauw.jpg",
+      "photo_available": null
     },
     {
       "id": "mbym-leopard-top",
@@ -174,9 +200,14 @@
       "category": "tops",
       "color": "bruin",
       "fit": "wijd",
-      "tags": ["mouwloos", "luipaard", "print"],
+      "tags": [
+        "mouwloos",
+        "luipaard",
+        "print"
+      ],
       "image": "assets/wardrobe/mbym-leopard-top.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_mbym-leopard-top"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_mbym-leopard-top.jpg",
+      "photo_available": null
     },
     {
       "id": "av-crop-longsleeve",
@@ -186,9 +217,13 @@
       "color": "donkerblauw",
       "fit": "wijd",
       "material": "katoen",
-      "tags": ["crop", "longsleeve"],
+      "tags": [
+        "crop",
+        "longsleeve"
+      ],
       "image": "assets/wardrobe/av-crop-longsleeve.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_av-crop-longsleeve"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_av-crop-longsleeve.jpg",
+      "photo_available": null
     },
     {
       "id": "av-remytown-turquoise",
@@ -198,9 +233,13 @@
       "color": "turquoise",
       "fit": "wijd",
       "material": "katoen",
-      "tags": ["crop", "longsleeve"],
+      "tags": [
+        "crop",
+        "longsleeve"
+      ],
       "image": "assets/wardrobe/av-remytown-turquoise.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_av-remytown-turquoise"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_av-remytown-turquoise.jpg",
+      "photo_available": null
     },
     {
       "id": "zara-turquoise-sweater",
@@ -211,7 +250,8 @@
       "fit": "wijd",
       "material": "katoen",
       "image": "assets/wardrobe/zara-turquoise-sweater.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_zara-turquoise-sweater"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_zara-turquoise-sweater.jpg",
+      "photo_available": null
     },
     {
       "id": "roze-maxi",
@@ -220,9 +260,13 @@
       "color": "felroze",
       "fit": "wijd",
       "material": "satijn",
-      "tags": ["rok", "maxi"],
+      "tags": [
+        "rok",
+        "maxi"
+      ],
       "image": "assets/wardrobe/roze-maxi.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_roze-maxi"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_roze-maxi.jpg",
+      "photo_available": null
     },
     {
       "id": "print-mini",
@@ -230,9 +274,14 @@
       "category": "bottoms",
       "color": "oranje-rood",
       "fit": "wijd",
-      "tags": ["rok", "mini", "print"],
+      "tags": [
+        "rok",
+        "mini",
+        "print"
+      ],
       "image": "assets/wardrobe/print-mini.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_print-mini"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_print-mini.jpg",
+      "photo_available": null
     },
     {
       "id": "bruin-maxi",
@@ -241,9 +290,13 @@
       "color": "bruin",
       "fit": "wijd",
       "material": "satijn",
-      "tags": ["rok", "maxi"],
+      "tags": [
+        "rok",
+        "maxi"
+      ],
       "image": "assets/wardrobe/bruin-maxi.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_bruin-maxi"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_bruin-maxi.jpg",
+      "photo_available": null
     },
     {
       "id": "rood-rok",
@@ -251,9 +304,13 @@
       "category": "bottoms",
       "color": "oranje-rood",
       "fit": "aansluitend",
-      "tags": ["rok", "mini"],
+      "tags": [
+        "rok",
+        "mini"
+      ],
       "image": "assets/wardrobe/rood-rok.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_rood-rok"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_rood-rok.jpg",
+      "photo_available": null
     },
     {
       "id": "witte-shorts",
@@ -262,9 +319,12 @@
       "color": "gebroken-wit",
       "fit": "aansluitend",
       "material": "denim",
-      "tags": ["shorts"],
+      "tags": [
+        "shorts"
+      ],
       "image": "assets/wardrobe/witte-shorts.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_witte-shorts"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_witte-shorts.jpg",
+      "photo_available": null
     },
     {
       "id": "lichtblauwe-shorts",
@@ -273,9 +333,12 @@
       "color": "lichtblauw",
       "fit": "aansluitend",
       "material": "denim",
-      "tags": ["shorts"],
+      "tags": [
+        "shorts"
+      ],
       "image": "assets/wardrobe/lichtblauwe-shorts.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_lichtblauwe-shorts"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_lichtblauwe-shorts.jpg",
+      "photo_available": null
     },
     {
       "id": "adidas-broek",
@@ -284,9 +347,13 @@
       "category": "bottoms",
       "color": "donkerblauw",
       "fit": "wijd",
-      "tags": ["sport", "trackbroek"],
+      "tags": [
+        "sport",
+        "trackbroek"
+      ],
       "image": "assets/wardrobe/adidas-broek.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_adidas-broek"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_adidas-broek.jpg",
+      "photo_available": null
     },
     {
       "id": "bruin-shorts",
@@ -294,9 +361,12 @@
       "category": "bottoms",
       "color": "bruin",
       "fit": "aansluitend",
-      "tags": ["shorts"],
+      "tags": [
+        "shorts"
+      ],
       "image": "assets/wardrobe/bruin-shorts.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_bruin-shorts"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_bruin-shorts.jpg",
+      "photo_available": null
     },
     {
       "id": "khaki-bloemenprint",
@@ -306,9 +376,14 @@
       "color": "olijfgroen",
       "fit": "wijd",
       "material": "katoen",
-      "tags": ["print", "wide-leg", "bloemen"],
+      "tags": [
+        "print",
+        "wide-leg",
+        "bloemen"
+      ],
       "image": "assets/wardrobe/khaki-bloemenprint.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_khaki-bloemenprint"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_khaki-bloemenprint.jpg",
+      "photo_available": null
     },
     {
       "id": "bordeaux-stripe-broek",
@@ -316,9 +391,14 @@
       "category": "bottoms",
       "color": "bordeaux",
       "fit": "wijd",
-      "tags": ["wide-leg", "zijstreep", "sport"],
+      "tags": [
+        "wide-leg",
+        "zijstreep",
+        "sport"
+      ],
       "image": "assets/wardrobe/bordeaux-stripe-broek.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_bordeaux-stripe-broek"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_bordeaux-stripe-broek.jpg",
+      "photo_available": null
     },
     {
       "id": "pullbear-balloon-jeans",
@@ -328,9 +408,14 @@
       "color": "lichtblauw",
       "fit": "wijd",
       "material": "denim",
-      "tags": ["jeans", "balloon", "wide-leg"],
+      "tags": [
+        "jeans",
+        "balloon",
+        "wide-leg"
+      ],
       "image": "assets/wardrobe/pullbear-balloon-jeans.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_pullbear-balloon-jeans"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_pullbear-balloon-jeans.jpg",
+      "photo_available": null
     },
     {
       "id": "groen-barrel-broek",
@@ -340,9 +425,13 @@
       "color": "olijfgroen",
       "fit": "wijd",
       "material": "katoen",
-      "tags": ["barrel", "wide-leg"],
+      "tags": [
+        "barrel",
+        "wide-leg"
+      ],
       "image": "assets/wardrobe/groen-barrel-broek.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_groen-barrel-broek"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_groen-barrel-broek.jpg",
+      "photo_available": null
     },
     {
       "id": "zara-cargo-khaki",
@@ -352,9 +441,13 @@
       "color": "olijfgroen",
       "fit": "wijd",
       "material": "katoen",
-      "tags": ["cargo", "wide-leg"],
+      "tags": [
+        "cargo",
+        "wide-leg"
+      ],
       "image": "assets/wardrobe/zara-cargo-khaki.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_zara-cargo-khaki"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_zara-cargo-khaki.jpg",
+      "photo_available": null
     },
     {
       "id": "cargo-jasje",
@@ -363,9 +456,14 @@
       "color": "bruin",
       "fit": "wijd",
       "material": "denim",
-      "tags": ["cargo", "jacket", "crop"],
+      "tags": [
+        "cargo",
+        "jacket",
+        "crop"
+      ],
       "image": "assets/wardrobe/cargo-jasje.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_cargo-jasje"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_cargo-jasje.jpg",
+      "photo_available": null
     },
     {
       "id": "paarse-cardigan",
@@ -374,9 +472,12 @@
       "color": "paars",
       "fit": "wijd",
       "material": "wol",
-      "tags": ["cardigan"],
+      "tags": [
+        "cardigan"
+      ],
       "image": "assets/wardrobe/paarse-cardigan.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_paarse-cardigan"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_paarse-cardigan.jpg",
+      "photo_available": null
     },
     {
       "id": "witte-cardigan",
@@ -385,9 +486,12 @@
       "color": "gebroken-wit",
       "fit": "wijd",
       "material": "wol",
-      "tags": ["cardigan"],
+      "tags": [
+        "cardigan"
+      ],
       "image": "assets/wardrobe/witte-cardigan.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_witte-cardigan"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_witte-cardigan.jpg",
+      "photo_available": null
     },
     {
       "id": "zwart-gilet",
@@ -395,9 +499,13 @@
       "category": "layers",
       "color": "zwart",
       "fit": "aansluitend",
-      "tags": ["gilet", "vest"],
+      "tags": [
+        "gilet",
+        "vest"
+      ],
       "image": "assets/wardrobe/zwart-gilet.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_zwart-gilet"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_zwart-gilet.jpg",
+      "photo_available": null
     },
     {
       "id": "second-female-cardigan",
@@ -407,9 +515,14 @@
       "color": "beige",
       "fit": "wijd",
       "material": "wol",
-      "tags": ["cardigan", "gebreid", "gouden-knopen"],
+      "tags": [
+        "cardigan",
+        "gebreid",
+        "gouden-knopen"
+      ],
       "image": "assets/wardrobe/second-female-cardigan.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_second-female-cardigan"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_second-female-cardigan.jpg",
+      "photo_available": null
     },
     {
       "id": "hm-beige-jas",
@@ -419,9 +532,14 @@
       "color": "beige",
       "fit": "wijd",
       "material": "katoen",
-      "tags": ["jas", "crop", "trench"],
+      "tags": [
+        "jas",
+        "crop",
+        "trench"
+      ],
       "image": "assets/wardrobe/hm-beige-jas.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_hm-beige-jas"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_hm-beige-jas.jpg",
+      "photo_available": null
     },
     {
       "id": "hemdjurk",
@@ -430,9 +548,13 @@
       "color": "gebroken-wit",
       "fit": "aansluitend",
       "neckline": "open",
-      "tags": ["jurk", "hemd"],
+      "tags": [
+        "jurk",
+        "hemd"
+      ],
       "image": "assets/wardrobe/hemdjurk.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_hemdjurk"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_hemdjurk.jpg",
+      "photo_available": null
     },
     {
       "id": "bruin-jurk",
@@ -440,18 +562,27 @@
       "category": "jurken",
       "color": "bruin",
       "fit": "aansluitend",
-      "tags": ["jurk", "longsleeve"],
+      "tags": [
+        "jurk",
+        "longsleeve"
+      ],
       "image": "assets/wardrobe/bruin-jurk.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_bruin-jurk"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_bruin-jurk.jpg",
+      "photo_available": null
     },
     {
       "id": "blauwe-tas",
       "name": "Blauwe tweed kettingtas",
       "category": "bags",
       "color": "donkerblauw",
-      "tags": ["kettingtas", "tweed", "schoudertas"],
+      "tags": [
+        "kettingtas",
+        "tweed",
+        "schoudertas"
+      ],
       "image": "assets/wardrobe/blauwe-tas.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_blauwe-tas"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_blauwe-tas.jpg",
+      "photo_available": null
     },
     {
       "id": "leonie-bag",
@@ -459,18 +590,26 @@
       "category": "bags",
       "color": "bruin",
       "material": "suède",
-      "tags": ["schoudertas", "suède"],
+      "tags": [
+        "schoudertas",
+        "suède"
+      ],
       "image": "assets/wardrobe/leonie-bag.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_leonie-bag"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_leonie-bag.jpg",
+      "photo_available": null
     },
     {
       "id": "gele-bag",
       "name": "Gele stippen bucket bag",
       "category": "bags",
       "color": "geel",
-      "tags": ["bucket-bag", "stippen"],
+      "tags": [
+        "bucket-bag",
+        "stippen"
+      ],
       "image": "assets/wardrobe/gele-bag.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_gele-bag"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_gele-bag.jpg",
+      "photo_available": null
     },
     {
       "id": "groen-tote-zara",
@@ -478,27 +617,39 @@
       "brand": "Zara",
       "category": "bags",
       "color": "groen",
-      "tags": ["tote", "geweven"],
+      "tags": [
+        "tote",
+        "geweven"
+      ],
       "image": "assets/wardrobe/groen-tote-zara.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_groen-tote-zara"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_groen-tote-zara.jpg",
+      "photo_available": null
     },
     {
       "id": "zwarte-sandaal",
       "name": "Zwarte platte sandalen",
       "category": "shoes",
       "color": "zwart",
-      "tags": ["sandaal", "plat"],
+      "tags": [
+        "sandaal",
+        "plat"
+      ],
       "image": "assets/wardrobe/zwarte-sandaal.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_zwarte-sandaal"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_zwarte-sandaal.jpg",
+      "photo_available": null
     },
     {
       "id": "bruine-sandaal",
       "name": "Bruine platte sandalen",
       "category": "shoes",
       "color": "bruin",
-      "tags": ["sandaal", "plat"],
+      "tags": [
+        "sandaal",
+        "plat"
+      ],
       "image": "assets/wardrobe/bruine-sandaal.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_bruine-sandaal"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_bruine-sandaal.jpg",
+      "photo_available": null
     },
     {
       "id": "zwarte-suede",
@@ -506,9 +657,12 @@
       "category": "shoes",
       "color": "zwart",
       "material": "suède",
-      "tags": ["sandaal"],
+      "tags": [
+        "sandaal"
+      ],
       "image": "assets/wardrobe/zwarte-suede.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_zwarte-suede"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_zwarte-suede.jpg",
+      "photo_available": null
     },
     {
       "id": "bruine-suede",
@@ -516,36 +670,51 @@
       "category": "shoes",
       "color": "bruin",
       "material": "suède",
-      "tags": ["sandaal"],
+      "tags": [
+        "sandaal"
+      ],
       "image": "assets/wardrobe/bruine-suede.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_bruine-suede"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_bruine-suede.jpg",
+      "photo_available": null
     },
     {
       "id": "zwarte-kitten",
       "name": "Zwarte kitten heel sandalen",
       "category": "shoes",
       "color": "zwart",
-      "tags": ["sandaal", "kitten-heel"],
+      "tags": [
+        "sandaal",
+        "kitten-heel"
+      ],
       "image": "assets/wardrobe/zwarte-kitten.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_zwarte-kitten"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_zwarte-kitten.jpg",
+      "photo_available": null
     },
     {
       "id": "bruine-kitten",
       "name": "Bruine kitten heel sandalen",
       "category": "shoes",
       "color": "bruin",
-      "tags": ["sandaal", "kitten-heel"],
+      "tags": [
+        "sandaal",
+        "kitten-heel"
+      ],
       "image": "assets/wardrobe/bruine-kitten.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_bruine-kitten"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_bruine-kitten.jpg",
+      "photo_available": null
     },
     {
       "id": "choco-kitten",
       "name": "Choco kitten heel teenslippers",
       "category": "shoes",
       "color": "bruin",
-      "tags": ["slipper", "kitten-heel"],
+      "tags": [
+        "slipper",
+        "kitten-heel"
+      ],
       "image": "assets/wardrobe/choco-kitten.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_choco-kitten"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_choco-kitten.jpg",
+      "photo_available": null
     },
     {
       "id": "new-balance",
@@ -553,9 +722,13 @@
       "brand": "New Balance",
       "category": "shoes",
       "color": "beige",
-      "tags": ["sneaker", "sport"],
+      "tags": [
+        "sneaker",
+        "sport"
+      ],
       "image": "assets/wardrobe/new-balance.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_new-balance"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_new-balance.jpg",
+      "photo_available": null
     },
     {
       "id": "riem-bruin",
@@ -563,9 +736,12 @@
       "category": "accessories",
       "color": "bruin",
       "material": "leer",
-      "tags": ["riem"],
+      "tags": [
+        "riem"
+      ],
       "image": "assets/wardrobe/riem-bruin.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_riem-bruin"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_riem-bruin.jpg",
+      "photo_available": null
     },
     {
       "id": "riem-zwart",
@@ -573,51 +749,71 @@
       "category": "accessories",
       "color": "zwart",
       "material": "leer",
-      "tags": ["riem"],
+      "tags": [
+        "riem"
+      ],
       "image": "assets/wardrobe/riem-zwart.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_riem-zwart"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_riem-zwart.jpg",
+      "photo_available": null
     },
     {
       "id": "sjaaltje-roze",
       "name": "Felroze sjaaltje",
       "category": "accessories",
       "color": "felroze",
-      "tags": ["sjaaltje"],
+      "tags": [
+        "sjaaltje"
+      ],
       "image": "assets/wardrobe/sjaaltje-roze.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_sjaaltje-roze"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_sjaaltje-roze.jpg",
+      "photo_available": null
     },
     {
       "id": "sjaaltje-blauw",
       "name": "Blauw sjaaltje",
       "category": "accessories",
       "color": "donkerblauw",
-      "tags": ["sjaaltje"],
+      "tags": [
+        "sjaaltje"
+      ],
       "image": "assets/wardrobe/sjaaltje-blauw.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_sjaaltje-blauw"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_sjaaltje-blauw.jpg",
+      "photo_available": null
     },
     {
       "id": "zonnebril",
       "name": "Zonnebril",
       "category": "accessories",
-      "tags": ["zonnebril"],
+      "tags": [
+        "zonnebril"
+      ],
       "image": "assets/wardrobe/zonnebril.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_zonnebril"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_zonnebril.jpg",
+      "photo_available": null
     },
     {
       "id": "petje",
       "name": "Pet / cap",
       "category": "accessories",
-      "tags": ["pet", "cap"],
+      "tags": [
+        "pet",
+        "cap"
+      ],
       "image": "assets/wardrobe/petje.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_petje"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_petje.jpg",
+      "photo_available": null
     },
     {
       "id": "strooien-hoed",
       "name": "Strooien hoed",
       "category": "accessories",
-      "tags": ["hoed", "straw"],
+      "tags": [
+        "hoed",
+        "straw"
+      ],
       "image": "assets/wardrobe/strooien-hoed.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_strooien-hoed"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_strooien-hoed.jpg",
+      "photo_available": null
     },
     {
       "id": "ketting-goud",
@@ -625,9 +821,13 @@
       "category": "accessories",
       "color": "goud",
       "material": "goud",
-      "tags": ["sieraden", "ketting"],
+      "tags": [
+        "sieraden",
+        "ketting"
+      ],
       "image": "assets/wardrobe/ketting-goud.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_ketting-goud"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_ketting-goud.jpg",
+      "photo_available": null
     },
     {
       "id": "oorbellen-goud",
@@ -635,17 +835,26 @@
       "category": "accessories",
       "color": "goud",
       "material": "goud",
-      "tags": ["sieraden", "oorbellen", "hoepels"],
+      "tags": [
+        "sieraden",
+        "oorbellen",
+        "hoepels"
+      ],
       "image": "assets/wardrobe/oorbellen-goud.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_oorbellen-goud"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_oorbellen-goud.jpg",
+      "photo_available": null
     },
     {
       "id": "armband",
       "name": "Armband",
       "category": "accessories",
-      "tags": ["sieraden", "armband"],
+      "tags": [
+        "sieraden",
+        "armband"
+      ],
       "image": "assets/wardrobe/armband.jpg",
-      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_armband"
+      "image_url": "https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_armband.jpg",
+      "photo_available": null
     }
   ]
 }
