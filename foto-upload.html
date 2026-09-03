@@ -4,273 +4,656 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Foto Upload — Garderobe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap">
 <style>
-  body { font-family: 'Segoe UI', sans-serif; background: #f9f6f2; margin: 0; padding: 20px; color: #2e1a0e; }
-  h1 { font-size: 18px; margin-bottom: 4px; }
-  p.sub { font-size: 12px; color: #8a7060; margin-bottom: 24px; }
-  .grid { display: flex; flex-direction: column; gap: 10px; max-width: 500px; }
-  .row { display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 12px; padding: 10px 14px; border: 1.5px solid #e8e0d8; }
-  .thumb { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; background: #f0ebe4; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-  .thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
-  .info { flex: 1; min-width: 0; }
-  .export-bar { max-width:500px; margin-bottom:20px; display:flex; gap:10px; flex-wrap:wrap; }
-  .export-btn { padding:9px 16px; background:#2e1a0e; color:#f9f6f2; border:none; border-radius:10px; font-size:12px; cursor:pointer; }
-  .export-btn.sec { background:#fff; color:#2e1a0e; border:1.5px solid #e8e0d8; }
-  .iname { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .iid { font-size: 10px; color: #8a7060; }
-  .status { font-size: 10px; margin-top: 2px; }
-  .status.ok { color: #2d7a4f; }
-  .status.err { color: #c0392b; }
-  label.upload-btn { padding: 7px 12px; background: #2e1a0e; color: #f9f6f2; border-radius: 8px; font-size: 11px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-  label.upload-btn.done { background: #2d7a4f; }
-  input[type=file] { display: none; }
-  .section-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #8a7060; margin: 16px 0 6px; font-weight: 600; }
-  .note { font-size: 11px; color: #8a7060; margin-top: 20px; max-width: 500px; line-height: 1.6; }
+:root {
+  --bg:        #F8F5F1;
+  --surface:   #FFFFFF;
+  --border:    #E8DDD2;
+  --text:      #1C140E;
+  --text-2:    #8A7060;
+  --accent:    #9B7B5C;
+  --green:     #2D7A4F;
+  --red:       #C0392B;
+  --ph-bg:     #EDE5DA;
+  --matched:   #E8F5EF;
+  --matched-b: #2D7A4F;
+  --sel-b:     #3B7CD4;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:        #1A1410;
+    --surface:   #231C16;
+    --border:    #342620;
+    --text:      #F0E6D8;
+    --text-2:    #9A7E68;
+    --accent:    #C4976A;
+    --ph-bg:     #2C2018;
+    --matched:   #1A2E22;
+    --matched-b: #4CAF7A;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:        #1A1410;
+  --surface:   #231C16;
+  --border:    #342620;
+  --text:      #F0E6D8;
+  --text-2:    #9A7E68;
+  --accent:    #C4976A;
+  --ph-bg:     #2C2018;
+  --matched:   #1A2E22;
+  --matched-b: #4CAF7A;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding: 24px 20px 60px;
+  min-height: 100vh;
+}
+
+.wrap { max-width: 960px; margin: 0 auto; }
+
+header { padding-bottom: 18px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+h1 { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 500; color: var(--text); }
+h1 span { color: var(--accent); }
+.sub { font-size: 11px; color: var(--text-2); margin-top: 4px; }
+
+/* DROP ZONE */
+#drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  background: var(--surface);
+  margin-bottom: 24px;
+}
+#drop-zone.drag-over { border-color: var(--accent); background: var(--ph-bg); }
+#drop-zone.has-files { border-style: solid; border-color: var(--border); padding: 16px 24px; }
+.drop-icon { font-size: 40px; line-height: 1; margin-bottom: 12px; }
+.drop-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+.drop-sub { font-size: 11px; color: var(--text-2); }
+#drop-zone.has-files .drop-icon { font-size: 22px; margin-bottom: 6px; }
+#drop-zone.has-files .drop-title { font-size: 13px; }
+#file-input { display: none; }
+
+/* SUMMARY BAR */
+#summary-bar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+}
+.summary-text { font-size: 12px; color: var(--text); line-height: 1.6; }
+.summary-text strong { color: var(--green); }
+.summary-text .warn { color: var(--accent); }
+
+#upload-btn {
+  padding: 10px 22px;
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+#upload-btn:disabled { opacity: 0.45; cursor: default; }
+#upload-btn:not(:disabled):hover { opacity: 0.82; }
+
+/* UNMATCHED PHOTOS STRIP */
+#unmatched-section { margin-bottom: 20px; display: none; }
+.section-label {
+  font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent); font-weight: 600; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-label::before { content:''; display:block; width:14px; height:1px; background:var(--accent); }
+.section-label::after  { content:''; display:block; flex:1; height:1px; background:var(--border); }
+
+#unmatched-hint { font-size: 11px; color: var(--text-2); margin-bottom: 10px; }
+
+#unmatched-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.unmatched-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px 6px 6px;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.12s;
+  max-width: 200px;
+}
+.unmatched-pill.selected { border-color: var(--sel-b); }
+.unmatched-pill img { width: 36px; height: 36px; object-fit: cover; border-radius: 5px; flex-shrink: 0; }
+.pill-name { font-size: 10px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pill-hint { font-size: 9px; color: var(--text-2); }
+
+/* ITEMS GRID */
+#items-section { margin-bottom: 20px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+@media (max-width: 600px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+
+.item-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  transition: border-color 0.12s;
+  cursor: default;
+}
+.item-card.matched { border-color: var(--matched-b); background: var(--matched); }
+.item-card.assign-target { border-color: var(--sel-b); cursor: pointer; }
+.item-card.assign-target:hover { border-color: var(--sel-b); filter: brightness(0.97); }
+.item-card.uploaded { border-color: var(--matched-b); }
+.item-card.error { border-color: var(--red); }
+
+.photo-wrap {
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--ph-bg);
+  position: relative;
+  overflow: hidden;
+}
+.photo-wrap img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  position: absolute; inset: 0;
+}
+.photo-wrap .ph-icon {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-size: 22px; color: var(--text-2);
+  gap: 4px;
+}
+.ph-icon small { font-size: 8px; letter-spacing: 0.05em; color: var(--text-2); text-align: center; padding: 0 6px; }
+
+.progress-bar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px; background: var(--border);
+  display: none;
+}
+.progress-bar .fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.2s; }
+
+.card-label { padding: 6px 7px 8px; }
+.iname { font-size: 9.5px; font-weight: 500; line-height: 1.3; color: var(--text);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.iid { font-size: 8px; color: var(--text-2); margin-top: 1px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-status { font-size: 8.5px; margin-top: 3px; font-weight: 500; }
+.card-status.ok  { color: var(--green); }
+.card-status.err { color: var(--red); }
+
+.assign-btn {
+  display: none;
+  font-size: 9px; color: var(--accent); font-weight: 600;
+  margin-top: 3px; cursor: pointer; letter-spacing: 0.04em;
+}
+
+/* PROGRESS OVERLAY */
+#progress-bar-global {
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+}
+.prog-label { font-size: 12px; color: var(--text); margin-bottom: 8px; }
+.prog-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.prog-fill  { height: 100%; background: var(--accent); border-radius: 3px; width: 0%; transition: width 0.25s; }
 </style>
 </head>
 <body>
-<h1>📷 Foto's toevoegen aan garderobe</h1>
-<p class="sub">Selecteer een foto per item — wordt direct geüpload naar Cloudinary en verschijnt daarna in de app.</p>
+<div class="wrap">
 
-<div class="export-bar">
-  <button id="check-btn" class="export-btn sec" onclick="runAvailabilityCheck()">🔍 Controleer foto-beschikbaarheid</button>
-  <button class="export-btn" onclick="exportWardrobeJson()">⬇ Download wardrobe.json</button>
-  <button class="export-btn sec" onclick="window.open('/wardrobe.json')">📄 Bekijk wardrobe.json</button>
+<header>
+  <h1>Garderobe <span>Foto Upload</span></h1>
+  <p class="sub">Sleep al je foto's tegelijk hierheen — ze worden automatisch gekoppeld op bestandsnaam.</p>
+</header>
+
+<div id="drop-zone">
+  <div class="drop-icon">📁</div>
+  <div class="drop-title">Sleep je foto's hierheen</div>
+  <div class="drop-sub">Of klik om te selecteren · meerdere foto's tegelijk · JPG, PNG, WEBP</div>
+  <input type="file" id="file-input" multiple accept="image/*">
 </div>
-<div id="check-status" style="font-size:11px;color:#8a7060;margin-bottom:12px;max-width:500px;"></div>
-<div class="grid" id="grid"></div>
-<p class="note">Na het uploaden: ververs <a href="/griette.html">griette.html</a> en de foto's verschijnen automatisch bij elk item.<br>
-Klik op "Download wardrobe.json" om een bijgewerkte export te downloaden met alle Cloudinary-URLs.</p>
+
+<div id="summary-bar">
+  <div class="summary-text" id="summary-text"></div>
+  <button id="upload-btn" onclick="uploadAll()">Upload foto's</button>
+</div>
+
+<div id="progress-bar-global">
+  <div class="prog-label" id="prog-label">Uploaden…</div>
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+
+<div id="unmatched-section">
+  <div class="section-label"><span>Niet herkend — klik een foto, dan een item</span></div>
+  <p id="unmatched-hint"></p>
+  <div id="unmatched-strip"></div>
+</div>
+
+<div id="items-section">
+  <div class="section-label"><span id="items-label">Alle items</span></div>
+  <div class="grid" id="grid"></div>
+</div>
+
+</div>
 
 <script>
-const CLOUD = 'dhggari0g';
+const CLOUD  = 'dhggari0g';
 const PRESET = 'griette-photos';
-const CDN_BASE = 'https://res.cloudinary.com/' + CLOUD + '/image/upload/griette-wardrobe/';
+const CDN    = 'https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_';
 
-// photo_available results from HEAD checks
-var photoAvailable = {};
+const ALL_ITEMS = [
+  {id:'bershka-raglan',       name:'Bershka raglan trui bruin/roze',              cat:'tops'},
+  {id:'second-female-grijs',  name:'Second Female crop sweater grijs',             cat:'tops'},
+  {id:'adidas-blauw-crop',    name:'Adidas crop t-shirt blauw',                    cat:'tops'},
+  {id:'only-sons-blauw',      name:'Only & Sons t-shirt koningsblauw',             cat:'tops'},
+  {id:'mbym-leopard-top',     name:'MbyM Rihne top luipaardprint',                 cat:'tops'},
+  {id:'av-crop-longsleeve',   name:'American Vintage crop longsleeve blauw',       cat:'tops'},
+  {id:'av-remytown-turquoise',name:'American Vintage Remytown t-shirt turquoise',  cat:'tops'},
+  {id:'zara-turquoise-sweater',name:'Turquoise Zara sweater',                      cat:'tops'},
+  {id:'wit-oversized',        name:'Wit oversized t-shirt',                        cat:'tops'},
+  {id:'wit-basic',            name:'Wit basic t-shirt',                            cat:'tops'},
+  {id:'geel-shirt',           name:'Geel Stieglitz t-shirt',                       cat:'tops'},
+  {id:'oranje-shirt',         name:'Oranje/zalm Stieglitz t-shirt',                cat:'tops'},
+  {id:'gestreept',            name:'Zwart-wit gestreepte longsleeve',              cat:'tops'},
+  {id:'blauwe-blouse',        name:'Lichtblauwe oversized blouse',                 cat:'tops'},
+  {id:'kanten-top',           name:'Witte kanten top',                             cat:'tops'},
+  {id:'zwart-peplum',         name:'Zwart peplum top',                             cat:'tops'},
+  {id:'blauw-spaghet',        name:'Donkerblauw spaghettitopje',                   cat:'tops'},
+  {id:'bruin-spaghet',        name:'Donkerbruin spaghettitopje',                   cat:'tops'},
+  {id:'bruin-longsleeve',     name:'Donkerbruin longsleeve aansluitend',           cat:'tops'},
+  {id:'khaki-bloemenprint',   name:'Khaki bloemenprint wide leg broek',            cat:'bottoms'},
+  {id:'bordeaux-stripe-broek',name:'Bordeaux wide leg broek met zijstreep',        cat:'bottoms'},
+  {id:'pullbear-balloon-jeans',name:'Pull&Bear ballonpijpen jeans blauw',          cat:'bottoms'},
+  {id:'groen-barrel-broek',   name:'Groene barrel-broek katoen Zara',              cat:'bottoms'},
+  {id:'zara-cargo-khaki',     name:'Zara cargo broek khaki',                       cat:'bottoms'},
+  {id:'roze-maxi',            name:'Felroze maxi rok',                             cat:'bottoms'},
+  {id:'print-mini',           name:'Kleurrijke print mini rok',                    cat:'bottoms'},
+  {id:'bruin-maxi',           name:'Bruin satijnen maxi rok',                      cat:'bottoms'},
+  {id:'rood-rok',             name:'Rood mini rokje met gesp',                     cat:'bottoms'},
+  {id:'witte-shorts',         name:'Witte denim shorts',                           cat:'bottoms'},
+  {id:'lichtblauwe-shorts',   name:'Lichtblauwe denim shorts',                     cat:'bottoms'},
+  {id:'adidas-broek',         name:'Adidas Firebird broek marineblauw',            cat:'bottoms'},
+  {id:'bruin-shorts',         name:'Bruine shorts',                                cat:'bottoms'},
+  {id:'second-female-cardigan',name:'Second Female cardigan beige gouden knopen',  cat:'layers'},
+  {id:'hm-beige-jas',         name:'H&M cropped jas lichtbeige',                   cat:'layers'},
+  {id:'cargo-jasje',          name:'Bruin cropped cargo jasje',                    cat:'layers'},
+  {id:'paarse-cardigan',      name:'Paarse cardigan',                              cat:'layers'},
+  {id:'witte-cardigan',       name:'Gebroken witte cardigan',                      cat:'layers'},
+  {id:'zwart-gilet',          name:'Zwart gilet goudknopen',                       cat:'layers'},
+  {id:'hemdjurk',             name:'Gebroken witte hemdjurk',                      cat:'jurken'},
+  {id:'bruin-jurk',           name:'Donkerbruin longsleeve jurk',                  cat:'jurken'},
+  {id:'groen-tote-zara',      name:'Groene geweven Zara tote bag',                 cat:'bags'},
+  {id:'blauwe-tas',           name:'Blauwe tweed kettingtas',                      cat:'bags'},
+  {id:'leonie-bag',           name:'Bruine suède Leonie bag',                      cat:'bags'},
+  {id:'gele-bag',             name:'Gele stippen bucket bag',                      cat:'bags'},
+];
 
-async function checkPhotoUrl(id) {
-  var url = 'https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_' + id + '.jpg';
-  // Also check if user uploaded via this session (cloudMap)
-  if (cloudMap[id]) { photoAvailable[id] = true; return true; }
-  try {
-    var resp = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
-    // no-cors = opaque response, can't read status; use img test instead
-  } catch(e) {}
-  // Use Image element to test — works cross-origin without CORS restriction
-  return new Promise(function(resolve) {
-    var img = new Image();
-    img.onload = function() { photoAvailable[id] = true; resolve(true); };
-    img.onerror = function() { photoAvailable[id] = false; resolve(false); };
-    img.src = url + '?_t=' + Date.now();
+// State
+let assignedFiles = {};   // itemId → File
+let unmatchedFiles = [];  // File[]
+let selectedPill = null;  // currently selected unmatched pill element
+let cloudMap = {};
+try { const s = localStorage.getItem('griette-cloud-photos-v1'); if (s) cloudMap = JSON.parse(s); } catch(e) {}
+
+// --- DROP ZONE ---
+const dz = document.getElementById('drop-zone');
+const fi = document.getElementById('file-input');
+
+dz.addEventListener('click', () => fi.click());
+fi.addEventListener('change', () => handleFiles(Array.from(fi.files)));
+
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => {
+  e.preventDefault();
+  dz.classList.remove('drag-over');
+  handleFiles(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')));
+});
+
+function normalize(s) {
+  return s.toLowerCase().replace(/\.[^.]+$/, '').replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+}
+
+function autoMatch(files) {
+  const matched = {};
+  const unmatched = [];
+  const usedItems = new Set();
+
+  files.forEach(file => {
+    const norm = normalize(file.name);
+    // Exact match
+    let hit = ALL_ITEMS.find(i => i.id === norm && !usedItems.has(i.id));
+    // Contains full ID
+    if (!hit) hit = ALL_ITEMS.find(i => !usedItems.has(i.id) && (norm.includes(i.id) || i.id.includes(norm)));
+    // Partial word overlap (≥2 words matching)
+    if (!hit) {
+      const normWords = norm.split('-').filter(w => w.length > 2);
+      hit = ALL_ITEMS.find(i => {
+        if (usedItems.has(i.id)) return false;
+        const idWords = i.id.split('-').filter(w => w.length > 2);
+        const overlap = normWords.filter(w => idWords.includes(w)).length;
+        return overlap >= 2;
+      });
+    }
+    if (hit) { matched[hit.id] = file; usedItems.add(hit.id); }
+    else unmatched.push(file);
+  });
+
+  return { matched, unmatched };
+}
+
+function handleFiles(files) {
+  if (!files.length) return;
+
+  const { matched, unmatched } = autoMatch(files);
+  assignedFiles = Object.assign({}, assignedFiles, matched);
+  unmatchedFiles = unmatched;
+
+  // Update drop zone appearance
+  dz.classList.add('has-files');
+  const total = Object.keys(assignedFiles).length + unmatchedFiles.length;
+  dz.querySelector('.drop-icon').textContent = '✓';
+  dz.querySelector('.drop-title').textContent = total + ' foto' + (total !== 1 ? "'s" : '') + ' geladen';
+  dz.querySelector('.drop-sub').textContent = 'Klik om meer toe te voegen';
+
+  renderAll();
+}
+
+function renderAll() {
+  renderSummary();
+  renderUnmatched();
+  renderGrid();
+}
+
+function renderSummary() {
+  const nMatched  = Object.keys(assignedFiles).length;
+  const nUnmatched = unmatchedFiles.length;
+  const bar = document.getElementById('summary-bar');
+  const txt = document.getElementById('summary-text');
+  bar.style.display = 'flex';
+
+  let html = '<strong>✓ ' + nMatched + ' automatisch gematched</strong>';
+  if (nUnmatched) html += ' &nbsp;·&nbsp; <span class="warn">⚠ ' + nUnmatched + ' niet herkend</span><br><small style="color:var(--text-2)">Klik hieronder een foto, dan het bijbehorende item.</small>';
+  txt.innerHTML = html;
+
+  const btn = document.getElementById('upload-btn');
+  btn.textContent = 'Upload ' + nMatched + ' foto' + (nMatched !== 1 ? "'s" : '');
+  btn.disabled = nMatched === 0;
+}
+
+function renderUnmatched() {
+  const sec  = document.getElementById('unmatched-section');
+  const strip = document.getElementById('unmatched-strip');
+  const hint  = document.getElementById('unmatched-hint');
+  strip.innerHTML = '';
+  if (!unmatchedFiles.length) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  hint.textContent = 'Selecteer een foto (blauw omlijnd) → klik dan op het juiste item in het raster hieronder.';
+
+  unmatchedFiles.forEach(file => {
+    const url = URL.createObjectURL(file);
+    const pill = document.createElement('div');
+    pill.className = 'unmatched-pill';
+    pill.innerHTML = '<img src="' + url + '" alt=""><div><div class="pill-name">' + file.name + '</div><div class="pill-hint">Klik om te selecteren</div></div>';
+    pill.addEventListener('click', () => selectPill(pill, file));
+    strip.appendChild(pill);
   });
 }
 
-async function runAvailabilityCheck() {
-  var btn = document.getElementById('check-btn');
-  btn.disabled = true; btn.textContent = '⏳ Controleren...';
-  var statusEl = document.getElementById('check-status');
-  statusEl.textContent = '';
-  var ids = ALL_ITEMS.map(function(i) { return i.id; });
-  var done = 0;
-  // Check in batches of 6
-  for (var i = 0; i < ids.length; i += 6) {
-    var batch = ids.slice(i, i + 6);
-    await Promise.all(batch.map(function(id) { return checkPhotoUrl(id); }));
-    done += batch.length;
-    statusEl.textContent = done + '/' + ids.length + ' gecontroleerd...';
-  }
-  var ok = Object.values(photoAvailable).filter(Boolean).length;
-  statusEl.textContent = '✓ Klaar: ' + ok + '/' + ids.length + ' foto\'s beschikbaar';
-  btn.disabled = false; btn.textContent = '🔍 Controleer foto-beschikbaarheid';
-  // Update row status indicators
-  ALL_ITEMS.forEach(function(item) {
-    var el = document.getElementById('st-' + item.id);
-    if (!el) return;
-    if (photoAvailable[item.id] === true) {
-      el.className = 'status ok'; el.textContent = '✓ foto beschikbaar';
-    } else if (photoAvailable[item.id] === false) {
-      el.className = 'status err'; el.textContent = '✗ geen foto';
+function selectPill(pill, file) {
+  document.querySelectorAll('.unmatched-pill').forEach(p => p.classList.remove('selected'));
+  if (selectedPill === pill) { selectedPill = null; clearAssignTargets(); return; }
+  selectedPill = pill;
+  pill.classList.add('selected');
+  // Highlight cards without a photo
+  document.querySelectorAll('.item-card').forEach(card => {
+    const id = card.dataset.id;
+    if (!assignedFiles[id] && !cloudMap[id]) {
+      card.classList.add('assign-target');
+      card.querySelector('.assign-btn').style.display = 'block';
     }
   });
 }
 
-async function exportWardrobeJson() {
-  var btn = event && event.target;
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Laden...'; }
-  try {
-    var base = await fetch('/wardrobe.json').then(r => r.json());
-    var updated = Object.assign({}, base);
-    updated._meta = Object.assign({}, base._meta, {
-      generated: new Date().toISOString().slice(0, 10),
-      photo_check_timestamp: new Date().toISOString()
-    });
-    updated.items = base.items.map(function(item) {
-      var uploadedUrl = cloudMap[item.id];
-      var cdnUrl = 'https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_' + item.id + '.jpg';
-      var avail = photoAvailable[item.id];
-      return Object.assign({}, item, {
-        image_url: uploadedUrl || cdnUrl,
-        image: 'assets/wardrobe/' + item.id + '.jpg',
-        photo_available: avail !== undefined ? avail : (uploadedUrl ? true : null)
-      });
-    });
-    var blob = new Blob([JSON.stringify(updated, null, 2)], { type: 'application/json' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'wardrobe.json';
-    a.click();
-  } catch(e) {
-    alert('Export mislukt: ' + e.message);
-  }
-  if (btn) { btn.disabled = false; btn.textContent = '⬇ Download wardrobe.json'; }
+function clearAssignTargets() {
+  document.querySelectorAll('.item-card').forEach(c => {
+    c.classList.remove('assign-target');
+    const ab = c.querySelector('.assign-btn');
+    if (ab) ab.style.display = 'none';
+  });
 }
 
-const ALL_ITEMS = [
-  // Nieuwe items
-  {id:'bershka-raglan', name:'Bershka raglan trui bruin/roze', cat:'tops'},
-  {id:'second-female-grijs', name:'Second Female crop sweater grijs', cat:'tops'},
-  {id:'adidas-blauw-crop', name:'Adidas crop t-shirt blauw', cat:'tops'},
-  {id:'only-sons-blauw', name:'Only & Sons t-shirt koningsblauw', cat:'tops'},
-  {id:'mbym-leopard-top', name:'MbyM Rihne top luipaardprint', cat:'tops'},
-  {id:'av-crop-longsleeve', name:'American Vintage crop longsleeve blauw', cat:'tops'},
-  {id:'av-remytown-turquoise', name:'American Vintage Remytown t-shirt turquoise', cat:'tops'},
-  {id:'zara-turquoise-sweater', name:'Turquoise Zara sweater', cat:'tops'},
-  {id:'khaki-bloemenprint', name:'Khaki bloemenprint wide leg broek', cat:'bottoms'},
-  {id:'bordeaux-stripe-broek', name:'Bordeaux wide leg broek met zijstreep', cat:'bottoms'},
-  {id:'pullbear-balloon-jeans', name:'Pull&Bear ballonpijpen jeans blauw', cat:'bottoms'},
-  {id:'groen-barrel-broek', name:'Groene barrel-broek katoen Zara', cat:'bottoms'},
-  {id:'zara-cargo-khaki', name:'Zara cargo broek khaki', cat:'bottoms'},
-  {id:'second-female-cardigan', name:'Second Female cardigan beige gouden knopen', cat:'layers'},
-  {id:'hm-beige-jas', name:'H&M cropped jas lichtbeige', cat:'layers'},
-  {id:'groen-tote-zara', name:'Groene geweven Zara tote bag', cat:'bags'},
-  // Bestaande items (ook foto's toevoegen als die er nog niet zijn)
-  {id:'wit-oversized', name:'Wit oversized t-shirt', cat:'tops'},
-  {id:'wit-basic', name:'Wit basic t-shirt', cat:'tops'},
-  {id:'geel-shirt', name:'Geel Stieglitz t-shirt', cat:'tops'},
-  {id:'oranje-shirt', name:'Oranje/zalm Stieglitz t-shirt', cat:'tops'},
-  {id:'gestreept', name:'Zwart-wit gestreepte longsleeve', cat:'tops'},
-  {id:'blauwe-blouse', name:'Lichtblauwe oversized blouse', cat:'tops'},
-  {id:'kanten-top', name:'Witte kanten top', cat:'tops'},
-  {id:'zwart-peplum', name:'Zwart peplum top', cat:'tops'},
-  {id:'blauw-spaghet', name:'Donkerblauw spaghettitopje', cat:'tops'},
-  {id:'bruin-spaghet', name:'Donkerbruin spaghettitopje', cat:'tops'},
-  {id:'bruin-longsleeve', name:'Donkerbruin longsleeve aansluitend', cat:'tops'},
-  {id:'roze-maxi', name:'Felroze maxi rok', cat:'bottoms'},
-  {id:'print-mini', name:'Kleurrijke print mini rok', cat:'bottoms'},
-  {id:'bruin-maxi', name:'Bruin satijnen maxi rok', cat:'bottoms'},
-  {id:'rood-rok', name:'Rood mini rokje met gesp', cat:'bottoms'},
-  {id:'witte-shorts', name:'Witte denim shorts', cat:'bottoms'},
-  {id:'lichtblauwe-shorts', name:'Lichtblauwe denim shorts', cat:'bottoms'},
-  {id:'adidas-broek', name:'Adidas Firebird broek marineblauw', cat:'bottoms'},
-  {id:'bruin-shorts', name:'Bruine shorts', cat:'bottoms'},
-  {id:'cargo-jasje', name:'Bruin cropped cargo jasje', cat:'layers'},
-  {id:'paarse-cardigan', name:'Paarse cardigan', cat:'layers'},
-  {id:'witte-cardigan', name:'Gebroken witte cardigan', cat:'layers'},
-  {id:'zwart-gilet', name:'Zwart gilet goudknopen', cat:'layers'},
-  {id:'hemdjurk', name:'Gebroken witte hemdjurk', cat:'jurken'},
-  {id:'bruin-jurk', name:'Donkerbruin longsleeve jurk', cat:'jurken'},
-  {id:'blauwe-tas', name:'Blauwe tweed kettingtas', cat:'bags'},
-  {id:'leonie-bag', name:'Bruine suède Leonie bag', cat:'bags'},
-  {id:'gele-bag', name:'Gele stippen bucket bag', cat:'bags'},
-];
+function assignToItem(itemId, file) {
+  assignedFiles[itemId] = file;
+  // Remove from unmatchedFiles
+  unmatchedFiles = unmatchedFiles.filter(f => f !== file);
+  selectedPill = null;
+  renderAll();
+}
 
-const CATS = {tops:'Tops', bottoms:'Bottoms & Rokken', layers:'Laagjes', jurken:'Jurken', bags:'Tassen'};
-const grid = document.getElementById('grid');
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  document.getElementById('items-label').textContent = 'Alle items (' + ALL_ITEMS.length + ')';
 
-// Load existing cloud map from localStorage
-let cloudMap = {};
-try {
-  const s = localStorage.getItem('griette-cloud-photos-v1');
-  if (s) cloudMap = JSON.parse(s);
-} catch(e) {}
+  ALL_ITEMS.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.dataset.id = item.id;
 
-let lastCat = null;
-ALL_ITEMS.forEach(function(item) {
-  if (item.cat !== lastCat) {
-    const t = document.createElement('div');
-    t.className = 'section-title';
-    t.textContent = CATS[item.cat] || item.cat;
-    grid.appendChild(t);
-    lastCat = item.cat;
-  }
+    const file = assignedFiles[item.id];
+    const existingUrl = cloudMap[item.id];
+    const previewUrl = file ? URL.createObjectURL(file) : (existingUrl || null);
+    const hasPhoto = !!(file || existingUrl);
 
-  const row = document.createElement('div');
-  row.className = 'row';
+    if (hasPhoto) card.classList.add('matched');
 
-  const thumb = document.createElement('div');
-  thumb.className = 'thumb';
-  const existingUrl = cloudMap[item.id];
-  if (existingUrl) {
-    thumb.innerHTML = '<img src="' + existingUrl + '" alt="">';
-  } else {
-    thumb.textContent = '👗';
-  }
+    const wrap = document.createElement('div');
+    wrap.className = 'photo-wrap';
+    if (previewUrl) {
+      const img = document.createElement('img');
+      img.src = previewUrl;
+      img.alt = item.name;
+      wrap.appendChild(img);
+    } else {
+      wrap.innerHTML = '<div class="ph-icon">👗<small>' + item.id + '</small></div>';
+    }
+    const prog = document.createElement('div');
+    prog.className = 'progress-bar';
+    prog.innerHTML = '<div class="fill"></div>';
+    wrap.appendChild(prog);
 
-  const info = document.createElement('div');
-  info.className = 'info';
-  info.innerHTML = '<div class="iname">' + item.name + '</div>'
-    + '<div class="iid">' + item.id + '</div>'
-    + '<div class="status' + (existingUrl ? ' ok' : '') + '" id="st-' + item.id + '">'
-    + (existingUrl ? '✓ foto aanwezig' : '') + '</div>';
+    const lbl = document.createElement('div');
+    lbl.className = 'card-label';
+    lbl.innerHTML = '<div class="iname">' + item.name + '</div>'
+      + '<div class="iid">' + item.id + '</div>'
+      + '<div class="card-status" id="st-' + item.id + '">'
+      + (file ? '✓ Klaar om te uploaden' : existingUrl ? '✓ Al geüpload' : '') + '</div>'
+      + '<div class="assign-btn" id="ab-' + item.id + '">← Wijs foto toe</div>';
 
-  const lbl = document.createElement('label');
-  lbl.className = 'upload-btn' + (existingUrl ? ' done' : '');
-  lbl.textContent = existingUrl ? '↺ Wijzig' : '+ Foto';
-  lbl.htmlFor = 'inp-' + item.id;
+    card.appendChild(wrap);
+    card.appendChild(lbl);
 
-  const inp = document.createElement('input');
-  inp.type = 'file';
-  inp.accept = 'image/*';
-  inp.id = 'inp-' + item.id;
-  inp.addEventListener('change', function() {
-    const file = inp.files[0];
-    if (!file) return;
-    const st = document.getElementById('st-' + item.id);
-    st.className = 'status';
-    st.textContent = '⏳ Uploaden...';
-    lbl.style.opacity = '0.5';
-
-    const fd = new FormData();
-    fd.append('file', file);
-    fd.append('upload_preset', PRESET);
-    fd.append('public_id', 'griette_' + item.id);
-    fd.append('folder', 'griette-wardrobe');
-
-    fetch('https://api.cloudinary.com/v1_1/' + CLOUD + '/image/upload', {method:'POST', body:fd})
-      .then(function(r){ return r.json(); })
-      .then(function(d) {
-        if (d.secure_url) {
-          cloudMap[item.id] = d.secure_url;
-          try { localStorage.setItem('griette-cloud-photos-v1', JSON.stringify(cloudMap)); } catch(e) {}
-          st.className = 'status ok';
-          st.textContent = '✓ Geüpload!';
-          lbl.className = 'upload-btn done';
-          lbl.textContent = '↺ Wijzig';
-          const img = document.createElement('img');
-          img.src = d.secure_url;
-          thumb.innerHTML = '';
-          thumb.appendChild(img);
-        } else {
-          st.className = 'status err';
-          st.textContent = '✗ ' + (d.error && d.error.message || 'Mislukt');
-          lbl.style.opacity = '1';
+    card.addEventListener('click', () => {
+      if (selectedPill && !assignedFiles[item.id]) {
+        const f = unmatchedFiles.find(f => {
+          // find from the selected pill
+          return true; // we store the file on selectedPill
+        });
+        // Get file from currently selected pill
+        const strips = document.querySelectorAll('.unmatched-pill.selected img');
+        const selFile = unmatchedFiles.find(uf => {
+          const url = URL.createObjectURL(uf);
+          return strips.length > 0; // just get first selected
+        });
+        // Easier: track selected file directly
+        if (window._selectedFile) {
+          assignToItem(item.id, window._selectedFile);
+          window._selectedFile = null;
+          clearAssignTargets();
         }
-      })
-      .catch(function(e) {
-        st.className = 'status err';
-        st.textContent = '✗ Netwerk fout';
-        lbl.style.opacity = '1';
-      });
-  });
+      }
+    });
 
-  row.appendChild(thumb);
-  row.appendChild(info);
-  row.appendChild(lbl);
-  row.appendChild(inp);
-  grid.appendChild(row);
-});
+    grid.appendChild(card);
+  });
+}
+
+// Fix: track selected file properly
+function selectPill(pill, file) {
+  document.querySelectorAll('.unmatched-pill').forEach(p => p.classList.remove('selected'));
+  if (window._selectedFile === file) {
+    window._selectedFile = null;
+    selectedPill = null;
+    clearAssignTargets();
+    return;
+  }
+  selectedPill = pill;
+  window._selectedFile = file;
+  pill.classList.add('selected');
+  document.querySelectorAll('.item-card').forEach(card => {
+    const id = card.dataset.id;
+    if (!assignedFiles[id] && !cloudMap[id]) {
+      card.classList.add('assign-target');
+      const ab = card.querySelector('.assign-btn');
+      if (ab) ab.style.display = 'block';
+    }
+  });
+}
+
+// --- UPLOAD ---
+async function uploadAll() {
+  const pairs = Object.entries(assignedFiles).map(([id, file]) => ({ id, file }));
+  if (!pairs.length) return;
+
+  const btn = document.getElementById('upload-btn');
+  btn.disabled = true;
+  const progGlobal = document.getElementById('progress-bar-global');
+  const progFill   = document.getElementById('prog-fill');
+  const progLabel  = document.getElementById('prog-label');
+  progGlobal.style.display = 'block';
+
+  let done = 0;
+  const total = pairs.length;
+
+  function updateProgress() {
+    done++;
+    progFill.style.width = Math.round(done / total * 100) + '%';
+    progLabel.textContent = 'Uploaden… ' + done + '/' + total;
+  }
+
+  // Concurrency: 4 at a time
+  let idx = 0;
+  async function worker() {
+    while (idx < pairs.length) {
+      const pair = pairs[idx++];
+      await uploadOne(pair.id, pair.file);
+      updateProgress();
+    }
+  }
+  await Promise.all([worker(), worker(), worker(), worker()]);
+
+  progLabel.textContent = '✓ ' + total + ' foto\'s geüpload!';
+  progFill.style.width = '100%';
+  btn.disabled = false;
+  btn.textContent = '✓ Klaar';
+
+  // Save to localStorage
+  localStorage.setItem('griette-cloud-photos-v1', JSON.stringify(cloudMap));
+
+  // Clear assigned
+  assignedFiles = {};
+  renderGrid();
+}
+
+async function uploadOne(itemId, file) {
+  const card  = document.querySelector('.item-card[data-id="' + itemId + '"]');
+  const st    = document.getElementById('st-' + itemId);
+  const prog  = card ? card.querySelector('.progress-bar') : null;
+  const fill  = prog ? prog.querySelector('.fill') : null;
+
+  if (st)   { st.className = 'card-status'; st.textContent = '⏳ Uploaden…'; }
+  if (prog) { prog.style.display = 'block'; }
+
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', PRESET);
+  fd.append('public_id', 'griette_' + itemId);
+  fd.append('folder', 'griette-wardrobe');
+
+  // Simulate progress
+  let pct = 0;
+  const sim = setInterval(() => {
+    pct = Math.min(pct + 12, 85);
+    if (fill) fill.style.width = pct + '%';
+  }, 200);
+
+  try {
+    const r = await fetch('https://api.cloudinary.com/v1_1/' + CLOUD + '/image/upload', { method:'POST', body:fd });
+    const d = await r.json();
+    clearInterval(sim);
+    if (fill) fill.style.width = '100%';
+    if (d.secure_url) {
+      cloudMap[itemId] = d.secure_url;
+      if (card)  { card.classList.add('uploaded'); card.classList.remove('matched'); }
+      if (st)    { st.className = 'card-status ok'; st.textContent = '✓ Geüpload'; }
+      // Update preview
+      if (card) {
+        const wrap = card.querySelector('.photo-wrap');
+        wrap.innerHTML = '<img src="' + d.secure_url + '" alt="">';
+        const pb = document.createElement('div');
+        pb.className = 'progress-bar';
+        pb.innerHTML = '<div class="fill"></div>';
+        wrap.appendChild(pb);
+      }
+    } else {
+      if (card) card.classList.add('error');
+      if (st)   { st.className = 'card-status err'; st.textContent = '✗ ' + (d.error && d.error.message || 'Mislukt'); }
+    }
+  } catch(e) {
+    clearInterval(sim);
+    if (card) card.classList.add('error');
+    if (st)   { st.className = 'card-status err'; st.textContent = '✗ Netwerkfout'; }
+  }
+  if (prog) setTimeout(() => { prog.style.display = 'none'; }, 800);
+}
+
+// Initial grid render (show existing cloudMap photos)
+renderGrid();
 </script>
 </body>
 </html>
