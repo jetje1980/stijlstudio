@@ -13,6 +13,9 @@
   .thumb { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; background: #f0ebe4; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
   .thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
   .info { flex: 1; min-width: 0; }
+  .export-bar { max-width:500px; margin-bottom:20px; display:flex; gap:10px; flex-wrap:wrap; }
+  .export-btn { padding:9px 16px; background:#2e1a0e; color:#f9f6f2; border:none; border-radius:10px; font-size:12px; cursor:pointer; }
+  .export-btn.sec { background:#fff; color:#2e1a0e; border:1.5px solid #e8e0d8; }
   .iname { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .iid { font-size: 10px; color: #8a7060; }
   .status { font-size: 10px; margin-top: 2px; }
@@ -29,12 +32,47 @@
 <h1>📷 Foto's toevoegen aan garderobe</h1>
 <p class="sub">Selecteer een foto per item — wordt direct geüpload naar Cloudinary en verschijnt daarna in de app.</p>
 
+<div class="export-bar">
+  <button class="export-btn" onclick="exportWardrobeJson()">⬇ Download wardrobe.json</button>
+  <button class="export-btn sec" onclick="window.open('/wardrobe.json')">📄 Bekijk wardrobe.json</button>
+</div>
 <div class="grid" id="grid"></div>
-<p class="note">Na het uploaden: ververs <a href="/griette.html">griette.html</a> en de foto's verschijnen automatisch bij elk item.</p>
+<p class="note">Na het uploaden: ververs <a href="/griette.html">griette.html</a> en de foto's verschijnen automatisch bij elk item.<br>
+Klik op "Download wardrobe.json" om een bijgewerkte export te downloaden met alle Cloudinary-URLs.</p>
 
 <script>
 const CLOUD = 'dhggari0g';
 const PRESET = 'griette-photos';
+const CDN_BASE = 'https://res.cloudinary.com/' + CLOUD + '/image/upload/griette-wardrobe/';
+
+function exportWardrobeJson() {
+  fetch('/wardrobe.json').then(r => r.json()).then(function(base) {
+    // Merge uploaded Cloudinary URLs into the base wardrobe.json
+    let updated = Object.assign({}, base);
+    updated._meta = Object.assign({}, base._meta, { generated: new Date().toISOString().slice(0,10) });
+    updated.items = base.items.map(function(item) {
+      var uploadedUrl = cloudMap[item.id];
+      return Object.assign({}, item, {
+        image_url: uploadedUrl || (CDN_BASE + 'griette_' + item.id),
+        image: 'assets/wardrobe/' + item.id + '.jpg'
+      });
+    });
+    var blob = new Blob([JSON.stringify(updated, null, 2)], {type: 'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'wardrobe.json';
+    a.click();
+  }).catch(function() {
+    // Fallback: build from ALL_ITEMS
+    var items = ALL_ITEMS.map(function(item) {
+      return { id: item.id, name: item.name, category: item.cat,
+        image: 'assets/wardrobe/' + item.id + '.jpg',
+        image_url: cloudMap[item.id] || (CDN_BASE + 'griette_' + item.id) };
+    });
+    var blob = new Blob([JSON.stringify({generated: new Date().toISOString().slice(0,10), items: items}, null, 2)], {type:'application/json'});
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'wardrobe.json'; a.click();
+  });
+}
 
 const ALL_ITEMS = [
   // Nieuwe items
