@@ -277,43 +277,53 @@ const DEFAULT_ITEMS = [
 
 const CDN_BASE = 'https://res.cloudinary.com/dhggari0g/image/upload/f_jpg,q_auto/griette-wardrobe/griette_';
 
-// ── READ LOCALSTORAGE ───────────────────────────────────────────────────────
-function readLocalStorage() {
-  let cloudMap    = {};
-  let customItems = [];
-  let deletedIds  = new Set();
+const SUPABASE_URL = 'https://osuqtfsxmquwqsbgzlqn.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
 
+async function sbGet(key) {
   try {
-    const cm = localStorage.getItem('griette-cloud-photos-v1');
-    if (cm) cloudMap = JSON.parse(cm);
-  } catch(e) {}
+    const r = await fetch(SUPABASE_URL + '/rest/v1/griette_data?key=eq.' + encodeURIComponent(key) + '&select=value&limit=1', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    const d = await r.json();
+    return (d && d.length) ? JSON.parse(d[0].value) : null;
+  } catch(e) { return null; }
+}
 
-  // Custom items (v3 key used by griette.html)
+// ── READ ALL DATA (localStorage + Supabase) ─────────────────────────────────
+async function readAllData() {
+  let cloudMap   = {};
+  let customFlat = [];
+  let deletedIds = new Set();
+
+  // localStorage (instant)
+  try { const s = localStorage.getItem('griette-cloud-photos-v1'); if (s) cloudMap = JSON.parse(s); } catch(e) {}
   try {
     const ci = localStorage.getItem('griette-custom-items-v3');
-    if (ci) {
-      const parsed = JSON.parse(ci);
-      // May be object {id: item} or array
-      if (Array.isArray(parsed)) {
-        customItems = parsed;
-      } else {
-        customItems = Object.values(parsed);
-      }
-    }
+    if (ci) { const p = JSON.parse(ci); customFlat = Array.isArray(p) ? p : Object.values(p).flat(); }
   } catch(e) {}
 
-  // Deleted default items (if the app tracks them)
-  try {
-    const del = localStorage.getItem('griette-deleted-items')
-             || localStorage.getItem('griette-deleted-v1')
-             || localStorage.getItem('griette-hidden-items');
-    if (del) {
-      const arr = JSON.parse(del);
-      (Array.isArray(arr) ? arr : Object.keys(arr)).forEach(id => deletedIds.add(id));
-    }
-  } catch(e) {}
+  // Supabase (authoritative)
+  const [sbCustom, sbPhotos, sbDeleted] = await Promise.all([
+    sbGet('custom-items'), sbGet('cloud-photos'), sbGet('deleted-items')
+  ]);
 
-  return { cloudMap, customItems, deletedIds };
+  if (sbPhotos && typeof sbPhotos === 'object') Object.assign(cloudMap, sbPhotos);
+
+  if (sbCustom) {
+    if (Array.isArray(sbCustom)) {
+      customFlat = sbCustom;
+    } else if (typeof sbCustom === 'object') {
+      customFlat = [];
+      Object.entries(sbCustom).forEach(([cat, items]) => {
+        if (Array.isArray(items)) items.forEach(i => customFlat.push(Object.assign({}, i, {cat})));
+      });
+    }
+  }
+
+  if (Array.isArray(sbDeleted)) sbDeleted.forEach(id => deletedIds.add(id));
+
+  return { cloudMap, customFlat, deletedIds };
 }
 
 // ── FETCH IMAGE BLOB ────────────────────────────────────────────────────────
@@ -354,14 +364,15 @@ let zipBlob = null;
 async function startExport() {
   const btn = document.getElementById('start-btn');
   btn.disabled = true;
-  btn.textContent = '⏳ Bezig…';
+  btn.textContent = '⏳ Gegevens ophalen…';
 
-  const { cloudMap, customItems, deletedIds } = readLocalStorage();
+  const { cloudMap, customFlat, deletedIds } = await readAllData();
+  btn.textContent = '⏳ Bezig…';
 
   // Merge items: default + custom, minus deleted
   const seen = new Set();
   const items = [];
-  [...DEFAULT_ITEMS, ...customItems].forEach(item => {
+  [...DEFAULT_ITEMS, ...customFlat].forEach(item => {
     if (!item || !item.id) return;
     if (seen.has(item.id)) return;
     if (deletedIds.has(item.id)) return;

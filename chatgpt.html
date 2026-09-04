@@ -301,33 +301,85 @@ const DEFAULT_ITEMS = [
 
 const CAT_NL = { tops:'Tops', bottoms:'Bottoms & Rokken', layers:'Laagjes', jurken:'Jurken', bags:'Tassen', shoes:'Schoenen', accessories:'Accessoires', swimwear:'Zwemwear', overig:'Overig' };
 
-// Read localStorage
+const SUPABASE_URL = 'https://osuqtfsxmquwqsbgzlqn.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
+
+async function sbGet(key) {
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/griette_data?key=eq.' + encodeURIComponent(key) + '&select=value&limit=1', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    const d = await r.json();
+    return (d && d.length) ? JSON.parse(d[0].value) : null;
+  } catch(e) { return null; }
+}
+
+// State (filled after init)
 let cloudMap = {};
-let customItems = [];
-try { const s = localStorage.getItem('griette-cloud-photos-v1'); if (s) cloudMap = JSON.parse(s); } catch(e) {}
-try {
-  const ci = localStorage.getItem('griette-custom-items-v3');
-  if (ci) {
-    const p = JSON.parse(ci);
-    customItems = Array.isArray(p) ? p : Object.values(p);
-  }
-} catch(e) {}
-
-// Merge items
-const seen = new Set();
 const ALL_ITEMS = [];
-[...DEFAULT_ITEMS, ...customItems].forEach(item => {
-  if (!item || !item.id || seen.has(item.id)) return;
-  seen.add(item.id);
-  ALL_ITEMS.push({ id: item.id, name: item.name || item.id, cat: item.cat || item.category || 'overig' });
-});
-
-// Photo availability: null = unchecked, true = ok, false = missing
 const avail = {};
-ALL_ITEMS.forEach(i => { avail[i.id] = cloudMap[i.id] ? true : null; });
 
-// Build initial grid
-buildGrid();
+async function init() {
+  document.getElementById('check-btn').disabled = true;
+  document.getElementById('status-text').textContent = 'Gegevens ophalen uit Supabase…';
+
+  // 1. Read localStorage first (fast)
+  try { const s = localStorage.getItem('griette-cloud-photos-v1'); if (s) cloudMap = JSON.parse(s); } catch(e) {}
+  let localCustom = [];
+  try {
+    const ci = localStorage.getItem('griette-custom-items-v3');
+    if (ci) { const p = JSON.parse(ci); localCustom = Array.isArray(p) ? p : Object.values(p).flat(); }
+  } catch(e) {}
+
+  // 2. Fetch Supabase in parallel
+  const [sbCustom, sbPhotos, sbDeleted] = await Promise.all([
+    sbGet('custom-items'),
+    sbGet('cloud-photos'),
+    sbGet('deleted-items'),
+  ]);
+
+  // Merge cloud photos (Supabase wins over localStorage)
+  if (sbPhotos && typeof sbPhotos === 'object') Object.assign(cloudMap, sbPhotos);
+
+  // Merge custom items (Supabase wins)
+  const rawCustom = sbCustom || localCustom;
+  let customFlat = [];
+  if (Array.isArray(rawCustom)) {
+    customFlat = rawCustom;
+  } else if (rawCustom && typeof rawCustom === 'object') {
+    // May be {cat: [items]} structure
+    Object.entries(rawCustom).forEach(([cat, items]) => {
+      if (Array.isArray(items)) items.forEach(i => customFlat.push(Object.assign({}, i, {cat})));
+    });
+  }
+
+  // Deleted IDs
+  const deletedIds = new Set(Array.isArray(sbDeleted) ? sbDeleted : []);
+
+  // Build merged items list
+  const seen = new Set();
+  [...DEFAULT_ITEMS, ...customFlat].forEach(item => {
+    if (!item || !item.id) return;
+    if (seen.has(item.id) || deletedIds.has(item.id)) return;
+    seen.add(item.id);
+    ALL_ITEMS.push({ id: item.id, name: item.name || item.id, cat: item.cat || item.category || 'overig' });
+  });
+
+  // Pre-mark items that have a photo in cloudMap
+  ALL_ITEMS.forEach(i => { avail[i.id] = cloudMap[i.id] ? true : null; });
+
+  const nCustom = customFlat.filter(i => !DEFAULT_ITEMS.find(d => d.id === i.id)).length;
+  document.getElementById('status-text').innerHTML =
+    ALL_ITEMS.length + ' items geladen'
+    + (nCustom ? ' (incl. <strong>' + nCustom + ' eigen items</strong>)' : '')
+    + ' · ' + Object.keys(cloudMap).length + ' foto-URL\'s uit Supabase/localStorage';
+  document.getElementById('check-btn').disabled = false;
+
+  buildGrid();
+}
+
+// Start on page load
+init();
 
 function urlFor(id) {
   return cloudMap[id] || (CDN + id + '.jpg');
