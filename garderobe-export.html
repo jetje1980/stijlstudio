@@ -383,7 +383,14 @@ async function startExport() {
     });
   });
 
-  // Build URL map: prefer cloudMap override, else standard CDN URL
+  // Add ALL photo IDs from cloudMap that aren't already in the item list
+  Object.entries(cloudMap).forEach(([id, url]) => {
+    if (!id || seen.has(id) || deletedIds.has(id)) return;
+    seen.add(id);
+    items.push({ id, name: id, cat: 'overig', _cloudUrl: url });
+  });
+
+  // Build URL map: use explicit cloudMap URL if present, else standard CDN URL
   const urlFor = id => cloudMap[id] || (CDN_BASE + id + '.jpg');
 
   // Show progress
