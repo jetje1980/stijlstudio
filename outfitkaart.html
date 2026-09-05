@@ -162,8 +162,9 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <div class="modal-note">Je sleutel wordt alleen in jouw browser opgeslagen en nooit gedeeld. Nodig voor AI-functies: kleurcombo-suggesties, beeldanalyse, trend-koppeling.</div>
     <div style="margin-top:14px;" class="sec-label">Model</div>
     <select class="modal-field" id="ai-model-select">
-      <option value="claude-haiku-4-5-20251001">Haiku 4.5 (snel + goedkoop)</option>
-      <option value="claude-sonnet-5">Sonnet 5 (rijker advies)</option>
+      <option value="claude-opus-5">Opus 5 — beste stijladvies (aanbevolen)</option>
+      <option value="claude-sonnet-5">Sonnet 5 — goede balans</option>
+      <option value="claude-haiku-4-5">Haiku 4.5 — snelst &amp; goedkoopst</option>
     </select>
     <div class="modal-actions">
       <button class="modal-save" onclick="saveSettings()">Opslaan</button>
@@ -256,7 +257,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 
   <div style="height:12px;"></div>
   <div class="dl-bar">
-    <button class="btn-dl" id="dl-btn" onclick="downloadKaart()">⬇ Download als afbeelding</button>
+    <button class="btn-dl" id="dl-btn" onclick="downloadKaart()">⬇ Opslaan als afbeelding</button>
 
     <!-- AI analyse section -->
     <button class="ai-btn" id="ai-analyse-btn" onclick="aiAnalyseOutfit()">🔍 AI-analyse: textuur, vorm &amp; trends</button>
@@ -458,7 +459,7 @@ let cloudMap = {};
 let itemTags = {};
 let customColors = []; // max 2 selected KLEUREN entries
 let anthropicKey = '';
-let aiModel = 'claude-haiku-4-5-20251001';
+let aiModel = 'claude-opus-5';
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────────
 function openSettings() {
@@ -480,7 +481,7 @@ function saveSettings() {
 // ── INIT ──────────────────────────────────────────────────────────────────────
 async function init() {
   try { anthropicKey = localStorage.getItem('anthropic-key') || ''; } catch(e){}
-  try { aiModel = localStorage.getItem('ai-model') || 'claude-haiku-4-5-20251001'; } catch(e){}
+  try { aiModel = localStorage.getItem('ai-model') || 'claude-opus-5'; } catch(e){}
   try { cloudMap = JSON.parse(localStorage.getItem('griette-cloud-photos-v1')||'{}'); } catch(e){}
   try { itemTags = JSON.parse(localStorage.getItem('griette-item-tags-v3')||'{}'); } catch(e){}
   try {
@@ -522,32 +523,54 @@ async function sbGet(key) {
 }
 
 // ── AI API CALL ───────────────────────────────────────────────────────────────
-async function callClaude(systemPrompt, userContent) {
+async function callClaude(systemPrompt, userContent, maxTokens) {
   if (!anthropicKey) {
     throw new Error('Geen API-sleutel. Voeg je sleutel toe via ⚙ Instellingen.');
   }
   const body = {
     model: aiModel,
-    max_tokens: 1024,
+    max_tokens: maxTokens || 8000,
     system: systemPrompt,
     messages: [{ role:'user', content: userContent }]
   };
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method:'POST',
-    headers:{
-      'x-api-key': anthropicKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify(body)
-  });
+  let res;
+  try {
+    res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{
+        'x-api-key': anthropicKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(body)
+    });
+  } catch(e) {
+    throw new Error('Geen verbinding met Anthropic. Check je internet.');
+  }
+
   if (!res.ok) {
     const err = await res.json().catch(()=>({}));
-    throw new Error(err?.error?.message || `API fout ${res.status}`);
+    const msg = err?.error?.message || '';
+    if (res.status === 401) throw new Error('API-sleutel ongeldig. Check je sleutel in ⚙ Instellingen.');
+    if (res.status === 400 && /credit|balance/i.test(msg)) throw new Error('Geen tegoed op je Anthropic-account. Voeg een betaalmethode toe op console.anthropic.com.');
+    if (res.status === 429) throw new Error('Te veel verzoeken. Wacht even en probeer opnieuw.');
+    throw new Error(msg || `API fout ${res.status}`);
   }
+
   const data = await res.json();
-  return data.content?.[0]?.text || '';
+
+  // Model kan het verzoek weigeren (Opus 5 / Fable) — vang dat netjes af
+  if (data.stop_reason === 'refusal') {
+    throw new Error('Het model heeft dit verzoek geweigerd. Probeer een andere formulering.');
+  }
+
+  // Met adaptive thinking staat er een thinking-blok vóór de tekst.
+  // Pak dus expliciet het text-blok, niet content[0].
+  const textBlock = (data.content || []).find(b => b.type === 'text');
+  const text = textBlock?.text || '';
+  if (!text) throw new Error('Leeg antwoord van het model. Probeer opnieuw.');
+  return text;
 }
 
 // ── STEP 1: COMBO TYPE ────────────────────────────────────────────────────────
@@ -609,7 +632,13 @@ function makePresetCard(p, onClick) {
 function buildCustomColorPicker() {
   customColors = [];
   const grid = document.getElementById('custom-color-grid');
-  if (grid.children.length > 0) { updateCustomCombos(); return; } // already built
+  if (grid.children.length > 0) {
+    // Al gebouwd — reset ook de visuele selectie, anders loopt die uit de pas
+    grid.querySelectorAll('.cswatch.selected').forEach(b=>b.classList.remove('selected'));
+    renderSelectedPills();
+    updateCustomCombos();
+    return;
+  }
   KLEUREN.forEach(({v, dot}) => {
     const sw = document.createElement('button');
     sw.className = 'cswatch';
@@ -727,7 +756,7 @@ Wees eerlijk als een kleur niet past bij Griette's Winter DNA — kies dan een n
 Antwoord ALLEEN met een geldig JSON array, geen uitleg eromheen.`;
 
   try {
-    const raw = await callClaude(system, userMsg);
+    const raw = await callClaude(system, userMsg, 4000);
     const match = raw.match(/\[[\s\S]*\]/);
     if (!match) throw new Error('Geen geldige JSON');
     const aiCombos = JSON.parse(match[0]);
@@ -850,7 +879,7 @@ Antwoord in JSON: {titel, sublabel, anno1, anno2, stylingnoot}
 anno1 en anno2: gebruik \\n voor regelbreuk.`;
 
   try {
-    const raw = await callClaude(system, userMsg);
+    const raw = await callClaude(system, userMsg, 4000);
     const match = raw.match(/\{[\s\S]*\}/);
     if (!match) throw new Error('Geen geldige JSON');
     const data = JSON.parse(match[0]);
@@ -957,7 +986,7 @@ Gebruik korte alinea's per punt. Wees eerlijk als iets niet klopt — geen lege 
 Schrijf altijd in het Nederlands. Gebruik **vetgedrukte** kopjes. Wees concreet, eerlijk en enthousiast.`;
 
   try {
-    const raw = await callClaude(system, userContent);
+    const raw = await callClaude(system, userContent, 12000);
     renderAiAnalysis(raw);
     panel.style.display = 'block';
     btn.textContent = '✓ Analyse gereed — scroll naar beneden';
@@ -979,20 +1008,49 @@ function renderAiAnalysis(text) {
 }
 
 // ── DOWNLOAD ──────────────────────────────────────────────────────────────────
+function setDlStatus(msg) {
+  let s = document.getElementById('dl-status');
+  if (!s) {
+    s = document.createElement('div');
+    s.id = 'dl-status';
+    s.style.cssText = 'font-size:11px;color:var(--text-2);text-align:center;line-height:1.5;';
+    const btn = document.getElementById('dl-btn');
+    btn.parentElement.insertBefore(s, btn.nextSibling);
+  }
+  s.innerHTML = msg;
+}
+
 async function downloadKaart() {
   const btn = document.getElementById('dl-btn');
+  const origLabel = '⬇ Opslaan als afbeelding';
+
+  // Guard: script kan niet geladen zijn (traag netwerk, adblocker, CDN storing)
+  if (typeof html2canvas === 'undefined') {
+    setDlStatus('De afbeeldingsbibliotheek kon niet laden. Check je internetverbinding en herlaad de pagina.');
+    return;
+  }
+
   btn.textContent = '⏳ Afbeelding maken…';
   btn.disabled = true;
+  setDlStatus('');
 
   const el = document.getElementById('the-kaart');
   try {
+    // GEEN allowTaint: dat vervuilt het canvas waardoor toDataURL een
+    // SecurityError gooit. useCORS alleen slaat onbereikbare foto's over.
     const canvas = await html2canvas(el, {
-      useCORS: true, allowTaint: true,
+      useCORS: true,
       scale: 3, backgroundColor: '#F5F2EE', logging: false,
     });
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
 
-    // Show inline — iOS: long-press to save
+    let dataUrl;
+    try {
+      dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+    } catch(secErr) {
+      throw new Error('Een foto blokkeert het opslaan (CORS). Probeer de kaart zonder die foto.');
+    }
+
+    // Toon de afbeelding altijd inline — werkt overal
     let imgWrap = document.getElementById('dl-img-wrap');
     if (!imgWrap) {
       imgWrap = document.createElement('div');
@@ -1002,20 +1060,43 @@ async function downloadKaart() {
     }
     imgWrap.innerHTML = '<img src="'+dataUrl+'" style="width:100%;display:block;" alt="Outfitkaart">';
 
-    // Try direct download (works Android + desktop)
-    try {
-      const a = document.createElement('a');
-      a.href = dataUrl;
-      a.download = 'outfitkaart-'+new Date().toISOString().slice(0,10)+'.jpg';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    } catch(e){}
+    const fname = 'outfitkaart-'+new Date().toISOString().slice(0,10)+'.jpg';
 
-    btn.textContent = '✓ Houd de afbeelding hieronder ingedrukt om op te slaan (iOS)';
+    // 1) iOS/Android: deelvenster → "Bewaar afbeelding" zet 'm in Foto's
+    let shared = false;
+    try {
+      const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.95));
+      if (blob && navigator.canShare) {
+        const file = new File([blob], fname, { type:'image/jpeg' });
+        if (navigator.canShare({ files:[file] })) {
+          await navigator.share({ files:[file] });
+          shared = true;
+        }
+      }
+    } catch(e) {
+      // Gebruiker kan het deelvenster annuleren — dat is geen fout
+      if (e && e.name === 'AbortError') shared = true;
+    }
+
+    // 2) Android/desktop: directe download
+    if (!shared) {
+      try {
+        const a = document.createElement('a');
+        a.href = dataUrl; a.download = fname;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      } catch(e){}
+    }
+
+    btn.textContent = '✓ Kaart klaar — nogmaals opslaan';
+    setDlStatus(shared
+      ? 'Opgeslagen via het deelvenster.'
+      : 'Lukt het niet? <b>Houd de afbeelding hierboven ingedrukt</b> en kies “Bewaar afbeelding”.');
     btn.disabled = false;
+
   } catch(e) {
-    btn.textContent = '⬇ Download als afbeelding';
+    btn.textContent = origLabel;
     btn.disabled = false;
-    alert('Mislukt: ' + e.message);
+    setDlStatus('Opslaan mislukt: ' + e.message);
   }
 }
 
