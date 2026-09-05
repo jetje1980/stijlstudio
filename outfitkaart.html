@@ -257,6 +257,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 
 <!-- STEP 4: CARD + DOWNLOAD -->
 <div id="card-wrap">
+  <div id="card-notice" style="display:none;margin:0 0 12px;padding:11px 13px;border-radius:12px;background:color-mix(in srgb,#b5232a 8%,var(--surface));border:1.5px solid color-mix(in srgb,#b5232a 30%,var(--border));font-size:12px;line-height:1.5;color:var(--text);"></div>
   <div class="kaart" id="the-kaart">
     <div class="kaart-title" id="k-title">OUTFIT</div>
     <div class="kaart-sub"   id="k-sub"></div>
@@ -604,13 +605,17 @@ async function sbGet(key) {
 }
 
 // ── AI API CALL ───────────────────────────────────────────────────────────────
-async function callClaude(systemPrompt, userContent, maxTokens) {
+async function callClaude(systemPrompt, userContent, maxTokens, effort) {
   const body = {
     model: aiModel,
-    max_tokens: maxTokens || 8000,
+    // Ruim bemeten: denk-tokens tellen mee in max_tokens. Te krap en het
+    // antwoord wordt midden in de JSON afgekapt.
+    max_tokens: maxTokens || 16000,
     system: systemPrompt,
     messages: [{ role:'user', content: userContent }]
   };
+  // Minder diep nadenken voor gestructureerde taken: sneller en goedkoper
+  if (effort) body.output_config = { effort };
   const headers = { 'content-type': 'application/json' };
   if (appSecret) headers['x-app-secret'] = appSecret;
 
@@ -649,6 +654,14 @@ async function callClaude(systemPrompt, userContent, maxTokens) {
   // Pak dus expliciet het text-blok, niet content[0].
   const textBlock = (data.content || []).find(b => b.type === 'text');
   const text = textBlock?.text || '';
+
+  // Tegen de tokenlimiet aangelopen: het antwoord is afgekapt en de JSON
+  // is onvolledig. Zeg dat, in plaats van stil te falen.
+  if (data.stop_reason === 'max_tokens') {
+    const err = new Error('Het antwoord werd afgekapt door de tokenlimiet. Probeer het opnieuw, of kies een lichter model in ⚙ Instellingen.');
+    err.truncated = true;
+    throw err;
+  }
   if (!text) throw new Error('Leeg antwoord van het model. Probeer opnieuw.');
   return text;
 }
@@ -835,7 +848,7 @@ Wees eerlijk als een kleur niet past bij Griette's Winter DNA — kies dan een n
 Antwoord ALLEEN met een geldig JSON array, geen uitleg eromheen.`;
 
   try {
-    const raw = await callClaude(system, userMsg, 4000);
+    const raw = await callClaude(system, userMsg, 8000, 'low');
     const aiCombos = pickArray(extractJson(raw), ['combos','suggesties']);
     if (!aiCombos || !aiCombos.length) throw new Error('Geen geldige suggesties');
 
@@ -1048,7 +1061,7 @@ Antwoord ALLEEN met JSON, geen tekst eromheen:
  "waarom_top":"2 zinnen: waarom dit als geheel een sterke combinatie is"}`;
 
   try {
-    const raw = await callClaude(system, userMsg, 4000);
+    const raw = await callClaude(system, userMsg, 16000, 'medium');
     const data = extractJson(raw);
     if (!data) throw new Error('Geen bruikbaar antwoord');
     const arr = pickArray(data, ['items','outfit','stukken']);
@@ -1089,6 +1102,8 @@ Antwoord ALLEEN met JSON, geen tekst eromheen:
   } catch(e) {
     btn.textContent = orig;
     status.textContent = 'Mislukt: ' + e.message;
+    btn.disabled = false;
+    throw e;              // zodat de kaart de reden kan tonen
   }
   btn.disabled = false;
 }
@@ -1121,7 +1136,7 @@ Antwoord in JSON: {titel, sublabel, anno1, anno2, stylingnoot}
 anno1 en anno2: gebruik \\n voor regelbreuk.`;
 
   try {
-    const raw = await callClaude(system, userMsg, 4000);
+    const raw = await callClaude(system, userMsg, 8000, 'low');
     const data = extractJson(raw);
     if (!data || Array.isArray(data)) throw new Error('Geen geldige JSON');
     if (data.titel)      document.getElementById('f-title').value  = data.titel;
@@ -1235,7 +1250,15 @@ function buildKaart() {
 }
 
 // Vult de kaart zelf als de gebruiker geen items koos.
+function showCardNotice(html) {
+  const el = document.getElementById('card-notice');
+  if (!el) return;
+  el.style.display = html ? 'block' : 'none';
+  el.innerHTML = html || '';
+}
+
 async function autoComposeOnCard() {
+  showCardNotice('');
   const grid = document.getElementById('k-grid');
   const had = selItems.length;
   if (!had) {
@@ -1249,14 +1272,22 @@ async function autoComposeOnCard() {
     u.innerHTML = '<div class="ku-txt" style="text-align:center;">✨ AI vult je outfit aan en legt uit waarom het werkt…</div>';
   }
 
+  let fout = null;
   try {
     await aiComposeOutfit();
-  } catch(e) {}
+  } catch(e) { fout = e; }
 
   if (selItems.length) {
     buildKaart();
+    // Lukte het aanvullen niet, zeg dat dan — anders lijkt het of de kaart
+    // gewoon klopt terwijl er items ontbreken.
+    if (fout) showCardNotice('Aanvullen lukte niet: ' + esc(fout.message)
+      + '<br>Je eigen keuze staat wel op de kaart.');
   } else {
-    grid.innerHTML = '<div style="padding:18px 8px;text-align:center;font-size:9px;color:#8a7060;line-height:1.6;">Geen items gekozen.<br>Ga terug en kies items, of laat de AI er een samenstellen.</div>';
+    grid.innerHTML = '<div style="padding:18px 8px;text-align:center;font-size:9px;color:#8a7060;line-height:1.6;">'
+      + 'Geen items op de kaart.<br>Ga terug en kies items, of laat de AI er een samenstellen.'
+      + '</div>';
+    if (fout) showCardNotice('Samenstellen lukte niet: ' + esc(fout.message));
   }
 }
 
@@ -1330,7 +1361,7 @@ Schrijf in het Nederlands. Wees concreet en eerlijk — geen lege complimenten.
 Verzin nooit een id dat niet in de garderobelijst staat.`;
 
   try {
-    const raw = await callClaude(system, userContent, 12000);
+    const raw = await callClaude(system, userContent, 16000);
     const data = extractJson(raw);
 
     // Antwoordt de AI in gewone tekst i.p.v. JSON, toon die dan alsnog als
@@ -1564,6 +1595,7 @@ function restart() {
   document.getElementById('ai-analyse-btn').textContent='🔍 Analyseer & perfectioneer deze kaart';
   const imgWrap = document.getElementById('dl-img-wrap');
   if (imgWrap) imgWrap.remove();
+  showCardNotice('');
   setStep(1);
   window.scrollTo(0,0);
 }
