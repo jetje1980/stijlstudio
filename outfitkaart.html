@@ -211,7 +211,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
   <div id="anchor-area" style="display:none">
     <div id="anchor-picked"></div>
     <div id="anchor-choose">
-      <div class="sec-label">Kies het item waar je omheen bouwt</div>
+      <div class="sec-label" id="anchor-label">Kies het item waar je omheen bouwt</div>
       <input class="anchor-search" id="anchor-search" type="text" placeholder="Zoek in je kast…" autocomplete="off">
       <div class="anchor-grid" id="anchor-grid"></div>
     </div>
@@ -552,7 +552,9 @@ let customCount = 0;   // aantal geladen eigen items
 let outfitUitleg = null; // {kleur, vorm, textuur} van de AI
 let outfitTop = '';      // slotzin: waarom dit als geheel werkt
 let startMode = 'combo'; // 'combo' = kleurcombo eerst, 'item' = item eerst
-let anchorItem = null;   // item waar de combo omheen wordt gebouwd
+let anchorItems = [];    // 1 of 2 items waar de look omheen wordt gebouwd
+const MAX_ANKERS = 2;
+const isAnker = id => anchorItems.some(a => a.id === id);
 let appSecret = '';
 let aiModel = 'claude-opus-5';
 const AI_ENDPOINT = SUPABASE_URL + '/functions/v1/claude';
@@ -723,16 +725,16 @@ function setStartMode(mode) {
 
   if (mode === 'item') {
     // Zonder anker hoort de kiezer open te staan, niet de (lege) combolijst
-    const heeftAnker = !!anchorItem;
+    const heeftAnker = anchorItems.length > 0;
     document.getElementById('anchor-choose').style.display     = heeftAnker ? 'none' : 'block';
     document.getElementById('anchor-combo-wrap').style.display = heeftAnker ? 'block' : 'none';
     renderAnchorPicked();
     buildAnchorGrid(document.getElementById('anchor-search').value);
   } else {
     // anker loslaten zodat de kleurcombo-route schoon start
-    if (anchorItem) {
-      selItems = selItems.filter(i => i.id !== anchorItem.id);
-      anchorItem = null;
+    if (anchorItems.length) {
+      selItems = selItems.filter(i => !isAnker(i.id));
+      anchorItems = [];
       renderAnchorPicked();
     }
   }
@@ -742,6 +744,13 @@ function buildAnchorGrid(filter) {
   const grid = document.getElementById('anchor-grid');
   const q = (filter || '').trim().toLowerCase();
   grid.innerHTML = '';
+
+  const lbl = document.getElementById('anchor-label');
+  if (lbl) lbl.textContent = anchorItems.length === 0
+    ? 'Kies het item waar je omheen bouwt'
+    : (anchorItems.length >= MAX_ANKERS
+       ? 'Twee items gekozen — laat er een los om te wisselen'
+       : 'Kies een tweede item (optioneel)');
 
   const lijst = allItems
     .filter(i => !q || i.name.toLowerCase().includes(q) || (i.brand||'').toLowerCase().includes(q))
@@ -765,6 +774,8 @@ function buildAnchorGrid(filter) {
       img.src = cloudMap[item.id];
       img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
     }
+    if (isAnker(item.id)) card.classList.add('selected');
+    else if (anchorItems.length >= MAX_ANKERS) card.classList.add('dim');
     card.addEventListener('click', () => kiesAnker(item));
     grid.appendChild(card);
   });
@@ -772,8 +783,9 @@ function buildAnchorGrid(filter) {
 
 function kiesAnker(item) {
   // vorig anker uit de selectie halen
-  if (anchorItem) selItems = selItems.filter(i => i.id !== anchorItem.id);
-  anchorItem = item;
+  if (isAnker(item.id)) return;                 // al gekozen
+  if (anchorItems.length >= MAX_ANKERS) return;  // maximaal twee
+  anchorItems.push(item);
   if (!selItems.some(i => i.id === item.id)) selItems.push(item);
 
   renderAnchorPicked();
@@ -784,29 +796,51 @@ function kiesAnker(item) {
 
 function renderAnchorPicked() {
   const wrap = document.getElementById('anchor-picked');
-  if (!anchorItem) { wrap.innerHTML = ''; return; }
-  const url = cloudMap[anchorItem.id];
-  wrap.innerHTML = '<div class="anchor-pick">'
-    + (url ? `<img src="${esc(url)}" alt="">` : `<span style="font-size:24px">${CAT_ICONS[anchorItem.cat]||'📦'}</span>`)
-    + `<span class="ap-name">${esc(anchorItem.name)}</span>`
-    + '<button class="ap-x" onclick="wisAnker()" title="Ander item kiezen">×</button></div>';
+  if (!anchorItems.length) { wrap.innerHTML = ''; return; }
+
+  wrap.innerHTML = anchorItems.map(it => {
+    const url = cloudMap[it.id];
+    return '<div class="anchor-pick">'
+      + (url ? `<img src="${esc(url)}" alt="">`
+             : `<span style="font-size:24px">${CAT_ICONS[it.cat]||'📦'}</span>`)
+      + `<span class="ap-name">${esc(it.name)}</span>`
+      + `<button class="ap-x" onclick="wisAnker('${esc(it.id)}')" title="Dit item loslaten">×</button></div>`;
+  }).join('')
+  + (anchorItems.length < MAX_ANKERS
+      ? '<button class="ai-btn" style="padding:9px;font-size:11px;margin-bottom:10px;" '
+        + 'onclick="voegAnkerToe()">+ Nog een eigen item toevoegen (optioneel)</button>'
+      : '');
 }
 
-function wisAnker() {
-  if (anchorItem) selItems = selItems.filter(i => i.id !== anchorItem.id);
-  anchorItem = null; selPreset = null;
-  renderAnchorPicked();
-  document.getElementById('anchor-choose').style.display = 'block';
-  document.getElementById('anchor-combo-wrap').style.display = 'none';
-  document.getElementById('anchor-preset-list').innerHTML = '';
-  document.getElementById('anchor-status').textContent = '';
+function wisAnker(id) {
+  anchorItems = anchorItems.filter(a => a.id !== id);
+  selItems = selItems.filter(i => i.id !== id);
+  selPreset = null;
   document.getElementById('btn-next').disabled = true;
+  renderAnchorPicked();
+
+  if (!anchorItems.length) {
+    // Niets meer over: terug naar het kiezen
+    document.getElementById('anchor-choose').style.display = 'block';
+    document.getElementById('anchor-combo-wrap').style.display = 'none';
+    document.getElementById('anchor-preset-list').innerHTML = '';
+    document.getElementById('anchor-status').textContent = '';
+    buildAnchorGrid(document.getElementById('anchor-search').value);
+  } else {
+    aiCombosVoorItem();   // combo's opnieuw, nu zonder dat item
+  }
+}
+
+// Kiezer weer openen om een tweede item te kiezen
+function voegAnkerToe() {
+  document.getElementById('anchor-choose').style.display = 'block';
   buildAnchorGrid(document.getElementById('anchor-search').value);
+  document.getElementById('anchor-choose').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
 // Laat de AI kleurcombo's bedenken die dit item als uitgangspunt nemen
 async function aiCombosVoorItem() {
-  if (!anchorItem) return;
+  if (!anchorItems.length) return;
   const btn    = document.getElementById('anchor-ai-btn');
   const status = document.getElementById('anchor-status');
   const list   = document.getElementById('anchor-preset-list');
@@ -815,27 +849,34 @@ async function aiCombosVoorItem() {
   status.textContent = '⏳ AI bedenkt combo\'s rond dit item…';
   list.innerHTML = '';
 
-  const t = itemTags[anchorItem.id] || {};
   const val = v => Array.isArray(v) ? v.join('/') : (v || '');
-  const kenmerken = [
-    'categorie: ' + anchorItem.cat,
-    val(t.kleur)     && 'kleur: '     + val(t.kleur),
-    val(t.patroon)   && 'patroon: '   + val(t.patroon),
-    val(t.materiaal) && 'materiaal: ' + val(t.materiaal),
-    val(t.pasvorm)   && 'pasvorm: '   + val(t.pasvorm),
-    val(t.soort)     && 'soort: '     + val(t.soort),
-  ].filter(Boolean).join(', ');
+  const beschrijf = it => {
+    const t = itemTags[it.id] || {};
+    const k = [
+      'categorie: ' + it.cat,
+      val(t.kleur)     && 'kleur: '     + val(t.kleur),
+      val(t.patroon)   && 'patroon: '   + val(t.patroon),
+      val(t.materiaal) && 'materiaal: ' + val(t.materiaal),
+      val(t.pasvorm)   && 'pasvorm: '   + val(t.pasvorm),
+      val(t.soort)     && 'soort: '     + val(t.soort),
+    ].filter(Boolean).join(', ');
+    return `- "${it.name}" (${k})`;
+  };
+  const itemsBlok = anchorItems.map(beschrijf).join('\n');
+  const meervoud  = anchorItems.length > 1;
 
   const kleurNamen = KLEUREN.map(k => k.v).join(', ');
   const system = `Je bent een kleur- en stijlexpert. ${GRIETTE_DNA}\n\n${FW_TRENDS}`;
   const userContent = [{ type:'text', text:
-`Griette wil een outfit bouwen rond dit item uit haar kast:
+`Griette wil een outfit bouwen rond ${meervoud ? 'deze items' : 'dit item'} uit haar kast:
 
-"${anchorItem.name}" (${kenmerken})
-${cloudMap[anchorItem.id] ? 'De foto staat hieronder — beoordeel de werkelijke kleur en textuur daarvan.' : ''}
+${itemsBlok}
+${anchorItems.some(i=>cloudMap[i.id]) ? 'De foto\'s staan hieronder — beoordeel de werkelijke kleur en textuur daarvan.' : ''}
 
-Geef precies 4 kleurcombo's die DIT ITEM als uitgangspunt nemen. Het item moet
-in elke combo passen; de overige kleuren bouwen eromheen.
+Geef precies 4 kleurcombo's die ${meervoud ? 'DEZE ITEMS' : 'DIT ITEM'} als uitgangspunt nemen.
+${meervoud
+  ? 'Beide items moeten samen in elke combo werken; de overige kleuren bouwen eromheen. Botsen ze qua kleur of textuur, zeg dat dan in de vibe van de combo die dat het beste oplost.'
+  : 'Het item moet in elke combo passen; de overige kleuren bouwen eromheen.'}
 
 Varieer de stijlrichtingen: geef zowel gedurfde streetstyle keuzes als
 elegante en klassieke opties.
@@ -846,9 +887,12 @@ ${kleurNamen}
 Antwoord ALLEEN met een JSON-array:
 [{"name":"korte naam","vibe":"paar woorden","stijl":"streetstyle|elegant|klassiek|gedurfd","colors":["#hex","#hex","#hex","#hex"],"tags":["kleur","kleur","kleur","kleur"]}]` }];
 
-  if (cloudMap[anchorItem.id]) {
-    userContent.push({ type:'image', source:{ type:'url', url: cloudMap[anchorItem.id] } });
-  }
+  anchorItems.forEach(it => {
+    if (cloudMap[it.id]) {
+      userContent.push({ type:'image', source:{ type:'url', url: cloudMap[it.id] } });
+      userContent.push({ type:'text', text:`(Foto van: ${it.name})` });
+    }
+  });
 
   try {
     const raw = await callClaude(system, userContent, 8000, 'low');
@@ -866,7 +910,7 @@ Antwoord ALLEEN met een JSON-array:
       list.appendChild(card);
     });
     status.innerHTML = list.children.length
-      ? `${list.children.length} combo's rond <b>${esc(anchorItem.name)}</b> — kies er een.`
+      ? `${list.children.length} combo's rond <b>${anchorItems.map(a=>esc(a.name)).join('</b> en <b>')}</b> — kies er een.`
       : 'Geen bruikbare combo\'s ontvangen.';
   } catch(e) {
     status.textContent = 'Mislukt: ' + e.message;
@@ -1237,8 +1281,8 @@ async function aiComposeOutfit() {
   const reedsBlok = reeds.length
     ? `\nGriette heeft deze items AL GEKOZEN. Neem ze allemaal over in je antwoord en bouw de outfit eromheen:\n`
       + reeds.map(i => `- ${i.id} | ${i.cat} | ${i.name}`
-          + (anchorItem && i.id === anchorItem.id
-             ? '   <-- het item waar de look omheen wordt gebouwd; dit blijft altijd staan'
+          + (isAnker(i.id)
+             ? '   <-- uitgangspunt van de look; dit blijft altijd staan'
              : '')).join('\n') + '\n'
     : '';
 
@@ -1303,10 +1347,12 @@ Antwoord ALLEEN met JSON, geen tekst eromheen:
       }
     });
     if (!picked.length) throw new Error('Geen items voorgesteld');
-    if (anchorItem && !picked.some(i => i.id === anchorItem.id)) {
-      picked.unshift(Object.assign({}, anchorItem, { _waarom: 'jouw uitgangspunt' }));
-      if (picked.length > 6) picked.length = 6;
-    }
+    anchorItems.forEach(a => {
+      if (!picked.some(i => i.id === a.id)) {
+        picked.unshift(Object.assign({}, a, { _waarom: 'jouw uitgangspunt' }));
+      }
+    });
+    if (picked.length > 6) picked.length = 6;
 
     selItems = picked;
     buildItemGrid();          // toont de aangevinkte eigen items
@@ -1531,13 +1577,14 @@ async function aiAnalyseOutfit() {
     : 'geen combo gekozen';
   const huidig = selItems.map(i =>
     `- ${i._suggestion ? '[voorstel, niet in bezit] ' : i.id + ' | '}${i.name} (${i.cat})`
-      + (anchorItem && i.id === anchorItem.id ? '   <-- VAST, NIET VERVANGEN' : '')
+      + (isAnker(i.id) ? '   <-- VAST, NIET VERVANGEN' : '')
   ).join('\n');
 
-  const ankerBlok = anchorItem ? `
-LET OP: "${anchorItem.name}" (id: ${anchorItem.id}) is het item waar Griette de
-look bewust omheen bouwt. Dit item MOET in de outfit blijven staan, precies zoals
-het is. Vervang het nooit. Past er iets niet bij, pas dan de ANDERE items aan.
+  const ankerBlok = anchorItems.length ? `
+LET OP: ${anchorItems.map(a => `"${a.name}" (id: ${a.id})`).join(' en ')} ${anchorItems.length > 1 ? 'zijn de items' : 'is het item'}
+waar Griette de look bewust omheen bouwt. ${anchorItems.length > 1 ? 'Deze items MOETEN' : 'Dit item MOET'} in de outfit blijven
+staan, precies zoals ${anchorItems.length > 1 ? 'ze zijn' : 'het is'}. Vervang ${anchorItems.length > 1 ? 'ze' : 'het'} nooit.
+Past er iets niet bij, pas dan de ANDERE items aan.
 ` : '';
 
   const userContent = [];
@@ -1603,7 +1650,7 @@ Verzin nooit een id dat niet in de garderobelijst staat.`;
     // Nieuwe, geperfectioneerde outfit overnemen
     const arr = pickArray(data, ['outfit','items']);
     let vervangen = 0;
-    let ankerHersteld = false;
+    const herstelde = [];
     if (arr && arr.length) {
       const oudeNamen = selItems.map(i=>i.name);
       const nieuw = [];
@@ -1619,11 +1666,13 @@ Verzin nooit een id dat niet in de garderobelijst staat.`;
       });
       if (nieuw.length) {
         // Vangnet: negeert de AI de instructie, dan zetten we het anker terug
-        if (anchorItem && !nieuw.some(i => i.id === anchorItem.id)) {
-          nieuw.unshift(Object.assign({}, anchorItem, { _waarom: 'jouw uitgangspunt' }));
-          if (nieuw.length > 6) nieuw.length = 6;
-          ankerHersteld = true;
-        }
+        anchorItems.forEach(a => {
+          if (!nieuw.some(i => i.id === a.id)) {
+            nieuw.unshift(Object.assign({}, a, { _waarom: 'jouw uitgangspunt' }));
+            herstelde.push(a.name);
+          }
+        });
+        if (nieuw.length > 6) nieuw.length = 6;
         vervangen = nieuw.filter(i=>!oudeNamen.includes(i.name)).length;
         selItems = nieuw;
       }
@@ -1633,9 +1682,10 @@ Verzin nooit een id dat niet in de garderobelijst staat.`;
     if (typeof data.waarom_top === 'string') outfitTop = data.waarom_top;
 
     buildKaart();
-    if (ankerHersteld) showCardNotice(
-      'De AI wilde <b>' + esc(anchorItem.name) + '</b> vervangen, maar dat is je '
-      + 'uitgangspunt — die is teruggezet.');
+    if (herstelde.length) showCardNotice(
+      'De AI wilde <b>' + herstelde.map(esc).join('</b> en <b>') + '</b> vervangen, maar '
+      + (herstelde.length > 1 ? 'dat zijn je uitgangspunten' : 'dat is je uitgangspunt')
+      + ' — ' + (herstelde.length > 1 ? 'die zijn' : 'die is') + ' teruggezet.');
     renderAiAnalysis(data, vervangen);
     panel.style.display = 'block';
     btn.textContent = vervangen
@@ -1827,7 +1877,7 @@ function nextStep() { setStep(Math.min(step+1,4)); }
 function prevStep() { setStep(Math.max(step-1,1)); }
 function restart() {
   selType=null; selPreset=null; selItems=[]; customColors=[]; outfitUitleg=null; outfitTop='';
-  anchorItem=null; renderAnchorPicked();
+  anchorItems=[]; renderAnchorPicked();
   document.getElementById('anchor-preset-list').innerHTML='';
   document.getElementById('anchor-status').textContent='';
   document.getElementById('anchor-choose').style.display='block';
