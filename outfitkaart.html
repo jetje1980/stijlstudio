@@ -102,6 +102,10 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 .kaart-photo img{width:100%;height:100%;object-fit:contain;background:#fff;}
 .kaart-brand{font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1a1510;text-align:center;line-height:1.2;}
 .kaart-desc{font-size:8px;color:#5a4030;text-align:center;line-height:1.3;}
+/* Voorstel: item dat nog niet in de kast zit */
+.kaart-photo.sugg{border:1.5px dashed #b9a48c;background:#faf7f3;flex-direction:column;gap:3px;font-size:15px;}
+.kaart-photo.sugg .sugg-tag{font-size:6px;letter-spacing:.09em;text-transform:uppercase;color:#9B7B5C;font-weight:700;}
+.kaart-brand.sugg-brand{color:#9B7B5C;font-style:italic;}
 .kaart-note{font-size:9px;color:#5a4030;text-align:center;border-top:1px solid #ddd5c8;padding-top:8px;margin-top:4px;margin-bottom:8px;line-height:1.5;}
 .kaart-swatches{display:flex;justify-content:center;gap:6px;align-items:center;}
 .kaart-swatch{width:20px;height:20px;border-radius:3px;}
@@ -206,6 +210,8 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 <!-- STEP 2: ITEMS -->
 <div class="panel" id="p2">
   <div>
+    <button class="ai-btn" id="ai-compose-btn" onclick="aiComposeOutfit()" style="margin-bottom:6px;">✨ Laat AI een outfit samenstellen uit mijn kast</button>
+    <div class="field-note" id="ai-compose-status" style="text-align:center;margin-bottom:12px;">Kies zelf items, of laat de AI kiezen en aanvullen met voorstellen.</div>
     <div class="sec-label" id="item-count-label">Items — optioneel (max 6)</div>
     <div class="item-grid" id="item-grid"></div>
   </div>
@@ -815,9 +821,11 @@ function buildItemGrid() {
   grid.innerHTML = '';
 
   // Selectie NIET wissen: deze functie draait ook als je vanuit stap 3
-  // terugkeert, en dan moet je keuze bewaard blijven.
+  // terugkeert, en dan moet je keuze bewaard blijven. AI-voorstellen staan
+  // niet in allItems, dus die houden we los vast.
+  const known = new Set(allItems.map(i=>i.id));
+  selItems = selItems.filter(i => i && (i._suggestion || known.has(i.id)));
   const keepIds = new Set(selItems.map(i=>i.id));
-  selItems = allItems.filter(i => keepIds.has(i.id));
 
   const matchTags = selPreset ? selPreset.tags : [];
   const withPhoto = allItems.filter(i=>cloudMap[i.id]);
@@ -893,6 +901,95 @@ function updateItemCount() {
   // Maak duidelijk dat de kaart zonder items geen foto's krijgt
   const btnNext = document.getElementById('btn-next');
   if (step === 2) btnNext.textContent = n === 0 ? 'Zonder items verder →' : `Volgende met ${n} item${n===1?'':'s'} →`;
+}
+
+// ── AI: OUTFIT SAMENSTELLEN UIT DE KAST ───────────────────────────────────────
+function wardrobeForAI() {
+  return allItems.map(i => {
+    const t = itemTags[i.id] || {};
+    const val = v => Array.isArray(v) ? v.join('/') : (v || '');
+    const extra = [val(t.kleur), val(t.patroon), val(t.materiaal), val(t.pasvorm)]
+      .filter(Boolean).join(', ');
+    return `${i.id} | ${i.cat} | ${i.name}${extra ? ' | ' + extra : ''}${cloudMap[i.id] ? ' | heeft foto' : ''}`;
+  }).join('\n');
+}
+
+async function aiComposeOutfit() {
+  const btn    = document.getElementById('ai-compose-btn');
+  const status = document.getElementById('ai-compose-status');
+  const orig   = '✨ Laat AI een outfit samenstellen uit mijn kast';
+
+  btn.disabled = true;
+  btn.textContent = '⏳ AI stelt een outfit samen…';
+  status.textContent = 'Bezig met kiezen uit je garderobe…';
+
+  const combo = selPreset
+    ? `${selPreset.name} — ${selPreset.vibe}${selPreset.stijl ? ' (' + selPreset.stijl + ')' : ''}, kleuren: ${(selPreset.tags||[]).join(', ')}`
+    : 'geen combo gekozen';
+
+  const system = `Je bent een persoonlijke stylist voor Griette. ${GRIETTE_DNA}\n\n${FW_TRENDS}\nAntwoord in het Nederlands. Wees eerlijk: verzin geen items die niet in de lijst staan als "eigen".`;
+
+  const userMsg = `Dit is Griette's complete garderobe (formaat: id | categorie | naam | tags):
+
+${wardrobeForAI()}
+
+Gekozen kleurcombo: ${combo}
+
+Stel hieruit één complete, draagbare outfit samen van 4 tot 6 stukken.
+
+Regels:
+- Gebruik BIJ VOORKEUR items uit de lijst hierboven. Neem dan het exacte id over.
+- Zorg voor een compleet silhouet: iets voor boven, iets voor onder (of een jurk),
+  schoenen, en waar passend een laag, tas of accessoire.
+- Ontbreekt er iets essentieels in haar kast om deze kleurcombo te laten werken,
+  stel dat dan voor als NIEUW item met eigen=false en een concrete omschrijving
+  (bijv. "antraciet barrel jeans, mid-rise"). Wees hier eerlijk over — liever één
+  eerlijk voorstel dan een item forceren dat niet past.
+- Maximaal 2 nieuwe voorstellen; de rest moet uit haar kast komen.
+
+Antwoord ALLEEN met een JSON-array, geen tekst eromheen:
+[{"id":"exact-id-uit-de-lijst-of-null","naam":"korte naam","categorie":"tops|bottoms|layers|jurken|bags|shoes|accessories","eigen":true,"waarom":"één korte zin"}]`;
+
+  try {
+    const raw = await callClaude(system, userMsg, 4000);
+    const m = raw.match(/\[[\s\S]*\]/);
+    if (!m) throw new Error('Geen bruikbaar antwoord');
+    const arr = JSON.parse(m[0]);
+    if (!Array.isArray(arr) || !arr.length) throw new Error('Geen items voorgesteld');
+
+    const picked = [];
+    arr.slice(0, 6).forEach(x => {
+      if (!x || typeof x !== 'object') return;
+      // Alleen als het id echt bestaat tellen we het als eigen item
+      const real = x.id ? allItems.find(i => i.id === x.id) : null;
+      if (real) {
+        picked.push(Object.assign({}, real, { _waarom: x.waarom || '' }));
+      } else {
+        picked.push({
+          id: 'sugg-' + Math.random().toString(36).slice(2, 9),
+          name: x.naam || 'Voorstel',
+          cat: x.categorie || 'overig',
+          brand: '',
+          _suggestion: true,
+          _waarom: x.waarom || '',
+        });
+      }
+    });
+    if (!picked.length) throw new Error('Geen items voorgesteld');
+
+    selItems = picked;
+    buildItemGrid();          // toont de aangevinkte eigen items
+    const nEigen = picked.filter(i => !i._suggestion).length;
+    const nNieuw = picked.length - nEigen;
+
+    btn.textContent = '✨ Opnieuw laten samenstellen';
+    status.innerHTML = `AI koos <b>${nEigen}</b> item${nEigen===1?'':'s'} uit je kast`
+      + (nNieuw ? ` en stelt <b>${nNieuw}</b> nieuw${nNieuw===1?' item':'e items'} voor.` : '.');
+  } catch(e) {
+    btn.textContent = orig;
+    status.textContent = 'Mislukt: ' + e.message;
+  }
+  btn.disabled = false;
 }
 
 // ── STEP 3: AI SUGGESTIES ─────────────────────────────────────────────────────
@@ -977,16 +1074,47 @@ function buildKaart() {
 
   slots.forEach(item => {
     const col = document.createElement('div'); col.className='kaart-item';
-    const photoUrl = cloudMap[item.id]||null;
+    const photoUrl = item._suggestion ? null : (cloudMap[item.id]||null);
     const icon = CAT_ICONS[item.cat]||'📦';
-    col.innerHTML = `<div class="kaart-photo" id="kp-${item.id}">${photoUrl?'':icon}</div><div class="kaart-brand">${(item.brand&&item.brand!=='—')?item.brand:''}</div><div class="kaart-desc">${item.name}</div>`;
+
+    if (item._suggestion) {
+      // Nog niet in de kast — als voorstel tonen, duidelijk herkenbaar
+      col.innerHTML =
+        `<div class="kaart-photo sugg">${icon}<span class="sugg-tag">nog te vinden</span></div>` +
+        `<div class="kaart-brand sugg-brand">voorstel</div>` +
+        `<div class="kaart-desc">${item.name}</div>`;
+    } else {
+      col.innerHTML =
+        `<div class="kaart-photo" id="kp-${item.id}">${photoUrl?'':icon}</div>` +
+        `<div class="kaart-brand">${(item.brand&&item.brand!=='—')?item.brand:''}</div>` +
+        `<div class="kaart-desc">${item.name}</div>`;
+    }
+    grid.appendChild(col);
+
     if (photoUrl) {
       const img = document.createElement('img');
       img.crossOrigin = 'anonymous'; img.src = photoUrl;
       document.getElementById('kp-'+item.id)?.appendChild(img);
     }
-    grid.appendChild(col);
   });
+}
+
+// Vult de kaart zelf als de gebruiker geen items koos.
+async function autoComposeOnCard() {
+  const grid = document.getElementById('k-grid');
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = '1fr';
+  grid.innerHTML = '<div style="padding:22px 8px;text-align:center;font-size:10px;color:#8a7060;letter-spacing:.06em;">✨ AI stelt een outfit samen uit je kast…</div>';
+
+  try {
+    await aiComposeOutfit();
+  } catch(e) {}
+
+  if (selItems.length) {
+    buildKaart();
+  } else {
+    grid.innerHTML = '<div style="padding:18px 8px;text-align:center;font-size:9px;color:#8a7060;line-height:1.6;">Geen items gekozen.<br>Ga terug en kies items, of laat de AI er een samenstellen.</div>';
+  }
 }
 
 // ── AI OUTFIT ANALYSE ─────────────────────────────────────────────────────────
@@ -1186,6 +1314,8 @@ function setStep(n) {
     document.getElementById('bottom-bar').style.display = 'none';
     document.getElementById('card-wrap').style.display = 'block';
     buildKaart();
+    // Niets gekozen? Dan stelt de AI zelf een outfit samen uit de kast.
+    if (selItems.length === 0) autoComposeOnCard();
   }
 }
 
