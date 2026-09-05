@@ -200,6 +200,12 @@ body {
     <input class="name-input" type="text" id="item-name" placeholder="bijv. Bruine suède laarsjes" autocomplete="off">
   </div>
 
+  <!-- BESCHRIJVING -->
+  <div>
+    <div class="sec-label">Beschrijving <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">optioneel</span></div>
+    <textarea class="name-input" id="item-desc" placeholder="bijv. Perfect voor een avondje uit, lekker wijd en soepel…" rows="2" style="resize:none;line-height:1.5;"></textarea>
+  </div>
+
   <!-- CATEGORIE -->
   <div>
     <div class="sec-label">Categorie</div>
@@ -297,35 +303,68 @@ CATS.forEach(c => {
   catGrid.appendChild(btn);
 });
 
+const PATRONEN = [
+  'uni','fijn streep','brede streep','ruit/check','pied-de-poule',
+  'bloemenprint','luipaard/leopard','stippen/polka','abstract',
+  'paisley','tie-dye','kant/broderie','snake print',
+];
+
 // ── TAG BUILDER ───────────────────────────────────────────────────────────────
 function buildTags(cat) {
   const area = document.getElementById('tags-area');
   area.innerHTML = '';
 
-  const showHals    = ['tops','layers','jurken'].includes(cat);
-  const showPasvorm = ['tops','bottoms','layers','jurken'].includes(cat);
-  const showMouw    = ['tops','layers','jurken'].includes(cat);
-  const showLengte  = ['tops','bottoms','jurken'].includes(cat);
+  const isClothing   = ['tops','bottoms','layers','jurken'].includes(cat);
+  const showHals     = ['tops','layers','jurken'].includes(cat);
+  const showMouw     = ['tops','layers','jurken'].includes(cat);
+  const showLengte   = ['tops','bottoms','jurken'].includes(cat);
+  const showMateriaal = cat !== 'bags' && cat !== 'accessories';
 
-  // KLEUR
-  addSection(area, 'Kleur', null, () => {
+  // KLEUR (multi-select)
+  addSection(area, 'Kleur', '(meerdere mogelijk)', () => {
     const row = document.createElement('div');
     row.className = 'tag-row';
     KLEUREN.forEach(({v, dot}) => {
-      row.appendChild(makeTagBtn(v, 'kleur', false, dot));
+      row.appendChild(makeTagBtn(v, 'kleur', true, dot));
     });
     return row;
   });
 
-  // PASVORM
-  if (showPasvorm) {
-    addSection(area, 'Pasvorm', null, () => {
-      const row = document.createElement('div'); row.className = 'tag-row';
-      ['aansluitend','licht oversized','wijd','cropped','gestructureerd','wrap','flared'].forEach(v => {
-        row.appendChild(makeTagBtn(v, 'pasvorm', false));
+  // PATROON (multi-select)
+  addSection(area, 'Patroon', '(meerdere mogelijk)', () => {
+    const row = document.createElement('div'); row.className = 'tag-row';
+    PATRONEN.forEach(v => row.appendChild(makeTagBtn(v, 'patroon', true)));
+    return row;
+  });
+
+  // PASVORM / TYPE — category-aware
+  {
+    let label, opts;
+    if (isClothing) {
+      label = 'Pasvorm';
+      opts = ['aansluitend','licht oversized','wijd','cropped','gestructureerd','wrap','flared'];
+    } else if (cat === 'shoes') {
+      label = 'Schoentype';
+      opts = ['sneakers','hakken','pumps','laarzen','enkellaarzen','mules','sandalen','ballerinas','loafers','slippers','boots'];
+    } else if (cat === 'bags') {
+      label = 'Tastype';
+      opts = ['schoudertas','clutch/minitas','tote','rugzak','crossbody','bucket bag','shopper','portemonnee'];
+    } else if (cat === 'accessories') {
+      label = 'Type';
+      opts = ['riem','sjaal/stola','hoed','pet','sieraad','zonnebril','handschoenen','andere'];
+    } else if (cat === 'swimwear') {
+      label = 'Type';
+      opts = ['badpak','bikini','tankini','cover-up'];
+    } else {
+      label = null;
+    }
+    if (label) {
+      addSection(area, label, null, () => {
+        const row = document.createElement('div'); row.className = 'tag-row';
+        opts.forEach(v => row.appendChild(makeTagBtn(v, 'pasvorm', false)));
+        return row;
       });
-      return row;
-    });
+    }
   }
 
   // HALS
@@ -359,30 +398,33 @@ function buildTags(cat) {
     return row;
   });
 
-  // MATERIAAL (multi)
-  addSection(area, 'Materiaal', '(meerdere mogelijk)', () => {
-    const wrap = document.createElement('div');
-    const groups = [
-      {label:'soepel:', items:['viscose','tencel','modal','satijn','jersey']},
-      {label:'stevig:', items:['katoen','bio-katoen','denim','wol','linnen','rib']},
-      {label:'gemengd:', items:['cashmere','merino','bamboe','fleece']},
-    ];
-    groups.forEach(g => {
-      const sub = document.createElement('div'); sub.className = 'tag-sub'; sub.textContent = g.label;
-      wrap.appendChild(sub);
-      const row = document.createElement('div'); row.className = 'tag-row';
-      g.items.forEach(v => row.appendChild(makeTagBtn(v, 'materiaal', true)));
-      wrap.appendChild(row);
+  // MATERIAAL (multi) — not for bags/accessories
+  if (showMateriaal) {
+    addSection(area, 'Materiaal', '(meerdere mogelijk)', () => {
+      const wrap = document.createElement('div');
+      const groups = [
+        {label:'soepel:', items:['viscose','tencel','modal','satijn','jersey']},
+        {label:'stevig:', items:['katoen','bio-katoen','denim','wol','linnen','rib']},
+        {label:'gemengd:', items:['cashmere','merino','bamboe','fleece']},
+        {label:'overig:', items:['leer','suède','velvet','neopreen','technisch']},
+      ];
+      groups.forEach(g => {
+        const sub = document.createElement('div'); sub.className = 'tag-sub'; sub.textContent = g.label;
+        wrap.appendChild(sub);
+        const row = document.createElement('div'); row.className = 'tag-row';
+        g.items.forEach(v => row.appendChild(makeTagBtn(v, 'materiaal', true)));
+        wrap.appendChild(row);
+      });
+      return wrap;
     });
-    return wrap;
-  });
 
-  // STOFGEWICHT
-  addSection(area, 'Stofgewicht', null, () => {
-    const row = document.createElement('div'); row.className = 'tag-row';
-    ['luchtig','medium','stevig'].forEach(v => row.appendChild(makeTagBtn(v, 'structuur', false)));
-    return row;
-  });
+    // STOFGEWICHT
+    addSection(area, 'Stofgewicht', null, () => {
+      const row = document.createElement('div'); row.className = 'tag-row';
+      ['luchtig','medium','stevig'].forEach(v => row.appendChild(makeTagBtn(v, 'structuur', false)));
+      return row;
+    });
+  }
 
   // LENGTE
   if (showLengte) {
@@ -501,6 +543,7 @@ async function saveItem() {
   const sm = document.getElementById('status-msg');
   pb.style.display = 'block';
 
+  const desc = (document.getElementById('item-desc').value || '').trim();
   const id = 'custom-' + Date.now();
   let photoUrl = null;
 
@@ -525,7 +568,7 @@ async function saveItem() {
   sm.textContent = 'Item opslaan…';
   const existing = await sbGet('custom-items') || {};
   if (!existing[selectedCat]) existing[selectedCat] = [];
-  existing[selectedCat].push({ id, name });
+  existing[selectedCat].push({ id, name, ...(desc ? {beschrijving: desc} : {}) });
   await sbSet('custom-items', existing);
   pf.style.width = '65%';
 
@@ -563,7 +606,7 @@ async function saveItem() {
   try {
     const lsi = JSON.parse(localStorage.getItem('griette-custom-items-v3') || '{}');
     if (!lsi[selectedCat]) lsi[selectedCat] = [];
-    lsi[selectedCat].push({ id, name });
+    lsi[selectedCat].push({ id, name, ...(desc ? {beschrijving: desc} : {}) });
     localStorage.setItem('griette-custom-items-v3', JSON.stringify(lsi));
   } catch(e) {}
 
@@ -589,6 +632,7 @@ function resetForm() {
   document.getElementById('file-camera').value  = '';
   document.getElementById('file-gallery').value = '';
   document.getElementById('item-name').value = '';
+  document.getElementById('item-desc').value  = '';
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
   document.getElementById('tags-area').innerHTML = '';
   document.getElementById('save-btn').disabled = true;
