@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Outfitkaart</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@500;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@500;600&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root {
+  --bg:#F8F5F1; --surface:#FFF; --border:#E8DDD2;
+  --text:#1C140E; --text-2:#8A7060; --accent:#9B7B5C;
+  --green:#2D7A4F; --ph-bg:#EDE5DA;
+}
+@media (prefers-color-scheme:dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#1A1410; --surface:#231C16; --border:#342620;
+    --text:#F0E6D8; --text-2:#9A7E68; --accent:#C4976A; --ph-bg:#2C2018;
+  }
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;display:flex;flex-direction:column;}
+
+.top-bar{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--bg);position:sticky;top:0;z-index:10;}
+.top-bar h1{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;flex:1;}
+.top-bar h1 span{color:var(--accent);}
+.back-link{font-size:20px;text-decoration:none;color:var(--text-2);}
+
+/* STEPS */
+.steps{display:flex;padding:12px 20px;gap:0;border-bottom:1px solid var(--border);background:var(--bg);}
+.step-dot{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;}
+.step-dot::after{content:'';position:absolute;top:8px;right:-50%;width:100%;height:1.5px;background:var(--border);}
+.step-dot:last-child::after{display:none;}
+.step-dot .dot{width:18px;height:18px;border-radius:50%;background:var(--border);color:var(--text-2);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:1;position:relative;}
+.step-dot.active .dot{background:var(--accent);color:#fff;}
+.step-dot.done .dot{background:var(--green);color:#fff;}
+.step-dot .slbl{font-size:8px;color:var(--text-2);text-align:center;letter-spacing:.03em;}
+.step-dot.active .slbl{color:var(--accent);font-weight:600;}
+
+/* PANELS */
+.panel{display:none;flex:1;overflow-y:auto;padding:20px 20px calc(90px + env(safe-area-inset-bottom,0px));}
+.panel.active{display:flex;flex-direction:column;gap:18px;}
+
+.sec-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:8px;}
+
+/* COMBO TYPE GRID */
+.combo-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.combo-type-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:14px 12px;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;}
+.combo-type-btn.selected{border-color:var(--accent);}
+.combo-type-btn .ct-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.combo-type-btn .ct-desc{font-size:10px;color:var(--text-2);line-height:1.4;}
+
+/* PRESET CARDS */
+.preset-list{display:flex;flex-direction:column;gap:10px;}
+.preset-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;-webkit-tap-highlight-color:transparent;}
+.preset-card.selected{border-color:var(--accent);}
+.preset-swatches{display:flex;gap:4px;flex-shrink:0;}
+.swatch{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.4);}
+.preset-info .pi-name{font-size:12px;font-weight:600;color:var(--text);}
+.preset-info .pi-vibe{font-size:10px;color:var(--text-2);margin-top:2px;}
+
+/* ITEM GRID */
+.item-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.icard{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent;}
+.icard.selected{border-color:var(--accent);}
+.icard.selected::after{content:'✓';position:absolute;top:4px;right:4px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.icard.dim{opacity:.35;}
+.ithumb{width:100%;aspect-ratio:1;background:var(--ph-bg);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.ithumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.iinfo{padding:5px 6px 7px;}
+.iname{font-size:8.5px;font-weight:500;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.icat{font-size:7.5px;color:var(--text-2);margin-top:1px;}
+
+/* FORM */
+input.field,textarea.field{width:100%;padding:13px 14px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;font-family:'Inter',sans-serif;font-size:15px;color:var(--text);outline:none;transition:border-color .2s;resize:none;}
+input.field:focus,textarea.field:focus{border-color:var(--accent);}
+input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
+.field-note{font-size:10px;color:var(--text-2);margin-top:4px;}
+
+/* BOTTOM BAR */
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--border);display:flex;gap:10px;}
+.btn-back{flex:0 0 auto;padding:14px 18px;background:transparent;border:1.5px solid var(--border);border-radius:12px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--text-2);cursor:pointer;}
+.btn-next{flex:1;padding:14px;background:var(--text);color:var(--bg);border:none;border-radius:12px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-next:disabled{opacity:.35;cursor:default;}
+
+/* ─── KAART ─────────────────────────────────────────────────────────────── */
+#card-wrap{display:none;padding:16px 16px calc(100px + env(safe-area-inset-bottom,0px));overflow-y:auto;}
+.kaart{
+  background:#F5F2EE;
+  border-radius:16px;overflow:hidden;
+  width:100%;max-width:420px;margin:0 auto;
+  padding:28px 24px 22px;
+  font-family:'Inter',sans-serif;
+  position:relative;
+}
+.kaart-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,10vw,48px);line-height:.95;letter-spacing:.02em;color:#1a1510;text-align:center;text-transform:uppercase;}
+.kaart-sub{font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#4a3828;text-align:center;margin-top:6px;margin-bottom:4px;}
+.kaart-anno-tr{position:absolute;top:28px;right:20px;font-family:'Caveat',cursive;font-size:14px;color:#1a2a4a;text-align:right;line-height:1.4;max-width:100px;}
+.kaart-anno-bl{position:absolute;bottom:130px;left:20px;font-family:'Caveat',cursive;font-size:14px;color:#1a2a4a;line-height:1.4;max-width:110px;}
+
+.kaart-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0 12px;}
+.kaart-item{display:flex;flex-direction:column;gap:5px;}
+.kaart-photo{width:100%;aspect-ratio:1;background:#e8ddd2;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.kaart-photo img{width:100%;height:100%;object-fit:contain;background:#fff;}
+.kaart-brand{font-family:'Inter',sans-serif;font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1a1510;text-align:center;line-height:1.2;}
+.kaart-desc{font-family:'Inter',sans-serif;font-size:8px;color:#5a4030;text-align:center;line-height:1.3;}
+
+.kaart-note{font-family:'Inter',sans-serif;font-size:9px;color:#5a4030;text-align:center;border-top:1px solid #ddd5c8;padding-top:8px;margin-top:4px;margin-bottom:8px;line-height:1.5;}
+.kaart-swatches{display:flex;justify-content:center;gap:6px;align-items:center;}
+.kaart-swatch{width:20px;height:20px;border-radius:3px;}
+.kaart-swatch-label{font-size:7.5px;color:#8a7060;letter-spacing:.1em;text-transform:uppercase;margin-right:4px;}
+
+.dl-bar{display:flex;flex-direction:column;gap:10px;padding:0 16px calc(20px + env(safe-area-inset-bottom,0px));max-width:480px;margin:0 auto;}
+.btn-dl{width:100%;padding:15px;background:#1C140E;color:#F5F2EE;border:none;border-radius:14px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-restart{width:100%;padding:14px;background:transparent;border:1.5px solid var(--border);border-radius:14px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a class="back-link" href="griette.html">←</a>
+  <h1>Outfit<span>kaart</span></h1>
+</div>
+
+<div class="steps" id="steps-bar">
+  <div class="step-dot active" id="sd1"><div class="dot">1</div><div class="slbl">Combo</div></div>
+  <div class="step-dot" id="sd2"><div class="dot">2</div><div class="slbl">Items</div></div>
+  <div class="step-dot" id="sd3"><div class="dot">3</div><div class="slbl">Details</div></div>
+  <div class="step-dot" id="sd4"><div class="dot">4</div><div class="slbl">Kaart</div></div>
+</div>
+
+<!-- STEP 1: COMBO -->
+<div class="panel active" id="p1">
+  <div>
+    <div class="sec-label">Kleurstrategie</div>
+    <div class="combo-type-grid" id="combo-type-grid"></div>
+  </div>
+  <div id="preset-area" style="display:none">
+    <div class="sec-label" id="preset-label">Kies een combo</div>
+    <div class="preset-list" id="preset-list"></div>
+  </div>
+</div>
+
+<!-- STEP 2: ITEMS -->
+<div class="panel" id="p2">
+  <div>
+    <div class="sec-label" id="item-count-label">Kies 4–6 items</div>
+    <div class="item-grid" id="item-grid"></div>
+  </div>
+</div>
+
+<!-- STEP 3: DETAILS -->
+<div class="panel" id="p3">
+  <div>
+    <div class="sec-label">Naam van de trip of gelegenheid</div>
+    <input class="field" type="text" id="f-title" placeholder="bijv. TERSCHELLING WEEKEND" maxlength="40">
+  </div>
+  <div>
+    <div class="sec-label">Label (nummer + omschrijving)</div>
+    <input class="field" type="text" id="f-sub" placeholder="bijv. 3.  DORP &amp; LUNCH" maxlength="50">
+  </div>
+  <div>
+    <div class="sec-label">Handgeschreven annotatie (rechtsboven)</div>
+    <textarea class="field" id="f-anno1" rows="2" placeholder="bijv. heldere kleur\nstrakke basis"></textarea>
+    <div class="field-note">Gebruik een enter voor twee regels</div>
+  </div>
+  <div>
+    <div class="sec-label">Handgeschreven annotatie (linksonder)</div>
+    <textarea class="field" id="f-anno2" rows="2" placeholder="bijv. sportief maar\nchic"></textarea>
+  </div>
+  <div>
+    <div class="sec-label">Stylingnoot (onderaan)</div>
+    <input class="field" type="text" id="f-note" placeholder="bijv. krachtige kleur + donkergrijs + grafische laag">
+  </div>
+</div>
+
+<!-- STEP 4: CARD + DOWNLOAD -->
+<div id="card-wrap">
+  <div class="kaart" id="the-kaart">
+    <div class="kaart-anno-tr" id="k-anno1"></div>
+    <div class="kaart-title" id="k-title">OUTFIT</div>
+    <div class="kaart-sub"   id="k-sub"></div>
+    <div class="kaart-grid"  id="k-grid"></div>
+    <div class="kaart-anno-bl" id="k-anno2"></div>
+    <div class="kaart-note"  id="k-note"></div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px;">
+      <span class="kaart-swatch-label">kleurfamilie</span>
+      <div class="kaart-swatches" id="k-swatches"></div>
+    </div>
+  </div>
+  <div style="height:16px;"></div>
+  <div class="dl-bar">
+    <button class="btn-dl" onclick="downloadKaart()">⬇ Download als afbeelding</button>
+    <button class="btn-restart" onclick="restart()">Nieuwe kaart maken</button>
+  </div>
+</div>
+
+<div class="bottom-bar" id="bottom-bar">
+  <button class="btn-back" id="btn-back" onclick="prevStep()" style="display:none">←</button>
+  <button class="btn-next" id="btn-next" disabled onclick="nextStep()">Volgende →</button>
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://osuqtfsxmquwqsbgzlqn.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
+const CDN = 'https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_';
+
+const DEFAULT_ITEMS = [
+  {id:'bershka-raglan',name:'Bershka raglan trui',brand:'Bershka',cat:'tops'},
+  {id:'second-female-grijs',name:'Crop sweater grijs',brand:'Second Female',cat:'tops'},
+  {id:'adidas-blauw-crop',name:'Crop t-shirt blauw',brand:'Adidas',cat:'tops'},
+  {id:'only-sons-blauw',name:'T-shirt koningsblauw',brand:'Only & Sons',cat:'tops'},
+  {id:'mbym-leopard-top',name:'Top luipaardprint',brand:'MbyM',cat:'tops'},
+  {id:'av-crop-longsleeve',name:'Crop longsleeve blauw',brand:'American Vintage',cat:'tops'},
+  {id:'av-remytown-turquoise',name:'T-shirt turquoise',brand:'American Vintage',cat:'tops'},
+  {id:'zara-turquoise-sweater',name:'Sweater turquoise',brand:'Zara',cat:'tops'},
+  {id:'wit-oversized',name:'Oversized t-shirt wit',brand:'—',cat:'tops'},
+  {id:'wit-basic',name:'Basic t-shirt wit',brand:'—',cat:'tops'},
+  {id:'geel-shirt',name:'T-shirt geel',brand:'Stieglitz',cat:'tops'},
+  {id:'oranje-shirt',name:'T-shirt oranje/zalm',brand:'Stieglitz',cat:'tops'},
+  {id:'gestreept',name:'Longsleeve gestreept',brand:'—',cat:'tops'},
+  {id:'blauwe-blouse',name:'Oversized blouse lichtblauw',brand:'—',cat:'tops'},
+  {id:'kanten-top',name:'Kanten top wit',brand:'—',cat:'tops'},
+  {id:'zwart-peplum',name:'Peplum top zwart',brand:'—',cat:'tops'},
+  {id:'blauw-spaghet',name:'Spaghettitopje donkerblauw',brand:'—',cat:'tops'},
+  {id:'bruin-spaghet',name:'Spaghettitopje donkerbruin',brand:'—',cat:'tops'},
+  {id:'bruin-longsleeve',name:'Longsleeve donkerbruin',brand:'—',cat:'tops'},
+  {id:'khaki-bloemenprint',name:'Wide leg broek khaki bloemenprint',brand:'—',cat:'bottoms'},
+  {id:'bordeaux-stripe-broek',name:'Wide leg broek bordeaux',brand:'—',cat:'bottoms'},
+  {id:'pullbear-balloon-jeans',name:'Ballonpijpen jeans blauw',brand:'Pull&Bear',cat:'bottoms'},
+  {id:'groen-barrel-broek',name:'Barrel-broek groen',brand:'Zara',cat:'bottoms'},
+  {id:'zara-cargo-khaki',name:'Cargo broek khaki',brand:'Zara',cat:'bottoms'},
+  {id:'roze-maxi',name:'Maxi rok felroze',brand:'—',cat:'bottoms'},
+  {id:'print-mini',name:'Mini rok print',brand:'—',cat:'bottoms'},
+  {id:'bruin-maxi',name:'Maxi rok bruin satijn',brand:'—',cat:'bottoms'},
+  {id:'rood-rok',name:'Mini rok rood',brand:'—',cat:'bottoms'},
+  {id:'witte-shorts',name:'Denim shorts wit',brand:'—',cat:'bottoms'},
+  {id:'lichtblauwe-shorts',name:'Denim shorts lichtblauw',brand:'—',cat:'bottoms'},
+  {id:'adidas-broek',name:'Firebird broek marineblauw',brand:'Adidas',cat:'bottoms'},
+  {id:'bruin-shorts',name:'Shorts bruin',brand:'—',cat:'bottoms'},
+  {id:'second-female-cardigan',name:'Cardigan beige gouden knopen',brand:'Second Female',cat:'layers'},
+  {id:'hm-beige-jas',name:'Cropped jas lichtbeige',brand:'H&M',cat:'layers'},
+  {id:'cargo-jasje',name:'Cargo jasje bruin',brand:'—',cat:'layers'},
+  {id:'paarse-cardigan',name:'Cardigan paars',brand:'—',cat:'layers'},
+  {id:'witte-cardigan',name:'Cardigan gebroken wit',brand:'—',cat:'layers'},
+  {id:'zwart-gilet',name:'Gilet zwart goudknopen',brand:'—',cat:'layers'},
+  {id:'hemdjurk',name:'Hemdjurk gebroken wit',brand:'—',cat:'jurken'},
+  {id:'bruin-jurk',name:'Longsleeve jurk donkerbruin',brand:'—',cat:'jurken'},
+  {id:'groen-tote-zara',name:'Tote bag groen geweven',brand:'Zara',cat:'bags'},
+  {id:'blauwe-tas',name:'Kettingtas blauw tweed',brand:'—',cat:'bags'},
+  {id:'leonie-bag',name:'Leonie bag bruin suède',brand:'Things I Like',cat:'bags'},
+  {id:'gele-bag',name:'Bucket bag geel stippen',brand:'—',cat:'bags'},
+  {id:'zwarte-sandaal',name:'Platte sandalen zwart',brand:'—',cat:'shoes'},
+  {id:'bruine-sandaal',name:'Platte sandalen bruin',brand:'—',cat:'shoes'},
+  {id:'zwarte-suede',name:'Suède sandalen zwart',brand:'—',cat:'shoes'},
+  {id:'bruine-suede',name:'Suède sandalen bruin',brand:'—',cat:'shoes'},
+  {id:'zwarte-kitten',name:'Kitten heel sandalen zwart',brand:'—',cat:'shoes'},
+  {id:'bruine-kitten',name:'Kitten heel sandalen bruin',brand:'—',cat:'shoes'},
+  {id:'choco-kitten',name:'Kitten heel slippers chocolade',brand:'—',cat:'shoes'},
+  {id:'new-balance',name:'9060 grijs/beige',brand:'New Balance',cat:'shoes'},
+  {id:'riem-bruin',name:'Leren riem bruin',brand:'—',cat:'accessories'},
+  {id:'riem-zwart',name:'Leren riem zwart',brand:'—',cat:'accessories'},
+  {id:'sjaaltje-roze',name:'Sjaaltje felroze',brand:'—',cat:'accessories'},
+  {id:'sjaaltje-blauw',name:'Sjaaltje blauw',brand:'—',cat:'accessories'},
+  {id:'zonnebril',name:'Zonnebril',brand:'—',cat:'accessories'},
+  {id:'petje',name:'Pet / cap',brand:'—',cat:'accessories'},
+  {id:'strooien-hoed',name:'Strooien hoed',brand:'—',cat:'accessories'},
+  {id:'ketting-goud',name:'Goudkleurige ketting',brand:'H&M',cat:'accessories'},
+  {id:'oorbellen-goud',name:'Gouden oorbellen',brand:'—',cat:'accessories'},
+  {id:'armband',name:'Armband',brand:'—',cat:'accessories'},
+  {id:'bikini-1',name:'Bikini',brand:'—',cat:'swimwear'},
+  {id:'badpak-1',name:'Badpak',brand:'—',cat:'swimwear'},
+  {id:'pareo',name:'Pareo / sarong',brand:'—',cat:'swimwear'},
+  {id:'strandtas',name:'Strandtas',brand:'—',cat:'swimwear'},
+  {id:'flipflops',name:'Flipflops',brand:'—',cat:'swimwear'},
+];
+
+// Color combo types — based on Griette's stijl DNA (Winter type, bold on neutral basis)
+const COMBO_TYPES = [
+  {
+    id:'ton-sur-ton', label:'Ton-sur-ton', desc:'Één kleurenfamilie van licht naar donker — verfijnd & rustig',
+    presets:[
+      {name:'Chocolade tonal',vibe:'warm & elegant',colors:['#5c3317','#8B4513','#c19a6b','#f0e8d8'],tags:['bruin','cognac','camel','gebroken-wit']},
+      {name:'Navy tonal',vibe:'krachtig & helder',colors:['#111827','#162038','#1a2a4a','#a8c4e0'],tags:['zwart','donkerblauw','marine','lichtblauw']},
+      {name:'Roze tonal',vibe:'romantisch & modern',colors:['#7b3fa0','#b088c8','#e8a0b4','#f8f4ef'],tags:['paars','lila/paars','roze','wit']},
+    ]
+  },
+  {
+    id:'complementair', label:'Complementair', desc:'Tegenovergestelde kleuren — maximaal contrast & energie',
+    presets:[
+      {name:'Turquoise × bruin',vibe:'elegant maar verrassend',colors:['#2ab0a8','#5c3317','#c19a6b','#f0e8d8'],tags:['turquoise','bruin','camel','gebroken-wit']},
+      {name:'Kobaltblauw × cognac',vibe:'grafisch & warm',colors:['#0047AB','#8B4513','#c19a6b','#f8f4ef'],tags:['kobaltblauw','cognac','camel','wit']},
+      {name:'Marine × mosterd',vibe:'klassiek & sterk',colors:['#1a2a4a','#b8860b','#c19a6b','#f8f4ef'],tags:['marine','mosterd','camel','wit']},
+      {name:'Felroze × olijf',vibe:'speels & onverwacht',colors:['#e8407a','#6b7c45','#f0e8d8','#888'],tags:['felroze','olijf/khaki','gebroken-wit','grijs']},
+    ]
+  },
+  {
+    id:'split-complementair', label:'Split-complementair', desc:'Jouw aanbevolen strategie — één kleur + twee accenten',
+    presets:[
+      {name:'Turquoise + roze + grijs',vibe:'energiek & chic',colors:['#2ab0a8','#e8407a','#888','#f0e8d8'],tags:['turquoise','felroze','grijs','gebroken-wit']},
+      {name:'Oranje-rood + roze + blauw',vibe:'warm & speels',colors:['#b5232a','#e8a0b4','#a8c4e0','#f8f4ef'],tags:['oranje-rood','roze','lichtblauw','wit']},
+      {name:'Navy + turquoise + roze',vibe:'grafisch & fris',colors:['#162038','#2ab0a8','#e8407a','#f0e8d8'],tags:['donkerblauw','turquoise','felroze','gebroken-wit']},
+    ]
+  },
+  {
+    id:'neutraal-accent', label:'Neutraal + accent', desc:'Strakke basis met één krachtige kleurpop',
+    presets:[
+      {name:'Zwart × felroze',vibe:'krachtig & verleidelijk',colors:['#111','#333','#e8407a','#f8f4ef'],tags:['zwart','zwart','felroze','wit']},
+      {name:'Bruin × turquoise',vibe:'aards & verrassend',colors:['#5c3317','#c19a6b','#2ab0a8','#f0e8d8'],tags:['bruin','camel','turquoise','gebroken-wit']},
+      {name:'Navy × geel/mosterd',vibe:'klassiek & vrolijk',colors:['#162038','#1a2a4a','#d4b84a','#f8f4ef'],tags:['donkerblauw','marine','geel','wit']},
+      {name:'Grijs × rood',vibe:'grafisch & sterk',colors:['#888','#555','#cc2211','#f8f4ef'],tags:['grijs','grijs','rood','wit']},
+    ]
+  },
+  {
+    id:'grafisch', label:'Grafisch', desc:'Hoog contrast met maximale visuele impact',
+    presets:[
+      {name:'Zwart-wit + goud',vibe:'tijdloos & luxe',colors:['#111','#f8f4ef','#c9a84c','#888'],tags:['zwart','wit','geel','grijs']},
+      {name:'Marine + crème + zwart',vibe:'strak & doordacht',colors:['#162038','#f0e8d8','#111','#c19a6b'],tags:['marine','gebroken-wit','zwart','camel']},
+      {name:'Bordeaux + zwart + goud',vibe:'dramatisch & elegant',colors:['#6e1020','#111','#c9a84c','#f0e8d8'],tags:['bordeaux','zwart','geel','gebroken-wit']},
+    ]
+  },
+];
+
+const CAT_ICONS = {tops:'👕',bottoms:'👖',layers:'🧥',jurken:'👗',bags:'👜',shoes:'👟',accessories:'🕶️',swimwear:'🩱',overig:'📦'};
+
+// STATE
+let step = 1;
+let selType = null, selPreset = null;
+let selItems = []; // max 6
+let allItems = [];
+let cloudMap = {};
+let itemTags = {};
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+async function init() {
+  // localStorage
+  try { cloudMap = JSON.parse(localStorage.getItem('griette-cloud-photos-v1')||'{}'); } catch(e){}
+  try { itemTags = JSON.parse(localStorage.getItem('griette-item-tags-v3')||'{}'); } catch(e){}
+  try {
+    const ci = JSON.parse(localStorage.getItem('griette-custom-items-v3')||'{}');
+    Object.entries(ci).forEach(([cat,list])=> list.forEach(i => DEFAULT_ITEMS.push(Object.assign({},i,{cat,brand:'eigen'}))));
+  } catch(e){}
+
+  // Supabase
+  const [sbPhotos, sbTags, sbCustom, sbDeleted] = await Promise.all([
+    sbGet('cloud-photos'), sbGet('item-tags'), sbGet('custom-items'), sbGet('deleted-items')
+  ]);
+  if (sbPhotos) Object.assign(cloudMap, sbPhotos);
+  if (sbTags)   Object.assign(itemTags, sbTags);
+  const deleted = new Set(Array.isArray(sbDeleted) ? sbDeleted : []);
+
+  const seen = new Set();
+  const extra = [];
+  if (sbCustom && typeof sbCustom === 'object') {
+    const entries = Array.isArray(sbCustom) ? sbCustom : Object.entries(sbCustom).flatMap(([cat,list])=>list.map(i=>Object.assign({},i,{cat,brand:'eigen'})));
+    entries.forEach(i => extra.push(i));
+  }
+
+  allItems = [...DEFAULT_ITEMS, ...extra].filter(i => {
+    if (!i || !i.id || deleted.has(i.id) || seen.has(i.id)) return false;
+    seen.add(i.id);
+    return true;
+  });
+
+  buildComboTypes();
+}
+
+async function sbGet(key) {
+  try {
+    const r = await fetch(SUPABASE_URL+'/rest/v1/griette_data?key=eq.'+encodeURIComponent(key)+'&select=value&limit=1',
+      {headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}});
+    const d = await r.json();
+    return (d&&d.length) ? JSON.parse(d[0].value) : null;
+  } catch(e){return null;}
+}
+
+// ── STEP 1: COMBO TYPE ────────────────────────────────────────────────────────
+function buildComboTypes() {
+  const grid = document.getElementById('combo-type-grid');
+  COMBO_TYPES.forEach(ct => {
+    const btn = document.createElement('button');
+    btn.className = 'combo-type-btn';
+    btn.innerHTML = `<div class="ct-name">${ct.label}</div><div class="ct-desc">${ct.desc}</div>`;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.combo-type-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selType = ct;
+      selPreset = null;
+      buildPresets(ct);
+      document.getElementById('btn-next').disabled = true;
+    });
+    grid.appendChild(btn);
+  });
+}
+
+function buildPresets(ct) {
+  const area  = document.getElementById('preset-area');
+  const list  = document.getElementById('preset-list');
+  const label = document.getElementById('preset-label');
+  label.textContent = ct.label + ' — kies een combo';
+  list.innerHTML = '';
+  ct.presets.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'preset-card';
+    const swatches = p.colors.map(c=>`<div class="swatch" style="background:${c}"></div>`).join('');
+    card.innerHTML = `<div class="preset-swatches">${swatches}</div><div class="preset-info"><div class="pi-name">${p.name}</div><div class="pi-vibe">${p.vibe}</div></div>`;
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.preset-card').forEach(b=>b.classList.remove('selected'));
+      card.classList.add('selected');
+      selPreset = p;
+      document.getElementById('btn-next').disabled = false;
+    });
+    list.appendChild(card);
+  });
+  area.style.display = 'block';
+  area.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ── STEP 2: ITEMS ─────────────────────────────────────────────────────────────
+function buildItemGrid() {
+  const grid = document.getElementById('item-grid');
+  grid.innerHTML = '';
+  selItems = [];
+
+  // Sort: items with photos first, then matching color tags first within that
+  const matchTags = selPreset ? selPreset.tags : [];
+  const withPhoto = allItems.filter(i => cloudMap[i.id]);
+  const noPhoto   = allItems.filter(i => !cloudMap[i.id]);
+
+  function tagMatch(i) {
+    const t = itemTags[i.id];
+    if (!t || !t.kleur) return 0;
+    return matchTags.includes(t.kleur) ? 2 : 0;
+  }
+
+  const sorted = [
+    ...withPhoto.sort((a,b) => tagMatch(b)-tagMatch(a)),
+    ...noPhoto.sort((a,b) => tagMatch(b)-tagMatch(a)),
+  ];
+
+  sorted.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'icard';
+    card.dataset.id = item.id;
+
+    const hasPhoto = !!cloudMap[item.id];
+    const icon = CAT_ICONS[item.cat] || '📦';
+    card.innerHTML = `
+      <div class="ithumb" id="ith-${item.id}">${icon}</div>
+      <div class="iinfo">
+        <div class="iname">${item.name}</div>
+        <div class="icat">${item.brand || item.cat}</div>
+      </div>`;
+
+    if (hasPhoto) {
+      const img = new Image();
+      img.onload = () => {
+        const th = document.getElementById('ith-'+item.id);
+        if (th) { th.textContent=''; th.appendChild(img); }
+      };
+      img.src = cloudMap[item.id];
+      img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+    }
+
+    card.addEventListener('click', () => toggleItem(item, card));
+    grid.appendChild(card);
+  });
+
+  updateItemCount();
+}
+
+function toggleItem(item, card) {
+  const idx = selItems.findIndex(i=>i.id===item.id);
+  if (idx >= 0) {
+    selItems.splice(idx, 1);
+    card.classList.remove('selected');
+  } else {
+    if (selItems.length >= 6) return;
+    selItems.push(item);
+    card.classList.add('selected');
+  }
+  // dim cards over limit
+  document.querySelectorAll('.icard').forEach(c => {
+    if (!c.classList.contains('selected') && selItems.length >= 6) c.classList.add('dim');
+    else c.classList.remove('dim');
+  });
+  updateItemCount();
+  document.getElementById('btn-next').disabled = selItems.length < 4;
+}
+
+function updateItemCount() {
+  document.getElementById('item-count-label').textContent = `Items gekozen: ${selItems.length}/6 (min 4)`;
+}
+
+// ── STEP 3 validation ──────────────────────────────────────────────────────────
+function step3Check() {
+  const t = document.getElementById('f-title').value.trim();
+  document.getElementById('btn-next').disabled = !t;
+}
+
+// ── STEP 4: CARD ──────────────────────────────────────────────────────────────
+function buildKaart() {
+  const title = document.getElementById('f-title').value.trim().toUpperCase() || 'OUTFIT';
+  const sub   = document.getElementById('f-sub').value.trim();
+  const anno1 = document.getElementById('f-anno1').value.trim().replace(/\n/g,'<br>');
+  const anno2 = document.getElementById('f-anno2').value.trim().replace(/\n/g,'<br>');
+  const note  = document.getElementById('f-note').value.trim();
+
+  document.getElementById('k-title').textContent = title;
+  document.getElementById('k-sub').textContent   = sub;
+  document.getElementById('k-anno1').innerHTML   = anno1;
+  document.getElementById('k-anno2').innerHTML   = anno2;
+  document.getElementById('k-note').textContent  = note;
+
+  // Color swatches
+  const sw = document.getElementById('k-swatches');
+  sw.innerHTML = '';
+  (selPreset?.colors || []).forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'kaart-swatch';
+    d.style.background = c;
+    sw.appendChild(d);
+  });
+
+  // Items grid
+  const grid = document.getElementById('k-grid');
+  grid.innerHTML = '';
+  // Fill to 6 slots
+  const slots = selItems.slice(0,6);
+  while (slots.length < 6) slots.push(null);
+
+  slots.forEach(item => {
+    const col = document.createElement('div');
+    col.className = 'kaart-item';
+    if (!item) { col.innerHTML='<div class="kaart-photo"></div><div class="kaart-brand"></div><div class="kaart-desc"></div>'; grid.appendChild(col); return; }
+    const photoUrl = cloudMap[item.id] || null;
+    const icon = CAT_ICONS[item.cat] || '📦';
+    col.innerHTML = `
+      <div class="kaart-photo" id="kp-${item.id}">${photoUrl?'':icon}</div>
+      <div class="kaart-brand">${(item.brand&&item.brand!=='—')?item.brand:''}</div>
+      <div class="kaart-desc">${item.name}</div>`;
+    if (photoUrl) {
+      const img = document.createElement('img');
+      img.crossOrigin = 'anonymous';
+      img.src = photoUrl;
+      document.getElementById('kp-'+item.id)?.appendChild(img);
+    }
+    grid.appendChild(col);
+  });
+}
+
+// ── DOWNLOAD ──────────────────────────────────────────────────────────────────
+async function downloadKaart() {
+  const el = document.getElementById('the-kaart');
+  try {
+    const canvas = await html2canvas(el, {
+      useCORS: true, allowTaint: false,
+      scale: 3, backgroundColor: '#F5F2EE',
+      logging: false,
+    });
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/jpeg', 0.95);
+    a.download = 'outfitkaart-' + new Date().toISOString().slice(0,10) + '.jpg';
+    a.click();
+  } catch(e) {
+    alert('Download mislukt: ' + e.message);
+  }
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function setStep(n) {
+  step = n;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('card-wrap').style.display='none';
+  document.getElementById('steps-bar').style.display='flex';
+  document.getElementById('bottom-bar').style.display='flex';
+
+  [1,2,3,4].forEach(i=>{
+    const sd=document.getElementById('sd'+i);
+    sd.classList.remove('active','done');
+    if(i<n) sd.classList.add('done');
+    if(i===n) sd.classList.add('active');
+  });
+
+  const btnBack = document.getElementById('btn-back');
+  const btnNext = document.getElementById('btn-next');
+  btnBack.style.display = n>1?'block':'none';
+
+  if (n===1) {
+    document.getElementById('p1').classList.add('active');
+    btnNext.textContent = 'Volgende →';
+    btnNext.disabled = !selPreset;
+
+  } else if (n===2) {
+    document.getElementById('p2').classList.add('active');
+    buildItemGrid();
+    btnNext.textContent = 'Volgende →';
+    btnNext.disabled = selItems.length < 4;
+
+  } else if (n===3) {
+    document.getElementById('p3').classList.add('active');
+    btnNext.textContent = 'Kaart genereren →';
+    document.getElementById('f-title').addEventListener('input', step3Check);
+    step3Check();
+
+  } else if (n===4) {
+    document.getElementById('steps-bar').style.display='none';
+    document.getElementById('bottom-bar').style.display='none';
+    document.getElementById('card-wrap').style.display='block';
+    buildKaart();
+  }
+}
+
+function nextStep() { setStep(Math.min(step+1,4)); }
+function prevStep() { setStep(Math.max(step-1,1)); }
+function restart()  { selType=null; selPreset=null; selItems=[]; setStep(1); window.scrollTo(0,0); }
+
+// Start
+init().then(() => setStep(1));
+</script>
+</body>
+</html>
