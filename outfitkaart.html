@@ -823,6 +823,7 @@ async function aiCombosVoorItem() {
     val(t.patroon)   && 'patroon: '   + val(t.patroon),
     val(t.materiaal) && 'materiaal: ' + val(t.materiaal),
     val(t.pasvorm)   && 'pasvorm: '   + val(t.pasvorm),
+    val(t.soort)     && 'soort: '     + val(t.soort),
   ].filter(Boolean).join(', ');
 
   const kleurNamen = KLEUREN.map(k => k.v).join(', ');
@@ -1210,7 +1211,7 @@ function wardrobeForAI() {
   return allItems.map(i => {
     const t = itemTags[i.id] || {};
     const val = v => Array.isArray(v) ? v.join('/') : (v || '');
-    const extra = [val(t.kleur), val(t.patroon), val(t.materiaal), val(t.pasvorm)]
+    const extra = [val(t.kleur), val(t.patroon), val(t.materiaal), val(t.pasvorm), val(t.soort)]
       .filter(Boolean).join(', ');
     return `${i.id} | ${i.cat} | ${i.name}${extra ? ' | ' + extra : ''}${cloudMap[i.id] ? ' | heeft foto' : ''}`;
   }).join('\n');
@@ -1235,7 +1236,10 @@ async function aiComposeOutfit() {
   const reeds = selItems.filter(i => !i._suggestion);
   const reedsBlok = reeds.length
     ? `\nGriette heeft deze items AL GEKOZEN. Neem ze allemaal over in je antwoord en bouw de outfit eromheen:\n`
-      + reeds.map(i => `- ${i.id} | ${i.cat} | ${i.name}`).join('\n') + '\n'
+      + reeds.map(i => `- ${i.id} | ${i.cat} | ${i.name}`
+          + (anchorItem && i.id === anchorItem.id
+             ? '   <-- het item waar de look omheen wordt gebouwd; dit blijft altijd staan'
+             : '')).join('\n') + '\n'
     : '';
 
   const userMsg = `Dit is Griette's complete garderobe (formaat: id | categorie | naam | tags):
@@ -1250,6 +1254,9 @@ Regels:
 - Gebruik BIJ VOORKEUR items uit de lijst hierboven. Neem dan het exacte id over.
 - Zorg voor een compleet silhouet: iets voor boven, iets voor onder (of een jurk),
   schoenen, en waar passend een laag, tas of accessoire.
+- Een jas of blazer telt als EXTRA laag bovenop een cardigan of gilet. Voeg er een
+  toe als het seizoen of de gelegenheid erom vraagt; de tag "soort" zegt om wat
+  voor laag het gaat.
 - Ontbreekt er iets essentieels in haar kast om deze kleurcombo te laten werken,
   stel dat dan voor als NIEUW item met eigen=false en een concrete omschrijving
   (bijv. "antraciet barrel jeans, mid-rise"). Wees hier eerlijk over — liever één
@@ -1296,6 +1303,10 @@ Antwoord ALLEEN met JSON, geen tekst eromheen:
       }
     });
     if (!picked.length) throw new Error('Geen items voorgesteld');
+    if (anchorItem && !picked.some(i => i.id === anchorItem.id)) {
+      picked.unshift(Object.assign({}, anchorItem, { _waarom: 'jouw uitgangspunt' }));
+      if (picked.length > 6) picked.length = 6;
+    }
 
     selItems = picked;
     buildItemGrid();          // toont de aangevinkte eigen items
@@ -1520,7 +1531,14 @@ async function aiAnalyseOutfit() {
     : 'geen combo gekozen';
   const huidig = selItems.map(i =>
     `- ${i._suggestion ? '[voorstel, niet in bezit] ' : i.id + ' | '}${i.name} (${i.cat})`
+      + (anchorItem && i.id === anchorItem.id ? '   <-- VAST, NIET VERVANGEN' : '')
   ).join('\n');
+
+  const ankerBlok = anchorItem ? `
+LET OP: "${anchorItem.name}" (id: ${anchorItem.id}) is het item waar Griette de
+look bewust omheen bouwt. Dit item MOET in de outfit blijven staan, precies zoals
+het is. Vervang het nooit. Past er iets niet bij, pas dan de ANDERE items aan.
+` : '';
 
   const userContent = [];
   userContent.push({ type:'text', text:
@@ -1533,13 +1551,14 @@ VOLLEDIGE GARDEROBE (id | categorie | naam | tags):
 ${wardrobeForAI()}
 
 Gekozen kleurcombo: ${combo}
-
+${ankerBlok}
 ${FW_TRENDS}
 
 Kijk naar de foto's hieronder en beoordeel elk item op kleur, vorm/silhouet en textuur.
 
 Werkt een item niet goed in deze combinatie, VERVANG het dan door een beter item
-uit de garderobe hierboven (neem het exacte id over). Alleen als de garderobe echt
+uit de garderobe hierboven (neem het exacte id over). Een item dat als VAST staat
+gemarkeerd blijft altijd staan. Alleen als de garderobe echt
 geen alternatief heeft, mag je een nieuw item voorstellen met eigen=false.
 Vervang niet om te vervangen: klopt de outfit al, laat hem dan staan.
 
@@ -1584,6 +1603,7 @@ Verzin nooit een id dat niet in de garderobelijst staat.`;
     // Nieuwe, geperfectioneerde outfit overnemen
     const arr = pickArray(data, ['outfit','items']);
     let vervangen = 0;
+    let ankerHersteld = false;
     if (arr && arr.length) {
       const oudeNamen = selItems.map(i=>i.name);
       const nieuw = [];
@@ -1598,6 +1618,12 @@ Verzin nooit een id dat niet in de garderobelijst staat.`;
         });
       });
       if (nieuw.length) {
+        // Vangnet: negeert de AI de instructie, dan zetten we het anker terug
+        if (anchorItem && !nieuw.some(i => i.id === anchorItem.id)) {
+          nieuw.unshift(Object.assign({}, anchorItem, { _waarom: 'jouw uitgangspunt' }));
+          if (nieuw.length > 6) nieuw.length = 6;
+          ankerHersteld = true;
+        }
         vervangen = nieuw.filter(i=>!oudeNamen.includes(i.name)).length;
         selItems = nieuw;
       }
@@ -1607,6 +1633,9 @@ Verzin nooit een id dat niet in de garderobelijst staat.`;
     if (typeof data.waarom_top === 'string') outfitTop = data.waarom_top;
 
     buildKaart();
+    if (ankerHersteld) showCardNotice(
+      'De AI wilde <b>' + esc(anchorItem.name) + '</b> vervangen, maar dat is je '
+      + 'uitgangspunt — die is teruggezet.');
     renderAiAnalysis(data, vervangen);
     panel.style.display = 'block';
     btn.textContent = vervangen

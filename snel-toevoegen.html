@@ -356,6 +356,15 @@ function buildTags(cat) {
     }
   }
 
+  // SOORT LAAG — alleen bij laagjes
+  if (cat === 'layers') {
+    addSection(area, 'Soort laag', null, () => {
+      const row = document.createElement('div'); row.className = 'tag-row';
+      ['jas', 'blazer', 'trenchcoat', 'parka', 'bomber', 'biker', 'overshirt', 'blouson', 'cape', 'gilet', 'cardigan', 'vest', 'poncho', 'teddy', 'puffer', 'regenjas'].forEach(v => row.appendChild(makeTagBtn(v, 'soort', false)));
+      return row;
+    });
+  }
+
   // HALS
   if (showHals) {
     addSection(area, 'Hals', null, () => {
