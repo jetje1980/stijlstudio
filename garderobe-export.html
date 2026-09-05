@@ -171,11 +171,10 @@ h1 span { color:var(--accent); }
 <div id="launch-card">
   <div class="lc-title">Wat er in de ZIP komt</div>
   <ul class="lc-list">
-    <li>Eén JPG per item (bestandsnaam = item-ID, bijv. <code>adidas-broek.jpg</code>)</li>
-    <li><code>manifest.json</code> — item-ID, naam, categorie, bestandsnaam, URL</li>
-    <li><code>manifest.csv</code> — zelfde data, tabulair</li>
-    <li>Alleen items die daadwerkelijk een foto hebben op Cloudinary</li>
-    <li>Custom items uit localStorage worden meegenomen</li>
+    <li>Eén JPG per item dat een foto heeft op Cloudinary</li>
+    <li><code>manifest.json</code> / <code>manifest.csv</code> — <strong>alle</strong> items (ook zonder foto), met naam, categorie en foto-URL</li>
+    <li>Items zonder foto staan in het manifest met <code>heeft_foto: false</code></li>
+    <li>Custom/eigen items uit Supabase worden automatisch meegenomen</li>
   </ul>
   <button id="start-btn" onclick="startExport()">⬇ Maak garderobe-export.zip</button>
 </div>
@@ -384,7 +383,14 @@ async function startExport() {
     });
   });
 
-  // Build URL map: prefer cloudMap override, else standard CDN URL
+  // Add ALL photo IDs from cloudMap that aren't already in the item list
+  Object.entries(cloudMap).forEach(([id, url]) => {
+    if (!id || seen.has(id) || deletedIds.has(id)) return;
+    seen.add(id);
+    items.push({ id, name: id, cat: 'overig', _cloudUrl: url });
+  });
+
+  // Build URL map: use explicit cloudMap URL if present, else standard CDN URL
   const urlFor = id => cloudMap[id] || (CDN_BASE + id + '.jpg');
 
   // Show progress
@@ -435,14 +441,26 @@ async function startExport() {
   const queue = [...items];
   await Promise.all([worker(queue), worker(queue), worker(queue), worker(queue), worker(queue)]);
 
-  // Build manifests
+  // Build manifests — ALL items, photo flag
   const found = results.filter(r => r.status === 'ok');
-  const manifest = found.map(r => ({ id: r.id, name: r.name, category: r.cat, file: r.file, cloudinary_url: r.url }));
+  const manifest = results.map(r => ({
+    id: r.id, name: r.name, category: r.cat,
+    file: r.file || null,
+    cloudinary_url: r.file ? r.url : null,
+    heeft_foto: r.file !== null,
+  }));
   zip.file('manifest.json', JSON.stringify(manifest, null, 2));
 
   const csvRows = [
-    ['item_id','naam','categorie','bestand','cloudinary_url'],
-    ...found.map(r => [r.id, '"' + r.name.replace(/"/g,'""') + '"', r.cat, r.file, r.url])
+    ['item_id','naam','categorie','heeft_foto','bestand','cloudinary_url'],
+    ...results.map(r => [
+      r.id,
+      '"' + r.name.replace(/"/g,'""') + '"',
+      r.cat,
+      r.file ? 'ja' : 'nee',
+      r.file || '',
+      r.file ? r.url : '',
+    ])
   ];
   zip.file('manifest.csv', csvRows.map(r => r.join(',')).join('\n'));
 
@@ -455,16 +473,18 @@ async function startExport() {
   const dlCard = document.getElementById('dl-card');
   const dlSub  = document.getElementById('dl-sub');
   dlCard.style.display = 'block';
-  document.getElementById('dl-title').textContent = '✓ ' + found.length + ' foto\'s ingepakt';
+  document.getElementById('dl-title').textContent = '✓ ' + found.length + ' foto\'s + ' + (items.length - found.length) + ' naamlijst';
   dlSub.innerHTML =
-    found.length + ' foto\'s · ' + (items.length - found.length) + ' zonder foto overgeslagen<br>'
-    + 'Bevat ook <code>manifest.json</code> en <code>manifest.csv</code>.';
+    '<strong>' + found.length + '</strong> foto\'s ingepakt · '
+    + '<strong>' + (items.length - found.length) + '</strong> items zonder foto (staan wel in manifest)<br>'
+    + '<code>manifest.json</code> en <code>manifest.csv</code> bevatten alle '
+    + items.length + ' items.';
 
   document.getElementById('dl-btn').addEventListener('click', downloadZip);
   document.getElementById('stats-bar').style.display = 'block';
   document.getElementById('stats-bar').innerHTML =
     '<strong>' + found.length + '</strong> foto\'s · '
-    + '<strong>' + (items.length - found.length) + '</strong> zonder foto · '
+    + '<strong>' + (items.length - found.length) + '</strong> zonder foto (wel in manifest) · '
     + '<strong>' + items.length + '</strong> items totaal';
 }
 

@@ -31,144 +31,84 @@
 }
 *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text); padding:28px 20px 60px; }
-.wrap { max-width: 860px; margin: 0 auto; }
+.wrap { max-width: 900px; margin: 0 auto; }
 
-header { padding-bottom:18px; border-bottom:1px solid var(--border); margin-bottom:24px; }
+header { padding-bottom:16px; border-bottom:1px solid var(--border); margin-bottom:22px; }
 h1 { font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:500; }
 h1 span { color:var(--accent); }
 .sub { font-size:11px; color:var(--text-2); margin-top:5px; line-height:1.7; }
 
-/* STATUS BAR */
+/* STATUS */
 #status-bar {
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:14px 18px;
-  margin-bottom:18px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  gap:10px;
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+  padding:14px 18px; margin-bottom:16px;
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
 }
-.status-text { font-size:12px; line-height:1.7; }
+.status-text { font-size:12px; line-height:1.8; }
 .status-text .ok   { color:var(--green); font-weight:600; }
 .status-text .warn { color:var(--accent); font-weight:600; }
-#check-btn {
-  padding:9px 18px;
-  background:var(--text);
-  color:var(--bg);
-  border:none; border-radius:8px;
+.status-text .info { color:var(--text-2); }
+
+.btn-row { display:flex; gap:8px; flex-wrap:wrap; }
+.btn {
+  padding:9px 16px; border:none; border-radius:8px;
   font-family:'Inter',sans-serif; font-size:12px; font-weight:600;
   cursor:pointer; white-space:nowrap;
 }
-#check-btn:disabled { opacity:.4; cursor:default; }
+.btn-primary { background:var(--text); color:var(--bg); }
+.btn-secondary { background:var(--surface); color:var(--text); border:1.5px solid var(--border); }
+.btn:disabled { opacity:.4; cursor:default; }
+.btn-primary:not(:disabled):hover { opacity:.82; }
+.btn-secondary:not(:disabled):hover { background:var(--ph-bg); }
 
 /* PROGRESS */
-#check-prog {
-  display:none;
-  height:4px; background:var(--border); border-radius:2px;
-  overflow:hidden; margin-bottom:16px;
-}
+#check-prog { display:none; height:4px; background:var(--border); border-radius:2px; overflow:hidden; margin-bottom:16px; }
 #check-prog .f { height:100%; background:var(--accent); width:0; transition:width .2s; }
 
 /* CONTEXT BLOCK */
-#context-wrap {
-  display:none;
-  margin-bottom:24px;
-}
-.cw-head {
-  display:flex; align-items:center; justify-content:space-between;
-  flex-wrap:wrap; gap:10px; margin-bottom:10px;
-}
-.cw-label { font-size:11px; font-weight:600; color:var(--text); }
+#context-wrap { display:none; margin-bottom:22px; }
+.cw-head { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:8px; }
+.cw-label { font-size:11px; font-weight:600; }
 .cw-sub   { font-size:10px; color:var(--text-2); }
-#copy-btn {
-  padding:8px 16px;
-  background:var(--accent);
-  color:#fff; border:none; border-radius:7px;
-  font-family:'Inter',sans-serif; font-size:12px; font-weight:600;
-  cursor:pointer; white-space:nowrap;
-}
+#copy-btn { padding:8px 16px; background:var(--accent); color:#fff; border:none; border-radius:7px; font-family:'Inter',sans-serif; font-size:12px; font-weight:600; cursor:pointer; }
 #copy-btn.copied { background:var(--green); }
-
 #context-box {
-  width:100%;
-  height:220px;
-  background:var(--code-bg);
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:14px 16px;
-  font-family:'Courier New',monospace;
-  font-size:10px;
-  line-height:1.7;
-  color:var(--text);
-  resize:vertical;
-  overflow:auto;
-  white-space:pre;
+  width:100%; height:200px; background:var(--code-bg); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px; font-family:'Courier New',monospace; font-size:10px;
+  line-height:1.7; color:var(--text); resize:vertical; overflow:auto; white-space:pre;
 }
 
-/* HOW-TO CARD */
-.howto {
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:18px 20px;
-  margin-bottom:24px;
-}
-.howto h2 { font-size:13px; font-weight:600; margin-bottom:12px; }
-.steps { list-style:none; counter-reset:steps; }
-.steps li { counter-increment:steps; display:flex; gap:12px; margin-bottom:10px; font-size:12px; line-height:1.6; }
-.steps li::before {
-  content:counter(steps);
-  display:flex; align-items:center; justify-content:center;
-  width:20px; height:20px; border-radius:50%;
-  background:var(--accent); color:#fff;
-  font-size:9px; font-weight:700; flex-shrink:0; margin-top:1px;
-}
-.steps code {
-  background:var(--code-bg);
-  padding:1px 5px; border-radius:3px;
-  font-family:'Courier New',monospace; font-size:9.5px;
-}
-.tip {
-  font-size:11px; color:var(--text-2);
-  background:var(--code-bg); border-radius:7px;
-  padding:10px 13px; margin-top:12px; line-height:1.7;
-}
+/* HOW-TO */
+.howto { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin-bottom:20px; }
+.howto h2 { font-size:12px; font-weight:600; margin-bottom:10px; }
+.steps { list-style:none; counter-reset:s; }
+.steps li { counter-increment:s; display:flex; gap:10px; margin-bottom:8px; font-size:11px; line-height:1.6; }
+.steps li::before { content:counter(s); display:flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:var(--accent); color:#fff; font-size:9px; font-weight:700; flex-shrink:0; margin-top:2px; }
 
 /* GRID */
-#grid-wrap { margin-top:6px; }
+#grid-area { }
+.cat-block { margin-bottom:20px; }
 .sec-label {
-  font-size:9px; letter-spacing:.18em; text-transform:uppercase;
-  color:var(--accent); font-weight:600; margin-bottom:12px;
-  display:flex; align-items:center; gap:8px;
+  font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent);
+  font-weight:600; margin-bottom:10px; display:flex; align-items:center; gap:8px;
 }
 .sec-label::before { content:''; width:14px; height:1px; background:var(--accent); flex-shrink:0; }
 .sec-label::after  { content:''; flex:1; height:1px; background:var(--border); }
-.grid {
-  display:grid; grid-template-columns:repeat(6,1fr); gap:7px;
-}
-@media (max-width:560px) { .grid { grid-template-columns:repeat(3,1fr); } }
-.icard {
-  background:var(--surface); border:2px solid var(--border);
-  border-radius:7px; overflow:hidden;
-}
+.grid { display:grid; grid-template-columns:repeat(7,1fr); gap:7px; }
+@media (max-width:600px) { .grid { grid-template-columns:repeat(3,1fr); } }
+
+.icard { background:var(--surface); border:2px solid var(--border); border-radius:7px; overflow:hidden; transition:border-color .12s; }
 .icard.ok   { border-color:#2D7A4F; }
-.icard.miss { opacity:.45; }
-.thumb {
-  width:100%; aspect-ratio:1; background:var(--ph-bg);
-  position:relative; overflow:hidden;
-  display:flex; align-items:center; justify-content:center;
-  font-size:18px; color:var(--text-2);
-}
+.icard.miss { opacity:.5; }
+.icard.custom { border-color:var(--accent); }
+.thumb { width:100%; aspect-ratio:1; background:var(--ph-bg); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--text-2); }
 .thumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-.ilabel { padding:5px 6px 7px; }
-.iname { font-size:8.5px; font-weight:500; line-height:1.3;
-  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-.ist { font-size:8px; margin-top:2px; font-weight:500; }
+.ilabel { padding:4px 5px 6px; }
+.iname { font-size:8px; font-weight:500; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.ist { font-size:7.5px; margin-top:1px; font-weight:500; }
 .ist.ok   { color:var(--green); }
 .ist.miss { color:var(--text-2); }
+.ist.custom { color:var(--accent); }
 </style>
 </head>
 <body>
@@ -176,65 +116,57 @@ h1 span { color:var(--accent); }
 
 <header>
   <h1>Garderobe <span>× ChatGPT</span></h1>
-  <p class="sub">
-    Controleer welke foto's beschikbaar zijn op Cloudinary, genereer daarna een compleet contextblok
-    dat je in ChatGPT plakt — ChatGPT kan dan alle foto-URL's ophalen en de items "zien".
-  </p>
+  <p class="sub">Laadt alle items uit Supabase (incl. eigen toegevoegde items), controleert welke foto's beschikbaar zijn, en genereert een kant-en-klaar contextblok voor ChatGPT.</p>
 </header>
 
-<!-- HOW-TO -->
 <div class="howto">
   <h2>Hoe werkt het</h2>
   <ol class="steps">
-    <li>Klik <strong>"Controleer foto's"</strong> — de pagina test welke Cloudinary-URL's bereikbaar zijn.</li>
-    <li>Klik <strong>"Kopieer voor ChatGPT"</strong> — je krijgt een kant-en-klaar contextblok met alle items + foto-URL's.</li>
-    <li>Open ChatGPT → plak het blok als eerste bericht → ChatGPT laadt alle foto's via Vision.</li>
-    <li>Zijn er nog items zonder foto? Upload ze via <a href="/foto-upload.html" style="color:var(--accent)">foto-upload.html</a> en kom daarna hier terug.</li>
+    <li>Pagina laadt automatisch alle items + foto-URLs uit Supabase.</li>
+    <li>Klik <strong>"Controleer foto's"</strong> om te zien welke Cloudinary-URL's bereikbaar zijn (groene rand).</li>
+    <li>Klik <strong>"Kopieer voor ChatGPT"</strong> → plak als eerste bericht in ChatGPT.</li>
+    <li>ChatGPT kan dan alle foto-URL's ophalen via Vision/browsing.</li>
   </ol>
-  <p class="tip">
-    <strong>Tip voor ChatGPT:</strong> gebruik de instructie "Bekijk alle foto-URL's in dit bericht en gebruik ze bij je antwoorden over mijn garderobe."
-    ChatGPT met browsing of Vision kan elke Cloudinary-URL ophalen als afbeelding.
-  </p>
 </div>
 
-<!-- STATUS -->
 <div id="status-bar">
-  <div class="status-text" id="status-text">Klik "Controleer foto's" om te zien welke beschikbaar zijn.</div>
-  <button id="check-btn" onclick="runCheck()">🔍 Controleer foto's</button>
+  <div class="status-text" id="status-text"><span class="info">⏳ Gegevens laden uit Supabase…</span></div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" id="check-btn" onclick="runCheck()" disabled>🔍 Controleer foto's</button>
+    <button class="btn btn-primary"   id="copy-btn2" onclick="triggerCopy()" disabled>Kopieer voor ChatGPT</button>
+  </div>
 </div>
 <div id="check-prog"><div class="f" id="check-fill"></div></div>
 
-<!-- CONTEXT BLOCK -->
 <div id="context-wrap">
   <div class="cw-head">
-    <div>
-      <div class="cw-label">ChatGPT-contextblok</div>
-      <div class="cw-sub">Kopieer dit en plak het als eerste bericht in ChatGPT</div>
-    </div>
+    <div><div class="cw-label">ChatGPT-contextblok</div><div class="cw-sub">Kopieer en plak als eerste bericht in ChatGPT</div></div>
     <button id="copy-btn" onclick="copyContext()">Kopieer voor ChatGPT</button>
   </div>
   <textarea id="context-box" readonly></textarea>
 </div>
 
-<!-- GRID -->
-<div id="grid-wrap">
-  <div class="sec-label"><span id="grid-label">Alle items</span></div>
-  <div class="grid" id="grid"></div>
-</div>
+<div id="grid-area"></div>
 
 </div>
 <script>
 const CDN = 'https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_';
+const SUPABASE_URL = 'https://osuqtfsxmquwqsbgzlqn.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
+
+const CAT_META = {
+  tops:        { label:'Tops',            icon:'👕' },
+  bottoms:     { label:'Bottoms & Rokken',icon:'👖' },
+  layers:      { label:'Laagjes',         icon:'🧥' },
+  jurken:      { label:'Jurken',          icon:'👗' },
+  bags:        { label:'Tassen',          icon:'👜' },
+  shoes:       { label:'Schoenen',        icon:'👟' },
+  accessories: { label:'Accessoires',     icon:'🕶️' },
+  swimwear:    { label:'Zwemwear',        icon:'🩱' },
+  overig:      { label:'Overig',          icon:'📦' },
+};
 
 const DEFAULT_ITEMS = [
-  {id:'bershka-raglan',        name:'Bershka raglan trui bruin/roze',              cat:'tops'},
-  {id:'second-female-grijs',   name:'Second Female crop sweater grijs',             cat:'tops'},
-  {id:'adidas-blauw-crop',     name:'Adidas crop t-shirt blauw',                    cat:'tops'},
-  {id:'only-sons-blauw',       name:'Only & Sons t-shirt koningsblauw',             cat:'tops'},
-  {id:'mbym-leopard-top',      name:'MbyM Rihne top luipaardprint',                 cat:'tops'},
-  {id:'av-crop-longsleeve',    name:'American Vintage crop longsleeve blauw',       cat:'tops'},
-  {id:'av-remytown-turquoise', name:'American Vintage Remytown t-shirt turquoise',  cat:'tops'},
-  {id:'zara-turquoise-sweater',name:'Turquoise Zara sweater',                       cat:'tops'},
   {id:'wit-oversized',         name:'Wit oversized t-shirt',                        cat:'tops'},
   {id:'wit-basic',             name:'Wit basic t-shirt',                            cat:'tops'},
   {id:'geel-shirt',            name:'Geel Stieglitz t-shirt',                       cat:'tops'},
@@ -246,11 +178,14 @@ const DEFAULT_ITEMS = [
   {id:'blauw-spaghet',         name:'Donkerblauw spaghettitopje',                   cat:'tops'},
   {id:'bruin-spaghet',         name:'Donkerbruin spaghettitopje',                   cat:'tops'},
   {id:'bruin-longsleeve',      name:'Donkerbruin longsleeve aansluitend',           cat:'tops'},
-  {id:'khaki-bloemenprint',    name:'Khaki bloemenprint wide leg broek',            cat:'bottoms'},
-  {id:'bordeaux-stripe-broek', name:'Bordeaux wide leg broek met zijstreep',        cat:'bottoms'},
-  {id:'pullbear-balloon-jeans',name:'Pull&Bear ballonpijpen jeans blauw',           cat:'bottoms'},
-  {id:'groen-barrel-broek',    name:'Groene barrel-broek katoen Zara',              cat:'bottoms'},
-  {id:'zara-cargo-khaki',      name:'Zara cargo broek khaki',                       cat:'bottoms'},
+  {id:'bershka-raglan',        name:'Bershka raglan trui bruin/roze',               cat:'tops'},
+  {id:'second-female-grijs',   name:'Second Female crop sweater grijs',             cat:'tops'},
+  {id:'adidas-blauw-crop',     name:'Adidas crop t-shirt blauw',                    cat:'tops'},
+  {id:'only-sons-blauw',       name:'Only & Sons t-shirt koningsblauw',             cat:'tops'},
+  {id:'mbym-leopard-top',      name:'MbyM Rihne top luipaardprint',                 cat:'tops'},
+  {id:'av-crop-longsleeve',    name:'American Vintage crop longsleeve blauw',       cat:'tops'},
+  {id:'zara-turquoise-sweater',name:'Turquoise Zara sweater',                       cat:'tops'},
+  {id:'av-remytown-turquoise', name:'American Vintage Remytown t-shirt turquoise',  cat:'tops'},
   {id:'roze-maxi',             name:'Felroze maxi rok',                             cat:'bottoms'},
   {id:'print-mini',            name:'Kleurrijke print mini rok',                    cat:'bottoms'},
   {id:'bruin-maxi',            name:'Bruin satijnen maxi rok',                      cat:'bottoms'},
@@ -259,19 +194,23 @@ const DEFAULT_ITEMS = [
   {id:'lichtblauwe-shorts',    name:'Lichtblauwe denim shorts',                     cat:'bottoms'},
   {id:'adidas-broek',          name:'Adidas Firebird broek marineblauw',            cat:'bottoms'},
   {id:'bruin-shorts',          name:'Bruine shorts',                                cat:'bottoms'},
-  {id:'second-female-cardigan',name:'Second Female cardigan beige gouden knopen',   cat:'layers'},
-  {id:'hm-beige-jas',          name:'H&M cropped jas lichtbeige',                   cat:'layers'},
+  {id:'khaki-bloemenprint',    name:'Khaki bloemenprint wide leg broek',            cat:'bottoms'},
+  {id:'bordeaux-stripe-broek', name:'Bordeaux wide leg broek met zijstreep',        cat:'bottoms'},
+  {id:'pullbear-balloon-jeans',name:'Pull&Bear ballonpijpen jeans blauw',           cat:'bottoms'},
+  {id:'groen-barrel-broek',    name:'Groene barrel-broek katoen Zara',              cat:'bottoms'},
+  {id:'zara-cargo-khaki',      name:'Zara cargo broek khaki',                       cat:'bottoms'},
   {id:'cargo-jasje',           name:'Bruin cropped cargo jasje',                    cat:'layers'},
   {id:'paarse-cardigan',       name:'Paarse cardigan',                              cat:'layers'},
   {id:'witte-cardigan',        name:'Gebroken witte cardigan',                      cat:'layers'},
   {id:'zwart-gilet',           name:'Zwart gilet goudknopen',                       cat:'layers'},
+  {id:'second-female-cardigan',name:'Second Female cardigan beige gouden knopen',   cat:'layers'},
+  {id:'hm-beige-jas',          name:'H&M cropped jas lichtbeige',                   cat:'layers'},
   {id:'hemdjurk',              name:'Gebroken witte hemdjurk',                      cat:'jurken'},
   {id:'bruin-jurk',            name:'Donkerbruin longsleeve jurk',                  cat:'jurken'},
-  {id:'groen-tote-zara',       name:'Groene geweven Zara tote bag',                 cat:'bags'},
   {id:'blauwe-tas',            name:'Blauwe tweed kettingtas',                      cat:'bags'},
   {id:'leonie-bag',            name:'Bruine suède Leonie bag',                      cat:'bags'},
   {id:'gele-bag',              name:'Gele stippen bucket bag',                      cat:'bags'},
-  // Schoenen (8)
+  {id:'groen-tote-zara',       name:'Groene geweven Zara tote bag',                 cat:'bags'},
   {id:'zwarte-sandaal',        name:'Zwarte platte sandalen',                       cat:'shoes'},
   {id:'bruine-sandaal',        name:'Bruine platte sandalen',                       cat:'shoes'},
   {id:'zwarte-suede',          name:'Zwarte suède sandalen',                        cat:'shoes'},
@@ -280,7 +219,6 @@ const DEFAULT_ITEMS = [
   {id:'bruine-kitten',         name:'Bruine kitten heel sandalen',                  cat:'shoes'},
   {id:'choco-kitten',          name:'Choco kitten heel teenslippers',               cat:'shoes'},
   {id:'new-balance',           name:'New Balance 9060 beige',                       cat:'shoes'},
-  // Accessoires (10)
   {id:'riem-bruin',            name:'Bruine leren riem',                            cat:'accessories'},
   {id:'riem-zwart',            name:'Zwarte leren riem',                            cat:'accessories'},
   {id:'sjaaltje-roze',         name:'Felroze sjaaltje',                             cat:'accessories'},
@@ -291,144 +229,168 @@ const DEFAULT_ITEMS = [
   {id:'ketting-goud',          name:'Gouden ketting',                               cat:'accessories'},
   {id:'oorbellen-goud',        name:'Gouden oorbellen (hoepels)',                   cat:'accessories'},
   {id:'armband',               name:'Armband',                                      cat:'accessories'},
-  // Zwemwear (5)
   {id:'bikini-1',              name:'Bikini',                                        cat:'swimwear'},
   {id:'badpak-1',              name:'Badpak',                                        cat:'swimwear'},
   {id:'pareo',                 name:'Pareo / sarong',                               cat:'swimwear'},
   {id:'strandtas',             name:'Strandtas',                                    cat:'swimwear'},
   {id:'flipflops',             name:'Flipflops / slippers',                         cat:'swimwear'},
 ];
+const DEFAULT_IDS = new Set(DEFAULT_ITEMS.map(i => i.id));
 
-const CAT_NL = { tops:'Tops', bottoms:'Bottoms & Rokken', layers:'Laagjes', jurken:'Jurken', bags:'Tassen', shoes:'Schoenen', accessories:'Accessoires', swimwear:'Zwemwear', overig:'Overig' };
-
-const SUPABASE_URL = 'https://osuqtfsxmquwqsbgzlqn.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
-
-async function sbGet(key) {
-  try {
-    const r = await fetch(SUPABASE_URL + '/rest/v1/griette_data?key=eq.' + encodeURIComponent(key) + '&select=value&limit=1', {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-    });
-    const d = await r.json();
-    return (d && d.length) ? JSON.parse(d[0].value) : null;
-  } catch(e) { return null; }
-}
-
-// State (filled after init)
-let cloudMap = {};
-const ALL_ITEMS = [];
-const avail = {};
-
-async function init() {
-  document.getElementById('check-btn').disabled = true;
-  document.getElementById('status-text').textContent = 'Gegevens ophalen uit Supabase…';
-
-  // 1. Read localStorage first (fast)
-  try { const s = localStorage.getItem('griette-cloud-photos-v1'); if (s) cloudMap = JSON.parse(s); } catch(e) {}
-  let localCustom = [];
-  try {
-    const ci = localStorage.getItem('griette-custom-items-v3');
-    if (ci) { const p = JSON.parse(ci); localCustom = Array.isArray(p) ? p : Object.values(p).flat(); }
-  } catch(e) {}
-
-  // 2. Fetch Supabase in parallel
-  const [sbCustom, sbPhotos, sbDeleted] = await Promise.all([
-    sbGet('custom-items'),
-    sbGet('cloud-photos'),
-    sbGet('deleted-items'),
-  ]);
-
-  // Merge cloud photos (Supabase wins over localStorage)
-  if (sbPhotos && typeof sbPhotos === 'object') Object.assign(cloudMap, sbPhotos);
-
-  // Merge custom items (Supabase wins)
-  const rawCustom = sbCustom || localCustom;
-  let customFlat = [];
-  if (Array.isArray(rawCustom)) {
-    customFlat = rawCustom;
-  } else if (rawCustom && typeof rawCustom === 'object') {
-    // May be {cat: [items]} structure
-    Object.entries(rawCustom).forEach(([cat, items]) => {
-      if (Array.isArray(items)) items.forEach(i => customFlat.push(Object.assign({}, i, {cat})));
-    });
-  }
-
-  // Deleted IDs
-  const deletedIds = new Set(Array.isArray(sbDeleted) ? sbDeleted : []);
-
-  // Build merged items list
-  const seen = new Set();
-  [...DEFAULT_ITEMS, ...customFlat].forEach(item => {
-    if (!item || !item.id) return;
-    if (seen.has(item.id) || deletedIds.has(item.id)) return;
-    seen.add(item.id);
-    ALL_ITEMS.push({ id: item.id, name: item.name || item.id, cat: item.cat || item.category || 'overig' });
-  });
-
-  // Pre-mark items that have a photo in cloudMap
-  ALL_ITEMS.forEach(i => { avail[i.id] = cloudMap[i.id] ? true : null; });
-
-  const nCustom = customFlat.filter(i => !DEFAULT_ITEMS.find(d => d.id === i.id)).length;
-  document.getElementById('status-text').innerHTML =
-    ALL_ITEMS.length + ' items geladen'
-    + (nCustom ? ' (incl. <strong>' + nCustom + ' eigen items</strong>)' : '')
-    + ' · ' + Object.keys(cloudMap).length + ' foto-URL\'s uit Supabase/localStorage';
-  document.getElementById('check-btn').disabled = false;
-
-  buildGrid();
-}
-
-// Start on page load
-init();
+// ── Live state ───────────────────────────────────────────────────────────────
+let cloudMap  = {};
+let ALL_ITEMS = [];   // filled by init()
+let avail     = {};   // id → true/false/null
 
 function urlFor(id) {
   return cloudMap[id] || (CDN + id + '.jpg');
 }
 
+// ── Supabase ─────────────────────────────────────────────────────────────────
+async function sbGet(key) {
+  try {
+    const r = await fetch(
+      SUPABASE_URL + '/rest/v1/griette_data?key=eq.' + encodeURIComponent(key) + '&select=value&limit=1',
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+    );
+    if (!r.ok) return null;
+    const d = await r.json();
+    return (d && d.length) ? JSON.parse(d[0].value) : null;
+  } catch(e) { return null; }
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+async function init() {
+  // 1. localStorage (instant)
+  try { const s = localStorage.getItem('griette-cloud-photos-v1'); if (s) cloudMap = JSON.parse(s); } catch(e) {}
+  let lsCustom = [];
+  try {
+    const ci = localStorage.getItem('griette-custom-items-v3');
+    if (ci) {
+      const p = JSON.parse(ci);
+      lsCustom = Array.isArray(p) ? p : Object.values(p).flat().filter(Boolean);
+    }
+  } catch(e) {}
+
+  // 2. Supabase (authoritative, fetched in parallel)
+  const [sbCustom, sbPhotos, sbDeleted] = await Promise.all([
+    sbGet('custom-items'), sbGet('cloud-photos'), sbGet('deleted-items'),
+  ]);
+
+  // Merge photos: Supabase wins
+  if (sbPhotos && typeof sbPhotos === 'object') Object.assign(cloudMap, sbPhotos);
+
+  // Flatten custom items
+  let customFlat = lsCustom;
+  if (sbCustom) {
+    if (Array.isArray(sbCustom)) {
+      customFlat = sbCustom;
+    } else if (typeof sbCustom === 'object') {
+      customFlat = [];
+      Object.entries(sbCustom).forEach(([cat, arr]) => {
+        if (Array.isArray(arr)) arr.forEach(i => i && customFlat.push({ ...i, cat }));
+      });
+    }
+  }
+
+  // Deleted IDs
+  const deletedIds = new Set(Array.isArray(sbDeleted) ? sbDeleted : []);
+
+  // Build ALL_ITEMS: default + custom, minus deleted
+  const seen = new Set();
+  ALL_ITEMS = [];
+  [...DEFAULT_ITEMS, ...customFlat].forEach(item => {
+    if (!item || !item.id) return;
+    if (seen.has(item.id) || deletedIds.has(item.id)) return;
+    seen.add(item.id);
+    ALL_ITEMS.push({
+      id:     item.id,
+      name:   item.name || item.id,
+      cat:    item.cat || item.category || 'overig',
+      custom: !DEFAULT_IDS.has(item.id),
+    });
+  });
+
+  // Pre-mark from cloudMap
+  avail = {};
+  ALL_ITEMS.forEach(i => { avail[i.id] = cloudMap[i.id] ? true : null; });
+
+  // Status
+  const nCustom = ALL_ITEMS.filter(i => i.custom).length;
+  const nPhotos = Object.keys(cloudMap).length;
+  let html = '<span class="ok">✓ ' + ALL_ITEMS.length + ' items geladen</span>';
+  if (nCustom) html += ' &nbsp;·&nbsp; <span class="info">waarvan ' + nCustom + ' eigen</span>';
+  html += ' &nbsp;·&nbsp; <span class="info">' + nPhotos + ' foto-URL' + (nPhotos !== 1 ? "'s" : '') + ' in Supabase</span>';
+  document.getElementById('status-text').innerHTML = html;
+  document.getElementById('check-btn').disabled  = false;
+  document.getElementById('copy-btn2').disabled  = false;
+
+  buildGrid();
+}
+
+// ── Grid ─────────────────────────────────────────────────────────────────────
 function buildGrid() {
-  const grid = document.getElementById('grid');
-  grid.innerHTML = '';
-  document.getElementById('grid-label').textContent = 'Alle items (' + ALL_ITEMS.length + ')';
+  const area = document.getElementById('grid-area');
+  area.innerHTML = '';
 
-  ALL_ITEMS.forEach(item => {
-    const a = avail[item.id];
-    const card = document.createElement('div');
-    card.className = 'icard' + (a === true ? ' ok' : a === false ? ' miss' : '');
-    card.id = 'ic-' + item.id;
+  // Group by category, preserving catOrder
+  const catOrder = ['tops','bottoms','layers','jurken','bags','shoes','accessories','swimwear','overig'];
+  const byCat = {};
+  ALL_ITEMS.forEach(i => (byCat[i.cat] = byCat[i.cat] || []).push(i));
+  const allCats = [...catOrder, ...Object.keys(byCat).filter(c => !catOrder.includes(c))];
 
-    const url = urlFor(item.id);
-    card.innerHTML =
-      '<div class="thumb" id="ith-' + item.id + '">⏳</div>'
-      + '<div class="ilabel">'
-      + '<div class="iname">' + item.name + '</div>'
-      + '<div class="ist ' + (a === true ? 'ok' : a === false ? 'miss' : '') + '" id="ist-' + item.id + '">'
-      + (a === true ? '✓ foto' : a === false ? '— geen foto' : '') + '</div>'
-      + '</div>';
+  allCats.forEach(cat => {
+    const items = byCat[cat];
+    if (!items || !items.length) return;
+    const meta = CAT_META[cat] || { label: cat, icon: '📦' };
 
-    // Non-blocking preview
-    const img = new Image();
-    img.onload = () => {
-      const th = document.getElementById('ith-' + item.id);
-      if (th) { th.innerHTML = ''; th.appendChild(img); }
-    };
-    img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
-    img.src = url;
+    const block = document.createElement('div');
+    block.className = 'cat-block';
 
-    grid.appendChild(card);
+    const lbl = document.createElement('div');
+    lbl.className = 'sec-label';
+    lbl.innerHTML = '<span>' + meta.icon + ' ' + meta.label + ' — ' + items.length + '</span>';
+    block.appendChild(lbl);
+
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+
+    items.forEach(item => {
+      const a   = avail[item.id];
+      const card = document.createElement('div');
+      card.className = 'icard' + (item.custom ? ' custom' : '') + (a === true ? ' ok' : a === false ? ' miss' : '');
+      card.id = 'ic-' + item.id;
+
+      const wrap = document.createElement('div');
+      wrap.className = 'thumb';
+      wrap.id = 'ith-' + item.id;
+      wrap.textContent = meta.icon;
+
+      // Non-blocking preview
+      const img = new Image();
+      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+      img.onload = () => { wrap.innerHTML = ''; wrap.appendChild(img); };
+      img.src = urlFor(item.id);
+
+      const info = document.createElement('div');
+      info.className = 'ilabel';
+      info.innerHTML =
+        '<div class="iname">' + item.name + '</div>'
+        + '<div class="ist' + (item.custom ? ' custom' : a === true ? ' ok' : a === false ? ' miss' : '') + '" id="ist-' + item.id + '">'
+        + (item.custom ? '★ eigen' : a === true ? '✓ foto' : a === false ? '— geen foto' : '')
+        + '</div>';
+
+      card.appendChild(wrap);
+      card.appendChild(info);
+      grid.appendChild(card);
+    });
+
+    block.appendChild(grid);
+    area.appendChild(block);
   });
 }
 
-// ── CHECK ────────────────────────────────────────────────────────────────────
-async function checkOne(item) {
-  if (avail[item.id] === true) return true; // already known
-  return new Promise(resolve => {
-    const img = new Image();
-    img.onload  = () => { avail[item.id] = true;  resolve(true); };
-    img.onerror = () => { avail[item.id] = false; resolve(false); };
-    img.src = urlFor(item.id) + (urlFor(item.id).includes('?') ? '&' : '?') + '_cb=' + Date.now();
-  });
-}
-
+// ── Check ─────────────────────────────────────────────────────────────────────
 async function runCheck() {
   const btn  = document.getElementById('check-btn');
   const prog = document.getElementById('check-prog');
@@ -438,21 +400,42 @@ async function runCheck() {
 
   let done = 0;
   const total = ALL_ITEMS.length;
+  const queue = [...ALL_ITEMS];
 
-  async function worker(q) {
-    while (q.length) {
-      const item = q.shift();
-      await checkOne(item);
+  async function worker() {
+    while (queue.length) {
+      const item = queue.shift();
+      if (avail[item.id] !== true) {
+        await new Promise(resolve => {
+          const img = new Image();
+          img.onload  = () => { avail[item.id] = true;  resolve(); };
+          img.onerror = () => { avail[item.id] = false; resolve(); };
+          img.src = urlFor(item.id) + '?_cb=' + Date.now();
+        });
+      }
       done++;
       fill.style.width = Math.round(done / total * 100) + '%';
-      updateCard(item.id);
-      document.getElementById('status-text').textContent =
-        done + '/' + total + ' gecontroleerd…';
+      // Update card
+      const card = document.getElementById('ic-' + item.id);
+      const ist  = document.getElementById('ist-' + item.id);
+      if (card) {
+        const ok = avail[item.id] === true;
+        card.className = 'icard' + (item.custom ? ' custom' : '') + (ok ? ' ok' : ' miss');
+        if (ist && !item.custom) { ist.className = 'ist ' + (ok ? 'ok' : 'miss'); ist.textContent = ok ? '✓ foto' : '— geen foto'; }
+        if (ok) {
+          const th = document.getElementById('ith-' + item.id);
+          if (th && !th.querySelector('img')) {
+            const img = new Image();
+            img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+            img.onload = () => { th.innerHTML = ''; th.appendChild(img); };
+            img.src = urlFor(item.id);
+          }
+        }
+      }
     }
   }
 
-  const queue = [...ALL_ITEMS];
-  await Promise.all([worker(queue), worker(queue), worker(queue), worker(queue), worker(queue), worker(queue)]);
+  await Promise.all([worker(), worker(), worker(), worker(), worker(), worker()]);
 
   prog.style.display = 'none';
   btn.disabled = false; btn.textContent = '🔍 Opnieuw controleren';
@@ -461,79 +444,76 @@ async function runCheck() {
   const nMiss = ALL_ITEMS.filter(i => avail[i.id] === false).length;
   document.getElementById('status-text').innerHTML =
     '<span class="ok">✓ ' + nOk + ' foto\'s beschikbaar</span>'
-    + (nMiss ? ' &nbsp;·&nbsp; <span class="warn">' + nMiss + ' niet gevonden</span>' : '');
+    + (nMiss ? ' &nbsp;·&nbsp; <span class="warn">' + nMiss + ' zonder foto</span>' : '');
 
-  buildContextBlock(nOk);
+  buildContextBlock();
   document.getElementById('context-wrap').style.display = 'block';
+  document.getElementById('copy-btn2').disabled = false;
 }
 
-function updateCard(id) {
-  const card = document.getElementById('ic-' + id);
-  const ist  = document.getElementById('ist-' + id);
-  const ith  = document.getElementById('ith-' + id);
-  if (!card) return;
-  const ok = avail[id] === true;
-  card.className = 'icard' + (ok ? ' ok' : avail[id] === false ? ' miss' : '');
-  if (ist) { ist.className = 'ist ' + (ok ? 'ok' : 'miss'); ist.textContent = ok ? '✓ foto' : '— geen foto'; }
-  if (ok && ith && !ith.querySelector('img')) {
-    const img = new Image();
-    img.onload = () => { ith.innerHTML = ''; ith.appendChild(img); };
-    img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
-    img.src = urlFor(id);
-  }
-}
-
-// ── CONTEXT BLOCK ─────────────────────────────────────────────────────────────
-function buildContextBlock(nOk) {
+// ── Context block ─────────────────────────────────────────────────────────────
+function buildContextBlock() {
+  const catOrder = ['tops','bottoms','layers','jurken','bags','shoes','accessories','swimwear','overig'];
   const lines = [];
-  lines.push('=== GRIETTE\'S GARDEROBE ===');
-  lines.push(nOk + ' kledingstukken met foto\'s beschikbaar op Cloudinary.');
-  lines.push('Alle foto\'s zijn openbare JPEG-URL\'s — je kunt ze ophalen met Vision of browsing.');
+  lines.push("=== GRIETTE'S GARDEROBE ===");
+  const nOk = ALL_ITEMS.filter(i => avail[i.id] === true).length;
+  lines.push(nOk + ' items met foto · ' + ALL_ITEMS.length + ' items totaal');
+  lines.push('Foto\'s zijn openbare Cloudinary-URL\'s — haal ze op via Vision of browsing.');
   lines.push('');
 
+  // Items WITH photo grouped by category
   const byCat = {};
-  ALL_ITEMS.filter(i => avail[i.id] === true).forEach(i => {
-    (byCat[i.cat] = byCat[i.cat] || []).push(i);
-  });
-
-  const catOrder = ['tops','bottoms','layers','jurken','bags','overig'];
-  const allCats  = [...catOrder, ...Object.keys(byCat).filter(c => !catOrder.includes(c))];
+  ALL_ITEMS.forEach(i => (byCat[i.cat] = byCat[i.cat] || []).push(i));
+  const allCats = [...catOrder, ...Object.keys(byCat).filter(c => !catOrder.includes(c))];
 
   allCats.forEach(cat => {
-    const items = byCat[cat];
-    if (!items || !items.length) return;
-    lines.push('--- ' + (CAT_NL[cat] || cat).toUpperCase() + ' ---');
-    items.forEach(item => {
-      lines.push(item.name);
-      lines.push('  Foto: ' + urlFor(item.id));
+    const items = (byCat[cat] || []);
+    if (!items.length) return;
+    const meta = CAT_META[cat] || { label: cat };
+    const withPhoto = items.filter(i => avail[i.id] === true);
+    const noPhoto   = items.filter(i => avail[i.id] !== true);
+
+    lines.push('--- ' + meta.label.toUpperCase() + ' ---');
+    withPhoto.forEach(i => {
+      lines.push((i.custom ? '★ ' : '') + i.name);
+      lines.push('  Foto: ' + urlFor(i.id));
     });
+    if (noPhoto.length) {
+      lines.push('  Zonder foto: ' + noPhoto.map(i => i.name).join(', '));
+    }
     lines.push('');
   });
 
-  lines.push('---');
-  lines.push('Items zonder foto (' + ALL_ITEMS.filter(i => avail[i.id] === false).length + '):');
-  ALL_ITEMS.filter(i => avail[i.id] === false).forEach(i => lines.push('  - ' + i.name));
-  lines.push('');
-  lines.push('Instructie: bekijk bij je antwoorden over mijn garderobe de foto-URL\'s hierboven.');
-  lines.push('Je kunt elke URL ophalen als afbeelding (Vision/browsing).');
-
+  lines.push('Instructie voor ChatGPT: gebruik de foto-URL\'s bij vragen over mijn garderobe.');
+  lines.push('Je kunt elke URL ophalen als afbeelding.');
   document.getElementById('context-box').value = lines.join('\n');
+  return lines.join('\n');
+}
+
+function triggerCopy() {
+  if (!document.getElementById('context-wrap').style.display || document.getElementById('context-wrap').style.display === 'none') {
+    buildContextBlock();
+    document.getElementById('context-wrap').style.display = 'block';
+  }
+  copyContext();
 }
 
 function copyContext() {
   const box = document.getElementById('context-box');
-  const btn = document.getElementById('copy-btn');
-  navigator.clipboard.writeText(box.value).then(() => {
-    btn.textContent = '✓ Gekopieerd!';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Kopieer voor ChatGPT'; btn.classList.remove('copied'); }, 2500);
-  }).catch(() => {
-    box.select();
-    document.execCommand('copy');
-    btn.textContent = '✓ Gekopieerd!';
-    setTimeout(() => { btn.textContent = 'Kopieer voor ChatGPT'; }, 2500);
-  });
+  const btn  = document.getElementById('copy-btn');
+  const btn2 = document.getElementById('copy-btn2');
+  const text = box.value || buildContextBlock();
+  navigator.clipboard.writeText(text).then(() => {
+    [btn, btn2].forEach(b => { if(b){ b.textContent = '✓ Gekopieerd!'; b.style.background = 'var(--green)'; }});
+    setTimeout(() => {
+      if(btn)  { btn.textContent  = 'Kopieer voor ChatGPT'; btn.style.background  = ''; }
+      if(btn2) { btn2.textContent = 'Kopieer voor ChatGPT'; btn2.style.background = ''; }
+    }, 2500);
+  }).catch(() => { box.select(); document.execCommand('copy'); });
 }
+
+// Start
+init();
 </script>
 </body>
 </html>
