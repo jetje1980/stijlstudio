@@ -435,6 +435,13 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 <div class="meer-sheet" id="meer-sheet">
   <div style="width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 20px;"></div>
 
+  <a href="snel-toevoegen.html" style="width:100%;padding:15px 16px;background:var(--brown);border:none;border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--cream);text-decoration:none;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
+    <span style="font-size:20px;flex-shrink:0;">➕</span><span style="flex:1;font-weight:500;">Snel item toevoegen <span style="color:rgba(245,242,238,0.55);font-size:10px;font-weight:400;">— foto + naam + categorie</span></span><span style="color:rgba(245,242,238,0.55);">›</span>
+  </a>
+  <a href="outfitkaart.html" style="width:100%;padding:15px 16px;background:var(--brown);border:none;border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:10px;color:var(--cream);text-decoration:none;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
+    <span style="font-size:20px;flex-shrink:0;">🎨</span><span style="flex:1;font-weight:500;">Outfitkaart maken <span style="color:rgba(245,242,238,0.55);font-size:10px;font-weight:400;">— kleurcombo + items + download</span></span><span style="color:rgba(245,242,238,0.55);">›</span>
+  </a>
+
   <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-mid);font-family:’Jost’,sans-serif;font-weight:500;margin-bottom:10px;padding:0 2px;">Verkennen</div>
 
   <button type="button" data-meer-panel="week" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
@@ -828,7 +835,19 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
   <div class="add-modal" style="max-height:85vh;overflow-y:auto;">
     <div class="modal-handle"></div>
     <div class="modal-title" style="color:var(--brown);margin-bottom:4px;">Eigen item toevoegen</div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Naam, categorie en optioneel tags</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Naam, categorie en optioneel tags</div>
+
+    <!-- FOTO -->
+    <div id="new-item-photo-preview" style="display:none;width:100%;aspect-ratio:4/3;border-radius:10px;overflow:hidden;margin-bottom:10px;background:#edeae4;position:relative;">
+      <img id="new-item-photo-img" style="width:100%;height:100%;object-fit:cover;">
+      <button type="button" onclick="clearNewItemPhoto()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.45);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <button type="button" onclick="document.getElementById('new-photo-camera').click()" style="flex:1;padding:10px 6px;background:var(--cream);border:1.5px solid var(--cream-dark);border-radius:10px;font-size:11px;font-family:'Jost',sans-serif;color:var(--brown);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">📷 Camera</button>
+      <button type="button" onclick="document.getElementById('new-photo-gallery').click()" style="flex:1;padding:10px 6px;background:var(--cream);border:1.5px solid var(--cream-dark);border-radius:10px;font-size:11px;font-family:'Jost',sans-serif;color:var(--brown);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">🖼 Galerij</button>
+    </div>
+    <input type="file" id="new-photo-camera"  accept="image/*" capture="environment" style="display:none">
+    <input type="file" id="new-photo-gallery" accept="image/*" style="display:none">
 
     <input type="text" id="new-item-name" placeholder="Naam (bijv. Beige linnen broek)">
     <select id="new-item-cat" onchange="updateNewItemTagVisibility()">
@@ -2601,7 +2620,37 @@ function updateNewItemTagVisibility() {
   if (pasvormEl) pasvormEl.style.display = showPasvorm ? 'block' : 'none';
 }
 
-function confirmAddItem() {
+// Photo handling for add-item modal
+(function() {
+  function handleNewPhoto(file) {
+    if (!file) return;
+    window._newItemFile = file;
+    const img = document.getElementById('new-item-photo-img');
+    img.src = URL.createObjectURL(file);
+    document.getElementById('new-item-photo-preview').style.display = 'block';
+    // Pre-fill name from filename if empty
+    const nameEl = document.getElementById('new-item-name');
+    if (!nameEl.value.trim()) {
+      nameEl.value = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    const cam = document.getElementById('new-photo-camera');
+    const gal = document.getElementById('new-photo-gallery');
+    if (cam) cam.addEventListener('change', e => handleNewPhoto(e.target.files[0]));
+    if (gal) gal.addEventListener('change', e => handleNewPhoto(e.target.files[0]));
+  });
+})();
+
+function clearNewItemPhoto() {
+  window._newItemFile = null;
+  document.getElementById('new-item-photo-img').src = '';
+  document.getElementById('new-item-photo-preview').style.display = 'none';
+  document.getElementById('new-photo-camera').value  = '';
+  document.getElementById('new-photo-gallery').value = '';
+}
+
+async function confirmAddItem() {
   const name = document.getElementById('new-item-name').value.trim();
   const cat = document.getElementById('new-item-cat').value;
   if (!name) return;
@@ -2621,7 +2670,41 @@ function confirmAddItem() {
   document.getElementById('add-overlay').classList.remove('open');
   buildGarderobe();
   saveAppData();
-  showToast(name + ' toegevoegd ✓');
+
+  // Upload photo if selected
+  if (window._newItemFile) {
+    const file = window._newItemFile;
+    window._newItemFile = null;
+    clearNewItemPhoto();
+    showToast(name + ' toegevoegd — foto uploaden…');
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', 'griette-photos');
+      fd.append('public_id', 'griette-wardrobe/griette_' + id);
+      fd.append('folder', 'griette-wardrobe');
+      const res = await fetch('https://api.cloudinary.com/v1_1/dhggari0g/image/upload', {method:'POST',body:fd});
+      const json = await res.json();
+      if (json.secure_url) {
+        // Save to localStorage + Supabase
+        try {
+          const lsp = JSON.parse(localStorage.getItem('griette-cloud-photos-v1')||'{}');
+          lsp[id] = json.secure_url;
+          localStorage.setItem('griette-cloud-photos-v1', JSON.stringify(lsp));
+        } catch(e) {}
+        supabaseGet('cloud-photos').then(existing => {
+          const map = existing || {};
+          map[id] = json.secure_url;
+          supabaseSet('cloud-photos', map);
+        });
+        buildGarderobe();
+        showToast(name + ' + foto opgeslagen ✓');
+      }
+    } catch(e) { showToast(name + ' toegevoegd (foto mislukt)'); }
+  } else {
+    clearNewItemPhoto();
+    showToast(name + ' toegevoegd ✓');
+  }
 
   // Offer to scan combinations for new item
   setTimeout(function() {
