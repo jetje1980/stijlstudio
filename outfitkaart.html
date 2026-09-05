@@ -8,17 +8,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@500;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@500;600&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-:root {
-  --bg:#F8F5F1; --surface:#FFF; --border:#E8DDD2;
-  --text:#1C140E; --text-2:#8A7060; --accent:#9B7B5C;
-  --green:#2D7A4F; --ph-bg:#EDE5DA;
-}
-@media (prefers-color-scheme:dark) {
-  :root:not([data-theme="light"]) {
-    --bg:#1A1410; --surface:#231C16; --border:#342620;
-    --text:#F0E6D8; --text-2:#9A7E68; --accent:#C4976A; --ph-bg:#2C2018;
-  }
-}
+:root{--bg:#F8F5F1;--surface:#FFF;--border:#E8DDD2;--text:#1C140E;--text-2:#8A7060;--accent:#9B7B5C;--green:#2D7A4F;--ph-bg:#EDE5DA;}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1A1410;--surface:#231C16;--border:#342620;--text:#F0E6D8;--text-2:#9A7E68;--accent:#C4976A;--ph-bg:#2C2018;}}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;}
 body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;display:flex;flex-direction:column;}
@@ -27,6 +18,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .top-bar h1{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;flex:1;}
 .top-bar h1 span{color:var(--accent);}
 .back-link{font-size:20px;text-decoration:none;color:var(--text-2);}
+.gear-btn{font-size:18px;background:none;border:none;cursor:pointer;color:var(--text-2);padding:4px;-webkit-tap-highlight-color:transparent;}
 
 /* STEPS */
 .steps{display:flex;padding:12px 20px;gap:0;border-bottom:1px solid var(--border);background:var(--bg);}
@@ -42,13 +34,12 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 /* PANELS */
 .panel{display:none;flex:1;overflow-y:auto;padding:20px 20px calc(90px + env(safe-area-inset-bottom,0px));}
 .panel.active{display:flex;flex-direction:column;gap:18px;}
-
 .sec-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:8px;}
 
 /* COMBO TYPE GRID */
 .combo-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .combo-type-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:14px 12px;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;}
-.combo-type-btn.selected{border-color:var(--accent);}
+.combo-type-btn.selected{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--surface));}
 .combo-type-btn .ct-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;}
 .combo-type-btn .ct-desc{font-size:10px;color:var(--text-2);line-height:1.4;}
 
@@ -60,6 +51,17 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .swatch{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.4);}
 .preset-info .pi-name{font-size:12px;font-weight:600;color:var(--text);}
 .preset-info .pi-vibe{font-size:10px;color:var(--text-2);margin-top:2px;}
+.preset-info .pi-stijl{font-size:9px;color:var(--accent);margin-top:3px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
+
+/* CUSTOM COLOR PICKER */
+.color-swatch-grid{display:flex;flex-wrap:wrap;gap:8px;}
+.cswatch{width:36px;height:36px;border-radius:50%;border:2.5px solid transparent;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent;transition:transform .12s;}
+.cswatch.selected{border-color:var(--text);transform:scale(1.15);}
+.cswatch .check{display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:14px;color:#fff;text-shadow:0 0 3px rgba(0,0,0,.6);}
+.cswatch.selected .check{display:flex;}
+.selected-pills{display:flex;gap:8px;flex-wrap:wrap;min-height:24px;}
+.color-pill{display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--surface);border:1.5px solid var(--border);border-radius:20px;font-size:11px;font-weight:500;}
+.color-pill .cdot{width:12px;height:12px;border-radius:50%;}
 
 /* ITEM GRID */
 .item-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
@@ -78,6 +80,8 @@ input.field,textarea.field{width:100%;padding:13px 14px;background:var(--surface
 input.field:focus,textarea.field:focus{border-color:var(--accent);}
 input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 .field-note{font-size:10px;color:var(--text-2);margin-top:4px;}
+.ai-btn{width:100%;padding:12px;background:transparent;border:1.5px solid var(--accent);border-radius:12px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--accent);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.ai-btn:disabled{opacity:.4;cursor:default;}
 
 /* BOTTOM BAR */
 .bottom-bar{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--border);display:flex;gap:10px;}
@@ -85,36 +89,53 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 .btn-next{flex:1;padding:14px;background:var(--text);color:var(--bg);border:none;border-radius:12px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
 .btn-next:disabled{opacity:.35;cursor:default;}
 
-/* ─── KAART ─────────────────────────────────────────────────────────────── */
+/* KAART */
 #card-wrap{display:none;padding:16px 16px calc(100px + env(safe-area-inset-bottom,0px));overflow-y:auto;}
-.kaart{
-  background:#F5F2EE;
-  border-radius:16px;overflow:hidden;
-  width:100%;max-width:420px;margin:0 auto;
-  padding:28px 24px 22px;
-  font-family:'Inter',sans-serif;
-  position:relative;
-}
+.kaart{background:#F5F2EE;border-radius:16px;overflow:hidden;width:100%;max-width:420px;margin:0 auto;padding:28px 24px 22px;font-family:'Inter',sans-serif;position:relative;}
 .kaart-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,11vw,52px);line-height:.92;letter-spacing:.02em;color:#1a1510;text-align:center;text-transform:uppercase;margin-bottom:6px;}
-.kaart-sub{font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#4a3828;text-align:center;margin-bottom:10px;}
+.kaart-sub{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#4a3828;text-align:center;margin-bottom:10px;}
 .kaart-anno-tr{font-family:'Caveat',cursive;font-size:15px;color:#1a2a4a;text-align:right;line-height:1.35;margin-bottom:6px;}
 .kaart-anno-bl{font-family:'Caveat',cursive;font-size:15px;color:#1a2a4a;line-height:1.35;margin-top:8px;margin-bottom:4px;}
-
 .kaart-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:8px;}
 .kaart-item{display:flex;flex-direction:column;gap:5px;}
 .kaart-photo{width:100%;aspect-ratio:1;background:#e8ddd2;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;}
 .kaart-photo img{width:100%;height:100%;object-fit:contain;background:#fff;}
-.kaart-brand{font-family:'Inter',sans-serif;font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1a1510;text-align:center;line-height:1.2;}
-.kaart-desc{font-family:'Inter',sans-serif;font-size:8px;color:#5a4030;text-align:center;line-height:1.3;}
-
-.kaart-note{font-family:'Inter',sans-serif;font-size:9px;color:#5a4030;text-align:center;border-top:1px solid #ddd5c8;padding-top:8px;margin-top:4px;margin-bottom:8px;line-height:1.5;}
+.kaart-brand{font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1a1510;text-align:center;line-height:1.2;}
+.kaart-desc{font-size:8px;color:#5a4030;text-align:center;line-height:1.3;}
+.kaart-note{font-size:9px;color:#5a4030;text-align:center;border-top:1px solid #ddd5c8;padding-top:8px;margin-top:4px;margin-bottom:8px;line-height:1.5;}
 .kaart-swatches{display:flex;justify-content:center;gap:6px;align-items:center;}
 .kaart-swatch{width:20px;height:20px;border-radius:3px;}
 .kaart-swatch-label{font-size:7.5px;color:#8a7060;letter-spacing:.1em;text-transform:uppercase;margin-right:4px;}
 
-.dl-bar{display:flex;flex-direction:column;gap:10px;padding:0 16px calc(20px + env(safe-area-inset-bottom,0px));max-width:480px;margin:0 auto;}
+.dl-bar{display:flex;flex-direction:column;gap:10px;padding:0 0 calc(20px + env(safe-area-inset-bottom,0px));}
 .btn-dl{width:100%;padding:15px;background:#1C140E;color:#F5F2EE;border:none;border-radius:14px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
 .btn-restart{width:100%;padding:14px;background:transparent;border:1.5px solid var(--border);border-radius:14px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;}
+
+/* AI ANALYSE PANEL */
+.ai-panel{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-top:12px;}
+.ai-panel .ai-head{font-size:11px;font-weight:600;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;}
+.ai-section{margin-bottom:12px;}
+.ai-section-title{font-size:10px;font-weight:600;color:var(--text);margin-bottom:4px;letter-spacing:.04em;}
+.ai-section-body{font-size:12px;color:var(--text-2);line-height:1.6;}
+.ai-badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-top:6px;}
+.ai-badge.streetstyle{background:#162038;color:#a8c4e0;}
+.ai-badge.elegant{background:#5c3317;color:#f0e8d8;}
+.ai-badge.klassiek{background:#4a3828;color:#f8f4ef;}
+.ai-badge.gedurfd{background:#b5232a;color:#fff;}
+.ai-gap{color:#cc2211;font-weight:600;}
+.ai-ok{color:#2D7A4F;font-weight:600;}
+
+/* SETTINGS MODAL */
+.modal-backdrop{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.5);align-items:flex-end;}
+.modal-backdrop.open{display:flex;}
+.modal-sheet{background:var(--bg);width:100%;max-width:480px;margin:0 auto;border-radius:20px 20px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;margin-bottom:16px;}
+.modal-field{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;background:var(--surface);color:var(--text);outline:none;}
+.modal-field:focus{border-color:var(--accent);}
+.modal-note{font-size:10px;color:var(--text-2);margin-top:6px;line-height:1.5;}
+.modal-actions{display:flex;gap:10px;margin-top:16px;}
+.modal-save{flex:1;padding:13px;background:var(--text);color:var(--bg);border:none;border-radius:10px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
+.modal-cancel{padding:13px 18px;background:transparent;border:1.5px solid var(--border);border-radius:10px;font-family:'Inter',sans-serif;font-size:13px;color:var(--text-2);cursor:pointer;}
 </style>
 </head>
 <body>
@@ -122,6 +143,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 <div class="top-bar">
   <a class="back-link" href="griette.html">←</a>
   <h1>Outfit<span>kaart</span></h1>
+  <button class="gear-btn" onclick="openSettings()" title="Instellingen">⚙</button>
 </div>
 
 <div class="steps" id="steps-bar">
@@ -131,22 +153,59 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
   <div class="step-dot" id="sd4"><div class="dot">4</div><div class="slbl">Kaart</div></div>
 </div>
 
+<!-- SETTINGS MODAL -->
+<div class="modal-backdrop" id="settings-modal" onclick="if(event.target===this)closeSettings()">
+  <div class="modal-sheet">
+    <div class="modal-title">Instellingen</div>
+    <div class="sec-label">Anthropic API-sleutel</div>
+    <input class="modal-field" type="password" id="api-key-input" placeholder="sk-ant-api03-…" autocomplete="off">
+    <div class="modal-note">Je sleutel wordt alleen in jouw browser opgeslagen en nooit gedeeld. Nodig voor AI-functies: kleurcombo-suggesties, beeldanalyse, trend-koppeling.</div>
+    <div style="margin-top:14px;" class="sec-label">Model</div>
+    <select class="modal-field" id="ai-model-select">
+      <option value="claude-haiku-4-5-20251001">Haiku 4.5 (snel + goedkoop)</option>
+      <option value="claude-sonnet-5">Sonnet 5 (rijker advies)</option>
+    </select>
+    <div class="modal-actions">
+      <button class="modal-save" onclick="saveSettings()">Opslaan</button>
+      <button class="modal-cancel" onclick="closeSettings()">Sluiten</button>
+    </div>
+  </div>
+</div>
+
 <!-- STEP 1: COMBO -->
 <div class="panel active" id="p1">
   <div>
     <div class="sec-label">Kleurstrategie</div>
     <div class="combo-type-grid" id="combo-type-grid"></div>
   </div>
+
+  <!-- Preset combos (shown for non-custom types) -->
   <div id="preset-area" style="display:none">
     <div class="sec-label" id="preset-label">Kies een combo</div>
     <div class="preset-list" id="preset-list"></div>
+  </div>
+
+  <!-- Custom color picker (shown for Eigen kleurkeuze) -->
+  <div id="custom-area" style="display:none">
+    <div class="sec-label">Kies 1 of 2 ankerkleuren <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">dan stel ik combo's voor</span></div>
+    <div class="color-swatch-grid" id="custom-color-grid"></div>
+    <div style="margin-top:10px;">
+      <div class="selected-pills" id="selected-pills"></div>
+    </div>
+    <div id="custom-combos-wrap" style="display:none;margin-top:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div class="sec-label" style="margin-bottom:0">Combo suggesties</div>
+        <button id="ai-combo-btn" class="ai-btn" style="width:auto;padding:7px 14px;font-size:11px;" onclick="aiSuggestCombos()">✨ AI-suggesties</button>
+      </div>
+      <div class="preset-list" id="custom-preset-list"></div>
+    </div>
   </div>
 </div>
 
 <!-- STEP 2: ITEMS -->
 <div class="panel" id="p2">
   <div>
-    <div class="sec-label" id="item-count-label">Kies 4–6 items</div>
+    <div class="sec-label" id="item-count-label">Items — optioneel (max 6)</div>
     <div class="item-grid" id="item-grid"></div>
   </div>
 </div>
@@ -163,16 +222,20 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
   </div>
   <div>
     <div class="sec-label">Handgeschreven annotatie (rechtsboven)</div>
-    <textarea class="field" id="f-anno1" rows="2" placeholder="bijv. heldere kleur\nstrakke basis"></textarea>
+    <textarea class="field" id="f-anno1" rows="2" placeholder="bijv. heldere kleur&#10;strakke basis"></textarea>
     <div class="field-note">Gebruik een enter voor twee regels</div>
   </div>
   <div>
     <div class="sec-label">Handgeschreven annotatie (linksonder)</div>
-    <textarea class="field" id="f-anno2" rows="2" placeholder="bijv. sportief maar\nchic"></textarea>
+    <textarea class="field" id="f-anno2" rows="2" placeholder="bijv. sportief maar&#10;chic"></textarea>
   </div>
   <div>
     <div class="sec-label">Stylingnoot (onderaan)</div>
     <input class="field" type="text" id="f-note" placeholder="bijv. krachtige kleur + donkergrijs + grafische laag">
+  </div>
+  <div>
+    <button class="ai-btn" id="ai-details-btn" onclick="aiSuggestDetails()">✨ AI-suggesties voor annotaties &amp; stylingnoot</button>
+    <div class="field-note" id="ai-details-status" style="text-align:center;margin-top:6px;"></div>
   </div>
 </div>
 
@@ -190,9 +253,15 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <div class="kaart-swatches" id="k-swatches"></div>
     </div>
   </div>
-  <div style="height:16px;"></div>
+
+  <div style="height:12px;"></div>
   <div class="dl-bar">
-    <button class="btn-dl" onclick="downloadKaart()">⬇ Download als afbeelding</button>
+    <button class="btn-dl" id="dl-btn" onclick="downloadKaart()">⬇ Download als afbeelding</button>
+
+    <!-- AI analyse section -->
+    <button class="ai-btn" id="ai-analyse-btn" onclick="aiAnalyseOutfit()">🔍 AI-analyse: textuur, vorm &amp; trends</button>
+    <div id="ai-analyse-panel" style="display:none;"></div>
+
     <button class="btn-restart" onclick="restart()">Nieuwe kaart maken</button>
   </div>
 </div>
@@ -203,10 +272,112 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 </div>
 
 <script>
-// ── DATA ─────────────────────────────────────────────────────────────────────
+// ── CONSTANTS ─────────────────────────────────────────────────────────────────
 const SUPABASE_URL = 'https://osuqtfsxmquwqsbgzlqn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
 const CDN = 'https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_';
+
+const KLEUREN = [
+  {v:'zwart',dot:'#111'},{v:'donkerblauw',dot:'#162038'},{v:'marine',dot:'#1a2a4a'},
+  {v:'bruin',dot:'#5c3317'},{v:'cognac',dot:'#8B4513'},{v:'camel',dot:'#c19a6b'},
+  {v:'beige',dot:'#d4b896'},{v:'gebroken-wit',dot:'#f0e8d8'},{v:'wit',dot:'#f8f4ef'},
+  {v:'grijs',dot:'#888'},{v:'felroze',dot:'#e8407a'},{v:'roze',dot:'#e8a0b4'},
+  {v:'lila/paars',dot:'#b088c8'},{v:'paars',dot:'#7b3fa0'},{v:'geel',dot:'#d4b84a'},
+  {v:'mosterd',dot:'#b8860b'},{v:'oranje',dot:'#d4703a'},{v:'oranje-rood',dot:'#b5232a'},
+  {v:'rood',dot:'#cc2211'},{v:'lichtblauw',dot:'#a8c4e0'},{v:'kobaltblauw',dot:'#0047AB'},
+  {v:'turquoise',dot:'#2ab0a8'},{v:'mintgroen',dot:'#88c8b0'},{v:'groen',dot:'#4a8a5c'},
+  {v:'olijf/khaki',dot:'#6b7c45'},{v:'bordeaux',dot:'#6e1020'},{v:'nude/huid',dot:'#d4a882'},
+  {v:'terra cotta',dot:'#c1654a'},
+];
+
+// Griette's stijl DNA — embedded in all AI prompts
+const GRIETTE_DNA = `Griette's stijl DNA (Winter kleurtype):
+- Basiskleuren: donkerblauw, bruin, zwart, gebroken-wit
+- Accentkleuren: felroze, paars, geel, oranje-rood, lichtblauw, groen
+- VERMIJDEN: champagne, grijzige tinten, pastelgrijs
+- Aanbevolen strategieën: split-complementair en ton-sur-ton
+- Stijlpijlers: modern-klassiek, niet te braaf, gedurfde kleurpop, textuurspel`;
+
+const FW_TRENDS = `Fashion Week trends 2025/2026:
+FW Paris 2025/2026: architecturale silhouetten, structured tailoring, power dressing, jewel tones (saffier, bordeaux, bosgroen), luipaard renaissance, sheer layering, quiet luxury evolving naar maximal moments, oversized schouders.
+Copenhagen FW 2026: sculptural knitwear, sustainable stoffen, knitwear-als-statement, kleurblokken met aardse tonen, streetwear-meets-tailoring, onverwachte proporties.
+Streetstyle CHF 2026: barrel jeans + structured blazer, wide-leg + crop top, colour-pop accessoires, leather × knitwear mix, sneakers bij formele items, bold print als enkel item.`;
+
+const COMBO_TYPES = [
+  {
+    id:'ton-sur-ton', label:'Ton-sur-ton', desc:'Één kleurenfamilie van licht naar donker',
+    presets:[
+      {name:'Chocolade tonal',vibe:'warm & elegant',stijl:'klassiek',colors:['#5c3317','#8B4513','#c19a6b','#f0e8d8'],tags:['bruin','cognac','camel','gebroken-wit']},
+      {name:'Navy tonal',vibe:'krachtig & helder',stijl:'elegant',colors:['#111827','#162038','#1a2a4a','#a8c4e0'],tags:['zwart','donkerblauw','marine','lichtblauw']},
+      {name:'Roze tonal',vibe:'romantisch & modern',stijl:'elegant',colors:['#7b3fa0','#b088c8','#e8a0b4','#f8f4ef'],tags:['paars','lila/paars','roze','wit']},
+      {name:'Aards tonal',vibe:'robuust & authentiek',stijl:'klassiek',colors:['#5c3317','#6b7c45','#c19a6b','#d4b896'],tags:['bruin','olijf/khaki','camel','beige']},
+      {name:'Nacht tonal',vibe:'dramatisch & sterk',stijl:'gedurfd',colors:['#111','#162038','#6e1020','#2ab0a8'],tags:['zwart','donkerblauw','bordeaux','turquoise']},
+    ]
+  },
+  {
+    id:'monochromatisch', label:'Monochromatisch', desc:'Één kleur in alle tinten en texturen',
+    presets:[
+      {name:'All-navy',vibe:'strak & doordacht',stijl:'klassiek',colors:['#0a1228','#162038','#1a3560','#a8c4e0'],tags:['donkerblauw','marine','donkerblauw','lichtblauw']},
+      {name:'All-bruin',vibe:'aards & rijkgeschakeerd',stijl:'klassiek',colors:['#3a1f0c','#5c3317','#8B4513','#c19a6b'],tags:['bruin','bruin','cognac','camel']},
+      {name:'All-zwart',vibe:'onverslaanbaar & krachtig',stijl:'gedurfd',colors:['#000','#222','#444','#888'],tags:['zwart','zwart','zwart','grijs']},
+      {name:'All-roze',vibe:'bold & maximalist',stijl:'gedurfd',colors:['#7b3fa0','#e8407a','#e8a0b4','#f8eef3'],tags:['paars','felroze','roze','wit']},
+    ]
+  },
+  {
+    id:'analoog', label:'Analoog', desc:'Naast elkaar op de kleurencirkel — harmonieus & warm',
+    presets:[
+      {name:'Bruin-oranje-mosterd',vibe:'warm & rijp',stijl:'klassiek',colors:['#5c3317','#d4703a','#b8860b','#f0e8d8'],tags:['bruin','oranje','mosterd','gebroken-wit']},
+      {name:'Navy-turquoise-groen',vibe:'maritiem & fris',stijl:'elegant',colors:['#162038','#2ab0a8','#4a8a5c','#f0e8d8'],tags:['donkerblauw','turquoise','groen','gebroken-wit']},
+      {name:'Felroze-paars-blauw',vibe:'vibrant & onverwacht',stijl:'gedurfd',colors:['#e8407a','#7b3fa0','#0047AB','#f8f4ef'],tags:['felroze','paars','kobaltblauw','wit']},
+      {name:'Rood-oranje-rood-geel',vibe:'vurig & energiek',stijl:'gedurfd',colors:['#cc2211','#b5232a','#d4703a','#d4b84a'],tags:['rood','oranje-rood','oranje','geel']},
+    ]
+  },
+  {
+    id:'complementair', label:'Complementair', desc:'Tegenovergestelde kleuren — maximaal contrast',
+    presets:[
+      {name:'Turquoise × bruin',vibe:'elegant maar verrassend',stijl:'elegant',colors:['#2ab0a8','#5c3317','#c19a6b','#f0e8d8'],tags:['turquoise','bruin','camel','gebroken-wit']},
+      {name:'Kobaltblauw × cognac',vibe:'grafisch & warm',stijl:'klassiek',colors:['#0047AB','#8B4513','#c19a6b','#f8f4ef'],tags:['kobaltblauw','cognac','camel','wit']},
+      {name:'Marine × mosterd',vibe:'klassiek & sterk',stijl:'klassiek',colors:['#1a2a4a','#b8860b','#c19a6b','#f8f4ef'],tags:['marine','mosterd','camel','wit']},
+      {name:'Felroze × olijf',vibe:'speels & onverwacht',stijl:'streetstyle',colors:['#e8407a','#6b7c45','#f0e8d8','#888'],tags:['felroze','olijf/khaki','gebroken-wit','grijs']},
+      {name:'Bordeaux × turquoise',vibe:'dramatisch & fris',stijl:'gedurfd',colors:['#6e1020','#2ab0a8','#f0e8d8','#111'],tags:['bordeaux','turquoise','gebroken-wit','zwart']},
+    ]
+  },
+  {
+    id:'split-complementair', label:'Split-complementair', desc:'Jouw aanbevolen strategie — één kleur + twee accenten',
+    presets:[
+      {name:'Turquoise + roze + grijs',vibe:'energiek & chic',stijl:'streetstyle',colors:['#2ab0a8','#e8407a','#888','#f0e8d8'],tags:['turquoise','felroze','grijs','gebroken-wit']},
+      {name:'Oranje-rood + roze + blauw',vibe:'warm & speels',stijl:'gedurfd',colors:['#b5232a','#e8a0b4','#a8c4e0','#f8f4ef'],tags:['oranje-rood','roze','lichtblauw','wit']},
+      {name:'Navy + turquoise + roze',vibe:'grafisch & fris',stijl:'streetstyle',colors:['#162038','#2ab0a8','#e8407a','#f0e8d8'],tags:['donkerblauw','turquoise','felroze','gebroken-wit']},
+      {name:'Bruin + geel + lichtblauw',vibe:'zonnig & warm',stijl:'elegant',colors:['#5c3317','#d4b84a','#a8c4e0','#f0e8d8'],tags:['bruin','geel','lichtblauw','gebroken-wit']},
+      {name:'Zwart + felroze + groen',vibe:'bold streetstyle',stijl:'streetstyle',colors:['#111','#e8407a','#4a8a5c','#f8f4ef'],tags:['zwart','felroze','groen','wit']},
+    ]
+  },
+  {
+    id:'neutraal-accent', label:'Neutraal + accent', desc:'Strakke basis met één krachtige kleurpop',
+    presets:[
+      {name:'Zwart × felroze',vibe:'krachtig & verleidelijk',stijl:'gedurfd',colors:['#111','#333','#e8407a','#f8f4ef'],tags:['zwart','zwart','felroze','wit']},
+      {name:'Bruin × turquoise',vibe:'aards & verrassend',stijl:'elegant',colors:['#5c3317','#c19a6b','#2ab0a8','#f0e8d8'],tags:['bruin','camel','turquoise','gebroken-wit']},
+      {name:'Navy × geel',vibe:'klassiek & vrolijk',stijl:'klassiek',colors:['#162038','#1a2a4a','#d4b84a','#f8f4ef'],tags:['donkerblauw','marine','geel','wit']},
+      {name:'Grijs × rood',vibe:'grafisch & sterk',stijl:'gedurfd',colors:['#888','#555','#cc2211','#f8f4ef'],tags:['grijs','grijs','rood','wit']},
+      {name:'Bruin × kobaltblauw',vibe:'onverwacht & krachtig',stijl:'streetstyle',colors:['#5c3317','#c19a6b','#0047AB','#f0e8d8'],tags:['bruin','camel','kobaltblauw','gebroken-wit']},
+    ]
+  },
+  {
+    id:'grafisch', label:'Grafisch', desc:'Hoog contrast — maximale visuele impact',
+    presets:[
+      {name:'Zwart-wit + goud',vibe:'tijdloos & luxe',stijl:'elegant',colors:['#111','#f8f4ef','#c9a84c','#888'],tags:['zwart','wit','geel','grijs']},
+      {name:'Marine + crème + zwart',vibe:'strak & doordacht',stijl:'klassiek',colors:['#162038','#f0e8d8','#111','#c19a6b'],tags:['marine','gebroken-wit','zwart','camel']},
+      {name:'Bordeaux + zwart + goud',vibe:'dramatisch & elegant',stijl:'elegant',colors:['#6e1020','#111','#c9a84c','#f0e8d8'],tags:['bordeaux','zwart','geel','gebroken-wit']},
+      {name:'Kobaltblauw + wit + rood',vibe:'power dressing',stijl:'gedurfd',colors:['#0047AB','#f8f4ef','#cc2211','#111'],tags:['kobaltblauw','wit','rood','zwart']},
+    ]
+  },
+  {
+    id:'custom', label:'Eigen kleurkeuze', desc:'Kies 1 of 2 kleuren — ik stel combo\'s voor',
+    presets:[]
+  },
+];
+
+const CAT_ICONS = {tops:'👕',bottoms:'👖',layers:'🧥',jurken:'👗',bags:'👜',shoes:'👟',accessories:'🕶️',swimwear:'🩱',overig:'📦'};
 
 const DEFAULT_ITEMS = [
   {id:'bershka-raglan',name:'Bershka raglan trui',brand:'Bershka',cat:'tops'},
@@ -278,73 +449,45 @@ const DEFAULT_ITEMS = [
   {id:'flipflops',name:'Flipflops',brand:'—',cat:'swimwear'},
 ];
 
-// Color combo types — based on Griette's stijl DNA (Winter type, bold on neutral basis)
-const COMBO_TYPES = [
-  {
-    id:'ton-sur-ton', label:'Ton-sur-ton', desc:'Één kleurenfamilie van licht naar donker — verfijnd & rustig',
-    presets:[
-      {name:'Chocolade tonal',vibe:'warm & elegant',colors:['#5c3317','#8B4513','#c19a6b','#f0e8d8'],tags:['bruin','cognac','camel','gebroken-wit']},
-      {name:'Navy tonal',vibe:'krachtig & helder',colors:['#111827','#162038','#1a2a4a','#a8c4e0'],tags:['zwart','donkerblauw','marine','lichtblauw']},
-      {name:'Roze tonal',vibe:'romantisch & modern',colors:['#7b3fa0','#b088c8','#e8a0b4','#f8f4ef'],tags:['paars','lila/paars','roze','wit']},
-    ]
-  },
-  {
-    id:'complementair', label:'Complementair', desc:'Tegenovergestelde kleuren — maximaal contrast & energie',
-    presets:[
-      {name:'Turquoise × bruin',vibe:'elegant maar verrassend',colors:['#2ab0a8','#5c3317','#c19a6b','#f0e8d8'],tags:['turquoise','bruin','camel','gebroken-wit']},
-      {name:'Kobaltblauw × cognac',vibe:'grafisch & warm',colors:['#0047AB','#8B4513','#c19a6b','#f8f4ef'],tags:['kobaltblauw','cognac','camel','wit']},
-      {name:'Marine × mosterd',vibe:'klassiek & sterk',colors:['#1a2a4a','#b8860b','#c19a6b','#f8f4ef'],tags:['marine','mosterd','camel','wit']},
-      {name:'Felroze × olijf',vibe:'speels & onverwacht',colors:['#e8407a','#6b7c45','#f0e8d8','#888'],tags:['felroze','olijf/khaki','gebroken-wit','grijs']},
-    ]
-  },
-  {
-    id:'split-complementair', label:'Split-complementair', desc:'Jouw aanbevolen strategie — één kleur + twee accenten',
-    presets:[
-      {name:'Turquoise + roze + grijs',vibe:'energiek & chic',colors:['#2ab0a8','#e8407a','#888','#f0e8d8'],tags:['turquoise','felroze','grijs','gebroken-wit']},
-      {name:'Oranje-rood + roze + blauw',vibe:'warm & speels',colors:['#b5232a','#e8a0b4','#a8c4e0','#f8f4ef'],tags:['oranje-rood','roze','lichtblauw','wit']},
-      {name:'Navy + turquoise + roze',vibe:'grafisch & fris',colors:['#162038','#2ab0a8','#e8407a','#f0e8d8'],tags:['donkerblauw','turquoise','felroze','gebroken-wit']},
-    ]
-  },
-  {
-    id:'neutraal-accent', label:'Neutraal + accent', desc:'Strakke basis met één krachtige kleurpop',
-    presets:[
-      {name:'Zwart × felroze',vibe:'krachtig & verleidelijk',colors:['#111','#333','#e8407a','#f8f4ef'],tags:['zwart','zwart','felroze','wit']},
-      {name:'Bruin × turquoise',vibe:'aards & verrassend',colors:['#5c3317','#c19a6b','#2ab0a8','#f0e8d8'],tags:['bruin','camel','turquoise','gebroken-wit']},
-      {name:'Navy × geel/mosterd',vibe:'klassiek & vrolijk',colors:['#162038','#1a2a4a','#d4b84a','#f8f4ef'],tags:['donkerblauw','marine','geel','wit']},
-      {name:'Grijs × rood',vibe:'grafisch & sterk',colors:['#888','#555','#cc2211','#f8f4ef'],tags:['grijs','grijs','rood','wit']},
-    ]
-  },
-  {
-    id:'grafisch', label:'Grafisch', desc:'Hoog contrast met maximale visuele impact',
-    presets:[
-      {name:'Zwart-wit + goud',vibe:'tijdloos & luxe',colors:['#111','#f8f4ef','#c9a84c','#888'],tags:['zwart','wit','geel','grijs']},
-      {name:'Marine + crème + zwart',vibe:'strak & doordacht',colors:['#162038','#f0e8d8','#111','#c19a6b'],tags:['marine','gebroken-wit','zwart','camel']},
-      {name:'Bordeaux + zwart + goud',vibe:'dramatisch & elegant',colors:['#6e1020','#111','#c9a84c','#f0e8d8'],tags:['bordeaux','zwart','geel','gebroken-wit']},
-    ]
-  },
-];
-
-const CAT_ICONS = {tops:'👕',bottoms:'👖',layers:'🧥',jurken:'👗',bags:'👜',shoes:'👟',accessories:'🕶️',swimwear:'🩱',overig:'📦'};
-
 // STATE
 let step = 1;
 let selType = null, selPreset = null;
-let selItems = []; // max 6
+let selItems = [];
 let allItems = [];
 let cloudMap = {};
 let itemTags = {};
+let customColors = []; // max 2 selected KLEUREN entries
+let anthropicKey = '';
+let aiModel = 'claude-haiku-4-5-20251001';
 
-// ── INIT ─────────────────────────────────────────────────────────────────────
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
+function openSettings() {
+  document.getElementById('api-key-input').value = anthropicKey;
+  document.getElementById('ai-model-select').value = aiModel;
+  document.getElementById('settings-modal').classList.add('open');
+}
+function closeSettings() {
+  document.getElementById('settings-modal').classList.remove('open');
+}
+function saveSettings() {
+  anthropicKey = document.getElementById('api-key-input').value.trim();
+  aiModel = document.getElementById('ai-model-select').value;
+  try { localStorage.setItem('anthropic-key', anthropicKey); } catch(e){}
+  try { localStorage.setItem('ai-model', aiModel); } catch(e){}
+  closeSettings();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
 async function init() {
-  // localStorage
+  try { anthropicKey = localStorage.getItem('anthropic-key') || ''; } catch(e){}
+  try { aiModel = localStorage.getItem('ai-model') || 'claude-haiku-4-5-20251001'; } catch(e){}
   try { cloudMap = JSON.parse(localStorage.getItem('griette-cloud-photos-v1')||'{}'); } catch(e){}
   try { itemTags = JSON.parse(localStorage.getItem('griette-item-tags-v3')||'{}'); } catch(e){}
   try {
     const ci = JSON.parse(localStorage.getItem('griette-custom-items-v3')||'{}');
-    Object.entries(ci).forEach(([cat,list])=> list.forEach(i => DEFAULT_ITEMS.push(Object.assign({},i,{cat,brand:'eigen'}))));
+    Object.entries(ci).forEach(([cat,list])=>list.forEach(i=>DEFAULT_ITEMS.push(Object.assign({},i,{cat,brand:'eigen'}))));
   } catch(e){}
 
-  // Supabase
   const [sbPhotos, sbTags, sbCustom, sbDeleted] = await Promise.all([
     sbGet('cloud-photos'), sbGet('item-tags'), sbGet('custom-items'), sbGet('deleted-items')
   ]);
@@ -352,17 +495,18 @@ async function init() {
   if (sbTags)   Object.assign(itemTags, sbTags);
   const deleted = new Set(Array.isArray(sbDeleted) ? sbDeleted : []);
 
-  const seen = new Set();
   const extra = [];
   if (sbCustom && typeof sbCustom === 'object') {
-    const entries = Array.isArray(sbCustom) ? sbCustom : Object.entries(sbCustom).flatMap(([cat,list])=>list.map(i=>Object.assign({},i,{cat,brand:'eigen'})));
-    entries.forEach(i => extra.push(i));
+    const entries = Array.isArray(sbCustom)
+      ? sbCustom
+      : Object.entries(sbCustom).flatMap(([cat,list])=>list.map(i=>Object.assign({},i,{cat,brand:'eigen'})));
+    entries.forEach(i=>extra.push(i));
   }
 
+  const seen = new Set();
   allItems = [...DEFAULT_ITEMS, ...extra].filter(i => {
     if (!i || !i.id || deleted.has(i.id) || seen.has(i.id)) return false;
-    seen.add(i.id);
-    return true;
+    seen.add(i.id); return true;
   });
 
   buildComboTypes();
@@ -377,6 +521,35 @@ async function sbGet(key) {
   } catch(e){return null;}
 }
 
+// ── AI API CALL ───────────────────────────────────────────────────────────────
+async function callClaude(systemPrompt, userContent) {
+  if (!anthropicKey) {
+    throw new Error('Geen API-sleutel. Voeg je sleutel toe via ⚙ Instellingen.');
+  }
+  const body = {
+    model: aiModel,
+    max_tokens: 1024,
+    system: systemPrompt,
+    messages: [{ role:'user', content: userContent }]
+  };
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{
+      'x-api-key': anthropicKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(()=>({}));
+    throw new Error(err?.error?.message || `API fout ${res.status}`);
+  }
+  const data = await res.json();
+  return data.content?.[0]?.text || '';
+}
+
 // ── STEP 1: COMBO TYPE ────────────────────────────────────────────────────────
 function buildComboTypes() {
   const grid = document.getElementById('combo-type-grid');
@@ -387,10 +560,17 @@ function buildComboTypes() {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.combo-type-btn').forEach(b=>b.classList.remove('selected'));
       btn.classList.add('selected');
-      selType = ct;
-      selPreset = null;
-      buildPresets(ct);
+      selType = ct; selPreset = null;
       document.getElementById('btn-next').disabled = true;
+
+      if (ct.id === 'custom') {
+        document.getElementById('preset-area').style.display = 'none';
+        buildCustomColorPicker();
+        document.getElementById('custom-area').style.display = 'block';
+      } else {
+        document.getElementById('custom-area').style.display = 'none';
+        buildPresets(ct);
+      }
     });
     grid.appendChild(btn);
   });
@@ -403,12 +583,8 @@ function buildPresets(ct) {
   label.textContent = ct.label + ' — kies een combo';
   list.innerHTML = '';
   ct.presets.forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'preset-card';
-    const swatches = p.colors.map(c=>`<div class="swatch" style="background:${c}"></div>`).join('');
-    card.innerHTML = `<div class="preset-swatches">${swatches}</div><div class="preset-info"><div class="pi-name">${p.name}</div><div class="pi-vibe">${p.vibe}</div></div>`;
-    card.addEventListener('click', () => {
-      document.querySelectorAll('.preset-card').forEach(b=>b.classList.remove('selected'));
+    const card = makePresetCard(p, () => {
+      document.querySelectorAll('#preset-list .preset-card').forEach(b=>b.classList.remove('selected'));
       card.classList.add('selected');
       selPreset = p;
       document.getElementById('btn-next').disabled = false;
@@ -419,56 +595,206 @@ function buildPresets(ct) {
   area.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
+function makePresetCard(p, onClick) {
+  const card = document.createElement('div');
+  card.className = 'preset-card';
+  const swatches = p.colors.map(c=>`<div class="swatch" style="background:${c}"></div>`).join('');
+  const stijlBadge = p.stijl ? `<div class="pi-stijl">${p.stijl}</div>` : '';
+  card.innerHTML = `<div class="preset-swatches">${swatches}</div><div class="preset-info"><div class="pi-name">${p.name}</div><div class="pi-vibe">${p.vibe}</div>${stijlBadge}</div>`;
+  card.addEventListener('click', onClick);
+  return card;
+}
+
+// ── CUSTOM COLOR PICKER ────────────────────────────────────────────────────────
+function buildCustomColorPicker() {
+  customColors = [];
+  const grid = document.getElementById('custom-color-grid');
+  if (grid.children.length > 0) { updateCustomCombos(); return; } // already built
+  KLEUREN.forEach(({v, dot}) => {
+    const sw = document.createElement('button');
+    sw.className = 'cswatch';
+    sw.style.background = dot;
+    sw.style.borderColor = dot;
+    sw.dataset.v = v;
+    sw.innerHTML = '<span class="check">✓</span>';
+    sw.title = v;
+    sw.addEventListener('click', () => toggleCustomColor({v, dot}, sw));
+    grid.appendChild(sw);
+  });
+  updateCustomCombos();
+}
+
+function toggleCustomColor(color, btn) {
+  const idx = customColors.findIndex(c=>c.v===color.v);
+  if (idx >= 0) {
+    customColors.splice(idx, 1);
+    btn.classList.remove('selected');
+  } else {
+    if (customColors.length >= 2) {
+      // Remove oldest
+      const oldV = customColors.shift().v;
+      document.querySelector(`.cswatch[data-v="${CSS.escape(oldV)}"]`)?.classList.remove('selected');
+    }
+    customColors.push(color);
+    btn.classList.add('selected');
+  }
+  renderSelectedPills();
+  updateCustomCombos();
+}
+
+function renderSelectedPills() {
+  const wrap = document.getElementById('selected-pills');
+  wrap.innerHTML = '';
+  customColors.forEach(c => {
+    const pill = document.createElement('div');
+    pill.className = 'color-pill';
+    pill.innerHTML = `<span class="cdot" style="background:${c.dot}"></span>${c.v}`;
+    wrap.appendChild(pill);
+  });
+}
+
+function updateCustomCombos() {
+  const wrap = document.getElementById('custom-combos-wrap');
+  if (customColors.length === 0) { wrap.style.display='none'; selPreset=null; document.getElementById('btn-next').disabled=true; return; }
+  wrap.style.display = 'block';
+  buildAlgorithmicCombos();
+}
+
+function buildAlgorithmicCombos() {
+  const list = document.getElementById('custom-preset-list');
+  list.innerHTML = '';
+  selPreset = null;
+  document.getElementById('btn-next').disabled = true;
+
+  const combos = generateCombos(customColors);
+  if (combos.length === 0) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--text-2);">Kies een kleur om suggesties te zien.</div>';
+    return;
+  }
+  combos.forEach(p => {
+    const card = makePresetCard(p, () => {
+      document.querySelectorAll('#custom-preset-list .preset-card').forEach(b=>b.classList.remove('selected'));
+      card.classList.add('selected');
+      selPreset = p;
+      document.getElementById('btn-next').disabled = false;
+    });
+    list.appendChild(card);
+  });
+}
+
+function generateCombos(selectedColors) {
+  // Find best matching presets from all types, ranked by color match
+  const allPresets = COMBO_TYPES.filter(t=>t.id!=='custom').flatMap(t=>
+    t.presets.map(p=>({...p, typeName:t.label}))
+  );
+  const results = [];
+  const selectedVals = selectedColors.map(c=>c.v);
+
+  allPresets.forEach(p => {
+    let score = 0;
+    selectedVals.forEach(v => {
+      const exact = p.tags.filter(t=>t===v).length;
+      const partial = p.tags.filter(t=>t.includes(v.split('/')[0])||v.includes(t.split('/')[0])).length;
+      score += exact*3 + partial*1;
+    });
+    if (score > 0) results.push({...p, score});
+  });
+
+  results.sort((a,b)=>b.score-a.score);
+  // Return top 5, deduplicated by name
+  const seen = new Set();
+  return results.filter(p=>{ if(seen.has(p.name)) return false; seen.add(p.name); return true; }).slice(0,5);
+}
+
+async function aiSuggestCombos() {
+  const btn = document.getElementById('ai-combo-btn');
+  if (!anthropicKey) { openSettings(); return; }
+  if (customColors.length === 0) return;
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Bezig…';
+  const list = document.getElementById('custom-preset-list');
+
+  const colorNames = customColors.map(c=>c.v).join(' en ');
+  const system = `Je bent een kleur- en stijlexpert. ${GRIETTE_DNA}\n\n${FW_TRENDS}`;
+  const userMsg = `Griette heeft ${customColors.length === 1 ? 'kleur' : 'kleuren'} "${colorNames}" gekozen als ankerpunt.
+
+Geef precies 4 kleurcombo-suggesties in JSON. Elk object heeft: name (string), vibe (string), stijl (één van: streetstyle|elegant|klassiek|gedurfd), colors (array van 4 hex-codes), tags (array van 4 kleuernamen uit Griette's DNA).
+
+Varieer de stijlrichtingen: geef zowel gedurfde streetstyle keuzes als elegante en klassieke opties.
+Wees eerlijk als een kleur niet past bij Griette's Winter DNA — kies dan een naburige kleur die wél past.
+
+Antwoord ALLEEN met een geldig JSON array, geen uitleg eromheen.`;
+
+  try {
+    const raw = await callClaude(system, userMsg);
+    const match = raw.match(/\[[\s\S]*\]/);
+    if (!match) throw new Error('Geen geldige JSON');
+    const aiCombos = JSON.parse(match[0]);
+
+    list.innerHTML = '';
+    selPreset = null;
+    document.getElementById('btn-next').disabled = true;
+
+    aiCombos.forEach(p => {
+      const card = makePresetCard(p, () => {
+        document.querySelectorAll('#custom-preset-list .preset-card').forEach(b=>b.classList.remove('selected'));
+        card.classList.add('selected');
+        selPreset = p;
+        document.getElementById('btn-next').disabled = false;
+      });
+      list.appendChild(card);
+    });
+
+    btn.textContent = '✓ AI-suggesties geladen';
+  } catch(e) {
+    btn.textContent = '✨ AI-suggesties';
+    alert('AI-fout: ' + e.message);
+  }
+  btn.disabled = false;
+}
+
 // ── STEP 2: ITEMS ─────────────────────────────────────────────────────────────
 function buildItemGrid() {
   const grid = document.getElementById('item-grid');
   grid.innerHTML = '';
   selItems = [];
 
-  // Sort: items with photos first, then matching color tags first within that
   const matchTags = selPreset ? selPreset.tags : [];
-  const withPhoto = allItems.filter(i => cloudMap[i.id]);
-  const noPhoto   = allItems.filter(i => !cloudMap[i.id]);
+  const withPhoto = allItems.filter(i=>cloudMap[i.id]);
+  const noPhoto   = allItems.filter(i=>!cloudMap[i.id]);
 
-  function tagMatch(i) {
+  function tagScore(i) {
     const t = itemTags[i.id];
-    if (!t || !t.kleur) return 0;
-    return matchTags.includes(t.kleur) ? 2 : 0;
+    if (!t) return 0;
+    const kleur = Array.isArray(t.kleur) ? t.kleur : (t.kleur ? [t.kleur] : []);
+    return matchTags.filter(mt => kleur.some(k=>k===mt||k.includes(mt.split('/')[0])||mt.includes(k.split('/')[0]))).length;
   }
 
   const sorted = [
-    ...withPhoto.sort((a,b) => tagMatch(b)-tagMatch(a)),
-    ...noPhoto.sort((a,b) => tagMatch(b)-tagMatch(a)),
+    ...withPhoto.sort((a,b)=>tagScore(b)-tagScore(a)),
+    ...noPhoto.sort((a,b)=>tagScore(b)-tagScore(a)),
   ];
 
   sorted.forEach(item => {
     const card = document.createElement('div');
     card.className = 'icard';
     card.dataset.id = item.id;
+    const icon = CAT_ICONS[item.cat]||'📦';
+    card.innerHTML = `<div class="ithumb" id="ith-${item.id}">${icon}</div><div class="iinfo"><div class="iname">${item.name}</div><div class="icat">${item.brand||item.cat}</div></div>`;
 
-    const hasPhoto = !!cloudMap[item.id];
-    const icon = CAT_ICONS[item.cat] || '📦';
-    card.innerHTML = `
-      <div class="ithumb" id="ith-${item.id}">${icon}</div>
-      <div class="iinfo">
-        <div class="iname">${item.name}</div>
-        <div class="icat">${item.brand || item.cat}</div>
-      </div>`;
-
-    if (hasPhoto) {
+    if (cloudMap[item.id]) {
       const img = new Image();
       img.onload = () => {
         const th = document.getElementById('ith-'+item.id);
         if (th) { th.textContent=''; th.appendChild(img); }
       };
       img.src = cloudMap[item.id];
-      img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
     }
-
-    card.addEventListener('click', () => toggleItem(item, card));
+    card.addEventListener('click', ()=>toggleItem(item, card));
     grid.appendChild(card);
   });
-
   updateItemCount();
 }
 
@@ -482,17 +808,63 @@ function toggleItem(item, card) {
     selItems.push(item);
     card.classList.add('selected');
   }
-  // dim cards over limit
   document.querySelectorAll('.icard').forEach(c => {
-    if (!c.classList.contains('selected') && selItems.length >= 6) c.classList.add('dim');
-    else c.classList.remove('dim');
+    c.classList.toggle('dim', !c.classList.contains('selected') && selItems.length >= 6);
   });
   updateItemCount();
-  document.getElementById('btn-next').disabled = selItems.length < 4;
 }
 
 function updateItemCount() {
-  document.getElementById('item-count-label').textContent = `Items gekozen: ${selItems.length}/6 (min 4)`;
+  const n = selItems.length;
+  document.getElementById('item-count-label').textContent =
+    n === 0 ? 'Items — optioneel (max 6, sla gerust over)'
+    : `Items gekozen: ${n}/6`;
+}
+
+// ── STEP 3: AI SUGGESTIES ─────────────────────────────────────────────────────
+async function aiSuggestDetails() {
+  const btn = document.getElementById('ai-details-btn');
+  const status = document.getElementById('ai-details-status');
+  if (!anthropicKey) { openSettings(); return; }
+
+  btn.disabled = true;
+  status.textContent = '⏳ AI denkt na…';
+
+  const combo = selPreset ? `${selPreset.name} (${selPreset.vibe}, stijl: ${selPreset.stijl||'?'})` : 'geen combo gekozen';
+  const items = selItems.length > 0
+    ? selItems.map(i=>`${i.name} (${i.cat})`).join(', ')
+    : 'geen specifieke items gekozen';
+
+  const system = `Je bent een persoonlijke stylist voor Griette. ${GRIETTE_DNA}\n\n${FW_TRENDS}\nSchrijf altijd in het Nederlands. Wees direct, enthousiast en eerlijk.`;
+  const userMsg = `Gekozen kleurcombo: ${combo}
+Geselecteerde items: ${items}
+
+Geef suggesties voor:
+1. titel (max 4 woorden, HOOFDLETTERS, naam van een trip/gelegenheid)
+2. sublabel (bijv. "3. STRAND & DINER")
+3. anno1 (handgeschreven annotatie rechtsboven, 2 regels, stijlobservatie)
+4. anno2 (handgeschreven annotatie linksonder, 2 regels, gevoel/vibe)
+5. stylingnoot (1 zin, styling-tip voor de outfit)
+
+Antwoord in JSON: {titel, sublabel, anno1, anno2, stylingnoot}
+anno1 en anno2: gebruik \\n voor regelbreuk.`;
+
+  try {
+    const raw = await callClaude(system, userMsg);
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('Geen geldige JSON');
+    const data = JSON.parse(match[0]);
+    if (data.titel)      document.getElementById('f-title').value  = data.titel;
+    if (data.sublabel)   document.getElementById('f-sub').value    = data.sublabel;
+    if (data.anno1)      document.getElementById('f-anno1').value  = data.anno1.replace(/\\n/g,'\n');
+    if (data.anno2)      document.getElementById('f-anno2').value  = data.anno2.replace(/\\n/g,'\n');
+    if (data.stylingnoot) document.getElementById('f-note').value = data.stylingnoot;
+    status.textContent = '✓ Ingevuld — pas aan naar jouw smaak';
+    step3Check();
+  } catch(e) {
+    status.textContent = 'Mislukt: ' + e.message;
+  }
+  btn.disabled = false;
 }
 
 // ── STEP 3 validation ──────────────────────────────────────────────────────────
@@ -515,41 +887,95 @@ function buildKaart() {
   document.getElementById('k-anno2').innerHTML   = anno2;
   document.getElementById('k-note').textContent  = note;
 
-  // Color swatches
   const sw = document.getElementById('k-swatches');
   sw.innerHTML = '';
-  (selPreset?.colors || []).forEach(c => {
-    const d = document.createElement('div');
-    d.className = 'kaart-swatch';
-    d.style.background = c;
-    sw.appendChild(d);
+  (selPreset?.colors||[]).forEach(c=>{
+    const d = document.createElement('div'); d.className='kaart-swatch'; d.style.background=c; sw.appendChild(d);
   });
 
-  // Items grid
   const grid = document.getElementById('k-grid');
   grid.innerHTML = '';
-  // Fill to 6 slots
   const slots = selItems.slice(0,6);
   while (slots.length < 6) slots.push(null);
 
   slots.forEach(item => {
-    const col = document.createElement('div');
-    col.className = 'kaart-item';
+    const col = document.createElement('div'); col.className='kaart-item';
     if (!item) { col.innerHTML='<div class="kaart-photo"></div><div class="kaart-brand"></div><div class="kaart-desc"></div>'; grid.appendChild(col); return; }
-    const photoUrl = cloudMap[item.id] || null;
-    const icon = CAT_ICONS[item.cat] || '📦';
-    col.innerHTML = `
-      <div class="kaart-photo" id="kp-${item.id}">${photoUrl?'':icon}</div>
-      <div class="kaart-brand">${(item.brand&&item.brand!=='—')?item.brand:''}</div>
-      <div class="kaart-desc">${item.name}</div>`;
+    const photoUrl = cloudMap[item.id]||null;
+    const icon = CAT_ICONS[item.cat]||'📦';
+    col.innerHTML = `<div class="kaart-photo" id="kp-${item.id}">${photoUrl?'':icon}</div><div class="kaart-brand">${(item.brand&&item.brand!=='—')?item.brand:''}</div><div class="kaart-desc">${item.name}</div>`;
     if (photoUrl) {
       const img = document.createElement('img');
-      img.crossOrigin = 'anonymous';
-      img.src = photoUrl;
+      img.crossOrigin = 'anonymous'; img.src = photoUrl;
       document.getElementById('kp-'+item.id)?.appendChild(img);
     }
     grid.appendChild(col);
   });
+}
+
+// ── AI OUTFIT ANALYSE ─────────────────────────────────────────────────────────
+async function aiAnalyseOutfit() {
+  const btn = document.getElementById('ai-analyse-btn');
+  const panel = document.getElementById('ai-analyse-panel');
+  if (!anthropicKey) { openSettings(); return; }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ AI analyseert…';
+  panel.style.display = 'none';
+
+  const combo = selPreset ? `${selPreset.name} — ${selPreset.vibe} (${selPreset.stijl||''})` : 'geen preset';
+  const itemLines = selItems.map(i=>`- ${i.name} (${i.cat}${cloudMap[i.id]?' — met foto':''})`).join('\n') || '- geen items geselecteerd';
+
+  // Build content blocks for Claude: text + image URLs
+  const userContent = [];
+  userContent.push({ type:'text', text:
+    `Analyseer deze outfit voor Griette.\n\nGekozen kleurcombo: ${combo}\n\nItems:\n${itemLines}\n\n${FW_TRENDS}\n\nGeef analyse op de volgende punten (in het Nederlands, eerlijk en direct):
+
+1. **Textuur & Vorm** — beschrijf per item (indien foto): materiaal, silhouet, volume. Wat klopt of clashed?
+2. **Kleur & DNA** — past dit bij Griette's Winter DNA? Wat werkt, wat minder?
+3. **Wat mist** — welk item, kleur of textuur ontbreekt om de outfit compleet te maken? Wees eerlijk.
+4. **FW Paris / Copenhagen 2026** — hoe sluit dit aan op actuele trends? Geef concrete voorbeelden.
+5. **Stijlrichting** — is dit streetstyle, elegant, klassiek of gedurfd? Leg uit.
+6. **Gedurfd alternatief** — één bold streetstyle CHF/Parijs 2026 voorstel dat Griette's garderobe optimaal benut.
+
+Gebruik korte alinea's per punt. Wees eerlijk als iets niet klopt — geen lege complimenten.`
+  });
+
+  // Add images for items with photos
+  selItems.forEach(item => {
+    const url = cloudMap[item.id];
+    if (url) {
+      userContent.push({
+        type: 'image',
+        source: { type: 'url', url }
+      });
+      userContent.push({ type:'text', text: `(Foto van: ${item.name})` });
+    }
+  });
+
+  const system = `Je bent een eerlijke, deskundige persoonlijke stylist voor Griette. ${GRIETTE_DNA}
+Schrijf altijd in het Nederlands. Gebruik **vetgedrukte** kopjes. Wees concreet, eerlijk en enthousiast.`;
+
+  try {
+    const raw = await callClaude(system, userContent);
+    renderAiAnalysis(raw);
+    panel.style.display = 'block';
+    btn.textContent = '✓ Analyse gereed — scroll naar beneden';
+  } catch(e) {
+    alert('AI-fout: ' + e.message);
+    btn.textContent = '🔍 AI-analyse: textuur, vorm & trends';
+  }
+  btn.disabled = false;
+}
+
+function renderAiAnalysis(text) {
+  const panel = document.getElementById('ai-analyse-panel');
+  // Convert markdown bold + newlines to HTML
+  const html = text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+  panel.innerHTML = `<div class="ai-panel"><div class="ai-head">✨ AI Stijlanalyse</div><div class="ai-section-body"><p>${html}</p></div></div>`;
 }
 
 // ── DOWNLOAD ──────────────────────────────────────────────────────────────────
@@ -562,13 +988,11 @@ async function downloadKaart() {
   try {
     const canvas = await html2canvas(el, {
       useCORS: true, allowTaint: true,
-      scale: 3, backgroundColor: '#F5F2EE',
-      logging: false,
+      scale: 3, backgroundColor: '#F5F2EE', logging: false,
     });
-
     const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
 
-    // Show image inline — works on iOS (long-press to save) and desktop
+    // Show inline — iOS: long-press to save
     let imgWrap = document.getElementById('dl-img-wrap');
     if (!imgWrap) {
       imgWrap = document.createElement('div');
@@ -576,21 +1000,18 @@ async function downloadKaart() {
       imgWrap.style.cssText = 'margin:12px 0 4px;border-radius:12px;overflow:hidden;border:1.5px solid var(--border);';
       btn.parentElement.insertBefore(imgWrap, btn);
     }
-    imgWrap.innerHTML = '<img src="' + dataUrl + '" style="width:100%;display:block;" alt="Outfitkaart">';
+    imgWrap.innerHTML = '<img src="'+dataUrl+'" style="width:100%;display:block;" alt="Outfitkaart">';
 
-    // Also try direct download (works on Android + desktop)
+    // Try direct download (works Android + desktop)
     try {
       const a = document.createElement('a');
       a.href = dataUrl;
-      a.download = 'outfitkaart-' + new Date().toISOString().slice(0,10) + '.jpg';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } catch(e) {}
+      a.download = 'outfitkaart-'+new Date().toISOString().slice(0,10)+'.jpg';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    } catch(e){}
 
-    btn.textContent = '✓ Opgeslagen — of houd de afbeelding hieronder ingedrukt';
+    btn.textContent = '✓ Houd de afbeelding hieronder ingedrukt om op te slaan (iOS)';
     btn.disabled = false;
-
   } catch(e) {
     btn.textContent = '⬇ Download als afbeelding';
     btn.disabled = false;
@@ -602,12 +1023,12 @@ async function downloadKaart() {
 function setStep(n) {
   step = n;
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('card-wrap').style.display='none';
-  document.getElementById('steps-bar').style.display='flex';
-  document.getElementById('bottom-bar').style.display='flex';
+  document.getElementById('card-wrap').style.display = 'none';
+  document.getElementById('steps-bar').style.display = 'flex';
+  document.getElementById('bottom-bar').style.display = 'flex';
 
   [1,2,3,4].forEach(i=>{
-    const sd=document.getElementById('sd'+i);
+    const sd = document.getElementById('sd'+i);
     sd.classList.remove('active','done');
     if(i<n) sd.classList.add('done');
     if(i===n) sd.classList.add('active');
@@ -615,39 +1036,48 @@ function setStep(n) {
 
   const btnBack = document.getElementById('btn-back');
   const btnNext = document.getElementById('btn-next');
-  btnBack.style.display = n>1?'block':'none';
+  btnBack.style.display = n > 1 ? 'block' : 'none';
 
-  if (n===1) {
+  if (n === 1) {
     document.getElementById('p1').classList.add('active');
     btnNext.textContent = 'Volgende →';
     btnNext.disabled = !selPreset;
-
-  } else if (n===2) {
+  } else if (n === 2) {
     document.getElementById('p2').classList.add('active');
     buildItemGrid();
     btnNext.textContent = 'Volgende →';
-    btnNext.disabled = selItems.length < 4;
-
-  } else if (n===3) {
+    btnNext.disabled = false; // items are optional
+  } else if (n === 3) {
     document.getElementById('p3').classList.add('active');
     btnNext.textContent = 'Kaart genereren →';
-    document.getElementById('f-title').addEventListener('input', step3Check);
+    const titleInput = document.getElementById('f-title');
+    titleInput.removeEventListener('input', step3Check);
+    titleInput.addEventListener('input', step3Check);
     step3Check();
-
-  } else if (n===4) {
-    document.getElementById('steps-bar').style.display='none';
-    document.getElementById('bottom-bar').style.display='none';
-    document.getElementById('card-wrap').style.display='block';
+  } else if (n === 4) {
+    document.getElementById('steps-bar').style.display = 'none';
+    document.getElementById('bottom-bar').style.display = 'none';
+    document.getElementById('card-wrap').style.display = 'block';
     buildKaart();
+    // Hide AI analyse button if no key
+    document.getElementById('ai-analyse-btn').style.display = anthropicKey ? 'block' : 'none';
   }
 }
 
 function nextStep() { setStep(Math.min(step+1,4)); }
 function prevStep() { setStep(Math.max(step-1,1)); }
-function restart()  { selType=null; selPreset=null; selItems=[]; setStep(1); window.scrollTo(0,0); }
+function restart() {
+  selType=null; selPreset=null; selItems=[]; customColors=[];
+  document.getElementById('ai-analyse-panel').style.display='none';
+  document.getElementById('ai-analyse-btn').textContent='🔍 AI-analyse: textuur, vorm & trends';
+  const imgWrap = document.getElementById('dl-img-wrap');
+  if (imgWrap) imgWrap.remove();
+  setStep(1);
+  window.scrollTo(0,0);
+}
 
 // Start
-init().then(() => setStep(1));
+init().then(()=>setStep(1));
 </script>
 </body>
 </html>
