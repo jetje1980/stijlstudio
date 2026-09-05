@@ -102,6 +102,9 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 .kaart-photo img{width:100%;height:100%;object-fit:contain;background:#fff;}
 .kaart-brand{font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1a1510;text-align:center;line-height:1.2;}
 .kaart-desc{font-size:8px;color:#5a4030;text-align:center;line-height:1.3;}
+.kaart-why{font-size:6.5px;color:#9B7B5C;text-align:center;line-height:1.35;font-style:italic;margin-top:1px;}
+.kaart-top{font-size:8.5px;color:#4a3828;text-align:center;line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid #ddd5c8;}
+.kaart-top b{color:#1a1510;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:6.5px;display:block;margin-bottom:3px;}
 /* Voorstel: item dat nog niet in de kast zit */
 .kaart-photo.sugg{border:1.5px dashed #b9a48c;background:#faf7f3;flex-direction:column;gap:3px;font-size:15px;}
 .kaart-photo.sugg .sugg-tag{font-size:6px;letter-spacing:.09em;text-transform:uppercase;color:#9B7B5C;font-weight:700;}
@@ -262,6 +265,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <div class="kaart-anno-bl" id="k-anno2"></div>
     <div class="kaart-note"  id="k-note"></div>
     <div class="kaart-uitleg" id="k-uitleg"></div>
+    <div class="kaart-top" id="k-top" style="display:none"></div>
     <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;">
       <span class="kaart-swatch-label" id="k-combo-type">kleurcombo</span>
       <div class="kaart-swatches" id="k-swatches"></div>
@@ -274,7 +278,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <button class="btn-dl" id="dl-btn" onclick="downloadKaart()">⬇ Opslaan als afbeelding</button>
 
     <!-- AI analyse section -->
-    <button class="ai-btn" id="ai-analyse-btn" onclick="aiAnalyseOutfit()">🔍 AI-analyse: textuur, vorm &amp; trends</button>
+    <button class="ai-btn" id="ai-analyse-btn" onclick="aiAnalyseOutfit()">🔍 Analyseer &amp; perfectioneer deze kaart</button>
     <div id="ai-analyse-panel" style="display:none;"></div>
 
     <button class="btn-restart" onclick="restart()">Nieuwe kaart maken</button>
@@ -474,6 +478,7 @@ let itemTags = {};
 let customColors = []; // max 2 selected KLEUREN entries
 let customCount = 0;   // aantal geladen eigen items
 let outfitUitleg = null; // {kleur, vorm, textuur} van de AI
+let outfitTop = '';      // slotzin: waarom dit als geheel werkt
 let appSecret = '';
 let aiModel = 'claude-opus-5';
 const AI_ENDPOINT = SUPABASE_URL + '/functions/v1/claude';
@@ -921,6 +926,11 @@ function updateItemCount() {
 // Haalt JSON uit een antwoord dat er tekst omheen kan hebben. Werkt zowel
 // voor een object als voor een kale array — een regex op { } alleen pakt bij
 // een array de binnenkant en levert dan ongeldige JSON op.
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
 function extractJson(raw) {
   if (typeof raw !== 'string') return null;
   const oi = raw.indexOf('{'), ai = raw.indexOf('[');
@@ -1000,8 +1010,9 @@ Leg daarnaast uit WAAROM deze combinatie klopt, in drie korte stukjes:
 Elk stukje maximaal 20 woorden, concreet, geen holle frasen.
 
 Antwoord ALLEEN met JSON, geen tekst eromheen:
-{"items":[{"id":"exact-id-uit-de-lijst-of-null","naam":"korte naam","categorie":"tops|bottoms|layers|jurken|bags|shoes|accessories","eigen":true,"waarom":"één korte zin"}],
- "uitleg":{"kleur":"...","vorm":"...","textuur":"..."}}`;
+{"items":[{"id":"exact-id-uit-de-lijst-of-null","naam":"korte naam","categorie":"tops|bottoms|layers|jurken|bags|shoes|accessories","eigen":true,"waarom":"max 7 woorden waarom dit item hier ligt"}],
+ "uitleg":{"kleur":"...","vorm":"...","textuur":"..."},
+ "waarom_top":"2 zinnen: waarom dit als geheel een sterke combinatie is"}`;
 
   try {
     const raw = await callClaude(system, userMsg, 4000);
@@ -1011,6 +1022,7 @@ Antwoord ALLEEN met JSON, geen tekst eromheen:
     if (!arr || !arr.length) throw new Error('Geen items voorgesteld');
     outfitUitleg = (!Array.isArray(data) && data.uitleg && typeof data.uitleg === 'object')
       ? data.uitleg : null;
+    outfitTop = (!Array.isArray(data) && typeof data.waarom_top === 'string') ? data.waarom_top : '';
 
     const picked = [];
     arr.slice(0, 6).forEach(x => {
@@ -1133,11 +1145,21 @@ function buildKaart() {
       ['Vorm',    outfitUitleg.vorm],
       ['Textuur', outfitUitleg.textuur],
     ].filter(r => r[1]).map(([l,t]) =>
-      `<div class="ku-row"><span class="ku-lbl">${l}</span><span class="ku-txt">${String(t)}</span></div>`
+      `<div class="ku-row"><span class="ku-lbl">${l}</span><span class="ku-txt">${esc(t)}</span></div>`
     ).join('');
   } else {
     uEl.style.display = 'none';
     uEl.innerHTML = '';
+  }
+
+  // Slotzin: waarom dit als geheel werkt
+  const tEl = document.getElementById('k-top');
+  if (outfitTop) {
+    tEl.style.display = 'block';
+    tEl.innerHTML = '<b>Waarom dit werkt</b>' + esc(outfitTop);
+  } else {
+    tEl.style.display = 'none';
+    tEl.innerHTML = '';
   }
 
   const grid = document.getElementById('k-grid');
@@ -1154,17 +1176,20 @@ function buildKaart() {
     const photoUrl = item._suggestion ? null : (cloudMap[item.id]||null);
     const icon = CAT_ICONS[item.cat]||'📦';
 
+    // Waarom dit item er ligt — kort, van de AI
+    const why = item._waarom ? `<div class="kaart-why">${esc(item._waarom)}</div>` : '';
+
     if (item._suggestion) {
       // Nog niet in de kast — als voorstel tonen, duidelijk herkenbaar
       col.innerHTML =
         `<div class="kaart-photo sugg">${icon}<span class="sugg-tag">nog te vinden</span></div>` +
         `<div class="kaart-brand sugg-brand">voorstel</div>` +
-        `<div class="kaart-desc">${item.name}</div>`;
+        `<div class="kaart-desc">${esc(item.name)}</div>` + why;
     } else {
       col.innerHTML =
         `<div class="kaart-photo" id="kp-${item.id}">${photoUrl?'':icon}</div>` +
-        `<div class="kaart-brand">${(item.brand&&item.brand!=='—')?item.brand:''}</div>` +
-        `<div class="kaart-desc">${item.name}</div>`;
+        `<div class="kaart-brand">${(item.brand&&item.brand!=='—')?esc(item.brand):''}</div>` +
+        `<div class="kaart-desc">${esc(item.name)}</div>` + why;
     }
     grid.appendChild(col);
 
@@ -1202,68 +1227,161 @@ async function autoComposeOnCard() {
   }
 }
 
-// ── AI OUTFIT ANALYSE ─────────────────────────────────────────────────────────
+// ── AI ANALYSE + PERFECTIONEREN ───────────────────────────────────────────────
+// Beoordeelt de outfit op de foto's, vervangt wat niet werkt door een beter
+// item uit de kast, en bouwt de kaart opnieuw op.
 async function aiAnalyseOutfit() {
   const btn = document.getElementById('ai-analyse-btn');
   const panel = document.getElementById('ai-analyse-panel');
+  const orig = '🔍 Analyseer & perfectioneer deze kaart';
+
+  if (!selItems.length) {
+    alert('Er staat nog geen outfit op de kaart om te analyseren.');
+    return;
+  }
 
   btn.disabled = true;
-  btn.textContent = '⏳ AI analyseert…';
+  btn.textContent = '⏳ AI beoordeelt en verbetert…';
   panel.style.display = 'none';
 
-  const combo = selPreset ? `${selPreset.name} — ${selPreset.vibe} (${selPreset.stijl||''})` : 'geen preset';
-  const itemLines = selItems.map(i=>`- ${i.name} (${i.cat}${cloudMap[i.id]?' — met foto':''})`).join('\n') || '- geen items geselecteerd';
+  const combo = selPreset
+    ? `${selPreset.name} — ${selPreset.vibe}${selPreset.stijl?' ('+selPreset.stijl+')':''}, kleuren: ${(selPreset.tags||[]).join(', ')}`
+    : 'geen combo gekozen';
+  const huidig = selItems.map(i =>
+    `- ${i._suggestion ? '[voorstel, niet in bezit] ' : i.id + ' | '}${i.name} (${i.cat})`
+  ).join('\n');
 
-  // Build content blocks for Claude: text + image URLs
   const userContent = [];
   userContent.push({ type:'text', text:
-    `Analyseer deze outfit voor Griette.\n\nGekozen kleurcombo: ${combo}\n\nItems:\n${itemLines}\n\n${FW_TRENDS}\n\nGeef analyse op de volgende punten (in het Nederlands, eerlijk en direct):
+`Beoordeel deze outfit van Griette en maak hem beter waar dat kan.
 
-1. **Textuur & Vorm** — beschrijf per item (indien foto): materiaal, silhouet, volume. Wat klopt of clashed?
-2. **Kleur & DNA** — past dit bij Griette's Winter DNA? Wat werkt, wat minder?
-3. **Wat mist** — welk item, kleur of textuur ontbreekt om de outfit compleet te maken? Wees eerlijk.
-4. **FW Paris / Copenhagen 2026** — hoe sluit dit aan op actuele trends? Geef concrete voorbeelden.
-5. **Stijlrichting** — is dit streetstyle, elegant, klassiek of gedurfd? Leg uit.
-6. **Gedurfd alternatief** — één bold streetstyle CHF/Parijs 2026 voorstel dat Griette's garderobe optimaal benut.
+HUIDIGE OUTFIT:
+${huidig}
 
-Gebruik korte alinea's per punt. Wees eerlijk als iets niet klopt — geen lege complimenten.`
-  });
+VOLLEDIGE GARDEROBE (id | categorie | naam | tags):
+${wardrobeForAI()}
 
-  // Add images for items with photos
+Gekozen kleurcombo: ${combo}
+
+${FW_TRENDS}
+
+Kijk naar de foto's hieronder en beoordeel elk item op kleur, vorm/silhouet en textuur.
+
+Werkt een item niet goed in deze combinatie, VERVANG het dan door een beter item
+uit de garderobe hierboven (neem het exacte id over). Alleen als de garderobe echt
+geen alternatief heeft, mag je een nieuw item voorstellen met eigen=false.
+Vervang niet om te vervangen: klopt de outfit al, laat hem dan staan.
+
+Wees eerlijk. Als iets niet ideaal is en de kast biedt geen oplossing, zeg dat.
+
+Antwoord ALLEEN met JSON:
+{
+ "outfit":[{"id":"exact-id-of-null","naam":"...","categorie":"tops|bottoms|layers|jurken|bags|shoes|accessories","eigen":true,"waarom":"max 7 woorden waarom dit item hier ligt"}],
+ "wissels":[{"van":"naam oud item","naar":"naam nieuw item","reden":"waarom dit beter is"}],
+ "uitleg":{"kleur":"max 20 woorden","vorm":"max 20 woorden","textuur":"max 20 woorden"},
+ "waarom_top":"2 zinnen: waarom dit als geheel een sterke combinatie is",
+ "analyse":"uitgebreidere toelichting per item op kleur, vorm en textuur, plus de link met FW Paris/Copenhagen 2026 en de stijlrichting. Gebruik **vet** voor kopjes.",
+ "eerlijk":"wat nog niet ideaal is en waarom de kast daar geen oplossing voor heeft, of leeg"
+}` });
+
   selItems.forEach(item => {
     const url = cloudMap[item.id];
     if (url) {
-      userContent.push({
-        type: 'image',
-        source: { type: 'url', url }
-      });
-      userContent.push({ type:'text', text: `(Foto van: ${item.name})` });
+      userContent.push({ type:'image', source:{ type:'url', url } });
+      userContent.push({ type:'text', text:`(Foto van: ${item.name})` });
     }
   });
 
   const system = `Je bent een eerlijke, deskundige persoonlijke stylist voor Griette. ${GRIETTE_DNA}
-Schrijf altijd in het Nederlands. Gebruik **vetgedrukte** kopjes. Wees concreet, eerlijk en enthousiast.`;
+Schrijf in het Nederlands. Wees concreet en eerlijk — geen lege complimenten.
+Verzin nooit een id dat niet in de garderobelijst staat.`;
 
   try {
     const raw = await callClaude(system, userContent, 12000);
-    renderAiAnalysis(raw);
+    const data = extractJson(raw);
+
+    // Antwoordt de AI in gewone tekst i.p.v. JSON, toon die dan alsnog als
+    // analyse. De kaart blijft dan staan zoals hij was — beter dan niets.
+    if (!data || Array.isArray(data)) {
+      renderAiAnalysis({ analyse: String(raw || '').trim() }, 0);
+      panel.style.display = 'block';
+      btn.textContent = '✓ Analyse hieronder (kaart ongewijzigd)';
+      btn.disabled = false;
+      return;
+    }
+
+    // Nieuwe, geperfectioneerde outfit overnemen
+    const arr = pickArray(data, ['outfit','items']);
+    let vervangen = 0;
+    if (arr && arr.length) {
+      const oudeNamen = selItems.map(i=>i.name);
+      const nieuw = [];
+      arr.slice(0,6).forEach(x => {
+        if (!x || typeof x !== 'object') return;
+        const real = x.id ? allItems.find(i=>i.id===x.id) : null;
+        if (real) nieuw.push(Object.assign({}, real, { _waarom: x.waarom||'' }));
+        else nieuw.push({
+          id:'sugg-'+Math.random().toString(36).slice(2,9),
+          name: x.naam||'Voorstel', cat: x.categorie||'overig', brand:'',
+          _suggestion:true, _waarom: x.waarom||'',
+        });
+      });
+      if (nieuw.length) {
+        vervangen = nieuw.filter(i=>!oudeNamen.includes(i.name)).length;
+        selItems = nieuw;
+      }
+    }
+
+    if (data.uitleg && typeof data.uitleg === 'object') outfitUitleg = data.uitleg;
+    if (typeof data.waarom_top === 'string') outfitTop = data.waarom_top;
+
+    buildKaart();
+    renderAiAnalysis(data, vervangen);
     panel.style.display = 'block';
-    btn.textContent = '✓ Analyse gereed — scroll naar beneden';
+    btn.textContent = vervangen
+      ? `✓ Kaart bijgewerkt — ${vervangen} item${vervangen===1?'':'s'} vervangen`
+      : '✓ Kaart klopt al — analyse hieronder';
   } catch(e) {
     alert('AI-fout: ' + e.message);
-    btn.textContent = '🔍 AI-analyse: textuur, vorm & trends';
+    btn.textContent = orig;
   }
   btn.disabled = false;
 }
 
-function renderAiAnalysis(text) {
+function renderAiAnalysis(data, vervangen) {
   const panel = document.getElementById('ai-analyse-panel');
-  // Convert markdown bold + newlines to HTML
-  const html = text
+  const md = t => esc(t)
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\n\n/g, '</p><p>')
     .replace(/\n/g, '<br>');
-  panel.innerHTML = `<div class="ai-panel"><div class="ai-head">✨ AI Stijlanalyse</div><div class="ai-section-body"><p>${html}</p></div></div>`;
+
+  let html = '<div class="ai-panel"><div class="ai-head">✨ AI Stijlanalyse</div>';
+
+  // Wat is er vervangen en waarom
+  const wissels = Array.isArray(data.wissels) ? data.wissels.filter(w=>w && (w.van||w.naar)) : [];
+  if (wissels.length) {
+    html += '<div class="ai-section"><div class="ai-section-title">Aangepast in je kaart</div><div class="ai-section-body">'
+      + wissels.map(w =>
+          `<div style="margin-bottom:6px;"><span style="text-decoration:line-through;opacity:.6;">${esc(w.van||'')}</span>`
+          + ` → <b>${esc(w.naar||'')}</b><br><span style="font-size:11px;">${esc(w.reden||'')}</span></div>`
+        ).join('')
+      + '</div></div>';
+  } else if (vervangen === 0) {
+    html += '<div class="ai-section"><div class="ai-section-body"><span class="ai-ok">De outfit klopte al — niets vervangen.</span></div></div>';
+  }
+
+  if (data.waarom_top) {
+    html += `<div class="ai-section"><div class="ai-section-title">Waarom dit een sterke combinatie is</div><div class="ai-section-body"><p>${md(data.waarom_top)}</p></div></div>`;
+  }
+  if (data.analyse) {
+    html += `<div class="ai-section"><div class="ai-section-title">Per item: kleur, vorm &amp; textuur</div><div class="ai-section-body"><p>${md(data.analyse)}</p></div></div>`;
+  }
+  if (data.eerlijk && String(data.eerlijk).trim()) {
+    html += `<div class="ai-section"><div class="ai-section-title">Eerlijk gezegd</div><div class="ai-section-body"><span class="ai-gap">${md(data.eerlijk)}</span></div></div>`;
+  }
+
+  html += '</div>';
+  panel.innerHTML = html;
 }
 
 // ── DOWNLOAD ──────────────────────────────────────────────────────────────────
@@ -1408,9 +1526,9 @@ function setStep(n) {
 function nextStep() { setStep(Math.min(step+1,4)); }
 function prevStep() { setStep(Math.max(step-1,1)); }
 function restart() {
-  selType=null; selPreset=null; selItems=[]; customColors=[]; outfitUitleg=null;
+  selType=null; selPreset=null; selItems=[]; customColors=[]; outfitUitleg=null; outfitTop='';
   document.getElementById('ai-analyse-panel').style.display='none';
-  document.getElementById('ai-analyse-btn').textContent='🔍 AI-analyse: textuur, vorm & trends';
+  document.getElementById('ai-analyse-btn').textContent='🔍 Analyseer & perfectioneer deze kaart';
   const imgWrap = document.getElementById('dl-img-wrap');
   if (imgWrap) imgWrap.remove();
   setStep(1);
