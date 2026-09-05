@@ -3244,6 +3244,28 @@ function saveAppData() {
       const customs = list.filter(i => i.id.startsWith('custom-'));
       if (customs.length) customItems[cat] = customs;
     }
+
+    // Voeg samen met wat er inmiddels op de server staat. Zonder dit wist
+    // deze save items die elders zijn toegevoegd (bijv. via snel-toevoegen)
+    // nadat deze pagina was geladen.
+    try {
+      const remote = await supabaseGet('custom-items');
+      if (remote && typeof remote === 'object' && !Array.isArray(remote)) {
+        const known = new Set();
+        Object.values(customItems).forEach(l => (l||[]).forEach(i => i && i.id && known.add(i.id)));
+        const gone = deletedItemIds;
+        Object.entries(remote).forEach(([cat, list]) => {
+          if (!Array.isArray(list)) return;
+          list.forEach(i => {
+            if (!i || !i.id || known.has(i.id) || gone.has(i.id)) return;
+            if (!customItems[cat]) customItems[cat] = [];
+            customItems[cat].push(i);
+            known.add(i.id);
+          });
+        });
+      }
+    } catch(e) {}
+
     await supabaseSet('custom-items', customItems);
     await supabaseSet('boards', boards.map(b => ({ id: b.id, outfits: b.outfits, label: b.label, emoji: b.emoji })));
     await supabaseSet('outfit-counter', outfitCounter);
