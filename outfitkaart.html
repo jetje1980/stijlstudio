@@ -157,9 +157,9 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 <div class="modal-backdrop" id="settings-modal" onclick="if(event.target===this)closeSettings()">
   <div class="modal-sheet">
     <div class="modal-title">Instellingen</div>
-    <div class="sec-label">Anthropic API-sleutel</div>
-    <input class="modal-field" type="password" id="api-key-input" placeholder="sk-ant-api03-…" autocomplete="off">
-    <div class="modal-note">Je sleutel wordt alleen in jouw browser opgeslagen en nooit gedeeld. Nodig voor AI-functies: kleurcombo-suggesties, beeldanalyse, trend-koppeling.</div>
+    <div class="sec-label">Toegangscode <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">alleen als je die hebt ingesteld</span></div>
+    <input class="modal-field" type="password" id="app-secret-input" placeholder="laat leeg als je geen code hebt" autocomplete="off">
+    <div class="modal-note">De AI-sleutel staat veilig op de server — je hoeft hier geen API-sleutel in te vullen. Heb je in Supabase een <b>APP_SECRET</b> ingesteld, vul die dan hier in.</div>
     <div style="margin-top:14px;" class="sec-label">Model</div>
     <select class="modal-field" id="ai-model-select">
       <option value="claude-opus-5">Opus 5 — beste stijladvies (aanbevolen)</option>
@@ -458,12 +458,13 @@ let allItems = [];
 let cloudMap = {};
 let itemTags = {};
 let customColors = []; // max 2 selected KLEUREN entries
-let anthropicKey = '';
+let appSecret = '';
 let aiModel = 'claude-opus-5';
+const AI_ENDPOINT = SUPABASE_URL + '/functions/v1/claude';
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────────
 function openSettings() {
-  document.getElementById('api-key-input').value = anthropicKey;
+  document.getElementById('app-secret-input').value = appSecret;
   document.getElementById('ai-model-select').value = aiModel;
   document.getElementById('settings-modal').classList.add('open');
 }
@@ -471,16 +472,16 @@ function closeSettings() {
   document.getElementById('settings-modal').classList.remove('open');
 }
 function saveSettings() {
-  anthropicKey = document.getElementById('api-key-input').value.trim();
-  aiModel = document.getElementById('ai-model-select').value;
-  try { localStorage.setItem('anthropic-key', anthropicKey); } catch(e){}
+  appSecret = document.getElementById('app-secret-input').value.trim();
+  aiModel   = document.getElementById('ai-model-select').value;
+  try { localStorage.setItem('app-secret', appSecret); } catch(e){}
   try { localStorage.setItem('ai-model', aiModel); } catch(e){}
   closeSettings();
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 async function init() {
-  try { anthropicKey = localStorage.getItem('anthropic-key') || ''; } catch(e){}
+  try { appSecret = localStorage.getItem('app-secret') || ''; } catch(e){}
   try { aiModel = localStorage.getItem('ai-model') || 'claude-opus-5'; } catch(e){}
   try { cloudMap = JSON.parse(localStorage.getItem('griette-cloud-photos-v1')||'{}'); } catch(e){}
   try { itemTags = JSON.parse(localStorage.getItem('griette-item-tags-v3')||'{}'); } catch(e){}
@@ -524,38 +525,37 @@ async function sbGet(key) {
 
 // ── AI API CALL ───────────────────────────────────────────────────────────────
 async function callClaude(systemPrompt, userContent, maxTokens) {
-  if (!anthropicKey) {
-    throw new Error('Geen API-sleutel. Voeg je sleutel toe via ⚙ Instellingen.');
-  }
   const body = {
     model: aiModel,
     max_tokens: maxTokens || 8000,
     system: systemPrompt,
     messages: [{ role:'user', content: userContent }]
   };
+  const headers = { 'content-type': 'application/json' };
+  if (appSecret) headers['x-app-secret'] = appSecret;
+
   let res;
   try {
-    res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{
-        'x-api-key': anthropicKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true',
-        'content-type': 'application/json',
-      },
+    // Gaat naar onze eigen Supabase Edge Function; die houdt de
+    // Anthropic-sleutel server-side vast.
+    res = await fetch(AI_ENDPOINT, {
+      method: 'POST',
+      headers,
       body: JSON.stringify(body)
     });
   } catch(e) {
-    throw new Error('Geen verbinding met Anthropic. Check je internet.');
+    throw new Error('Geen verbinding. Check je internet.');
   }
 
   if (!res.ok) {
     const err = await res.json().catch(()=>({}));
     const msg = err?.error?.message || '';
-    if (res.status === 401) throw new Error('API-sleutel ongeldig. Check je sleutel in ⚙ Instellingen.');
-    if (res.status === 400 && /credit|balance/i.test(msg)) throw new Error('Geen tegoed op je Anthropic-account. Voeg een betaalmethode toe op console.anthropic.com.');
+    if (res.status === 401) throw new Error('Toegangscode ontbreekt of klopt niet. Vul hem in via ⚙ Instellingen.');
+    if (res.status === 403) throw new Error('Deze pagina mag de AI-functie niet aanroepen.');
+    if (res.status === 500 && /ANTHROPIC_API_KEY/.test(msg)) throw new Error('De AI-sleutel is nog niet ingesteld in Supabase. Zie Edge Functions → Secrets.');
+    if (/credit|balance/i.test(msg)) throw new Error('Geen tegoed op het Anthropic-account. Voeg tegoed toe op console.anthropic.com.');
     if (res.status === 429) throw new Error('Te veel verzoeken. Wacht even en probeer opnieuw.');
-    throw new Error(msg || `API fout ${res.status}`);
+    throw new Error(msg || `Fout ${res.status}`);
   }
 
   const data = await res.json();
@@ -737,7 +737,6 @@ function generateCombos(selectedColors) {
 
 async function aiSuggestCombos() {
   const btn = document.getElementById('ai-combo-btn');
-  if (!anthropicKey) { openSettings(); return; }
   if (customColors.length === 0) return;
 
   btn.disabled = true;
@@ -854,7 +853,6 @@ function updateItemCount() {
 async function aiSuggestDetails() {
   const btn = document.getElementById('ai-details-btn');
   const status = document.getElementById('ai-details-status');
-  if (!anthropicKey) { openSettings(); return; }
 
   btn.disabled = true;
   status.textContent = '⏳ AI denkt na…';
@@ -946,7 +944,6 @@ function buildKaart() {
 async function aiAnalyseOutfit() {
   const btn = document.getElementById('ai-analyse-btn');
   const panel = document.getElementById('ai-analyse-panel');
-  if (!anthropicKey) { openSettings(); return; }
 
   btn.disabled = true;
   btn.textContent = '⏳ AI analyseert…';
@@ -1140,8 +1137,6 @@ function setStep(n) {
     document.getElementById('bottom-bar').style.display = 'none';
     document.getElementById('card-wrap').style.display = 'block';
     buildKaart();
-    // Hide AI analyse button if no key
-    document.getElementById('ai-analyse-btn').style.display = anthropicKey ? 'block' : 'none';
   }
 }
 
