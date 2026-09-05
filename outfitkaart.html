@@ -554,19 +554,47 @@ function buildKaart() {
 
 // ── DOWNLOAD ──────────────────────────────────────────────────────────────────
 async function downloadKaart() {
+  const btn = document.getElementById('dl-btn');
+  btn.textContent = '⏳ Afbeelding maken…';
+  btn.disabled = true;
+
   const el = document.getElementById('the-kaart');
   try {
     const canvas = await html2canvas(el, {
-      useCORS: true, allowTaint: false,
+      useCORS: true, allowTaint: true,
       scale: 3, backgroundColor: '#F5F2EE',
       logging: false,
     });
-    const a = document.createElement('a');
-    a.href = canvas.toDataURL('image/jpeg', 0.95);
-    a.download = 'outfitkaart-' + new Date().toISOString().slice(0,10) + '.jpg';
-    a.click();
+
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+
+    // Show image inline — works on iOS (long-press to save) and desktop
+    let imgWrap = document.getElementById('dl-img-wrap');
+    if (!imgWrap) {
+      imgWrap = document.createElement('div');
+      imgWrap.id = 'dl-img-wrap';
+      imgWrap.style.cssText = 'margin:12px 0 4px;border-radius:12px;overflow:hidden;border:1.5px solid var(--border);';
+      btn.parentElement.insertBefore(imgWrap, btn);
+    }
+    imgWrap.innerHTML = '<img src="' + dataUrl + '" style="width:100%;display:block;" alt="Outfitkaart">';
+
+    // Also try direct download (works on Android + desktop)
+    try {
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = 'outfitkaart-' + new Date().toISOString().slice(0,10) + '.jpg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch(e) {}
+
+    btn.textContent = '✓ Opgeslagen — of houd de afbeelding hieronder ingedrukt';
+    btn.disabled = false;
+
   } catch(e) {
-    alert('Download mislukt: ' + e.message);
+    btn.textContent = '⬇ Download als afbeelding';
+    btn.disabled = false;
+    alert('Mislukt: ' + e.message);
   }
 }
 
