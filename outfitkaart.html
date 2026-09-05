@@ -297,16 +297,23 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const CDN = 'https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/griette-wardrobe/griette_';
 
 const KLEUREN = [
-  {v:'zwart',dot:'#111'},{v:'donkerblauw',dot:'#162038'},{v:'marine',dot:'#1a2a4a'},
-  {v:'bruin',dot:'#5c3317'},{v:'cognac',dot:'#8B4513'},{v:'camel',dot:'#c19a6b'},
-  {v:'beige',dot:'#d4b896'},{v:'gebroken-wit',dot:'#f0e8d8'},{v:'wit',dot:'#f8f4ef'},
-  {v:'grijs',dot:'#888'},{v:'felroze',dot:'#e8407a'},{v:'roze',dot:'#e8a0b4'},
-  {v:'lila/paars',dot:'#b088c8'},{v:'paars',dot:'#7b3fa0'},{v:'geel',dot:'#d4b84a'},
-  {v:'mosterd',dot:'#b8860b'},{v:'oranje',dot:'#d4703a'},{v:'oranje-rood',dot:'#b5232a'},
-  {v:'rood',dot:'#cc2211'},{v:'lichtblauw',dot:'#a8c4e0'},{v:'kobaltblauw',dot:'#0047AB'},
-  {v:'turquoise',dot:'#2ab0a8'},{v:'mintgroen',dot:'#88c8b0'},{v:'groen',dot:'#4a8a5c'},
-  {v:'olijf/khaki',dot:'#6b7c45'},{v:'bordeaux',dot:'#6e1020'},{v:'nude/huid',dot:'#d4a882'},
-  {v:'terra cotta',dot:'#c1654a'},
+  {v:'zwart',dot:'#111'},{v:'antraciet',dot:'#3a3d42'},{v:'grijs',dot:'#888'},
+  {v:'donkerblauw',dot:'#162038'},{v:'marine',dot:'#1a2a4a'},{v:'bruin',dot:'#5c3317'},
+  {v:'chocolade',dot:'#3d2314'},{v:'cognac',dot:'#8B4513'},{v:'camel',dot:'#c19a6b'},
+  {v:'taupe',dot:'#8b7d6b'},{v:'beige',dot:'#d4b896'},{v:'zand',dot:'#e0d5bf'},
+  {v:'ecru',dot:'#f5f0e1'},{v:'gebroken-wit',dot:'#f0e8d8'},{v:'wit',dot:'#f8f4ef'},
+  {v:'felroze',dot:'#e8407a'},{v:'fuchsia',dot:'#d6006e'},{v:'roze',dot:'#e8a0b4'},
+  {v:'oudroze',dot:'#d4a5a5'},{v:'zalm',dot:'#f0928a'},{v:'koraal',dot:'#f4715e'},
+  {v:'perzik',dot:'#f0a07a'},{v:'nude/huid',dot:'#d4a882'},{v:'rood',dot:'#cc2211'},
+  {v:'oranje-rood',dot:'#b5232a'},{v:'bordeaux',dot:'#6e1020'},{v:'terra cotta',dot:'#c1654a'},
+  {v:'roest',dot:'#a8522a'},{v:'oranje',dot:'#d4703a'},{v:'geel',dot:'#d4b84a'},
+  {v:'botergeel',dot:'#f5e6a8'},{v:'mosterd',dot:'#b8860b'},{v:'goud',dot:'#c9a84c'},
+  {v:'lila/paars',dot:'#b088c8'},{v:'lavendel',dot:'#c3b1e1'},{v:'paars',dot:'#7b3fa0'},
+  {v:'aubergine',dot:'#4a2545'},{v:'ijsblauw',dot:'#d4e4f0'},{v:'lichtblauw',dot:'#a8c4e0'},
+  {v:'hemelsblauw',dot:'#4aa8d8'},{v:'denimblauw',dot:'#4a6d94'},{v:'kobaltblauw',dot:'#0047AB'},
+  {v:'petrol',dot:'#1a4d5c'},{v:'turquoise',dot:'#2ab0a8'},{v:'smaragdgroen',dot:'#0f7361'},
+  {v:'mintgroen',dot:'#88c8b0'},{v:'salie',dot:'#9caa8c'},{v:'groen',dot:'#4a8a5c'},
+  {v:'olijf/khaki',dot:'#6b7c45'},{v:'zilver',dot:'#bbb'},
 ];
 
 // Griette's stijl DNA — embedded in all AI prompts
@@ -331,6 +338,8 @@ const COMBO_TYPES = [
       {name:'Roze tonal',vibe:'romantisch & modern',stijl:'elegant',colors:['#7b3fa0','#b088c8','#e8a0b4','#f8f4ef'],tags:['paars','lila/paars','roze','wit']},
       {name:'Aards tonal',vibe:'robuust & authentiek',stijl:'klassiek',colors:['#5c3317','#6b7c45','#c19a6b','#d4b896'],tags:['bruin','olijf/khaki','camel','beige']},
       {name:'Nacht tonal',vibe:'dramatisch & sterk',stijl:'gedurfd',colors:['#111','#162038','#6e1020','#2ab0a8'],tags:['zwart','donkerblauw','bordeaux','turquoise']},
+      {name:'Groen tonal',vibe:'gelaagd en rustig',stijl:'klassiek',colors:['#9caa8c','#6b7c45','#0f7361','#f5f0e1'],tags:['salie','olijf/khaki','smaragdgroen','ecru']},
+      {name:'Roze tonal warm',vibe:'zacht met diepte',stijl:'elegant',colors:['#f0a07a','#d4a5a5','#a8522a','#3d2314'],tags:['perzik','oudroze','roest','chocolade']},
     ]
   },
   {
@@ -340,6 +349,7 @@ const COMBO_TYPES = [
       {name:'All-bruin',vibe:'aards & rijkgeschakeerd',stijl:'klassiek',colors:['#3a1f0c','#5c3317','#8B4513','#c19a6b'],tags:['bruin','bruin','cognac','camel']},
       {name:'All-zwart',vibe:'onverslaanbaar & krachtig',stijl:'gedurfd',colors:['#000','#222','#444','#888'],tags:['zwart','zwart','zwart','grijs']},
       {name:'All-roze',vibe:'bold & maximalist',stijl:'gedurfd',colors:['#7b3fa0','#e8407a','#e8a0b4','#f8eef3'],tags:['paars','felroze','roze','wit']},
+      {name:'All-denim',vibe:'één blauw, alle wassingen',stijl:'streetstyle',colors:['#162038','#4a6d94','#a8c4e0','#d4e4f0'],tags:['donkerblauw','denimblauw','lichtblauw','ijsblauw']},
     ]
   },
   {
@@ -349,6 +359,8 @@ const COMBO_TYPES = [
       {name:'Navy-turquoise-groen',vibe:'maritiem & fris',stijl:'elegant',colors:['#162038','#2ab0a8','#4a8a5c','#f0e8d8'],tags:['donkerblauw','turquoise','groen','gebroken-wit']},
       {name:'Felroze-paars-blauw',vibe:'vibrant & onverwacht',stijl:'gedurfd',colors:['#e8407a','#7b3fa0','#0047AB','#f8f4ef'],tags:['felroze','paars','kobaltblauw','wit']},
       {name:'Rood-oranje-rood-geel',vibe:'vurig & energiek',stijl:'gedurfd',colors:['#cc2211','#b5232a','#d4703a','#d4b84a'],tags:['rood','oranje-rood','oranje','geel']},
+      {name:'Perzik-koraal-terracotta',vibe:'zonnig en warm',stijl:'elegant',colors:['#f0a07a','#f4715e','#c1654a','#f5f0e1'],tags:['perzik','koraal','terra cotta','ecru']},
+      {name:'Petrol-turquoise-smaragd',vibe:'diep en helder',stijl:'gedurfd',colors:['#1a4d5c','#2ab0a8','#0f7361','#f0e8d8'],tags:['petrol','turquoise','smaragdgroen','gebroken-wit']},
     ]
   },
   {
@@ -359,6 +371,8 @@ const COMBO_TYPES = [
       {name:'Marine × mosterd',vibe:'klassiek & sterk',stijl:'klassiek',colors:['#1a2a4a','#b8860b','#c19a6b','#f8f4ef'],tags:['marine','mosterd','camel','wit']},
       {name:'Felroze × olijf',vibe:'speels & onverwacht',stijl:'streetstyle',colors:['#e8407a','#6b7c45','#f0e8d8','#888'],tags:['felroze','olijf/khaki','gebroken-wit','grijs']},
       {name:'Bordeaux × turquoise',vibe:'dramatisch & fris',stijl:'gedurfd',colors:['#6e1020','#2ab0a8','#f0e8d8','#111'],tags:['bordeaux','turquoise','gebroken-wit','zwart']},
+      {name:'Koraal × petrol',vibe:'warm tegen koel',stijl:'gedurfd',colors:['#f4715e','#1a4d5c','#f5f0e1','#8b7d6b'],tags:['koraal','petrol','ecru','taupe']},
+      {name:'Botergeel × lavendel',vibe:'zacht maar eigenzinnig',stijl:'elegant',colors:['#f5e6a8','#c3b1e1','#f8f4ef','#3a3d42'],tags:['botergeel','lavendel','wit','antraciet']},
     ]
   },
   {
@@ -369,6 +383,7 @@ const COMBO_TYPES = [
       {name:'Navy + turquoise + roze',vibe:'grafisch & fris',stijl:'streetstyle',colors:['#162038','#2ab0a8','#e8407a','#f0e8d8'],tags:['donkerblauw','turquoise','felroze','gebroken-wit']},
       {name:'Bruin + geel + lichtblauw',vibe:'zonnig & warm',stijl:'elegant',colors:['#5c3317','#d4b84a','#a8c4e0','#f0e8d8'],tags:['bruin','geel','lichtblauw','gebroken-wit']},
       {name:'Zwart + felroze + groen',vibe:'bold streetstyle',stijl:'streetstyle',colors:['#111','#e8407a','#4a8a5c','#f8f4ef'],tags:['zwart','felroze','groen','wit']},
+      {name:'Chocolade + roze + hemelsblauw',vibe:'warm met een frisse knal',stijl:'streetstyle',colors:['#3d2314','#e8a0b4','#4aa8d8','#f0e8d8'],tags:['chocolade','roze','hemelsblauw','gebroken-wit']},
     ]
   },
   {
@@ -379,6 +394,10 @@ const COMBO_TYPES = [
       {name:'Navy × geel',vibe:'klassiek & vrolijk',stijl:'klassiek',colors:['#162038','#1a2a4a','#d4b84a','#f8f4ef'],tags:['donkerblauw','marine','geel','wit']},
       {name:'Grijs × rood',vibe:'grafisch & sterk',stijl:'gedurfd',colors:['#888','#555','#cc2211','#f8f4ef'],tags:['grijs','grijs','rood','wit']},
       {name:'Bruin × kobaltblauw',vibe:'onverwacht & krachtig',stijl:'streetstyle',colors:['#5c3317','#c19a6b','#0047AB','#f0e8d8'],tags:['bruin','camel','kobaltblauw','gebroken-wit']},
+      {name:'Chocolade × roze',vibe:'de combo van je inspiratie',stijl:'streetstyle',colors:['#3d2314','#5c3317','#e8a0b4','#f5f0e1'],tags:['chocolade','bruin','roze','ecru']},
+      {name:'Antraciet × botergeel',vibe:'stoer met een zachte pop',stijl:'gedurfd',colors:['#3a3d42','#111','#f5e6a8','#f0e8d8'],tags:['antraciet','zwart','botergeel','gebroken-wit']},
+      {name:'Taupe × koraal',vibe:'ingetogen met warmte',stijl:'elegant',colors:['#8b7d6b','#e0d5bf','#f4715e','#f5f0e1'],tags:['taupe','zand','koraal','ecru']},
+      {name:'Ecru × smaragdgroen',vibe:'rustig en rijk',stijl:'elegant',colors:['#f5f0e1','#e0d5bf','#0f7361','#3d2314'],tags:['ecru','zand','smaragdgroen','chocolade']},
     ]
   },
   {
@@ -388,6 +407,20 @@ const COMBO_TYPES = [
       {name:'Marine + crème + zwart',vibe:'strak & doordacht',stijl:'klassiek',colors:['#162038','#f0e8d8','#111','#c19a6b'],tags:['marine','gebroken-wit','zwart','camel']},
       {name:'Bordeaux + zwart + goud',vibe:'dramatisch & elegant',stijl:'elegant',colors:['#6e1020','#111','#c9a84c','#f0e8d8'],tags:['bordeaux','zwart','geel','gebroken-wit']},
       {name:'Kobaltblauw + wit + rood',vibe:'power dressing',stijl:'gedurfd',colors:['#0047AB','#f8f4ef','#cc2211','#111'],tags:['kobaltblauw','wit','rood','zwart']},
+      {name:'Marine + wit + rood',vibe:'maritiem, tijdloos',stijl:'klassiek',colors:['#1a2a4a','#f8f4ef','#cc2211','#c9a84c'],tags:['marine','wit','rood','goud']},
+      {name:'Zwart + ecru + cognac',vibe:'strak met warmte',stijl:'klassiek',colors:['#111','#f5f0e1','#8B4513','#8b7d6b'],tags:['zwart','ecru','cognac','taupe']},
+    ]
+  },
+  {
+    id:'inspiratie', label:'Van je inspiratieplaat', desc:'Looks die je zelf bewaarde — actueel streetstyle',
+    presets:[
+      {name:'Chocolade × zacht roze',vibe:'de raglan-combo — warm & modern',stijl:'streetstyle',colors:['#3d2314','#e8a0b4','#f0e8d8','#c19a6b'],tags:['chocolade','roze','gebroken-wit','camel']},
+      {name:'Hemelsblauw × denim × cognac',vibe:'frisse lucht op warme grond',stijl:'streetstyle',colors:['#4aa8d8','#a8c4e0','#8B4513','#f0e8d8'],tags:['hemelsblauw','lichtblauw','cognac','gebroken-wit']},
+      {name:'Denim tonal',vibe:'blauw op blauw, zonder ruis',stijl:'streetstyle',colors:['#1a2a4a','#4a6d94','#a8c4e0','#d4e4f0'],tags:['marine','denimblauw','lichtblauw','ijsblauw']},
+      {name:'Khaki × wit × zwart',vibe:'utility, strak afgewerkt',stijl:'streetstyle',colors:['#6b7c45','#f8f4ef','#111','#c19a6b'],tags:['olijf/khaki','wit','zwart','camel']},
+      {name:'Bordeaux × lichtblauw',vibe:'onverwacht en rijk',stijl:'gedurfd',colors:['#6e1020','#a8c4e0','#f0e8d8','#111'],tags:['bordeaux','lichtblauw','gebroken-wit','zwart']},
+      {name:'Botergeel × zwart',vibe:'zacht geel met harde rand',stijl:'gedurfd',colors:['#f5e6a8','#111','#f0e8d8','#8b7d6b'],tags:['botergeel','zwart','gebroken-wit','taupe']},
+      {name:'Marine × wit × licht denim',vibe:'nonchalant klassiek',stijl:'klassiek',colors:['#1a2a4a','#f8f4ef','#a8c4e0','#c9a84c'],tags:['marine','wit','lichtblauw','goud']},
     ]
   },
   {
