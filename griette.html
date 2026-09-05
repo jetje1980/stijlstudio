@@ -864,6 +864,10 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
     <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);margin-bottom:6px;">Kleur</div>
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;" id="new-kleur-row"></div>
 
+    <!-- PATROON -->
+    <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);margin-bottom:6px;">Patroon</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;" id="new-patroon-row"></div>
+
     <!-- PASVORM -->
     <div id="new-pasvorm-section">
       <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);margin-bottom:6px;">Pasvorm</div>
@@ -1618,8 +1622,8 @@ Object.entries(structuurDefaults).forEach(function(e) {
 });
 
 // Griette's color palette
-const basisKleuren = ['zwart','donkerblauw','marine','bruin','cognac','camel','beige','gebroken-wit','wit','grijs'];
-const accentKleuren = ['felroze','roze','lila/paars','paars','geel','mosterd','oranje','oranje-rood','rood','lichtblauw','kobaltblauw','turquoise','mintgroen','groen','olijf/khaki','bordeaux','nude/huid','terra cotta'];
+const basisKleuren = ['zwart','antraciet','donkerblauw','marine','bruin','chocolade','cognac','camel','taupe','beige','zand','ecru','gebroken-wit','wit','grijs'];
+const accentKleuren = ['felroze','fuchsia','roze','oudroze','zalm','koraal','perzik','lila/paars','lavendel','paars','aubergine','geel','mosterd','oranje','terra cotta','roest','oranje-rood','rood','bordeaux','ijsblauw','lichtblauw','denimblauw','kobaltblauw','petrol','turquoise','smaragdgroen','mintgroen','salie','groen','olijf/khaki','nude/huid','goud','zilver'];
 const vermijdKleuren = ['champagne','zilver','goud','neon geel','neon roze'];
 
 // Which accent combos work well together
@@ -1719,7 +1723,13 @@ const kleurDots = {
   'mintgroen':'#88c8b0','groen':'#4a8a5c','olijf/khaki':'#6b7c45',
   'bordeaux':'#6e1020','nude/huid':'#d4a882','terra cotta':'#c1654a',
   'champagne':'#e8d5b0','zilver':'#bbb','goud':'#c9a84c',
-  'neon geel':'#e8f040','neon roze':'#ff4499'
+  'neon geel':'#e8f040','neon roze':'#ff4499',
+  // uitbreiding
+  'antraciet':'#3a3d42','chocolade':'#3d2314','taupe':'#8b7d6b',
+  'zand':'#e0d5bf','ecru':'#f5f0e1','fuchsia':'#d6006e','oudroze':'#d4a5a5',
+  'zalm':'#f0928a','koraal':'#f4715e','perzik':'#f0a07a','lavendel':'#c3b1e1',
+  'aubergine':'#4a2545','roest':'#a8522a','ijsblauw':'#d4e4f0',
+  'denimblauw':'#4a6d94','petrol':'#1a4d5c','smaragdgroen':'#0f7361','salie':'#9caa8c'
 };
 
 function renderTagButtons(itemId, container) {
@@ -2578,9 +2588,35 @@ function openAddModal() {
   document.getElementById('new-item-cat').value = 'tops';
   document.querySelectorAll('.new-tag-btn').forEach(b => b.classList.remove('active'));
   buildNewKleurRow();
+  buildNewPatroonRow();
   updateNewItemTagVisibility();
   document.getElementById('add-overlay').classList.add('open');
   document.getElementById('new-item-name').focus();
+}
+
+const patroonOpties = ['uni','fijn streep','brede streep','ruit/check','pied-de-poule',
+  'bloemenprint','luipaard/leopard','stippen/polka','abstract','paisley','tie-dye',
+  'kant/broderie','snake print'];
+
+// Tags kunnen een string of een array zijn (kleur/patroon/materiaal zijn multi).
+function tagText(v) {
+  if (Array.isArray(v)) return v.join(' + ');
+  return v || '';
+}
+
+function buildNewPatroonRow() {
+  const row = document.getElementById('new-patroon-row');
+  if (!row) return;
+  row.innerHTML = '';
+  patroonOpties.forEach(v => {
+    const b = document.createElement('button');
+    b.className = 'new-tag-btn';
+    b.dataset.type = 'patroon';
+    b.dataset.val = v;
+    b.textContent = v;
+    b.onclick = () => toggleNewTagMulti(b);
+    row.appendChild(b);
+  });
 }
 
 function buildNewKleurRow() {
@@ -2595,7 +2631,7 @@ function buildNewKleurRow() {
     b.dataset.val = v;
     b.style.cssText = 'display:flex;align-items:center;gap:4px;';
     b.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:${dot};display:inline-block;"></span>${v}`;
-    b.onclick = () => toggleNewTag(b);
+    b.onclick = () => toggleNewTagMulti(b);   // meerdere kleuren tegelijk
     row.appendChild(b);
   });
 }
@@ -2657,15 +2693,21 @@ async function confirmAddItem() {
   const id = 'custom-' + Date.now();
   if (!items[cat]) items[cat] = [];
   items[cat].push({id, name});
-  // Save tags (materiaal is multi-select, all others single)
+  // Save tags. Kleur, patroon en materiaal mogen meerdere waarden hebben.
+  const MULTI = ['kleur','patroon','materiaal'];
   const newTags = {};
-  const materialen = [];
+  const multi = {};
   document.querySelectorAll('.new-tag-btn.active').forEach(b => {
-    if (b.dataset.type === 'materiaal') { materialen.push(b.dataset.val); }
-    else { newTags[b.dataset.type] = b.dataset.val; }
+    const t = b.dataset.type;
+    if (MULTI.includes(t)) { (multi[t] = multi[t] || []).push(b.dataset.val); }
+    else { newTags[t] = b.dataset.val; }
   });
-  if (materialen.length === 1) { newTags.materiaal = materialen[0]; }
-  else if (materialen.length > 1) { newTags.materiaal = materialen[0]; newTags.materialen = materialen; }
+  Object.entries(multi).forEach(([t, vals]) => {
+    newTags[t] = vals.length === 1 ? vals[0] : vals;
+  });
+  // materialen bleef als aparte sleutel bestaan; blijf die vullen voor
+  // bestaande code die er nog naar kijkt
+  if (Array.isArray(newTags.materiaal)) newTags.materialen = newTags.materiaal.slice();
   if (Object.keys(newTags).length > 0) itemTags[id] = newTags;
   document.getElementById('add-overlay').classList.remove('open');
   buildGarderobe();
@@ -12190,7 +12232,7 @@ async function analyzeBoardInspo(boardId) {
     if (!list || !list.length) return '';
     return (_catLabels[cat] || cat) + ': ' + list.map(function(it) {
       var t = itemTags[it.id] || defaultTags[it.id] || {};
-      return it.name + (t.kleur ? ' (' + t.kleur + ')' : '');
+      return it.name + (t.kleur ? ' (' + tagText(t.kleur) + ')' : '');
     }).join(', ');
   }).filter(Boolean).join('\n');
 
@@ -12502,7 +12544,7 @@ async function _spRankItems(cat, wardrobeItems, btn, body) {
 
   var itemsList = wardrobeItems.map(function(it) {
     var t = itemTags[it.id] || defaultTags[it.id] || {};
-    var tags = [t.kleur, t.pasvorm, t.lengte, t.hals].filter(Boolean).join(', ');
+    var tags = [t.kleur, t.pasvorm, t.lengte, t.hals].map(tagText).filter(Boolean).join(', ');
     return '- ' + it.id + ': ' + it.name + (tags ? ' [' + tags + ']' : '');
   }).join('\n');
 
@@ -12635,7 +12677,7 @@ async function _spAskHowItLooks(item, rank, resultDiv, btn) {
 
   var photoUrl = window.photos && window.photos[item.id];
   var t = itemTags[item.id] || defaultTags[item.id] || {};
-  var tags = [t.kleur, t.pasvorm, t.lengte, t.hals, t.materiaal].filter(Boolean).join(', ');
+  var tags = [t.kleur, t.pasvorm, t.lengte, t.hals, t.materiaal].map(tagText).filter(Boolean).join(', ');
 
   var parts = [{
     type: 'text',
