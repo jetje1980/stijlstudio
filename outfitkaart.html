@@ -1010,6 +1010,8 @@ Antwoord ALLEEN met een JSON-array:
 
     combos.forEach(p => {
       if (!p || !Array.isArray(p.colors)) return;
+      // Geef de combo een herkenbare naam op de kaart in plaats van "kleurcombo"
+      p.typeName = anchorItems.length > 1 ? 'Rond je twee items' : 'Rond je eigen item';
       const card = makePresetCard(p, () => {
         document.querySelectorAll('#anchor-preset-list .preset-card').forEach(b=>b.classList.remove('selected'));
         card.classList.add('selected');
@@ -1222,6 +1224,7 @@ Antwoord ALLEEN met een geldig JSON array, geen uitleg eromheen.`;
     document.getElementById('btn-next').disabled = true;
 
     aiCombos.forEach(p => {
+      p.typeName = 'Rond je eigen kleuren';
       const card = makePresetCard(p, () => {
         document.querySelectorAll('#custom-preset-list .preset-card').forEach(b=>b.classList.remove('selected'));
         card.classList.add('selected');
