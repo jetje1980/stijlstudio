@@ -458,6 +458,7 @@ let allItems = [];
 let cloudMap = {};
 let itemTags = {};
 let customColors = []; // max 2 selected KLEUREN entries
+let customCount = 0;   // aantal geladen eigen items
 let appSecret = '';
 let aiModel = 'claude-opus-5';
 const AI_ENDPOINT = SUPABASE_URL + '/functions/v1/claude';
@@ -485,33 +486,59 @@ async function init() {
   try { aiModel = localStorage.getItem('ai-model') || 'claude-opus-5'; } catch(e){}
   try { cloudMap = JSON.parse(localStorage.getItem('griette-cloud-photos-v1')||'{}'); } catch(e){}
   try { itemTags = JSON.parse(localStorage.getItem('griette-item-tags-v3')||'{}'); } catch(e){}
+
+  let lsCustom = null;
+  try { lsCustom = JSON.parse(localStorage.getItem('griette-custom-items-v3')||'{}'); } catch(e){}
+
+  let sbPhotos=null, sbTags=null, sbCustom=null, sbDeleted=null;
   try {
-    const ci = JSON.parse(localStorage.getItem('griette-custom-items-v3')||'{}');
-    Object.entries(ci).forEach(([cat,list])=>list.forEach(i=>DEFAULT_ITEMS.push(Object.assign({},i,{cat,brand:'eigen'}))));
+    [sbPhotos, sbTags, sbCustom, sbDeleted] = await Promise.all([
+      sbGet('cloud-photos'), sbGet('item-tags'), sbGet('custom-items'), sbGet('deleted-items')
+    ]);
   } catch(e){}
 
-  const [sbPhotos, sbTags, sbCustom, sbDeleted] = await Promise.all([
-    sbGet('cloud-photos'), sbGet('item-tags'), sbGet('custom-items'), sbGet('deleted-items')
-  ]);
   if (sbPhotos) Object.assign(cloudMap, sbPhotos);
   if (sbTags)   Object.assign(itemTags, sbTags);
   const deleted = new Set(Array.isArray(sbDeleted) ? sbDeleted : []);
 
-  const extra = [];
-  if (sbCustom && typeof sbCustom === 'object') {
-    const entries = Array.isArray(sbCustom)
-      ? sbCustom
-      : Object.entries(sbCustom).flatMap(([cat,list])=>list.map(i=>Object.assign({},i,{cat,brand:'eigen'})));
-    entries.forEach(i=>extra.push(i));
-  }
+  // Eigen items uit beide bronnen; normaliseer tolerant zodat één rare
+  // categorie nooit de hele pagina onderuit haalt.
+  const extra = [...normalizeCustom(lsCustom), ...normalizeCustom(sbCustom)];
 
   const seen = new Set();
   allItems = [...DEFAULT_ITEMS, ...extra].filter(i => {
     if (!i || !i.id || deleted.has(i.id) || seen.has(i.id)) return false;
     seen.add(i.id); return true;
   });
+  customCount = allItems.filter(i=>String(i.id).startsWith('custom-')).length;
 
   buildComboTypes();
+}
+
+// Accepteert {cat:[items]}, {cat:item}, een platte array, of rommel.
+// Geeft altijd een array terug — gooit nooit.
+function normalizeCustom(raw) {
+  const out = [];
+  if (!raw || typeof raw !== 'object') return out;
+
+  const add = (item, cat) => {
+    if (!item || typeof item !== 'object' || !item.id) return;
+    out.push(Object.assign({}, item, {
+      cat: item.cat || cat || 'overig',
+      brand: item.brand || 'eigen',
+    }));
+  };
+
+  if (Array.isArray(raw)) {
+    raw.forEach(i => add(i, null));
+    return out;
+  }
+
+  Object.entries(raw).forEach(([cat, list]) => {
+    if (Array.isArray(list))            list.forEach(i => add(i, cat));
+    else if (list && typeof list==='object') add(list, cat);   // los object
+  });
+  return out;
 }
 
 async function sbGet(key) {
@@ -844,9 +871,19 @@ function toggleItem(item, card) {
 
 function updateItemCount() {
   const n = selItems.length;
-  document.getElementById('item-count-label').textContent =
-    n === 0 ? 'Items — optioneel (max 6, sla gerust over)'
+  const el = document.getElementById('item-count-label');
+  el.textContent = n === 0
+    ? 'Items — optioneel (max 6, sla gerust over)'
     : `Items gekozen: ${n}/6`;
+
+  let info = document.getElementById('item-load-info');
+  if (!info) {
+    info = document.createElement('div');
+    info.id = 'item-load-info';
+    info.style.cssText = 'font-size:10px;color:var(--text-2);margin:-4px 0 8px;text-transform:none;letter-spacing:0;font-weight:400;';
+    el.parentElement.insertBefore(info, el.nextSibling);
+  }
+  info.textContent = `${allItems.length} items geladen — waarvan ${customCount} eigen`;
 }
 
 // ── STEP 3: AI SUGGESTIES ─────────────────────────────────────────────────────
