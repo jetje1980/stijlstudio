@@ -864,6 +864,12 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
     <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);margin-bottom:6px;">Kleur</div>
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;" id="new-kleur-row"></div>
 
+    <!-- SOORT LAAG (alleen bij laagjes) -->
+    <div id="new-soort-section" style="display:none">
+      <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);margin-bottom:6px;">Soort laag</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;" id="new-soort-row"></div>
+    </div>
+
     <!-- PATROON -->
     <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);margin-bottom:6px;">Patroon</div>
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;" id="new-patroon-row"></div>
@@ -2590,9 +2596,27 @@ function openAddModal() {
   document.querySelectorAll('.new-tag-btn').forEach(b => b.classList.remove('active'));
   buildNewKleurRow();
   buildNewPatroonRow();
+  buildNewSoortRow();
   updateNewItemTagVisibility();
   document.getElementById('add-overlay').classList.add('open');
   document.getElementById('new-item-name').focus();
+}
+
+const soortLaagOpties = ['jas', 'blazer', 'trenchcoat', 'parka', 'bomber', 'biker', 'overshirt', 'blouson', 'cape', 'gilet', 'cardigan', 'vest', 'poncho', 'teddy', 'puffer', 'regenjas'];
+
+function buildNewSoortRow() {
+  const row = document.getElementById('new-soort-row');
+  if (!row) return;
+  row.innerHTML = '';
+  soortLaagOpties.forEach(v => {
+    const b = document.createElement('button');
+    b.className = 'new-tag-btn';
+    b.dataset.type = 'soort';
+    b.dataset.val = v;
+    b.textContent = v;
+    b.onclick = () => toggleNewTag(b);
+    row.appendChild(b);
+  });
 }
 
 const patroonOpties = ['uni','fijn streep','brede streep','ruit/check','pied-de-poule',
@@ -2651,6 +2675,8 @@ function updateNewItemTagVisibility() {
   const cat = document.getElementById('new-item-cat')?.value;
   const showHals = ['tops','layers'].includes(cat);
   const showPasvorm = ['tops','bottoms','layers'].includes(cat);
+  const soortEl = document.getElementById('new-soort-section');
+  if (soortEl) soortEl.style.display = (cat === 'layers') ? 'block' : 'none';
   const halsEl = document.getElementById('new-hals-section');
   const pasvormEl = document.getElementById('new-pasvorm-section');
   if (halsEl) halsEl.style.display = showHals ? 'block' : 'none';
