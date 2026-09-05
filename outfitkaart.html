@@ -813,7 +813,11 @@ Antwoord ALLEEN met een geldig JSON array, geen uitleg eromheen.`;
 function buildItemGrid() {
   const grid = document.getElementById('item-grid');
   grid.innerHTML = '';
-  selItems = [];
+
+  // Selectie NIET wissen: deze functie draait ook als je vanuit stap 3
+  // terugkeert, en dan moet je keuze bewaard blijven.
+  const keepIds = new Set(selItems.map(i=>i.id));
+  selItems = allItems.filter(i => keepIds.has(i.id));
 
   const matchTags = selPreset ? selPreset.tags : [];
   const withPhoto = allItems.filter(i=>cloudMap[i.id]);
@@ -847,6 +851,7 @@ function buildItemGrid() {
       img.src = cloudMap[item.id];
       img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
     }
+    if (keepIds.has(item.id)) card.classList.add('selected');
     card.addEventListener('click', ()=>toggleItem(item, card));
     grid.appendChild(card);
   });
@@ -884,6 +889,10 @@ function updateItemCount() {
     el.parentElement.insertBefore(info, el.nextSibling);
   }
   info.textContent = `${allItems.length} items geladen — waarvan ${customCount} eigen`;
+
+  // Maak duidelijk dat de kaart zonder items geen foto's krijgt
+  const btnNext = document.getElementById('btn-next');
+  if (step === 2) btnNext.textContent = n === 0 ? 'Zonder items verder →' : `Volgende met ${n} item${n===1?'':'s'} →`;
 }
 
 // ── STEP 3: AI SUGGESTIES ─────────────────────────────────────────────────────
@@ -959,12 +968,15 @@ function buildKaart() {
 
   const grid = document.getElementById('k-grid');
   grid.innerHTML = '';
+
+  // Alleen echte items tonen. Vroeger vulden we aan tot 6 met lege
+  // blokken, wat bij weinig of geen items een kaart met spookvakjes gaf.
   const slots = selItems.slice(0,6);
-  while (slots.length < 6) slots.push(null);
+  grid.style.display = slots.length ? 'grid' : 'none';
+  grid.style.gridTemplateColumns = 'repeat(' + Math.min(Math.max(slots.length,1),3) + ',1fr)';
 
   slots.forEach(item => {
     const col = document.createElement('div'); col.className='kaart-item';
-    if (!item) { col.innerHTML='<div class="kaart-photo"></div><div class="kaart-brand"></div><div class="kaart-desc"></div>'; grid.appendChild(col); return; }
     const photoUrl = cloudMap[item.id]||null;
     const icon = CAT_ICONS[item.cat]||'📦';
     col.innerHTML = `<div class="kaart-photo" id="kp-${item.id}">${photoUrl?'':icon}</div><div class="kaart-brand">${(item.brand&&item.brand!=='—')?item.brand:''}</div><div class="kaart-desc">${item.name}</div>`;
