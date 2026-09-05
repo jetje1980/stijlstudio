@@ -110,6 +110,12 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 .kaart-swatches{display:flex;justify-content:center;gap:6px;align-items:center;}
 .kaart-swatch{width:20px;height:20px;border-radius:3px;}
 .kaart-swatch-label{font-size:7.5px;color:#8a7060;letter-spacing:.1em;text-transform:uppercase;margin-right:4px;}
+.kaart-combo-naam{font-size:8px;color:#8a7060;text-align:center;margin-top:5px;letter-spacing:.02em;}
+/* Waarom deze combinatie werkt */
+.kaart-uitleg{border-top:1px solid #ddd5c8;margin-top:6px;padding-top:9px;display:flex;flex-direction:column;gap:5px;}
+.ku-row{display:flex;gap:7px;align-items:baseline;text-align:left;}
+.ku-lbl{flex:0 0 40px;font-size:6.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9B7B5C;padding-top:1px;}
+.ku-txt{flex:1;font-size:8px;color:#5a4030;line-height:1.45;}
 
 .dl-bar{display:flex;flex-direction:column;gap:10px;padding:0 0 calc(20px + env(safe-area-inset-bottom,0px));}
 .btn-dl{width:100%;padding:15px;background:#1C140E;color:#F5F2EE;border:none;border-radius:14px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
@@ -255,10 +261,12 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <div class="kaart-grid"  id="k-grid"></div>
     <div class="kaart-anno-bl" id="k-anno2"></div>
     <div class="kaart-note"  id="k-note"></div>
-    <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px;">
-      <span class="kaart-swatch-label">kleurfamilie</span>
+    <div class="kaart-uitleg" id="k-uitleg"></div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;">
+      <span class="kaart-swatch-label" id="k-combo-type">kleurcombo</span>
       <div class="kaart-swatches" id="k-swatches"></div>
     </div>
+    <div class="kaart-combo-naam" id="k-combo-naam"></div>
   </div>
 
   <div style="height:12px;"></div>
@@ -465,6 +473,7 @@ let cloudMap = {};
 let itemTags = {};
 let customColors = []; // max 2 selected KLEUREN entries
 let customCount = 0;   // aantal geladen eigen items
+let outfitUitleg = null; // {kleur, vorm, textuur} van de AI
 let appSecret = '';
 let aiModel = 'claude-opus-5';
 const AI_ENDPOINT = SUPABASE_URL + '/functions/v1/claude';
@@ -789,9 +798,8 @@ Antwoord ALLEEN met een geldig JSON array, geen uitleg eromheen.`;
 
   try {
     const raw = await callClaude(system, userMsg, 4000);
-    const match = raw.match(/\[[\s\S]*\]/);
-    if (!match) throw new Error('Geen geldige JSON');
-    const aiCombos = JSON.parse(match[0]);
+    const aiCombos = pickArray(extractJson(raw), ['combos','suggesties']);
+    if (!aiCombos || !aiCombos.length) throw new Error('Geen geldige suggesties');
 
     list.innerHTML = '';
     selPreset = null;
@@ -901,6 +909,37 @@ function updateItemCount() {
   // Maak duidelijk dat de kaart zonder items geen foto's krijgt
   const btnNext = document.getElementById('btn-next');
   if (step === 2) btnNext.textContent = n === 0 ? 'Zonder items verder →' : `Volgende met ${n} item${n===1?'':'s'} →`;
+
+  const cbtn = document.getElementById('ai-compose-btn');
+  if (cbtn && !cbtn.disabled) {
+    cbtn.textContent = n === 0
+      ? '✨ Laat AI een outfit samenstellen uit mijn kast'
+      : `✨ Laat AI aanvullen rond mijn ${n} keuze${n===1?'':'s'}`;
+  }
+}
+
+// Haalt JSON uit een antwoord dat er tekst omheen kan hebben. Werkt zowel
+// voor een object als voor een kale array — een regex op { } alleen pakt bij
+// een array de binnenkant en levert dan ongeldige JSON op.
+function extractJson(raw) {
+  if (typeof raw !== 'string') return null;
+  const oi = raw.indexOf('{'), ai = raw.indexOf('[');
+  let start, close;
+  if (ai >= 0 && (oi < 0 || ai < oi)) { start = ai; close = ']'; }
+  else if (oi >= 0)                   { start = oi; close = '}'; }
+  else return null;
+  const end = raw.lastIndexOf(close);
+  if (end <= start) return null;
+  try { return JSON.parse(raw.slice(start, end + 1)); } catch(e) { return null; }
+}
+
+// Zoekt de itemlijst, of die nu kaal is of in een object zit
+function pickArray(data, keys) {
+  if (Array.isArray(data)) return data;
+  if (!data || typeof data !== 'object') return null;
+  for (const k of keys) if (Array.isArray(data[k])) return data[k];
+  const first = Object.values(data).find(v => Array.isArray(v));
+  return first || null;
 }
 
 // ── AI: OUTFIT SAMENSTELLEN UIT DE KAST ───────────────────────────────────────
@@ -929,13 +968,20 @@ async function aiComposeOutfit() {
 
   const system = `Je bent een persoonlijke stylist voor Griette. ${GRIETTE_DNA}\n\n${FW_TRENDS}\nAntwoord in het Nederlands. Wees eerlijk: verzin geen items die niet in de lijst staan als "eigen".`;
 
+  // Items die de gebruiker zelf al koos: die moeten blijven staan.
+  const reeds = selItems.filter(i => !i._suggestion);
+  const reedsBlok = reeds.length
+    ? `\nGriette heeft deze items AL GEKOZEN. Neem ze allemaal over in je antwoord en bouw de outfit eromheen:\n`
+      + reeds.map(i => `- ${i.id} | ${i.cat} | ${i.name}`).join('\n') + '\n'
+    : '';
+
   const userMsg = `Dit is Griette's complete garderobe (formaat: id | categorie | naam | tags):
 
 ${wardrobeForAI()}
 
 Gekozen kleurcombo: ${combo}
-
-Stel hieruit één complete, draagbare outfit samen van 4 tot 6 stukken.
+${reedsBlok}
+Stel één complete, draagbare outfit samen van 4 tot 6 stukken.
 
 Regels:
 - Gebruik BIJ VOORKEUR items uit de lijst hierboven. Neem dan het exacte id over.
@@ -947,15 +993,24 @@ Regels:
   eerlijk voorstel dan een item forceren dat niet past.
 - Maximaal 2 nieuwe voorstellen; de rest moet uit haar kast komen.
 
-Antwoord ALLEEN met een JSON-array, geen tekst eromheen:
-[{"id":"exact-id-uit-de-lijst-of-null","naam":"korte naam","categorie":"tops|bottoms|layers|jurken|bags|shoes|accessories","eigen":true,"waarom":"één korte zin"}]`;
+Leg daarnaast uit WAAROM deze combinatie klopt, in drie korte stukjes:
+- kleur: hoe de kleuren zich tot elkaar verhouden en waarom dat werkt bij haar Winter DNA
+- vorm: hoe de silhouetten en pasvormen elkaar in balans houden (volume tegenover strak)
+- textuur: hoe de materialen elkaar aanvullen of juist spanning geven
+Elk stukje maximaal 20 woorden, concreet, geen holle frasen.
+
+Antwoord ALLEEN met JSON, geen tekst eromheen:
+{"items":[{"id":"exact-id-uit-de-lijst-of-null","naam":"korte naam","categorie":"tops|bottoms|layers|jurken|bags|shoes|accessories","eigen":true,"waarom":"één korte zin"}],
+ "uitleg":{"kleur":"...","vorm":"...","textuur":"..."}}`;
 
   try {
     const raw = await callClaude(system, userMsg, 4000);
-    const m = raw.match(/\[[\s\S]*\]/);
-    if (!m) throw new Error('Geen bruikbaar antwoord');
-    const arr = JSON.parse(m[0]);
-    if (!Array.isArray(arr) || !arr.length) throw new Error('Geen items voorgesteld');
+    const data = extractJson(raw);
+    if (!data) throw new Error('Geen bruikbaar antwoord');
+    const arr = pickArray(data, ['items','outfit','stukken']);
+    if (!arr || !arr.length) throw new Error('Geen items voorgesteld');
+    outfitUitleg = (!Array.isArray(data) && data.uitleg && typeof data.uitleg === 'object')
+      ? data.uitleg : null;
 
     const picked = [];
     arr.slice(0, 6).forEach(x => {
@@ -984,7 +1039,8 @@ Antwoord ALLEEN met een JSON-array, geen tekst eromheen:
 
     btn.textContent = '✨ Opnieuw laten samenstellen';
     status.innerHTML = `AI koos <b>${nEigen}</b> item${nEigen===1?'':'s'} uit je kast`
-      + (nNieuw ? ` en stelt <b>${nNieuw}</b> nieuw${nNieuw===1?' item':'e items'} voor.` : '.');
+      + (nNieuw ? ` en stelt <b>${nNieuw}</b> nieuw${nNieuw===1?' item':'e items'} voor.` : '.')
+      + (outfitUitleg ? ' Uitleg komt op de kaart.' : '');
   } catch(e) {
     btn.textContent = orig;
     status.textContent = 'Mislukt: ' + e.message;
@@ -1021,9 +1077,8 @@ anno1 en anno2: gebruik \\n voor regelbreuk.`;
 
   try {
     const raw = await callClaude(system, userMsg, 4000);
-    const match = raw.match(/\{[\s\S]*\}/);
-    if (!match) throw new Error('Geen geldige JSON');
-    const data = JSON.parse(match[0]);
+    const data = extractJson(raw);
+    if (!data || Array.isArray(data)) throw new Error('Geen geldige JSON');
     if (data.titel)      document.getElementById('f-title').value  = data.titel;
     if (data.sublabel)   document.getElementById('f-sub').value    = data.sublabel;
     if (data.anno1)      document.getElementById('f-anno1').value  = data.anno1.replace(/\\n/g,'\n');
@@ -1062,6 +1117,28 @@ function buildKaart() {
   (selPreset?.colors||[]).forEach(c=>{
     const d = document.createElement('div'); d.className='kaart-swatch'; d.style.background=c; sw.appendChild(d);
   });
+
+  // Dit zijn de kleuren van de gekozen combo — benoem dat ook zo
+  const typeLabel = (selPreset && selPreset.typeName) || (selType && selType.label) || 'kleurcombo';
+  document.getElementById('k-combo-type').textContent = typeLabel;
+  const naam = [selPreset?.name, selPreset?.vibe].filter(Boolean).join(' · ');
+  document.getElementById('k-combo-naam').textContent = naam;
+
+  // Waarom deze combinatie werkt
+  const uEl = document.getElementById('k-uitleg');
+  if (outfitUitleg && (outfitUitleg.kleur || outfitUitleg.vorm || outfitUitleg.textuur)) {
+    uEl.style.display = 'flex';
+    uEl.innerHTML = [
+      ['Kleur',   outfitUitleg.kleur],
+      ['Vorm',    outfitUitleg.vorm],
+      ['Textuur', outfitUitleg.textuur],
+    ].filter(r => r[1]).map(([l,t]) =>
+      `<div class="ku-row"><span class="ku-lbl">${l}</span><span class="ku-txt">${String(t)}</span></div>`
+    ).join('');
+  } else {
+    uEl.style.display = 'none';
+    uEl.innerHTML = '';
+  }
 
   const grid = document.getElementById('k-grid');
   grid.innerHTML = '';
@@ -1102,9 +1179,17 @@ function buildKaart() {
 // Vult de kaart zelf als de gebruiker geen items koos.
 async function autoComposeOnCard() {
   const grid = document.getElementById('k-grid');
-  grid.style.display = 'grid';
-  grid.style.gridTemplateColumns = '1fr';
-  grid.innerHTML = '<div style="padding:22px 8px;text-align:center;font-size:10px;color:#8a7060;letter-spacing:.06em;">✨ AI stelt een outfit samen uit je kast…</div>';
+  const had = selItems.length;
+  if (!had) {
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = '1fr';
+    grid.innerHTML = '<div style="padding:22px 8px;text-align:center;font-size:10px;color:#8a7060;letter-spacing:.06em;">✨ AI stelt een outfit samen uit je kast…</div>';
+  } else {
+    // Je eigen keuze blijft in beeld terwijl de AI aanvult
+    const u = document.getElementById('k-uitleg');
+    u.style.display = 'flex';
+    u.innerHTML = '<div class="ku-txt" style="text-align:center;">✨ AI vult je outfit aan en legt uit waarom het werkt…</div>';
+  }
 
   try {
     await aiComposeOutfit();
@@ -1314,15 +1399,16 @@ function setStep(n) {
     document.getElementById('bottom-bar').style.display = 'none';
     document.getElementById('card-wrap').style.display = 'block';
     buildKaart();
-    // Niets gekozen? Dan stelt de AI zelf een outfit samen uit de kast.
-    if (selItems.length === 0) autoComposeOnCard();
+    // Nog geen complete outfit of nog geen uitleg? Dan vult de AI aan.
+    // Je eigen keuzes blijven daarbij altijd staan.
+    if (selItems.length < 4 || !outfitUitleg) autoComposeOnCard();
   }
 }
 
 function nextStep() { setStep(Math.min(step+1,4)); }
 function prevStep() { setStep(Math.max(step-1,1)); }
 function restart() {
-  selType=null; selPreset=null; selItems=[]; customColors=[];
+  selType=null; selPreset=null; selItems=[]; customColors=[]; outfitUitleg=null;
   document.getElementById('ai-analyse-panel').style.display='none';
   document.getElementById('ai-analyse-btn').textContent='🔍 AI-analyse: textuur, vorm & trends';
   const imgWrap = document.getElementById('dl-img-wrap');
