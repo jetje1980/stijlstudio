@@ -95,12 +95,12 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
   font-family:'Inter',sans-serif;
   position:relative;
 }
-.kaart-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,10vw,48px);line-height:.95;letter-spacing:.02em;color:#1a1510;text-align:center;text-transform:uppercase;}
-.kaart-sub{font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#4a3828;text-align:center;margin-top:6px;margin-bottom:4px;}
-.kaart-anno-tr{position:absolute;top:28px;right:20px;font-family:'Caveat',cursive;font-size:14px;color:#1a2a4a;text-align:right;line-height:1.4;max-width:100px;}
-.kaart-anno-bl{position:absolute;bottom:130px;left:20px;font-family:'Caveat',cursive;font-size:14px;color:#1a2a4a;line-height:1.4;max-width:110px;}
+.kaart-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,11vw,52px);line-height:.92;letter-spacing:.02em;color:#1a1510;text-align:center;text-transform:uppercase;margin-bottom:6px;}
+.kaart-sub{font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#4a3828;text-align:center;margin-bottom:10px;}
+.kaart-anno-tr{font-family:'Caveat',cursive;font-size:15px;color:#1a2a4a;text-align:right;line-height:1.35;margin-bottom:6px;}
+.kaart-anno-bl{font-family:'Caveat',cursive;font-size:15px;color:#1a2a4a;line-height:1.35;margin-top:8px;margin-bottom:4px;}
 
-.kaart-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0 12px;}
+.kaart-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:8px;}
 .kaart-item{display:flex;flex-direction:column;gap:5px;}
 .kaart-photo{width:100%;aspect-ratio:1;background:#e8ddd2;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;}
 .kaart-photo img{width:100%;height:100%;object-fit:contain;background:#fff;}
@@ -179,9 +179,9 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 <!-- STEP 4: CARD + DOWNLOAD -->
 <div id="card-wrap">
   <div class="kaart" id="the-kaart">
-    <div class="kaart-anno-tr" id="k-anno1"></div>
     <div class="kaart-title" id="k-title">OUTFIT</div>
     <div class="kaart-sub"   id="k-sub"></div>
+    <div class="kaart-anno-tr" id="k-anno1"></div>
     <div class="kaart-grid"  id="k-grid"></div>
     <div class="kaart-anno-bl" id="k-anno2"></div>
     <div class="kaart-note"  id="k-note"></div>
