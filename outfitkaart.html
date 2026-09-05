@@ -53,6 +53,10 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .combo-type-btn.selected{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--surface));}
 .combo-type-btn .ct-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;}
 .combo-type-btn .ct-desc{font-size:10px;color:var(--text-2);line-height:1.4;}
+.ct-bron{display:inline-block;font-size:8px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 6px;border-radius:20px;margin-bottom:4px;}
+.bron-rapport{background:color-mix(in srgb,var(--green) 15%,transparent);color:var(--green);}
+.bron-trend{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent);}
+.bron-buiten{background:color-mix(in srgb,#b5232a 12%,transparent);color:#b5232a;}
 
 /* PRESET CARDS */
 .preset-list{display:flex;flex-direction:column;gap:10px;}
@@ -383,6 +387,14 @@ vlak bij het gezicht. Maar het rapport verbiedt grijs NIET:
 Zeg dus nooit kortweg "vermijd grijs". Zeg waar en hoe het wel werkt: ver van
 het gezicht, in zacht materiaal, of als lichte steunkleur naast een hoofdkleur.
 
+TRENDKLEUREN BUITEN HET RAPPORT — Griette staat toe dat je hiermee werkt:
+turquoise, kobaltblauw, hemelsblauw, botergeel, koraal, smaragdgroen, petrol,
+aubergine, fuchsia, chocolade, roest en andere actuele tinten mogen in
+kleurcombinaties. Ze staan alleen NIET in haar officiele palet. Gebruik ze dus
+gerust, maar zeg erbij dat het een trend-aanvulling is en geen rapportadvies,
+en behandel ze als accentkleur: dus ook daarvan maximaal een per outfit, en
+altijd tegen een rustige basistoon.
+
 KLEURTHEORIE — het rapport raadt de volle complementaire aanpak AF: colorblocking
 geeft haar te veel visuele prikkels. Aanbevolen methoden:
 - Split-complementair (beste match): 1 hoofdkleur + 2 lichtere aanvullende tinten
@@ -433,7 +445,7 @@ Streetstyle CHF 2026: barrel jeans + structured blazer, wide-leg + crop top, col
 
 const COMBO_TYPES = [
   {
-    id:'stijlrapport', label:'Uit je stijlrapport', desc:'De combinaties die je rapport zelf aanbeveelt',
+    id:'stijlrapport', bron:'rapport', label:'Uit je stijlrapport', desc:'De combinaties die je rapport zelf aanbeveelt',
     presets:[
       {name:'Oranje-rood + lichtroze + ijsblauw',vibe:'split-complementair — beste match',stijl:'elegant',colors:['#b5232a','#e8a0b4','#d4e4f0','#f0e8d8'],tags:['oranje-rood','roze','ijsblauw','gebroken-wit']},
       {name:'Roze + botergeel + warm wit',vibe:'split-complementair, zacht',stijl:'elegant',colors:['#e8a0b4','#f5e6a8','#f5f0e1','#8b7d6b'],tags:['roze','botergeel','ecru','taupe']},
@@ -447,7 +459,7 @@ const COMBO_TYPES = [
     ]
   },
   {
-    id:'ton-sur-ton', label:'Ton-sur-ton', desc:'Één kleurenfamilie van licht naar donker',
+    id:'ton-sur-ton', bron:'rapport', label:'Ton-sur-ton', desc:'Één kleurenfamilie van licht naar donker',
     presets:[
       {name:'Chocolade tonal',vibe:'warm & elegant',stijl:'klassiek',colors:['#5c3317','#8B4513','#c19a6b','#f0e8d8'],tags:['bruin','cognac','camel','gebroken-wit']},
       {name:'Navy tonal',vibe:'krachtig & helder',stijl:'elegant',colors:['#111827','#162038','#1a2a4a','#a8c4e0'],tags:['zwart','donkerblauw','marine','lichtblauw']},
@@ -459,7 +471,7 @@ const COMBO_TYPES = [
     ]
   },
   {
-    id:'monochromatisch', label:'Monochromatisch', desc:'Één kleur in alle tinten en texturen',
+    id:'monochromatisch', bron:'trend', label:'Monochromatisch', desc:'Één kleur in alle tinten en texturen',
     presets:[
       {name:'All-navy',vibe:'strak & doordacht',stijl:'klassiek',colors:['#0a1228','#162038','#1a3560','#a8c4e0'],tags:['donkerblauw','marine','donkerblauw','lichtblauw']},
       {name:'All-bruin',vibe:'aards & rijkgeschakeerd',stijl:'klassiek',colors:['#3a1f0c','#5c3317','#8B4513','#c19a6b'],tags:['bruin','bruin','cognac','camel']},
@@ -469,7 +481,7 @@ const COMBO_TYPES = [
     ]
   },
   {
-    id:'analoog', label:'Analoog', desc:'Naast elkaar op de kleurencirkel — harmonieus & warm',
+    id:'analoog', bron:'rapport', label:'Analoog', desc:'Naast elkaar op de kleurencirkel — harmonieus & warm',
     presets:[
       {name:'Bruin-oranje-mosterd',vibe:'warm & rijp',stijl:'klassiek',colors:['#5c3317','#d4703a','#b8860b','#f0e8d8'],tags:['bruin','oranje','mosterd','gebroken-wit']},
       {name:'Navy-turquoise-groen',vibe:'maritiem & fris',stijl:'elegant',colors:['#162038','#2ab0a8','#4a8a5c','#f0e8d8'],tags:['donkerblauw','turquoise','groen','gebroken-wit']},
@@ -480,7 +492,7 @@ const COMBO_TYPES = [
     ]
   },
   {
-    id:'complementair', label:'Complementair', desc:'Maximaal contrast — je rapport raadt volle colorblocking af',
+    id:'complementair', bron:'buiten', label:'Complementair', desc:'Maximaal contrast — je rapport raadt volle colorblocking af',
     presets:[
       {name:'Turquoise × bruin',vibe:'elegant maar verrassend',stijl:'elegant',colors:['#2ab0a8','#5c3317','#c19a6b','#f0e8d8'],tags:['turquoise','bruin','camel','gebroken-wit']},
       {name:'Kobaltblauw × cognac',vibe:'grafisch & warm',stijl:'klassiek',colors:['#0047AB','#8B4513','#c19a6b','#f8f4ef'],tags:['kobaltblauw','cognac','camel','wit']},
@@ -492,7 +504,7 @@ const COMBO_TYPES = [
     ]
   },
   {
-    id:'split-complementair', label:'Split-complementair', desc:'Beste match volgens je rapport — 1 hoofdkleur + 2 lichtere tinten',
+    id:'split-complementair', bron:'rapport', label:'Split-complementair', desc:'Beste match volgens je rapport — 1 hoofdkleur + 2 lichtere tinten',
     presets:[
       {name:'Turquoise + roze + grijs',vibe:'energiek & chic',stijl:'streetstyle',colors:['#2ab0a8','#e8407a','#888','#f0e8d8'],tags:['turquoise','felroze','grijs','gebroken-wit']},
       {name:'Oranje-rood + roze + blauw',vibe:'warm & speels',stijl:'gedurfd',colors:['#b5232a','#e8a0b4','#a8c4e0','#f8f4ef'],tags:['oranje-rood','roze','lichtblauw','wit']},
@@ -503,7 +515,7 @@ const COMBO_TYPES = [
     ]
   },
   {
-    id:'neutraal-accent', label:'Neutraal + accent', desc:'Strakke basis met één krachtige kleurpop',
+    id:'neutraal-accent', bron:'rapport', label:'Neutraal + accent', desc:'Strakke basis met één krachtige kleurpop',
     presets:[
       {name:'Zwart × felroze',vibe:'krachtig & verleidelijk',stijl:'gedurfd',colors:['#111','#333','#e8407a','#f8f4ef'],tags:['zwart','zwart','felroze','wit']},
       {name:'Bruin × turquoise',vibe:'aards & verrassend',stijl:'elegant',colors:['#5c3317','#c19a6b','#2ab0a8','#f0e8d8'],tags:['bruin','camel','turquoise','gebroken-wit']},
@@ -517,7 +529,7 @@ const COMBO_TYPES = [
     ]
   },
   {
-    id:'grafisch', label:'Grafisch', desc:'Hoog contrast — meer prikkels dan je rapport aanraadt',
+    id:'grafisch', bron:'buiten', label:'Grafisch', desc:'Hoog contrast — meer prikkels dan je rapport aanraadt',
     presets:[
       {name:'Zwart-wit + goud',vibe:'tijdloos & luxe',stijl:'elegant',colors:['#111','#f8f4ef','#c9a84c','#888'],tags:['zwart','wit','geel','grijs']},
       {name:'Marine + crème + zwart',vibe:'strak & doordacht',stijl:'klassiek',colors:['#162038','#f0e8d8','#111','#c19a6b'],tags:['marine','gebroken-wit','zwart','camel']},
@@ -528,7 +540,7 @@ const COMBO_TYPES = [
     ]
   },
   {
-    id:'inspiratie', label:'Van je inspiratieplaat', desc:'Looks die je zelf bewaarde — actueel streetstyle',
+    id:'inspiratie', bron:'trend', label:'Van je inspiratieplaat', desc:'Looks die je zelf bewaarde — actueel streetstyle',
     presets:[
       {name:'Chocolade × zacht roze',vibe:'de raglan-combo — warm & modern',stijl:'streetstyle',colors:['#3d2314','#e8a0b4','#f0e8d8','#c19a6b'],tags:['chocolade','roze','gebroken-wit','camel']},
       {name:'Hemelsblauw × denim × cognac',vibe:'frisse lucht op warme grond',stijl:'streetstyle',colors:['#4aa8d8','#a8c4e0','#8B4513','#f0e8d8'],tags:['hemelsblauw','lichtblauw','cognac','gebroken-wit']},
@@ -1001,7 +1013,11 @@ function buildComboTypes() {
   COMBO_TYPES.forEach(ct => {
     const btn = document.createElement('button');
     btn.className = 'combo-type-btn';
-    btn.innerHTML = `<div class="ct-name">${ct.label}</div><div class="ct-desc">${ct.desc}</div>`;
+    const bronLabel = {rapport:'uit je rapport', trend:'trend-aanvulling', buiten:'buiten je rapport'}[ct.bron];
+    const bronKlas   = {rapport:'bron-rapport', trend:'bron-trend', buiten:'bron-buiten'}[ct.bron];
+    btn.innerHTML = `<div class="ct-name">${ct.label}</div>`
+      + (bronLabel ? `<div class="ct-bron ${bronKlas}">${bronLabel}</div>` : '')
+      + `<div class="ct-desc">${ct.desc}</div>`;
     btn.addEventListener('click', () => {
       document.querySelectorAll('.combo-type-btn').forEach(b=>b.classList.remove('selected'));
       btn.classList.add('selected');
