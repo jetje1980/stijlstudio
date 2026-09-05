@@ -56,7 +56,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .ct-bron{display:inline-block;font-size:8px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 6px;border-radius:20px;margin-bottom:4px;}
 .bron-rapport{background:color-mix(in srgb,var(--green) 15%,transparent);color:var(--green);}
 .bron-trend{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent);}
-.bron-buiten{background:color-mix(in srgb,#b5232a 12%,transparent);color:#b5232a;}
+.bron-kan{background:color-mix(in srgb,#b8860b 15%,transparent);color:#8a6508;}
 
 /* PRESET CARDS */
 .preset-list{display:flex;flex-direction:column;gap:10px;}
@@ -372,18 +372,30 @@ sjaal, accessoire): donkerblauw, rood, roze, paars.
 
 KLEUR
 - Basiskleuren (neutrale basis): donkerblauw, bruin, zwart, gebroken-wit
-- Accentkleuren (levendig, MAXIMAAL 1 PER OUTFIT): felroze, paars, geel,
-  oranje-rood, lichtblauw, groen
-- Krachtige kleuren (roze, paars, groen, oranje-rood) altijd combineren met
-  rustige basistonen, zodat Griette zelf zichtbaar blijft.
+- Accentkleuren (levendig): felroze, paars, geel, oranje, oranje-rood, rood,
+  lichtblauw, groen. Uitgelicht in het rapport: felroze en paars (energie en
+  vrouwelijke kracht, mooi met donkerblauw of bruin), geel en warm oranje-rood
+  (zonnig; vooral rood met oranje ondertoon), groen (mooi met donkerblauw,
+  bruin en gebroken wit), lichtblauw (frisse tegenhanger van de donkere basis,
+  sluit aan bij haar blauwgrijze ogen).
+- Er is GEEN limiet van een accentkleur per outfit. Het rapport noemt alleen
+  een maximum van een PRINT per outfit. Leg dus geen accentlimiet op.
+- Wel geldt: krachtige kleuren altijd combineren met zachte, rustige tonen,
+  zodat Griette zichtbaar blijft en het niet te veel wordt.
+- Concrete combinaties die het rapport noemt: donkerblauw met felroze, bruin
+  met lichtblauw, rood met gebroken wit.
 
 OVER GRIJS EN CHAMPAGNE — wees hier genuanceerd, niet stellig:
 Champagne en grijzige tinten maken haar uitstraling fletser als hoofdkleur en
 vlak bij het gezicht. Maar het rapport verbiedt grijs NIET:
 - Uitzondering: champagne en grijs MOGEN in een zachte, casual stof
   (bijv. jogging-kwaliteit).
-- Lichtgrijs wordt juist AANBEVOLEN als ondersteunende tint, o.a. in
-  "paars + lichtgrijs + zandkleur" en "donkerblauw + ijsblauw + lichtgrijs".
+- Sterker nog: het rapport noemt LICHTGRIJS letterlijk als een van de zachte,
+  rustige tonen om krachtige kleuren mee te combineren — "krachtige kleuren
+  zoals groen of oranje-rood combineren met zachte, rustige tonen zoals
+  lichtgrijs, bruin, gebroken wit of blauw". Lichtgrijs staat bovendien in
+  twee aanbevolen combinaties: "paars + lichtgrijs + zandkleur" en
+  "donkerblauw + ijsblauw + lichtgrijs".
 Zeg dus nooit kortweg "vermijd grijs". Zeg waar en hoe het wel werkt: ver van
 het gezicht, in zacht materiaal, of als lichte steunkleur naast een hoofdkleur.
 
@@ -392,11 +404,15 @@ turquoise, kobaltblauw, hemelsblauw, botergeel, koraal, smaragdgroen, petrol,
 aubergine, fuchsia, chocolade, roest en andere actuele tinten mogen in
 kleurcombinaties. Ze staan alleen NIET in haar officiele palet. Gebruik ze dus
 gerust, maar zeg erbij dat het een trend-aanvulling is en geen rapportadvies,
-en behandel ze als accentkleur: dus ook daarvan maximaal een per outfit, en
-altijd tegen een rustige basistoon.
+en behandel ze als accentkleur: dus altijd tegen een rustige basistoon, net als
+de accentkleuren uit het rapport.
 
-KLEURTHEORIE — het rapport raadt de volle complementaire aanpak AF: colorblocking
-geeft haar te veel visuele prikkels. Aanbevolen methoden:
+KLEURTHEORIE — vier manieren, met wat het rapport er per stuk over zegt:
+- Complementair (colorblocking): veel energie, maar ook veel visuele prikkels.
+  Het rapport VERBIEDT dit niet: "dit heb je voorheen veel gedragen en dat kan
+  je nog steeds hebben, maar ik denk dat je nu wat meer op zoek bent naar
+  balans." Bied het dus aan als bewuste keuze, niet als fout.
+Aanbevolen methoden:
 - Split-complementair (beste match): 1 hoofdkleur + 2 lichtere aanvullende tinten
   oranje-rood + lichtroze + ijsblauw | roze + lichtgeel + warm wit |
   paars + lichtgrijs + zandkleur
@@ -404,6 +420,10 @@ geeft haar te veel visuele prikkels. Aanbevolen methoden:
   taupe | groen + lichtgroen + taupe
 - Analoog: rood + koraal + zachtroze | lila + paars + oudroze |
   lichtgeel + creme + zandkleur
+
+OEFENTIP UIT HET RAPPORT: "Begin met een gekleurd item dat je al graag draagt,
+en combineer het met iets zachts." Dat is precies de route waarin Griette een
+eigen item als uitgangspunt kiest.
 
 SILHOUET (cruciaal): schouders en heupen even breed, van nature rechte lijn.
 De taille ALTIJD benadrukken.
@@ -492,7 +512,7 @@ const COMBO_TYPES = [
     ]
   },
   {
-    id:'complementair', bron:'buiten', label:'Complementair', desc:'Maximaal contrast — je rapport raadt volle colorblocking af',
+    id:'complementair', bron:'kan', label:'Complementair', desc:'Colorblocking — mag, maar je rapport zegt dat je nu meer balans zoekt',
     presets:[
       {name:'Turquoise × bruin',vibe:'elegant maar verrassend',stijl:'elegant',colors:['#2ab0a8','#5c3317','#c19a6b','#f0e8d8'],tags:['turquoise','bruin','camel','gebroken-wit']},
       {name:'Kobaltblauw × cognac',vibe:'grafisch & warm',stijl:'klassiek',colors:['#0047AB','#8B4513','#c19a6b','#f8f4ef'],tags:['kobaltblauw','cognac','camel','wit']},
@@ -529,7 +549,7 @@ const COMBO_TYPES = [
     ]
   },
   {
-    id:'grafisch', bron:'buiten', label:'Grafisch', desc:'Hoog contrast — meer prikkels dan je rapport aanraadt',
+    id:'grafisch', bron:'trend', label:'Grafisch', desc:'Hoog contrast — eigen toevoeging, staat niet in je rapport',
     presets:[
       {name:'Zwart-wit + goud',vibe:'tijdloos & luxe',stijl:'elegant',colors:['#111','#f8f4ef','#c9a84c','#888'],tags:['zwart','wit','geel','grijs']},
       {name:'Marine + crème + zwart',vibe:'strak & doordacht',stijl:'klassiek',colors:['#162038','#f0e8d8','#111','#c19a6b'],tags:['marine','gebroken-wit','zwart','camel']},
@@ -1013,8 +1033,8 @@ function buildComboTypes() {
   COMBO_TYPES.forEach(ct => {
     const btn = document.createElement('button');
     btn.className = 'combo-type-btn';
-    const bronLabel = {rapport:'uit je rapport', trend:'trend-aanvulling', buiten:'buiten je rapport'}[ct.bron];
-    const bronKlas   = {rapport:'bron-rapport', trend:'bron-trend', buiten:'bron-buiten'}[ct.bron];
+    const bronLabel = {rapport:'uit je rapport', trend:'trend-aanvulling', kan:'kan, maar veel prikkels'}[ct.bron];
+    const bronKlas   = {rapport:'bron-rapport', trend:'bron-trend', kan:'bron-kan'}[ct.bron];
     btn.innerHTML = `<div class="ct-name">${ct.label}</div>`
       + (bronLabel ? `<div class="ct-bron ${bronKlas}">${bronLabel}</div>` : '')
       + `<div class="ct-desc">${ct.desc}</div>`;
