@@ -337,6 +337,7 @@ const CDN = 'https://res.cloudinary.com/dhggari0g/image/upload/f_auto,q_auto/gri
 
 const KLEUREN = [
   {v:'zwart',dot:'#111'},{v:'antraciet',dot:'#3a3d42'},{v:'grijs',dot:'#888'},
+  {v:'lichtgrijs',dot:'#c4c4c8'},
   {v:'donkerblauw',dot:'#162038'},{v:'marine',dot:'#1a2a4a'},{v:'bruin',dot:'#5c3317'},
   {v:'chocolade',dot:'#3d2314'},{v:'cognac',dot:'#8B4513'},{v:'camel',dot:'#c19a6b'},
   {v:'taupe',dot:'#8b7d6b'},{v:'beige',dot:'#d4b896'},{v:'zand',dot:'#e0d5bf'},
@@ -356,12 +357,74 @@ const KLEUREN = [
 ];
 
 // Griette's stijl DNA — embedded in all AI prompts
-const GRIETTE_DNA = `Griette's stijl DNA (Winter kleurtype):
-- Basiskleuren: donkerblauw, bruin, zwart, gebroken-wit
-- Accentkleuren: felroze, paars, geel, oranje-rood, lichtblauw, groen
-- VERMIJDEN: champagne, grijzige tinten, pastelgrijs
-- Aanbevolen strategieën: split-complementair en ton-sur-ton
-- Stijlpijlers: modern-klassiek, niet te braaf, gedurfde kleurpop, textuurspel`;
+const GRIETTE_DNA = `Griette's stijl DNA — letterlijk uit haar stijlrapport:
+
+STIJL: klassiek casual, krachtig, kleurrijk en vrouwelijk. Comfort telt, maar
+kleding werkt het mooist als er duidelijke vorm in het silhouet zichtbaar blijft.
+Moeiteloos met impact. Tijdloos met karakter.
+
+OGEN: grijsblauw. Kleuren die dat versterken horen dicht bij het gezicht (top,
+sjaal, accessoire): donkerblauw, rood, roze, paars.
+
+KLEUR
+- Basiskleuren (neutrale basis): donkerblauw, bruin, zwart, gebroken-wit
+- Accentkleuren (levendig, MAXIMAAL 1 PER OUTFIT): felroze, paars, geel,
+  oranje-rood, lichtblauw, groen
+- Krachtige kleuren (roze, paars, groen, oranje-rood) altijd combineren met
+  rustige basistonen, zodat Griette zelf zichtbaar blijft.
+
+OVER GRIJS EN CHAMPAGNE — wees hier genuanceerd, niet stellig:
+Champagne en grijzige tinten maken haar uitstraling fletser als hoofdkleur en
+vlak bij het gezicht. Maar het rapport verbiedt grijs NIET:
+- Uitzondering: champagne en grijs MOGEN in een zachte, casual stof
+  (bijv. jogging-kwaliteit).
+- Lichtgrijs wordt juist AANBEVOLEN als ondersteunende tint, o.a. in
+  "paars + lichtgrijs + zandkleur" en "donkerblauw + ijsblauw + lichtgrijs".
+Zeg dus nooit kortweg "vermijd grijs". Zeg waar en hoe het wel werkt: ver van
+het gezicht, in zacht materiaal, of als lichte steunkleur naast een hoofdkleur.
+
+KLEURTHEORIE — het rapport raadt de volle complementaire aanpak AF: colorblocking
+geeft haar te veel visuele prikkels. Aanbevolen methoden:
+- Split-complementair (beste match): 1 hoofdkleur + 2 lichtere aanvullende tinten
+  oranje-rood + lichtroze + ijsblauw | roze + lichtgeel + warm wit |
+  paars + lichtgrijs + zandkleur
+- Ton-sur-ton: donkerblauw + ijsblauw + lichtgrijs | oranje-rood + zachtroze +
+  taupe | groen + lichtgroen + taupe
+- Analoog: rood + koraal + zachtroze | lila + paars + oudroze |
+  lichtgeel + creme + zandkleur
+
+SILHOUET (cruciaal): schouders en heupen even breed, van nature rechte lijn.
+De taille ALTIJD benadrukken.
+- Wijd onderstuk + aansluitend bovenstuk, of andersom
+- Broeken met hoge taille geven direct meer vorm
+- NOOIT wijd + wijd: het silhouet verdwijnt en ze oogt vierkanter
+- Oversized altijd bewust stylen: instoppen, mouwen oprollen, riem, hoge taille
+
+BLAZERS: rond de heup of net korter, niet te lang of te oversized. Oversized kan
+alleen met een strak shirt eronder. Voorkeur voor zachte, soepele jasjes.
+
+HALSLIJNEN: open en zacht (ronde hals, boothals, sweetheart, spaghetti, V-hals,
+open knoopsluiting). Hoge of gesloten halslijnen zijn te massief voor haar.
+
+MOUWEN: op de schouder, verlaagde schoudernaad of raglan. Pofmouw of subtiele
+schoudervulling werkt. Soepel vallend, niet strak.
+
+MATERIALEN
+- Soepel: lyocell/tencel, viscose, modal, rayon, stretchkatoen
+- Zacht: katoen, bamboe, jersey, fijn gebreide wol, cashmere
+- Glad/licht glanzend: viscose, satijnmix, gladde wolblend — felle kleuren
+  krijgen hier extra diepte
+- Structuur: denim, wolmix, ribstof, tweed, stevig katoen
+Beste combinatie is soepel + stevig (viscose top + denim, cashmere + satijn).
+Vermijd grove, stugge, zware stoffen.
+
+PRINTS: strepen, stippen, dierenprint, grafisch, subtiele bloemen met modern
+randje. Geen grote, drukke of veelkleurige prints. Maximaal 1 print per outfit,
+gecombineerd met een effen stuk in bijpassende tint.
+
+SCHOENEN & ACCESSOIRES: kitten heels zijn haar signature; New Balance voor
+casual; riemen essentieel bij oversized; sjaaltjes in felroze of lichtblauw;
+gouden sieraden; tas in een neutrale basiskleur.`;
 
 const FW_TRENDS = `Fashion Week trends 2025/2026:
 FW Paris 2025/2026: architecturale silhouetten, structured tailoring, power dressing, jewel tones (saffier, bordeaux, bosgroen), luipaard renaissance, sheer layering, quiet luxury evolving naar maximal moments, oversized schouders.
@@ -369,6 +432,20 @@ Copenhagen FW 2026: sculptural knitwear, sustainable stoffen, knitwear-als-state
 Streetstyle CHF 2026: barrel jeans + structured blazer, wide-leg + crop top, colour-pop accessoires, leather × knitwear mix, sneakers bij formele items, bold print als enkel item.`;
 
 const COMBO_TYPES = [
+  {
+    id:'stijlrapport', label:'Uit je stijlrapport', desc:'De combinaties die je rapport zelf aanbeveelt',
+    presets:[
+      {name:'Oranje-rood + lichtroze + ijsblauw',vibe:'split-complementair — beste match',stijl:'elegant',colors:['#b5232a','#e8a0b4','#d4e4f0','#f0e8d8'],tags:['oranje-rood','roze','ijsblauw','gebroken-wit']},
+      {name:'Roze + botergeel + warm wit',vibe:'split-complementair, zacht',stijl:'elegant',colors:['#e8a0b4','#f5e6a8','#f5f0e1','#8b7d6b'],tags:['roze','botergeel','ecru','taupe']},
+      {name:'Paars + lichtgrijs + zand',vibe:'split-complementair — grijs als steunkleur',stijl:'klassiek',colors:['#7b3fa0','#c4c4c8','#e0d5bf','#f5f0e1'],tags:['paars','lichtgrijs','zand','ecru']},
+      {name:'Donkerblauw + ijsblauw + lichtgrijs',vibe:'ton-sur-ton, rustig',stijl:'klassiek',colors:['#162038','#d4e4f0','#c4c4c8','#f8f4ef'],tags:['donkerblauw','ijsblauw','lichtgrijs','wit']},
+      {name:'Oranje-rood + zachtroze + taupe',vibe:'ton-sur-ton, warm',stijl:'elegant',colors:['#b5232a','#d4a5a5','#8b7d6b','#f5f0e1'],tags:['oranje-rood','oudroze','taupe','ecru']},
+      {name:'Groen + mintgroen + taupe',vibe:'ton-sur-ton, natuurlijk',stijl:'klassiek',colors:['#4a8a5c','#88c8b0','#8b7d6b','#f5f0e1'],tags:['groen','mintgroen','taupe','ecru']},
+      {name:'Rood + koraal + zachtroze',vibe:'analoog, vloeiend',stijl:'elegant',colors:['#cc2211','#f4715e','#d4a5a5','#f5f0e1'],tags:['rood','koraal','oudroze','ecru']},
+      {name:'Lila + paars + oudroze',vibe:'analoog, verfijnd',stijl:'elegant',colors:['#b088c8','#7b3fa0','#d4a5a5','#f8f4ef'],tags:['lila/paars','paars','oudroze','wit']},
+      {name:'Botergeel + creme + zand',vibe:'analoog, licht',stijl:'klassiek',colors:['#f5e6a8','#f5f0e1','#e0d5bf','#8b7d6b'],tags:['botergeel','ecru','zand','taupe']},
+    ]
+  },
   {
     id:'ton-sur-ton', label:'Ton-sur-ton', desc:'Één kleurenfamilie van licht naar donker',
     presets:[
@@ -403,7 +480,7 @@ const COMBO_TYPES = [
     ]
   },
   {
-    id:'complementair', label:'Complementair', desc:'Tegenovergestelde kleuren — maximaal contrast',
+    id:'complementair', label:'Complementair', desc:'Maximaal contrast — je rapport raadt volle colorblocking af',
     presets:[
       {name:'Turquoise × bruin',vibe:'elegant maar verrassend',stijl:'elegant',colors:['#2ab0a8','#5c3317','#c19a6b','#f0e8d8'],tags:['turquoise','bruin','camel','gebroken-wit']},
       {name:'Kobaltblauw × cognac',vibe:'grafisch & warm',stijl:'klassiek',colors:['#0047AB','#8B4513','#c19a6b','#f8f4ef'],tags:['kobaltblauw','cognac','camel','wit']},
@@ -415,7 +492,7 @@ const COMBO_TYPES = [
     ]
   },
   {
-    id:'split-complementair', label:'Split-complementair', desc:'Jouw aanbevolen strategie — één kleur + twee accenten',
+    id:'split-complementair', label:'Split-complementair', desc:'Beste match volgens je rapport — 1 hoofdkleur + 2 lichtere tinten',
     presets:[
       {name:'Turquoise + roze + grijs',vibe:'energiek & chic',stijl:'streetstyle',colors:['#2ab0a8','#e8407a','#888','#f0e8d8'],tags:['turquoise','felroze','grijs','gebroken-wit']},
       {name:'Oranje-rood + roze + blauw',vibe:'warm & speels',stijl:'gedurfd',colors:['#b5232a','#e8a0b4','#a8c4e0','#f8f4ef'],tags:['oranje-rood','roze','lichtblauw','wit']},
@@ -440,7 +517,7 @@ const COMBO_TYPES = [
     ]
   },
   {
-    id:'grafisch', label:'Grafisch', desc:'Hoog contrast — maximale visuele impact',
+    id:'grafisch', label:'Grafisch', desc:'Hoog contrast — meer prikkels dan je rapport aanraadt',
     presets:[
       {name:'Zwart-wit + goud',vibe:'tijdloos & luxe',stijl:'elegant',colors:['#111','#f8f4ef','#c9a84c','#888'],tags:['zwart','wit','geel','grijs']},
       {name:'Marine + crème + zwart',vibe:'strak & doordacht',stijl:'klassiek',colors:['#162038','#f0e8d8','#111','#c19a6b'],tags:['marine','gebroken-wit','zwart','camel']},
