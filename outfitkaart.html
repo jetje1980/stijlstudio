@@ -44,6 +44,17 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .anchor-search{width:100%;padding:11px 13px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;color:var(--text);outline:none;margin-bottom:10px;}
 .anchor-search:focus{border-color:var(--accent);}
 .anchor-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:280px;overflow-y:auto;padding:2px;}
+.robin-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.robin-card.selected{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,var(--surface));}
+.robin-card .rc-top{display:flex;align-items:center;gap:9px;margin-bottom:6px;}
+.robin-card .rc-nr{font-size:9px;font-weight:700;letter-spacing:.08em;color:var(--accent);flex-shrink:0;}
+.robin-card .rc-naam{font-size:12.5px;font-weight:600;flex:1;line-height:1.3;}
+.robin-card .rc-sw{display:flex;gap:3px;flex-shrink:0;}
+.robin-card .rc-sw i{width:13px;height:13px;border-radius:50%;display:block;}
+.robin-card .rc-items{font-size:10.5px;color:var(--text-2);line-height:1.55;}
+.robin-card .rc-heb{color:var(--green);font-weight:600;}
+.robin-card .rc-mis{color:var(--text-2);font-style:italic;}
+.robin-card .rc-tel{font-size:9.5px;margin-top:6px;color:var(--text-2);}
 .anchor-pick{display:flex;align-items:center;gap:9px;padding:9px 11px;background:color-mix(in srgb,var(--accent) 8%,var(--surface));border:1.5px solid var(--accent);border-radius:10px;margin-bottom:10px;}
 .anchor-pick img{width:34px;height:34px;border-radius:7px;object-fit:cover;flex-shrink:0;}
 .anchor-pick .ap-name{font-size:12px;font-weight:600;flex:1;line-height:1.3;}
@@ -209,6 +220,14 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <button class="mode-btn active" id="mode-combo" onclick="setStartMode('combo')">🎨 Met een kleurcombo</button>
       <button class="mode-btn" id="mode-item" onclick="setStartMode('item')">👕 Met een item uit mijn kast</button>
     </div>
+    <button class="mode-btn" id="mode-robin" onclick="setStartMode('robin')" style="width:100%;margin-top:8px;">📖 Kant-en-klaar: de 33 outfits van Robin</button>
+  </div>
+
+  <!-- ROUTE: outfits uit het stijlrapport -->
+  <div id="robin-area" style="display:none">
+    <div class="sec-label">Outfits die Robin uit je kast samenstelde</div>
+    <div class="field-note" style="margin-bottom:10px;">Uit je stijlrapport. Items die je al hebt worden meteen geselecteerd; wat ontbreekt komt als voorstel op de kaart.</div>
+    <div class="preset-list" id="robin-list"></div>
   </div>
 
   <!-- ROUTE: start met een item -->
@@ -458,10 +477,26 @@ SCHOENEN & ACCESSOIRES: kitten heels zijn haar signature; New Balance voor
 casual; riemen essentieel bij oversized; sjaaltjes in felroze of lichtblauw;
 gouden sieraden; tas in een neutrale basiskleur.`;
 
-const FW_TRENDS = `Fashion Week trends 2025/2026:
-FW Paris 2025/2026: architecturale silhouetten, structured tailoring, power dressing, jewel tones (saffier, bordeaux, bosgroen), luipaard renaissance, sheer layering, quiet luxury evolving naar maximal moments, oversized schouders.
-Copenhagen FW 2026: sculptural knitwear, sustainable stoffen, knitwear-als-statement, kleurblokken met aardse tonen, streetwear-meets-tailoring, onverwachte proporties.
-Streetstyle CHF 2026: barrel jeans + structured blazer, wide-leg + crop top, colour-pop accessoires, leather × knitwear mix, sneakers bij formele items, bold print als enkel item.`;
+const FW_TRENDS = `AANVULLENDE TRENDINFORMATIE (najaar/winter 2026) — SECUNDAIR.
+Gebruik dit pas nadat je het stijlrapport hebt toegepast, en alleen waar het
+Griette's DNA versterkt. Noem het expliciet als trend, niet als rapportadvies.
+
+Kleuren: bruin, bordeaux en pruimpaars vervangen het zware zwart in
+najaarscollecties (diepbruin +50% zoekvolume, paars +60%, bordeaux +46%).
+Elektrisch turquoise als onverwacht accent. Zachtere blush-tinten naast rijkere
+bessentinten; kersenrood als frissere update van rood.
+Sleutelstukken: funnel-neck jas met hoge kraag, suède laarzen (van slank
+knie-hoog tot slouchy western), donkere denimwassing, trenchcoat in marine of
+chocoladebruin, leer- en suèdedetails.
+Materialen: zachte, romantische stoffen tegenover zware buitenlagen — kant en
+zijde naast bouclé wol en gestructureerd nepbont.
+Richting: van quiet luxury naar meer maximalisme; runways kleurrijker dan
+voorheen.
+
+Let op de aansluiting met Griette: bruin, bordeaux, paars, suède en
+chocoladebruine trenchcoat sluiten naadloos aan op haar palet. Kersenrood past
+bij haar warme oranje-rood. Elektrisch turquoise is een trendkleur buiten haar
+rapport — bied dat aan als bewuste keuze.`;
 
 const COMBO_TYPES = [
   {
@@ -577,6 +612,116 @@ const COMBO_TYPES = [
   },
 ];
 
+
+// ── OUTFITS DIE STYLIST ROBIN UIT DE KAST SAMENSTELDE (stijlrapport, p.65-97) ──
+// id = item uit de digitale garderobe. mis:true = stond wel in het rapport,
+// maar zit (nog) niet in de kast.
+const ROBIN_OUTFITS = [
+ {nr:1, naam:'Antraciet & zwart, getailleerd', tags:['antraciet','zwart','gebroken-wit'], items:[
+   {naam:'Antraciet gebreide trui',mis:true,cat:'tops'},{naam:'Zwarte oversized blazer',mis:true,cat:'layers'},
+   {naam:'Gestreepte wijde broek zwart-wit',mis:true,cat:'bottoms'},{naam:'Zwarte loafers met gouden gesp',mis:true,cat:'shoes'}]},
+ {nr:2, naam:'Streep op denim', tags:['bruin','ecru','lichtblauw'], items:[
+   {id:'gestreept'},{id:'pullbear-balloon-jeans'},{naam:'Bruine suède enkellaarsjes, kitten heel',mis:true,cat:'shoes'}]},
+ {nr:3, naam:'Olijf op zwart', tags:['olijf/khaki','zwart'], items:[
+   {naam:'Olijfgroen T-shirt (Stieglitz)',mis:true,cat:'tops'},{naam:'Zwarte flared broek',mis:true,cat:'bottoms'}]},
+ {nr:4, naam:'Framboos op zwart', tags:['felroze','zwart'], items:[
+   {naam:'Framboosroze T-shirt (Stieglitz)',mis:true,cat:'tops'},{naam:'Zwarte flared broek',mis:true,cat:'bottoms'}]},
+ {nr:5, naam:'Bruin overhemd op denim', tags:['chocolade','lichtblauw','bruin'], items:[
+   {naam:'Donkerbruin cropped overhemd',mis:true,cat:'tops'},{id:'pullbear-balloon-jeans'},{id:'choco-kitten'}]},
+ {nr:6, naam:'Bruin leer met ruit', tags:['chocolade','taupe','bruin'], items:[
+   {naam:'Bruine asymmetrische top',mis:true,cat:'tops'},{naam:'Bruine leren jas met ceintuur',mis:true,cat:'layers'},
+   {naam:'Geruite broek grijsbruin',mis:true,cat:'bottoms'},{id:'choco-kitten'}]},
+ {nr:7, naam:'Olijf met patchwork', tags:['olijf/khaki','ecru','bruin'], items:[
+   {naam:'Olijfgroene sweater met zon-patch',mis:true,cat:'tops'},{id:'print-mini'},
+   {naam:'Crème linnen short',mis:true,cat:'bottoms'},{id:'choco-kitten'}]},
+ {nr:8, naam:'Olijf op luipaard', tags:['olijf/khaki','camel','bruin'], items:[
+   {naam:'Olijfgroene sweater met zon-patch',mis:true,cat:'tops'},{naam:'Luipaardprint broek',mis:true,cat:'bottoms'},{id:'choco-kitten'}]},
+ {nr:9, naam:'Botergeel op bruin', tags:['botergeel','bruin','chocolade'], items:[
+   {naam:'Botergele mohair trui',mis:true,cat:'tops'},{naam:'Bruine wijde pantalon met plooien',mis:true,cat:'bottoms'}]},
+ {nr:10,naam:'Sportief met blazer', tags:['ecru','zwart','lichtblauw'], items:[
+   {naam:'Crème sweater "70"',mis:true,cat:'tops'},{naam:'Zwarte oversized blazer',mis:true,cat:'layers'},
+   {id:'pullbear-balloon-jeans'},{naam:'Zwarte wijde pantalon',mis:true,cat:'bottoms'}]},
+ {nr:11,naam:'Ruches op denim', tags:['bruin','oudroze','lichtblauw'], items:[
+   {naam:'Bruin-roze geprinte blouse met ruches',mis:true,cat:'tops'},{id:'pullbear-balloon-jeans'},
+   {naam:'Bruine suède enkellaarsjes, kitten heel',mis:true,cat:'shoes'}]},
+ {nr:12,naam:'Zacht op felroze', tags:['ecru','felroze','bruin'], items:[
+   {id:'witte-cardigan'},{id:'roze-maxi'},{id:'choco-kitten'}]},
+ {nr:13,naam:'Rood-zwarte streep', tags:['rood','zwart'], items:[
+   {naam:'Rood-zwart gestreepte coltrui',mis:true,cat:'tops'},{naam:'Zwarte wijde pantalon',mis:true,cat:'bottoms'},
+   {naam:'Zwarte croco enkellaarsjes, kitten heel',mis:true,cat:'shoes'}]},
+ {nr:14,naam:'Rood op zand', tags:['rood','zand','camel'], items:[
+   {naam:'Rode geribde top, korte mouw',mis:true,cat:'tops'},{naam:'Camel jeans',mis:true,cat:'bottoms'}]},
+ {nr:15,naam:'Denim met oranje', tags:['lichtblauw','oranje','ecru'], items:[
+   {naam:'Denim jacket',mis:true,cat:'layers'},{id:'witte-cardigan'},
+   {naam:'Oranje gebreide mini rok',mis:true,cat:'bottoms'},{naam:'Zwarte croco enkellaarsjes',mis:true,cat:'shoes'}]},
+ {nr:16,naam:'Geel met ruit of luipaard', tags:['geel','taupe','camel'], items:[
+   {naam:'Gele cropped blouse',mis:true,cat:'tops'},{naam:'Geruite broek grijsbruin',mis:true,cat:'bottoms'},
+   {naam:'Luipaardprint broek',mis:true,cat:'bottoms'}]},
+ {nr:17,naam:'Stippen op zwart', tags:['ecru','zwart'], items:[
+   {naam:'Crème blouse met zwarte stippen',mis:true,cat:'tops'},{naam:'Zwarte flared broek',mis:true,cat:'bottoms'},
+   {naam:'Zwarte croco enkellaarsjes',mis:true,cat:'shoes'}]},
+ {nr:18,naam:'Botergeel op roze', tags:['botergeel','felroze'], items:[
+   {naam:'Botergele cardigan, korte mouw',mis:true,cat:'layers'},{id:'roze-maxi'},{id:'print-mini'}]},
+ {nr:19,naam:'Luipaard op bruin', tags:['camel','bruin','chocolade'], items:[
+   {id:'mbym-leopard-top'},{naam:'Bruine wijde pantalon',mis:true,cat:'bottoms'},{id:'choco-kitten'}]},
+ {nr:20,naam:'Marine onder camel', tags:['marine','camel','lichtblauw'], items:[
+   {id:'blauw-spaghet'},{naam:'Camel trenchcoat',mis:true,cat:'layers'},{id:'pullbear-balloon-jeans'}]},
+ {nr:21,naam:'Baseball op zwart', tags:['ecru','zwart'], items:[
+   {naam:'Baseball shirt crème-zwart',mis:true,cat:'tops'},{naam:'Zwarte flared broek',mis:true,cat:'bottoms'},
+   {naam:'Zwarte croco enkellaarsjes',mis:true,cat:'shoes'}]},
+ {nr:22,naam:'Print op denim', tags:['grijs','lichtblauw','zwart'], items:[
+   {naam:'Grijsblauw geprint cropped overhemd',mis:true,cat:'tops'},{id:'pullbear-balloon-jeans'},
+   {naam:'Zwarte croco enkellaarsjes',mis:true,cat:'shoes'}]},
+ {nr:23,naam:'Denim jack, drie bodems', tags:['lichtblauw','zwart'], items:[
+   {naam:'Denim jacket',mis:true,cat:'layers'},{naam:'Zwarte wijde pantalon',mis:true,cat:'bottoms'},
+   {naam:'Denim mini rok',mis:true,cat:'bottoms'},{id:'pullbear-balloon-jeans'}]},
+ {nr:24,naam:'Oranje op zwart', tags:['oranje','zwart'], items:[
+   {id:'oranje-shirt'},{naam:'Zwarte flared broek',mis:true,cat:'bottoms'}]},
+ {nr:25,naam:'Zwart glanzend, avond', tags:['zwart'], items:[
+   {naam:'Zwarte kanten top met glans',mis:true,cat:'tops'},{naam:'Zwarte oversized blazer',mis:true,cat:'layers'},
+   {naam:'Zwarte wijde pantalon',mis:true,cat:'bottoms'},{naam:'Zwarte croco laarzen',mis:true,cat:'shoes'}]},
+ {nr:26,naam:'Bruin met luipaard of oranje', tags:['chocolade','camel','oranje'], items:[
+   {naam:'Bruin cropped overhemd',mis:true,cat:'tops'},{naam:'Luipaardprint broek',mis:true,cat:'bottoms'},
+   {naam:'Oranje gebreide mini rok',mis:true,cat:'bottoms'},{naam:'Bruine wijde pantalon',mis:true,cat:'bottoms'}]},
+ {nr:27,naam:'Kant onder leer', tags:['ecru','chocolade','zwart'], items:[
+   {id:'kanten-top'},{naam:'Bruine leren jas met ceintuur',mis:true,cat:'layers'},
+   {naam:'Zwarte flared broek',mis:true,cat:'bottoms'}]},
+ {nr:28,naam:'Kleurpop op patchwork', tags:['rood','ecru'], items:[
+   {naam:'Rood T-shirt',mis:true,cat:'tops'},{naam:'Limoengroen T-shirt',mis:true,cat:'tops'},{id:'print-mini'}]},
+ {nr:29,naam:'Denim met linnen', tags:['lichtblauw','ecru','zand'], items:[
+   {naam:'Denim jacket',mis:true,cat:'layers'},{naam:'Crème linnen short',mis:true,cat:'bottoms'}]},
+ {nr:30,naam:'Lichtblauw met ruit', tags:['lichtblauw','zwart','camel'], items:[
+   {id:'blauwe-blouse'},{naam:'Zwarte wijde pantalon',mis:true,cat:'bottoms'},
+   {naam:'Luipaardprint broek',mis:true,cat:'bottoms'}]},
+ {nr:31,naam:'Ecru met teddy', tags:['ecru','chocolade','taupe'], items:[
+   {naam:'Ecru overhemd',mis:true,cat:'tops'},{naam:'Bruine teddy jas',mis:true,cat:'layers'},
+   {naam:'Geruite broek grijsbruin',mis:true,cat:'bottoms'}]},
+ {nr:32,naam:'Zacht met print', tags:['ecru','oudroze','bruin'], items:[
+   {id:'witte-cardigan'},{naam:'Roze geprinte broek',mis:true,cat:'bottoms'},{id:'choco-kitten'}]},
+ {nr:33,naam:'Sweater onder leer', tags:['ecru','chocolade','camel'], items:[
+   {naam:'Crème sweater "70"',mis:true,cat:'tops'},{naam:'Bruine leren jas met ceintuur',mis:true,cat:'layers'},
+   {naam:'Luipaardprint broek',mis:true,cat:'bottoms'},{id:'pullbear-balloon-jeans'}]},
+];
+
+// Zoeklinks per ontbrekend item, bij winkels die Griette al draagt
+const INSPIRATIE = {
+  'Zwarte flared broek':'flared+broek+zwart','Zwarte wijde pantalon':'wide+leg+pantalon+zwart',
+  'Luipaardprint broek':'luipaard+broek','Bruine wijde pantalon':'wide+leg+pantalon+bruin',
+  'Zwarte croco enkellaarsjes':'enkellaarsjes+zwart+kitten+heel',
+  'Zwarte croco enkellaarsjes, kitten heel':'enkellaarsjes+zwart+kitten+heel',
+  'Bruine suède enkellaarsjes, kitten heel':'suede+enkellaarsjes+bruin',
+  'Zwarte oversized blazer':'oversized+blazer+zwart','Denim jacket':'denim+jacket',
+  'Bruine leren jas met ceintuur':'leren+jas+bruin','Geruite broek grijsbruin':'geruite+broek',
+  'Camel trenchcoat':'trenchcoat+camel','Bruine teddy jas':'teddy+jas+bruin',
+  'Oranje gebreide mini rok':'gebreide+mini+rok','Crème linnen short':'linnen+short',
+  'Camel jeans':'jeans+camel','Denim mini rok':'denim+rok',
+};
+const WINKELS = [
+  ['Zara','https://www.zara.com/nl/nl/search?searchTerm='],
+  ['Arket','https://www.arket.com/nl/search.html?q='],
+  ['& Other Stories','https://www.stories.com/nl_nl/search.html?q='],
+];
+
 const CAT_ICONS = {tops:'👕',bottoms:'👖',layers:'🧥',jurken:'👗',bags:'👜',shoes:'👟',accessories:'🕶️',swimwear:'🩱',overig:'📦'};
 
 const DEFAULT_ITEMS = [
@@ -662,6 +807,7 @@ let outfitUitleg = null; // {kleur, vorm, textuur} van de AI
 let outfitTop = '';      // slotzin: waarom dit als geheel werkt
 let startMode = 'combo'; // 'combo' = kleurcombo eerst, 'item' = item eerst
 let anchorItems = [];    // 1 of 2 items waar de look omheen wordt gebouwd
+let kantEnKlaar = false; // outfit komt compleet uit het stijlrapport
 const MAX_ANKERS = 2;
 const isAnker = id => anchorItems.some(a => a.id === id);
 let appSecret = '';
@@ -817,13 +963,73 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort) {
   return text;
 }
 
+// ── ROUTE: OUTFITS VAN ROBIN ──────────────────────────────────────────────────
+// Zet een outfit uit het rapport om naar items: wat in de kast zit wordt
+// geselecteerd, de rest komt als voorstel op de kaart.
+function robinNaarItems(o) {
+  return o.items.map(it => {
+    if (it.id) {
+      const echt = allItems.find(i => i.id === it.id);
+      if (echt) return Object.assign({}, echt, { _waarom: 'uit outfit ' + o.nr });
+    }
+    return {
+      id: 'sugg-r' + o.nr + '-' + Math.random().toString(36).slice(2,6),
+      name: it.naam || 'Voorstel', cat: it.cat || 'overig', brand: '',
+      _suggestion: true, _waarom: 'nog niet in je kast',
+    };
+  }).slice(0, 6);
+}
+
+function buildRobinList() {
+  const list = document.getElementById('robin-list');
+  list.innerHTML = '';
+  ROBIN_OUTFITS.forEach(o => {
+    const items = robinNaarItems(o);
+    const heb = items.filter(i => !i._suggestion).length;
+    const dots = o.tags.map(t => {
+      const k = KLEUREN.find(k => k.v === t);
+      return `<i style="background:${k ? k.dot : '#ccc'}"></i>`;
+    }).join('');
+    const regels = items.map(i => i._suggestion
+      ? `<span class="rc-mis">${esc(i.name)}</span>`
+      : `<span class="rc-heb">${esc(i.name)}</span>`).join(' · ');
+
+    const card = document.createElement('div');
+    card.className = 'robin-card';
+    card.innerHTML = `<div class="rc-top"><span class="rc-nr">${o.nr}</span>`
+      + `<span class="rc-naam">${esc(o.naam)}</span><span class="rc-sw">${dots}</span></div>`
+      + `<div class="rc-items">${regels}</div>`
+      + `<div class="rc-tel">${heb} van ${items.length} in je kast</div>`;
+
+    card.addEventListener('click', () => {
+      document.querySelectorAll('#robin-list .robin-card').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      selItems = robinNaarItems(o);
+      anchorItems = selItems.filter(i => !i._suggestion);  // eigen items staan vast
+      kantEnKlaar = true;   // Robin stelde deze samen; niet automatisch herschrijven
+      selPreset = {
+        name: 'Outfit ' + o.nr + ' — ' + o.naam,
+        vibe: 'samengesteld door Robin',
+        typeName: 'Uit je stijlrapport',
+        stijl: 'klassiek',
+        colors: o.tags.map(t => (KLEUREN.find(k=>k.v===t)||{dot:'#ccc'}).dot),
+        tags: o.tags.slice(),
+      };
+      document.getElementById('btn-next').disabled = false;
+    });
+    list.appendChild(card);
+  });
+}
+
 // ── STEP 1: STARTKEUZE ────────────────────────────────────────────────────────
 function setStartMode(mode) {
   startMode = mode;
   document.getElementById('mode-combo').classList.toggle('active', mode === 'combo');
   document.getElementById('mode-item').classList.toggle('active', mode === 'item');
+  document.getElementById('mode-robin').classList.toggle('active', mode === 'robin');
   document.getElementById('combo-area').style.display  = mode === 'combo' ? 'block' : 'none';
   document.getElementById('anchor-area').style.display = mode === 'item'  ? 'block' : 'none';
+  document.getElementById('robin-area').style.display  = mode === 'robin' ? 'block' : 'none';
 
   // Route wisselen betekent opnieuw beginnen met de combo
   selPreset = null;
@@ -832,7 +1038,12 @@ function setStartMode(mode) {
   document.getElementById('custom-area').style.display = 'none';
   document.querySelectorAll('.combo-type-btn').forEach(b=>b.classList.remove('selected'));
 
-  if (mode === 'item') {
+  kantEnKlaar = false;
+  if (mode === 'robin') {
+    selItems = [];
+    anchorItems = [];
+    buildRobinList();
+  } else if (mode === 'item') {
     // Zonder anker hoort de kiezer open te staan, niet de (lege) combolijst
     const heeftAnker = anchorItems.length > 0;
     document.getElementById('anchor-choose').style.display     = heeftAnker ? 'none' : 'block';
@@ -846,6 +1057,7 @@ function setStartMode(mode) {
       anchorItems = [];
       renderAnchorPicked();
     }
+    if (mode === 'combo') { selItems = []; document.getElementById('robin-list').innerHTML=''; }
   }
 }
 
@@ -1715,6 +1927,15 @@ ${wardrobeForAI()}
 
 Gekozen kleurcombo: ${combo}
 ${ankerBlok}
+VOLGORDE VAN JE ADVIES — houd je hieraan:
+1. Toets eerst aan Griette's stijlrapport hierboven: kleur, silhouet, halslijn,
+   mouw, materiaal, print. Dat is de leidende bron.
+2. Kijk daarna pas of een trend hieronder de outfit versterkt. Noem het dan
+   expliciet als trend, niet als rapportadvies.
+3. Ontbreekt er iets in haar kast dat een echte aanvulling zou zijn, benoem dat
+   concreet: wat voor item, in welke kleur en welk materiaal, en waarom het bij
+   haar past. Zet zulke items in het veld "ontbreekt".
+
 ${FW_TRENDS}
 
 Kijk naar de foto's hieronder en beoordeel elk item op kleur, vorm/silhouet en textuur.
@@ -1734,7 +1955,8 @@ Antwoord ALLEEN met JSON:
  "uitleg":{"kleur":"max 20 woorden","vorm":"max 20 woorden","textuur":"max 20 woorden"},
  "waarom_top":"2 zinnen: waarom dit als geheel een sterke combinatie is",
  "analyse":"uitgebreidere toelichting per item op kleur, vorm en textuur, plus de link met FW Paris/Copenhagen 2026 en de stijlrichting. Gebruik **vet** voor kopjes.",
- "eerlijk":"wat nog niet ideaal is en waarom de kast daar geen oplossing voor heeft, of leeg"
+ "eerlijk":"wat nog niet ideaal is en waarom de kast daar geen oplossing voor heeft, of leeg",
+ "ontbreekt":[{"wat":"korte omschrijving, bijv. zwarte flared broek","waarom":"waarom dit een echte aanvulling is","zoekterm":"twee of drie woorden om op te zoeken"}]
 }` });
 
   selItems.forEach(item => {
@@ -1842,6 +2064,21 @@ function renderAiAnalysis(data, vervangen) {
   if (data.analyse) {
     html += `<div class="ai-section"><div class="ai-section-title">Per item: kleur, vorm &amp; textuur</div><div class="ai-section-body"><p>${md(data.analyse)}</p></div></div>`;
   }
+  const ontbreekt = Array.isArray(data.ontbreekt) ? data.ontbreekt.filter(o=>o&&o.wat) : [];
+  if (ontbreekt.length) {
+    html += '<div class="ai-section"><div class="ai-section-title">Zou je kast compleet maken</div><div class="ai-section-body">'
+      + ontbreekt.map(o => {
+          const q = encodeURIComponent(String(o.zoekterm || o.wat).trim());
+          const links = WINKELS.map(([naam,url]) =>
+            `<a href="${url}${q}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;">${naam}</a>`
+          ).join(' · ');
+          return `<div style="margin-bottom:9px;"><b>${esc(o.wat)}</b>`
+            + (o.waarom ? `<br><span style="font-size:11px;">${esc(o.waarom)}</span>` : '')
+            + `<br><span style="font-size:11px;">Zoek bij: ${links}</span></div>`;
+        }).join('')
+      + '</div></div>';
+  }
+
   if (data.eerlijk && String(data.eerlijk).trim()) {
     html += `<div class="ai-section"><div class="ai-section-title">Eerlijk gezegd</div><div class="ai-section-body"><span class="ai-gap">${md(data.eerlijk)}</span></div></div>`;
   }
@@ -1985,7 +2222,8 @@ function setStep(n) {
     buildKaart();
     // Nog geen complete outfit of nog geen uitleg? Dan vult de AI aan.
     // Je eigen keuzes blijven daarbij altijd staan.
-    if (selItems.length < 4 || !outfitUitleg) autoComposeOnCard();
+    // Een outfit van Robin laten we staan zoals hij is — die is bewust gekozen.
+    if (!kantEnKlaar && (selItems.length < 4 || !outfitUitleg)) autoComposeOnCard();
   }
 }
 
@@ -1993,7 +2231,7 @@ function nextStep() { setStep(Math.min(step+1,4)); }
 function prevStep() { setStep(Math.max(step-1,1)); }
 function restart() {
   selType=null; selPreset=null; selItems=[]; customColors=[]; outfitUitleg=null; outfitTop='';
-  anchorItems=[]; renderAnchorPicked();
+  anchorItems=[]; kantEnKlaar=false; renderAnchorPicked();
   document.getElementById('anchor-preset-list').innerHTML='';
   document.getElementById('anchor-status').textContent='';
   document.getElementById('anchor-choose').style.display='block';
