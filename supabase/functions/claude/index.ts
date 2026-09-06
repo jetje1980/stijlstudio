@@ -20,7 +20,7 @@ const ALLOWED_MODELS = [
   "claude-haiku-4-5",
 ];
 
-const MAX_TOKENS_CAP = 16000;
+const MAX_TOKENS_CAP = 32000;   // denk-tokens tellen mee; te krap levert lege antwoorden
 const MAX_BODY_BYTES = 256 * 1024;
 
 function corsHeaders(origin: string, allowed: boolean) {
