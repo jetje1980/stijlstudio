@@ -54,6 +54,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .robin-card .rc-items{font-size:10.5px;color:var(--text-2);line-height:1.55;}
 .robin-card .rc-heb{color:var(--green);font-weight:600;}
 .robin-card .rc-mis{color:var(--text-2);font-style:italic;}
+.rc-link{background:none;border:none;padding:0 0 0 2px;font-family:'Inter',sans-serif;font-size:9.5px;color:var(--accent);text-decoration:underline;cursor:pointer;}
 .robin-card .rc-tel{font-size:9.5px;margin-top:6px;color:var(--text-2);}
 .anchor-pick{display:flex;align-items:center;gap:9px;padding:9px 11px;background:color-mix(in srgb,var(--accent) 8%,var(--surface));border:1.5px solid var(--accent);border-radius:10px;margin-bottom:10px;}
 .anchor-pick img{width:34px;height:34px;border-radius:7px;object-fit:cover;flex-shrink:0;}
@@ -618,89 +619,89 @@ const COMBO_TYPES = [
 // maar zit (nog) niet in de kast.
 const ROBIN_OUTFITS = [
  {nr:1, naam:'Antraciet & zwart, getailleerd', tags:['antraciet','zwart','gebroken-wit'], items:[
-   {naam:'Antraciet gebreide trui',mis:true,cat:'tops'},{naam:'Zwarte oversized blazer',mis:true,cat:'layers'},
-   {naam:'Gestreepte wijde broek zwart-wit',mis:true,cat:'bottoms'},{naam:'Zwarte loafers met gouden gesp',mis:true,cat:'shoes'}]},
+   {naam:'Antraciet gebreide trui',zoek:['antraciet','trui'],cat:'tops'},{naam:'Zwarte oversized blazer',zoek:['blazer'],kleur:'zwart',cat:'layers'},
+   {naam:'Gestreepte wijde broek zwart-wit',zoek:['streep','broek'],cat:'bottoms'},{naam:'Zwarte loafers met gouden gesp',zoek:['loafer'],cat:'shoes'}]},
  {nr:2, naam:'Streep op denim', tags:['bruin','ecru','lichtblauw'], items:[
-   {id:'gestreept'},{id:'pullbear-balloon-jeans'},{naam:'Bruine suède enkellaarsjes, kitten heel',mis:true,cat:'shoes'}]},
+   {id:'gestreept'},{id:'pullbear-balloon-jeans'},{naam:'Bruine suède enkellaarsjes, kitten heel',zoek:['laars','laarsje','boot'],kleur:'bruin',cat:'shoes'}]},
  {nr:3, naam:'Olijf op zwart', tags:['olijf/khaki','zwart'], items:[
-   {naam:'Olijfgroen T-shirt (Stieglitz)',mis:true,cat:'tops'},{naam:'Zwarte flared broek',mis:true,cat:'bottoms'}]},
+   {naam:'Olijfgroen T-shirt (Stieglitz)',zoek:['olijf','groen'],cat:'tops'},{naam:'Zwarte flared broek',zoek:['flared','flare'],cat:'bottoms'}]},
  {nr:4, naam:'Framboos op zwart', tags:['felroze','zwart'], items:[
-   {naam:'Framboosroze T-shirt (Stieglitz)',mis:true,cat:'tops'},{naam:'Zwarte flared broek',mis:true,cat:'bottoms'}]},
+   {naam:'Framboosroze T-shirt (Stieglitz)',zoek:['roze','framboos'],cat:'tops'},{naam:'Zwarte flared broek',zoek:['flared','flare'],cat:'bottoms'}]},
  {nr:5, naam:'Bruin overhemd op denim', tags:['chocolade','lichtblauw','bruin'], items:[
-   {naam:'Donkerbruin cropped overhemd',mis:true,cat:'tops'},{id:'pullbear-balloon-jeans'},{id:'choco-kitten'}]},
+   {naam:'Donkerbruin cropped overhemd',zoek:['overhemd','blouse'],kleur:'bruin',cat:'tops'},{id:'pullbear-balloon-jeans'},{id:'choco-kitten'}]},
  {nr:6, naam:'Bruin leer met ruit', tags:['chocolade','taupe','bruin'], items:[
-   {naam:'Bruine asymmetrische top',mis:true,cat:'tops'},{naam:'Bruine leren jas met ceintuur',mis:true,cat:'layers'},
-   {naam:'Geruite broek grijsbruin',mis:true,cat:'bottoms'},{id:'choco-kitten'}]},
+   {naam:'Bruine asymmetrische top',zoek:['top'],kleur:'bruin',cat:'tops'},{naam:'Bruine leren jas met ceintuur',zoek:['leer','leren'],cat:'layers'},
+   {naam:'Geruite broek grijsbruin',zoek:['ruit','geruit','check','pied'],cat:'bottoms'},{id:'choco-kitten'}]},
  {nr:7, naam:'Olijf met patchwork', tags:['olijf/khaki','ecru','bruin'], items:[
-   {naam:'Olijfgroene sweater met zon-patch',mis:true,cat:'tops'},{id:'print-mini'},
-   {naam:'Crème linnen short',mis:true,cat:'bottoms'},{id:'choco-kitten'}]},
+   {naam:'Olijfgroene sweater met zon-patch',zoek:['sweater','trui'],kleur:'groen',cat:'tops'},{id:'print-mini'},
+   {naam:'Crème linnen short',zoek:['short'],cat:'bottoms'},{id:'choco-kitten'}]},
  {nr:8, naam:'Olijf op luipaard', tags:['olijf/khaki','camel','bruin'], items:[
-   {naam:'Olijfgroene sweater met zon-patch',mis:true,cat:'tops'},{naam:'Luipaardprint broek',mis:true,cat:'bottoms'},{id:'choco-kitten'}]},
+   {naam:'Olijfgroene sweater met zon-patch',zoek:['sweater','trui'],kleur:'groen',cat:'tops'},{naam:'Luipaardprint broek',zoek:['luipaard','leopard','panter'],cat:'bottoms'},{id:'choco-kitten'}]},
  {nr:9, naam:'Botergeel op bruin', tags:['botergeel','bruin','chocolade'], items:[
-   {naam:'Botergele mohair trui',mis:true,cat:'tops'},{naam:'Bruine wijde pantalon met plooien',mis:true,cat:'bottoms'}]},
+   {naam:'Botergele mohair trui',zoek:['geel','mohair'],cat:'tops'},{naam:'Bruine wijde pantalon met plooien',zoek:['pantalon','wide'],kleur:'bruin',cat:'bottoms'}]},
  {nr:10,naam:'Sportief met blazer', tags:['ecru','zwart','lichtblauw'], items:[
-   {naam:'Crème sweater "70"',mis:true,cat:'tops'},{naam:'Zwarte oversized blazer',mis:true,cat:'layers'},
-   {id:'pullbear-balloon-jeans'},{naam:'Zwarte wijde pantalon',mis:true,cat:'bottoms'}]},
+   {naam:'Crème sweater "70"',zoek:['sweater','70'],cat:'tops'},{naam:'Zwarte oversized blazer',zoek:['blazer'],kleur:'zwart',cat:'layers'},
+   {id:'pullbear-balloon-jeans'},{naam:'Zwarte wijde pantalon',zoek:['pantalon','wide'],kleur:'zwart',cat:'bottoms'}]},
  {nr:11,naam:'Ruches op denim', tags:['bruin','oudroze','lichtblauw'], items:[
-   {naam:'Bruin-roze geprinte blouse met ruches',mis:true,cat:'tops'},{id:'pullbear-balloon-jeans'},
-   {naam:'Bruine suède enkellaarsjes, kitten heel',mis:true,cat:'shoes'}]},
+   {naam:'Bruin-roze geprinte blouse met ruches',zoek:['blouse','ruche'],cat:'tops'},{id:'pullbear-balloon-jeans'},
+   {naam:'Bruine suède enkellaarsjes, kitten heel',zoek:['laars','laarsje','boot'],kleur:'bruin',cat:'shoes'}]},
  {nr:12,naam:'Zacht op felroze', tags:['ecru','felroze','bruin'], items:[
    {id:'witte-cardigan'},{id:'roze-maxi'},{id:'choco-kitten'}]},
  {nr:13,naam:'Rood-zwarte streep', tags:['rood','zwart'], items:[
-   {naam:'Rood-zwart gestreepte coltrui',mis:true,cat:'tops'},{naam:'Zwarte wijde pantalon',mis:true,cat:'bottoms'},
-   {naam:'Zwarte croco enkellaarsjes, kitten heel',mis:true,cat:'shoes'}]},
+   {naam:'Rood-zwart gestreepte coltrui',zoek:['col','streep'],kleur:'rood',cat:'tops'},{naam:'Zwarte wijde pantalon',zoek:['pantalon','wide'],kleur:'zwart',cat:'bottoms'},
+   {naam:'Zwarte enkellaarsjes',zoek:['laars','laarsje','boot'],kleur:'zwart',cat:'shoes'}]},
  {nr:14,naam:'Rood op zand', tags:['rood','zand','camel'], items:[
-   {naam:'Rode geribde top, korte mouw',mis:true,cat:'tops'},{naam:'Camel jeans',mis:true,cat:'bottoms'}]},
+   {naam:'Rode geribde top',zoek:['rood','rib'],cat:'tops'},{naam:'Camel jeans',zoek:['jeans','broek'],kleur:'camel',cat:'bottoms'}]},
  {nr:15,naam:'Denim met oranje', tags:['lichtblauw','oranje','ecru'], items:[
-   {naam:'Denim jacket',mis:true,cat:'layers'},{id:'witte-cardigan'},
-   {naam:'Oranje gebreide mini rok',mis:true,cat:'bottoms'},{naam:'Zwarte croco enkellaarsjes',mis:true,cat:'shoes'}]},
+   {naam:'Denim jacket',zoek:['denim','spijker'],cat:'layers'},{id:'witte-cardigan'},
+   {naam:'Oranje gebreide mini rok',zoek:['rok'],kleur:'oranje',cat:'bottoms'},{naam:'Zwarte enkellaarsjes',zoek:['laars','laarsje','boot'],kleur:'zwart',cat:'shoes'}]},
  {nr:16,naam:'Geel met ruit of luipaard', tags:['geel','taupe','camel'], items:[
-   {naam:'Gele cropped blouse',mis:true,cat:'tops'},{naam:'Geruite broek grijsbruin',mis:true,cat:'bottoms'},
-   {naam:'Luipaardprint broek',mis:true,cat:'bottoms'}]},
+   {naam:'Gele cropped blouse',zoek:['blouse','overhemd'],kleur:'geel',cat:'tops'},{naam:'Geruite broek grijsbruin',zoek:['ruit','geruit','check','pied'],cat:'bottoms'},
+   {naam:'Luipaardprint broek',zoek:['luipaard','leopard','panter'],cat:'bottoms'}]},
  {nr:17,naam:'Stippen op zwart', tags:['ecru','zwart'], items:[
-   {naam:'Crème blouse met zwarte stippen',mis:true,cat:'tops'},{naam:'Zwarte flared broek',mis:true,cat:'bottoms'},
-   {naam:'Zwarte croco enkellaarsjes',mis:true,cat:'shoes'}]},
+   {naam:'Crème blouse met zwarte stippen',zoek:['stip','blouse'],cat:'tops'},{naam:'Zwarte flared broek',zoek:['flared','flare'],cat:'bottoms'},
+   {naam:'Zwarte enkellaarsjes',zoek:['laars','laarsje','boot'],kleur:'zwart',cat:'shoes'}]},
  {nr:18,naam:'Botergeel op roze', tags:['botergeel','felroze'], items:[
-   {naam:'Botergele cardigan, korte mouw',mis:true,cat:'layers'},{id:'roze-maxi'},{id:'print-mini'}]},
+   {naam:'Botergele cardigan',zoek:['cardigan','vest'],kleur:'geel',cat:'layers'},{id:'roze-maxi'},{id:'print-mini'}]},
  {nr:19,naam:'Luipaard op bruin', tags:['camel','bruin','chocolade'], items:[
    {id:'mbym-leopard-top'},{naam:'Bruine wijde pantalon',mis:true,cat:'bottoms'},{id:'choco-kitten'}]},
  {nr:20,naam:'Marine onder camel', tags:['marine','camel','lichtblauw'], items:[
-   {id:'blauw-spaghet'},{naam:'Camel trenchcoat',mis:true,cat:'layers'},{id:'pullbear-balloon-jeans'}]},
+   {id:'blauw-spaghet'},{naam:'Camel trenchcoat',zoek:['trench','jas'],kleur:'camel',cat:'layers'},{id:'pullbear-balloon-jeans'}]},
  {nr:21,naam:'Baseball op zwart', tags:['ecru','zwart'], items:[
-   {naam:'Baseball shirt crème-zwart',mis:true,cat:'tops'},{naam:'Zwarte flared broek',mis:true,cat:'bottoms'},
-   {naam:'Zwarte croco enkellaarsjes',mis:true,cat:'shoes'}]},
+   {naam:'Baseball shirt crème-zwart',zoek:['baseball','shirt'],cat:'tops'},{naam:'Zwarte flared broek',zoek:['flared','flare'],cat:'bottoms'},
+   {naam:'Zwarte enkellaarsjes',zoek:['laars','laarsje','boot'],kleur:'zwart',cat:'shoes'}]},
  {nr:22,naam:'Print op denim', tags:['grijs','lichtblauw','zwart'], items:[
-   {naam:'Grijsblauw geprint cropped overhemd',mis:true,cat:'tops'},{id:'pullbear-balloon-jeans'},
-   {naam:'Zwarte croco enkellaarsjes',mis:true,cat:'shoes'}]},
+   {naam:'Grijsblauw geprint cropped overhemd',zoek:['overhemd','blouse'],cat:'tops'},{id:'pullbear-balloon-jeans'},
+   {naam:'Zwarte enkellaarsjes',zoek:['laars','laarsje','boot'],kleur:'zwart',cat:'shoes'}]},
  {nr:23,naam:'Denim jack, drie bodems', tags:['lichtblauw','zwart'], items:[
-   {naam:'Denim jacket',mis:true,cat:'layers'},{naam:'Zwarte wijde pantalon',mis:true,cat:'bottoms'},
-   {naam:'Denim mini rok',mis:true,cat:'bottoms'},{id:'pullbear-balloon-jeans'}]},
+   {naam:'Denim jacket',zoek:['denim','spijker'],cat:'layers'},{naam:'Zwarte wijde pantalon',zoek:['pantalon','wide'],kleur:'zwart',cat:'bottoms'},
+   {naam:'Denim mini rok',zoek:['denim','rok'],cat:'bottoms'},{id:'pullbear-balloon-jeans'}]},
  {nr:24,naam:'Oranje op zwart', tags:['oranje','zwart'], items:[
-   {id:'oranje-shirt'},{naam:'Zwarte flared broek',mis:true,cat:'bottoms'}]},
+   {id:'oranje-shirt'},{naam:'Zwarte flared broek',zoek:['flared','flare'],cat:'bottoms'}]},
  {nr:25,naam:'Zwart glanzend, avond', tags:['zwart'], items:[
-   {naam:'Zwarte kanten top met glans',mis:true,cat:'tops'},{naam:'Zwarte oversized blazer',mis:true,cat:'layers'},
-   {naam:'Zwarte wijde pantalon',mis:true,cat:'bottoms'},{naam:'Zwarte croco laarzen',mis:true,cat:'shoes'}]},
+   {naam:'Zwarte kanten top met glans',zoek:['kant','glans'],kleur:'zwart',cat:'tops'},{naam:'Zwarte oversized blazer',zoek:['blazer'],kleur:'zwart',cat:'layers'},
+   {naam:'Zwarte wijde pantalon',zoek:['pantalon','wide'],kleur:'zwart',cat:'bottoms'},{naam:'Zwarte laarzen',zoek:['laars','laarzen','boot'],kleur:'zwart',cat:'shoes'}]},
  {nr:26,naam:'Bruin met luipaard of oranje', tags:['chocolade','camel','oranje'], items:[
-   {naam:'Bruin cropped overhemd',mis:true,cat:'tops'},{naam:'Luipaardprint broek',mis:true,cat:'bottoms'},
-   {naam:'Oranje gebreide mini rok',mis:true,cat:'bottoms'},{naam:'Bruine wijde pantalon',mis:true,cat:'bottoms'}]},
+   {naam:'Bruin cropped overhemd',zoek:['overhemd','blouse'],kleur:'bruin',cat:'tops'},{naam:'Luipaardprint broek',zoek:['luipaard','leopard','panter'],cat:'bottoms'},
+   {naam:'Oranje gebreide mini rok',zoek:['rok'],kleur:'oranje',cat:'bottoms'},{naam:'Bruine wijde pantalon',mis:true,cat:'bottoms'}]},
  {nr:27,naam:'Kant onder leer', tags:['ecru','chocolade','zwart'], items:[
-   {id:'kanten-top'},{naam:'Bruine leren jas met ceintuur',mis:true,cat:'layers'},
-   {naam:'Zwarte flared broek',mis:true,cat:'bottoms'}]},
+   {id:'kanten-top'},{naam:'Bruine leren jas met ceintuur',zoek:['leer','leren'],cat:'layers'},
+   {naam:'Zwarte flared broek',zoek:['flared','flare'],cat:'bottoms'}]},
  {nr:28,naam:'Kleurpop op patchwork', tags:['rood','ecru'], items:[
-   {naam:'Rood T-shirt',mis:true,cat:'tops'},{naam:'Limoengroen T-shirt',mis:true,cat:'tops'},{id:'print-mini'}]},
+   {naam:'Rood T-shirt',zoek:['shirt'],kleur:'rood',cat:'tops'},{naam:'Limoengroen T-shirt',zoek:['shirt'],kleur:'groen',cat:'tops'},{id:'print-mini'}]},
  {nr:29,naam:'Denim met linnen', tags:['lichtblauw','ecru','zand'], items:[
-   {naam:'Denim jacket',mis:true,cat:'layers'},{naam:'Crème linnen short',mis:true,cat:'bottoms'}]},
+   {naam:'Denim jacket',zoek:['denim','spijker'],cat:'layers'},{naam:'Crème linnen short',zoek:['short'],cat:'bottoms'}]},
  {nr:30,naam:'Lichtblauw met ruit', tags:['lichtblauw','zwart','camel'], items:[
-   {id:'blauwe-blouse'},{naam:'Zwarte wijde pantalon',mis:true,cat:'bottoms'},
-   {naam:'Luipaardprint broek',mis:true,cat:'bottoms'}]},
+   {id:'blauwe-blouse'},{naam:'Zwarte wijde pantalon',zoek:['pantalon','wide'],kleur:'zwart',cat:'bottoms'},
+   {naam:'Luipaardprint broek',zoek:['luipaard','leopard','panter'],cat:'bottoms'}]},
  {nr:31,naam:'Ecru met teddy', tags:['ecru','chocolade','taupe'], items:[
-   {naam:'Ecru overhemd',mis:true,cat:'tops'},{naam:'Bruine teddy jas',mis:true,cat:'layers'},
-   {naam:'Geruite broek grijsbruin',mis:true,cat:'bottoms'}]},
+   {naam:'Ecru overhemd',zoek:['overhemd','blouse'],cat:'tops'},{naam:'Bruine teddy jas',zoek:['teddy','jas'],kleur:'bruin',cat:'layers'},
+   {naam:'Geruite broek grijsbruin',zoek:['ruit','geruit','check','pied'],cat:'bottoms'}]},
  {nr:32,naam:'Zacht met print', tags:['ecru','oudroze','bruin'], items:[
-   {id:'witte-cardigan'},{naam:'Roze geprinte broek',mis:true,cat:'bottoms'},{id:'choco-kitten'}]},
+   {id:'witte-cardigan'},{naam:'Roze geprinte broek',zoek:['broek','pantalon'],kleur:'roze',cat:'bottoms'},{id:'choco-kitten'}]},
  {nr:33,naam:'Sweater onder leer', tags:['ecru','chocolade','camel'], items:[
-   {naam:'Crème sweater "70"',mis:true,cat:'tops'},{naam:'Bruine leren jas met ceintuur',mis:true,cat:'layers'},
-   {naam:'Luipaardprint broek',mis:true,cat:'bottoms'},{id:'pullbear-balloon-jeans'}]},
+   {naam:'Crème sweater "70"',zoek:['sweater','70'],cat:'tops'},{naam:'Bruine leren jas met ceintuur',zoek:['leer','leren'],cat:'layers'},
+   {naam:'Luipaardprint broek',zoek:['luipaard','leopard','panter'],cat:'bottoms'},{id:'pullbear-balloon-jeans'}]},
 ];
 
 // Zoeklinks per ontbrekend item, bij winkels die Griette al draagt
@@ -917,16 +918,24 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort) {
   if (appSecret) headers['x-app-secret'] = appSecret;
 
   let res;
+  const ctrl = new AbortController();
+  const tijdKlok = setTimeout(() => ctrl.abort(), 120000);
   try {
     // Gaat naar onze eigen Supabase Edge Function; die houdt de
     // Anthropic-sleutel server-side vast.
     res = await fetch(AI_ENDPOINT, {
       method: 'POST',
       headers,
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      signal: ctrl.signal
     });
+    clearTimeout(tijdKlok);
   } catch(e) {
-    throw new Error('Geen verbinding. Check je internet.');
+    clearTimeout(tijdKlok);
+    if (e && e.name === 'AbortError') {
+      throw new Error('Het duurde te lang (meer dan 2 minuten). Probeer een lichter model via ⚙ Instellingen, of kies minder items.');
+    }
+    throw new Error('Verbinding mislukt: ' + (e && e.message ? e.message : 'onbekende oorzaak'));
   }
 
   if (!res.ok) {
@@ -959,25 +968,101 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort) {
     err.truncated = true;
     throw err;
   }
-  if (!text) throw new Error('Leeg antwoord van het model. Probeer opnieuw.');
+  if (!text) {
+    const denk = (data.content || []).find(b => b.type === 'thinking');
+    throw new Error('Het model gaf geen tekst terug'
+      + (data.stop_reason ? ' (reden: ' + data.stop_reason + ')' : '')
+      + (denk ? '. Het denkwerk vulde het antwoord.' : '')
+      + ' Probeer het opnieuw of kies een lichter model via ⚙ Instellingen.');
+  }
   return text;
 }
 
 // ── ROUTE: OUTFITS VAN ROBIN ──────────────────────────────────────────────────
 // Zet een outfit uit het rapport om naar items: wat in de kast zit wordt
 // geselecteerd, de rest komt als voorstel op de kaart.
+// Handmatige koppelingen die de gebruiker zelf legde, blijven bewaard
+let robinKoppel = {};
+try { robinKoppel = JSON.parse(localStorage.getItem('robin-koppel') || '{}'); } catch(e){}
+
+// Zoekt een item uit de LIVE garderobe dat bij Robins omschrijving past.
+// Zo verschijnen items die zelf zijn toegevoegd vanzelf, zonder dat ik ze
+// hoef te kennen.
+function zoekInKast(it) {
+  if (!it.zoek) return null;
+  const woorden = it.zoek.map(w => w.toLowerCase());
+  let beste = null, besteScore = 0;
+
+  allItems.forEach(item => {
+    const naam = (item.name || '').toLowerCase();
+    const t = itemTags[item.id] || {};
+    const kleuren = (Array.isArray(t.kleur) ? t.kleur : [t.kleur])
+      .filter(Boolean).map(k => String(k).toLowerCase());
+
+    // De naam MOET raken. Zonder dat is categorie + kleur veel te grof:
+    // een bruine ruitbroek zou dan doorgaan voor een bruine wijde pantalon.
+    if (!woorden.some(w => naam.includes(w))) return;
+
+    let score = 3;
+    if (it.cat && item.cat === it.cat) score += 2;
+    // Is er een kleur opgegeven, dan moet die ook echt blijken uit de tags of
+    // de naam. Ontbrekende kleurinformatie telde eerder als "geen bezwaar",
+    // waardoor een khaki bloemenbroek doorging voor een bruine pantalon.
+    if (it.kleur) {
+      const k = it.kleur.toLowerCase();
+      if (!(kleuren.some(c => c.includes(k)) || naam.includes(k))) return;
+      score += 3;
+    }
+    if (cloudMap[item.id]) score += 1;   // met foto is bruikbaarder op de kaart
+
+    // Alleen accepteren als naam EN categorie kloppen
+    if (score > besteScore && score >= 5) { besteScore = score; beste = item; }
+  });
+  return beste;
+}
+
 function robinNaarItems(o) {
-  return o.items.map(it => {
+  return o.items.map((it, idx) => {
+    // 1. vaste koppeling uit het rapport
     if (it.id) {
       const echt = allItems.find(i => i.id === it.id);
       if (echt) return Object.assign({}, echt, { _waarom: 'uit outfit ' + o.nr });
     }
+    // 2. koppeling die je zelf legde
+    const sleutel = o.nr + ':' + idx;
+    if (robinKoppel[sleutel]) {
+      const eigen = allItems.find(i => i.id === robinKoppel[sleutel]);
+      if (eigen) return Object.assign({}, eigen, { _waarom: 'uit outfit ' + o.nr });
+    }
+    // 3. automatisch zoeken in je huidige kast
+    const gevonden = zoekInKast(it);
+    if (gevonden) return Object.assign({}, gevonden, { _waarom: 'uit outfit ' + o.nr });
+
+    // 4. echt niet gevonden
     return {
-      id: 'sugg-r' + o.nr + '-' + Math.random().toString(36).slice(2,6),
+      id: 'sugg-r' + o.nr + '-' + idx,
       name: it.naam || 'Voorstel', cat: it.cat || 'overig', brand: '',
       _suggestion: true, _waarom: 'nog niet in je kast',
+      _robinSleutel: sleutel, _robinZoek: it,
     };
   }).slice(0, 6);
+}
+
+// Zelf een item uit de kast koppelen aan een stuk van Robin
+function koppelHandmatig(sleutel, naam) {
+  const opties = allItems.slice().sort((a,b)=>a.name.localeCompare(b.name));
+  const keuze = prompt(
+    'Welk item uit je kast is "' + naam + '"?\n\n'
+    + 'Typ een deel van de naam:', '');
+  if (!keuze) return;
+  const q = keuze.toLowerCase().trim();
+  const treffers = opties.filter(i => i.name.toLowerCase().includes(q));
+  if (!treffers.length) { alert('Niets gevonden voor "' + keuze + '".'); return; }
+  const item = treffers[0];
+  robinKoppel[sleutel] = item.id;
+  try { localStorage.setItem('robin-koppel', JSON.stringify(robinKoppel)); } catch(e){}
+  buildRobinList();
+  alert('Gekoppeld aan: ' + item.name);
 }
 
 function buildRobinList() {
@@ -992,6 +1077,9 @@ function buildRobinList() {
     }).join('');
     const regels = items.map(i => i._suggestion
       ? `<span class="rc-mis">${esc(i.name)}</span>`
+        + (i._robinSleutel
+           ? ` <button class="rc-link" onclick="event.stopPropagation();koppelHandmatig('${i._robinSleutel}','${esc(i.name).replace(/'/g,"&#39;")}')">heb ik wel</button>`
+           : '')
       : `<span class="rc-heb">${esc(i.name)}</span>`).join(' · ');
 
     const card = document.createElement('div');
@@ -1649,7 +1737,8 @@ Antwoord ALLEEN met JSON, geen tekst eromheen:
   try {
     const raw = await callClaude(system, userMsg, 16000, 'medium');
     const data = extractJson(raw);
-    if (!data) throw new Error('Geen bruikbaar antwoord');
+    if (!data) throw new Error('Antwoord was geen bruikbare JSON. Het model zei: "'
+      + String(raw).trim().slice(0, 120) + '…"');
     const arr = pickArray(data, ['items','outfit','stukken']);
     if (!arr || !arr.length) throw new Error('Geen items voorgesteld');
     outfitUitleg = (!Array.isArray(data) && data.uitleg && typeof data.uitleg === 'object')
@@ -1972,7 +2061,7 @@ Schrijf in het Nederlands. Wees concreet en eerlijk — geen lege complimenten.
 Verzin nooit een id dat niet in de garderobelijst staat.`;
 
   try {
-    const raw = await callClaude(system, userContent, 16000);
+    const raw = await callClaude(system, userContent, 24000, 'medium');
     const data = extractJson(raw);
 
     // Antwoordt de AI in gewone tekst i.p.v. JSON, toon die dan alsnog als
