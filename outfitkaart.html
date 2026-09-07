@@ -499,6 +499,19 @@ SCHOENEN & ACCESSOIRES: kitten heels zijn haar signature; New Balance voor
 casual; riemen essentieel bij oversized; sjaaltjes in felroze of lichtblauw;
 gouden sieraden; tas in een neutrale basiskleur.`;
 
+// Voor kiezen en beschrijven is de volledige set stijlregels overbodig.
+// Dit korte blok scheelt ruim duizend tokens per aanroep.
+const DNA_KORT = `Griette's stijlregels, kort:
+- Basis: donkerblauw, bruin, zwart, gebroken-wit
+- Accenten: felroze, paars, geel, oranje, oranje-rood, rood, lichtblauw, groen
+- Krachtige kleuren altijd tegen een rustige basistoon
+- Champagne en grijzige tinten dof haar gezicht; lichtgrijs werkt juist wel als
+  rustige steunkleur, en in zachte casual stof mag grijs gewoon
+- Silhouet: taille benadrukken, nooit wijd op wijd, hoge taille geeft vorm
+- Halslijn open en zacht, geen hoge of gesloten hals
+- Materiaal: soepel met stevig combineren
+- Maximaal een print per outfit`;
+
 const FW_TRENDS = `AANVULLENDE TRENDINFORMATIE (najaar/winter 2026) — SECUNDAIR.
 Gebruik dit pas nadat je het stijlrapport hebt toegepast, en alleen waar het
 Griette's DNA versterkt. Noem het expliciet als trend, niet als rapportadvies.
@@ -1358,7 +1371,7 @@ async function aiCombosVoorItem() {
   const meervoud  = anchorItems.length > 1;
 
   const kleurNamen = KLEUREN.map(k => k.v).join(', ');
-  const system = `Je bent een kleur- en stijlexpert. ${GRIETTE_DNA}\n\n${FW_TRENDS}`;
+  const system = `Je bent een kleur- en stijlexpert. ${DNA_KORT}`;
   const userContent = [{ type:'text', text:
 `Griette wil een outfit bouwen rond ${meervoud ? 'deze items' : 'dit item'} uit haar kast:
 
@@ -1587,7 +1600,7 @@ async function aiSuggestCombos() {
   const list = document.getElementById('custom-preset-list');
 
   const colorNames = customColors.map(c=>c.v).join(' en ');
-  const system = `Je bent een kleur- en stijlexpert. ${GRIETTE_DNA}\n\n${FW_TRENDS}`;
+  const system = `Je bent een kleur- en stijlexpert. ${DNA_KORT}`;
   const userMsg = `Griette heeft ${customColors.length === 1 ? 'kleur' : 'kleuren'} "${colorNames}" gekozen als ankerpunt.
 
 Geef precies 4 kleurcombo-suggesties in JSON. Elk object heeft: name (string), vibe (string), stijl (één van: streetstyle|elegant|klassiek|gedurfd), colors (array van 4 hex-codes), tags (array van 4 kleuernamen uit Griette's DNA).
@@ -1887,7 +1900,7 @@ async function aiComposeOutfit() {
     ? `${selPreset.name} — ${selPreset.vibe}${selPreset.stijl ? ' (' + selPreset.stijl + ')' : ''}, kleuren: ${(selPreset.tags||[]).join(', ')}`
     : 'geen combo gekozen';
 
-  const system = `Je bent een persoonlijke stylist voor Griette. ${GRIETTE_DNA}\n\n${FW_TRENDS}\nAntwoord in het Nederlands. Wees eerlijk: verzin geen items die niet in de lijst staan als "eigen".`;
+  const system = `Je bent een persoonlijke stylist voor Griette. ${DNA_KORT}\nAntwoord in het Nederlands. Wees eerlijk: verzin geen items die niet in de lijst staan als "eigen".`;
 
   // Items die de gebruiker zelf al koos: die moeten blijven staan.
   const reeds = selItems.filter(i => !i._suggestion);
@@ -2003,7 +2016,7 @@ async function aiSuggestDetails() {
     ? selItems.map(i=>`${i.name} (${i.cat})`).join(', ')
     : 'geen specifieke items gekozen';
 
-  const system = `Je bent een persoonlijke stylist voor Griette. ${GRIETTE_DNA}\n\n${FW_TRENDS}\nSchrijf altijd in het Nederlands. Wees direct, enthousiast en eerlijk.`;
+  const system = `Je bent een persoonlijke stylist voor Griette. ${DNA_KORT}\nSchrijf in het Nederlands. Wees direct en eerlijk.`;
   const userMsg = `Gekozen kleurcombo: ${combo}
 Geselecteerde items: ${items}
 
@@ -2240,7 +2253,7 @@ VOLGORDE VAN JE ADVIES — houd je hieraan:
 
 ${FW_TRENDS}
 
-Kijk naar de foto's hieronder en beoordeel elk item op kleur, vorm/silhouet en textuur.
+Beoordeel elk item op kleur, vorm/silhouet en textuur.
 
 Werkt een item niet goed in deze combinatie, VERVANG het dan door een beter item
 uit de garderobe hierboven (neem het exacte id over). Een item dat als VAST staat
@@ -2261,13 +2274,22 @@ Antwoord ALLEEN met JSON:
  "ontbreekt":[{"wat":"korte omschrijving, bijv. zwarte flared broek","waarom":"waarom dit een echte aanvulling is","zoekterm":"twee of drie woorden om op te zoeken"}]
 }` });
 
-  selItems.forEach(item => {
-    const url = cloudMap[item.id];
-    if (url) {
-      userContent.push({ type:'image', source:{ type:'url', url } });
+  // Zijn alle items al gescand, dan staat wat op de foto te zien is al als
+  // tekst in de garderobelijst. De foto's nogmaals meesturen kost duizenden
+  // tokens en voegt dan niets toe.
+  const metFoto = selItems.filter(i => cloudMap[i.id] && !i._suggestion);
+  const alGescand = metFoto.length > 0 && metFoto.every(i => itemVisueel[i.id]);
+
+  if (!alGescand) {
+    metFoto.forEach(item => {
+      userContent.push({ type:'image', source:{ type:'url', url: cloudMap[item.id] } });
       userContent.push({ type:'text', text:`(Foto van: ${item.name})` });
-    }
-  });
+    });
+  } else {
+    userContent.push({ type:'text', text:
+      'De foto\'s zijn al eerder bekeken; wat erop te zien is staat hierboven ' +
+      'bij elk item onder "GEZIEN OP FOTO". Gebruik die beschrijvingen.' });
+  }
 
   const system = `Je bent een eerlijke, deskundige persoonlijke stylist voor Griette. ${GRIETTE_DNA}
 Schrijf in het Nederlands. Wees concreet en eerlijk — geen lege complimenten.
