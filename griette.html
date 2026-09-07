@@ -1475,6 +1475,34 @@ supabaseGet('item-visueel').then(function(v) {
   }
 }).catch(function(){});
 
+// Het stijlprofiel dat de outfitkaart uit haar inspiratieplaat destilleerde.
+// Het stijlrapport zegt wat haar staat; dit zegt wat zij mooi vindt. De stylist
+// hier hoort dat net zo goed te kennen als daar.
+let stijlProfiel = null;
+try { stijlProfiel = JSON.parse(localStorage.getItem('griette-stijlprofiel-v1') || 'null'); } catch(e) {}
+supabaseGet('stijlprofiel').then(function(p) {
+  if (p && typeof p === 'object') {
+    stijlProfiel = p;
+    try { localStorage.setItem('griette-stijlprofiel-v1', JSON.stringify(p)); } catch(e) {}
+  }
+}).catch(function(){});
+
+function profielBlok() {
+  var p = stijlProfiel;
+  if (!p) return '';
+  var stukken = [p.kern, p.silhouet, p.kleuren, p.texturen, p.accessoires,
+                 Array.isArray(p.regels) ? p.regels.join(' ') : '']
+                .filter(Boolean).join(' ');
+  if (!stukken.trim()) return '';
+  return '\n\n## Haar eigen smaak (' + (p.bron === 'uitgevraagd'
+      ? 'uit haar antwoorden op stijlvragen'
+      : 'gedestilleerd uit haar inspiratieplaat') + ')\n'
+    + stukken.slice(0, 900)
+    + '\nDit is wat zij zelf mooi vindt. Het stijlrapport blijft leidend voor wat '
+    + 'haar staat; dit profiel bepaalt de richting binnen die grenzen. Botsen ze, '
+    + 'kies dan het rapport en zeg erbij dat je dat doet.';
+}
+
 // Korte omschrijving van wat er op de foto te zien is, voor in AI-prompts
 function visueelTekst(id) {
   var v = itemVisueel[id];
@@ -11127,7 +11155,7 @@ ${(function(){
     return txt;
   } catch(e) { return ''; }
 })()}
-Spreek altijd Nederlands. Wees bondig. Eindig altijd met één concrete actie of beslissing.`;
+Spreek altijd Nederlands. Wees bondig. Eindig altijd met één concrete actie of beslissing.${profielBlok()}`;
 }
 
 function appendChatMessage(role, text) {

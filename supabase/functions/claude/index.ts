@@ -21,7 +21,10 @@ const ALLOWED_MODELS = [
 ];
 
 const MAX_TOKENS_CAP = 32000;   // denk-tokens tellen mee; te krap levert lege antwoorden
-const MAX_BODY_BYTES = 256 * 1024;
+// Ruim genoeg voor een inspiratieplaat van twaalf verkleinde foto's. De vorige
+// 256 KB was te krap: een enkele schermafdruk van een telefoon haalde dat al.
+// De grens blijft bestaan zodat een misbruikte aanroep begrensd blijft.
+const MAX_BODY_BYTES = 5 * 1024 * 1024;
 
 function corsHeaders(origin: string, allowed: boolean) {
   return {
@@ -72,7 +75,11 @@ Deno.serve(async (req: Request) => {
 
   const raw = await req.text();
   if (raw.length > MAX_BODY_BYTES) {
-    return err("Verzoek te groot.", 413, cors);
+    return err(
+      "Verzoek te groot: er zit te veel beeld in. Kies een kleinere schermafdruk, of stuur minder foto's tegelijk.",
+      413,
+      cors,
+    );
   }
 
   let body: Record<string, unknown>;
