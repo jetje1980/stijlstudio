@@ -90,6 +90,14 @@ Deno.serve(async (req: Request) => {
   const requested = typeof body.max_tokens === "number" ? body.max_tokens : 8000;
   body.max_tokens = Math.min(Math.max(requested, 256), MAX_TOKENS_CAP);
 
+  // Haiku 4.5 kent de effort-parameter niet en geeft dan een 400 terug.
+  // Weghalen in plaats van de aanroep laten mislukken.
+  if (/haiku/i.test(String(body.model)) && body.output_config) {
+    const oc = body.output_config as Record<string, unknown>;
+    delete oc.effort;
+    if (Object.keys(oc).length === 0) delete body.output_config;
+  }
+
   let upstream: Response;
   try {
     upstream = await fetch("https://api.anthropic.com/v1/messages", {
