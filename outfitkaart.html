@@ -221,6 +221,12 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
       <div class="sec-label">Foto's scannen</div>
       <div class="modal-note" style="margin-bottom:8px;">Eenmalig je foto's laten bekijken op kleur, silhouet en textuur. Daarna weegt de AI dat mee bij het samenstellen van outfits, in plaats van alleen op naam en tags af te gaan.</div>
+      <select class="modal-field" id="scan-model" style="margin-bottom:8px;font-size:12px;padding:9px 11px;">
+        <option value="claude-haiku-4-5">Haiku 4.5 — snelst en goedkoopst</option>
+        <option value="claude-sonnet-5">Sonnet 5 — nauwkeuriger</option>
+        <option value="claude-opus-5">Opus 5 — meest nauwkeurig</option>
+      </select>
+      <div class="field-note" id="scan-kosten" style="margin-bottom:8px;"></div>
       <button class="ai-btn" id="scan-btn" onclick="scanKast()">📷 Scan foto's</button>
       <div class="field-note" id="scan-status" style="margin-top:6px;"></div>
       <button class="btn-rescan" onclick="if(confirm('Alle beschrijvingen wissen en opnieuw scannen?'))scanKast(true)">Opnieuw scannen</button>
@@ -848,6 +854,7 @@ const isAnker = id => anchorItems.some(a => a.id === id);
 let appSecret = '';
 let aiModel = 'claude-opus-5';   // alleen voor de zware analyse
 let zuinig = true;               // lichte taken op het goedkoopste model
+let scanModel = 'claude-haiku-4-5';  // eenmalige foto-scan; los te kiezen
 const MODEL_LICHT = 'claude-haiku-4-5';
 const PRIJS = {                  // euro per miljoen tokens (invoer, uitvoer)
   'claude-opus-5':[5,25], 'claude-sonnet-5':[2,10], 'claude-haiku-4-5':[1,5],
@@ -877,6 +884,9 @@ function openSettings() {
   bijwerkScanKnop();
   bijwerkVerbruik();
   document.getElementById('zuinig-check').checked = zuinig;
+  const sm = document.getElementById('scan-model');
+  sm.value = scanModel;
+  sm.onchange = bijwerkScanKosten;
   document.getElementById('app-secret-input').value = appSecret;
   document.getElementById('ai-model-select').value = aiModel;
   document.getElementById('settings-modal').classList.add('open');
@@ -885,6 +895,8 @@ function closeSettings() {
   document.getElementById('settings-modal').classList.remove('open');
 }
 function saveSettings() {
+  scanModel = document.getElementById('scan-model').value;
+  try { localStorage.setItem('ai-scanmodel', scanModel); } catch(e){}
   appSecret = document.getElementById('app-secret-input').value.trim();
   aiModel   = document.getElementById('ai-model-select').value;
   zuinig    = document.getElementById('zuinig-check').checked;
@@ -899,6 +911,7 @@ async function init() {
   try { appSecret = localStorage.getItem('app-secret') || ''; } catch(e){}
   try { aiModel = localStorage.getItem('ai-model') || 'claude-opus-5'; } catch(e){}
   try { zuinig = localStorage.getItem('ai-zuinig') !== '0'; } catch(e){}
+  try { scanModel = localStorage.getItem('ai-scanmodel') || 'claude-haiku-4-5'; } catch(e){}
   try { cloudMap = JSON.parse(localStorage.getItem('griette-cloud-photos-v1')||'{}'); } catch(e){}
   try { itemTags = JSON.parse(localStorage.getItem('griette-item-tags-v3')||'{}'); } catch(e){}
 
@@ -981,7 +994,9 @@ async function sbGet(key) {
 // taak 'licht'  = kiezen, beschrijven, invullen — gaat op het goedkoopste model
 // taak 'zwaar'  = de uitgebreide beeldanalyse — gebruikt het gekozen model
 async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
-  const model = (taak === 'zwaar' && !zuinig) ? aiModel : MODEL_LICHT;
+  const model = taak === 'scan'  ? scanModel
+              : (taak === 'zwaar' && !zuinig) ? aiModel
+              : MODEL_LICHT;
 
   const body = {
     model,
@@ -993,7 +1008,9 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
     system: [{ type:'text', text: systemPrompt, cache_control:{ type:'ephemeral' } }],
     messages: [{ role:'user', content: userContent }]
   };
-  if (effort) body.output_config = { effort };
+  // Let op: Haiku 4.5 kent de effort-parameter niet en geeft dan een fout.
+  // Alleen meesturen bij modellen die hem wel ondersteunen.
+  if (effort && !/haiku/i.test(model)) body.output_config = { effort };
   const headers = { 'content-type': 'application/json' };
   if (appSecret) headers['x-app-secret'] = appSecret;
 
@@ -1785,6 +1802,8 @@ function nogTeScannen() {
 }
 
 async function scanKast(opnieuw) {
+  const sel = document.getElementById('scan-model');
+  if (sel) scanModel = sel.value;
   const btn = document.getElementById('scan-btn');
   const st  = document.getElementById('scan-status');
   if (opnieuw) itemVisueel = {};
@@ -1826,7 +1845,7 @@ Antwoord ALLEEN met een JSON-array in dezelfde volgorde als de foto's:
     });
 
     try {
-      const raw = await callClaude(system, inhoud, 6000, 'low', 'licht');
+      const raw = await callClaude(system, inhoud, 6000, 'low', 'scan');
       const arr = pickArray(extractJson(raw), ['items','beschrijvingen']);
       if (arr) {
         arr.forEach(b => {
@@ -1856,10 +1875,24 @@ Antwoord ALLEEN met een JSON-array in dezelfde volgorde als de foto's:
   bijwerkScanKnop();
 }
 
+function bijwerkScanKosten() {
+  const sel = document.getElementById('scan-model');
+  const el  = document.getElementById('scan-kosten');
+  if (!sel || !el) return;
+  const n = nogTeScannen().length;
+  if (!n) { el.textContent = ''; return; }
+  const [pi, po] = PRIJS[sel.value] || PRIJS[MODEL_LICHT];
+  const groepjes = Math.ceil(n / 6);
+  const euro = (n*1500*pi + groepjes*450*pi + n*120*po) / 1000000;
+  const min  = Math.max(1, Math.round(groepjes * (sel.value.includes('haiku') ? 4 : sel.value.includes('sonnet') ? 7 : 12) / 60));
+  el.innerHTML = `Eenmalig ongeveer <b>€ ${euro.toFixed(2)}</b> voor ${n} foto's, circa ${min} min.`;
+}
+
 function bijwerkScanKnop() {
   const btn = document.getElementById('scan-btn');
   const st  = document.getElementById('scan-status');
   if (!btn) return;
+  bijwerkScanKosten();
   const open = nogTeScannen().length;
   const gescand = Object.keys(itemVisueel).length;
   btn.textContent = open ? `📷 Scan ${open} foto${open===1?'':'\'s'}` : '📷 Alles gescand';
