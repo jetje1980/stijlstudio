@@ -175,6 +175,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 .modal-note{font-size:10px;color:var(--text-2);margin-top:6px;line-height:1.5;}
 .modal-actions{display:flex;gap:10px;margin-top:16px;}
 .modal-save{flex:1;padding:13px;background:var(--text);color:var(--bg);border:none;border-radius:10px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
+.btn-rescan{width:100%;margin-top:8px;padding:9px;background:transparent;border:1.5px solid var(--border);border-radius:10px;font-family:'Inter',sans-serif;font-size:11px;color:var(--text-2);cursor:pointer;}
 .modal-cancel{padding:13px 18px;background:transparent;border:1.5px solid var(--border);border-radius:10px;font-family:'Inter',sans-serif;font-size:13px;color:var(--text-2);cursor:pointer;}
 </style>
 </head>
@@ -206,6 +207,14 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <option value="claude-sonnet-5">Sonnet 5 — goede balans</option>
       <option value="claude-haiku-4-5">Haiku 4.5 — snelst &amp; goedkoopst</option>
     </select>
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+      <div class="sec-label">Foto's scannen</div>
+      <div class="modal-note" style="margin-bottom:8px;">Eenmalig je foto's laten bekijken op kleur, silhouet en textuur. Daarna weegt de AI dat mee bij het samenstellen van outfits, in plaats van alleen op naam en tags af te gaan.</div>
+      <button class="ai-btn" id="scan-btn" onclick="scanKast()">📷 Scan foto's</button>
+      <div class="field-note" id="scan-status" style="margin-top:6px;"></div>
+      <button class="btn-rescan" onclick="if(confirm('Alle beschrijvingen wissen en opnieuw scannen?'))scanKast(true)">Opnieuw scannen</button>
+    </div>
+
     <div class="modal-actions">
       <button class="modal-save" onclick="saveSettings()">Opslaan</button>
       <button class="modal-cancel" onclick="closeSettings()">Sluiten</button>
@@ -281,7 +290,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 <!-- STEP 2: ITEMS -->
 <div class="panel" id="p2">
   <div>
-    <button class="ai-btn" id="ai-compose-btn" onclick="aiComposeOutfit()" style="margin-bottom:6px;">✨ Laat AI een outfit samenstellen uit mijn kast</button>
+    <button class="ai-btn" id="ai-compose-btn" onclick="aiComposeOutfit().catch(function(){})" style="margin-bottom:6px;">✨ Laat AI een outfit samenstellen uit mijn kast</button>
     <div class="field-note" id="ai-compose-status" style="text-align:center;margin-bottom:12px;">Kies zelf items, of laat de AI kiezen en aanvullen met voorstellen.</div>
     <div class="sec-label" id="item-count-label">Items — optioneel (max 6)</div>
     <div class="item-grid" id="item-grid"></div>
@@ -817,6 +826,7 @@ const AI_ENDPOINT = SUPABASE_URL + '/functions/v1/claude';
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────────
 function openSettings() {
+  bijwerkScanKnop();
   document.getElementById('app-secret-input').value = appSecret;
   document.getElementById('ai-model-select').value = aiModel;
   document.getElementById('settings-modal').classList.add('open');
@@ -863,6 +873,7 @@ async function init() {
     seen.add(i.id); return true;
   });
   customCount = allItems.filter(i=>String(i.id).startsWith('custom-')).length;
+  await laadVisueel();
 
   buildComboTypes();
 }
@@ -891,6 +902,17 @@ function normalizeCustom(raw) {
     else if (list && typeof list==='object') add(list, cat);   // los object
   });
   return out;
+}
+
+async function sbSet(key, value) {
+  try {
+    await fetch(SUPABASE_URL+'/rest/v1/griette_data', {
+      method:'POST',
+      headers:{ apikey:SUPABASE_KEY, Authorization:'Bearer '+SUPABASE_KEY,
+                'Content-Type':'application/json', Prefer:'resolution=merge-duplicates' },
+      body: JSON.stringify({ key, value: JSON.stringify(value), updated_at: new Date().toISOString() })
+    });
+  } catch(e){}
 }
 
 async function sbGet(key) {
@@ -1666,6 +1688,115 @@ function pickArray(data, keys) {
   return first || null;
 }
 
+// ── FOTO'S SCANNEN ────────────────────────────────────────────────────────────
+// De AI koos items op naam en tags, zonder ooit de foto te zien. Silhouet,
+// volume, textuur en de werkelijke kleur zitten niet in een naam. Daarom
+// scannen we elke foto eenmalig en bewaren we een compacte beschrijving.
+// Die reist daarna mee in elke outfit-aanroep, ook in griette.html.
+let itemVisueel = {};
+
+async function laadVisueel() {
+  try { itemVisueel = JSON.parse(localStorage.getItem('griette-item-visueel') || '{}'); } catch(e){}
+  const sb = await sbGet('item-visueel');
+  if (sb && typeof sb === 'object') Object.assign(itemVisueel, sb);
+}
+
+async function bewaarVisueel() {
+  try { localStorage.setItem('griette-item-visueel', JSON.stringify(itemVisueel)); } catch(e){}
+  await sbSet('item-visueel', itemVisueel);
+}
+
+function nogTeScannen() {
+  return allItems.filter(i => cloudMap[i.id] && !itemVisueel[i.id]);
+}
+
+async function scanKast(opnieuw) {
+  const btn = document.getElementById('scan-btn');
+  const st  = document.getElementById('scan-status');
+  if (opnieuw) itemVisueel = {};
+
+  const todo = nogTeScannen();
+  if (!todo.length) {
+    st.textContent = 'Alle items met foto zijn al gescand ('
+      + Object.keys(itemVisueel).length + ').';
+    return;
+  }
+
+  btn.disabled = true;
+  const BATCH = 6;
+  let klaar = 0, mislukt = 0;
+
+  const system = `Je beschrijft kledingstukken op de foto, kort en feitelijk.
+Geen stijladvies, geen complimenten. Alleen wat je ziet.`;
+
+  for (let i = 0; i < todo.length; i += BATCH) {
+    const groep = todo.slice(i, i + BATCH);
+    st.textContent = `Scannen… ${klaar} van ${todo.length}`;
+
+    const inhoud = [{ type:'text', text:
+`Beschrijf elk kledingstuk hieronder. Per foto krijg je de naam en het volgnummer.
+
+Geef per item terug:
+- kleur: de werkelijke kleur die je ziet, in gewone woorden (bijv. "diep chocoladebruin", "verwassen lichtblauw")
+- vorm: het silhouet (bijv. "recht en licht oversized", "wijd uitlopend vanaf de heup", "getailleerd")
+- textuur: het materiaaloppervlak (bijv. "grof gebreid", "glad satijn", "ruwe denim", "zacht suède")
+- details: maximaal 3 woorden over opvallende details (bijv. "gouden knopen", "hoge taille", "raglanmouw")
+- volume: een van luchtig, medium, zwaar
+
+Antwoord ALLEEN met een JSON-array in dezelfde volgorde als de foto's:
+[{"nr":1,"kleur":"...","vorm":"...","textuur":"...","details":"...","volume":"..."}]` }];
+
+    groep.forEach((it, n) => {
+      inhoud.push({ type:'text', text: `Foto ${n+1}: ${it.name} (${it.cat})` });
+      inhoud.push({ type:'image', source:{ type:'url', url: cloudMap[it.id] } });
+    });
+
+    try {
+      const raw = await callClaude(system, inhoud, 6000, 'low');
+      const arr = pickArray(extractJson(raw), ['items','beschrijvingen']);
+      if (arr) {
+        arr.forEach(b => {
+          const idx = (Number(b && b.nr) || 0) - 1;
+          const item = groep[idx];
+          if (!item || !b) return;
+          itemVisueel[item.id] = {
+            kleur: b.kleur || '', vorm: b.vorm || '', textuur: b.textuur || '',
+            details: b.details || '', volume: b.volume || '',
+          };
+          klaar++;
+        });
+      }
+    } catch(e) {
+      mislukt += groep.length;
+      st.textContent = 'Gestopt na een fout: ' + e.message;
+      break;
+    }
+    await bewaarVisueel();
+  }
+
+  await bewaarVisueel();
+  st.innerHTML = `<b>${klaar}</b> item${klaar===1?'':'s'} gescand`
+    + (mislukt ? `, ${mislukt} mislukt` : '')
+    + `. Totaal bekend: ${Object.keys(itemVisueel).length}.`;
+  btn.disabled = false;
+  bijwerkScanKnop();
+}
+
+function bijwerkScanKnop() {
+  const btn = document.getElementById('scan-btn');
+  const st  = document.getElementById('scan-status');
+  if (!btn) return;
+  const open = nogTeScannen().length;
+  const gescand = Object.keys(itemVisueel).length;
+  btn.textContent = open ? `📷 Scan ${open} foto${open===1?'':'\'s'}` : '📷 Alles gescand';
+  btn.disabled = open === 0;
+  if (st && !st.textContent) {
+    st.textContent = gescand
+      ? `${gescand} items met visuele beschrijving.`
+      : 'Nog niets gescand — de AI kiest nu op naam en tags.';
+  }
+}
+
 // ── AI: OUTFIT SAMENSTELLEN UIT DE KAST ───────────────────────────────────────
 function wardrobeForAI() {
   return allItems.map(i => {
@@ -1673,7 +1804,12 @@ function wardrobeForAI() {
     const val = v => Array.isArray(v) ? v.join('/') : (v || '');
     const extra = [val(t.kleur), val(t.patroon), val(t.materiaal), val(t.pasvorm), val(t.soort)]
       .filter(Boolean).join(', ');
-    return `${i.id} | ${i.cat} | ${i.name}${extra ? ' | ' + extra : ''}${cloudMap[i.id] ? ' | heeft foto' : ''}`;
+    const v = itemVisueel[i.id];
+    const gezien = v
+      ? ' | GEZIEN OP FOTO: ' + [v.kleur, v.vorm, v.textuur, v.details, v.volume && ('volume ' + v.volume)]
+          .filter(Boolean).join('; ')
+      : (cloudMap[i.id] ? ' | heeft foto (nog niet gescand)' : '');
+    return `${i.id} | ${i.cat} | ${i.name}${extra ? ' | ' + extra : ''}${gezien}`;
   }).join('\n');
 }
 
@@ -1714,6 +1850,10 @@ Regels:
 - Gebruik BIJ VOORKEUR items uit de lijst hierboven. Neem dan het exacte id over.
 - Zorg voor een compleet silhouet: iets voor boven, iets voor onder (of een jurk),
   schoenen, en waar passend een laag, tas of accessoire.
+- Bij items staat waar mogelijk "GEZIEN OP FOTO" met de werkelijke kleur, het
+  silhouet, de textuur en het volume. Weeg dat zwaarder dan de naam of de tags:
+  daar staat wat het item echt is. Gebruik het om het silhouet in balans te
+  houden (nooit wijd op wijd) en om soepel met stevig te combineren.
 - Een jas of blazer telt als EXTRA laag bovenop een cardigan of gilet. Voeg er een
   toe als het seizoen of de gelegenheid erom vraagt; de tag "soort" zegt om wat
   voor laag het gaat.
