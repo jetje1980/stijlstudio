@@ -503,7 +503,14 @@ gecombineerd met een effen stuk in bijpassende tint.
 
 SCHOENEN & ACCESSOIRES: kitten heels zijn haar signature; New Balance voor
 casual; riemen essentieel bij oversized; sjaaltjes in felroze of lichtblauw;
-gouden sieraden; tas in een neutrale basiskleur.`;
+gouden sieraden; tas in een neutrale basiskleur.
+
+WAAR HET RAPPORT ZWIJGT: het rapport dekt niet alles. Over schoenkeuze bij een
+specifiek silhouet, proporties van tassen, hoe je lagen opbouwt of wat op dit
+moment gangbaar is, staat weinig of niets. Val daar terug op je eigen kennis
+als stylist en oordeel zelf. Zeg er dan bij dat het jouw inschatting is en niet
+uit haar rapport komt. Verzin geen regels die er niet staan, maar laat een vraag
+ook niet onbeantwoord omdat het rapport erover zwijgt.`;
 
 // Voor kiezen en beschrijven is de volledige set stijlregels overbodig.
 // Dit korte blok scheelt ruim duizend tokens per aanroep.
@@ -516,7 +523,9 @@ const DNA_KORT = `Griette's stijlregels, kort:
 - Silhouet: taille benadrukken, nooit wijd op wijd, hoge taille geeft vorm
 - Halslijn open en zacht, geen hoge of gesloten hals
 - Materiaal: soepel met stevig combineren
-- Maximaal een print per outfit`;
+- Maximaal een print per outfit
+Dekt dit een vraag niet, bijvoorbeeld over schoenkeuze of proporties, oordeel
+dan zelf als stylist en zeg erbij dat het jouw inschatting is.`;
 
 const FW_TRENDS = `AANVULLENDE TRENDINFORMATIE (najaar/winter 2026) — SECUNDAIR.
 Gebruik dit pas nadat je het stijlrapport hebt toegepast, en alleen waar het
@@ -855,7 +864,8 @@ let appSecret = '';
 let aiModel = 'claude-opus-5';   // alleen voor de zware analyse
 let zuinig = true;               // lichte taken op het goedkoopste model
 let scanModel = 'claude-haiku-4-5';  // eenmalige foto-scan; los te kiezen
-const MODEL_LICHT = 'claude-haiku-4-5';
+const MODEL_LICHT = 'claude-haiku-4-5';    // formatteren en beschrijven
+const MODEL_OORDEEL = 'claude-sonnet-5';  // samenstellen en beoordelen
 const PRIJS = {                  // euro per miljoen tokens (invoer, uitvoer)
   'claude-opus-5':[5,25], 'claude-sonnet-5':[2,10], 'claude-haiku-4-5':[1,5],
 };
@@ -994,9 +1004,15 @@ async function sbGet(key) {
 // taak 'licht'  = kiezen, beschrijven, invullen — gaat op het goedkoopste model
 // taak 'zwaar'  = de uitgebreide beeldanalyse — gebruikt het gekozen model
 async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
-  const model = taak === 'scan'  ? scanModel
-              : (taak === 'zwaar' && !zuinig) ? aiModel
-              : MODEL_LICHT;
+  // Wat voor soort taak is dit?
+  //   scan   = beschrijven wat je op een foto ziet -> waarnemen, goedkoop kan
+  //   licht  = tekst formatteren, velden invullen  -> goedkoop kan
+  //   kies   = outfit samenstellen of verbeteren   -> OORDEEL, capabel model
+  //   zwaar  = uitgebreide analyse                 -> OORDEEL, capabel model
+  const model = taak === 'scan' ? scanModel
+              : (taak === 'kies' || taak === 'zwaar')
+                  ? (zuinig ? MODEL_OORDEEL : aiModel)
+                  : MODEL_LICHT;
 
   const body = {
     model,
@@ -1417,7 +1433,7 @@ Antwoord ALLEEN met een JSON-array:
   });
 
   try {
-    const raw = await callClaude(system, userContent, 8000, 'low', 'licht');
+    const raw = await callClaude(system, userContent, 8000, 'low', 'kies');
     const combos = pickArray(extractJson(raw), ['combos','suggesties']);
     if (!combos || !combos.length) throw new Error('Geen combo\'s ontvangen');
 
@@ -1771,10 +1787,14 @@ function extractJson(raw) {
 }
 
 // Zoekt de itemlijst, of die nu kaal is of in een object zit
-function pickArray(data, keys) {
+// strikt = alleen de genoemde sleutels. Zonder dat pakte de losse terugval
+// bij een analyse de wissels-lijst als outfit, en kwam er "Voorstel" op de
+// kaart in plaats van de echte items.
+function pickArray(data, keys, strikt) {
   if (Array.isArray(data)) return data;
   if (!data || typeof data !== 'object') return null;
   for (const k of keys) if (Array.isArray(data[k])) return data[k];
+  if (strikt) return null;
   const first = Object.values(data).find(v => Array.isArray(v));
   return first || null;
 }
@@ -1970,6 +1990,17 @@ Regels:
   eerlijk voorstel dan een item forceren dat niet past.
 - Maximaal 2 nieuwe voorstellen; de rest moet uit haar kast komen.
 
+CONTROLEER JE EIGEN ANTWOORD VOORDAT JE HET GEEFT:
+- Past elk item echt in de gekozen kleurcombo? Zo niet, kies een ander item.
+  Lever nooit een item met een opmerking als "fout" of "vervangen" erbij; kies
+  dan gewoon meteen het juiste item.
+- Het veld "waarom" is een korte, positieve reden waarom dit item hier ligt.
+  Geen correcties, geen twijfel, geen verwijzingen naar je eigen keuzeproces.
+- Niet wijd op wijd: check dat boven- en onderstuk elkaar in balans houden.
+- Hoogstens twee opvallende kleuren; de rest is rustige basis.
+- Geen dubbele functie: niet twee rokken, niet twee paar schoenen, niet drie
+  tops. Een compleet silhouet betekent verschillende rollen.
+
 Leg daarnaast uit WAAROM deze combinatie klopt, in drie korte stukjes:
 - kleur: hoe de kleuren zich tot elkaar verhouden en waarom dat werkt bij haar Winter DNA
 - vorm: hoe de silhouetten en pasvormen elkaar in balans houden (volume tegenover strak)
@@ -1977,12 +2008,12 @@ Leg daarnaast uit WAAROM deze combinatie klopt, in drie korte stukjes:
 Elk stukje maximaal 20 woorden, concreet, geen holle frasen.
 
 Antwoord ALLEEN met JSON, geen tekst eromheen:
-{"items":[{"id":"exact-id-uit-de-lijst-of-null","naam":"korte naam","categorie":"tops|bottoms|layers|jurken|bags|shoes|accessories","eigen":true,"waarom":"max 7 woorden waarom dit item hier ligt"}],
+{"items":[{"id":"exact-id-uit-de-lijst-of-null","naam":"korte naam","categorie":"tops|bottoms|layers|jurken|bags|shoes|accessories","eigen":true,"waarom":"max 7 woorden, positieve reden waarom dit item hier ligt"}],
  "uitleg":{"kleur":"...","vorm":"...","textuur":"..."},
  "waarom_top":"2 zinnen: waarom dit als geheel een sterke combinatie is"}`;
 
   try {
-    const raw = await callClaude(system, userMsg, 16000, 'medium', 'licht');
+    const raw = await callClaude(system, userMsg, 16000, 'medium', 'kies');
     const data = extractJson(raw);
     if (!data) throw new Error('Antwoord was geen bruikbare JSON. Het model zei: "'
       + String(raw).trim().slice(0, 120) + '…"');
@@ -2296,9 +2327,17 @@ Vervang niet om te vervangen: klopt de outfit al, laat hem dan staan.
 
 Wees eerlijk. Als iets niet ideaal is en de kast biedt geen oplossing, zeg dat.
 
+CONTROLEER VOORDAT JE ANTWOORDT:
+- "outfit" bevat ALTIJD de volledige, definitieve outfit — ook de items die je
+  niet verandert. Laat dit veld nooit leeg; zonder complete lijst kan de kaart
+  je advies niet volgen.
+- Elke wissel in "wissels" moet terugkomen in "outfit". Noem geen verbetering
+  die niet in de outfit staat.
+- Geen dubbele functie: niet twee rokken, niet twee paar schoenen.
+
 Antwoord ALLEEN met JSON:
 {
- "outfit":[{"id":"exact-id-of-null","naam":"...","categorie":"tops|bottoms|layers|jurken|bags|shoes|accessories","eigen":true,"waarom":"max 7 woorden waarom dit item hier ligt"}],
+ "outfit":[{"id":"exact-id-of-null","naam":"...","categorie":"tops|bottoms|layers|jurken|bags|shoes|accessories","eigen":true,"waarom":"max 7 woorden, positieve reden waarom dit item hier ligt"}],
  "wissels":[{"van":"naam oud item","naar":"naam nieuw item","reden":"waarom dit beter is"}],
  "uitleg":{"kleur":"max 20 woorden","vorm":"max 20 woorden","textuur":"max 20 woorden"},
  "waarom_top":"2 zinnen: waarom dit als geheel een sterke combinatie is",
@@ -2343,9 +2382,32 @@ Verzin nooit een id dat niet in de garderobelijst staat.`;
     }
 
     // Nieuwe, geperfectioneerde outfit overnemen
-    const arr = pickArray(data, ['outfit','items']);
+    let arr = pickArray(data, ['outfit','items'], true);   // strikt: nooit 'wissels' pakken
     let vervangen = 0;
     const herstelde = [];
+    let viaWissels = false;
+
+    // Geeft de AI wel wissels maar geen complete outfit terug, dan liep de
+    // kaart uit de pas met het advies: het paneel toonde verbeteringen die
+    // nergens werden doorgevoerd. Dan passen we de wissels zelf toe.
+    if ((!arr || !arr.length) && Array.isArray(data.wissels) && data.wissels.length) {
+      const kopie = selItems.slice();
+      data.wissels.forEach(w => {
+        if (!w || !w.naar) return;
+        const vervanger = allItems.find(i =>
+          i.name.toLowerCase() === String(w.naar).toLowerCase()) ||
+          allItems.find(i => i.name.toLowerCase().includes(String(w.naar).toLowerCase().slice(0,14)));
+        const idx = w.van
+          ? kopie.findIndex(i => i.name.toLowerCase().includes(String(w.van).toLowerCase().slice(0,14)))
+          : -1;
+        if (vervanger && idx >= 0) {
+          kopie[idx] = Object.assign({}, vervanger, { _waarom: w.reden || '' });
+          viaWissels = true;
+        }
+      });
+      if (viaWissels) arr = kopie.map(i => ({ id:i.id, naam:i.name, categorie:i.cat, waarom:i._waarom }));
+    }
+
     if (arr && arr.length) {
       const oudeNamen = selItems.map(i=>i.name);
       const nieuw = [];
@@ -2377,6 +2439,14 @@ Verzin nooit een id dat niet in de garderobelijst staat.`;
     if (typeof data.waarom_top === 'string') outfitTop = data.waarom_top;
 
     buildKaart();
+
+    // Nooit stil uit de pas lopen met het advies
+    const genoemd = Array.isArray(data.wissels) ? data.wissels.length : 0;
+    if (genoemd && !vervangen && !viaWissels) {
+      showCardNotice('De analyse noemt ' + genoemd + ' verbetering'
+        + (genoemd===1?'':'en') + ', maar die kon ik niet automatisch doorvoeren. '
+        + 'Lees ze hieronder en pas de items zelf aan via stap 2.');
+    }
     if (herstelde.length) showCardNotice(
       'De AI wilde <b>' + herstelde.map(esc).join('</b> en <b>') + '</b> vervangen, maar '
       + (herstelde.length > 1 ? 'dat zijn je uitgangspunten' : 'dat is je uitgangspunt')
