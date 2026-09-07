@@ -1463,6 +1463,27 @@ const photos = {}; // id → dataURL
 // Track permanently deleted items
 let deletedItemIds = new Set();
 
+// Visuele beschrijvingen die de outfitkaart uit de foto's haalde. Zonder deze
+// kiest de stylist op naam en tags, en ziet hij silhouet, volume en de
+// werkelijke kleur dus niet.
+let itemVisueel = {};
+try { itemVisueel = JSON.parse(localStorage.getItem('griette-item-visueel') || '{}'); } catch(e) {}
+supabaseGet('item-visueel').then(function(v) {
+  if (v && typeof v === 'object') {
+    Object.assign(itemVisueel, v);
+    try { localStorage.setItem('griette-item-visueel', JSON.stringify(itemVisueel)); } catch(e) {}
+  }
+}).catch(function(){});
+
+// Korte omschrijving van wat er op de foto te zien is, voor in AI-prompts
+function visueelTekst(id) {
+  var v = itemVisueel[id];
+  if (!v) return '';
+  var d = [v.kleur, v.vorm, v.textuur, v.details, v.volume && ('volume ' + v.volume)]
+    .filter(Boolean).join('; ');
+  return d ? ' {foto: ' + d + '}' : '';
+}
+
 function loadDeletedItems() {
   // SYNC: load from localStorage immediately
   try {
@@ -7173,7 +7194,7 @@ async function generateBoardOutfitsWithCounts(boardId, counts, extra) {
   allItems.forEach(function(i){
     if (!byCategory[i.cat]) byCategory[i.cat] = [];
     var k = getTag(i.id,'kleur')||''; var s2 = getStructuurKlasse(i.id)||'';
-    byCategory[i.cat].push(i.name + (k?' ['+k+']':'') + (s2?' ['+s2+']':''));
+    byCategory[i.cat].push(i.name + (k?' ['+k+']':'') + (s2?' ['+s2+']':'') + visueelTekst(i.id));
   });
   var wardrobeText = (usingCapsule ? 'CAPSULE ITEMS (alleen deze gebruiken):\n' : 'GARDEROBE:\n')
     + Object.entries(byCategory).map(function(e){
@@ -11758,7 +11779,7 @@ async function svAnalyze() {
   var wardrobeText = allItems.slice(0, 40).map(function(i) {
     var kleur = getTag(i.id, 'kleur') || '';
     var mat = getTag(i.id, 'materiaal') || '';
-    return i.naam + (kleur ? ' (' + kleur + (mat ? ', ' + mat : '') + ')' : '') + ' [' + i.cat + ']';
+    return i.naam + (kleur ? ' (' + kleur + (mat ? ', ' + mat : '') + ')' : '') + ' [' + i.cat + ']' + visueelTekst(i.id);
   }).join(', ');
 
   var contentParts = [{
