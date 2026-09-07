@@ -50,6 +50,22 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .photo-inspo.heeft span{display:none;}
 .recept-blok{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 13px;margin-bottom:9px;font-size:11.5px;line-height:1.6;color:var(--text-2);}
 .recept-blok b{color:var(--text);}
+/* Inspiratieplaat: een raster van kleine foto's waar het stijlprofiel uit komt */
+.plaat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:9px;}
+.plaat-cel{position:relative;aspect-ratio:3/4;border-radius:9px;overflow:hidden;background:var(--ph-bg);border:1.5px solid var(--border);}
+.plaat-cel img{width:100%;height:100%;object-fit:cover;display:block;}
+.plaat-weg{position:absolute;top:2px;right:2px;width:19px;height:19px;border-radius:50%;border:none;background:rgba(0,0,0,.55);color:#fff;font-size:12px;line-height:1;cursor:pointer;padding:0;}
+.plaat-leeg{grid-column:1/-1;padding:18px 10px;text-align:center;font-size:11px;color:var(--text-2);border:2px dashed var(--border);border-radius:11px;}
+.plaat-add{width:100%;padding:11px;background:var(--ph-bg);border:2px dashed var(--border);border-radius:11px;font-family:'Inter',sans-serif;font-size:12px;color:var(--text-2);cursor:pointer;}
+.profiel-blok{background:color-mix(in srgb,var(--accent) 6%,var(--surface));border:1.5px solid color-mix(in srgb,var(--accent) 28%,var(--border));border-radius:12px;padding:12px 13px;font-size:11.5px;line-height:1.6;color:var(--text-2);}
+.profiel-blok b{color:var(--text);}
+.profiel-regel{display:flex;gap:7px;margin-top:5px;}
+.profiel-regel span:first-child{color:var(--accent);flex-shrink:0;}
+.vraag-blok{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 13px;margin-bottom:9px;}
+.vraag-tekst{font-size:12.5px;font-weight:600;margin-bottom:8px;line-height:1.45;}
+.vraag-opties{display:flex;flex-direction:column;gap:6px;}
+.vraag-opt{text-align:left;padding:9px 11px;border:1.5px solid var(--border);border-radius:10px;background:var(--ph-bg);font-family:'Inter',sans-serif;font-size:11.5px;line-height:1.45;color:var(--text);cursor:pointer;}
+.vraag-opt.gekozen{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--surface));font-weight:600;}
 .accent-kaart{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 13px;margin-bottom:9px;}
 .ak-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
 .ak-dot{width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(0,0,0,.12);flex-shrink:0;}
@@ -184,7 +200,10 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 /* SETTINGS MODAL */
 .modal-backdrop{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.5);align-items:flex-end;}
 .modal-backdrop.open{display:flex;}
-.modal-sheet{background:var(--bg);width:100%;max-width:480px;margin:0 auto;border-radius:20px 20px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));}
+/* max-height + scroll: het blad is met de inspiratieplaat erbij langer dan een
+   telefoonscherm, en zonder dit valt de onderkant buiten beeld zonder dat je
+   erbij kunt. */
+.modal-sheet{background:var(--bg);width:100%;max-width:480px;margin:0 auto;border-radius:20px 20px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .modal-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;margin-bottom:16px;}
 .modal-field{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;background:var(--surface);color:var(--text);outline:none;}
 .modal-field:focus{border-color:var(--accent);}
@@ -248,6 +267,20 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <button class="btn-rescan" onclick="if(confirm('Alle beschrijvingen wissen en opnieuw scannen?'))scanKast(true)">Opnieuw scannen</button>
     </div>
 
+    <!-- MIJN INSPIRATIEPLAAT -->
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);" id="plaat-sectie">
+      <div class="sec-label">Mijn inspiratieplaat</div>
+      <div class="modal-note" style="margin-bottom:9px;">Verzamel looks die je mooi vindt. Uit minstens drie foto's haal ik één stijlprofiel: wat er steeds terugkomt in vorm, kleur en sfeer. Dat profiel gebruikt de stylist daarna overal — bij het samenstellen, het perfectioneren en het accentadvies. De foto's blijven op dit toestel; het profiel gaat mee naar je andere apparaten.</div>
+      <div class="plaat-grid" id="plaat-grid"></div>
+      <input type="file" id="plaat-file" accept="image/*" multiple style="display:none">
+      <button class="plaat-add" onclick="document.getElementById('plaat-file').click()">＋ Foto's toevoegen</button>
+      <div class="field-note" id="plaat-status" style="margin-top:6px;"></div>
+      <button class="ai-btn" id="plaat-btn" style="margin-top:9px;" onclick="aiDestilleerStijl()">✨ Haal mijn stijlprofiel hieruit</button>
+      <button class="btn-rescan" id="vraag-btn" onclick="startStijlvragen()">Liever dat ik je uitvraag? 6 korte vragen</button>
+      <div id="vraag-area" style="margin-top:10px;display:none;"></div>
+      <div id="profiel-area" style="margin-top:10px;"></div>
+    </div>
+
     <div class="modal-actions">
       <button class="modal-save" onclick="saveSettings()">Opslaan</button>
       <button class="modal-cancel" onclick="closeSettings()">Sluiten</button>
@@ -280,6 +313,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <button class="ai-btn" id="inspo-btn" onclick="aiLeesInspo()" style="margin-top:10px;display:none;">🔍 Lees deze look en zoek het na in mijn kast</button>
     <div class="field-note" id="inspo-status" style="margin-top:6px;"></div>
     <div id="inspo-recept" style="margin-top:12px;"></div>
+    <button class="btn-rescan" style="margin-top:10px;" onclick="openSettings();setTimeout(()=>{const e=document.getElementById('plaat-sectie');if(e)e.scrollIntoView({behavior:'smooth'});},120)">Meer foto's? Maak een inspiratieplaat en laat me je stijl leren →</button>
   </div>
 
   <!-- ROUTE: outfits uit het stijlrapport -->
@@ -940,6 +974,7 @@ function openSettings() {
   sm.onchange = bijwerkScanKosten;
   document.getElementById('app-secret-input').value = appSecret;
   document.getElementById('ai-model-select').value = aiModel;
+  toonPlaat();
   document.getElementById('settings-modal').classList.add('open');
 }
 function closeSettings() {
@@ -991,6 +1026,7 @@ async function init() {
   });
   customCount = allItems.filter(i=>String(i.id).startsWith('custom-')).length;
   await laadVisueel();
+  await laadPlaat();
 
   buildComboTypes();
 }
@@ -1062,7 +1098,12 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
     max_tokens: maxTokens || 16000,
     // Systeemtekst als blok met cache_control: de stijlregels zijn elke
     // aanroep identiek, dus die hoeven niet steeds opnieuw betaald te worden.
-    system: [{ type:'text', text: systemPrompt, cache_control:{ type:'ephemeral' } }],
+    // Haar eigen smaak hoort overal mee te reizen, niet alleen op de plek waar
+    // ze hem heeft ingevuld. Alleen niet bij het scannen: daar wordt beschreven
+    // wat er op een foto staat, en die beschrijving mag geen smaak bevatten.
+    system: [{ type:'text',
+               text: systemPrompt + (taak === 'scan' ? '' : profielBlok()),
+               cache_control:{ type:'ephemeral' } }],
     messages: [{ role:'user', content: userContent }]
   };
   // Let op: Haiku 4.5 kent de effort-parameter niet en geeft dan een fout.
@@ -2088,6 +2129,363 @@ Antwoord ALLEEN met JSON:
   btn.disabled = false;
 }
 
+// ── MIJN INSPIRATIEPLAAT ──────────────────────────────────────────────────────
+// Eén foto lezen is een losse vraag. Wie tien looks naast elkaar legt, ziet iets
+// anders: wat er stééds terugkomt. Dat is haar smaak, en die hoort de stylist te
+// kennen zonder dat ze het elke keer opnieuw uitlegt. Uit de plaat destilleren we
+// daarom eenmalig een profiel; dat profiel reist daarna mee in elke aanroep.
+//
+// De foto's zelf blijven op dit toestel — tien afbeeldingen door de cloud sturen
+// bij elke paginalading is traag en nergens voor nodig. Het profiel is tekst en
+// gaat wel naar Supabase, zodat het advies op elk apparaat hetzelfde is.
+let inspoPlaat = [];        // [{id, data, type}] — verkleinde foto's
+let stijlProfiel = null;    // het gedestilleerde profiel
+const MAX_PLAAT = 12;
+const MIN_PLAAT = 3;
+
+async function laadPlaat() {
+  try { inspoPlaat = JSON.parse(localStorage.getItem('griette-inspoplaat-v1') || '[]'); } catch(e){}
+  if (!Array.isArray(inspoPlaat)) inspoPlaat = [];
+  try { stijlProfiel = JSON.parse(localStorage.getItem('griette-stijlprofiel-v1') || 'null'); } catch(e){}
+  const sb = await sbGet('stijlprofiel');
+  if (sb && typeof sb === 'object') stijlProfiel = sb;
+}
+
+function bewaarPlaat() {
+  try { localStorage.setItem('griette-inspoplaat-v1', JSON.stringify(inspoPlaat)); }
+  catch(e) {
+    // localStorage vol: eerlijk zeggen in plaats van stil verliezen
+    const st = document.getElementById('plaat-status');
+    if (st) st.textContent = 'Het geheugen van dit toestel zit vol. Verwijder een paar foto\'s van de plaat.';
+  }
+}
+
+async function bewaarProfiel() {
+  try { localStorage.setItem('griette-stijlprofiel-v1', JSON.stringify(stijlProfiel)); } catch(e){}
+  await sbSet('stijlprofiel', stijlProfiel);
+}
+
+// Een screenshot van Instagram is al gauw 2 MB. Voor "welke sfeer zie ik hier"
+// is 640 pixels ruim genoeg, en het scheelt zowel opslag als tokens.
+function verkleinFoto(file) {
+  return new Promise((klaar, fout) => {
+    const lezer = new FileReader();
+    lezer.onerror = () => fout(new Error('Kon de foto niet lezen'));
+    lezer.onload = ev => {
+      const img = new Image();
+      img.onerror = () => fout(new Error('Dit lijkt geen afbeelding'));
+      img.onload = () => {
+        const max = 640;
+        const s = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width  = Math.max(1, Math.round(img.width  * s));
+        c.height = Math.max(1, Math.round(img.height * s));
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        try {
+          klaar(c.toDataURL('image/jpeg', 0.7).split(',')[1]);
+        } catch(e) { fout(new Error('Verkleinen lukte niet')); }
+      };
+      img.src = String(ev.target.result);
+    };
+    lezer.readAsDataURL(file);
+  });
+}
+
+function koppelPlaat() {
+  const inp = document.getElementById('plaat-file');
+  if (!inp) return;
+  inp.addEventListener('change', async e => {
+    const files = [...(e.target.files || [])];
+    const st = document.getElementById('plaat-status');
+    if (!files.length) return;
+    const ruimte = MAX_PLAAT - inspoPlaat.length;
+    if (ruimte <= 0) {
+      st.textContent = `De plaat zit vol (${MAX_PLAAT} foto's). Verwijder er eerst een.`;
+      inp.value = ''; return;
+    }
+    let toegevoegd = 0, mislukt = 0;
+    for (const f of files.slice(0, ruimte)) {
+      try {
+        const data = await verkleinFoto(f);
+        inspoPlaat.push({ id: 'ip-' + Date.now() + '-' + Math.random().toString(36).slice(2,6),
+                          data, type: 'image/jpeg' });
+        toegevoegd++;
+      } catch(err) { mislukt++; }
+    }
+    bewaarPlaat();
+    toonPlaat();
+    const over = files.length - ruimte;
+    st.textContent = `${toegevoegd} toegevoegd.`
+      + (mislukt ? ` ${mislukt} lukte niet.` : '')
+      + (over > 0 ? ` ${over} niet geplaatst: maximaal ${MAX_PLAAT}.` : '');
+    inp.value = '';
+  });
+}
+
+function verwijderVanPlaat(id) {
+  inspoPlaat = inspoPlaat.filter(p => p.id !== id);
+  bewaarPlaat();
+  toonPlaat();
+}
+
+function toonPlaat() {
+  const grid = document.getElementById('plaat-grid');
+  const btn  = document.getElementById('plaat-btn');
+  if (!grid) return;
+
+  grid.innerHTML = inspoPlaat.length
+    ? inspoPlaat.map(p =>
+        `<div class="plaat-cel"><img src="data:${p.type};base64,${p.data}" alt="">`
+        + `<button class="plaat-weg" onclick="verwijderVanPlaat('${p.id}')" title="Weghalen">×</button></div>`
+      ).join('')
+    : `<div class="plaat-leeg">Nog geen foto's. Voeg er minstens ${MIN_PLAAT} toe, dan kan ik er een profiel uit halen.</div>`;
+
+  if (btn) {
+    const genoeg = inspoPlaat.length >= MIN_PLAAT;
+    btn.disabled = !genoeg;
+    btn.textContent = genoeg
+      ? `✨ Haal mijn stijlprofiel uit ${inspoPlaat.length} foto's`
+      : `✨ Nog ${MIN_PLAAT - inspoPlaat.length} foto${MIN_PLAAT - inspoPlaat.length === 1 ? '' : "'s"} nodig`;
+  }
+  toonProfiel();
+}
+
+function toonProfiel() {
+  const el = document.getElementById('profiel-area');
+  if (!el) return;
+  if (!stijlProfiel) {
+    el.innerHTML = '<div class="field-note">Nog geen stijlprofiel. De stylist gaat nu alleen op je stijlrapport af.</div>';
+    return;
+  }
+  const p = stijlProfiel;
+  const rij = (lbl, txt) => txt ? `<div class="profiel-regel"><span>${lbl}</span><span>${esc(txt)}</span></div>` : '';
+  el.innerHTML = '<div class="profiel-blok">'
+    + `<b>Je stijlprofiel</b> <span style="font-size:10px;">(${p.bron === 'uitgevraagd' ? 'uit je antwoorden' : 'uit ' + (p.aantal || '?') + " foto's"})</span>`
+    + (p.kern ? `<div style="margin-top:6px;">${esc(p.kern)}</div>` : '')
+    + rij('Silhouet', p.silhouet) + rij('Kleur', p.kleuren)
+    + rij('Textuur', p.texturen) + rij('Accessoires', p.accessoires)
+    + (Array.isArray(p.regels) && p.regels.length
+        ? '<div style="margin-top:8px;"><b>Wat de stylist hieruit meeneemt</b>'
+          + p.regels.map(r => `<div class="profiel-regel"><span>·</span><span>${esc(r)}</span></div>`).join('')
+          + '</div>' : '')
+    + (p.spanning ? `<div style="margin-top:8px;"><b>Waar dit botst met je rapport</b><br>${esc(p.spanning)}</div>` : '')
+    + '</div>'
+    + '<button class="btn-rescan" onclick="wisProfiel()">Profiel wissen</button>';
+}
+
+async function wisProfiel() {
+  if (!confirm('Het stijlprofiel wissen? Je foto\'s blijven staan.')) return;
+  stijlProfiel = null;
+  try { localStorage.removeItem('griette-stijlprofiel-v1'); } catch(e){}
+  await sbSet('stijlprofiel', null);
+  toonProfiel();
+}
+
+// Het profiel als compact blok voor in de systeemtekst. Bewust kort gehouden:
+// dit gaat mee bij élke aanroep, dus elke zin telt door in de kosten.
+function profielBlok() {
+  const p = stijlProfiel;
+  if (!p) return '';
+  const stukken = [
+    p.kern, p.silhouet, p.kleuren, p.texturen, p.accessoires,
+    Array.isArray(p.regels) ? p.regels.join(' ') : ''
+  ].filter(Boolean).join(' ');
+  if (!stukken.trim()) return '';
+  return `\n\nHAAR EIGEN SMAAK (${p.bron === 'uitgevraagd'
+    ? 'uit haar antwoorden op stijlvragen'
+    : "gedestilleerd uit haar inspiratieplaat"}):
+${stukken.slice(0, 900)}
+Dit is wat zij zelf mooi vindt. Het stijlrapport blijft leidend voor wat haar
+staat; dit profiel bepaalt de richting binnen die grenzen. Botsen ze, kies dan
+het rapport en zeg erbij dat je dat doet.`;
+}
+
+async function aiDestilleerStijl() {
+  const btn = document.getElementById('plaat-btn');
+  const st  = document.getElementById('plaat-status');
+  if (inspoPlaat.length < MIN_PLAAT) return;
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Je plaat lezen…';
+  st.textContent = '';
+
+  const system = `Je bent een stylist die uit een verzameling inspiratiebeelden
+de rode draad haalt. Je zoekt niet naar losse outfits maar naar wat er STEEDS
+terugkomt. ${DNA_KORT}
+Antwoord in het Nederlands, in de je-vorm, concreet en zonder holle woorden als
+"effortless chic". Schrijf niets op wat je niet in meerdere foto's terugziet.`;
+
+  const inhoud = [{ type:'text', text:
+`Hieronder staan ${inspoPlaat.length} looks die Griette heeft verzameld.
+
+Kijk ernaar als geheel. Wat is de rode draad? Let op:
+- welk silhouet steeds terugkomt (waar zit volume, waar strak, hoe lang)
+- welke kleuren en welke verhouding tussen die kleuren
+- welke texturen en materialen
+- de rol van accessoires en schoenen
+- de sfeer: wie wil zij zijn in deze kleren
+
+Noem alleen wat in MEERDERE foto's terugkomt. Zie je iets maar één keer, laat
+het weg of zeg erbij dat het een uitschieter is.
+
+Wees ook eerlijk over de botsing: haar stijlrapport zegt bepaalde dingen over
+kleur en silhouet. Wijkt haar eigen smaak daarvan af, benoem dat dan — niet om
+haar te corrigeren, maar zodat de stylist weet waar hij moet kiezen.
+
+Antwoord ALLEEN met JSON:
+{"kern":"2 zinnen: wie zij wil zijn in kleding, op basis van deze beelden",
+ "silhouet":"wat er steeds terugkomt in vorm en verhouding, 1 zin",
+ "kleuren":"welke kleuren en in welke verhouding, 1 zin",
+ "texturen":"welke materialen en contrasten, 1 zin",
+ "accessoires":"de rol van tassen, schoenen en sieraden, 1 zin",
+ "terugkerend":["4 tot 6 concrete dingen die je in meerdere foto's ziet"],
+ "spanning":"waar haar smaak afwijkt van haar stijlrapport, 1 tot 2 zinnen, of leeg",
+ "regels":["4 tot 6 korte instructies die een stylist hieruit meeneemt, elk max 12 woorden"]}` }];
+
+  inspoPlaat.forEach(p => inhoud.push({
+    type:'image', source:{ type:'base64', media_type: p.type || 'image/jpeg', data: p.data }
+  }));
+
+  try {
+    const raw = await callClaude(system, inhoud, 16000, 'medium', 'zwaar');
+    const data = extractJson(raw);
+    if (!data || Array.isArray(data)) throw new Error('Geen bruikbaar antwoord');
+    if (!data.kern && !data.silhouet && !(data.regels||[]).length) throw new Error('Antwoord was leeg');
+
+    stijlProfiel = Object.assign({}, data, {
+      bron: 'foto', aantal: inspoPlaat.length, gemaakt: new Date().toISOString()
+    });
+    await bewaarProfiel();
+    toonProfiel();
+    st.innerHTML = '<b>Profiel opgeslagen.</b> De stylist gebruikt dit vanaf nu overal.';
+    btn.textContent = '✨ Opnieuw uit de plaat halen';
+  } catch(e) {
+    st.textContent = 'Mislukt: ' + e.message;
+    btn.textContent = `✨ Haal mijn stijlprofiel uit ${inspoPlaat.length} foto's`;
+  }
+  btn.disabled = false;
+}
+
+// ── ANDERS: JOU UITVRAGEN ─────────────────────────────────────────────────────
+// Niet iedereen heeft een map met screenshots. Zes keuzes leveren genoeg op om
+// dezelfde richting te bepalen, en kosten niets omdat er geen beeld bij komt.
+const STIJLVRAGEN = [
+  { v:'Als je jezelf ziet lopen in iets waar je blij van wordt — wat valt dan het eerst op?',
+    o:['De kleur. Er zit iets in dat je niet over het hoofd ziet.',
+       'De vorm. Een silhouet dat klopt, ook van een afstand.',
+       'Het materiaal. Iets dat valt en beweegt zoals het hoort.',
+       'Het geheel. Niets schreeuwt, alles klopt.'] },
+  { v:'Waar zit bij jou het volume het liefst?',
+    o:['Onder: wijde broek of rok, strak erboven.',
+       'Boven: ruime trui of jas, smal eronder.',
+       'Overal een beetje, maar met een riem of taille als breekpunt.',
+       'Nergens echt — ik hou het liever slank en recht.'] },
+  { v:'Hoeveel kleur wil je aanhebben?',
+    o:['Eén rustige basis met één kleur die eruit springt.',
+       'Twee kleuren die elkaar opzoeken, plus een neutrale.',
+       'Vol kleur, ik ben er niet bang voor.',
+       'Vooral tonen van dezelfde familie, ton-sur-ton.'] },
+  { v:'Wat doen je accessoires?',
+    o:['Ze zijn het accent — daar zit de kleur of de knal.',
+       'Ze zijn rustig en dragen de outfit, niet andersom.',
+       'Eén opvallend stuk, verder niets.',
+       'Zo min mogelijk, ik hou het kaal.'] },
+  { v:'Welk woord wil je dat mensen bij je outfit denken?',
+    o:['Verzorgd en klassiek.',
+       'Eigenzinnig, met durf.',
+       'Zacht en vrouwelijk.',
+       'Krachtig en strak.'] },
+  { v:'Waar draag je de meeste outfits?',
+    o:['Werk en afspraken overdag.',
+       'Gewoon dagelijks: school, boodschappen, koffie.',
+       'Uit eten, borrels, avonden.',
+       'Van alles door elkaar.'] },
+];
+let stijlAntwoorden = [];
+
+function startStijlvragen() {
+  stijlAntwoorden = [];
+  const el = document.getElementById('vraag-area');
+  el.style.display = 'block';
+  el.innerHTML = STIJLVRAGEN.map((q, qi) =>
+    `<div class="vraag-blok"><div class="vraag-tekst">${qi+1}. ${esc(q.v)}</div>`
+    + '<div class="vraag-opties">'
+    + q.o.map((o, oi) =>
+        `<button class="vraag-opt" id="vo-${qi}-${oi}" onclick="kiesAntwoord(${qi},${oi})">${esc(o)}</button>`
+      ).join('')
+    + '</div></div>'
+  ).join('')
+  + '<button class="ai-btn" id="vraag-klaar" disabled onclick="maakProfielUitVragen()">Maak mijn profiel</button>'
+  + '<div class="field-note" id="vraag-status" style="margin-top:6px;"></div>';
+}
+
+function kiesAntwoord(qi, oi) {
+  stijlAntwoorden[qi] = oi;
+  STIJLVRAGEN[qi].o.forEach((_, i) => {
+    const b = document.getElementById(`vo-${qi}-${i}`);
+    if (b) b.classList.toggle('gekozen', i === oi);
+  });
+  const compleet = STIJLVRAGEN.every((_, i) => stijlAntwoorden[i] != null);
+  const k = document.getElementById('vraag-klaar');
+  if (k) {
+    k.disabled = !compleet;
+    const open = STIJLVRAGEN.filter((_, i) => stijlAntwoorden[i] == null).length;
+    k.textContent = compleet ? 'Maak mijn profiel' : `Nog ${open} ${open===1?'vraag':'vragen'}`;
+  }
+}
+
+async function maakProfielUitVragen() {
+  const btn = document.getElementById('vraag-klaar');
+  const st  = document.getElementById('vraag-status');
+  const gekozen = STIJLVRAGEN.map((q, i) => ({ vraag:q.v, antwoord:q.o[stijlAntwoorden[i]] }))
+                             .filter(x => x.antwoord);
+  if (gekozen.length < STIJLVRAGEN.length) return;
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Profiel opstellen…';
+
+  // Valt de AI weg, dan is er nog steeds een bruikbaar profiel: haar
+  // antwoorden zijn op zichzelf al concreet genoeg om op te sturen.
+  const terugval = {
+    kern: 'Uit je antwoorden: ' + gekozen.slice(0,2).map(x => x.antwoord).join(' '),
+    regels: gekozen.map(x => x.antwoord),
+    bron: 'uitgevraagd'
+  };
+
+  try {
+    const raw = await callClaude(
+      `Je zet antwoorden op stijlvragen om in een kort, bruikbaar stijlprofiel.
+${DNA_KORT}
+Antwoord in het Nederlands, in de je-vorm. Verzin niets bij wat zij niet heeft
+gezegd. Blijf dicht bij haar woorden.`,
+      [{ type:'text', text:
+`Griette gaf deze antwoorden:
+
+${gekozen.map(x => `V: ${x.vraag}\nA: ${x.antwoord}`).join('\n\n')}
+
+Antwoord ALLEEN met JSON:
+{"kern":"2 zinnen die samenvatten wat zij wil uitstralen",
+ "silhouet":"1 zin over vorm en volume, uit haar antwoorden",
+ "kleuren":"1 zin over hoeveel kleur en hoe",
+ "accessoires":"1 zin over de rol van accessoires",
+ "regels":["4 tot 6 korte instructies voor de stylist, elk max 12 woorden"]}` }],
+      4000, null, 'licht');
+    const data = extractJson(raw);
+    stijlProfiel = (data && !Array.isArray(data) && (data.kern || (data.regels||[]).length))
+      ? Object.assign({}, data, { bron:'uitgevraagd', gemaakt:new Date().toISOString() })
+      : terugval;
+    st.innerHTML = '<b>Profiel opgeslagen.</b> De stylist gebruikt dit vanaf nu overal.';
+  } catch(e) {
+    stijlProfiel = terugval;
+    st.textContent = 'De AI deed het even niet, dus je antwoorden staan er nu letterlijk in. '
+      + 'Je kunt het later opnieuw laten opstellen.';
+  }
+  await bewaarProfiel();
+  toonProfiel();
+  document.getElementById('vraag-area').style.display = 'none';
+  btn.disabled = false;
+}
+
 // ── ACCENTKLEUR BIJ WAT JE AL KOOS ────────────────────────────────────────────
 // Kies je twee stukken, dan is de vraag niet "welke preset past" maar "welke
 // derde kleur maakt dit af, en op welk formaat". Dat is kleurenleer toegepast
@@ -3059,7 +3457,8 @@ function restart() {
 // Start
 document.getElementById('anchor-search').addEventListener('input', e => buildAnchorGrid(e.target.value));
 koppelInspo();
-init().then(()=>setStep(1));
+koppelPlaat();
+init().then(()=>{ setStep(1); toonPlaat(); });
 </script>
 </body>
 </html>
