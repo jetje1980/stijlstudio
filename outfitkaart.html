@@ -1222,7 +1222,11 @@ function buildRobinList() {
       document.querySelectorAll('#robin-list .robin-card').forEach(c=>c.classList.remove('selected'));
       card.classList.add('selected');
       selItems = robinNaarItems(o);
-      anchorItems = selItems.filter(i => !i._suggestion);  // eigen items staan vast
+      // Niet als anker markeren: kantEnKlaar voorkomt al dat de kaart zichzelf
+      // ongevraagd herschrijft. Vroeg je wél om perfectioneren, dan moet de AI
+      // vrij zijn om te verbeteren — anders kreeg je te horen dat alles "vast"
+      // stond en er niets gewisseld kon worden.
+      anchorItems = [];
       kantEnKlaar = true;   // Robin stelde deze samen; niet automatisch herschrijven
       selPreset = {
         name: 'Outfit ' + o.nr + ' — ' + o.naam,
@@ -1973,39 +1977,71 @@ Gekozen kleurcombo: ${combo}
 ${reedsBlok}
 Stel één complete, draagbare outfit samen van 4 tot 6 stukken.
 
-Regels:
-- Gebruik BIJ VOORKEUR items uit de lijst hierboven. Neem dan het exacte id over.
-- Zorg voor een compleet silhouet: iets voor boven, iets voor onder (of een jurk),
-  schoenen, en waar passend een laag, tas of accessoire.
-- Bij items staat waar mogelijk "GEZIEN OP FOTO" met de werkelijke kleur, het
-  silhouet, de textuur en het volume. Weeg dat zwaarder dan de naam of de tags:
-  daar staat wat het item echt is. Gebruik het om het silhouet in balans te
-  houden (nooit wijd op wijd) en om soepel met stevig te combineren.
-- Een jas of blazer telt als EXTRA laag bovenop een cardigan of gilet. Voeg er een
-  toe als het seizoen of de gelegenheid erom vraagt; de tag "soort" zegt om wat
-  voor laag het gaat.
-- Ontbreekt er iets essentieels in haar kast om deze kleurcombo te laten werken,
-  stel dat dan voor als NIEUW item met eigen=false en een concrete omschrijving
-  (bijv. "antraciet barrel jeans, mid-rise"). Wees hier eerlijk over — liever één
-  eerlijk voorstel dan een item forceren dat niet past.
-- Maximaal 2 nieuwe voorstellen; de rest moet uit haar kast komen.
+WERK IN DEZE VOLGORDE. Denk elke stap echt door voordat je verder gaat.
 
-CONTROLEER JE EIGEN ANTWOORD VOORDAT JE HET GEEFT:
-- Past elk item echt in de gekozen kleurcombo? Zo niet, kies een ander item.
-  Lever nooit een item met een opmerking als "fout" of "vervangen" erbij; kies
-  dan gewoon meteen het juiste item.
-- Het veld "waarom" is een korte, positieve reden waarom dit item hier ligt.
-  Geen correcties, geen twijfel, geen verwijzingen naar je eigen keuzeproces.
-- Niet wijd op wijd: check dat boven- en onderstuk elkaar in balans houden.
-- Hoogstens twee opvallende kleuren; de rest is rustige basis.
-- Geen dubbele functie: niet twee rokken, niet twee paar schoenen, niet drie
-  tops. Een compleet silhouet betekent verschillende rollen.
+STAP 1 — ANKER
+Kies het stuk dat de outfit draagt: het meest uitgesproken item, of het item dat
+Griette al koos. Alles daarna is een keuze IN dienst daarvan.
 
-Leg daarnaast uit WAAROM deze combinatie klopt, in drie korte stukjes:
-- kleur: hoe de kleuren zich tot elkaar verhouden en waarom dat werkt bij haar Winter DNA
-- vorm: hoe de silhouetten en pasvormen elkaar in balans houden (volume tegenover strak)
-- textuur: hoe de materialen elkaar aanvullen of juist spanning geven
-Elk stukje maximaal 20 woorden, concreet, geen holle frasen.
+STAP 2 — SILHOUET
+Bepaal waar het volume zit, en dus waar het strak moet. Precies één van beide:
+  wijd onderstuk + aansluitend bovenstuk, of aansluitend onderstuk + wijd
+  bovenstuk. Nooit allebei wijd; dan verdwijnt haar taille.
+Bepaal ook waar het silhouet breekt: hoge taille, ingestopte top, korte laag of
+een riem. Zonder breekpunt hangt een outfit als een zak.
+Kijk hiervoor naar "GEZIEN OP FOTO": daar staat het werkelijke volume en de
+pasvorm. Dat weegt zwaarder dan de naam of de tags.
+
+STAP 3 — KLEUR
+Eén kleur voert, één ondersteunt, de rest is rustige basis. Laat de accentkleur
+één keer terugkomen in een tweede stuk — een tas, schoen of sjaal — zodat het
+een geheel wordt en niet één losse kleurvlek. Krachtige kleuren horen dicht bij
+het gezicht; rustige tonen ver ervan.
+
+STAP 4 — TEXTUUR
+Minstens twee verschillende materiaalfamilies: iets soepels tegenover iets
+stevigs. Glad tegen ruw, mat tegen glanzend, fijn gebreid tegen denim. Zonder
+dat contrast oogt een outfit vlak, ook als de kleuren kloppen. Maar niet alles
+verschillend: dan wordt het rommelig.
+
+STAP 5 — EIGENTIJDS
+Kies proporties en combinaties die nu gedragen worden, niet die van tien jaar
+terug. Denk aan wijde of barrel pijpen op een strak bovenstuk, een korte laag
+over een langer stuk, een verfijnde schoen bij een stoere broek of andersom.
+Vermijd een silhouet dat overal even ruim of overal even strak is.
+
+STAP 6 — AFWERKING
+Voeg het stuk toe dat de look afmaakt: riem, tas, sieraad of schoen. Bij een
+oversized item is dat geen extraatje maar noodzaak — instoppen, oprollen of een
+riem, anders verdwijnt de vorm.
+
+BRONNEN
+- Gebruik bij voorkeur items uit de garderobe hierboven; neem het exacte id over.
+- Ontbreekt er iets essentieels, stel dat dan voor als NIEUW item met eigen=false
+  en een concrete omschrijving (kleur, materiaal, pasvorm). Maximaal 2 daarvan.
+- Een jas of blazer telt als EXTRA laag bovenop een cardigan of gilet.
+
+TOETS JE EIGEN ANTWOORD VOORDAT JE HET GEEFT
+1. Leest dit als één look, of als losse items die toevallig samen liggen?
+2. Waar zit het volume, en waar het tegenwicht? Is de taille zichtbaar?
+3. Welke twee texturen staan tegenover elkaar? Kun je ze benoemen?
+4. Komt de accentkleur ergens terug?
+5. Geen dubbele rollen: niet twee rokken, niet twee paar schoenen, niet drie tops.
+6. Zou je dit vandaag zo op straat zien, of voelt het gedateerd?
+Klopt een van deze punten niet, pas de outfit dan aan vóór je antwoordt.
+
+Het veld "waarom" is een korte, positieve reden waarom dit item hier ligt — de
+rol die het speelt. Nooit een correctie, twijfel of verwijzing naar je eigen
+keuzeproces. Lever nooit een item met een opmerking als "fout" erbij; kies dan
+meteen het juiste item.
+
+Leg daarnaast uit WAAROM deze combinatie klopt, in drie korte stukjes.
+Noem steeds welke twee stukken tegenover elkaar staan; geen algemeenheden.
+- kleur: welke kleur voert, welke ondersteunt, en waar het accent terugkomt
+- vorm: waar het volume zit, wat het tegenwicht geeft, en waar het silhouet breekt
+- textuur: welke twee materialen tegenover elkaar staan en wat dat doet
+Elk stukje maximaal 20 woorden. Schrijf "wijde maxi tegen strak shirt", niet
+"mooie balans tussen de stukken".
 
 Antwoord ALLEEN met JSON, geen tekst eromheen:
 {"items":[{"id":"exact-id-uit-de-lijst-of-null","naam":"korte naam","categorie":"tops|bottoms|layers|jurken|bags|shoes|accessories","eigen":true,"waarom":"max 7 woorden, positieve reden waarom dit item hier ligt"}],
@@ -2319,9 +2355,19 @@ ${FW_TRENDS}
 
 Beoordeel elk item op kleur, vorm/silhouet en textuur.
 
-Werkt een item niet goed in deze combinatie, VERVANG het dan door een beter item
-uit de garderobe hierboven (neem het exacte id over). Een item dat als VAST staat
-gemarkeerd blijft altijd staan. Alleen als de garderobe echt
+Loop dezelfde stappen na die een stylist zou gebruiken:
+1. Silhouet — zit het volume op één plek, met tegenwicht? Is de taille zichtbaar?
+   Wijd op wijd is fout, ook als de kleuren kloppen.
+2. Kleur — voert één kleur, ondersteunt één, en komt het accent ergens terug?
+3. Textuur — staan er minstens twee materiaalfamilies tegenover elkaar?
+4. Eigentijds — voelen deze proporties actueel, of gedateerd?
+5. Afwerking — mist er een riem, tas of sieraad om de look af te maken?
+
+Werkt een item niet goed, VERVANG het dan door een beter item uit de garderobe
+hierboven (neem het exacte id over). Een item dat als VAST staat gemarkeerd
+blijft altijd staan; de rest mag je vrij verbeteren.
+Ligt het probleem niet bij een item maar bij hoe het gedragen wordt (instoppen,
+riem, mouwen oprollen), zeg dat dan in plaats van te wisselen. Alleen als de garderobe echt
 geen alternatief heeft, mag je een nieuw item voorstellen met eigen=false.
 Vervang niet om te vervangen: klopt de outfit al, laat hem dan staan.
 
