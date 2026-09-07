@@ -201,7 +201,18 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <div class="sec-label">Toegangscode <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">alleen als je die hebt ingesteld</span></div>
     <input class="modal-field" type="password" id="app-secret-input" placeholder="laat leeg als je geen code hebt" autocomplete="off">
     <div class="modal-note">De AI-sleutel staat veilig op de server — je hoeft hier geen API-sleutel in te vullen. Heb je in Supabase een <b>APP_SECRET</b> ingesteld, vul die dan hier in.</div>
-    <div style="margin-top:14px;" class="sec-label">Model</div>
+    <div style="margin-top:16px;padding:12px 13px;border-radius:12px;background:color-mix(in srgb,var(--green) 8%,var(--surface));border:1.5px solid color-mix(in srgb,var(--green) 30%,var(--border));">
+      <label style="display:flex;align-items:flex-start;gap:9px;cursor:pointer;">
+        <input type="checkbox" id="zuinig-check" style="margin-top:2px;width:17px;height:17px;flex-shrink:0;">
+        <span><b style="font-size:13px;">Zuinig</b>
+        <span style="display:block;font-size:11px;color:var(--text-2);line-height:1.5;margin-top:2px;">Kiezen, beschrijven en invullen gaan op het goedkoopste model. Dat scheelt ongeveer vijf keer in kosten en je merkt er nauwelijks iets van, want dat zijn geen denkklussen. Zet uit als je de uitgebreide analyse door het beste model wilt laten doen.</span></span>
+      </label>
+    </div>
+
+    <div id="verbruik-vak" style="margin-top:12px;font-size:11px;color:var(--text-2);line-height:1.6;"></div>
+    <button class="btn-rescan" style="margin-top:6px;" onclick="resetVerbruik()">Teller op nul</button>
+
+    <div style="margin-top:14px;" class="sec-label">Model voor de zware analyse</div>
     <select class="modal-field" id="ai-model-select">
       <option value="claude-opus-5">Opus 5 — beste stijladvies (aanbevolen)</option>
       <option value="claude-sonnet-5">Sonnet 5 — goede balans</option>
@@ -347,6 +358,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 
   <div style="height:12px;"></div>
   <div class="dl-bar">
+    <button class="ai-btn" id="aanvul-btn" style="display:none;" onclick="autoComposeOnCard()">✨ Laat AI een outfit samenstellen</button>
     <button class="btn-dl" id="dl-btn" onclick="downloadKaart()">⬇ Opslaan als afbeelding</button>
 
     <!-- AI analyse section -->
@@ -821,12 +833,37 @@ let kantEnKlaar = false; // outfit komt compleet uit het stijlrapport
 const MAX_ANKERS = 2;
 const isAnker = id => anchorItems.some(a => a.id === id);
 let appSecret = '';
-let aiModel = 'claude-opus-5';
+let aiModel = 'claude-opus-5';   // alleen voor de zware analyse
+let zuinig = true;               // lichte taken op het goedkoopste model
+const MODEL_LICHT = 'claude-haiku-4-5';
+const PRIJS = {                  // euro per miljoen tokens (invoer, uitvoer)
+  'claude-opus-5':[5,25], 'claude-sonnet-5':[2,10], 'claude-haiku-4-5':[1,5],
+};
+let verbruik = { in:0, uit:0, cache:0, euro:0, aanroepen:0 };
+try { verbruik = Object.assign(verbruik, JSON.parse(localStorage.getItem('ai-verbruik')||'{}')); } catch(e){}
 const AI_ENDPOINT = SUPABASE_URL + '/functions/v1/claude';
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────────
+function bijwerkVerbruik() {
+  const el = document.getElementById('verbruik-vak');
+  if (!el) return;
+  if (!verbruik.aanroepen) { el.textContent = 'Nog geen AI-gebruik geteld.'; return; }
+  const bespaard = verbruik.cache ? ` <span style="color:var(--green)">${Math.round(verbruik.cache/1000)}k uit cache</span>` : '';
+  el.innerHTML = `<b>${verbruik.aanroepen}</b> aanroep${verbruik.aanroepen===1?'':'en'} · `
+    + `${Math.round((verbruik.in+verbruik.cache)/1000)}k in, ${Math.round(verbruik.uit/1000)}k uit${bespaard}<br>`
+    + `Geschat: <b>€ ${verbruik.euro.toFixed(2)}</b> sinds de laatste reset`;
+}
+
+function resetVerbruik() {
+  verbruik = { in:0, uit:0, cache:0, euro:0, aanroepen:0 };
+  try { localStorage.setItem('ai-verbruik', JSON.stringify(verbruik)); } catch(e){}
+  bijwerkVerbruik();
+}
+
 function openSettings() {
   bijwerkScanKnop();
+  bijwerkVerbruik();
+  document.getElementById('zuinig-check').checked = zuinig;
   document.getElementById('app-secret-input').value = appSecret;
   document.getElementById('ai-model-select').value = aiModel;
   document.getElementById('settings-modal').classList.add('open');
@@ -837,6 +874,8 @@ function closeSettings() {
 function saveSettings() {
   appSecret = document.getElementById('app-secret-input').value.trim();
   aiModel   = document.getElementById('ai-model-select').value;
+  zuinig    = document.getElementById('zuinig-check').checked;
+  try { localStorage.setItem('ai-zuinig', zuinig ? '1' : '0'); } catch(e){}
   try { localStorage.setItem('app-secret', appSecret); } catch(e){}
   try { localStorage.setItem('ai-model', aiModel); } catch(e){}
   closeSettings();
@@ -846,6 +885,7 @@ function saveSettings() {
 async function init() {
   try { appSecret = localStorage.getItem('app-secret') || ''; } catch(e){}
   try { aiModel = localStorage.getItem('ai-model') || 'claude-opus-5'; } catch(e){}
+  try { zuinig = localStorage.getItem('ai-zuinig') !== '0'; } catch(e){}
   try { cloudMap = JSON.parse(localStorage.getItem('griette-cloud-photos-v1')||'{}'); } catch(e){}
   try { itemTags = JSON.parse(localStorage.getItem('griette-item-tags-v3')||'{}'); } catch(e){}
 
@@ -925,16 +965,21 @@ async function sbGet(key) {
 }
 
 // ── AI API CALL ───────────────────────────────────────────────────────────────
-async function callClaude(systemPrompt, userContent, maxTokens, effort) {
+// taak 'licht'  = kiezen, beschrijven, invullen — gaat op het goedkoopste model
+// taak 'zwaar'  = de uitgebreide beeldanalyse — gebruikt het gekozen model
+async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
+  const model = (taak === 'zwaar' && !zuinig) ? aiModel : MODEL_LICHT;
+
   const body = {
-    model: aiModel,
+    model,
     // Ruim bemeten: denk-tokens tellen mee in max_tokens. Te krap en het
     // antwoord wordt midden in de JSON afgekapt.
     max_tokens: maxTokens || 16000,
-    system: systemPrompt,
+    // Systeemtekst als blok met cache_control: de stijlregels zijn elke
+    // aanroep identiek, dus die hoeven niet steeds opnieuw betaald te worden.
+    system: [{ type:'text', text: systemPrompt, cache_control:{ type:'ephemeral' } }],
     messages: [{ role:'user', content: userContent }]
   };
-  // Minder diep nadenken voor gestructureerde taken: sneller en goedkoper
   if (effort) body.output_config = { effort };
   const headers = { 'content-type': 'application/json' };
   if (appSecret) headers['x-app-secret'] = appSecret;
@@ -972,6 +1017,22 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort) {
   }
 
   const data = await res.json();
+
+  // Verbruik bijhouden zodat zichtbaar is wat een aanroep kost
+  if (data.usage) {
+    const [pi, po] = PRIJS[model] || PRIJS[MODEL_LICHT];
+    const cacheLees = data.usage.cache_read_input_tokens || 0;
+    const vers = data.usage.input_tokens || 0;
+    const uit = data.usage.output_tokens || 0;
+    verbruik.in    += vers;
+    verbruik.cache += cacheLees;
+    verbruik.uit   += uit;
+    // gelezen cache kost ongeveer een tiende van verse invoer
+    verbruik.euro  += (vers*pi + cacheLees*pi*0.1 + uit*po) / 1000000;
+    verbruik.aanroepen += 1;
+    try { localStorage.setItem('ai-verbruik', JSON.stringify(verbruik)); } catch(e){}
+    bijwerkVerbruik();
+  }
 
   // Model kan het verzoek weigeren (Opus 5 / Fable) — vang dat netjes af
   if (data.stop_reason === 'refusal') {
@@ -1326,7 +1387,7 @@ Antwoord ALLEEN met een JSON-array:
   });
 
   try {
-    const raw = await callClaude(system, userContent, 8000, 'low');
+    const raw = await callClaude(system, userContent, 8000, 'low', 'licht');
     const combos = pickArray(extractJson(raw), ['combos','suggesties']);
     if (!combos || !combos.length) throw new Error('Geen combo\'s ontvangen');
 
@@ -1537,7 +1598,7 @@ Wees eerlijk als een kleur niet past bij Griette's Winter DNA — kies dan een n
 Antwoord ALLEEN met een geldig JSON array, geen uitleg eromheen.`;
 
   try {
-    const raw = await callClaude(system, userMsg, 8000, 'low');
+    const raw = await callClaude(system, userMsg, 8000, 'low', 'licht');
     const aiCombos = pickArray(extractJson(raw), ['combos','suggesties']);
     if (!aiCombos || !aiCombos.length) throw new Error('Geen geldige suggesties');
 
@@ -1752,7 +1813,7 @@ Antwoord ALLEEN met een JSON-array in dezelfde volgorde als de foto's:
     });
 
     try {
-      const raw = await callClaude(system, inhoud, 6000, 'low');
+      const raw = await callClaude(system, inhoud, 6000, 'low', 'licht');
       const arr = pickArray(extractJson(raw), ['items','beschrijvingen']);
       if (arr) {
         arr.forEach(b => {
@@ -1875,7 +1936,7 @@ Antwoord ALLEEN met JSON, geen tekst eromheen:
  "waarom_top":"2 zinnen: waarom dit als geheel een sterke combinatie is"}`;
 
   try {
-    const raw = await callClaude(system, userMsg, 16000, 'medium');
+    const raw = await callClaude(system, userMsg, 16000, 'medium', 'licht');
     const data = extractJson(raw);
     if (!data) throw new Error('Antwoord was geen bruikbare JSON. Het model zei: "'
       + String(raw).trim().slice(0, 120) + '…"');
@@ -1957,7 +2018,7 @@ Antwoord in JSON: {titel, sublabel, anno1, anno2, stylingnoot}
 anno1 en anno2: gebruik \\n voor regelbreuk.`;
 
   try {
-    const raw = await callClaude(system, userMsg, 8000, 'low');
+    const raw = await callClaude(system, userMsg, 8000, 'low', 'licht');
     const data = extractJson(raw);
     if (!data || Array.isArray(data)) throw new Error('Geen geldige JSON');
     if (data.titel)      document.getElementById('f-title').value  = data.titel;
@@ -2071,6 +2132,17 @@ function buildKaart() {
 }
 
 // Vult de kaart zelf als de gebruiker geen items koos.
+// Biedt aanvullen aan in plaats van het ongevraagd te doen
+function toonAanvulKnop() {
+  const btn = document.getElementById('aanvul-btn');
+  if (!btn) return;
+  const nodig = !kantEnKlaar && (selItems.length < 4 || !outfitUitleg);
+  btn.style.display = nodig ? 'block' : 'none';
+  btn.textContent = selItems.length === 0
+    ? '✨ Laat AI een outfit samenstellen'
+    : `✨ Aanvullen tot een complete outfit (nu ${selItems.length})`;
+}
+
 function showCardNotice(html) {
   const el = document.getElementById('card-notice');
   if (!el) return;
@@ -2098,6 +2170,7 @@ async function autoComposeOnCard() {
     await aiComposeOutfit();
   } catch(e) { fout = e; }
 
+  toonAanvulKnop();
   if (selItems.length) {
     buildKaart();
     // Lukte het aanvullen niet, zeg dat dan — anders lijkt het of de kaart
@@ -2201,7 +2274,7 @@ Schrijf in het Nederlands. Wees concreet en eerlijk — geen lege complimenten.
 Verzin nooit een id dat niet in de garderobelijst staat.`;
 
   try {
-    const raw = await callClaude(system, userContent, 24000, 'medium');
+    const raw = await callClaude(system, userContent, 24000, 'medium', 'zwaar');
     const data = extractJson(raw);
 
     // Antwoordt de AI in gewone tekst i.p.v. JSON, toon die dan alsnog als
@@ -2451,8 +2524,9 @@ function setStep(n) {
     buildKaart();
     // Nog geen complete outfit of nog geen uitleg? Dan vult de AI aan.
     // Je eigen keuzes blijven daarbij altijd staan.
-    // Een outfit van Robin laten we staan zoals hij is — die is bewust gekozen.
-    if (!kantEnKlaar && (selItems.length < 4 || !outfitUitleg)) autoComposeOnCard();
+    // Niet vanzelf aanroepen: dat kost geld zonder dat erom gevraagd is.
+    // Wel een knop tonen als de kaart nog niet compleet is.
+    toonAanvulKnop();
   }
 }
 
