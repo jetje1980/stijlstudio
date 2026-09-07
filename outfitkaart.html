@@ -44,6 +44,22 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .anchor-search{width:100%;padding:11px 13px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;color:var(--text);outline:none;margin-bottom:10px;}
 .anchor-search:focus{border-color:var(--accent);}
 .anchor-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:280px;overflow-y:auto;padding:2px;}
+.photo-inspo{width:100%;aspect-ratio:4/3;background:var(--ph-bg);border:2px dashed var(--border);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;position:relative;overflow:hidden;}
+.photo-inspo img{display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:var(--surface);}
+.photo-inspo.heeft img{display:block;}
+.photo-inspo.heeft span{display:none;}
+.recept-blok{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 13px;margin-bottom:9px;font-size:11.5px;line-height:1.6;color:var(--text-2);}
+.recept-blok b{color:var(--text);}
+.accent-kaart{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 13px;margin-bottom:9px;}
+.ak-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
+.ak-dot{width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(0,0,0,.12);flex-shrink:0;}
+.ak-naam{font-size:13px;font-weight:600;}
+.ak-rel{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 7px;border-radius:20px;}
+.ak-bron{font-size:8px;letter-spacing:.07em;text-transform:uppercase;color:#8a6508;background:color-mix(in srgb,#b8860b 15%,transparent);padding:2px 6px;border-radius:20px;}
+.ak-waarom{font-size:11.5px;color:var(--text-2);line-height:1.55;margin-bottom:6px;}
+.ak-item{font-size:11.5px;color:var(--text);margin-bottom:6px;}
+.ak-heb,.ak-mis{font-size:11px;color:var(--text-2);}
+.ak-kies{background:none;border:1.5px solid var(--accent);border-radius:16px;padding:3px 10px;margin:2px 3px 2px 0;font-family:'Inter',sans-serif;font-size:10.5px;color:var(--accent);cursor:pointer;}
 .robin-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .robin-card.selected{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,var(--surface));}
 .robin-card .rc-top{display:flex;align-items:center;gap:9px;margin-bottom:6px;}
@@ -248,6 +264,22 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <button class="mode-btn" id="mode-item" onclick="setStartMode('item')">👕 Met een item uit mijn kast</button>
     </div>
     <button class="mode-btn" id="mode-robin" onclick="setStartMode('robin')" style="width:100%;margin-top:8px;">📖 Kant-en-klaar: de 33 outfits van Robin</button>
+    <button class="mode-btn" id="mode-inspo" onclick="setStartMode('inspo')" style="width:100%;margin-top:8px;">📸 Deze look wil ik namaken</button>
+  </div>
+
+  <!-- ROUTE: inspiratiefoto namaken -->
+  <div id="inspo-area" style="display:none">
+    <div class="sec-label">Foto van een look die je mooi vindt</div>
+    <div class="field-note" style="margin-bottom:10px;">Een screenshot van Instagram of Pinterest. Ik lees eruit welke kleuren, vormen en texturen het werkend maken, en zoek het equivalent in jouw kast.</div>
+    <div class="photo-inspo" id="inspo-zone" onclick="document.getElementById('inspo-file').click()">
+      <span style="font-size:34px;">📸</span>
+      <span style="font-size:12px;color:var(--text-2);">Tik om een foto te kiezen</span>
+      <img id="inspo-preview">
+    </div>
+    <input type="file" id="inspo-file" accept="image/*" style="display:none">
+    <button class="ai-btn" id="inspo-btn" onclick="aiLeesInspo()" style="margin-top:10px;display:none;">🔍 Lees deze look en zoek het na in mijn kast</button>
+    <div class="field-note" id="inspo-status" style="margin-top:6px;"></div>
+    <div id="inspo-recept" style="margin-top:12px;"></div>
   </div>
 
   <!-- ROUTE: outfits uit het stijlrapport -->
@@ -311,6 +343,10 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <input class="field" type="text" id="f-gelegenheid" placeholder="bijv. lunch op een terras, werkdag, 18 graden" style="margin-bottom:10px;font-size:14px;padding:11px 13px;">
     <button class="ai-btn" id="ai-compose-btn" onclick="aiComposeOutfit().catch(function(){})" style="margin-bottom:6px;">✨ Laat AI een outfit samenstellen uit mijn kast</button>
     <div class="field-note" id="ai-compose-status" style="text-align:center;margin-bottom:12px;">Kies zelf items, of laat de AI kiezen en aanvullen met voorstellen.</div>
+    <button class="ai-btn" id="accent-btn" onclick="aiAccentAdvies()" style="margin-bottom:6px;">🎨 Welke accentkleur past hierbij?</button>
+    <div class="field-note" id="accent-status" style="margin-bottom:8px;">Kies een of twee stukken; dan zoek ik uit welke derde kleur het afmaakt, en op welk formaat.</div>
+    <div id="accent-lijst" style="margin-bottom:16px;"></div>
+
     <div class="sec-label" id="item-count-label">Items — optioneel (max 6)</div>
     <div class="item-grid" id="item-grid"></div>
   </div>
@@ -624,6 +660,9 @@ const COMBO_TYPES = [
   {
     id:'neutraal-accent', bron:'rapport', label:'Neutraal + accent', desc:'Strakke basis met één krachtige kleurpop',
     presets:[
+      {name:'Grijs + felroze',vibe:'zachte basis, harde knal — de sweater-en-rok-look',stijl:'streetstyle',colors:['#c4c4c8','#e8407a','#0047AB','#f0e8d8'],tags:['lichtgrijs','felroze','kobaltblauw','gebroken-wit']},
+      {name:'Grijs + roze + kobalt',vibe:'grijs draagt, roze voert, blauw verrast',stijl:'gedurfd',colors:['#888','#e8a0b4','#0047AB','#f5f0e1'],tags:['grijs','roze','kobaltblauw','ecru']},
+      {name:'Lichtgrijs + paars + zand',vibe:'uit je rapport, rustig en verfijnd',stijl:'elegant',colors:['#c4c4c8','#7b3fa0','#e0d5bf','#f5f0e1'],tags:['lichtgrijs','paars','zand','ecru']},
       {name:'Zwart × felroze',vibe:'krachtig & verleidelijk',stijl:'gedurfd',colors:['#111','#333','#e8407a','#f8f4ef'],tags:['zwart','zwart','felroze','wit']},
       {name:'Bruin × turquoise',vibe:'aards & verrassend',stijl:'elegant',colors:['#5c3317','#c19a6b','#2ab0a8','#f0e8d8'],tags:['bruin','camel','turquoise','gebroken-wit']},
       {name:'Navy × geel',vibe:'klassiek & vrolijk',stijl:'klassiek',colors:['#162038','#1a2a4a','#d4b84a','#f8f4ef'],tags:['donkerblauw','marine','geel','wit']},
@@ -1250,9 +1289,11 @@ function setStartMode(mode) {
   document.getElementById('mode-combo').classList.toggle('active', mode === 'combo');
   document.getElementById('mode-item').classList.toggle('active', mode === 'item');
   document.getElementById('mode-robin').classList.toggle('active', mode === 'robin');
+  document.getElementById('mode-inspo').classList.toggle('active', mode === 'inspo');
   document.getElementById('combo-area').style.display  = mode === 'combo' ? 'block' : 'none';
   document.getElementById('anchor-area').style.display = mode === 'item'  ? 'block' : 'none';
   document.getElementById('robin-area').style.display  = mode === 'robin' ? 'block' : 'none';
+  document.getElementById('inspo-area').style.display  = mode === 'inspo' ? 'block' : 'none';
 
   // Route wisselen betekent opnieuw beginnen met de combo
   selPreset = null;
@@ -1928,6 +1969,263 @@ function bijwerkScanKnop() {
       ? `${gescand} items met visuele beschrijving.`
       : 'Nog niets gescand — de AI kiest nu op naam en tags.';
   }
+}
+
+// ── INSPIRATIEFOTO NAMAKEN ────────────────────────────────────────────────────
+// "Ik wil deze look" is een andere vraag dan "kies iets uit mijn kast". Hier
+// leest de AI eerst het recept van de foto — welke rollen, kleuren, vormen en
+// texturen hem laten werken — en zoekt daarna het equivalent in de kast.
+let inspoBase64 = null, inspoType = 'image/jpeg';
+
+function koppelInspo() {
+  const inp = document.getElementById('inspo-file');
+  if (!inp) return;
+  inp.addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const lezer = new FileReader();
+    lezer.onload = ev => {
+      inspoBase64 = String(ev.target.result).split(',')[1];
+      inspoType = f.type || 'image/jpeg';
+      const img = document.getElementById('inspo-preview');
+      img.src = ev.target.result;
+      document.getElementById('inspo-zone').classList.add('heeft');
+      document.getElementById('inspo-btn').style.display = 'block';
+      document.getElementById('inspo-status').textContent = '';
+    };
+    lezer.readAsDataURL(f);
+  });
+}
+
+async function aiLeesInspo() {
+  if (!inspoBase64) return;
+  const btn = document.getElementById('inspo-btn');
+  const st  = document.getElementById('inspo-status');
+  const rec = document.getElementById('inspo-recept');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Look lezen en vertalen…';
+  rec.innerHTML = '';
+
+  const gel = (document.getElementById('f-gelegenheid')||{}).value || '';
+  const system = `Je bent een stylist die een look kan ontleden en vertalen naar
+een andere garderobe. ${DNA_KORT}
+Antwoord in het Nederlands. Vertaal, kopieer niet: het gaat om de verhoudingen
+en het gevoel, niet om exact dezelfde stukken.`;
+
+  const inhoud = [
+    { type:'text', text:
+`Griette wil deze look namaken met wat zij heeft.
+
+STAP A — LEES DE FOTO
+Beschrijf wat deze look laat werken:
+- welke rollen de stukken spelen (wat draagt, wat ondersteunt, wat is accent)
+- de kleurverhouding: welke kleur voert, welke ondersteunt, welk accent en hoe klein
+- het silhouet: waar zit het volume, waar het tegenwicht, waar breekt het
+- de texturen die tegenover elkaar staan
+- waarom het als geheel klopt
+
+STAP B — VERTAAL NAAR HAAR KAST
+Zoek per rol het dichtstbijzijnde item uit onderstaande garderobe. Het hoeft
+niet dezelfde kleur te zijn; het moet dezelfde ROL spelen in dezelfde
+verhouding. Wijkt haar kleur af, kies dan een kleur die bij haar palet past en
+dezelfde functie heeft.
+Ontbreekt een rol echt, stel dan een nieuw item voor met eigen=false.
+${gel ? '\nGelegenheid: ' + gel : ''}
+
+GARDEROBE (id | categorie | naam | tags):
+${wardrobeForAI()}
+
+Antwoord ALLEEN met JSON:
+{"recept":{"rollen":"welke rollen en wat ze doen, 2 zinnen",
+  "kleur":"de kleurverhouding in de foto, 1 zin",
+  "silhouet":"volume en tegenwicht, 1 zin",
+  "textuur":"welke texturen tegenover elkaar staan, 1 zin",
+  "waarom":"waarom deze look klopt, 1 zin"},
+ "vertaling":"wat je bewust anders doet voor Griette en waarom, 2 zinnen",
+ "items":[{"id":"exact-id-of-null","naam":"...","categorie":"...","eigen":true,
+   "waarom":"welke rol dit item overneemt, max 7 woorden"}],
+ "uitleg":{"kleur":"...","vorm":"...","textuur":"..."},
+ "waarom_top":"2 zinnen waarom dit als geheel werkt voor haar"}` },
+    { type:'image', source:{ type:'base64', media_type: inspoType, data: inspoBase64 } },
+  ];
+
+  try {
+    const raw = await callClaude(system, inhoud, 16000, 'medium', 'zwaar');
+    const data = extractJson(raw);
+    if (!data || Array.isArray(data)) throw new Error('Geen bruikbaar antwoord');
+
+    const arr = pickArray(data, ['items','outfit'], true);
+    if (!arr || !arr.length) throw new Error('Geen items voorgesteld');
+
+    selItems = arr.slice(0,6).map(x => {
+      const echt = x && x.id ? allItems.find(i => i.id === x.id) : null;
+      if (echt) return Object.assign({}, echt, { _waarom: (x.waarom||'') });
+      return { id:'sugg-i-'+Math.random().toString(36).slice(2,7),
+               name:(x&&x.naam)||'Voorstel', cat:(x&&x.categorie)||'overig', brand:'',
+               _suggestion:true, _waarom:(x&&x.waarom)||'' };
+    });
+    if (data.uitleg) outfitUitleg = data.uitleg;
+    if (data.waarom_top) outfitTop = data.waarom_top;
+
+    const r = data.recept || {};
+    rec.innerHTML = '<div class="recept-blok">'
+      + '<b>Wat deze look laat werken</b><br>'
+      + [r.rollen, r.kleur, r.silhouet, r.textuur, r.waarom].filter(Boolean).map(esc).join('<br>')
+      + (data.vertaling ? '<br><br><b>Voor jou aangepast</b><br>' + esc(data.vertaling) : '')
+      + '</div>';
+
+    const eigen = selItems.filter(i=>!i._suggestion).length;
+    st.innerHTML = `<b>${eigen}</b> van ${selItems.length} uit je eigen kast. Ga door naar de volgende stap.`;
+    selPreset = selPreset || { name:'Nagemaakt van je inspiratiefoto', vibe:'zelfde rollen, jouw kleuren',
+      typeName:'Van je inspiratiefoto', stijl:'streetstyle', colors:['#c4c4c8','#e8407a','#0047AB','#f0e8d8'], tags:[] };
+    document.getElementById('btn-next').disabled = false;
+    btn.textContent = '🔍 Opnieuw lezen';
+  } catch(e) {
+    st.textContent = 'Mislukt: ' + e.message;
+    btn.textContent = '🔍 Lees deze look en zoek het na in mijn kast';
+  }
+  btn.disabled = false;
+}
+
+// ── ACCENTKLEUR BIJ WAT JE AL KOOS ────────────────────────────────────────────
+// Kies je twee stukken, dan is de vraag niet "welke preset past" maar "welke
+// derde kleur maakt dit af, en op welk formaat". Dat is kleurenleer toegepast
+// op jouw items, niet een lijstje vooraf.
+let accentOpties = [];
+
+async function aiAccentAdvies() {
+  const btn = document.getElementById('accent-btn');
+  const st  = document.getElementById('accent-status');
+  const lijst = document.getElementById('accent-lijst');
+  const basis = selItems.filter(i => !i._suggestion);
+
+  if (basis.length < 1) {
+    st.textContent = 'Kies eerst een of twee items waar je omheen wilt bouwen.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Kleuren afwegen…';
+  st.textContent = '';
+  lijst.innerHTML = '';
+
+  const beschrijf = i => {
+    const t = itemTags[i.id] || {};
+    const v = itemVisueel[i.id];
+    const val = x => Array.isArray(x) ? x.join('/') : (x || '');
+    return `- ${i.name} (${i.cat})`
+      + (val(t.kleur) ? `, getagd als ${val(t.kleur)}` : '')
+      + (v ? `, op de foto: ${[v.kleur, v.vorm, v.textuur].filter(Boolean).join('; ')}` : '');
+  };
+
+  const kleurNamen = KLEUREN.map(k => k.v).join(', ');
+  const gel = (document.getElementById('f-gelegenheid')||{}).value || '';
+
+  const system = `Je bent een kleurexpert en stylist. ${DNA_KORT}
+Antwoord in het Nederlands. Wees concreet en leg de kleurenleer uit in gewone
+taal, zonder jargon zonder uitleg.`;
+
+  const userMsg = `Griette heeft deze stukken gekozen:
+
+${basis.map(beschrijf).join('\n')}
+${gel ? '\nGelegenheid: ' + gel : ''}
+
+Deze combinatie mist nog een accent. Geef 3 of 4 accentkleuren die hier
+technisch bij passen, en leg per kleur uit WAAROM volgens de kleurenleer.
+
+Denk hierbij aan:
+- Welke kleurrelatie het is: complementair, split-complementair, analoog, of
+  een neutrale basis met een kleurpop. Benoem dat met naam.
+- Hoe warm of koel de gekozen stukken zijn, en wat daarbij past.
+- Dat een accent klein hoort te blijven: grofweg een tiende van de outfit.
+  Zeg dus ook op WELK FORMAAT de kleur moet komen. Een sjaal, tas, schoen,
+  riem of sieraad draagt een accent; een broek of jas is te groot en wordt
+  dan zelf de hoofdkleur.
+- Waar op het lichaam: krachtige kleuren staan haar goed dicht bij het
+  gezicht, rustige tonen juist verder weg.
+- Of de kleur in haar rapport staat of een trendaanvulling is; zeg dat erbij.
+
+Gebruik voor "kleur" uitsluitend een naam uit deze lijst:
+${kleurNamen}
+
+Antwoord ALLEEN met een JSON-array:
+[{"kleur":"naam uit de lijst","hex":"#rrggbb","relatie":"bijv. split-complementair",
+  "waarom":"twee zinnen kleurenleer, concreet over deze stukken",
+  "item":"wat voor item de kleur moet dragen, bijv. een klein schoudertasje",
+  "formaat":"klein|middel|groot","bron":"rapport|trend"}]`;
+
+  try {
+    const raw = await callClaude(system, userMsg, 8000, 'low', 'kies');
+    const arr = pickArray(extractJson(raw), ['accenten','kleuren','opties']);
+    if (!arr || !arr.length) throw new Error('Geen bruikbare suggesties');
+    accentOpties = arr;
+    toonAccenten(arr);
+    st.innerHTML = `${arr.length} accentkleuren die passen bij <b>`
+      + basis.map(i=>esc(i.name)).join('</b> en <b>') + '</b>.';
+    btn.textContent = '🎨 Opnieuw';
+  } catch(e) {
+    st.textContent = 'Mislukt: ' + e.message;
+    btn.textContent = '🎨 Welke accentkleur past hierbij?';
+  }
+  btn.disabled = false;
+}
+
+function toonAccenten(arr) {
+  const lijst = document.getElementById('accent-lijst');
+  lijst.innerHTML = '';
+  arr.forEach(a => {
+    if (!a || !a.kleur) return;
+    const bekend = KLEUREN.find(k => k.v === a.kleur);
+    const dot = a.hex || (bekend && bekend.dot) || '#ccc';
+
+    // Heeft ze al iets in deze kleur?
+    const heeft = allItems.filter(i => {
+      const t = itemTags[i.id] || {};
+      const kl = Array.isArray(t.kleur) ? t.kleur : (t.kleur ? [t.kleur] : []);
+      const klein = ['accessories','bags','shoes'].includes(i.cat);
+      return klein && kl.some(k => k === a.kleur);
+    }).slice(0, 3);
+
+    const kaart = document.createElement('div');
+    kaart.className = 'accent-kaart';
+    kaart.innerHTML =
+      `<div class="ak-top"><span class="ak-dot" style="background:${esc(dot)}"></span>`
+      + `<span class="ak-naam">${esc(a.kleur)}</span>`
+      + `<span class="ak-rel">${esc(a.relatie||'')}</span>`
+      + (a.bron === 'trend' ? '<span class="ak-bron">trend</span>' : '')
+      + '</div>'
+      + `<div class="ak-waarom">${esc(a.waarom||'')}</div>`
+      + `<div class="ak-item">Draag het als: <b>${esc(a.item||'accessoire')}</b>`
+      + (a.formaat ? ` <span style="opacity:.7">(${esc(a.formaat)})</span>` : '') + '</div>'
+      + (heeft.length
+          ? '<div class="ak-heb">Uit je kast: '
+            + heeft.map(i => `<button class="ak-kies" onclick="voegAccentToe('${esc(i.id)}')">${esc(i.name)}</button>`).join(' ')
+            + '</div>'
+          : `<div class="ak-mis">Nog niets in deze kleur bij je accessoires. `
+            + `<button class="ak-kies" onclick="voegAccentVoorstel('${esc(a.kleur)}','${esc(a.item||'accessoire')}')">Als voorstel toevoegen</button></div>`);
+    lijst.appendChild(kaart);
+  });
+}
+
+function voegAccentToe(id) {
+  const item = allItems.find(i => i.id === id);
+  if (!item || selItems.some(i => i.id === id)) return;
+  if (selItems.length >= 6) { alert('Je hebt al zes items; haal er eerst een weg.'); return; }
+  selItems.push(Object.assign({}, item, { _waarom: 'accent' }));
+  buildItemGrid();
+  document.getElementById('accent-status').textContent = item.name + ' toegevoegd.';
+}
+
+function voegAccentVoorstel(kleur, itemtype) {
+  if (selItems.length >= 6) { alert('Je hebt al zes items; haal er eerst een weg.'); return; }
+  selItems.push({
+    id: 'sugg-acc-' + Math.random().toString(36).slice(2,7),
+    name: itemtype + ' in ' + kleur, cat: 'accessories', brand: '',
+    _suggestion: true, _waarom: 'accent dat de combinatie afmaakt',
+  });
+  buildItemGrid();
+  document.getElementById('accent-status').textContent = 'Voorstel toegevoegd aan je kaart.';
 }
 
 // ── AI: OUTFIT SAMENSTELLEN UIT DE KAST ───────────────────────────────────────
@@ -2760,6 +3058,7 @@ function restart() {
 
 // Start
 document.getElementById('anchor-search').addEventListener('input', e => buildAnchorGrid(e.target.value));
+koppelInspo();
 init().then(()=>setStep(1));
 </script>
 </body>
