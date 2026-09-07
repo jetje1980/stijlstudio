@@ -1112,6 +1112,18 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
   const headers = { 'content-type': 'application/json' };
   if (appSecret) headers['x-app-secret'] = appSecret;
 
+  const verzoek = JSON.stringify(body);
+  // Zelf tellen voordat we versturen: een afwijzing na twintig seconden
+  // wachten is vervelender dan meteen weten dat er te veel beeld in zit.
+  const MAX_VERZOEK = 4.5 * 1024 * 1024;
+  if (verzoek.length > MAX_VERZOEK) {
+    const beelden = (Array.isArray(userContent) ? userContent : [])
+                      .filter(x => x && x.type === 'image').length;
+    throw new Error(beelden > 1
+      ? `Te veel beeld in één keer (${beelden} foto's, ${Math.round(verzoek.length/1024/1024*10)/10} MB). Haal er een paar van je inspiratieplaat af en probeer het opnieuw.`
+      : 'De foto is te groot om te versturen. Probeer een kleinere schermafdruk.');
+  }
+
   let res;
   const ctrl = new AbortController();
   const tijdKlok = setTimeout(() => ctrl.abort(), 120000);
@@ -1121,7 +1133,7 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
     res = await fetch(AI_ENDPOINT, {
       method: 'POST',
       headers,
-      body: JSON.stringify(body),
+      body: verzoek,
       signal: ctrl.signal
     });
     clearTimeout(tijdKlok);
@@ -1138,6 +1150,7 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
     const msg = err?.error?.message || '';
     if (res.status === 401) throw new Error('Toegangscode ontbreekt of klopt niet. Vul hem in via ⚙ Instellingen.');
     if (res.status === 403) throw new Error('Deze pagina mag de AI-functie niet aanroepen.');
+    if (res.status === 413) throw new Error('De foto\'s zijn samen te groot. Kies een kleinere schermafdruk, of haal er een paar van je inspiratieplaat af.');
     if (res.status === 500 && /ANTHROPIC_API_KEY/.test(msg)) throw new Error('De AI-sleutel is nog niet ingesteld in Supabase. Zie Edge Functions → Secrets.');
     if (/credit|balance/i.test(msg)) throw new Error('Geen tegoed op het Anthropic-account. Voeg tegoed toe op console.anthropic.com.');
     if (res.status === 429) throw new Error('Te veel verzoeken. Wacht even en probeer opnieuw.');
@@ -2021,20 +2034,25 @@ let inspoBase64 = null, inspoType = 'image/jpeg';
 function koppelInspo() {
   const inp = document.getElementById('inspo-file');
   if (!inp) return;
-  inp.addEventListener('change', e => {
+  inp.addEventListener('change', async e => {
     const f = e.target.files && e.target.files[0];
     if (!f) return;
-    const lezer = new FileReader();
-    lezer.onload = ev => {
-      inspoBase64 = String(ev.target.result).split(',')[1];
-      inspoType = f.type || 'image/jpeg';
+    const st = document.getElementById('inspo-status');
+    st.textContent = 'Foto klaarmaken…';
+    try {
+      // Altijd verkleinen. Een schermafdruk van een telefoon is te groot om
+      // ongewijzigd te versturen, en op 1200 pixels is alles wat ertoe doet
+      // — kleur, silhouet, textuur — nog gewoon te zien.
+      inspoBase64 = await verkleinFoto(f, 1200);
+      inspoType = 'image/jpeg';
       const img = document.getElementById('inspo-preview');
-      img.src = ev.target.result;
+      img.src = 'data:image/jpeg;base64,' + inspoBase64;
       document.getElementById('inspo-zone').classList.add('heeft');
       document.getElementById('inspo-btn').style.display = 'block';
-      document.getElementById('inspo-status').textContent = '';
-    };
-    lezer.readAsDataURL(f);
+      st.textContent = '';
+    } catch(err) {
+      st.textContent = 'Deze foto lukte niet: ' + err.message;
+    }
   });
 }
 
@@ -2165,9 +2183,11 @@ async function bewaarProfiel() {
   await sbSet('stijlprofiel', stijlProfiel);
 }
 
-// Een screenshot van Instagram is al gauw 2 MB. Voor "welke sfeer zie ik hier"
-// is 640 pixels ruim genoeg, en het scheelt zowel opslag als tokens.
-function verkleinFoto(file) {
+// Een screenshot van Instagram is al gauw 2 tot 4 MB, en als base64 nog een
+// derde meer. Ongewijzigd doorsturen loopt tegen de limiet van de Edge Function
+// aan ("verzoek te groot"), en het is ook nergens voor nodig: voor het lezen van
+// een look is 1200 pixels ruim, voor het herkennen van een sfeer 640.
+function verkleinFoto(file, maxZijde) {
   return new Promise((klaar, fout) => {
     const lezer = new FileReader();
     lezer.onerror = () => fout(new Error('Kon de foto niet lezen'));
@@ -2175,14 +2195,14 @@ function verkleinFoto(file) {
       const img = new Image();
       img.onerror = () => fout(new Error('Dit lijkt geen afbeelding'));
       img.onload = () => {
-        const max = 640;
+        const max = maxZijde || 640;
         const s = Math.min(1, max / Math.max(img.width, img.height));
         const c = document.createElement('canvas');
         c.width  = Math.max(1, Math.round(img.width  * s));
         c.height = Math.max(1, Math.round(img.height * s));
         c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
         try {
-          klaar(c.toDataURL('image/jpeg', 0.7).split(',')[1]);
+          klaar(c.toDataURL('image/jpeg', maxZijde ? 0.75 : 0.7).split(',')[1]);
         } catch(e) { fout(new Error('Verkleinen lukte niet')); }
       };
       img.src = String(ev.target.result);
