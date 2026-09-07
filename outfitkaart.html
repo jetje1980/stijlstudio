@@ -307,6 +307,8 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 <!-- STEP 2: ITEMS -->
 <div class="panel" id="p2">
   <div>
+    <div class="sec-label">Waar ga je heen? <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">optioneel, maar het scheelt veel</span></div>
+    <input class="field" type="text" id="f-gelegenheid" placeholder="bijv. lunch op een terras, werkdag, 18 graden" style="margin-bottom:10px;font-size:14px;padding:11px 13px;">
     <button class="ai-btn" id="ai-compose-btn" onclick="aiComposeOutfit().catch(function(){})" style="margin-bottom:6px;">✨ Laat AI een outfit samenstellen uit mijn kast</button>
     <div class="field-note" id="ai-compose-status" style="text-align:center;margin-bottom:12px;">Kies zelf items, of laat de AI kiezen en aanvullen met voorstellen.</div>
     <div class="sec-label" id="item-count-label">Items — optioneel (max 6)</div>
@@ -1957,6 +1959,11 @@ async function aiComposeOutfit() {
     ? `${selPreset.name} — ${selPreset.vibe}${selPreset.stijl ? ' (' + selPreset.stijl + ')' : ''}, kleuren: ${(selPreset.tags||[]).join(', ')}`
     : 'geen combo gekozen';
 
+  const gel = (document.getElementById('f-gelegenheid')||{}).value || '';
+  const gelBlok = gel.trim()
+    ? `\nGELEGENHEID: ${gel.trim()}\nStem hier alles op af: de mate van formaliteit, of ze erin moet kunnen\nbewegen, en of het weer om een laag vraagt.\n`
+    : '\nGeen gelegenheid opgegeven. Ga uit van een gewone dag waarop ze zich\nverzorgd maar op haar gemak wil voelen; zeg erbij dat je die aanname doet.\n';
+
   const system = `Je bent een persoonlijke stylist voor Griette. ${DNA_KORT}\nAntwoord in het Nederlands. Wees eerlijk: verzin geen items die niet in de lijst staan als "eigen".`;
 
   // Items die de gebruiker zelf al koos: die moeten blijven staan.
@@ -1974,29 +1981,39 @@ async function aiComposeOutfit() {
 ${wardrobeForAI()}
 
 Gekozen kleurcombo: ${combo}
-${reedsBlok}
+${gelBlok}${reedsBlok}
 Stel één complete, draagbare outfit samen van 4 tot 6 stukken.
 
 WERK IN DEZE VOLGORDE. Denk elke stap echt door voordat je verder gaat.
 
-STAP 1 — ANKER
+STAP 1 — ANKER EN BLIKVANGER
 Kies het stuk dat de outfit draagt: het meest uitgesproken item, of het item dat
 Griette al koos. Alles daarna is een keuze IN dienst daarvan.
+Bepaal meteen waar het oog naartoe moet. Eén blikvanger, de rest ondersteunt.
+Twee stukken die om aandacht vechten laten een outfit uit elkaar vallen.
 
-STAP 2 — SILHOUET
+STAP 2 — SILHOUET EN ZOOMLIJNEN
 Bepaal waar het volume zit, en dus waar het strak moet. Precies één van beide:
   wijd onderstuk + aansluitend bovenstuk, of aansluitend onderstuk + wijd
   bovenstuk. Nooit allebei wijd; dan verdwijnt haar taille.
 Bepaal ook waar het silhouet breekt: hoge taille, ingestopte top, korte laag of
 een riem. Zonder breekpunt hangt een outfit als een zak.
+Let op waar de zomen vallen. Elke zoom trekt een horizontale lijn en die deelt
+het lichaam. Een zoom die eindigt op het breedste punt van de heup maakt breed;
+net erboven of ruim eronder werkt beter. Een korte laag over een langer stuk
+verlengt juist. Blazers en jasjes: rond de heup of net korter.
 Kijk hiervoor naar "GEZIEN OP FOTO": daar staat het werkelijke volume en de
 pasvorm. Dat weegt zwaarder dan de naam of de tags.
 
-STAP 3 — KLEUR
-Eén kleur voert, één ondersteunt, de rest is rustige basis. Laat de accentkleur
-één keer terugkomen in een tweede stuk — een tas, schoen of sjaal — zodat het
-een geheel wordt en niet één losse kleurvlek. Krachtige kleuren horen dicht bij
-het gezicht; rustige tonen ver ervan.
+STAP 3 — KLEUR EN VERHOUDING
+Eén kleur voert, één ondersteunt, de rest is rustige basis. Denk in verhouding,
+niet alleen in kleurkeuze: grofweg zestig procent rustige basis, dertig procent
+ondersteunende kleur, tien procent accent. Een accent dat de helft van de outfit
+beslaat is geen accent meer.
+Laat de accentkleur één keer terugkomen in een tweede stuk — een tas, schoen of
+sjaal — zodat het een geheel wordt en niet één losse kleurvlek. Datzelfde ritme
+werkt ook met een materiaal of detail: goud bij goud, leer bij leer.
+Krachtige kleuren horen dicht bij het gezicht; rustige tonen ver ervan.
 
 STAP 4 — TEXTUUR
 Minstens twee verschillende materiaalfamilies: iets soepels tegenover iets
@@ -2010,10 +2027,19 @@ terug. Denk aan wijde of barrel pijpen op een strak bovenstuk, een korte laag
 over een langer stuk, een verfijnde schoen bij een stoere broek of andersom.
 Vermijd een silhouet dat overal even ruim of overal even strak is.
 
-STAP 6 — AFWERKING
+STAP 6 — AFWERKING EN WEGLATEN
 Voeg het stuk toe dat de look afmaakt: riem, tas, sieraad of schoen. Bij een
 oversized item is dat geen extraatje maar noodzaak — instoppen, oprollen of een
 riem, anders verdwijnt de vorm.
+Kijk daarna of er iets te veel is. Een outfit wordt vaker beter door iets weg te
+laten dan door iets toe te voegen. Doet een stuk niets voor het silhouet, de
+kleurbalans of de textuur, dan hoort het er niet.
+
+STAP 7 — DRAAGBAARHEID
+Toets of dit een dag lang te dragen is. Kan ze erin zitten, lopen en bewegen
+zonder telkens te trekken of te schikken? Past het bij het weer en bij de duur
+van de gelegenheid? Een outfit die alleen staand op een foto werkt, werkt niet.
+Voelt iets onpraktisch, kies dan een alternatief in plaats van het te negeren.
 
 BRONNEN
 - Gebruik bij voorkeur items uit de garderobe hierboven; neem het exacte id over.
@@ -2024,10 +2050,14 @@ BRONNEN
 TOETS JE EIGEN ANTWOORD VOORDAT JE HET GEEFT
 1. Leest dit als één look, of als losse items die toevallig samen liggen?
 2. Waar zit het volume, en waar het tegenwicht? Is de taille zichtbaar?
-3. Welke twee texturen staan tegenover elkaar? Kun je ze benoemen?
-4. Komt de accentkleur ergens terug?
-5. Geen dubbele rollen: niet twee rokken, niet twee paar schoenen, niet drie tops.
-6. Zou je dit vandaag zo op straat zien, of voelt het gedateerd?
+3. Waar vallen de zomen? Deelt er een lijn op een ongelukkige plek?
+4. Welke twee texturen staan tegenover elkaar? Kun je ze benoemen?
+5. Komt de accentkleur ergens terug, en blijft het aandeel klein genoeg?
+6. Is er één blikvanger, of vechten twee stukken om aandacht?
+7. Kan er iets weg zonder dat de outfit minder wordt? Haal het dan weg.
+8. Past dit bij de gelegenheid, en kan ze er een dag in bewegen?
+9. Geen dubbele rollen: niet twee rokken, niet twee paar schoenen, niet drie tops.
+10. Zou je dit vandaag zo op straat zien, of voelt het gedateerd?
 Klopt een van deze punten niet, pas de outfit dan aan vóór je antwoordt.
 
 Het veld "waarom" is een korte, positieve reden waarom dit item hier ligt — de
@@ -2341,7 +2371,8 @@ VOLLEDIGE GARDEROBE (id | categorie | naam | tags):
 ${wardrobeForAI()}
 
 Gekozen kleurcombo: ${combo}
-${ankerBlok}
+${(document.getElementById('f-gelegenheid')||{}).value
+   ? 'GELEGENHEID: ' + document.getElementById('f-gelegenheid').value + '\n' : ''}${ankerBlok}
 VOLGORDE VAN JE ADVIES — houd je hieraan:
 1. Toets eerst aan Griette's stijlrapport hierboven: kleur, silhouet, halslijn,
    mouw, materiaal, print. Dat is de leidende bron.
@@ -2358,10 +2389,15 @@ Beoordeel elk item op kleur, vorm/silhouet en textuur.
 Loop dezelfde stappen na die een stylist zou gebruiken:
 1. Silhouet — zit het volume op één plek, met tegenwicht? Is de taille zichtbaar?
    Wijd op wijd is fout, ook als de kleuren kloppen.
-2. Kleur — voert één kleur, ondersteunt één, en komt het accent ergens terug?
-3. Textuur — staan er minstens twee materiaalfamilies tegenover elkaar?
-4. Eigentijds — voelen deze proporties actueel, of gedateerd?
-5. Afwerking — mist er een riem, tas of sieraad om de look af te maken?
+2. Zoomlijnen — valt er een zoom op het breedste punt van de heup? Verplaats die.
+3. Kleur — voert één kleur, ondersteunt één, en komt het accent ergens terug?
+   Beslaat het accent niet te veel van de outfit?
+4. Textuur — staan er minstens twee materiaalfamilies tegenover elkaar?
+5. Blikvanger — is er één, of vechten twee stukken om aandacht?
+6. Eigentijds — voelen deze proporties actueel, of gedateerd?
+7. Afwerking — mist er een riem, tas of sieraad om de look af te maken?
+8. Te veel — kan er iets weg zonder dat de outfit minder wordt?
+9. Draagbaarheid — kan ze hier een dag in bewegen, past het bij het weer?
 
 Werkt een item niet goed, VERVANG het dan door een beter item uit de garderobe
 hierboven (neem het exacte id over). Een item dat als VAST staat gemarkeerd
@@ -2711,6 +2747,7 @@ function restart() {
   document.getElementById('anchor-choose').style.display='block';
   document.getElementById('anchor-combo-wrap').style.display='none';
   document.getElementById('anchor-search').value='';
+  const g=document.getElementById('f-gelegenheid'); if (g) g.value='';
   setStartMode('combo');
   document.getElementById('ai-analyse-panel').style.display='none';
   document.getElementById('ai-analyse-btn').textContent='🔍 Analyseer & perfectioneer deze kaart';
