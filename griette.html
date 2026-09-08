@@ -1289,7 +1289,34 @@ function noteerVerbruik(model, usage, wat) {
   } catch(e) {}
 }
 
+// Haal de tekst uit een antwoord. Staat er een denkblok voor, dan is
+// content[0] niet de tekst - dat is precies wat er misging toen deze pagina
+// naar Sonnet 5 ging.
+function aiTekst(data) {
+  if (!data || !Array.isArray(data.content)) return '';
+  var blok = data.content.find(function(b){ return b && b.type === 'text'; });
+  return (blok && blok.text) || '';
+}
+
+// Alle prompts op deze pagina zijn geschreven voor Sonnet 4.6, dat alleen
+// nadenkt als je erom vraagt. Sonnet 5 doet dat uit zichzelf, en dan gaan de
+// denk-tokens van dezelfde max_tokens af: budgetten van 400 tot 1400 leverden
+// daardoor een leeg of afgekapt antwoord op. Zet denken hier dus uit, tenzij
+// een aanroep er zelf iets over zegt. Dat herstelt precies het gedrag waar
+// deze prompts en budgetten op gebouwd zijn.
+function aiZonderDenken(opts) {
+  try {
+    var body = JSON.parse(opts.body);
+    if (body && body.messages && !body.thinking) {
+      body.thinking = { type: 'disabled' };
+      return Object.assign({}, opts, { body: JSON.stringify(body) });
+    }
+  } catch(e) {}
+  return opts;
+}
+
 async function aiFetch(_, opts) {
+  opts = aiZonderDenken(opts);
   var res = await fetch(AI_URL, opts);
   if (res.status === 400 && !aiTerugval) {
     aiTerugval = true;
@@ -4797,7 +4824,7 @@ Schrijf direct, kort, in het Nederlands, geen aanhef.`;
     clearTimeout(timeout);
     if (!response.ok) return null;
     const data = await response.json();
-    return data.content?.[0]?.text || null;
+    return aiTekst(data) || null;
   } catch(e) {
     return null;
   }
@@ -11935,7 +11962,7 @@ async function svAnalyze() {
       body: JSON.stringify({ model: aiModelNu(), max_tokens: 600, messages: [{ role: 'user', content: contentParts }] })
     });
     var data = await res.json();
-    var txt = (data.content && data.content[0] && data.content[0].text) || '';
+    var txt = aiTekst(data);
     var m = txt.match(/\{[\s\S]*\}/);
     var result = null;
     if (m) { try { result = JSON.parse(m[0]); } catch(e) {} }
@@ -12442,7 +12469,7 @@ async function analyzeBoardInspo(boardId) {
     });
     if (!resp.ok) throw new Error('API error ' + resp.status);
     var data = await resp.json();
-    var raw = (data.content && data.content[0] && data.content[0].text) || '';
+    var raw = aiTekst(data);
 
     var result = null;
     try {
@@ -12491,8 +12518,17 @@ async function analyzeBoardInspo(boardId) {
       if (result.tip) {
         html += '<div class="bi-result-card" style="background:var(--cream-dark);"><div class="bi-result-lbl">Styling tip</div><div class="bi-result-val">→ ' + result.tip + '</div></div>';
       }
-    } else {
+    } else if (raw.trim()) {
       html = '<div class="bi-result-card"><div class="bi-result-lbl">Analyse</div><div class="bi-result-val">' + raw.replace(/\n/g,'<br>') + '</div></div>';
+    } else {
+      // Een leeg vak zegt niets. Zeg wát er misging en wat je eraan kunt doen.
+      var reden = data.stop_reason === 'max_tokens'
+        ? 'Het antwoord werd afgekapt voordat er looks uit kwamen.'
+        : 'Er kwam geen bruikbaar antwoord terug.';
+      html = '<div class="bi-result-card" style="border-color:rgba(181,35,42,0.3);">'
+        + '<div class="bi-result-lbl">Geen looks</div>'
+        + '<div class="bi-result-val" style="color:#b5232a;">' + reden
+        + ' Probeer het opnieuw, of haal een foto van het board af.</div></div>';
     }
 
     board.inspoResult = html;
@@ -12666,7 +12702,7 @@ async function _spAnalyzeBody(btn, body) {
       body: JSON.stringify({ model: aiModelNu(), max_tokens: 900, messages: [{ role: 'user', content: parts }] })
     });
     var data = await resp.json();
-    var raw = (data.content && data.content[0] && data.content[0].text) || '';
+    var raw = aiTekst(data);
     var m = raw.match(/\{[\s\S]*\}/);
     if (m) { try { _sp.profile = JSON.parse(m[0]); } catch(e) { _sp.profile = { beschrijving: raw.slice(0, 300), lichaamsvorm: '', principes: [] }; } }
     else { _sp.profile = { beschrijving: raw.slice(0, 300), lichaamsvorm: '', principes: [] }; }
@@ -12746,7 +12782,7 @@ async function _spRankItems(cat, wardrobeItems, btn, body) {
       body: JSON.stringify({ model: aiModelNu(), max_tokens: 1200, messages: [{ role: 'user', content: parts }] })
     });
     var data = await resp.json();
-    var raw = (data.content && data.content[0] && data.content[0].text) || '';
+    var raw = aiTekst(data);
     var m = raw.match(/\{[\s\S]*\}/);
     var result = null;
     if (m) { try { result = JSON.parse(m[0]); } catch(e) {} }
@@ -12878,7 +12914,7 @@ async function _spAskHowItLooks(item, rank, resultDiv, btn) {
       body: JSON.stringify({ model: aiModelNu(), max_tokens: 500, messages: [{ role: 'user', content: parts }] })
     });
     var data = await resp.json();
-    var reply = (data.content && data.content[0] && data.content[0].text) || '';
+    var reply = aiTekst(data);
     resultDiv.innerHTML = reply.replace(/\n/g,'<br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
     btn.style.display = 'none';
   } catch(e) {
