@@ -448,6 +448,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <button class="ai-btn" id="ai-analyse-btn" onclick="aiAnalyseOutfit()">🔍 Analyseer &amp; perfectioneer deze kaart</button>
     <div id="ai-analyse-panel" style="display:none;"></div>
 
+    <div id="kaart-kosten" style="margin-top:10px;font-size:10.5px;color:var(--text-2);line-height:1.6;"></div>
     <button class="btn-restart" onclick="restart()">Nieuwe kaart maken</button>
   </div>
 </div>
@@ -954,20 +955,87 @@ try { verbruik = Object.assign(verbruik, JSON.parse(localStorage.getItem('ai-ver
 const AI_ENDPOINT = SUPABASE_URL + '/functions/v1/claude';
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────────
+// Losse aanroepen bijhouden, niet alleen een totaal. "Wat kostten die twee
+// kaarten net?" is anders niet te beantwoorden, en juist dat wil je weten.
+// Beide pagina's schrijven in dezelfde lijst, zodat het totaal klopt met de
+// console in plaats van alleen met de outfitkaart.
+const LOG_MAX = 40;
+let kaartGestart = Date.now();   // alles wat hierna komt hoort bij de kaart van nu
+
+function taakNaam(taak) {
+  return taak === 'scan' ? 'foto\'s scannen'
+       : taak === 'kies' ? 'outfit samenstellen'
+       : taak === 'zwaar' ? 'analyseren en perfectioneren'
+       : 'kleine taak';
+}
+
+function leesLog() {
+  try { const l = JSON.parse(localStorage.getItem('ai-log') || '[]');
+        return Array.isArray(l) ? l : []; } catch(e) { return []; }
+}
+
+function noteerAanroep(r) {
+  const log = leesLog();
+  log.push(Object.assign({ tijd: Date.now(), bron: 'outfitkaart' }, r));
+  try { localStorage.setItem('ai-log', JSON.stringify(log.slice(-LOG_MAX))); } catch(e){}
+  toonLaatsteKosten();
+}
+
+const dollar = n => '$ ' + (n < 0.01 ? n.toFixed(4) : n.toFixed(3));
+
+// Direct onder de kaart: wat heeft deze kaart tot nu toe gekost?
+function toonLaatsteKosten() {
+  const el = document.getElementById('kaart-kosten');
+  if (!el) return;
+  const sinds = kaartGestart || 0;
+  const eigen = leesLog().filter(r => r.tijd >= sinds);
+  if (!eigen.length) { el.textContent = ''; return; }
+  const som = eigen.reduce((t,r) => t + (r.kosten||0), 0);
+  el.innerHTML = `Deze kaart: <b>${dollar(som)}</b> in ${eigen.length} `
+    + `aanroep${eigen.length===1?'':'en'} · <span style="opacity:.75">`
+    + eigen.map(r => esc(r.wat)).join(', ') + '</span>';
+}
+
 function bijwerkVerbruik() {
   const el = document.getElementById('verbruik-vak');
   if (!el) return;
-  if (!verbruik.aanroepen) { el.textContent = 'Nog geen AI-gebruik geteld.'; return; }
-  const bespaard = verbruik.cache ? ` <span style="color:var(--green)">${Math.round(verbruik.cache/1000)}k uit cache</span>` : '';
+  const log = leesLog();
+  if (!verbruik.aanroepen && !log.length) { el.textContent = 'Nog geen AI-gebruik geteld.'; return; }
+
+  const bespaard = verbruik.cache
+    ? ` <span style="color:var(--green)">${Math.round(verbruik.cache/1000)}k uit cache</span>` : '';
+  const vandaag = log.filter(r => new Date(r.tijd).toDateString() === new Date().toDateString());
+  const somVandaag = vandaag.reduce((t,r) => t + (r.kosten||0), 0);
+
   el.innerHTML = `<b>${verbruik.aanroepen}</b> aanroep${verbruik.aanroepen===1?'':'en'} · `
-    + `${Math.round((verbruik.in+verbruik.cache)/1000)}k in, ${Math.round(verbruik.uit/1000)}k uit${bespaard}<br>`
-    + `Geschat: <b>€ ${verbruik.euro.toFixed(2)}</b> sinds de laatste reset`;
+    + `${Math.round((verbruik.in+verbruik.cache+(verbruik.schrijf||0))/1000)}k in, `
+    + `${Math.round(verbruik.uit/1000)}k uit${bespaard}<br>`
+    + `Geschat: <b>${dollar(verbruik.euro)}</b> sinds de laatste reset`
+    + (vandaag.length ? ` · vandaag ${dollar(somVandaag)}` : '')
+    + '<div style="margin-top:8px;font-size:10.5px;line-height:1.7;">'
+    + (log.length
+        ? '<b>Laatste aanroepen</b>' + log.slice(-8).reverse().map(r => {
+            const t = new Date(r.tijd);
+            const kl = String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0');
+            return `<div>${kl} · ${esc(r.wat)}`
+              + `<span style="opacity:.7"> (${esc(String(r.model||'').replace('claude-',''))}`
+              + `${r.bron && r.bron!=='outfitkaart' ? ', '+esc(r.bron) : ''})</span>`
+              + ` — <b>${dollar(r.kosten||0)}</b></div>`;
+          }).join('')
+        : '')
+    + '</div>'
+    + '<div style="margin-top:6px;opacity:.7;">Bedragen in dollars, net als in de '
+    + 'Anthropic-console. Het is een schatting op basis van de tokens die de API '
+    + 'terugmeldt; de console telt ook aanroepen mee van apparaten waar je '
+    + 'deze teller niet ziet.</div>';
 }
 
 function resetVerbruik() {
-  verbruik = { in:0, uit:0, cache:0, euro:0, aanroepen:0 };
-  try { localStorage.setItem('ai-verbruik', JSON.stringify(verbruik)); } catch(e){}
+  verbruik = { in:0, uit:0, cache:0, schrijf:0, euro:0, aanroepen:0 };
+  try { localStorage.setItem('ai-verbruik', JSON.stringify(verbruik));
+        localStorage.removeItem('ai-log'); } catch(e){}
   bijwerkVerbruik();
+  toonLaatsteKosten();
 }
 
 // "Zuinig" is een vinkje dat een verschil van twee-en-een-half keer verbergt.
@@ -1202,16 +1270,23 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
   // Verbruik bijhouden zodat zichtbaar is wat een aanroep kost
   if (data.usage) {
     const [pi, po] = PRIJS[model] || PRIJS[MODEL_LICHT];
-    const cacheLees = data.usage.cache_read_input_tokens || 0;
+    const cacheLees   = data.usage.cache_read_input_tokens || 0;
+    // Cache SCHRIJVEN werd niet geteld en kost 1,25x verse invoer. Dat is een
+    // van de redenen dat de teller lager uitkwam dan de rekening.
+    const cacheSchrijf = data.usage.cache_creation_input_tokens || 0;
     const vers = data.usage.input_tokens || 0;
-    const uit = data.usage.output_tokens || 0;
-    verbruik.in    += vers;
-    verbruik.cache += cacheLees;
-    verbruik.uit   += uit;
-    // gelezen cache kost ongeveer een tiende van verse invoer
-    verbruik.euro  += (vers*pi + cacheLees*pi*0.1 + uit*po) / 1000000;
+    const uit  = data.usage.output_tokens || 0;
+    const kosten = (vers*pi + cacheSchrijf*pi*1.25 + cacheLees*pi*0.1 + uit*po) / 1e6;
+
+    verbruik.in     += vers;
+    verbruik.cache  += cacheLees;
+    verbruik.schrijf = (verbruik.schrijf || 0) + cacheSchrijf;
+    verbruik.uit    += uit;
+    verbruik.euro   += kosten;
     verbruik.aanroepen += 1;
     try { localStorage.setItem('ai-verbruik', JSON.stringify(verbruik)); } catch(e){}
+    noteerAanroep({ wat: taakNaam(taak), model, in: vers + cacheSchrijf + cacheLees,
+                    uit, kosten });
     bijwerkVerbruik();
   }
 
@@ -3584,6 +3659,7 @@ function setStep(n) {
 function nextStep() { setStep(Math.min(step+1,4)); }
 function prevStep() { setStep(Math.max(step-1,1)); }
 function restart() {
+  kaartGestart = Date.now();     // vanaf hier tellen de kosten van de nieuwe kaart
   selType=null; selPreset=null; selItems=[]; customColors=[]; outfitUitleg=null; outfitTop='';
   anchorItems=[]; kantEnKlaar=false; renderAnchorPicked();
   document.getElementById('anchor-preset-list').innerHTML='';
