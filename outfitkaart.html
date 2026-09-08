@@ -317,6 +317,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <div class="sec-label">Waarmee wil je beginnen?</div>
     <div class="start-mode">
       <button class="mode-btn active" id="mode-combo" onclick="setStartMode('combo')">🎨 Met een kleurcombo</button>
+      <button class="mode-btn" id="mode-eigenkleur" onclick="startEigenKleur()">🖌️ Met mijn eigen kleuren</button>
       <button class="mode-btn" id="mode-item" onclick="setStartMode('item')">👕 Met een item uit mijn kast</button>
     </div>
     <button class="mode-btn" id="mode-robin" onclick="setStartMode('robin')" style="width:100%;margin-top:8px;">📖 Kant-en-klaar: de 33 outfits van Robin</button>
@@ -1517,6 +1518,7 @@ function setStartMode(mode) {
   document.getElementById('mode-robin').classList.toggle('active', mode === 'robin');
   document.getElementById('mode-inspo').classList.toggle('active', mode === 'inspo');
   document.getElementById('mode-capsule').classList.toggle('active', mode === 'capsule');
+  document.getElementById('mode-eigenkleur').classList.remove('active');
   document.getElementById('combo-area').style.display  = mode === 'combo' ? 'block' : 'none';
   document.getElementById('anchor-area').style.display = mode === 'item'  ? 'block' : 'none';
   document.getElementById('robin-area').style.display  = mode === 'robin' ? 'block' : 'none';
@@ -1744,6 +1746,20 @@ Antwoord ALLEEN met een JSON-array:
     status.textContent = 'Mislukt: ' + e.message;
   }
   btn.disabled = false;
+}
+
+// Zelf een of twee kleuren kiezen kon al, maar zat weggestopt als tiende en
+// laatste type onder "Met een kleurcombo". Deze knop brengt je er direct heen.
+function startEigenKleur() {
+  setStartMode('combo');
+  const knoppen = [...document.querySelectorAll('.combo-type-btn')];
+  const i = COMBO_TYPES.findIndex(ct => ct.id === 'custom');
+  if (i >= 0 && knoppen[i]) {
+    knoppen[i].click();
+    knoppen[i].scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+  document.getElementById('mode-eigenkleur').classList.add('active');
+  document.getElementById('mode-combo').classList.remove('active');
 }
 
 // ── STEP 1: COMBO TYPE ────────────────────────────────────────────────────────

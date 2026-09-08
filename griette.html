@@ -1315,6 +1315,30 @@ function aiZonderDenken(opts) {
   return opts;
 }
 
+// Soms komt een antwoord terug dat halverwege is afgekapt: stop_reason
+// max_tokens. Dan is er geen bruikbare JSON en zie je een lege of rode kaart.
+// Het denkverzoek hierboven zou dat moeten voorkomen, maar de proxy staat
+// buiten deze pagina en we kunnen niet zien of die hem doorgeeft. Dus: merk het
+// gewoon op en probeer het één keer opnieuw met meer ruimte. Dat werkt of de
+// proxy nu meewerkt of niet, en kost alleen iets in het geval dat het misging.
+async function aiRuimerBijAfkap(res, opts) {
+  if (!res.ok) return res;
+  var data;
+  try { data = await res.clone().json(); } catch(e) { return res; }
+  if (!data || data.stop_reason !== 'max_tokens') return res;
+
+  var body;
+  try { body = JSON.parse(opts.body); } catch(e) { return res; }
+  var oud = Number(body.max_tokens) || 1000;
+  if (oud >= 8000) return res;                    // al ruim; niet blijven proberen
+  body.max_tokens = Math.min(Math.max(oud * 4, 4000), 8000);
+
+  try {
+    var ruimer = await fetch(AI_URL, Object.assign({}, opts, { body: JSON.stringify(body) }));
+    return ruimer.ok ? ruimer : res;
+  } catch(e) { return res; }
+}
+
 async function aiFetch(_, opts) {
   opts = aiZonderDenken(opts);
   var res = await fetch(AI_URL, opts);
@@ -1326,6 +1350,7 @@ async function aiFetch(_, opts) {
       res = await fetch(AI_URL, Object.assign({}, opts, { body: JSON.stringify(body) }));
     } catch(e) {}
   }
+  res = await aiRuimerBijAfkap(res, opts);
   // Meelezen zonder de aanroepplekken aan te raken: het antwoord wordt hier
   // eenmaal gekopieerd, geteld, en daarna onaangeroerd doorgegeven.
   try {
@@ -12463,7 +12488,10 @@ async function analyzeBoardInspo(boardId) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: aiModelNu(),
-        max_tokens: 1400,
+        // Stijlanalyse plus drie looks met items en een tip is als JSON al
+        // gauw meer dan 1400 tokens. Te krap betekent hier geen looks, geen
+        // half antwoord - dus ruimer bemeten.
+        max_tokens: 4000,
         messages: [{ role: 'user', content: contentParts }]
       })
     });
