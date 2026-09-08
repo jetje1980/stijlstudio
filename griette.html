@@ -1222,6 +1222,51 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
   if (code !== 'SS-GRIET') { window.location.replace('stijlstudio.html'); }
 })();
 
+// ============ AI-AANROEPEN: MODEL EN TERUGVAL ============
+// Deze pagina draaide op claude-sonnet-4-6. Sonnet 5 is een generatie nieuwer
+// en een derde goedkoper: $2 in / $10 uit per miljoen tokens, tegen $3 / $15.
+// Voor hetzelfde werk scheelt dat dus een derde van de rekening.
+//
+// De proxy staat buiten deze pagina (een Cloudflare Worker), dus of die het
+// nieuwe model accepteert is hier niet te zien. Daarom: probeer het, en zak bij
+// een 400 eenmalig terug naar de vorm die het zeker deed. Kosten van een
+// verkeerde gok zijn dan één mislukte poging, nooit een chat die stukgaat.
+// Na een etmaal proberen we het nieuwe model opnieuw.
+const AI_URL   = 'https://griette-stylist.griette.workers.dev';
+const AI_NIEUW = 'claude-sonnet-5';
+const AI_OUD   = 'claude-sonnet-4-6';
+
+var aiTerugval = false;
+try {
+  var tv = localStorage.getItem('ai-terugval');
+  aiTerugval = !!tv && (Date.now() - Number(tv)) < 864e5;
+} catch(e) {}
+
+function aiModelNu() { return aiTerugval ? AI_OUD : AI_NIEUW; }
+
+// De oude vorm: oud model, systeemtekst als platte string.
+function aiVeiligeVorm(body) {
+  var b = Object.assign({}, body);
+  b.model = AI_OUD;
+  if (Array.isArray(b.system)) {
+    b.system = b.system.map(function(x){ return (x && x.text) || ''; }).join('\n');
+  }
+  return b;
+}
+
+async function aiFetch(_, opts) {
+  var res = await fetch(AI_URL, opts);
+  if (res.status === 400 && !aiTerugval) {
+    aiTerugval = true;
+    try { localStorage.setItem('ai-terugval', String(Date.now())); } catch(e) {}
+    try {
+      var body = aiVeiligeVorm(JSON.parse(opts.body));
+      res = await fetch(AI_URL, Object.assign({}, opts, { body: JSON.stringify(body) }));
+    } catch(e) {}
+  }
+  return res;
+}
+
 // ============ CLOUDINARY CONFIG ============
 const CLOUDINARY_CLOUD = 'dhggari0g';
 const CLOUDINARY_PRESET = 'griette-photos';
@@ -4692,14 +4737,14 @@ Schrijf direct, kort, in het Nederlands, geen aanhef.`;
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
-    const response = await fetch('https://griette-stylist.griette.workers.dev', {
+    const response = await aiFetch(null, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       signal: controller.signal,
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: aiModelNu(),
         max_tokens: 1000,
         messages: [{ role: 'user', content: prompt }]
       })
@@ -5491,11 +5536,11 @@ Geef maximaal 4 matches. Gebruik alleen items die EXACT in de lijst staan.`;
     if (inspoBase64.startsWith('iVBOR')) mType = 'image/png';
     else if (inspoBase64.startsWith('UklGR')) mType = 'image/webp';
 
-    const response = await fetch('https://griette-stylist.griette.workers.dev', {
+    const response = await aiFetch(null, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: aiModelNu(),
         max_tokens: 1200,
         messages: [{
           role: 'user',
@@ -5969,10 +6014,10 @@ function generatePaklijst(board) {
     'Bondig, persoonlijk, Nederlands. Verwijs naar de échte itemnamen. Max 250 woorden.'
   ].join('\n');
 
-  fetch('https://griette-stylist.griette.workers.dev', {
+  aiFetch(null, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 600, messages: [{ role: 'user', content: prompt }] })
+    body: JSON.stringify({ model: aiModelNu(), max_tokens: 600, messages: [{ role: 'user', content: prompt }] })
   }).then(function(r){ return r.json(); })
   .then(function(data){
     var text = (data.content||[]).map(function(b){ return b.text||''; }).join('');
@@ -6170,10 +6215,10 @@ function generateShoppingList() {
     'WINKELS: Mango, Zara, H&M, Sézane, ASOS, Zalando, Massimo Dutti, Omoda, OrangeBag\n\n' +
     'Geef per item:\nITEM: [naam en kleur]\nWAAROM: [reden]\nWINKEL: [winkel(s)]\nZOEK: [zoekterm]\n\nBondig, persoonlijk, Nederlands.';
 
-  fetch('https://griette-stylist.griette.workers.dev', {
+  aiFetch(null, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 800,
+    body: JSON.stringify({ model: aiModelNu(), max_tokens: 800,
       messages: [{ role: 'user', content: prompt }] })
   }).then(function(r){ return r.json(); })
   .then(function(data){
@@ -6479,11 +6524,11 @@ async function showDailyInspirationTip() {
     + 'Alleen JSON.';
 
   try {
-    var response = await fetch('https://griette-stylist.griette.workers.dev', {
+    var response = await aiFetch(null, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: aiModelNu(),
         max_tokens: 1200,
         useWebSearch: true,
         messages: [{ role: 'user', content: prompt }]
@@ -7100,9 +7145,9 @@ async function sendChatWithImage(base64Data, mediaType) {
   ]});
   showChatTyping();
   try {
-    var res = await fetch('https://griette-stylist.griette.workers.dev', {
+    var res = await aiFetch(null, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, system: getChatSystemPrompt(), messages: chatHistory.slice(-8) })
+      body: JSON.stringify({ model: aiModelNu(), max_tokens: 1000, system: gecachteSysteemtekst(), messages: chatHistory.slice(-8) })
     });
     var data = await res.json();
     var reply = (data.content||[]).map(function(b){ return b.text||''; }).join('').trim();
@@ -7250,9 +7295,9 @@ async function generateBoardOutfitsWithCounts(boardId, counts, extra) {
     + '"items":["exacte naam top","exacte naam broek/rok","exacte naam schoenen"],'
     + '"tip":"concrete stijltip"}]';
   try {
-    var res = await fetch('https://griette-stylist.griette.workers.dev', {
+    var res = await aiFetch(null, {
       method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 2500, messages: [{role:'user',content:prompt}] })
+      body: JSON.stringify({ model: aiModelNu(), max_tokens: 2500, messages: [{role:'user',content:prompt}] })
     });
     var data = await res.json();
     var text = (data.content||[]).filter(function(b){ return b.type==='text'; }).map(function(b){ return b.text; }).join('');
@@ -7598,9 +7643,9 @@ async function generateBoardOutfits(boardId) {
     + '[{"naam":"korte naam","gelegenheid":"strand|diner|stad|casual","items":["exacte naam","exacte naam","exacte schoenen"],"tip":"concrete stijltip"}]';
 
   try {
-    var res = await fetch('https://griette-stylist.griette.workers.dev', {
+    var res = await aiFetch(null, {
       method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 2000, messages: [{role:'user',content:prompt}] })
+      body: JSON.stringify({ model: aiModelNu(), max_tokens: 2000, messages: [{role:'user',content:prompt}] })
     });
     var data = await res.json();
     var text = (data.content||[]).filter(function(b){ return b.type==='text'; }).map(function(b){ return b.text; }).join('');
@@ -7722,9 +7767,9 @@ async function generateOutfitFromAnchor(boardId, anchorId, anchorName) {
     + 'Geef ALLEEN JSON: [{"naam":"...","items":["' + anchorName + '","exacte naam","exacte naam"],"tip":"concrete stijltip"}]';
 
   try {
-    var res = await fetch('https://griette-stylist.griette.workers.dev', {
+    var res = await aiFetch(null, {
       method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1200, messages: [{role:'user',content:prompt}] })
+      body: JSON.stringify({ model: aiModelNu(), max_tokens: 1200, messages: [{role:'user',content:prompt}] })
     });
     var data = await res.json();
     var text = (data.content||[]).filter(function(b){ return b.type==='text'; }).map(function(b){ return b.text; }).join('');
@@ -7815,9 +7860,9 @@ async function saveInspoToBoard(tipText, itemIds) {
         + 'Maak er een concrete outfit van.\n'
         + 'Geef ALLEEN dit JSON: {"items":["exacte itemnaam","exacte itemnaam","exacte schoenen"],"naam":"outfit naam","tip":"stijltip"}';
 
-      var res = await fetch('https://griette-stylist.griette.workers.dev', {
+      var res = await aiFetch(null, {
         method: 'POST', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 400, messages: [{role:'user',content:matchPrompt}] })
+        body: JSON.stringify({ model: aiModelNu(), max_tokens: 400, messages: [{role:'user',content:matchPrompt}] })
       });
       var data = await res.json();
       var text = (data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
@@ -7886,9 +7931,9 @@ async function generateOutfitFromAnchor(boardId, anchorId, anchorName) {
     + '{"naam":"creatieve outfit naam","items":["'+anchorName+'","exacte naam 2","exacte naam 3"],"tip":"concrete stijltip"}';
 
   try {
-    var res = await fetch('https://griette-stylist.griette.workers.dev', {
+    var res = await aiFetch(null, {
       method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 400, messages: [{role:'user',content:prompt}] })
+      body: JSON.stringify({ model: aiModelNu(), max_tokens: 400, messages: [{role:'user',content:prompt}] })
     });
     var data = await res.json();
     var text = (data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
@@ -8115,7 +8160,7 @@ async function generateQuickOutfit(feedback){
     +'Stel 1 outfit voor. Geen recent gedragen items. MAX 4 items. Jurk = geen broek erbij.\n'
     +'Geef ALLEEN JSON: {"naam":"...","items":["exacte naam","exacte naam","exacte schoenen"],"reden":"1 zin"}';
   try{
-    var res=await fetch('https://griette-stylist.griette.workers.dev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,messages:[{role:'user',content:prompt}]})});
+    var res=await aiFetch(null,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:aiModelNu(),max_tokens:400,messages:[{role:'user',content:prompt}]})});
     var data=await res.json();
     var text=(data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
     var clean=text.replace(/^[^{]*/,'').replace(/[^}]*$/,'');
@@ -8436,9 +8481,9 @@ async function generateFromBuilder() {
     + '[{"naam":"...","items":["exacte top","exacte rok/broek","exacte schoenen"],"tip":"stijltip"}]';
 
   try {
-    var res = await fetch('https://griette-stylist.griette.workers.dev',{
+    var res = await aiFetch(null,{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1200,messages:[{role:'user',content:prompt}]})
+      body:JSON.stringify({model:aiModelNu(),max_tokens:1200,messages:[{role:'user',content:prompt}]})
     });
     var data = await res.json();
     var text = (data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
@@ -8909,9 +8954,9 @@ async function getCyclusOutfitAdvies(day, fase) {
     + 'Geef ALLEEN JSON: {"naam":"...","items":["exacte naam","exacte naam","exacte schoenen"],"reden":"waarom dit past bij dag ' + day + '"}';
 
   try {
-    var res = await fetch('https://griette-stylist.griette.workers.dev',{
+    var res = await aiFetch(null,{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,messages:[{role:'user',content:prompt}]})
+      body:JSON.stringify({model:aiModelNu(),max_tokens:400,messages:[{role:'user',content:prompt}]})
     });
     var data = await res.json();
     var text = (data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
@@ -9235,7 +9280,7 @@ async function getWellbeingOutfitAdvies(entry, cyclusDay, fase) {
     + 'Geef ALLEEN JSON: {"naam":"...","items":["exacte naam","exacte naam","exacte schoenen"],"reden":"waarom dit past bij haar dag"}';
 
   try {
-    var res=await fetch('https://griette-stylist.griette.workers.dev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,messages:[{role:'user',content:prompt}]})});
+    var res=await aiFetch(null,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:aiModelNu(),max_tokens:400,messages:[{role:'user',content:prompt}]})});
     var data=await res.json();
     var text=(data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
     var clean=text.replace(/^[^{]*/,'').replace(/[^}]*$/,'');
@@ -10755,11 +10800,11 @@ TIP: [1 concrete stylingtip of accessoire]
 Schrijf warm, direct, als een goede vriendin. In het Nederlands. Niet te lang.`;
 
   try {
-    var response = await fetch('https://griette-stylist.griette.workers.dev', {
+    var response = await aiFetch(null, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: aiModelNu(),
         max_tokens: 400,
         messages: [{ role: 'user', content: prompt }]
       })
@@ -10984,6 +11029,16 @@ function initShopPanel() { /* shop panel is static HTML, nothing to init */ }
 var chatHistory = [];
 var chatInitialized = false;
 var imgFile = null; // attached image for next chat message
+
+// De systeemtekst is ruim 2700 tokens - stijlrapport, garderobe, texturen - en
+// is elk bericht identiek. Zonder markering betaal je die elke beurt opnieuw;
+// met markering kost hij na de eerste beurt nog een tiende. Boven de 1024
+// tokens die Sonnet minimaal nodig heeft om te cachen, dus dit pakt echt.
+function gecachteSysteemtekst(extra) {
+  return [{ type:'text',
+            text: getChatSystemPrompt() + (extra || ''),
+            cache_control: { type:'ephemeral' } }];
+}
 
 function getChatSystemPrompt() {
   var allItems = getAllItems();
@@ -11239,13 +11294,13 @@ async function sendChat() {
   var recentHistory = chatHistory.slice(-10);
 
   try {
-    var response = await fetch('https://griette-stylist.griette.workers.dev', {
+    var response = await aiFetch(null, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: aiModelNu(),
         max_tokens: 1400,
-        system: getChatSystemPrompt(),
+        system: gecachteSysteemtekst(),
         messages: recentHistory
       })
     });
@@ -11830,9 +11885,9 @@ async function svAnalyze() {
   });
 
   try {
-    var res = await fetch('https://griette-stylist.griette.workers.dev', {
+    var res = await aiFetch(null, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 600, messages: [{ role: 'user', content: contentParts }] })
+      body: JSON.stringify({ model: aiModelNu(), max_tokens: 600, messages: [{ role: 'user', content: contentParts }] })
     });
     var data = await res.json();
     var txt = (data.content && data.content[0] && data.content[0].text) || '';
@@ -12149,13 +12204,13 @@ async function _biChatSend(boardId, question, msgHistory, msgsDiv, sendBtn) {
   }
 
   try {
-    var resp = await fetch('https://griette-stylist.griette.workers.dev', {
+    var resp = await aiFetch(null, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: aiModelNu(),
         max_tokens: 900,
-        system: getChatSystemPrompt() + '\n\n## Huidig moodboard\n' + boardCtx,
+        system: gecachteSysteemtekst('\n\n## Huidig moodboard\n' + boardCtx),
         messages: historyToSend
       })
     });
@@ -12331,11 +12386,11 @@ async function analyzeBoardInspo(boardId) {
   });
 
   try {
-    var resp = await fetch('https://griette-stylist.griette.workers.dev', {
+    var resp = await aiFetch(null, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: aiModelNu(),
         max_tokens: 1400,
         messages: [{ role: 'user', content: contentParts }]
       })
@@ -12561,9 +12616,9 @@ async function _spAnalyzeBody(btn, body) {
   body.appendChild(loadDiv);
 
   try {
-    var resp = await fetch('https://griette-stylist.griette.workers.dev', {
+    var resp = await aiFetch(null, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 900, messages: [{ role: 'user', content: parts }] })
+      body: JSON.stringify({ model: aiModelNu(), max_tokens: 900, messages: [{ role: 'user', content: parts }] })
     });
     var data = await resp.json();
     var raw = (data.content && data.content[0] && data.content[0].text) || '';
@@ -12641,9 +12696,9 @@ async function _spRankItems(cat, wardrobeItems, btn, body) {
   body.appendChild(loadDiv);
 
   try {
-    var resp = await fetch('https://griette-stylist.griette.workers.dev', {
+    var resp = await aiFetch(null, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1200, messages: [{ role: 'user', content: parts }] })
+      body: JSON.stringify({ model: aiModelNu(), max_tokens: 1200, messages: [{ role: 'user', content: parts }] })
     });
     var data = await resp.json();
     var raw = (data.content && data.content[0] && data.content[0].text) || '';
@@ -12773,9 +12828,9 @@ async function _spAskHowItLooks(item, rank, resultDiv, btn) {
   }
 
   try {
-    var resp = await fetch('https://griette-stylist.griette.workers.dev', {
+    var resp = await aiFetch(null, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 500, messages: [{ role: 'user', content: parts }] })
+      body: JSON.stringify({ model: aiModelNu(), max_tokens: 500, messages: [{ role: 'user', content: parts }] })
     });
     var data = await resp.json();
     var reply = (data.content && data.content[0] && data.content[0].text) || '';
