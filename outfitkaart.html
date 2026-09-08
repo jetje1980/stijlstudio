@@ -67,6 +67,24 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .vraag-opt{text-align:left;padding:9px 11px;border:1.5px solid var(--border);border-radius:10px;background:var(--ph-bg);font-family:'Inter',sans-serif;font-size:11.5px;line-height:1.45;color:var(--text);cursor:pointer;}
 .vraag-opt.gekozen{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--surface));font-weight:600;}
 .vraag-tel{font-size:10px;color:var(--text-2);margin-top:6px;}
+/* Weekendtas */
+.cap-rij{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.cap-paklijst{background:color-mix(in srgb,var(--accent) 6%,var(--surface));border:1.5px solid color-mix(in srgb,var(--accent) 28%,var(--border));border-radius:12px;padding:12px 13px;margin-bottom:10px;}
+.cap-groep{margin-top:8px;font-size:11.5px;line-height:1.6;}
+.cap-groep b{color:var(--text);}
+.cap-tel{font-size:11px;color:var(--text-2);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+.cap-outfit{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 13px;margin-bottom:9px;}
+.cap-kop{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin-bottom:5px;}
+.cap-nr{font-size:11px;font-weight:700;color:var(--accent);}
+.cap-naam{font-size:13px;font-weight:600;}
+.cap-stijl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2);border:1px solid var(--border);border-radius:20px;padding:2px 7px;}
+.cap-stukken{display:flex;flex-wrap:wrap;gap:4px;margin:7px 0;}
+.cap-chip{font-size:10.5px;padding:3px 8px;border-radius:20px;background:var(--ph-bg);border:1px solid var(--border);}
+.cap-chip.nieuw{border-style:dashed;color:var(--text-2);}
+.cap-waarom{font-size:11px;color:var(--text-2);line-height:1.55;}
+.cap-kaart-btn{margin-top:8px;width:100%;padding:8px;background:transparent;border:1.5px solid var(--accent);border-radius:9px;font-family:'Inter',sans-serif;font-size:11px;color:var(--accent);cursor:pointer;}
+.cap-verrassing{background:color-mix(in srgb,var(--green) 8%,var(--surface));border:1.5px solid color-mix(in srgb,var(--green) 30%,var(--border));border-radius:12px;padding:12px 13px;margin-bottom:10px;font-size:11.5px;line-height:1.6;color:var(--text-2);}
+.cap-verrassing b{color:var(--text);}
 /* Pijltje op foto's die nog niet geüpload zijn: dan weet je dat die er op je
    andere apparaten nog niet bij staan. */
 .plaat-lokaal{position:absolute;bottom:2px;left:2px;width:17px;height:17px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:10px;line-height:17px;text-align:center;}
@@ -303,6 +321,45 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     </div>
     <button class="mode-btn" id="mode-robin" onclick="setStartMode('robin')" style="width:100%;margin-top:8px;">📖 Kant-en-klaar: de 33 outfits van Robin</button>
     <button class="mode-btn" id="mode-inspo" onclick="setStartMode('inspo')" style="width:100%;margin-top:8px;">📸 Deze look wil ik namaken</button>
+    <button class="mode-btn" id="mode-capsule" onclick="setStartMode('capsule')" style="width:100%;margin-top:8px;">🧳 Weekendtas: veel outfits uit weinig items</button>
+  </div>
+
+  <!-- ROUTE: capsule voor een paar dagen -->
+  <div id="capsule-area" style="display:none">
+    <div class="sec-label">Waar ga je heen, en hoe lang?</div>
+    <div class="field-note" style="margin-bottom:10px;">Ik zoek een kleine set stukken die op elkaar passen, en maak daar zoveel mogelijk verschillende outfits van. Weinig meenemen, veel kunnen dragen.</div>
+    <input class="modal-field" id="cap-gelegenheid" type="text" placeholder="bijv. weekend Terschelling, stad en strand, koud" autocomplete="off">
+
+    <div class="cap-rij">
+      <div>
+        <div class="sec-label" style="margin-bottom:5px;">Outfits</div>
+        <select class="modal-field" id="cap-aantal" style="padding:9px 11px;font-size:12px;">
+          <option value="4">4 outfits</option>
+          <option value="6" selected>6 outfits</option>
+          <option value="8">8 outfits</option>
+        </select>
+      </div>
+      <div>
+        <div class="sec-label" style="margin-bottom:5px;">Buitenlaag</div>
+        <select class="modal-field" id="cap-jas" style="padding:9px 11px;font-size:12px;">
+          <option value="jas">Jas of mantel mee</option>
+          <option value="licht">Alleen vest of blazer</option>
+          <option value="geen">Geen buitenlaag</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sec-label" style="margin-top:14px;">Vaste stukken <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">optioneel — deze gaan sowieso mee</span></div>
+    <div id="cap-gekozen"></div>
+    <input class="anchor-search" id="cap-search" type="text" placeholder="Zoek in je kast…" autocomplete="off">
+    <div class="anchor-grid" id="cap-grid"></div>
+
+    <div class="sec-label" style="margin-top:14px;">Kleuren <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">optioneel — max 3</span></div>
+    <div class="color-swatch-grid" id="cap-kleuren"></div>
+
+    <button class="ai-btn" id="cap-btn" style="margin-top:12px;" onclick="aiCapsule()">🧳 Stel mijn weekendtas samen</button>
+    <div class="field-note" id="cap-status" style="margin-top:6px;"></div>
+    <div id="cap-uitkomst" style="margin-top:14px;"></div>
   </div>
 
   <!-- ROUTE: inspiratiefoto namaken -->
@@ -1459,10 +1516,12 @@ function setStartMode(mode) {
   document.getElementById('mode-item').classList.toggle('active', mode === 'item');
   document.getElementById('mode-robin').classList.toggle('active', mode === 'robin');
   document.getElementById('mode-inspo').classList.toggle('active', mode === 'inspo');
+  document.getElementById('mode-capsule').classList.toggle('active', mode === 'capsule');
   document.getElementById('combo-area').style.display  = mode === 'combo' ? 'block' : 'none';
   document.getElementById('anchor-area').style.display = mode === 'item'  ? 'block' : 'none';
   document.getElementById('robin-area').style.display  = mode === 'robin' ? 'block' : 'none';
   document.getElementById('inspo-area').style.display  = mode === 'inspo' ? 'block' : 'none';
+  document.getElementById('capsule-area').style.display = mode === 'capsule' ? 'block' : 'none';
 
   // Route wisselen betekent opnieuw beginnen met de combo
   selPreset = null;
@@ -1472,7 +1531,16 @@ function setStartMode(mode) {
   document.querySelectorAll('.combo-type-btn').forEach(b=>b.classList.remove('selected'));
 
   kantEnKlaar = false;
-  if (mode === 'robin') {
+  if (mode === 'capsule') {
+    bouwCapKleuren();
+    bouwCapGrid('');
+    toonCapGekozen();
+    const zoek = document.getElementById('cap-search');
+    if (zoek && !zoek._gekoppeld) {
+      zoek._gekoppeld = true;
+      zoek.addEventListener('input', e => bouwCapGrid(e.target.value));
+    }
+  } else if (mode === 'robin') {
     selItems = [];
     anchorItems = [];
     buildRobinList();
@@ -1491,6 +1559,10 @@ function setStartMode(mode) {
       renderAnchorPicked();
     }
     if (mode === 'combo') { selItems = []; document.getElementById('robin-list').innerHTML=''; }
+  }
+  if (mode !== 'capsule') {
+    const u = document.getElementById('cap-uitkomst');
+    if (u) u.innerHTML = '';
   }
 }
 
@@ -2709,6 +2781,304 @@ Antwoord ALLEEN met JSON:
   btn.disabled = false;
 }
 
+// ── WEEKENDTAS: VEEL OUTFITS UIT WEINIG ITEMS ─────────────────────────────────
+// Een losse outfit maken is één som. Een tas pakken is een andere: je zoekt de
+// kleinste set stukken waaruit de meeste verschillende dagen te halen zijn.
+// De truc zit in kleurdiscipline — deelt alles een kern van twee, drie kleuren,
+// dan past elk bovenstuk op elk onderstuk en groeit het aantal combinaties
+// vanzelf. Variatie komt daarna niet uit méér spullen maar uit een andere
+// stijlgreep op dezelfde stukken: vandaag ton-sur-ton, morgen een hard accent.
+let capItems = [];      // vaste stukken die sowieso meegaan
+let capKleuren = [];    // maximaal drie
+const CAP_MAX_ITEMS = 6;
+const CAP_MAX_KLEUR = 3;
+
+function isCapItem(id) { return capItems.some(i => i.id === id); }
+
+function bouwCapKleuren() {
+  const grid = document.getElementById('cap-kleuren');
+  if (!grid || grid.children.length) return;
+  grid.innerHTML = KLEUREN.map(k =>
+    `<button class="cswatch" data-v="${esc(k.v)}" style="background:${k.dot}" title="${esc(k.v)}"`
+    + ` onclick="wisselCapKleur('${esc(k.v)}')"><span class="check">✓</span></button>`).join('');
+}
+
+function wisselCapKleur(v) {
+  const i = capKleuren.indexOf(v);
+  if (i >= 0) capKleuren.splice(i, 1);
+  else {
+    if (capKleuren.length >= CAP_MAX_KLEUR) capKleuren.shift();
+    capKleuren.push(v);
+  }
+  document.querySelectorAll('#cap-kleuren .cswatch').forEach(b =>
+    b.classList.toggle('selected', capKleuren.includes(b.dataset.v)));
+}
+
+function bouwCapGrid(filter) {
+  const grid = document.getElementById('cap-grid');
+  if (!grid) return;
+  const q = (filter || '').trim().toLowerCase();
+  const lijst = allItems.filter(i => !q || (i.name || '').toLowerCase().includes(q)).slice(0, 60);
+  grid.innerHTML = lijst.map(i => {
+    const foto = cloudMap[i.id];
+    return `<div class="icard${isCapItem(i.id) ? ' selected' : ''}" onclick="wisselCapItem('${esc(i.id)}')">`
+      + (foto ? `<img src="${esc(foto)}" alt="">` : `<div class="icard-ph">${CAT_ICONS[i.cat] || '📦'}</div>`)
+      + `<div class="icard-name">${esc(i.name)}</div></div>`;
+  }).join('');
+}
+
+function wisselCapItem(id) {
+  const st = document.getElementById('cap-status');
+  if (isCapItem(id)) capItems = capItems.filter(i => i.id !== id);
+  else {
+    if (capItems.length >= CAP_MAX_ITEMS) {
+      st.textContent = `Maximaal ${CAP_MAX_ITEMS} vaste stukken — de rest kies ik erbij.`;
+      return;
+    }
+    const it = allItems.find(i => i.id === id);
+    if (it) capItems.push(it);
+  }
+  st.textContent = '';
+  toonCapGekozen();
+  bouwCapGrid(document.getElementById('cap-search').value);
+}
+
+function toonCapGekozen() {
+  const el = document.getElementById('cap-gekozen');
+  if (!el) return;
+  el.innerHTML = capItems.length
+    ? '<div class="cap-stukken" style="margin-bottom:8px;">'
+      + capItems.map(i => `<span class="cap-chip">${esc(i.name)} `
+          + `<span style="cursor:pointer;opacity:.6" onclick="wisselCapItem('${esc(i.id)}')">×</span></span>`).join('')
+      + '</div>'
+    : '';
+}
+
+async function aiCapsule() {
+  const btn = document.getElementById('cap-btn');
+  const st  = document.getElementById('cap-status');
+  const uit = document.getElementById('cap-uitkomst');
+  const aantal = Number(document.getElementById('cap-aantal').value) || 6;
+  const jas = document.getElementById('cap-jas').value;
+  const gel = (document.getElementById('cap-gelegenheid').value || '').trim();
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Tas pakken…';
+  st.textContent = '';
+  uit.innerHTML = '';
+
+  const jasRegel = jas === 'jas'
+    ? 'Er gaat één jas of mantel mee. Die moet over ELKE outfit passen, dus kies hem op de kleurkern en niet op één look.'
+    : jas === 'licht'
+      ? 'Geen jas, wel een vest of blazer als buitenste laag. Ook die moet bij alles passen.'
+      : 'Geen buitenlaag nodig.';
+
+  const vast = capItems.length
+    ? 'DEZE STUKKEN GAAN SOWIESO MEE, bouw eromheen:\n'
+      + capItems.map(i => `- ${i.name} (${i.id})`).join('\n')
+    : '';
+  const kleurRegel = capKleuren.length
+    ? `Griette wil deze kleuren gebruiken: ${capKleuren.join(', ')}. Maak daar de kern van.`
+    : 'Kies zelf een kleurkern die bij haar palet past.';
+
+  const system = `Je bent een stylist die een capsule samenstelt: de kleinste set
+kleding waaruit de meeste verschillende outfits te halen zijn. ${GRIETTE_DNA}
+${profielBlok()}
+Antwoord in het Nederlands. Wees concreet en eerlijk over wat ontbreekt.`;
+
+  const inhoud = [{ type:'text', text:
+`Griette gaat weg en wil weinig meenemen maar veel kunnen dragen.
+${gel ? 'Gelegenheid: ' + gel : 'Gelegenheid: niet opgegeven — ga uit van een gewoon weekend weg, dag en avond door elkaar, en zeg dat je dat aanneemt.'}
+Ze wil ${aantal} outfits.
+${jasRegel}
+${kleurRegel}
+${vast}
+
+HAAR GARDEROBE (id | categorie | naam | tags):
+${wardrobeForAI()}
+
+WERK ZO:
+
+STAP 1 — KLEURKERN
+Kies twee of drie kleuren die alles deelt, plus hooguit twee accentkleuren.
+Dit is het hele fundament: delen alle stukken een kern, dan past elk bovenstuk
+op elk onderstuk en krijg je veel outfits uit weinig items. Kies de kern uit
+haar basiskleuren, want die moeten het vaakst terugkomen.
+
+STAP 2 — DE PAKLIJST
+Kies de stukken. Streef naar zo weinig mogelijk: als vuistregel drie of vier
+bovenstukken, twee of drie onderstukken, één of twee lagen, twee paar schoenen
+en één tas is genoeg voor ${aantal} outfits. Elk onderstuk moet met ELK
+bovenstuk kunnen. Kan dat niet, dan hoort dat stuk niet in de tas.
+Voeg per stuk toe hoeveel outfits het draagt — een stuk dat in één outfit zit
+verdient zijn plek in de tas niet.
+
+STAP 3 — ${aantal} OUTFITS DIE ECHT VERSCHILLEN
+Variatie komt NIET uit meer items maar uit een andere greep op dezelfde stukken.
+Gebruik minstens drie verschillende stijlgrepen en noem ze bij naam, bijvoorbeeld:
+  ton-sur-ton (tinten van één kleurfamilie, verschil zit in textuur)
+  monochroom (één kleur van top tot teen)
+  neutraal met één accent
+  kleurblokken (twee volle kleuren tegenover elkaar)
+  print als blikvanger, rest stil
+  contrast in textuur (glad tegen ruw, zacht tegen stevig)
+Wissel ook het silhouet: niet zes keer wijd onder en strak boven.
+Geef elke outfit een gelegenheid: wandelen, uit eten, terras, reisdag.
+
+STAP 4 — DURF
+Eén van de outfits moet er een zijn die Griette zelf niet zou bedenken. Leg uit
+waarom die tóch klopt. Speel niet op zeker in alle ${aantal}.
+
+STAP 5 — EERLIJK
+Ontbreekt er iets waardoor de tas pas echt werkt, zeg dat dan, met eigen=false.
+Verzin nooit een id dat niet in de lijst staat.
+
+Antwoord ALLEEN met JSON:
+{"kern":{"kleuren":["2 of 3 basiskleuren"],"accenten":["max 2"],
+  "waarom":"1 zin: waarom deze kern zoveel combinaties oplevert"},
+ "paklijst":[{"id":"exact-id-of-null","naam":"...","categorie":"tops|bottoms|layers|jurken|shoes|bags|accessories",
+   "eigen":true,"outfits":3,"waarom":"waarom dit stuk mee moet, max 8 woorden"}],
+ "outfits":[{"naam":"korte naam","stijl":"de stijlgreep bij naam",
+   "gelegenheid":"waarvoor","items":["exacte namen uit de paklijst"],
+   "waarom":"1 tot 2 zinnen: waarom dit werkt"}],
+ "verrassing":"welke outfit ze zelf niet zou bedenken en waarom die tóch klopt, 2 zinnen",
+ "ontbreekt":"wat de tas nog mist, of leeg"}` }];
+
+  try {
+    const raw = await callClaude(system, inhoud, 24000, 'medium', 'zwaar');
+    const data = extractJson(raw);
+    if (!data || Array.isArray(data)) throw new Error('Geen bruikbaar antwoord');
+    const outfits = pickArray(data, ['outfits'], true) || [];
+    const paklijst = pickArray(data, ['paklijst'], true) || [];
+    if (!outfits.length) throw new Error('Geen outfits voorgesteld');
+
+    capsuleResultaat = { data, outfits, paklijst };
+    toonCapsule();
+    st.innerHTML = `<b>${outfits.length} outfits</b> uit ${paklijst.length} stuks.`;
+    btn.textContent = '🧳 Opnieuw samenstellen';
+  } catch(e) {
+    st.textContent = 'Mislukt: ' + e.message;
+    btn.textContent = '🧳 Stel mijn weekendtas samen';
+  }
+  btn.disabled = false;
+}
+
+let capsuleResultaat = null;
+
+function toonCapsule() {
+  const el = document.getElementById('cap-uitkomst');
+  if (!el || !capsuleResultaat) return;
+  const { data, outfits, paklijst } = capsuleResultaat;
+  const kern = data.kern || {};
+
+  // Paklijst gegroepeerd, zodat je ziet wat je in de tas legt
+  const groepen = {};
+  paklijst.forEach(p => {
+    const c = p.categorie || 'overig';
+    (groepen[c] = groepen[c] || []).push(p);
+  });
+  const label = { tops:'Bovenstukken', bottoms:'Onderstukken', layers:'Lagen',
+                  jurken:'Jurken', shoes:'Schoenen', bags:'Tassen',
+                  accessories:'Accessoires', overig:'Overig' };
+
+  let html = '<div class="cap-paklijst"><b>Je kleurkern</b><br>'
+    + '<span style="font-size:11.5px;">'
+    + esc((kern.kleuren || []).join(' · '))
+    + ((kern.accenten || []).length ? ' <span style="opacity:.7">met ' + esc(kern.accenten.join(' en ')) + ' als accent</span>' : '')
+    + '</span>'
+    + (kern.waarom ? `<div class="cap-groep" style="opacity:.85">${esc(kern.waarom)}</div>` : '');
+
+  Object.keys(groepen).forEach(c => {
+    html += `<div class="cap-groep"><b>${esc(label[c] || c)}</b><br>`
+      + groepen[c].map(p => {
+          const nieuw = p.eigen === false;
+          return `${nieuw ? '<i>' : ''}${esc(p.naam || '')}${nieuw ? ' — heb je niet</i>' : ''}`
+            + (p.outfits ? ` <span style="opacity:.6">(${p.outfits}×)</span>` : '');
+        }).join('<br>')
+      + '</div>';
+  });
+
+  const eigenAantal = paklijst.filter(p => p.eigen !== false).length;
+  html += `<div class="cap-tel"><b>${paklijst.length}</b> stuks → <b>${outfits.length}</b> outfits`
+    + (eigenAantal < paklijst.length
+        ? ` · ${eigenAantal} uit je eigen kast, ${paklijst.length - eigenAantal} zou je nog moeten hebben` : '')
+    + '</div></div>';
+
+  if (data.verrassing) {
+    html += `<div class="cap-verrassing"><b>Durf eens</b><br>${esc(data.verrassing)}</div>`;
+  }
+
+  outfits.forEach((o, i) => {
+    const namen = Array.isArray(o.items) ? o.items : [];
+    html += '<div class="cap-outfit">'
+      + `<div class="cap-kop"><span class="cap-nr">${i+1}</span>`
+      + `<span class="cap-naam">${esc(o.naam || 'Outfit ' + (i+1))}</span>`
+      + (o.stijl ? `<span class="cap-stijl">${esc(o.stijl)}</span>` : '')
+      + '</div>'
+      + (o.gelegenheid ? `<div class="cap-waarom" style="margin-bottom:4px;opacity:.8">${esc(o.gelegenheid)}</div>` : '')
+      + '<div class="cap-stukken">'
+      + namen.map(n => {
+          const echt = vindItemOpNaam(n);
+          return `<span class="cap-chip${echt ? '' : ' nieuw'}">${esc(n)}</span>`;
+        }).join('')
+      + '</div>'
+      + (o.waarom ? `<div class="cap-waarom">${esc(o.waarom)}</div>` : '')
+      + `<button class="cap-kaart-btn" onclick="capsuleNaarKaart(${i})">Maak hier een outfitkaart van →</button>`
+      + '</div>';
+  });
+
+  if (data.ontbreekt) {
+    html += `<div class="recept-blok"><b>Eerlijk gezegd</b><br>${esc(data.ontbreekt)}</div>`;
+  }
+  el.innerHTML = html;
+}
+
+// De paklijst noemt namen, geen ids. Zoek het echte item erbij zodat de kaart
+// de foto's kan tonen.
+function vindItemOpNaam(naam) {
+  const q = String(naam || '').toLowerCase().trim();
+  if (!q) return null;
+  return allItems.find(i => (i.name || '').toLowerCase() === q)
+      || allItems.find(i => (i.name || '').toLowerCase().includes(q))
+      || allItems.find(i => q.includes((i.name || '').toLowerCase()) && (i.name || '').length > 4)
+      || null;
+}
+
+function capsuleNaarKaart(idx) {
+  if (!capsuleResultaat) return;
+  const o = capsuleResultaat.outfits[idx];
+  if (!o) return;
+
+  selItems = (Array.isArray(o.items) ? o.items : []).slice(0, 6).map(n => {
+    const echt = vindItemOpNaam(n);
+    if (echt) return Object.assign({}, echt, { _waarom: '' });
+    return { id:'sugg-c-'+Math.random().toString(36).slice(2,7), name:n, cat:'overig',
+             brand:'', _suggestion:true, _waarom:'' };
+  });
+  anchorItems = [];
+  kantEnKlaar = false;
+  outfitUitleg = null;
+  outfitTop = o.waarom || '';
+
+  const kern = (capsuleResultaat.data.kern || {});
+  selPreset = {
+    name: o.naam || 'Weekendoutfit',
+    vibe: [o.stijl, o.gelegenheid].filter(Boolean).join(' · '),
+    typeName: 'Uit je weekendtas',
+    stijl: 'weekend',
+    colors: ['#c4c4c8','#8b7d6b','#5c3317','#f5f0e1'],
+    tags: (kern.kleuren || []).concat(kern.accenten || []),
+  };
+  selType = { label: 'Uit je weekendtas' };
+
+  const t = document.getElementById('f-title');
+  if (t && !t.value) t.value = (o.naam || 'Weekend').toUpperCase();
+  const g = document.getElementById('f-gelegenheid');
+  if (g && !g.value) g.value = o.gelegenheid || '';
+
+  setStep(3);
+}
+
 // ── ACCENTKLEUR BIJ WAT JE AL KOOS ────────────────────────────────────────────
 // Kies je twee stukken, dan is de vraag niet "welke preset past" maar "welke
 // derde kleur maakt dit af, en op welk formaat". Dat is kleurenleer toegepast
@@ -2902,6 +3272,11 @@ ${wardrobeForAI()}
 Gekozen kleurcombo: ${combo}
 ${gelBlok}${reedsBlok}
 Stel één complete, draagbare outfit samen van 4 tot 6 stukken.
+
+DENK AAN DE BUITENLAAG. Een outfit voor buiten is niet af zonder jas, mantel,
+blazer of vest zodra het seizoen of de gelegenheid daarom vraagt. Sla die laag
+niet over omdat de rest al klopt: kies hem bewust, op kleur en op lengte ten
+opzichte van de zoom eronder. Past er echt geen buitenlaag bij, zeg dat dan.
 
 WERK IN DEZE VOLGORDE. Denk elke stap echt door voordat je verder gaat.
 
