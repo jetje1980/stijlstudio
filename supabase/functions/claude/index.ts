@@ -91,8 +91,13 @@ Deno.serve(async (req: Request) => {
 
   // Alleen bekende modellen en een plafond op max_tokens, zodat een
   // misbruikte aanroep nooit een grote rekening kan opleveren.
+  //
+  // Valt terug op Sonnet, niet op Opus. Dit stond andersom, en dat is precies
+  // de verkeerde kant op: een typefout in een modelnaam werd dan stilletjes
+  // het duurste model (Opus is 2,5x Sonnet). Onbekend hoort goedkoop uit te
+  // pakken, niet duur.
   if (typeof body.model !== "string" || !ALLOWED_MODELS.includes(body.model)) {
-    body.model = "claude-opus-5";
+    body.model = "claude-sonnet-5";
   }
   const requested = typeof body.max_tokens === "number" ? body.max_tokens : 8000;
   body.max_tokens = Math.min(Math.max(requested, 256), MAX_TOKENS_CAP);

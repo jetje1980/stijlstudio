@@ -244,8 +244,9 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <label style="display:flex;align-items:flex-start;gap:9px;cursor:pointer;">
         <input type="checkbox" id="zuinig-check" style="margin-top:2px;width:17px;height:17px;flex-shrink:0;">
         <span><b style="font-size:13px;">Zuinig</b>
-        <span style="display:block;font-size:11px;color:var(--text-2);line-height:1.5;margin-top:2px;">Kiezen, beschrijven en invullen gaan op het goedkoopste model. Dat scheelt ongeveer vijf keer in kosten en je merkt er nauwelijks iets van, want dat zijn geen denkklussen. Zet uit als je de uitgebreide analyse door het beste model wilt laten doen.</span></span>
+        <span style="display:block;font-size:11px;color:var(--text-2);line-height:1.5;margin-top:2px;">Het samenstellen en perfectioneren gaan op Sonnet 5, beschrijven en invullen op het goedkoopste model. Zet uit als je de zware analyse door het duurste model wilt laten doen.</span></span>
       </label>
+      <div id="zuinig-prijs" style="margin-top:9px;font-size:11px;line-height:1.55;"></div>
     </div>
 
     <div id="verbruik-vak" style="margin-top:12px;font-size:11px;color:var(--text-2);line-height:1.6;"></div>
@@ -969,6 +970,36 @@ function resetVerbruik() {
   bijwerkVerbruik();
 }
 
+// "Zuinig" is een vinkje dat een verschil van twee-en-een-half keer verbergt.
+// Gemeten aan de werkelijke aanroepen: samenstellen kost ongeveer 3k tokens
+// invoer, perfectioneren 8,5k waarvan de helft foto's, en samen zo'n 4,5k
+// uitvoer. Dat staat hier in euro's, want een vinkje zegt niets over een
+// rekening en een bedrag wel.
+function kaartPrijs(model) {
+  const [pi, po] = PRIJS[model] || PRIJS[MODEL_OORDEEL];
+  const invoer = 3100 + 8550;
+  const uitvoer = 4500;
+  return (invoer*pi + uitvoer*po) / 1e6;
+}
+
+function bijwerkZuinigPrijs() {
+  const el = document.getElementById('zuinig-prijs');
+  if (!el) return;
+  const aan = document.getElementById('zuinig-check').checked;
+  const goedkoop = kaartPrijs(MODEL_OORDEEL);
+  const duur     = kaartPrijs(aiModel);
+  const rond = n => '€ ' + n.toFixed(2);
+
+  el.innerHTML = aan
+    ? `<b>Nu ongeveer ${rond(goedkoop)}</b> voor een kaart maken én perfectioneren.`
+      + `<br><span style="color:var(--text-2)">Uitgezet wordt dat ${rond(duur)} — `
+      + `${(duur/goedkoop).toFixed(1)}× zo veel.</span>`
+    : `<b style="color:#b5232a">Nu ongeveer ${rond(duur)}</b> voor een kaart maken én perfectioneren, `
+      + `op ${aiModel.replace('claude-','')}.`
+      + `<br><span style="color:var(--text-2)">Met zuinig aan is dat ${rond(goedkoop)} — `
+      + `je betaalt nu ${(duur/goedkoop).toFixed(1)}× zo veel.</span>`;
+}
+
 function openSettings() {
   bijwerkScanKnop();
   bijwerkVerbruik();
@@ -977,7 +1008,12 @@ function openSettings() {
   sm.value = scanModel;
   sm.onchange = bijwerkScanKosten;
   document.getElementById('app-secret-input').value = appSecret;
-  document.getElementById('ai-model-select').value = aiModel;
+  const ms = document.getElementById('ai-model-select');
+  ms.value = aiModel;
+  // Meteen laten zien wat een keuze kost, niet pas na opslaan.
+  ms.onchange = () => { aiModel = ms.value; bijwerkZuinigPrijs(); };
+  document.getElementById('zuinig-check').onchange = bijwerkZuinigPrijs;
+  bijwerkZuinigPrijs();
   toonPlaat();
   document.getElementById('settings-modal').classList.add('open');
 }
