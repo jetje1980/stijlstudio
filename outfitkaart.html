@@ -355,7 +355,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <input class="anchor-search" id="cap-search" type="text" placeholder="Zoek in je kast…" autocomplete="off">
     <div class="anchor-grid" id="cap-grid"></div>
 
-    <div class="sec-label" style="margin-top:14px;">Kleuren <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">optioneel — max 3</span></div>
+    <div class="sec-label" style="margin-top:14px;">Kleuren <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">optioneel — hoe minder kleuren, hoe meer combinaties</span></div>
     <div class="color-swatch-grid" id="cap-kleuren"></div>
 
     <button class="ai-btn" id="cap-btn" style="margin-top:12px;" onclick="aiCapsule()">🧳 Stel mijn weekendtas samen</button>
@@ -1290,25 +1290,41 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
       : 'De foto is te groot om te versturen. Probeer een kleinere schermafdruk.');
   }
 
+  // Een zware vraag duurt op de server soms een halve tot hele minuut. Een
+  // telefoon houdt zo'n verbinding niet altijd open — schermdimmen, een
+  // overstap tussen wifi en 5G, en de fetch sneuvelt met "Failed to fetch".
+  // Dat is geen fout in het antwoord maar in de leiding ernaartoe, dus:
+  // gewoon nog een keer proberen voordat we het opgeven.
   let res;
-  const ctrl = new AbortController();
-  const tijdKlok = setTimeout(() => ctrl.abort(), 120000);
-  try {
-    // Gaat naar onze eigen Supabase Edge Function; die houdt de
-    // Anthropic-sleutel server-side vast.
-    res = await fetch(AI_ENDPOINT, {
-      method: 'POST',
-      headers,
-      body: verzoek,
-      signal: ctrl.signal
-    });
-    clearTimeout(tijdKlok);
-  } catch(e) {
-    clearTimeout(tijdKlok);
-    if (e && e.name === 'AbortError') {
-      throw new Error('Het duurde te lang (meer dan 2 minuten). Probeer een lichter model via ⚙ Instellingen, of kies minder items.');
+  let poging = 0;
+  while (true) {
+    poging++;
+    const ctrl = new AbortController();
+    const tijdKlok = setTimeout(() => ctrl.abort(), 120000);
+    try {
+      // Gaat naar onze eigen Supabase Edge Function; die houdt de
+      // Anthropic-sleutel server-side vast.
+      res = await fetch(AI_ENDPOINT, {
+        method: 'POST',
+        headers,
+        body: verzoek,
+        signal: ctrl.signal
+      });
+      clearTimeout(tijdKlok);
+      break;
+    } catch(e) {
+      clearTimeout(tijdKlok);
+      if (e && e.name === 'AbortError') {
+        throw new Error('Het duurde te lang (meer dan 2 minuten). Probeer een lichter model via ⚙ Instellingen, of kies minder items.');
+      }
+      if (poging < 2) {
+        await new Promise(r => setTimeout(r, 1500));
+        continue;
+      }
+      throw new Error('De verbinding viel weg, ook na een tweede poging. '
+        + 'Dit gebeurt op een telefoon als een vraag lang duurt. Probeer het opnieuw, '
+        + 'het liefst met het scherm aan.');
     }
-    throw new Error('Verbinding mislukt: ' + (e && e.message ? e.message : 'onbekende oorzaak'));
   }
 
   if (!res.ok) {
@@ -2807,7 +2823,10 @@ Antwoord ALLEEN met JSON:
 let capItems = [];      // vaste stukken die sowieso meegaan
 let capKleuren = [];    // maximaal drie
 const CAP_MAX_ITEMS = 6;
-const CAP_MAX_KLEUR = 3;
+// Zes is ruim. Voor een tas werkt minder meestal beter — hoe meer kleuren, hoe
+// minder stukken op elkaar passen — maar dat is een advies, geen verbod. Wie
+// vijf kleuren mee wil, mag dat zelf weten.
+const CAP_MAX_KLEUR = 6;
 
 function isCapItem(id) { return capItems.some(i => i.id === id); }
 
@@ -2834,13 +2853,37 @@ function bouwCapGrid(filter) {
   const grid = document.getElementById('cap-grid');
   if (!grid) return;
   const q = (filter || '').trim().toLowerCase();
-  const lijst = allItems.filter(i => !q || (i.name || '').toLowerCase().includes(q)).slice(0, 60);
-  grid.innerHTML = lijst.map(i => {
-    const foto = cloudMap[i.id];
-    return `<div class="icard${isCapItem(i.id) ? ' selected' : ''}" onclick="wisselCapItem('${esc(i.id)}')">`
-      + (foto ? `<img src="${esc(foto)}" alt="">` : `<div class="icard-ph">${CAT_ICONS[i.cat] || '📦'}</div>`)
-      + `<div class="icard-name">${esc(i.name)}</div></div>`;
-  }).join('');
+  const lijst = allItems
+    .filter(i => !q || (i.name || '').toLowerCase().includes(q) || (i.brand || '').toLowerCase().includes(q))
+    .sort((a,b) => (cloudMap[b.id] ? 1 : 0) - (cloudMap[a.id] ? 1 : 0))
+    .slice(0, 60);
+
+  grid.innerHTML = '';
+  if (!lijst.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;font-size:11px;color:var(--text-2);padding:10px 2px;">Niets gevonden.</div>';
+    return;
+  }
+
+  // Dezelfde opbouw als de andere itemkiezers: de foto hoort IN .ithumb, anders
+  // rekt hij over de hele kaart uit en valt de naam eronder weg.
+  lijst.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'icard' + (isCapItem(item.id) ? ' selected' : '');
+    card.innerHTML = `<div class="ithumb" id="cap-th-${esc(item.id)}">${CAT_ICONS[item.cat] || '📦'}</div>`
+      + `<div class="iinfo"><div class="iname">${esc(item.name)}</div>`
+      + `<div class="icat">${esc(item.brand || item.cat)}</div></div>`;
+    if (cloudMap[item.id]) {
+      const img = new Image();
+      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+      img.onload = () => {
+        const t = document.getElementById('cap-th-' + item.id);
+        if (t) { t.textContent = ''; t.appendChild(img); }
+      };
+      img.src = cloudMap[item.id];
+    }
+    card.addEventListener('click', () => wisselCapItem(item.id));
+    grid.appendChild(card);
+  });
 }
 
 function wisselCapItem(id) {
@@ -2880,8 +2923,15 @@ async function aiCapsule() {
 
   btn.disabled = true;
   btn.textContent = '⏳ Tas pakken…';
-  st.textContent = '';
   uit.innerHTML = '';
+  // Dit is de zwaarste vraag in de app en duurt makkelijk een halve minuut.
+  // Zonder teller lijkt het scherm vast te zitten en gaat er getikt worden.
+  let sec = 0;
+  st.textContent = 'Dit duurt ongeveer een halve minuut. Laat je scherm aan.';
+  const klok = setInterval(() => {
+    sec += 1;
+    st.textContent = `Bezig… ${sec} seconden. Laat je scherm aan.`;
+  }, 1000);
 
   const jasRegel = jas === 'jas'
     ? 'Er gaat één jas of mantel mee. Die moet over ELKE outfit passen, dus kies hem op de kleurkern en niet op één look.'
@@ -2961,7 +3011,10 @@ Antwoord ALLEEN met JSON:
  "ontbreekt":"wat de tas nog mist, of leeg"}` }];
 
   try {
-    const raw = await callClaude(system, inhoud, 24000, 'medium', 'zwaar');
+    // 12000 in plaats van 24000: het antwoord is een paar duizend tokens JSON.
+    // Meer ruimte maakt het niet beter, alleen langer — en hoe langer het duurt,
+    // hoe groter de kans dat een telefoon de verbinding laat vallen.
+    const raw = await callClaude(system, inhoud, 12000, 'medium', 'zwaar');
     const data = extractJson(raw);
     if (!data || Array.isArray(data)) throw new Error('Geen bruikbaar antwoord');
     const outfits = pickArray(data, ['outfits'], true) || [];
@@ -2970,12 +3023,15 @@ Antwoord ALLEEN met JSON:
 
     capsuleResultaat = { data, outfits, paklijst };
     toonCapsule();
+    clearInterval(klok);
     st.innerHTML = `<b>${outfits.length} outfits</b> uit ${paklijst.length} stuks.`;
     btn.textContent = '🧳 Opnieuw samenstellen';
   } catch(e) {
+    clearInterval(klok);
     st.textContent = 'Mislukt: ' + e.message;
     btn.textContent = '🧳 Stel mijn weekendtas samen';
   }
+  clearInterval(klok);
   btn.disabled = false;
 }
 
