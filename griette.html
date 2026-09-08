@@ -1254,6 +1254,41 @@ function aiVeiligeVorm(body) {
   return b;
 }
 
+// Deze pagina telde haar eigen verbruik helemaal niet mee, terwijl ze
+// drieentwintig aanroepplekken heeft en dagelijks gebruikt wordt. De teller in
+// de outfitkaart kwam daardoor altijd lager uit dan de rekening. Beide pagina's
+// schrijven nu in dezelfde lijst.
+var AI_PRIJS = {
+  'claude-opus-5':    [5, 25],
+  'claude-sonnet-5':  [2, 10],
+  'claude-sonnet-4-6':[3, 15],
+  'claude-haiku-4-5': [1, 5],
+};
+
+function noteerVerbruik(model, usage, wat) {
+  if (!usage) return;
+  var p = AI_PRIJS[model] || AI_PRIJS['claude-sonnet-5'];
+  var vers    = usage.input_tokens || 0;
+  var lees    = usage.cache_read_input_tokens || 0;
+  var schrijf = usage.cache_creation_input_tokens || 0;   // kost 1,25x
+  var uit     = usage.output_tokens || 0;
+  var kosten  = (vers*p[0] + schrijf*p[0]*1.25 + lees*p[0]*0.1 + uit*p[1]) / 1e6;
+
+  try {
+    var v = JSON.parse(localStorage.getItem('ai-verbruik') || '{}');
+    v.in = (v.in||0) + vers;  v.cache = (v.cache||0) + lees;
+    v.schrijf = (v.schrijf||0) + schrijf;  v.uit = (v.uit||0) + uit;
+    v.euro = (v.euro||0) + kosten;  v.aanroepen = (v.aanroepen||0) + 1;
+    localStorage.setItem('ai-verbruik', JSON.stringify(v));
+
+    var log = JSON.parse(localStorage.getItem('ai-log') || '[]');
+    if (!Array.isArray(log)) log = [];
+    log.push({ tijd: Date.now(), bron: 'stijlstudio', wat: wat || 'stylist',
+               model: model, in: vers + schrijf + lees, uit: uit, kosten: kosten });
+    localStorage.setItem('ai-log', JSON.stringify(log.slice(-40)));
+  } catch(e) {}
+}
+
 async function aiFetch(_, opts) {
   var res = await fetch(AI_URL, opts);
   if (res.status === 400 && !aiTerugval) {
@@ -1264,6 +1299,16 @@ async function aiFetch(_, opts) {
       res = await fetch(AI_URL, Object.assign({}, opts, { body: JSON.stringify(body) }));
     } catch(e) {}
   }
+  // Meelezen zonder de aanroepplekken aan te raken: het antwoord wordt hier
+  // eenmaal gekopieerd, geteld, en daarna onaangeroerd doorgegeven.
+  try {
+    if (res.ok) {
+      var kopie = res.clone();
+      kopie.json().then(function(d) {
+        if (d && d.usage) noteerVerbruik(d.model || aiModelNu(), d.usage);
+      }).catch(function(){});
+    }
+  } catch(e) {}
   return res;
 }
 
