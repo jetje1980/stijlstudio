@@ -1384,7 +1384,7 @@ function volgVoortgang(el, sinds) {
 // een verkeerd etiket. Komen er gebeurtenissen binnen, dan tellen we die op;
 // blijkt het gewone JSON te zijn, dan lezen we dat. Beide werken, en de
 // voortgang loopt intussen gewoon mee.
-async function leesStroom(res) {
+async function leesStroom(res, bewaker) {
   const lezer = res.body.getReader();
   const decoder = new TextDecoder();
   let rest = '';
@@ -1438,6 +1438,7 @@ async function leesStroom(res) {
   while (true) {
     const { done, value } = await lezer.read();
     if (done) break;
+    if (bewaker) bewaker.tik();      // er komt nog iets binnen: de wacht opnieuw
     const stuk = decoder.decode(value, { stream: true });
     alles += stuk;
     rest  += stuk;
@@ -1534,10 +1535,11 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
   // gewoon nog een keer proberen voordat we het opgeven.
   let res;
   let poging = 0;
+  let bewaker = null;      // blijft lopen zolang de stroom nog binnenkomt
   while (true) {
     poging++;
     const ctrl = new AbortController();
-    const tijdKlok = setTimeout(() => ctrl.abort(), 120000);
+    let tijdKlok = setTimeout(() => ctrl.abort(), 120000);
     try {
       // Gaat naar onze eigen Supabase Edge Function; die houdt de
       // Anthropic-sleutel server-side vast.
@@ -1547,7 +1549,20 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
         body: verzoek,
         signal: ctrl.signal
       });
-      clearTimeout(tijdKlok);
+      // Bij streamen is de fetch al klaar zodra de eerste kop binnen is; het
+      // wachten begint dán pas. De klok stilzetten zou de bewaking dus juist
+      // weghalen op het moment dat je haar nodig hebt — en dan hangt hij voor
+      // altijd als de stroom stilvalt. Daarom blijft er een wacht lopen die
+      // opnieuw begint bij elk stukje dat binnenkomt.
+      if (streamen) {
+        bewaker = {
+          tik() { clearTimeout(tijdKlok); tijdKlok = setTimeout(() => ctrl.abort(), 45000); },
+          stop() { clearTimeout(tijdKlok); }
+        };
+        bewaker.tik();
+      } else {
+        clearTimeout(tijdKlok);
+      }
       break;
     } catch(e) {
       clearTimeout(tijdKlok);
@@ -1590,8 +1605,14 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
   // keer op de ouderwetse manier. Trager, maar het werkt.
   let data;
   try {
-    data = (streamen && res.body) ? await leesStroom(res) : await res.json();
+    data = (streamen && res.body) ? await leesStroom(res, bewaker) : await res.json();
+    if (bewaker) bewaker.stop();
   } catch(e) {
+    if (bewaker) bewaker.stop();
+    if (e && e.name === 'AbortError') {
+      throw new Error('De verbinding viel stil: er kwam 45 seconden lang niets meer binnen. '
+        + 'Probeer het opnieuw met het scherm aan.');
+    }
     if (!streamen) throw e;
     stroomKapot = true;
     try { localStorage.setItem('ai-stroom-kapot', String(Date.now())); } catch(_){}
@@ -3178,28 +3199,44 @@ function toonCapGekozen() {
     : '';
 }
 
-async function aiCapsule() {
-  const btn = document.getElementById('cap-btn');
-  const st  = document.getElementById('cap-status');
-  const uit = document.getElementById('cap-uitkomst');
-  const aantal = Number(document.getElementById('cap-aantal').value) || 6;
-  const jas = document.getElementById('cap-jas').value;
-  const gel = (document.getElementById('cap-gelegenheid').value || '').trim();
+// De weekendtas was één grote vraag: kleurkern, paklijst én alle outfits in
+// één keer, met ruimte voor twaalfduizend tokens antwoord. Op een goede
+// verbinding gaat dat prima. Op een telefoon niet: die houdt een verbinding
+// van een minuut niet open, en dan valt de hele tas in het water — inclusief
+// het deel dat al af was.
+//
+// Daarom nu in stappen. Eerst de kern en de paklijst; die verschijnt meteen
+// op het scherm. Daarna de outfits in groepjes van drie. Elke aanroep is kort
+// genoeg om te overleven, je ziet onderweg wat er al staat, en gaat er één
+// stap mis, dan blijft de rest gewoon staan en probeer je alleen díé opnieuw.
+let capsuleResultaat = null;
 
-  btn.disabled = true;
-  btn.textContent = '⏳ Tas pakken…';
-  uit.innerHTML = '';
-  // Dit is de zwaarste vraag in de app en duurt makkelijk een halve minuut.
-  // Zonder teller lijkt het scherm vast te zitten en gaat er getikt worden.
-  st.textContent = 'Dit duurt ongeveer een halve minuut.';
-  const stopVolgen = volgVoortgang(st);
+function capsuleOpdracht() {
+  return {
+    aantal: Number(document.getElementById('cap-aantal').value) || 6,
+    jas: document.getElementById('cap-jas').value,
+    gel: (document.getElementById('cap-gelegenheid').value || '').trim(),
+  };
+}
 
-  const jasRegel = jas === 'jas'
+function capsuleJasRegel(jas) {
+  return jas === 'jas'
     ? 'Er gaat één jas of mantel mee. Die moet over ELKE outfit passen, dus kies hem op de kleurkern en niet op één look.'
     : jas === 'licht'
       ? 'Geen jas, wel een vest of blazer als buitenste laag. Ook die moet bij alles passen.'
       : 'Geen buitenlaag nodig.';
+}
 
+function capsuleSysteem() {
+  return `Je bent een stylist die een capsule samenstelt: de kleinste set
+kleding waaruit de meeste verschillende outfits te halen zijn. ${GRIETTE_DNA}
+${profielBlok()}
+Antwoord in het Nederlands. Wees concreet en eerlijk over wat ontbreekt.`;
+}
+
+// ── STAP 1: KLEURKERN EN PAKLIJST ─────────────────────────────────────────────
+async function capsuleStap1() {
+  const { aantal, jas, gel } = capsuleOpdracht();
   const vast = capItems.length
     ? 'DEZE STUKKEN GAAN SOWIESO MEE, bouw eromheen:\n'
       + capItems.map(i => `- ${i.name} (${i.id})`).join('\n')
@@ -3208,56 +3245,33 @@ async function aiCapsule() {
     ? `Griette wil deze kleuren gebruiken: ${capKleuren.join(', ')}. Maak daar de kern van.`
     : 'Kies zelf een kleurkern die bij haar palet past.';
 
-  const system = `Je bent een stylist die een capsule samenstelt: de kleinste set
-kleding waaruit de meeste verschillende outfits te halen zijn. ${GRIETTE_DNA}
-${profielBlok()}
-Antwoord in het Nederlands. Wees concreet en eerlijk over wat ontbreekt.`;
-
-  const inhoud = [{ type:'text', text:
+  const raw = await callClaude(capsuleSysteem(), [{ type:'text', text:
 `Griette gaat weg en wil weinig meenemen maar veel kunnen dragen.
 ${gel ? 'Gelegenheid: ' + gel : 'Gelegenheid: niet opgegeven — ga uit van een gewoon weekend weg, dag en avond door elkaar, en zeg dat je dat aanneemt.'}
-Ze wil ${aantal} outfits.
-${jasRegel}
+Ze wil er ${aantal} outfits uit kunnen halen.
+${capsuleJasRegel(jas)}
 ${kleurRegel}
 ${vast}
 
 HAAR GARDEROBE (id | categorie | naam | tags):
 ${wardrobeForAI()}
 
-WERK ZO:
+Doe nu ALLEEN stap 1 en 2. De outfits volgen later.
 
 STAP 1 — KLEURKERN
 Kies twee of drie kleuren die alles deelt, plus hooguit twee accentkleuren.
-Dit is het hele fundament: delen alle stukken een kern, dan past elk bovenstuk
-op elk onderstuk en krijg je veel outfits uit weinig items. Kies de kern uit
-haar basiskleuren, want die moeten het vaakst terugkomen.
+Dit is het fundament: delen alle stukken een kern, dan past elk bovenstuk op
+elk onderstuk en krijg je veel outfits uit weinig items. Kies de kern uit haar
+basiskleuren, want die moeten het vaakst terugkomen.
 
 STAP 2 — DE PAKLIJST
 Kies de stukken. Streef naar zo weinig mogelijk: als vuistregel drie of vier
 bovenstukken, twee of drie onderstukken, één of twee lagen, twee paar schoenen
 en één tas is genoeg voor ${aantal} outfits. Elk onderstuk moet met ELK
 bovenstuk kunnen. Kan dat niet, dan hoort dat stuk niet in de tas.
-Voeg per stuk toe hoeveel outfits het draagt — een stuk dat in één outfit zit
-verdient zijn plek in de tas niet.
-
-STAP 3 — ${aantal} OUTFITS DIE ECHT VERSCHILLEN
-Variatie komt NIET uit meer items maar uit een andere greep op dezelfde stukken.
-Gebruik minstens drie verschillende stijlgrepen en noem ze bij naam, bijvoorbeeld:
-  ton-sur-ton (tinten van één kleurfamilie, verschil zit in textuur)
-  monochroom (één kleur van top tot teen)
-  neutraal met één accent
-  kleurblokken (twee volle kleuren tegenover elkaar)
-  print als blikvanger, rest stil
-  contrast in textuur (glad tegen ruw, zacht tegen stevig)
-Wissel ook het silhouet: niet zes keer wijd onder en strak boven.
-Geef elke outfit een gelegenheid: wandelen, uit eten, terras, reisdag.
-
-STAP 4 — DURF
-Eén van de outfits moet er een zijn die Griette zelf niet zou bedenken. Leg uit
-waarom die tóch klopt. Speel niet op zeker in alle ${aantal}.
-
-STAP 5 — EERLIJK
-Ontbreekt er iets waardoor de tas pas echt werkt, zeg dat dan, met eigen=false.
+Zet er per stuk bij in hoeveel van de ${aantal} outfits het meedoet — een stuk
+dat in één outfit zit verdient zijn plek in de tas niet.
+Ontbreekt er iets waardoor de tas pas echt werkt, zet het erin met eigen=false.
 Verzin nooit een id dat niet in de lijst staat.
 
 Antwoord ALLEEN met JSON:
@@ -3265,42 +3279,140 @@ Antwoord ALLEEN met JSON:
   "waarom":"1 zin: waarom deze kern zoveel combinaties oplevert"},
  "paklijst":[{"id":"exact-id-of-null","naam":"...","categorie":"tops|bottoms|layers|jurken|shoes|bags|accessories",
    "eigen":true,"outfits":3,"waarom":"waarom dit stuk mee moet, max 8 woorden"}],
- "outfits":[{"naam":"korte naam","stijl":"de stijlgreep bij naam",
-   "gelegenheid":"waarvoor","items":["exacte namen uit de paklijst"],
-   "waarom":"1 tot 2 zinnen: waarom dit werkt"}],
- "verrassing":"welke outfit ze zelf niet zou bedenken en waarom die tóch klopt, 2 zinnen",
- "ontbreekt":"wat de tas nog mist, of leeg"}` }];
+ "ontbreekt":"wat de tas nog mist, of leeg"}` }], 6000, 'medium', 'zwaar');
 
-  try {
-    // 12000 in plaats van 24000: het antwoord is een paar duizend tokens JSON.
-    // Meer ruimte maakt het niet beter, alleen langer — en hoe langer het duurt,
-    // hoe groter de kans dat een telefoon de verbinding laat vallen.
-    const raw = await callClaude(system, inhoud, 12000, 'medium', 'zwaar');
-    const data = extractJson(raw);
-    if (!data || Array.isArray(data)) throw new Error('Geen bruikbaar antwoord');
-    const outfits = pickArray(data, ['outfits'], true) || [];
-    const paklijst = pickArray(data, ['paklijst'], true) || [];
-    if (!outfits.length) throw new Error('Geen outfits voorgesteld');
-
-    capsuleResultaat = { data, outfits, paklijst };
-    toonCapsule();
-    st.innerHTML = `<b>${outfits.length} outfits</b> uit ${paklijst.length} stuks.`;
-    btn.textContent = '🧳 Opnieuw samenstellen';
-  } catch(e) {
-    st.textContent = 'Mislukt: ' + e.message;
-    btn.textContent = '🧳 Stel mijn weekendtas samen';
-  }
-  stopVolgen();
-  btn.disabled = false;
+  const data = extractJson(raw);
+  if (!data || Array.isArray(data)) throw new Error('Geen bruikbaar antwoord');
+  const paklijst = pickArray(data, ['paklijst'], true) || [];
+  if (!paklijst.length) throw new Error('Geen paklijst voorgesteld');
+  return { kern: data.kern || {}, paklijst, ontbreekt: data.ontbreekt || '' };
 }
 
-let capsuleResultaat = null;
+// ── STAP 2: OUTFITS, IN GROEPJES ──────────────────────────────────────────────
+// Drie tegelijk. Kort genoeg om te overleven op een telefoon, en je ziet ze
+// binnendruppelen in plaats van een minuut naar niets te kijken.
+async function capsuleOutfits(vanaf, hoeveel) {
+  const { aantal, jas, gel } = capsuleOpdracht();
+  const { kern, paklijst } = capsuleResultaat;
+  const alDaan = capsuleResultaat.outfits.map((o,i) =>
+    `${i+1}. ${o.naam} — ${o.stijl}${o.gelegenheid ? ' (' + o.gelegenheid + ')' : ''}`).join('\n');
+
+  const raw = await callClaude(capsuleSysteem(), [{ type:'text', text:
+`Griette heeft haar tas gepakt. Dit zit erin:
+
+KLEURKERN: ${(kern.kleuren||[]).join(', ')}${(kern.accenten||[]).length ? ' met ' + kern.accenten.join(' en ') + ' als accent' : ''}
+${paklijst.map(p => `- ${p.naam} (${p.categorie}${p.eigen === false ? ', heeft ze nog niet' : ''})`).join('\n')}
+
+${gel ? 'Gelegenheid: ' + gel : 'Gelegenheid: een gewoon weekend weg, dag en avond door elkaar.'}
+${capsuleJasRegel(jas)}
+
+${alDaan ? 'DEZE OUTFITS ZIJN AL GEMAAKT — maak iets anders:\n' + alDaan + '\n' : ''}
+Maak nu outfit ${vanaf + 1} tot en met ${Math.min(vanaf + hoeveel, aantal)} van de ${aantal}.
+Gebruik UITSLUITEND stukken uit de paklijst hierboven.
+
+WAAR HET OM DRAAIT: variatie komt NIET uit meer items maar uit een andere greep
+op dezelfde stukken. Gebruik per outfit een andere stijlgreep en noem die bij
+naam, bijvoorbeeld:
+  ton-sur-ton (tinten van één kleurfamilie, verschil zit in textuur)
+  monochroom (één kleur van top tot teen)
+  neutraal met één accent
+  kleurblokken (twee volle kleuren tegenover elkaar)
+  print als blikvanger, rest stil
+  contrast in textuur (glad tegen ruw, zacht tegen stevig)
+Wissel ook het silhouet: niet elke keer wijd onder en strak boven.
+Geef elke outfit een gelegenheid: wandelen, uit eten, terras, reisdag.
+${vanaf === 0 ? 'Maak er één bij die Griette zelf niet zou bedenken, en leg uit waarom die tóch klopt.' : ''}
+
+Antwoord ALLEEN met JSON:
+{"outfits":[{"naam":"korte naam","stijl":"de stijlgreep bij naam",
+  "gelegenheid":"waarvoor","items":["exacte namen uit de paklijst"],
+  "waarom":"1 tot 2 zinnen: waarom dit werkt"}]${vanaf === 0 ? ',\n "verrassing":"welke van deze outfits ze zelf niet zou bedenken en waarom die tóch klopt, 2 zinnen"' : ''}}` }],
+    6000, 'medium', 'zwaar');
+
+  const data = extractJson(raw);
+  if (!data || Array.isArray(data)) throw new Error('Geen bruikbaar antwoord');
+  const outfits = pickArray(data, ['outfits'], true) || [];
+  if (!outfits.length) throw new Error('Geen outfits voorgesteld');
+  return { outfits, verrassing: data.verrassing || '' };
+}
+
+// ── DE REGIE ──────────────────────────────────────────────────────────────────
+const CAP_PER_KEER = 3;
+
+async function aiCapsule() {
+  const btn = document.getElementById('cap-btn');
+  const st  = document.getElementById('cap-status');
+  btn.disabled = true;
+  document.getElementById('cap-uitkomst').innerHTML = '';
+
+  const { aantal } = capsuleOpdracht();
+  capsuleResultaat = { kern:{}, paklijst:[], outfits:[], verrassing:'', ontbreekt:'', doel:aantal };
+
+  btn.textContent = '⏳ Stap 1 van ' + (1 + Math.ceil(aantal / CAP_PER_KEER)) + ': de paklijst…';
+  const stopVolgen = volgVoortgang(st);
+  try {
+    const stap1 = await capsuleStap1();
+    Object.assign(capsuleResultaat, stap1);
+    stopVolgen();
+    toonCapsule();
+    st.innerHTML = `Paklijst klaar: <b>${stap1.paklijst.length}</b> stuks. Nu de outfits…`;
+  } catch(e) {
+    stopVolgen();
+    st.textContent = 'De paklijst lukte niet: ' + e.message;
+    btn.textContent = '🧳 Stel mijn weekendtas samen';
+    btn.disabled = false;
+    return;
+  }
+  btn.disabled = false;
+  await capsuleVervolg();
+}
+
+// Haalt de volgende groep outfits op. Ook de knop na een mislukte stap.
+async function capsuleVervolg() {
+  const btn = document.getElementById('cap-btn');
+  const st  = document.getElementById('cap-status');
+  if (!capsuleResultaat) return;
+
+  const doel = capsuleResultaat.doel;
+  btn.disabled = true;
+
+  while (capsuleResultaat.outfits.length < doel) {
+    const vanaf = capsuleResultaat.outfits.length;
+    const stap = Math.floor(vanaf / CAP_PER_KEER) + 2;
+    const totaal = 1 + Math.ceil(doel / CAP_PER_KEER);
+    btn.textContent = `⏳ Stap ${stap} van ${totaal}: outfit ${vanaf + 1}…`;
+    const stopVolgen = volgVoortgang(st);
+    try {
+      const groep = await capsuleOutfits(vanaf, CAP_PER_KEER);
+      capsuleResultaat.outfits = capsuleResultaat.outfits
+        .concat(groep.outfits).slice(0, doel);
+      if (groep.verrassing) capsuleResultaat.verrassing = groep.verrassing;
+      stopVolgen();
+      toonCapsule();
+      st.innerHTML = `<b>${capsuleResultaat.outfits.length}</b> van ${doel} outfits klaar.`;
+    } catch(e) {
+      stopVolgen();
+      // Wat er al staat blijft staan; alleen dit stukje ging mis.
+      st.innerHTML = `Outfit ${vanaf + 1} lukte niet: ${esc(e.message)}<br>`
+        + `<b>${capsuleResultaat.outfits.length}</b> outfits staan er al — die blijven staan.`;
+      btn.textContent = `🧳 Ga verder vanaf outfit ${vanaf + 1}`;
+      btn.onclick = capsuleVervolg;
+      btn.disabled = false;
+      return;
+    }
+  }
+
+  st.innerHTML = `<b>${capsuleResultaat.outfits.length} outfits</b> uit `
+    + `${capsuleResultaat.paklijst.length} stuks.`;
+  btn.textContent = '🧳 Opnieuw samenstellen';
+  btn.onclick = aiCapsule;
+  btn.disabled = false;
+}
 
 function toonCapsule() {
   const el = document.getElementById('cap-uitkomst');
   if (!el || !capsuleResultaat) return;
-  const { data, outfits, paklijst } = capsuleResultaat;
-  const kern = data.kern || {};
+  const { kern, paklijst, outfits } = capsuleResultaat;
 
   // Paklijst gegroepeerd, zodat je ziet wat je in de tas legt
   const groepen = {};
@@ -3330,13 +3442,14 @@ function toonCapsule() {
   });
 
   const eigenAantal = paklijst.filter(p => p.eigen !== false).length;
-  html += `<div class="cap-tel"><b>${paklijst.length}</b> stuks → <b>${outfits.length}</b> outfits`
+  html += `<div class="cap-tel"><b>${paklijst.length}</b> stuks → <b>${outfits.length}</b>`
+    + (outfits.length < capsuleResultaat.doel ? ' van ' + capsuleResultaat.doel : '') + ' outfits'
     + (eigenAantal < paklijst.length
         ? ` · ${eigenAantal} uit je eigen kast, ${paklijst.length - eigenAantal} zou je nog moeten hebben` : '')
     + '</div></div>';
 
-  if (data.verrassing) {
-    html += `<div class="cap-verrassing"><b>Durf eens</b><br>${esc(data.verrassing)}</div>`;
+  if (capsuleResultaat.verrassing) {
+    html += `<div class="cap-verrassing"><b>Durf eens</b><br>${esc(capsuleResultaat.verrassing)}</div>`;
   }
 
   outfits.forEach((o, i) => {
@@ -3358,14 +3471,12 @@ function toonCapsule() {
       + '</div>';
   });
 
-  if (data.ontbreekt) {
-    html += `<div class="recept-blok"><b>Eerlijk gezegd</b><br>${esc(data.ontbreekt)}</div>`;
+  if (capsuleResultaat.ontbreekt) {
+    html += `<div class="recept-blok"><b>Eerlijk gezegd</b><br>${esc(capsuleResultaat.ontbreekt)}</div>`;
   }
   el.innerHTML = html;
 }
 
-// De paklijst noemt namen, geen ids. Zoek het echte item erbij zodat de kaart
-// de foto's kan tonen.
 function vindItemOpNaam(naam) {
   const q = String(naam || '').toLowerCase().trim();
   if (!q) return null;
@@ -3391,7 +3502,7 @@ function capsuleNaarKaart(idx) {
   outfitUitleg = null;
   outfitTop = o.waarom || '';
 
-  const kern = (capsuleResultaat.data.kern || {});
+  const kern = capsuleResultaat.kern || {};
   selPreset = {
     name: o.naam || 'Weekendoutfit',
     vibe: [o.stijl, o.gelegenheid].filter(Boolean).join(' · '),
