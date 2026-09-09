@@ -309,7 +309,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 <div class="steps" id="steps-bar">
   <div class="step-dot active" id="sd1"><div class="dot">1</div><div class="slbl">Combo</div></div>
   <div class="step-dot" id="sd2"><div class="dot">2</div><div class="slbl">Items</div></div>
-  <div class="step-dot" id="sd3"><div class="dot">3</div><div class="slbl">Details</div></div>
+  <div class="step-dot" id="sd3"><div class="dot">3</div><div class="slbl">Tekst</div></div>
   <div class="step-dot" id="sd4"><div class="dot">4</div><div class="slbl">Kaart</div></div>
 </div>
 
@@ -519,6 +519,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <div id="anchor-picked"></div>
     <div id="anchor-choose">
       <div class="sec-label" id="anchor-label">Kies het item waar je omheen bouwt</div>
+      <div class="field-note" style="margin-bottom:8px;">Zodra je kiest, bedenk ik kleurcombo's rond dat stuk. Daaruit kies je er één.</div>
       <input class="anchor-search" id="anchor-search" type="text" placeholder="Zoek in je kast…" autocomplete="off">
       <div class="anchor-grid" id="anchor-grid"></div>
     </div>
@@ -535,12 +536,14 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
   <!-- ROUTE: start met een kleurcombo -->
   <div id="combo-area">
     <div class="sec-label">Kleurstrategie</div>
+    <div class="field-note" style="margin-bottom:8px;">Kies eerst een soort combinatie, dan een combo daarbinnen. Daarna ga je door naar je items.</div>
     <div class="combo-type-grid" id="combo-type-grid"></div>
   </div>
 
   <!-- Preset combos (shown for non-custom types) -->
   <div id="preset-area" style="display:none">
     <div class="sec-label" id="preset-label">Kies een combo</div>
+    <div class="field-note" style="margin-bottom:8px;">Tik er één aan; dan kun je door naar je items.</div>
     <div class="preset-list" id="preset-list"></div>
   </div>
 
@@ -564,8 +567,9 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 <!-- STEP 2: ITEMS -->
 <div class="panel" id="p2">
   <div>
+    <div class="vw-balk" id="vw-balk-2" style="display:none;"></div>
     <div class="sec-label">Waar ga je heen? <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">optioneel, maar het scheelt veel</span></div>
-    <input class="field" type="text" id="f-gelegenheid" placeholder="bijv. lunch op een terras, werkdag, 18 graden" style="margin-bottom:10px;font-size:14px;padding:11px 13px;">
+    <input class="field" type="text" id="f-gelegenheid" placeholder="bijv. lunch op een terras, werkdag, 18 graden" style="margin-bottom:10px;font-size:14px;padding:11px 13px;" oninput="gelegenheidGewijzigd()">
     <button class="ai-btn" id="ai-compose-btn" onclick="aiComposeOutfit().catch(function(){})" style="margin-bottom:6px;">✨ Laat AI een outfit samenstellen uit mijn kast</button>
     <div class="field-note" id="ai-compose-status" style="text-align:center;margin-bottom:12px;">Kies zelf items, of laat de AI kiezen en aanvullen met voorstellen.</div>
     <button class="ai-btn" id="accent-btn" onclick="aiAccentAdvies()" style="margin-bottom:6px;">🎨 Welke accentkleur past hierbij?</button>
@@ -577,12 +581,17 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
   </div>
 </div>
 
-<!-- STEP 3: DETAILS -->
+<!-- STEP 3: DE TEKST OP DE KAART -->
 <div class="panel" id="p3">
   <button class="btn-rescan" id="terug-herkomst-3" style="display:none;margin-bottom:12px;" onclick="terugNaarHerkomst()"></button>
   <div class="vw-balk" id="vw-balk-3" style="display:none;"></div>
+  <div class="field-note" style="margin-bottom:10px;">Dit is de tekst die straks op je kaart komt te staan. Laat de stylist het invullen, of typ het zelf.</div>
   <div>
-    <div class="sec-label">Naam van de trip of gelegenheid</div>
+    <button class="ai-btn" id="ai-details-btn" onclick="aiSuggestDetails()">✨ Laat de stylist deze teksten schrijven</button>
+    <div class="field-note" id="ai-details-status" style="text-align:center;margin-top:6px;margin-bottom:14px;"></div>
+  </div>
+  <div>
+    <div class="sec-label">Titel op de kaart</div>
     <input class="field" type="text" id="f-title" placeholder="bijv. TERSCHELLING WEEKEND" maxlength="40">
   </div>
   <div>
@@ -601,10 +610,6 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
   <div>
     <div class="sec-label">Stylingnoot (onderaan)</div>
     <input class="field" type="text" id="f-note" placeholder="bijv. krachtige kleur + donkergrijs + grafische laag">
-  </div>
-  <div>
-    <button class="ai-btn" id="ai-details-btn" onclick="aiSuggestDetails()">✨ AI-suggesties voor annotaties &amp; stylingnoot</button>
-    <div class="field-note" id="ai-details-status" style="text-align:center;margin-top:6px;"></div>
   </div>
 </div>
 
@@ -2016,10 +2021,48 @@ function buildRobinList() {
         colors: o.tags.map(t => (KLEUREN.find(k=>k.v===t)||{dot:'#ccc'}).dot),
         tags: o.tags.slice(),
       };
-      document.getElementById('btn-next').disabled = false;
+      comboGekozen(selPreset);
     });
     list.appendChild(card);
   });
+}
+
+// Elke route eindigt op hetzelfde punt: een gekozen kleurcombo, en dan mag je
+// door. Dat stond eerst als losse regel op vijf plekken, en dan loopt het
+// vanzelf uiteen — Robin zette bijvoorbeeld wél kantEnKlaar, de rest niet, en
+// de voorwaardenbalk werd nergens bijgewerkt. Nu op één plek.
+// De gelegenheid is een voorwaarde, geen los tekstveld. Je typte hem in de
+// weekendtas, en dan nog een keer in stap 2, en dan stond er in stap 3 nog een
+// veld dat "Naam van de trip of gelegenheid" heette. Drie velden die elkaar
+// niet kenden. Nu vult wat je op de ene plek zegt de andere alvast in.
+function gelegenheidGewijzigd() {
+  const el = document.getElementById('f-gelegenheid');
+  if (!el) return;
+  voorwaarden = voorwaarden || { weer:'wisselend', gelegenheid:'', nee:[], nietKleuren:[] };
+  voorwaarden.gelegenheid = el.value.trim();
+  toonVoorwaardenBalk();
+}
+
+// Wat je bij de ene stap invulde, staat bij de volgende alvast klaar. Leeg
+// laten mag; overschrijven ook — ik vul alleen aan wat nog leeg is.
+function vulGelegenheidAan() {
+  const v = huidigeVoorwaarden();
+  const el = document.getElementById('f-gelegenheid');
+  if (el && !el.value.trim() && v.gelegenheid) el.value = v.gelegenheid;
+}
+
+function vulTitelAan() {
+  const t = document.getElementById('f-title');
+  const v = huidigeVoorwaarden();
+  const gel = (document.getElementById('f-gelegenheid')||{}).value || v.gelegenheid || '';
+  if (t && !t.value.trim() && gel) t.value = gel.toUpperCase().slice(0, 40);
+}
+
+function comboGekozen(p) {
+  selPreset = p;
+  const btn = document.getElementById('btn-next');
+  if (btn) btn.disabled = false;
+  toonVoorwaardenBalk();
 }
 
 // ── STEP 1: STARTKEUZE ────────────────────────────────────────────────────────
@@ -2261,8 +2304,7 @@ Antwoord ALLEEN met een JSON-array:
       const card = makePresetCard(p, () => {
         document.querySelectorAll('#anchor-preset-list .preset-card').forEach(b=>b.classList.remove('selected'));
         card.classList.add('selected');
-        selPreset = p;
-        document.getElementById('btn-next').disabled = false;
+        comboGekozen(p);
       });
       list.appendChild(card);
     });
@@ -2329,8 +2371,7 @@ function buildPresets(ct) {
     const card = makePresetCard(p, () => {
       document.querySelectorAll('#preset-list .preset-card').forEach(b=>b.classList.remove('selected'));
       card.classList.add('selected');
-      selPreset = p;
-      document.getElementById('btn-next').disabled = false;
+      comboGekozen(p);
     });
     list.appendChild(card);
   });
@@ -2424,8 +2465,7 @@ function buildAlgorithmicCombos() {
     const card = makePresetCard(p, () => {
       document.querySelectorAll('#custom-preset-list .preset-card').forEach(b=>b.classList.remove('selected'));
       card.classList.add('selected');
-      selPreset = p;
-      document.getElementById('btn-next').disabled = false;
+      comboGekozen(p);
     });
     list.appendChild(card);
   });
@@ -2488,8 +2528,7 @@ Antwoord ALLEEN met een geldig JSON array, geen uitleg eromheen.`;
       const card = makePresetCard(p, () => {
         document.querySelectorAll('#custom-preset-list .preset-card').forEach(b=>b.classList.remove('selected'));
         card.classList.add('selected');
-        selPreset = p;
-        document.getElementById('btn-next').disabled = false;
+        comboGekozen(p);
       });
       list.appendChild(card);
     });
@@ -2866,9 +2905,8 @@ Antwoord ALLEEN met JSON:
 
     const eigen = selItems.filter(i=>!i._suggestion).length;
     st.innerHTML = `<b>${eigen}</b> van ${selItems.length} uit je eigen kast. Ga door naar de volgende stap.`;
-    selPreset = selPreset || { name:'Nagemaakt van je inspiratiefoto', vibe:'zelfde rollen, jouw kleuren',
-      typeName:'Van je inspiratiefoto', stijl:'streetstyle', colors:['#c4c4c8','#e8407a','#0047AB','#f0e8d8'], tags:[] };
-    document.getElementById('btn-next').disabled = false;
+    comboGekozen(selPreset || { name:'Nagemaakt van je inspiratiefoto', vibe:'zelfde rollen, jouw kleuren',
+      typeName:'Van je inspiratiefoto', stijl:'streetstyle', colors:['#c4c4c8','#e8407a','#0047AB','#f0e8d8'], tags:[] });
     btn.textContent = '🔍 Opnieuw lezen';
   } catch(e) {
     st.textContent = 'Mislukt: ' + e.message;
@@ -4691,7 +4729,7 @@ function toonHerkomstKnop() {
 // net had uitgesloten zonder dat je begreep waar het vandaan kwam.
 function toonVoorwaardenBalk() {
   const regels = voorwaardenTekst();
-  ['vw-balk-3', 'vw-balk-4'].forEach(id => {
+  ['vw-balk-2', 'vw-balk-3', 'vw-balk-4'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     if (!regels.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
@@ -4744,8 +4782,13 @@ function capsuleNaarKaart(idx) {
   toonVoorwaardenBalk();
   const t = document.getElementById('f-title');
   if (t) t.value = (o.naam || 'Weekend').toUpperCase();
+  // De reis is de gelegenheid; die van de losse outfit is de aanleiding.
+  // Allebei meenemen, want "Terschelling — dansen" zegt meer dan één van de twee.
   const g = document.getElementById('f-gelegenheid');
-  if (g && !g.value) g.value = o.gelegenheid || '';
+  if (g && !g.value) {
+    const reis = huidigeVoorwaarden().gelegenheid;
+    g.value = [reis, o.gelegenheid].filter(Boolean).filter((x,i,a)=>a.indexOf(x)===i).join(' — ');
+  }
 
   setStep(3);
 }
@@ -5885,11 +5928,15 @@ function setStep(n) {
     btnNext.disabled = !selPreset;
   } else if (n === 2) {
     document.getElementById('p2').classList.add('active');
+    vulGelegenheidAan();
+    toonVoorwaardenBalk();
     buildItemGrid();
     btnNext.textContent = 'Volgende →';
     btnNext.disabled = false; // items are optional
   } else if (n === 3) {
     document.getElementById('p3').classList.add('active');
+    gelegenheidGewijzigd();
+    vulTitelAan();
     toonVoorwaardenBalk();
     btnNext.textContent = 'Kaart genereren →';
     const titleInput = document.getElementById('f-title');
