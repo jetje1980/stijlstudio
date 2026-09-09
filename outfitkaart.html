@@ -67,6 +67,18 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .vraag-opt{text-align:left;padding:9px 11px;border:1.5px solid var(--border);border-radius:10px;background:var(--ph-bg);font-family:'Inter',sans-serif;font-size:11.5px;line-height:1.45;color:var(--text);cursor:pointer;}
 .vraag-opt.gekozen{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--surface));font-weight:600;}
 .vraag-tel{font-size:10px;color:var(--text-2);margin-top:6px;}
+/* Mijn kaarten */
+.kaart-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:10px;}
+.kaart-cel{border:1.5px solid var(--border);border-radius:11px;overflow:hidden;background:var(--surface);cursor:pointer;}
+.kaart-cel img{width:100%;display:block;aspect-ratio:3/4;object-fit:cover;background:var(--ph-bg);}
+.kaart-cel .kc-info{padding:6px 8px 8px;}
+.kaart-cel .kc-titel{font-size:11px;font-weight:600;line-height:1.3;}
+.kaart-cel .kc-datum{font-size:9.5px;color:var(--text-2);margin-top:2px;}
+.kaart-leeg{grid-column:1/-1;padding:20px 10px;text-align:center;font-size:11px;color:var(--text-2);border:2px dashed var(--border);border-radius:11px;}
+.kaart-open{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:10px;}
+.kaart-open img{max-width:100%;max-height:70vh;border-radius:10px;}
+.kaart-open .ko-knoppen{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.kaart-open button{padding:10px 16px;border-radius:10px;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;}
 /* Weekendtas */
 .cap-stappen{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:12px;font-size:10px;}
 .cap-stap{color:var(--text-2);}
@@ -195,7 +207,12 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 .kaart-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:8px;}
 .kaart-item{display:flex;flex-direction:column;gap:5px;}
 .kaart-photo{width:100%;aspect-ratio:1;background:#e8ddd2;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;}
-.kaart-photo img{width:100%;height:100%;object-fit:contain;background:#fff;}
+/* cover, niet contain. Haar kastfoto's zijn vaak schermafdrukken van een
+   webshop: met contain zie je de statusbalk van de telefoon, de prijssticker
+   en de navigatie eronder net zo groot als het kledingstuk. Bijsnijden op het
+   midden laat zien waar het om gaat, en het is dezelfde uitsnede als in de
+   rest van de app, dus de kaart sluit aan bij wat je bij het kiezen zag. */
+.kaart-photo img{width:100%;height:100%;object-fit:cover;background:#fff;}
 .kaart-brand{font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1a1510;text-align:center;line-height:1.2;}
 .kaart-desc{font-size:8px;color:#5a4030;text-align:center;line-height:1.3;}
 .kaart-why{font-size:6.5px;color:#9B7B5C;text-align:center;line-height:1.35;font-style:italic;margin-top:1px;}
@@ -256,7 +273,8 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 <div class="top-bar">
   <a class="back-link" href="griette.html">←</a>
   <h1>Outfit<span>kaart</span></h1>
-  <button class="gear-btn" onclick="openSettings()" title="Instellingen">⚙</button>
+  <button class="gear-btn" id="kaarten-btn" onclick="openKaarten()" title="Mijn kaarten" style="margin-right:2px;">🗂</button>
+  <button class="gear-btn" id="settings-btn" onclick="openSettings()" title="Instellingen">⚙</button>
 </div>
 
 <div class="steps" id="steps-bar">
@@ -502,6 +520,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 
 <!-- STEP 3: DETAILS -->
 <div class="panel" id="p3">
+  <button class="btn-rescan" id="terug-herkomst-3" style="display:none;margin-bottom:12px;" onclick="terugNaarHerkomst()"></button>
   <div>
     <div class="sec-label">Naam van de trip of gelegenheid</div>
     <input class="field" type="text" id="f-title" placeholder="bijv. TERSCHELLING WEEKEND" maxlength="40">
@@ -530,6 +549,19 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 </div>
 
 <!-- STEP 4: CARD + DOWNLOAD -->
+<!-- MIJN KAARTEN -->
+<div class="modal-backdrop" id="kaarten-modal" onclick="if(event.target===this)sluitKaarten()">
+  <div class="modal-sheet">
+    <div class="modal-title">Mijn kaarten</div>
+    <div class="modal-note" id="kaarten-uitleg">Elke kaart die je bewaart of opslaat als afbeelding komt hier terecht. Ze staan online, dus ook op je andere apparaten.</div>
+    <div class="kaart-grid" id="kaarten-grid"></div>
+    <div class="field-note" id="kaarten-status" style="margin-top:8px;"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="sluitKaarten()">Sluiten</button>
+    </div>
+  </div>
+</div>
+
 <div id="card-wrap">
   <div id="card-notice" style="display:none;margin:0 0 12px;padding:11px 13px;border-radius:12px;background:color-mix(in srgb,#b5232a 8%,var(--surface));border:1.5px solid color-mix(in srgb,#b5232a 30%,var(--border));font-size:12px;line-height:1.5;color:var(--text);"></div>
   <div class="kaart" id="the-kaart">
@@ -552,12 +584,15 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
   <div class="dl-bar">
     <button class="ai-btn" id="aanvul-btn" style="display:none;" onclick="autoComposeOnCard()">✨ Laat AI een outfit samenstellen</button>
     <button class="btn-dl" id="dl-btn" onclick="downloadKaart()">⬇ Opslaan als afbeelding</button>
+    <button class="ai-btn" id="bewaar-btn" onclick="bewaarKaart()" style="margin-top:8px;">💾 Bewaar bij mijn kaarten</button>
+    <div class="field-note" id="bewaar-status" style="margin-top:6px;"></div>
 
     <!-- AI analyse section -->
     <button class="ai-btn" id="ai-analyse-btn" onclick="aiAnalyseOutfit()">🔍 Analyseer &amp; perfectioneer deze kaart</button>
     <div id="ai-analyse-panel" style="display:none;"></div>
 
     <div id="kaart-kosten" style="margin-top:10px;font-size:10.5px;color:var(--text-2);line-height:1.6;"></div>
+    <button class="btn-rescan" id="terug-herkomst" style="display:none;" onclick="terugNaarHerkomst()"></button>
     <button class="btn-restart" onclick="restart()">Nieuwe kaart maken</button>
   </div>
 </div>
@@ -1337,6 +1372,7 @@ async function init() {
   customCount = allItems.filter(i=>String(i.id).startsWith('custom-')).length;
   await laadVisueel();
   await laadPlaat();
+  await laadKaarten();
 
   buildComboTypes();
 }
@@ -1592,6 +1628,14 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
         body: verzoek,
         signal: ctrl.signal
       });
+      // 429 en 529 betekenen "even te druk", niet "kan niet". Dat hoort de
+      // pagina zelf op te vangen in plaats van jou met "Overloaded" op te
+      // zadelen. Twee keer wachten en opnieuw; helpt dat niet, dan pas melden.
+      if ((res.status === 529 || res.status === 429) && poging < 3) {
+        clearTimeout(tijdKlok);
+        await new Promise(r => setTimeout(r, poging * 2500));
+        continue;
+      }
       // Bij streamen is de fetch al klaar zodra de eerste kop binnen is; het
       // wachten begint dán pas. De klok stilzetten zou de bewaking dus juist
       // weghalen op het moment dat je haar nodig hebt — en dan hangt hij voor
@@ -1630,7 +1674,10 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
     if (res.status === 413) throw new Error('De foto\'s zijn samen te groot. Kies een kleinere schermafdruk, of haal er een paar van je inspiratieplaat af.');
     if (res.status === 500 && /ANTHROPIC_API_KEY/.test(msg)) throw new Error('De AI-sleutel is nog niet ingesteld in Supabase. Zie Edge Functions → Secrets.');
     if (/credit|balance/i.test(msg)) throw new Error('Geen tegoed op het Anthropic-account. Voeg tegoed toe op console.anthropic.com.');
-    if (res.status === 429) throw new Error('Te veel verzoeken. Wacht even en probeer opnieuw.');
+    if (res.status === 429) throw new Error('Te veel verzoeken achter elkaar. Wacht een halve minuut en probeer opnieuw.');
+    if (res.status === 529 || /overload/i.test(msg)) throw new Error(
+      'De AI is op dit moment overbelast — dat ligt niet aan jou of aan je verbinding. '
+      + 'Ik heb het drie keer geprobeerd. Wacht een minuutje en tik nog eens.');
     throw new Error(msg || `Fout ${res.status}`);
   }
 
@@ -3521,6 +3568,29 @@ function vindItemOpNaam(naam) {
       || null;
 }
 
+// Waar kwam deze kaart vandaan? Kom je uit je weekendtas, dan wil je daarna
+// terug naar de lijst om ook outfit 2 en 3 te maken. Zonder dit zat je vast
+// en moest je de hele tas opnieuw laten samenstellen.
+let kaartHerkomst = null;
+
+function toonHerkomstKnop() {
+  [ 'terug-herkomst', 'terug-herkomst-3' ].forEach(id => {
+    const b = document.getElementById(id);
+    if (!b) return;
+    b.style.display = kaartHerkomst ? 'block' : 'none';
+    if (kaartHerkomst) b.textContent = '← Terug naar je weekendtas';
+  });
+}
+
+function terugNaarHerkomst() {
+  if (!kaartHerkomst) return;
+  setStep(1);
+  setStartMode('capsule');
+  capToonStap(4);            // de outfits staan er nog
+  kaartHerkomst = null;
+  toonHerkomstKnop();
+}
+
 function capsuleNaarKaart(idx) {
   if (!capsuleResultaat) return;
   const o = capsuleResultaat.outfits[idx];
@@ -3548,8 +3618,10 @@ function capsuleNaarKaart(idx) {
   };
   selType = { label: 'Uit je weekendtas' };
 
+  kaartHerkomst = { type:'capsule' };
+  toonHerkomstKnop();
   const t = document.getElementById('f-title');
-  if (t && !t.value) t.value = (o.naam || 'Weekend').toUpperCase();
+  if (t) t.value = (o.naam || 'Weekend').toUpperCase();
   const g = document.getElementById('f-gelegenheid');
   if (g && !g.value) g.value = o.gelegenheid || '';
 
@@ -4389,6 +4461,182 @@ function setDlStatus(msg) {
   s.innerHTML = msg;
 }
 
+// ── MIJN KAARTEN ──────────────────────────────────────────────────────────────
+// Een gemaakte kaart was tot nu toe vluchtig: sloeg je hem niet meteen op, dan
+// was hij weg zodra je een nieuwe maakte. Nu gaat elke kaart die je bewaart of
+// downloadt naar Cloudinary, net als je kastfoto's, en staat de lijst in
+// Supabase. Zo staan ze op al je apparaten en kun je er later uit downloaden.
+let bewaardeKaarten = [];
+const MAX_KAARTEN = 60;
+
+async function laadKaarten() {
+  try { bewaardeKaarten = JSON.parse(localStorage.getItem('griette-kaarten-v1') || '[]'); } catch(e){}
+  if (!Array.isArray(bewaardeKaarten)) bewaardeKaarten = [];
+  const sb = await sbGet('bewaarde-kaarten');
+  if (Array.isArray(sb)) bewaardeKaarten = sb;
+}
+
+async function schrijfKaarten() {
+  try { localStorage.setItem('griette-kaarten-v1', JSON.stringify(bewaardeKaarten)); } catch(e){}
+  await sbSet('bewaarde-kaarten', bewaardeKaarten);
+}
+
+// De kaart als afbeelding vastleggen. Scale 2 in plaats van 3: ruim scherp
+// genoeg om te bewaren en te delen, en een stuk lichter om te bewaren.
+async function kaartNaarCanvas(scale) {
+  if (typeof html2canvas === 'undefined') {
+    throw new Error('De afbeeldingsbibliotheek kon niet laden. Herlaad de pagina.');
+  }
+  return await html2canvas(document.getElementById('the-kaart'), {
+    useCORS: true, scale: scale || 2, backgroundColor: '#F5F2EE', logging: false,
+  });
+}
+
+async function uploadKaart(dataUrl, id) {
+  const fd = new FormData();
+  fd.append('file', dataUrl);
+  fd.append('upload_preset', CLOUDINARY_PRESET);
+  fd.append('public_id', 'griette_kaart_' + id);
+  fd.append('folder', 'griette-kaarten');
+  const res = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/image/upload',
+                          { method:'POST', body: fd });
+  if (!res.ok) throw new Error('uploaden geweigerd (' + res.status + ')');
+  const d = await res.json();
+  if (!d.secure_url) throw new Error('geen link terug');
+  return d.secure_url;
+}
+
+// Bewaart de kaart die nu op het scherm staat. Wordt ook automatisch
+// aangeroepen als je hem downloadt — dan is de afbeelding er toch al.
+async function bewaarKaart(bestaandeDataUrl, stil) {
+  const btn = document.getElementById('bewaar-btn');
+  const st  = document.getElementById('bewaar-status');
+  if (btn && !stil) { btn.disabled = true; btn.textContent = '⏳ Bewaren…'; }
+  if (st && !stil) st.textContent = '';
+
+  const titel = (document.getElementById('f-title').value || '').trim() || 'Outfitkaart';
+  const id = 'kk-' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+
+  try {
+    let dataUrl = bestaandeDataUrl;
+    if (!dataUrl) {
+      const canvas = await kaartNaarCanvas(2);
+      dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    }
+    const url = await uploadKaart(dataUrl, id);
+
+    bewaardeKaarten.unshift({
+      id, url, titel,
+      datum: new Date().toISOString(),
+      items: selItems.map(i => i.name).filter(Boolean).slice(0, 8),
+    });
+    if (bewaardeKaarten.length > MAX_KAARTEN) bewaardeKaarten = bewaardeKaarten.slice(0, MAX_KAARTEN);
+    await schrijfKaarten();
+
+    if (btn && !stil) { btn.textContent = '✓ Bewaard bij je kaarten'; }
+    if (st && !stil) st.innerHTML = `Staat nu bij <b>🗂 Mijn kaarten</b>, ook op je andere apparaten.`;
+    return true;
+  } catch(e) {
+    if (btn && !stil) btn.textContent = '💾 Bewaar bij mijn kaarten';
+    if (st && !stil) st.textContent = 'Bewaren lukte niet: ' + e.message;
+    return false;
+  } finally {
+    if (btn && !stil) btn.disabled = false;
+  }
+}
+
+function openKaarten() {
+  toonKaarten();
+  document.getElementById('kaarten-modal').classList.add('open');
+}
+function sluitKaarten() {
+  document.getElementById('kaarten-modal').classList.remove('open');
+}
+
+function toonKaarten() {
+  const grid = document.getElementById('kaarten-grid');
+  const st = document.getElementById('kaarten-status');
+  if (!grid) return;
+  grid.innerHTML = bewaardeKaarten.length
+    ? bewaardeKaarten.map((k, i) => {
+        const d = new Date(k.datum);
+        const datum = isNaN(d) ? '' : d.toLocaleDateString('nl-NL', {day:'numeric', month:'short'});
+        return `<div class="kaart-cel" onclick="openKaart(${i})">`
+          + `<img src="${esc(k.url)}" alt="${esc(k.titel)}" loading="lazy">`
+          + `<div class="kc-info"><div class="kc-titel">${esc(k.titel)}</div>`
+          + `<div class="kc-datum">${esc(datum)}</div></div></div>`;
+      }).join('')
+    : '<div class="kaart-leeg">Nog geen kaarten bewaard. Maak er een en tik op “Bewaar bij mijn kaarten”.</div>';
+  if (st) st.textContent = bewaardeKaarten.length
+    ? `${bewaardeKaarten.length} kaart${bewaardeKaarten.length===1?'':'en'} bewaard.` : '';
+}
+
+// Een bewaarde kaart groot bekijken, downloaden of weggooien.
+function openKaart(i) {
+  const k = bewaardeKaarten[i];
+  if (!k) return;
+  const ov = document.createElement('div');
+  ov.className = 'kaart-open';
+  ov.id = 'kaart-open';
+  ov.innerHTML = `<img src="${esc(k.url)}" alt="${esc(k.titel)}">`
+    + '<div class="ko-knoppen">'
+    + `<button onclick="downloadBewaarde(${i})">⬇ Download</button>`
+    + `<button onclick="verwijderKaart(${i})">🗑 Verwijderen</button>`
+    + '<button onclick="document.getElementById(\'kaart-open\').remove()">Sluiten</button>'
+    + '</div>'
+    + '<div id="kaart-open-status" style="color:#fff;font-size:11px;opacity:.85;text-align:center;"></div>';
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+  document.body.appendChild(ov);
+}
+
+// Downloaden vanuit het archief. Dezelfde route als op de kaart zelf: eerst
+// het deelvenster (daarmee komt hij op een telefoon in je fotorol), anders een
+// gewone download.
+async function downloadBewaarde(i) {
+  const k = bewaardeKaarten[i];
+  const st = document.getElementById('kaart-open-status');
+  if (!k) return;
+  if (st) st.textContent = 'Ophalen…';
+  const naam = (k.titel || 'outfitkaart').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '.jpg';
+  try {
+    const res = await fetch(k.url);
+    if (!res.ok) throw new Error('kon de afbeelding niet ophalen');
+    const blob = await res.blob();
+
+    let gedeeld = false;
+    try {
+      if (navigator.canShare) {
+        const file = new File([blob], naam, { type:'image/jpeg' });
+        if (navigator.canShare({ files:[file] })) {
+          await navigator.share({ files:[file] });
+          gedeeld = true;
+        }
+      }
+    } catch(e) { if (e && e.name === 'AbortError') gedeeld = true; }
+
+    if (!gedeeld) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = naam;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    }
+    if (st) st.textContent = gedeeld ? 'Opgeslagen via het deelvenster.'
+      : 'Gedownload. Lukt het niet? Houd de afbeelding ingedrukt en kies “Bewaar afbeelding”.';
+  } catch(e) {
+    if (st) st.textContent = 'Downloaden lukte niet: ' + e.message;
+  }
+}
+
+async function verwijderKaart(i) {
+  if (!confirm('Deze kaart uit je lijst halen?')) return;
+  bewaardeKaarten.splice(i, 1);
+  await schrijfKaarten();
+  const ov = document.getElementById('kaart-open');
+  if (ov) ov.remove();
+  toonKaarten();
+}
+
 async function downloadKaart() {
   const btn = document.getElementById('dl-btn');
   const origLabel = '⬇ Opslaan als afbeelding';
@@ -4456,6 +4704,10 @@ async function downloadKaart() {
       } catch(e){}
     }
 
+    // De afbeelding is er nu toch al: meteen ook in je kaartenlijst zetten,
+    // zodat je hem later terug kunt vinden zonder eraan te hoeven denken.
+    bewaarKaart(dataUrl, true);
+
     btn.textContent = '✓ Kaart klaar — nogmaals opslaan';
     setDlStatus(shared
       ? 'Opgeslagen via het deelvenster.'
@@ -4520,6 +4772,7 @@ function setStep(n) {
 function nextStep() { setStep(Math.min(step+1,4)); }
 function prevStep() { setStep(Math.max(step-1,1)); }
 function restart() {
+  kaartHerkomst = null; toonHerkomstKnop();
   kaartGestart = Date.now();     // vanaf hier tellen de kosten van de nieuwe kaart
   selType=null; selPreset=null; selItems=[]; customColors=[]; outfitUitleg=null; outfitTop='';
   anchorItems=[]; kantEnKlaar=false; renderAnchorPicked();
