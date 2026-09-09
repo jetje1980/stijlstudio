@@ -270,6 +270,14 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <div id="verbruik-vak" style="margin-top:12px;font-size:11px;color:var(--text-2);line-height:1.6;"></div>
     <button class="btn-rescan" style="margin-top:6px;" onclick="resetVerbruik()">Teller op nul</button>
 
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+      <div class="sec-label">Werkt het?</div>
+      <div class="modal-note" style="margin-bottom:8px;">Twee piepkleine testaanroepen die precies laten zien waar het misgaat als iets niet werkt. Kost een fractie van een cent.</div>
+      <button class="ai-btn" id="zelftest-btn" onclick="zelftest()">🩺 Test de verbinding</button>
+      <div id="zelftest-uit" style="margin-top:8px;font-size:11px;line-height:1.7;"></div>
+      <div class="field-note" style="margin-top:8px;" id="versie-regel"></div>
+    </div>
+
     <div style="margin-top:14px;" class="sec-label">Model voor de zware analyse</div>
     <select class="modal-field" id="ai-model-select">
       <option value="claude-opus-5">Opus 5 — beste stijladvies (aanbevolen)</option>
@@ -1013,6 +1021,89 @@ try { verbruik = Object.assign(verbruik, JSON.parse(localStorage.getItem('ai-ver
 const AI_ENDPOINT = SUPABASE_URL + '/functions/v1/claude';
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────────
+// Deze versie staat in de instellingen. Klaagt er iets, dan is meteen te zien
+// of de telefoon een oude pagina uit de cache draait in plaats van deze.
+const APP_VERSIE = '2026-09-09 · streamen + zelftest';
+
+// De zelftest doet wat ik van hieruit niet kan: een echte aanroep vanaf jouw
+// toestel. Twee piepkleine vragen — een gewone en een gestreamde — zodat
+// zichtbaar wordt of het aan de verbinding ligt, aan het streamen, of aan iets
+// anders. Bij een "werkt niet" is dit in een tik de diagnose.
+async function zelftest() {
+  const btn = document.getElementById('zelftest-btn');
+  const uit = document.getElementById('zelftest-uit');
+  btn.disabled = true;
+  btn.textContent = '⏳ Testen…';
+  uit.innerHTML = '';
+
+  const regels = [];
+  const zet = (goed, tekst, detail) => {
+    regels.push(`<div><span style="color:${goed?'var(--green)':'#b5232a'}">${goed?'✓':'✗'}</span> ${esc(tekst)}`
+      + (detail ? `<br><span style="opacity:.7;font-size:10px;">${esc(detail)}</span>` : '') + '</div>');
+    uit.innerHTML = regels.join('');
+  };
+
+  const kop = { 'content-type':'application/json' };
+  if (appSecret) kop['x-app-secret'] = appSecret;
+  const vraag = (stroom) => JSON.stringify({
+    model: 'claude-haiku-4-5', max_tokens: 16, stream: stroom || undefined,
+    messages: [{ role:'user', content:'Antwoord met exact: hoi' }]
+  });
+
+  // 1 — gewone aanroep
+  let gewoonOk = false;
+  try {
+    const t0 = Date.now();
+    const r = await fetch(AI_ENDPOINT, { method:'POST', headers:kop, body: vraag(false) });
+    const tekst = await r.text();
+    const ms = Date.now() - t0;
+    if (r.ok) {
+      let d = null; try { d = JSON.parse(tekst); } catch(e){}
+      const t = d && (d.content||[]).find(b=>b.type==='text');
+      gewoonOk = !!(t && t.text);
+      zet(gewoonOk, `Gewone aanroep: ${r.status} in ${ms} ms`,
+          gewoonOk ? 'antwoord: ' + t.text.trim().slice(0,40)
+                   : 'geen tekst terug: ' + tekst.slice(0,90));
+    } else {
+      zet(false, `Gewone aanroep: fout ${r.status}`, tekst.slice(0,120));
+    }
+  } catch(e) {
+    zet(false, 'Gewone aanroep: geen verbinding', e.message);
+  }
+
+  // 2 — gestreamde aanroep
+  try {
+    const t0 = Date.now();
+    const r = await fetch(AI_ENDPOINT, { method:'POST', headers:kop, body: vraag(true) });
+    const soort = r.headers.get('content-type') || '(geen)';
+    if (!r.ok) {
+      const tekst = await r.text();
+      zet(false, `Streamen: fout ${r.status}`, tekst.slice(0,120));
+    } else {
+      const ruw = await r.text();
+      const ms = Date.now() - t0;
+      const events = (ruw.match(/^data:/gm) || []).length;
+      const stroomOk = events > 0;
+      zet(stroomOk, `Streamen: ${r.status} in ${ms} ms, ${events} gebeurtenissen`,
+          'etiket: ' + soort + (stroomOk ? '' : ' — begin: ' + ruw.slice(0,90)));
+      if (stroomOk && stroomKapot) {
+        stroomKapot = false;
+        try { localStorage.removeItem('ai-stroom-kapot'); } catch(e){}
+        zet(true, 'Streamen werkt weer — de noodrem is losgezet.');
+      }
+    }
+  } catch(e) {
+    zet(false, 'Streamen: geen verbinding', e.message);
+  }
+
+  regels.push('<div style="margin-top:6px;opacity:.75;">'
+    + (gewoonOk ? 'De AI is bereikbaar vanaf dit toestel.'
+                : 'De AI is niet bereikbaar vanaf dit toestel. Stuur deze regels door.')
+    + '</div>');
+  uit.innerHTML = regels.join('');
+  btn.textContent = '🩺 Opnieuw testen';
+  btn.disabled = false;
+}
 // Losse aanroepen bijhouden, niet alleen een totaal. "Wat kostten die twee
 // kaarten net?" is anders niet te beantwoorden, en juist dat wil je weten.
 // Beide pagina's schrijven in dezelfde lijst, zodat het totaal klopt met de
@@ -1140,6 +1231,9 @@ function openSettings() {
   ms.onchange = () => { aiModel = ms.value; bijwerkZuinigPrijs(); };
   document.getElementById('zuinig-check').onchange = bijwerkZuinigPrijs;
   bijwerkZuinigPrijs();
+  const vr = document.getElementById('versie-regel');
+  if (vr) vr.textContent = 'Versie: ' + APP_VERSIE
+    + (stroomKapot ? ' · streamen staat tijdelijk uit' : '');
   toonPlaat();
   document.getElementById('settings-modal').classList.add('open');
 }
