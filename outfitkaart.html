@@ -803,17 +803,15 @@ ook niet onbeantwoord omdat het rapport erover zwijgt.`;
 const DNA_KORT = `Griette's stijlregels, kort:
 - Basis: donkerblauw, bruin, zwart, gebroken-wit
 - Accenten die het rapport noemt: felroze, paars, geel, oranje, oranje-rood,
-  rood, lichtblauw, groen. Dat is een VOORBEELDLIJST, geen hek: het rapport
-  somde op wat het tegenkwam, niet wat mag. Een heldere kleur die er niet in
-  staat — turquoise, petrol, smaragd, kobalt — is niet afgekeurd. Zeg dus nooit
-  dat een kleur "niet in haar profiel past" omdat hij niet in het rijtje staat.
-- Krachtige kleuren altijd tegen een rustige basistoon
-- EEN HELDERE KLEUR IS HET STATEMENT, en dan gaat de rest een stap terug. Rust
-  is: denim, gebroken wit, camel, zand, zacht groen, lichtgrijs, donkerblauw,
-  bruin. Zet er geen tweede zwaargewicht naast — zwart, bordeaux, aubergine —
-  want dan pakken twee kleuren de aandacht en verdwijnt juist het stuk waar
-  het om ging. Alleen als zij er zelf om vraagt, of als het echt beter is; leg
-  dan uit waarom.
+  rood, lichtblauw, groen. VOORBEELDLIJST, geen hek — het rapport somde op wat
+  het tegenkwam, niet wat mag. Turquoise, petrol, smaragd of kobalt zijn dus
+  niet afgekeurd. Zeg nooit dat een kleur "niet in haar profiel past" omdat
+  hij niet in dat rijtje staat.
+- EEN HELDERE KLEUR IS HET STATEMENT; de rest gaat een stap terug naar denim,
+  gebroken wit, camel, zand, zacht groen, lichtgrijs, donkerblauw of bruin.
+  Geen tweede zwaargewicht ernaast (zwart, bordeaux, aubergine): dan pakken
+  twee kleuren de aandacht en verdwijnt juist het stuk waar het om ging.
+  Alleen als zij erom vraagt of het echt beter is — en zeg dan waarom.
 - Champagne en grijzige tinten dof haar gezicht; lichtgrijs werkt juist wel als
   rustige steunkleur, en in zachte casual stof mag grijs gewoon
 - Silhouet: taille benadrukken, nooit wijd op wijd, hoge taille geeft vorm
@@ -3103,7 +3101,7 @@ function toonProfiel() {
     + (p.spanning ? `<div style="margin-top:8px;"><b>Waar dit botst met je rapport</b><br>${esc(p.spanning)}</div>` : '')
     + '</div>'
     + eigenKleurenUI()
-    + '<button class="btn-rescan" onclick="wisProfiel()">Profiel wissen</button>';
+    + '<button class="btn-rescan" id="wis-profiel-btn" onclick="wisProfiel()">Profiel wissen</button>';
 }
 
 async function wisProfiel() {
@@ -4254,7 +4252,7 @@ Antwoord ALLEEN met JSON:
   if (mislukt.length && nGoed) {
     // Deels gelukt is geen mislukking: laat staan wat er is, en zeg wat er
     // ontbreekt en hoe je dat alsnog haalt.
-    st.innerHTML = `<b>${nGoed} outfits</b> staan er. `
+    st.innerHTML = `<b>${nGoed} outfits</b> staan er al — die blijven staan. `
       + `${mislukt.length} van de ${capGekozenCombos.length} combo's lukte niet `
       + `(${esc(mislukt[0])}).<br>`
       + '<button class="cap-vervang-btn" style="margin-top:8px;" onclick="capMaakOutfits()">'
