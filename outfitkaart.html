@@ -68,6 +68,21 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .vraag-opt.gekozen{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--surface));font-weight:600;}
 .vraag-tel{font-size:10px;color:var(--text-2);margin-top:6px;}
 /* Weekendtas */
+.cap-stappen{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:12px;font-size:10px;}
+.cap-stap{color:var(--text-2);}
+.cap-stap.nu{color:var(--accent);font-weight:700;}
+.cap-stap.gedaan{color:var(--text);}
+.cap-pijl{color:var(--border);}
+.cap-palet{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 13px;margin-bottom:9px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.cap-palet.gekozen{cursor:default;border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,var(--surface));}
+.cap-palet-dots{display:flex;gap:6px;margin-bottom:8px;}
+.cap-dot{width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(0,0,0,.12);}
+.cap-dot.groot{width:20px;height:20px;}
+.cap-palet-naam{font-size:13px;font-weight:600;}
+.cap-palet-kleuren{font-size:11px;color:var(--text-2);margin-top:2px;}
+.cap-kleurrij{display:flex;flex-wrap:wrap;gap:6px;}
+.cap-kleurknop{display:flex;align-items:center;gap:6px;padding:5px 10px 5px 6px;border:1.5px solid var(--border);border-radius:20px;background:var(--ph-bg);font-family:'Inter',sans-serif;font-size:11px;color:var(--text);cursor:pointer;}
+.cap-kleurknop.actief{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--surface));}
 .cap-rij{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
 .cap-paklijst{background:color-mix(in srgb,var(--accent) 6%,var(--surface));border:1.5px solid color-mix(in srgb,var(--accent) 28%,var(--border));border-radius:12px;padding:12px 13px;margin-bottom:10px;}
 .cap-groep{margin-top:8px;font-size:11.5px;line-height:1.6;}
@@ -333,42 +348,70 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <button class="mode-btn" id="mode-capsule" onclick="setStartMode('capsule')" style="width:100%;margin-top:8px;">🧳 Weekendtas: veel outfits uit weinig items</button>
   </div>
 
-  <!-- ROUTE: capsule voor een paar dagen -->
+  <!-- ROUTE: weekendtas — jij kiest, de AI doet steeds één kleine stap -->
   <div id="capsule-area" style="display:none">
-    <div class="sec-label">Waar ga je heen, en hoe lang?</div>
-    <div class="field-note" style="margin-bottom:10px;">Ik zoek een kleine set stukken die op elkaar passen, en maak daar zoveel mogelijk verschillende outfits van. Weinig meenemen, veel kunnen dragen.</div>
-    <input class="modal-field" id="cap-gelegenheid" type="text" placeholder="bijv. weekend Terschelling, stad en strand, koud" autocomplete="off">
+    <div class="cap-stappen" id="cap-stappen"></div>
 
-    <div class="cap-rij">
-      <div>
-        <div class="sec-label" style="margin-bottom:5px;">Outfits</div>
-        <select class="modal-field" id="cap-aantal" style="padding:9px 11px;font-size:12px;">
-          <option value="4">4 outfits</option>
-          <option value="6" selected>6 outfits</option>
-          <option value="8">8 outfits</option>
-        </select>
+    <!-- STAP 1 — jij kiest de items. Hier komt geen AI aan te pas, dus dit is
+         onmiddellijk. Dat is precies de bedoeling: het zware kiezen doe jij. -->
+    <div id="cap-s1">
+      <div class="sec-label">Waar ga je heen?</div>
+      <input class="modal-field" id="cap-gelegenheid" type="text" placeholder="bijv. weekend Terschelling, stad en strand, koud" autocomplete="off">
+
+      <div class="cap-rij">
+        <div>
+          <div class="sec-label" style="margin-bottom:5px;">Outfits</div>
+          <select class="modal-field" id="cap-aantal" style="padding:9px 11px;font-size:12px;">
+            <option value="3">3 outfits</option>
+            <option value="4" selected>4 outfits</option>
+            <option value="6">6 outfits</option>
+          </select>
+        </div>
+        <div>
+          <div class="sec-label" style="margin-bottom:5px;">Buitenlaag</div>
+          <select class="modal-field" id="cap-jas" style="padding:9px 11px;font-size:12px;">
+            <option value="jas">Jas of mantel mee</option>
+            <option value="licht">Alleen vest of blazer</option>
+            <option value="geen">Geen buitenlaag</option>
+          </select>
+        </div>
       </div>
-      <div>
-        <div class="sec-label" style="margin-bottom:5px;">Buitenlaag</div>
-        <select class="modal-field" id="cap-jas" style="padding:9px 11px;font-size:12px;">
-          <option value="jas">Jas of mantel mee</option>
-          <option value="licht">Alleen vest of blazer</option>
-          <option value="geen">Geen buitenlaag</option>
-        </select>
-      </div>
+
+      <div class="sec-label" style="margin-top:14px;">Wat gaat er mee?</div>
+      <div class="field-note" style="margin-bottom:8px;">Kies de stukken die je in je tas wilt. Hoe meer je zelf kiest, hoe sneller en scherper de rest gaat.</div>
+      <div id="cap-gekozen"></div>
+      <input class="anchor-search" id="cap-search" type="text" placeholder="Zoek in je kast…" autocomplete="off">
+      <div class="anchor-grid" id="cap-grid"></div>
+      <button class="ai-btn" id="cap-naar-palet" style="margin-top:12px;" disabled onclick="capNaarPalet()">Kies eerst een paar stukken</button>
     </div>
 
-    <div class="sec-label" style="margin-top:14px;">Vaste stukken <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">optioneel — deze gaan sowieso mee</span></div>
-    <div id="cap-gekozen"></div>
-    <input class="anchor-search" id="cap-search" type="text" placeholder="Zoek in je kast…" autocomplete="off">
-    <div class="anchor-grid" id="cap-grid"></div>
+    <!-- STAP 2 — kleurpaletten die bij die stukken passen -->
+    <div id="cap-s2" style="display:none">
+      <div class="sec-label">Welk kleurpalet?</div>
+      <div class="field-note" style="margin-bottom:10px;">Zo ver mogelijk uit elkaar, zodat je echt wat te kiezen hebt. Elk palet levert andere outfits op uit dezelfde stukken.</div>
+      <div id="cap-palet-lijst"></div>
+      <div class="field-note" id="cap-palet-status" style="margin-top:6px;"></div>
+      <button class="btn-rescan" id="cap-terug1" style="margin-top:10px;" onclick="capTerug(1)">← Terug naar de items</button>
+    </div>
 
-    <div class="sec-label" style="margin-top:14px;">Kleuren <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">optioneel — hoe minder kleuren, hoe meer combinaties</span></div>
-    <div class="color-swatch-grid" id="cap-kleuren"></div>
+    <!-- STAP 3 — palet bijstellen: een kleur wisselen tot het klopt -->
+    <div id="cap-s3" style="display:none">
+      <div class="sec-label">Je palet</div>
+      <div class="field-note" style="margin-bottom:10px;">Tik op een kleur om hem te wisselen. Klopt het? Dan maak ik er outfits mee.</div>
+      <div id="cap-palet-gekozen"></div>
+      <div id="cap-wissel" style="display:none;margin-top:10px;"></div>
+      <button class="ai-btn" id="cap-maak-outfits" style="margin-top:12px;" onclick="capMaakOutfits()">Maak de outfits →</button>
+      <div class="field-note" id="cap-outfit-status" style="margin-top:6px;"></div>
+      <button class="btn-rescan" id="cap-terug2" style="margin-top:10px;" onclick="capTerug(2)">← Ander palet</button>
+    </div>
 
-    <button class="ai-btn" id="cap-btn" style="margin-top:12px;" onclick="aiCapsule()">🧳 Stel mijn weekendtas samen</button>
-    <div class="field-note" id="cap-status" style="margin-top:6px;"></div>
-    <div id="cap-uitkomst" style="margin-top:14px;"></div>
+    <!-- STAP 4 — de outfits, en dan nog een ronde -->
+    <div id="cap-s4" style="display:none">
+      <div class="sec-label">Je outfits</div>
+      <div id="cap-uitkomst"></div>
+      <button class="ai-btn" id="cap-ronde" style="margin-top:10px;" onclick="capNogEenRonde()">＋ Nog een ronde: meer stukken erbij</button>
+      <button class="btn-rescan" id="cap-terug3" style="margin-top:8px;" onclick="capTerug(3)">← Palet bijstellen</button>
+    </div>
   </div>
 
   <!-- ROUTE: inspiratiefoto namaken -->
@@ -1836,7 +1879,7 @@ function setStartMode(mode) {
 
   kantEnKlaar = false;
   if (mode === 'capsule') {
-    bouwCapKleuren();
+    capToonStap(1);
     bouwCapGrid('');
     toonCapGekozen();
     const zoek = document.getElementById('cap-search');
@@ -3099,42 +3142,75 @@ Antwoord ALLEEN met JSON:
   btn.disabled = false;
 }
 
-// ── WEEKENDTAS: VEEL OUTFITS UIT WEINIG ITEMS ─────────────────────────────────
-// Een losse outfit maken is één som. Een tas pakken is een andere: je zoekt de
-// kleinste set stukken waaruit de meeste verschillende dagen te halen zijn.
-// De truc zit in kleurdiscipline — deelt alles een kern van twee, drie kleuren,
-// dan past elk bovenstuk op elk onderstuk en groeit het aantal combinaties
-// vanzelf. Variatie komt daarna niet uit méér spullen maar uit een andere
-// stijlgreep op dezelfde stukken: vandaag ton-sur-ton, morgen een hard accent.
-let capItems = [];      // vaste stukken die sowieso meegaan
-let capKleuren = [];    // maximaal drie
-const CAP_MAX_ITEMS = 6;
-// Zes is ruim. Voor een tas werkt minder meestal beter — hoe meer kleuren, hoe
-// minder stukken op elkaar passen — maar dat is een advies, geen verbod. Wie
-// vijf kleuren mee wil, mag dat zelf weten.
-const CAP_MAX_KLEUR = 6;
+// ── WEEKENDTAS: JIJ KIEST, DE AI DOET STEEDS EEN KLEINE STAP ──────────────────
+let capItems = [];           // de stukken die jij aanwijst
 
-function isCapItem(id) { return capItems.some(i => i.id === id); }
+// De weekendtas werkte eerst met één grote vraag aan de AI, en daarna met
+// een paar minder grote. Beide te traag: de AI moest zelf de kast doorspitten
+// én kiezen én combineren, en dat kost een minuut.
+//
+// Nu andersom. Jij kiest de stukken — dat is meteen, want daar komt geen AI
+// aan te pas. Daarna hoeft de AI alleen nog kleine dingen te doen op een
+// kleine set: welke kleurpaletten passen hierbij, en welke outfits vallen er
+// uit te halen. Elke aanroep gaat over een handvol items in plaats van je hele
+// garderobe, en duurt dus seconden.
+//
+//   1. jij kiest items      (geen AI)
+//   2. AI stelt paletten voor, zo ver mogelijk uit elkaar
+//   3. jij kiest er een en mag elke kleur wisselen
+//   4. AI maakt de outfits uit jouw stukken in jouw palet
+//   5. nog een ronde: stukken erbij, verder bouwen
+let capStap = 1;
+let capPaletten = [];        // voorstellen uit stap 2
+let capPalet = null;         // het gekozen palet
+let capOutfits = [];
+let capWisselIndex = -1;
 
-function bouwCapKleuren() {
-  const grid = document.getElementById('cap-kleuren');
-  if (!grid || grid.children.length) return;
-  grid.innerHTML = KLEUREN.map(k =>
-    `<button class="cswatch" data-v="${esc(k.v)}" style="background:${k.dot}" title="${esc(k.v)}"`
-    + ` onclick="wisselCapKleur('${esc(k.v)}')"><span class="check">✓</span></button>`).join('');
+function capsuleOpdracht() {
+  return {
+    aantal: Number((document.getElementById('cap-aantal')||{}).value) || 4,
+    jas: (document.getElementById('cap-jas')||{}).value || 'jas',
+    gel: ((document.getElementById('cap-gelegenheid')||{}).value || '').trim(),
+  };
 }
 
-function wisselCapKleur(v) {
-  const i = capKleuren.indexOf(v);
-  if (i >= 0) capKleuren.splice(i, 1);
-  else {
-    if (capKleuren.length >= CAP_MAX_KLEUR) capKleuren.shift();
-    capKleuren.push(v);
-  }
-  document.querySelectorAll('#cap-kleuren .cswatch').forEach(b =>
-    b.classList.toggle('selected', capKleuren.includes(b.dataset.v)));
+function capsuleJasRegel(jas) {
+  return jas === 'jas'
+    ? 'Er gaat één jas of mantel mee die over elke outfit moet passen.'
+    : jas === 'licht'
+      ? 'Geen jas, wel een vest of blazer als buitenste laag.'
+      : 'Geen buitenlaag nodig.';
 }
 
+// Korte beschrijving van de gekozen stukken. Dit is alles wat de AI nodig
+// heeft — niet de hele kast, alleen wat jij hebt aangewezen.
+function capItemsTekst() {
+  return capItems.map(i => {
+    const t = itemTags[i.id] || {};
+    const v = itemVisueel[i.id];
+    const val = x => Array.isArray(x) ? x.join('/') : (x || '');
+    return `- ${i.name} (${i.cat})`
+      + (val(t.kleur) ? `, ${val(t.kleur)}` : '')
+      + (v && v.kleur ? `, op de foto ${v.kleur}` : '');
+  }).join('\n');
+}
+
+function capToonStap(n) {
+  capStap = n;
+  [1,2,3,4].forEach(i => {
+    const el = document.getElementById('cap-s' + i);
+    if (el) el.style.display = (i === n) ? 'block' : 'none';
+  });
+  const namen = ['Items', 'Palet', 'Bijstellen', 'Outfits'];
+  const bar = document.getElementById('cap-stappen');
+  if (bar) bar.innerHTML = namen.map((naam, i) =>
+    `<span class="cap-stap${i+1 === n ? ' nu' : ''}${i+1 < n ? ' gedaan' : ''}">${i+1}. ${naam}</span>`
+  ).join('<span class="cap-pijl">›</span>');
+}
+
+function capTerug(n) { capToonStap(n); }
+
+// ── STAP 1: ITEMS ─────────────────────────────────────────────────────────────
 function bouwCapGrid(filter) {
   const grid = document.getElementById('cap-grid');
   if (!grid) return;
@@ -3149,9 +3225,6 @@ function bouwCapGrid(filter) {
     grid.innerHTML = '<div style="grid-column:1/-1;font-size:11px;color:var(--text-2);padding:10px 2px;">Niets gevonden.</div>';
     return;
   }
-
-  // Dezelfde opbouw als de andere itemkiezers: de foto hoort IN .ithumb, anders
-  // rekt hij over de hele kaart uit en valt de naam eronder weg.
   lijst.forEach(item => {
     const card = document.createElement('div');
     card.className = 'icard' + (isCapItem(item.id) ? ' selected' : '');
@@ -3161,10 +3234,8 @@ function bouwCapGrid(filter) {
     if (cloudMap[item.id]) {
       const img = new Image();
       img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
-      img.onload = () => {
-        const t = document.getElementById('cap-th-' + item.id);
-        if (t) { t.textContent = ''; t.appendChild(img); }
-      };
+      img.onload = () => { const t = document.getElementById('cap-th-' + item.id);
+                           if (t) { t.textContent = ''; t.appendChild(img); } };
       img.src = cloudMap[item.id];
     }
     card.addEventListener('click', () => wisselCapItem(item.id));
@@ -3172,281 +3243,245 @@ function bouwCapGrid(filter) {
   });
 }
 
+function isCapItem(id) { return capItems.some(i => i.id === id); }
+
 function wisselCapItem(id) {
-  const st = document.getElementById('cap-status');
   if (isCapItem(id)) capItems = capItems.filter(i => i.id !== id);
   else {
-    if (capItems.length >= CAP_MAX_ITEMS) {
-      st.textContent = `Maximaal ${CAP_MAX_ITEMS} vaste stukken — de rest kies ik erbij.`;
-      return;
-    }
     const it = allItems.find(i => i.id === id);
     if (it) capItems.push(it);
   }
-  st.textContent = '';
   toonCapGekozen();
-  bouwCapGrid(document.getElementById('cap-search').value);
+  bouwCapGrid((document.getElementById('cap-search')||{}).value || '');
 }
 
 function toonCapGekozen() {
   const el = document.getElementById('cap-gekozen');
-  if (!el) return;
-  el.innerHTML = capItems.length
+  const knop = document.getElementById('cap-naar-palet');
+  if (el) el.innerHTML = capItems.length
     ? '<div class="cap-stukken" style="margin-bottom:8px;">'
       + capItems.map(i => `<span class="cap-chip">${esc(i.name)} `
           + `<span style="cursor:pointer;opacity:.6" onclick="wisselCapItem('${esc(i.id)}')">×</span></span>`).join('')
       + '</div>'
     : '';
+  if (knop) {
+    const genoeg = capItems.length >= 3;
+    knop.disabled = !genoeg;
+    knop.textContent = genoeg
+      ? `Verder met ${capItems.length} stuks →`
+      : `Kies er minstens ${3 - capItems.length} meer`;
+  }
 }
 
-// De weekendtas was één grote vraag: kleurkern, paklijst én alle outfits in
-// één keer, met ruimte voor twaalfduizend tokens antwoord. Op een goede
-// verbinding gaat dat prima. Op een telefoon niet: die houdt een verbinding
-// van een minuut niet open, en dan valt de hele tas in het water — inclusief
-// het deel dat al af was.
-//
-// Daarom nu in stappen. Eerst de kern en de paklijst; die verschijnt meteen
-// op het scherm. Daarna de outfits in groepjes van drie. Elke aanroep is kort
-// genoeg om te overleven, je ziet onderweg wat er al staat, en gaat er één
-// stap mis, dan blijft de rest gewoon staan en probeer je alleen díé opnieuw.
-let capsuleResultaat = null;
+// ── STAP 2: KLEURPALETTEN ─────────────────────────────────────────────────────
+async function capNaarPalet() {
+  capToonStap(2);
+  const lijst = document.getElementById('cap-palet-lijst');
+  const st = document.getElementById('cap-palet-status');
+  lijst.innerHTML = '';
+  const stopVolgen = volgVoortgang(st);
+  st.textContent = 'Kleuren afwegen…';
 
-function capsuleOpdracht() {
-  return {
-    aantal: Number(document.getElementById('cap-aantal').value) || 6,
-    jas: document.getElementById('cap-jas').value,
-    gel: (document.getElementById('cap-gelegenheid').value || '').trim(),
-  };
-}
+  const { gel } = capsuleOpdracht();
+  try {
+    const raw = await callClaude(
+      `Je bent een kleurexpert en stylist. ${DNA_KORT}\nAntwoord in het Nederlands.`,
+      [{ type:'text', text:
+`Griette neemt deze stukken mee${gel ? ' naar: ' + gel : ''}:
 
-function capsuleJasRegel(jas) {
-  return jas === 'jas'
-    ? 'Er gaat één jas of mantel mee. Die moet over ELKE outfit passen, dus kies hem op de kleurkern en niet op één look.'
-    : jas === 'licht'
-      ? 'Geen jas, wel een vest of blazer als buitenste laag. Ook die moet bij alles passen.'
-      : 'Geen buitenlaag nodig.';
-}
+${capItemsTekst()}
 
-function capsuleSysteem() {
-  return `Je bent een stylist die een capsule samenstelt: de kleinste set
-kleding waaruit de meeste verschillende outfits te halen zijn. ${GRIETTE_DNA}
-${profielBlok()}
-Antwoord in het Nederlands. Wees concreet en eerlijk over wat ontbreekt.`;
-}
+Stel 4 kleurpaletten voor waarmee zij hiermee kan werken. Elk palet is een
+kern van 2 of 3 kleuren plus hooguit 1 accent.
 
-// ── STAP 1: KLEURKERN EN PAKLIJST ─────────────────────────────────────────────
-async function capsuleStap1() {
-  const { aantal, jas, gel } = capsuleOpdracht();
-  const vast = capItems.length
-    ? 'DEZE STUKKEN GAAN SOWIESO MEE, bouw eromheen:\n'
-      + capItems.map(i => `- ${i.name} (${i.id})`).join('\n')
-    : '';
-  const kleurRegel = capKleuren.length
-    ? `Griette wil deze kleuren gebruiken: ${capKleuren.join(', ')}. Maak daar de kern van.`
-    : 'Kies zelf een kleurkern die bij haar palet past.';
+BELANGRIJK: maak ze zo VERSCHILLEND mogelijk van elkaar. Niet vier variaties op
+hetzelfde, maar vier echt andere richtingen — bijvoorbeeld één rustig en
+ton-sur-ton, één met een hard accent, één warm, één koel. Zij moet echt iets te
+kiezen hebben.
 
-  const raw = await callClaude(capsuleSysteem(), [{ type:'text', text:
-`Griette gaat weg en wil weinig meenemen maar veel kunnen dragen.
-${gel ? 'Gelegenheid: ' + gel : 'Gelegenheid: niet opgegeven — ga uit van een gewoon weekend weg, dag en avond door elkaar, en zeg dat je dat aanneemt.'}
-Ze wil er ${aantal} outfits uit kunnen halen.
-${capsuleJasRegel(jas)}
-${kleurRegel}
-${vast}
-
-HAAR GARDEROBE (id | categorie | naam | tags):
-${wardrobeForAI()}
-
-Doe nu ALLEEN stap 1 en 2. De outfits volgen later.
-
-STAP 1 — KLEURKERN
-Kies twee of drie kleuren die alles deelt, plus hooguit twee accentkleuren.
-Dit is het fundament: delen alle stukken een kern, dan past elk bovenstuk op
-elk onderstuk en krijg je veel outfits uit weinig items. Kies de kern uit haar
-basiskleuren, want die moeten het vaakst terugkomen.
-
-STAP 2 — DE PAKLIJST
-Kies de stukken. Streef naar zo weinig mogelijk: als vuistregel drie of vier
-bovenstukken, twee of drie onderstukken, één of twee lagen, twee paar schoenen
-en één tas is genoeg voor ${aantal} outfits. Elk onderstuk moet met ELK
-bovenstuk kunnen. Kan dat niet, dan hoort dat stuk niet in de tas.
-Zet er per stuk bij in hoeveel van de ${aantal} outfits het meedoet — een stuk
-dat in één outfit zit verdient zijn plek in de tas niet.
-Ontbreekt er iets waardoor de tas pas echt werkt, zet het erin met eigen=false.
-Verzin nooit een id dat niet in de lijst staat.
+Elk palet moet passen bij de stukken hierboven; noem per palet welk stuk de
+kern draagt. Blijf binnen haar kleurenpalet, en wijkt een palet daarvan af, zeg
+dat er dan bij.
 
 Antwoord ALLEEN met JSON:
-{"kern":{"kleuren":["2 of 3 basiskleuren"],"accenten":["max 2"],
-  "waarom":"1 zin: waarom deze kern zoveel combinaties oplevert"},
- "paklijst":[{"id":"exact-id-of-null","naam":"...","categorie":"tops|bottoms|layers|jurken|shoes|bags|accessories",
-   "eigen":true,"outfits":3,"waarom":"waarom dit stuk mee moet, max 8 woorden"}],
- "ontbreekt":"wat de tas nog mist, of leeg"}` }], 6000, 'medium', 'zwaar');
+{"paletten":[{"naam":"korte naam, 2 tot 4 woorden",
+  "kleuren":["2 of 3 kernkleuren, gewone kleurnamen"],
+  "accent":"1 accentkleur of leeg",
+  "hex":["#rrggbb per kleur, inclusief het accent"],
+  "richting":"in 1 zin wat voor sfeer dit geeft",
+  "draagt":"welk stuk uit haar lijst de kern draagt"}]}` }],
+      3000, null, 'kies');
 
-  const data = extractJson(raw);
-  if (!data || Array.isArray(data)) throw new Error('Geen bruikbaar antwoord');
-  const paklijst = pickArray(data, ['paklijst'], true) || [];
-  if (!paklijst.length) throw new Error('Geen paklijst voorgesteld');
-  return { kern: data.kern || {}, paklijst, ontbreekt: data.ontbreekt || '' };
+    const data = extractJson(raw);
+    const paletten = pickArray(data, ['paletten'], true) || [];
+    if (!paletten.length) throw new Error('Geen paletten ontvangen');
+    capPaletten = paletten;
+    toonPaletten();
+    stopVolgen();
+    st.textContent = `${paletten.length} paletten — kies er een.`;
+  } catch(e) {
+    stopVolgen();
+    st.textContent = 'Mislukt: ' + e.message;
+    lijst.innerHTML = '<button class="btn-rescan" onclick="capNaarPalet()">Opnieuw proberen</button>';
+  }
 }
 
-// ── STAP 2: OUTFITS, IN GROEPJES ──────────────────────────────────────────────
-// Drie tegelijk. Kort genoeg om te overleven op een telefoon, en je ziet ze
-// binnendruppelen in plaats van een minuut naar niets te kijken.
-async function capsuleOutfits(vanaf, hoeveel) {
+function toonPaletten() {
+  const lijst = document.getElementById('cap-palet-lijst');
+  if (!lijst) return;
+  lijst.innerHTML = capPaletten.map((p, i) => {
+    const hexen = (p.hex || []).slice(0, 4);
+    return `<div class="cap-palet" onclick="kiesPalet(${i})">`
+      + '<div class="cap-palet-dots">'
+      + hexen.map(h => `<span class="cap-dot" style="background:${esc(h)}"></span>`).join('')
+      + '</div>'
+      + `<div class="cap-palet-naam">${esc(p.naam || 'Palet ' + (i+1))}</div>`
+      + `<div class="cap-palet-kleuren">${esc((p.kleuren||[]).join(' · '))}`
+      + (p.accent ? ` <span style="opacity:.7">+ ${esc(p.accent)}</span>` : '') + '</div>'
+      + (p.richting ? `<div class="cap-waarom">${esc(p.richting)}</div>` : '')
+      + (p.draagt ? `<div class="cap-waarom" style="opacity:.7">Kern: ${esc(p.draagt)}</div>` : '')
+      + '</div>';
+  }).join('');
+}
+
+// ── STAP 3: BIJSTELLEN ────────────────────────────────────────────────────────
+function kiesPalet(i) {
+  const p = capPaletten[i];
+  if (!p) return;
+  // Kern en accent samen als één rijtje, zodat elke kleur te wisselen is.
+  const namen = (p.kleuren || []).slice();
+  const hexen = (p.hex || []).slice();
+  if (p.accent) namen.push(p.accent);
+  capPalet = {
+    naam: p.naam || 'Palet',
+    richting: p.richting || '',
+    kleuren: namen.map((n, k) => ({ naam: n, hex: hexen[k] || '#cccccc',
+                                    accent: !!p.accent && k === namen.length - 1 })),
+  };
+  capWisselIndex = -1;
+  toonGekozenPalet();
+  capToonStap(3);
+}
+
+function toonGekozenPalet() {
+  const el = document.getElementById('cap-palet-gekozen');
+  if (!el || !capPalet) return;
+  el.innerHTML = `<div class="cap-palet gekozen">`
+    + `<div class="cap-palet-naam">${esc(capPalet.naam)}</div>`
+    + (capPalet.richting ? `<div class="cap-waarom" style="margin-bottom:8px;">${esc(capPalet.richting)}</div>` : '')
+    + '<div class="cap-kleurrij">'
+    + capPalet.kleuren.map((k, i) =>
+        `<button class="cap-kleurknop${capWisselIndex === i ? ' actief' : ''}" onclick="capWissel(${i})">`
+        + `<span class="cap-dot groot" style="background:${esc(k.hex)}"></span>`
+        + `<span>${esc(k.naam)}${k.accent ? ' · accent' : ''}</span></button>`
+      ).join('')
+    + '</div></div>';
+}
+
+// Een kleur wisselen: kies uit haar eigen kleurenlijst. Geen AI nodig, dus
+// meteen — en je kunt net zo lang schuiven tot het klopt.
+function capWissel(i) {
+  const wrap = document.getElementById('cap-wissel');
+  if (capWisselIndex === i) { capWisselIndex = -1; wrap.style.display = 'none'; toonGekozenPalet(); return; }
+  capWisselIndex = i;
+  toonGekozenPalet();
+  wrap.style.display = 'block';
+  wrap.innerHTML = `<div class="field-note" style="margin-bottom:6px;">`
+    + `Vervang <b>${esc(capPalet.kleuren[i].naam)}</b> door:</div>`
+    + '<div class="color-swatch-grid">'
+    + KLEUREN.map(k =>
+        `<button class="cswatch" style="background:${k.dot}" title="${esc(k.v)}"`
+        + ` onclick="capZetKleur(${i},'${esc(k.v)}','${k.dot}')"></button>`).join('')
+    + '</div>';
+}
+
+function capZetKleur(i, naam, hex) {
+  if (!capPalet || !capPalet.kleuren[i]) return;
+  capPalet.kleuren[i].naam = naam;
+  capPalet.kleuren[i].hex = hex;
+  capWisselIndex = -1;
+  document.getElementById('cap-wissel').style.display = 'none';
+  toonGekozenPalet();
+}
+
+// ── STAP 4: OUTFITS ───────────────────────────────────────────────────────────
+async function capMaakOutfits() {
+  const btn = document.getElementById('cap-maak-outfits');
+  const st  = document.getElementById('cap-outfit-status');
   const { aantal, jas, gel } = capsuleOpdracht();
-  const { kern, paklijst } = capsuleResultaat;
-  const alDaan = capsuleResultaat.outfits.map((o,i) =>
-    `${i+1}. ${o.naam} — ${o.stijl}${o.gelegenheid ? ' (' + o.gelegenheid + ')' : ''}`).join('\n');
+  btn.disabled = true;
+  btn.textContent = '⏳ Outfits maken…';
+  const stopVolgen = volgVoortgang(st);
 
-  const raw = await callClaude(capsuleSysteem(), [{ type:'text', text:
-`Griette heeft haar tas gepakt. Dit zit erin:
+  const palet = capPalet.kleuren.map(k => k.naam + (k.accent ? ' (accent)' : '')).join(', ');
+  try {
+    const raw = await callClaude(
+      `Je bent een persoonlijke stylist voor Griette. ${DNA_KORT}${profielBlok()}
+Antwoord in het Nederlands. Wees concreet en eerlijk.`,
+      [{ type:'text', text:
+`Griette heeft deze stukken bij zich${gel ? ' voor: ' + gel : ''}:
 
-KLEURKERN: ${(kern.kleuren||[]).join(', ')}${(kern.accenten||[]).length ? ' met ' + kern.accenten.join(' en ') + ' als accent' : ''}
-${paklijst.map(p => `- ${p.naam} (${p.categorie}${p.eigen === false ? ', heeft ze nog niet' : ''})`).join('\n')}
+${capItemsTekst()}
 
-${gel ? 'Gelegenheid: ' + gel : 'Gelegenheid: een gewoon weekend weg, dag en avond door elkaar.'}
+Haar kleurpalet: ${palet}
 ${capsuleJasRegel(jas)}
 
-${alDaan ? 'DEZE OUTFITS ZIJN AL GEMAAKT — maak iets anders:\n' + alDaan + '\n' : ''}
-Maak nu outfit ${vanaf + 1} tot en met ${Math.min(vanaf + hoeveel, aantal)} van de ${aantal}.
-Gebruik UITSLUITEND stukken uit de paklijst hierboven.
+Maak ${aantal} outfits, UITSLUITEND uit de stukken hierboven.
 
-WAAR HET OM DRAAIT: variatie komt NIET uit meer items maar uit een andere greep
-op dezelfde stukken. Gebruik per outfit een andere stijlgreep en noem die bij
-naam, bijvoorbeeld:
-  ton-sur-ton (tinten van één kleurfamilie, verschil zit in textuur)
-  monochroom (één kleur van top tot teen)
-  neutraal met één accent
-  kleurblokken (twee volle kleuren tegenover elkaar)
-  print als blikvanger, rest stil
-  contrast in textuur (glad tegen ruw, zacht tegen stevig)
-Wissel ook het silhouet: niet elke keer wijd onder en strak boven.
+Variatie komt niet uit meer spullen maar uit een andere greep op dezelfde
+stukken. Gebruik per outfit een andere stijlgreep en noem die bij naam:
+ton-sur-ton, monochroom, neutraal met één accent, kleurblokken, print als
+blikvanger, of contrast in textuur. Wissel ook het silhouet — niet elke keer
+wijd onder en strak boven.
 Geef elke outfit een gelegenheid: wandelen, uit eten, terras, reisdag.
-${vanaf === 0 ? 'Maak er één bij die Griette zelf niet zou bedenken, en leg uit waarom die tóch klopt.' : ''}
+Maak er één bij die zij zelf niet zou bedenken, en leg uit waarom die tóch klopt.
+
+Ontbreekt er een stuk waardoor deze set pas echt werkt, zeg dat dan apart.
 
 Antwoord ALLEEN met JSON:
 {"outfits":[{"naam":"korte naam","stijl":"de stijlgreep bij naam",
-  "gelegenheid":"waarvoor","items":["exacte namen uit de paklijst"],
-  "waarom":"1 tot 2 zinnen: waarom dit werkt"}]${vanaf === 0 ? ',\n "verrassing":"welke van deze outfits ze zelf niet zou bedenken en waarom die tóch klopt, 2 zinnen"' : ''}}` }],
-    6000, 'medium', 'zwaar');
+  "gelegenheid":"waarvoor","items":["exacte namen uit de lijst"],
+  "waarom":"1 tot 2 zinnen"}],
+ "verrassing":"welke outfit zij zelf niet zou bedenken en waarom die klopt, 2 zinnen",
+ "ontbreekt":"wat er nog mist, of leeg"}` }],
+      4000, null, 'kies');
 
-  const data = extractJson(raw);
-  if (!data || Array.isArray(data)) throw new Error('Geen bruikbaar antwoord');
-  const outfits = pickArray(data, ['outfits'], true) || [];
-  if (!outfits.length) throw new Error('Geen outfits voorgesteld');
-  return { outfits, verrassing: data.verrassing || '' };
-}
-
-// ── DE REGIE ──────────────────────────────────────────────────────────────────
-const CAP_PER_KEER = 3;
-
-async function aiCapsule() {
-  const btn = document.getElementById('cap-btn');
-  const st  = document.getElementById('cap-status');
-  btn.disabled = true;
-  document.getElementById('cap-uitkomst').innerHTML = '';
-
-  const { aantal } = capsuleOpdracht();
-  capsuleResultaat = { kern:{}, paklijst:[], outfits:[], verrassing:'', ontbreekt:'', doel:aantal };
-
-  btn.textContent = '⏳ Stap 1 van ' + (1 + Math.ceil(aantal / CAP_PER_KEER)) + ': de paklijst…';
-  const stopVolgen = volgVoortgang(st);
-  try {
-    const stap1 = await capsuleStap1();
-    Object.assign(capsuleResultaat, stap1);
-    stopVolgen();
+    const data = extractJson(raw);
+    const outfits = pickArray(data, ['outfits'], true) || [];
+    if (!outfits.length) throw new Error('Geen outfits ontvangen');
+    capOutfits = outfits;
+    capsuleResultaat = { outfits, verrassing: data.verrassing || '', ontbreekt: data.ontbreekt || '' };
     toonCapsule();
-    st.innerHTML = `Paklijst klaar: <b>${stap1.paklijst.length}</b> stuks. Nu de outfits…`;
+    capToonStap(4);
+    stopVolgen();
+    st.textContent = '';
   } catch(e) {
     stopVolgen();
-    st.textContent = 'De paklijst lukte niet: ' + e.message;
-    btn.textContent = '🧳 Stel mijn weekendtas samen';
-    btn.disabled = false;
-    return;
+    st.textContent = 'Mislukt: ' + e.message;
   }
-  btn.disabled = false;
-  await capsuleVervolg();
-}
-
-// Haalt de volgende groep outfits op. Ook de knop na een mislukte stap.
-async function capsuleVervolg() {
-  const btn = document.getElementById('cap-btn');
-  const st  = document.getElementById('cap-status');
-  if (!capsuleResultaat) return;
-
-  const doel = capsuleResultaat.doel;
-  btn.disabled = true;
-
-  while (capsuleResultaat.outfits.length < doel) {
-    const vanaf = capsuleResultaat.outfits.length;
-    const stap = Math.floor(vanaf / CAP_PER_KEER) + 2;
-    const totaal = 1 + Math.ceil(doel / CAP_PER_KEER);
-    btn.textContent = `⏳ Stap ${stap} van ${totaal}: outfit ${vanaf + 1}…`;
-    const stopVolgen = volgVoortgang(st);
-    try {
-      const groep = await capsuleOutfits(vanaf, CAP_PER_KEER);
-      capsuleResultaat.outfits = capsuleResultaat.outfits
-        .concat(groep.outfits).slice(0, doel);
-      if (groep.verrassing) capsuleResultaat.verrassing = groep.verrassing;
-      stopVolgen();
-      toonCapsule();
-      st.innerHTML = `<b>${capsuleResultaat.outfits.length}</b> van ${doel} outfits klaar.`;
-    } catch(e) {
-      stopVolgen();
-      // Wat er al staat blijft staan; alleen dit stukje ging mis.
-      st.innerHTML = `Outfit ${vanaf + 1} lukte niet: ${esc(e.message)}<br>`
-        + `<b>${capsuleResultaat.outfits.length}</b> outfits staan er al — die blijven staan.`;
-      btn.textContent = `🧳 Ga verder vanaf outfit ${vanaf + 1}`;
-      btn.onclick = capsuleVervolg;
-      btn.disabled = false;
-      return;
-    }
-  }
-
-  st.innerHTML = `<b>${capsuleResultaat.outfits.length} outfits</b> uit `
-    + `${capsuleResultaat.paklijst.length} stuks.`;
-  btn.textContent = '🧳 Opnieuw samenstellen';
-  btn.onclick = aiCapsule;
+  btn.textContent = 'Maak de outfits →';
   btn.disabled = false;
 }
+
+// Nog een ronde: terug naar de items, met alles wat je al koos nog geselecteerd.
+function capNogEenRonde() {
+  capToonStap(1);
+  toonCapGekozen();
+  bouwCapGrid((document.getElementById('cap-search')||{}).value || '');
+}
+
+let capsuleResultaat = null;
 
 function toonCapsule() {
   const el = document.getElementById('cap-uitkomst');
   if (!el || !capsuleResultaat) return;
-  const { kern, paklijst, outfits } = capsuleResultaat;
+  const { outfits } = capsuleResultaat;
 
-  // Paklijst gegroepeerd, zodat je ziet wat je in de tas legt
-  const groepen = {};
-  paklijst.forEach(p => {
-    const c = p.categorie || 'overig';
-    (groepen[c] = groepen[c] || []).push(p);
-  });
-  const label = { tops:'Bovenstukken', bottoms:'Onderstukken', layers:'Lagen',
-                  jurken:'Jurken', shoes:'Schoenen', bags:'Tassen',
-                  accessories:'Accessoires', overig:'Overig' };
-
-  let html = '<div class="cap-paklijst"><b>Je kleurkern</b><br>'
+  let html = '<div class="cap-paklijst"><b>Je palet</b><br>'
     + '<span style="font-size:11.5px;">'
-    + esc((kern.kleuren || []).join(' · '))
-    + ((kern.accenten || []).length ? ' <span style="opacity:.7">met ' + esc(kern.accenten.join(' en ')) + ' als accent</span>' : '')
-    + '</span>'
-    + (kern.waarom ? `<div class="cap-groep" style="opacity:.85">${esc(kern.waarom)}</div>` : '');
-
-  Object.keys(groepen).forEach(c => {
-    html += `<div class="cap-groep"><b>${esc(label[c] || c)}</b><br>`
-      + groepen[c].map(p => {
-          const nieuw = p.eigen === false;
-          return `${nieuw ? '<i>' : ''}${esc(p.naam || '')}${nieuw ? ' — heb je niet</i>' : ''}`
-            + (p.outfits ? ` <span style="opacity:.6">(${p.outfits}×)</span>` : '');
-        }).join('<br>')
-      + '</div>';
-  });
-
-  const eigenAantal = paklijst.filter(p => p.eigen !== false).length;
-  html += `<div class="cap-tel"><b>${paklijst.length}</b> stuks → <b>${outfits.length}</b>`
-    + (outfits.length < capsuleResultaat.doel ? ' van ' + capsuleResultaat.doel : '') + ' outfits'
-    + (eigenAantal < paklijst.length
-        ? ` · ${eigenAantal} uit je eigen kast, ${paklijst.length - eigenAantal} zou je nog moeten hebben` : '')
-    + '</div></div>';
+    + esc(capPalet.kleuren.map(k => k.naam).join(' · ')) + '</span>'
+    + `<div class="cap-tel"><b>${capItems.length}</b> stuks → <b>${outfits.length}</b> outfits</div>`
+    + '</div>';
 
   if (capsuleResultaat.verrassing) {
     html += `<div class="cap-verrassing"><b>Durf eens</b><br>${esc(capsuleResultaat.verrassing)}</div>`;
