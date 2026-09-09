@@ -421,6 +421,19 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <div class="color-swatch-grid" id="cap-nietkleuren"></div>
       <div class="field-note" id="cap-nietkleuren-uit" style="margin-top:6px;"></div>
 
+      <div class="sec-label" style="margin-top:14px;">Inspiratie voor deze reis <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">optioneel</span></div>
+      <div class="field-note" style="margin-bottom:8px;">Een foto van een look of een kleurenpalet waar je nu zin in hebt. Ik lees eruit welke kleuren en sfeer erin zitten en neem dat mee.</div>
+      <input type="file" id="cap-inspo-input" accept="image/*" multiple style="display:none" onchange="capInspoToevoegen(event)">
+      <button class="btn-rescan" onclick="document.getElementById('cap-inspo-input').click()">📷 Foto toevoegen</button>
+      <div id="cap-inspo-lijst" style="margin-top:8px;"></div>
+      <div class="field-note" id="cap-inspo-status" style="margin-top:6px;"></div>
+
+      <div class="sec-label" style="margin-top:14px;">Kleuren die je wél wilt <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">optioneel</span></div>
+      <div class="field-note" style="margin-bottom:8px;">Tik een kleur aan en zeg erbij welke rol hij krijgt. De rest van de combinatie vul ik aan.</div>
+      <div class="color-swatch-grid" id="cap-wilkleuren"></div>
+      <div id="cap-rolkiezer" style="display:none;margin-top:8px;"></div>
+      <div id="cap-wil-uit" style="margin-top:6px;"></div>
+
       <div class="sec-label" style="margin-top:14px;">Moet mee <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">optioneel — hoeft niet</span></div>
       <div class="field-note" style="margin-bottom:8px;">Heb je iets wat sowieso meegaat, kies het hier. Dan zoek ik combo's die om díé kleuren heen zijn gebouwd.</div>
       <div id="cap-gekozen"></div>
@@ -455,6 +468,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <div class="sec-label">Je outfits</div>
       <div class="field-note" id="cap-outfit-status" style="margin-bottom:8px;"></div>
       <div id="cap-uitkomst"></div>
+      <div id="cap-bewaard" style="margin-top:8px;"></div>
       <button class="ai-btn" id="cap-bewaar-tas" style="margin-top:10px;" onclick="bewaarTas()">💾 Bewaar deze tas</button>
       <button class="btn-rescan" id="cap-terug2" style="margin-top:8px;" onclick="capTerug(2)">← Andere combo's kiezen</button>
     </div>
@@ -2015,6 +2029,8 @@ function setStartMode(mode) {
     capToonStap(1);
     bouwCapNee();
     bouwCapNietKleuren();
+    bouwCapWilKleuren();
+    toonCapInspo();
     bouwCapGrid('');
     toonCapGekozen();
     const zoek = document.getElementById('cap-search');
@@ -3498,6 +3514,159 @@ function wisselNietKleur(v) {
   bouwCapNietKleuren();
 }
 
+// Inspiratie voor déze reis. De vaste inspiratieplaat beschrijft haar smaak in
+// het algemeen; dit gaat over waar ze nu zin in heeft, en dat is niet elk
+// weekend hetzelfde. De foto wordt één keer gelezen — kleuren en sfeer — en
+// daarna reist alleen die korte beschrijving mee. Dat scheelt bij elke
+// vervolgvraag een hele foto aan verzendtijd.
+let capInspo = [];           // [{id, thumb, kleuren:[], sfeer}]
+
+async function capInspoToevoegen(ev) {
+  const files = [...(ev.target.files || [])].slice(0, 3);
+  ev.target.value = '';
+  if (!files.length) return;
+  const st = document.getElementById('cap-inspo-status');
+  st.textContent = '⏳ Foto lezen…';
+
+  for (const f of files) {
+    if (capInspo.length >= 3) break;
+    try {
+      const base64 = await verkleinFoto(f, 900);
+      const id = 'ci-' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+      capInspo.push({ id, thumb: 'data:image/jpeg;base64,' + base64, bezig: true });
+      toonCapInspo();
+
+      const raw = await callClaude(
+        'Je beschrijft wat je op een foto ziet. Geen smaakoordeel, geen advies. '
+        + 'Antwoord in het Nederlands.',
+        [{ type:'image', source:{ type:'base64', media_type:'image/jpeg', data: base64 } },
+         { type:'text', text:
+`Noem de kleuren die je in deze foto ziet, met gewone kleurnamen, en beschrijf
+de sfeer in één korte zin. Zeg er ook bij welke kleur de leiding neemt.
+
+Antwoord ALLEEN met JSON:
+{"kleuren":["kleurnamen, maximaal 5"],"hoofdkleur":"de kleur die leidt",
+ "sfeer":"1 korte zin"}` }],
+        800, null, 'scan');
+
+      const d = extractJson(raw) || {};
+      const rec = capInspo.find(x => x.id === id);
+      if (rec) {
+        rec.bezig = false;
+        rec.kleuren = [].concat(d.kleuren || []).slice(0, 5);
+        rec.hoofdkleur = d.hoofdkleur || '';
+        rec.sfeer = d.sfeer || '';
+      }
+      toonCapInspo();
+    } catch(e) {
+      capInspo = capInspo.filter(x => !x.bezig);
+      toonCapInspo();
+      st.textContent = 'Deze foto lukte niet: ' + e.message;
+      return;
+    }
+  }
+  st.textContent = capInspo.length
+    ? 'Deze sfeer neem ik mee in de kleurcombo\'s en de outfits.' : '';
+}
+
+function toonCapInspo() {
+  const el = document.getElementById('cap-inspo-lijst');
+  if (!el) return;
+  el.innerHTML = capInspo.map((p, i) =>
+    '<div class="cap-outfit" style="margin-bottom:6px;display:flex;gap:8px;align-items:flex-start;">'
+    + `<img src="${p.thumb}" style="width:54px;height:72px;object-fit:cover;border-radius:6px;flex-shrink:0;">`
+    + '<div style="flex:1;min-width:0;">'
+    + (p.bezig ? '<div class="field-note">⏳ Lezen…</div>'
+        : '<div class="cap-stukken">'
+          + (p.kleuren || []).map(k => `<span class="cap-chip">${esc(k)}</span>`).join('')
+          + '</div>'
+          + (p.sfeer ? `<div class="cap-waarom">${esc(p.sfeer)}</div>` : ''))
+    + '</div>'
+    + `<span style="cursor:pointer;opacity:.6;padding:2px 6px;" onclick="wisCapInspo(${i})">×</span>`
+    + '</div>').join('');
+}
+
+function wisCapInspo(i) { capInspo.splice(i, 1); toonCapInspo(); }
+
+// Wat er van die foto's meereist naar elke vraag: alleen de woorden.
+function inspoZin() {
+  const klaar = capInspo.filter(p => !p.bezig && (p.kleuren || []).length);
+  if (!klaar.length) return '';
+  return 'Ze heeft inspiratiefoto\'s meegegeven. Daarin zit: '
+    + klaar.map(p => (p.kleuren || []).join(', ')
+        + (p.hoofdkleur ? ` (${p.hoofdkleur} leidt)` : '')
+        + (p.sfeer ? ` — ${p.sfeer}` : '')).join(' | ')
+    + '. Laat die sfeer terugkomen, maar kies alleen uit wat zij echt heeft.\n';
+}
+
+// Een kleur noemen is niet genoeg: rood als tas is iets heel anders dan rood
+// als broek. Dezelfde kleur, andere outfit. Dus vraagt de pagina er meteen bij
+// welke rol hij krijgt, en dat gaat mee in elke vraag aan de stylist.
+const CAP_ROLLEN = [
+  { id:'statement', label:'Statement',   uitleg:'dit is de blikvanger, de rest gaat een stap terug' },
+  { id:'accessoire',label:'Accessoire',  uitleg:'klein vlak: tas, schoen, sjaal' },
+  { id:'top',       label:'Bovenstuk',   uitleg:'bij het gezicht' },
+  { id:'broek',     label:'Onderstuk',   uitleg:'broek of rok' },
+  { id:'rustig',    label:'Rustige basis', uitleg:'de kleur waar de rest tegenaan mag' },
+];
+let capWilKleuren = [];      // [{kleur, rol}]
+let capRolVoor = null;       // welke kleur staat te wachten op een rol
+
+function bouwCapWilKleuren() {
+  const el = document.getElementById('cap-wilkleuren');
+  if (!el) return;
+  el.innerHTML = KLEUREN.map(k =>
+    `<button class="cswatch${capWilKleuren.some(w=>w.kleur===k.v) ? ' selected' : ''}" `
+    + `style="background:${k.dot}" title="${esc(k.v)}" `
+    + `onclick="kiesWilKleur('${esc(k.v)}')"><span class="check">✓</span></button>`).join('');
+
+  const uit = document.getElementById('cap-wil-uit');
+  if (uit) uit.innerHTML = capWilKleuren.length
+    ? '<div class="cap-stukken">' + capWilKleuren.map((w, i) => {
+        const rol = CAP_ROLLEN.find(r => r.id === w.rol);
+        return `<span class="cap-chip">${esc(w.kleur)} <b>als ${esc(rol ? rol.label.toLowerCase() : w.rol)}</b> `
+          + `<span style="cursor:pointer;opacity:.6" onclick="wisWilKleur(${i})">×</span></span>`;
+      }).join('') + '</div>'
+    : '';
+}
+
+function kiesWilKleur(v) {
+  const bestaand = capWilKleuren.findIndex(w => w.kleur === v);
+  if (bestaand >= 0) { capWilKleuren.splice(bestaand, 1); capRolVoor = null;
+                       document.getElementById('cap-rolkiezer').style.display='none';
+                       bouwCapWilKleuren(); return; }
+  capRolVoor = v;
+  const kiezer = document.getElementById('cap-rolkiezer');
+  kiezer.style.display = 'block';
+  kiezer.innerHTML = `<div class="field-note" style="margin-bottom:6px;">Wil je <b>${esc(v)}</b> als:</div>`
+    + '<div class="cap-nee">'
+    + CAP_ROLLEN.map(r => `<button class="cap-neeknop" onclick="zetWilRol('${r.id}')">`
+        + `${esc(r.label)}<span style="display:block;font-size:9px;opacity:.65">${esc(r.uitleg)}</span></button>`).join('')
+    + '</div>';
+}
+
+function zetWilRol(rol) {
+  if (!capRolVoor) return;
+  capWilKleuren.push({ kleur: capRolVoor, rol });
+  capRolVoor = null;
+  document.getElementById('cap-rolkiezer').style.display = 'none';
+  bouwCapWilKleuren();
+}
+
+function wisWilKleur(i) { capWilKleuren.splice(i, 1); bouwCapWilKleuren(); }
+
+// Hoe die keuzes aan de stylist worden verteld.
+function wilKleurenZin() {
+  if (!capWilKleuren.length) return '';
+  const per = capWilKleuren.map(w => {
+    const r = CAP_ROLLEN.find(x => x.id === w.rol);
+    return `${w.kleur} als ${r ? r.label.toLowerCase() : w.rol}${r ? ' (' + r.uitleg + ')' : ''}`;
+  });
+  return 'Griette wil deze kleuren erin, met deze rol: ' + opsom(per)
+    + '. Houd je aan die rollen — dezelfde kleur op een andere plek geeft een '
+    + 'andere outfit.\n';
+}
+
 function isCapItem(id) { return capItems.some(i => i.id === id); }
 
 // "turquoise en wit en denimblauw" leest als een kind dat opsomt. Bij drie of
@@ -3513,9 +3682,11 @@ function opsom(lijst) {
 // de ankers, en moet elke combo die je te zien krijgt daar iets mee.
 function capAnkers() {
   const uit = [];
-  capItems.forEach(i => kleurenVan(i).forEach(k => {
-    if (!uit.includes(k) && !capNietKleuren.includes(k)) uit.push(k);
-  }));
+  const bij = k => { if (!uit.includes(k) && !capNietKleuren.includes(k)) uit.push(k); };
+  capItems.forEach(i => kleurenVan(i).forEach(bij));
+  // Kleuren die zij zelf noemde tellen net zo goed als een stuk uit de kast:
+  // "ik wil rood als tas" is precies zo goed een vertrekpunt als de tas zelf.
+  capWilKleuren.forEach(w => bij(w.kleur));
   return uit;
 }
 
@@ -3674,6 +3845,7 @@ function capAnkerTreffers() {
 }
 
 function capNaarCombos() {
+  capHuidigeTasId = null;   // andere opzet, dus een nieuwe tas in je lijst
   capFilterKast();
   capScoorCombos();
   capGekozenCombos = [];
@@ -3787,10 +3959,10 @@ async function capDerdeKleur() {
       `Je bent een kleurexpert en stylist voor Griette. ${DNA_KORT}${profielBlok()}
 Antwoord in het Nederlands.`,
       [{ type:'text', text:
-`Griette wil deze stukken dragen: ${capItems.map(i => i.name).join(' + ')}.
-De kleuren daarvan zijn: ${opsom(ankers)}.
+`${capItems.length ? 'Griette wil deze stukken dragen: ' + capItems.map(i => i.name).join(' + ') + '.\n' : ''}${wilKleurenZin()}De kleuren waar het om draait: ${opsom(ankers)}.
 ${capNietKleuren.length ? `Ze wil er NIET bij: ${capNietKleuren.join(', ')}. Noem die kleuren niet.\n` : ''}
 Deze kleuren hangen verder in haar kast: ${inKast.join(', ') || 'onbekend'}.
+${inspoZin()}
 
 Geef 6 verschillende manieren om hier een derde kleur bij te zetten. Kies
 alleen kleuren die in haar kast hangen. Maak ze onderling echt verschillend:
@@ -3999,6 +4171,8 @@ async function capMaakOutfits() {
   capsuleResultaat = { outfits: [], ontbreekt: '' };
   capToonStap(3);
   document.getElementById('cap-uitkomst').innerHTML = '';
+  const bew = document.getElementById('cap-bewaard');
+  if (bew) bew.innerHTML = '';
   btn.disabled = true;
 
   // Alleen naam, categorie en kleur: de AI hoeft niet alles te weten, alleen
@@ -4009,17 +4183,39 @@ async function capMaakOutfits() {
     return `- ${i.name} (${i.cat}${k ? ', ' + k : ''})`;
   }).join('\n');
 
-  for (let n_i = 0; n_i < capGekozenCombos.length; n_i++) {
-    const combo = capCombos[capGekozenCombos[n_i]];
-    st.textContent = `Combo ${n_i+1} van ${capGekozenCombos.length}: ${combo.name}…`;
-    const stopVolgen = volgVoortgang(st);
+  // De combo's stonden achter elkaar in de rij: pas als de eerste klaar was
+  // begon de tweede. Twee of drie keer een halve minuut wachten is dus twee of
+  // drie keer die halve minuut. Ze zijn onafhankelijk van elkaar, dus ze gaan
+  // nu tegelijk — het wachten is nog maar zo lang als de traagste. En valt er
+  // één om, dan blijven de andere gewoon staan in plaats van dat alles stopt.
+  const klaar = new Array(capGekozenCombos.length).fill(null);
+  const stuk  = new Array(capGekozenCombos.length).fill(null);
+  let af = 0;
+  st.textContent = `${capGekozenCombos.length} combo's tegelijk aan het samenstellen…`;
+  const stopVolgen = volgVoortgang(st);
+
+  // Binnengekomen resultaten meteen tonen, in de volgorde van de combo's —
+  // niet in de volgorde waarin ze toevallig terugkomen.
+  const bouwOp = () => {
+    capsuleResultaat.outfits = [];
+    capsuleResultaat.ontbreekt = '';
+    klaar.forEach(r => {
+      if (!r) return;
+      capsuleResultaat.outfits = capsuleResultaat.outfits.concat(r.outfits);
+      if (r.ontbreekt && !capsuleResultaat.ontbreekt) capsuleResultaat.ontbreekt = r.ontbreekt;
+    });
+    toonCapsule();
+  };
+
+  await Promise.all(capGekozenCombos.map(async (ci, n_i) => {
+    const combo = capCombos[ci];
     try {
       const raw = await callClaude(
         `Je bent een persoonlijke stylist voor Griette. ${DNA_KORT}${profielBlok()}
 Antwoord in het Nederlands. Kies alleen uit de gegeven lijst.`,
         [{ type:'text', text:
 `Griette gaat weg${gel ? ': ' + gel : ''}. Het weer is ${weer}.
-${capItems.length ? 'Deze stukken gaan sowieso mee, verwerk ze: ' + capItems.map(i=>i.name).join(', ') + '.\n' : ''}${capNietKleuren.length ? 'Ze wil deze kleuren er NIET bij: ' + opsom(capNietKleuren) + '. Laat stukken in die kleuren staan, ook als ze in de lijst voorkomen.\n' : ''}
+${capItems.length ? 'Deze stukken gaan sowieso mee, verwerk ze: ' + capItems.map(i=>i.name).join(', ') + '.\n' : ''}${capNietKleuren.length ? 'Ze wil deze kleuren er NIET bij: ' + opsom(capNietKleuren) + '. Laat stukken in die kleuren staan, ook als ze in de lijst voorkomen.\n' : ''}${wilKleurenZin()}${inspoZin()}
 Maak ${verdeling[n_i]} outfit${verdeling[n_i]===1?'':'s'} in deze kleurcombinatie:
 ${combo.name} — ${combo.vibe || ''} (${(combo.tags||[]).join(', ')})
 
@@ -4041,22 +4237,36 @@ Antwoord ALLEEN met JSON:
       const data = extractJson(raw);
       const outfits = pickArray(data, ['outfits'], true) || [];
       outfits.forEach(o => { o.combo = combo.name; });
-      capsuleResultaat.outfits = capsuleResultaat.outfits.concat(outfits);
-      if (data && data.ontbreekt && !capsuleResultaat.ontbreekt) {
-        capsuleResultaat.ontbreekt = data.ontbreekt;
-      }
-      stopVolgen();
-      toonCapsule();
+      klaar[n_i] = { outfits, ontbreekt: (data && data.ontbreekt) || '' };
     } catch(e) {
-      stopVolgen();
-      st.innerHTML = `Combo ${n_i+1} lukte niet: ${esc(e.message)}<br>`
-        + `<b>${capsuleResultaat.outfits.length}</b> outfits staan er al — die blijven staan.`;
-      btn.disabled = false;
-      return;
+      stuk[n_i] = e.message;
     }
+    af++;
+    bouwOp();
+    if (af < capGekozenCombos.length) {
+      st.textContent = `${af} van ${capGekozenCombos.length} klaar…`;
+    }
+  }));
+
+  stopVolgen();
+  const mislukt = stuk.filter(Boolean);
+  const nGoed = capsuleResultaat.outfits.length;
+  if (mislukt.length && nGoed) {
+    // Deels gelukt is geen mislukking: laat staan wat er is, en zeg wat er
+    // ontbreekt en hoe je dat alsnog haalt.
+    st.innerHTML = `<b>${nGoed} outfits</b> staan er. `
+      + `${mislukt.length} van de ${capGekozenCombos.length} combo's lukte niet `
+      + `(${esc(mislukt[0])}).<br>`
+      + '<button class="cap-vervang-btn" style="margin-top:8px;" onclick="capMaakOutfits()">'
+      + '↻ De rest opnieuw proberen</button>';
+  } else if (mislukt.length) {
+    st.innerHTML = `Het lukte niet: ${esc(mislukt[0])}<br>`
+      + '<button class="cap-vervang-btn" style="margin-top:8px;" onclick="capMaakOutfits()">'
+      + '↻ Opnieuw proberen</button>';
+  } else {
+    st.innerHTML = `<b>${nGoed} outfits</b> uit ${capGekozenCombos.length} kleurcombo's.`;
+    await bewaarAdvies();
   }
-  st.innerHTML = `<b>${capsuleResultaat.outfits.length} outfits</b> uit `
-    + `${capGekozenCombos.length} kleurcombo's.`;
   btn.disabled = false;
 }
 
@@ -4111,6 +4321,7 @@ Antwoord ALLEEN met JSON:
     toonCapsule();
     stopVolgen();
     st.textContent = `Outfit ${i+1} vervangen.`;
+    await bewaarAdvies();   // wat je ziet is ook wat er bewaard staat
   } catch(e) {
     stopVolgen();
     st.textContent = `Vervangen lukte niet: ${e.message} — de oude staat er nog.`;
@@ -4130,33 +4341,59 @@ async function laadTassen() {
   if (Array.isArray(sb)) bewaardeTassen = sb;
 }
 
-async function bewaarTas() {
-  const btn = document.getElementById('cap-bewaar-tas');
-  const st  = document.getElementById('cap-outfit-status');
-  if (!capsuleResultaat || !capsuleResultaat.outfits.length) return;
-  btn.disabled = true; btn.textContent = '⏳ Bewaren…';
+// Alles wat de stylist bedenkt hoort ergens te blijven staan. Bewaren op een
+// knop klinkt netjes, maar de ene keer dat je vergeet te drukken ben je het
+// kwijt — en dan is het werk voor niets gedaan én betaald. Dus bewaart de
+// pagina het zelf, meteen als er iets af is. Later opnieuw draaien schrijft
+// over dezelfde regel, zodat één weekend niet vijf keer in je lijst staat.
+let capHuidigeTasId = null;
 
+async function bewaarAdvies(handmatig) {
+  if (!capsuleResultaat || !capsuleResultaat.outfits.length) return;
   const { gel, weer } = capsuleOpdracht();
   const tel = new Map();
   capsuleResultaat.outfits.forEach(o => (o.items || []).forEach(n =>
     tel.set(n, (tel.get(n) || 0) + 1)));
 
-  bewaardeTassen.unshift({
-    id: 'tas-' + Date.now().toString(36),
+  const record = {
+    id: capHuidigeTasId || ('tas-' + Date.now().toString(36)),
     naam: gel || 'Weekendtas',
     datum: new Date().toISOString(),
     weer,
-    combos: capGekozenCombos.map(ci => capCombos[ci].name),
+    combos: capGekozenCombos.map(ci => (capCombos[ci] || {}).name).filter(Boolean),
+    zonder: capNietKleuren.slice(),
+    moetMee: capItems.map(i => i.name),
     paklijst: [...tel.entries()].map(([naam, keer]) => ({ naam, keer })),
     outfits: capsuleResultaat.outfits,
     ontbreekt: capsuleResultaat.ontbreekt || '',
-  });
-  bewaardeTassen = bewaardeTassen.slice(0, 20);
-  try { localStorage.setItem('griette-tassen-v1', JSON.stringify(bewaardeTassen)); } catch(e){}
-  await sbSet('bewaarde-tassen', bewaardeTassen);
+  };
+  capHuidigeTasId = record.id;
 
+  const bestaand = bewaardeTassen.findIndex(t => t && t.id === record.id);
+  if (bestaand >= 0) bewaardeTassen[bestaand] = record;
+  else bewaardeTassen.unshift(record);
+  bewaardeTassen = bewaardeTassen.slice(0, 20);
+
+  try { localStorage.setItem('griette-tassen-v1', JSON.stringify(bewaardeTassen)); } catch(e){}
+  try { await sbSet('bewaarde-tassen', bewaardeTassen); } catch(e){}
+  toonBewaardMelding(handmatig);
+}
+
+function toonBewaardMelding(handmatig) {
+  const el = document.getElementById('cap-bewaard');
+  if (!el) return;
+  el.innerHTML = '<div class="field-note">'
+    + (handmatig ? '✓ Opgeslagen. ' : '✓ Automatisch bewaard. ')
+    + 'Terug te vinden bij <b>🗂 Mijn kaarten</b>, onderaan bij je tassen — '
+    + 'daar kun je hem ook weggooien.</div>';
+}
+
+async function bewaarTas() {
+  const btn = document.getElementById('cap-bewaar-tas');
+  if (!capsuleResultaat || !capsuleResultaat.outfits.length) return;
+  btn.disabled = true; btn.textContent = '⏳ Bewaren…';
+  await bewaarAdvies(true);
   btn.textContent = '✓ Tas bewaard';
-  st.innerHTML = 'Staat nu bij <b>🗂 Mijn kaarten</b>, onderaan bij je tassen.';
   btn.disabled = false;
 }
 
@@ -4176,11 +4413,39 @@ function toonTassen() {
           + (t.paklijst||[]).slice(0,8).map(p =>
               `<span class="cap-chip">${esc(p.naam)} <span style="opacity:.6">${p.keer}×</span></span>`).join('')
           + '</div>'
-          + `<button class="cap-vervang-btn" style="margin-top:8px;width:100%;" `
-          + `onclick="verwijderTas(${i})">🗑 Verwijderen</button>`
+          // Bewaren zonder terug kunnen kijken is geen bewaren. Openklappen
+          // laat de outfits zelf zien, met wat er nog miste.
+          + `<div id="tas-open-${i}" style="display:none;margin-top:8px;"></div>`
+          + '<div style="display:flex;gap:6px;margin-top:8px;">'
+          + `<button class="cap-vervang-btn" style="flex:1;" onclick="klapTas(${i})">`
+          + `📖 Bekijken</button>`
+          + `<button class="cap-vervang-btn" style="flex:1;" onclick="verwijderTas(${i})">`
+          + `🗑 Verwijderen</button></div>`
           + '</div>';
       }).join('')
     : '<div class="kaart-leeg">Nog geen tassen bewaard.</div>';
+}
+
+function klapTas(i) {
+  const el = document.getElementById('tas-open-' + i);
+  const t = bewaardeTassen[i];
+  if (!el || !t) return;
+  if (el.style.display === 'block') { el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = 'block';
+  el.innerHTML = (t.outfits || []).map(o =>
+      '<div class="cap-outfit" style="margin-bottom:6px;">'
+      + `<div class="cap-kop"><span class="cap-naam">${esc(o.naam || '')}</span>`
+      + `<span class="cap-stijl">${esc(o.stijl || '')}</span></div>`
+      + '<div class="cap-stukken">'
+      + (o.items || []).map(n => `<span class="cap-chip">${esc(n)}</span>`).join('')
+      + '</div>'
+      + (o.waarom ? `<div class="cap-waarom">${esc(o.waarom)}</div>` : '')
+      + '</div>').join('')
+    + (t.moetMee && t.moetMee.length
+        ? `<div class="field-note">Moest mee: ${esc(opsom(t.moetMee))}</div>` : '')
+    + (t.zonder && t.zonder.length
+        ? `<div class="field-note">Zonder: ${esc(opsom(t.zonder))}</div>` : '')
+    + (t.ontbreekt ? `<div class="field-note">Miste nog: ${esc(t.ontbreekt)}</div>` : '');
 }
 
 async function verwijderTas(i) {
