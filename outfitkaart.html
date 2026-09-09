@@ -184,6 +184,15 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
    terwijl je die net had uitgesloten: je zag nergens meer dat het gold. */
 /* Twee soorten routes horen niet als één rijtje te lezen: vijf maken één
    kaart, de weekendtas plant een hele reis met eigen stappen. */
+/* Het startpunt: hetzelfde blok, welke route je ook nam. */
+.startpunt-kaart{margin-top:16px;padding:14px;border-radius:14px;background:var(--surface);border:2px solid var(--accent);}
+.sp-kop{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:600;}
+.sp-naam{font-size:16px;font-weight:600;margin-top:4px;line-height:1.3;}
+.sp-vibe{font-size:12px;color:var(--text-2);line-height:1.5;}
+.sp-bron{font-size:10px;color:var(--text-2);margin-top:3px;font-style:italic;}
+.sp-rij{margin-top:9px;}
+.sp-rij>span{display:block;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-2);margin-bottom:4px;}
+.sp-volgende{margin-top:11px;padding-top:9px;border-top:1px solid var(--border);font-size:11px;color:var(--text-2);}
 .route-scheiding{display:flex;align-items:center;gap:10px;margin:18px 0 14px;color:var(--text-2);font-size:10px;letter-spacing:.1em;text-transform:uppercase;}
 .route-scheiding::before,.route-scheiding::after{content:"";flex:1;height:1px;background:var(--border);}
 .vw-balk{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:10px;padding:8px 10px;background:color-mix(in srgb,var(--accent) 7%,var(--surface));border:1px solid var(--border);border-radius:10px;}
@@ -547,6 +556,14 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <div class="preset-list" id="preset-list"></div>
   </div>
 
+  <!-- HET STARTPUNT — waar elke route op uitkomt.
+       Vijf routes leverden vijf verschillende eindtoestanden op: bij drie
+       stond er een aangetikte kaart in een lijst, bij Robin en de
+       inspiratiefoto sprong je naar een kant-en-klaar resultaat zonder dat
+       ergens stond wát je nu eigenlijk had. Nu landt elke route hier, in
+       dezelfde vorm, met hetzelfde vervolg. -->
+  <div id="startpunt" style="display:none;"></div>
+
   <!-- Custom color picker (shown for Eigen kleurkeuze) -->
   <div id="custom-area" style="display:none">
     <div class="sec-label">Kies 1 of 2 ankerkleuren <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">dan stel ik combo's voor</span></div>
@@ -663,6 +680,17 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <!-- AI analyse section -->
     <button class="ai-btn" id="ai-analyse-btn" onclick="aiAnalyseOutfit()">🔍 Analyseer &amp; perfectioneer deze kaart</button>
     <div id="ai-analyse-panel" style="display:none;"></div>
+
+    <!-- Vragen stellen over de kaart die er staat. Tot nu toe kon je alleen
+         alles laten herschrijven of zelf terug om items te wisselen; een
+         gewone vraag als "vervang die broek door barrel jeans, en welke muts
+         hoort erbij?" kon nergens. -->
+    <div class="sec-label" style="margin-top:16px;">Vraag het de stylist</div>
+    <div class="field-note" style="margin-bottom:7px;">Bijvoorbeeld: <i>kan die grijze broek een barrel jeans worden, en welke muts hoort hierbij?</i> Je krijgt antwoord, en wat vervangen moet worden pas ik meteen aan op je kaart.</div>
+    <textarea class="field" id="stylist-vraag" rows="2" placeholder="Typ je vraag…"></textarea>
+    <button class="ai-btn" id="stylist-vraag-btn" style="margin-top:7px;" onclick="vraagDeStylist()">💬 Vraag het</button>
+    <div class="field-note" id="stylist-vraag-status" style="margin-top:6px;"></div>
+    <div id="stylist-vraag-antwoord" style="margin-top:10px;"></div>
 
     <div id="kaart-kosten" style="margin-top:10px;font-size:10.5px;color:var(--text-2);line-height:1.6;"></div>
     <button class="btn-rescan" id="terug-herkomst" style="display:none;" onclick="terugNaarHerkomst()"></button>
@@ -2006,14 +2034,11 @@ function buildRobinList() {
     card.addEventListener('click', () => {
       document.querySelectorAll('#robin-list .robin-card').forEach(c=>c.classList.remove('selected'));
       card.classList.add('selected');
-      selItems = robinNaarItems(o);
       // Niet als anker markeren: kantEnKlaar voorkomt al dat de kaart zichzelf
       // ongevraagd herschrijft. Vroeg je wél om perfectioneren, dan moet de AI
       // vrij zijn om te verbeteren — anders kreeg je te horen dat alles "vast"
       // stond en er niets gewisseld kon worden.
-      anchorItems = [];
-      kantEnKlaar = true;   // Robin stelde deze samen; niet automatisch herschrijven
-      selPreset = {
+      const startpunt = {
         name: 'Outfit ' + o.nr + ' — ' + o.naam,
         vibe: 'samengesteld door Robin',
         typeName: 'Uit je stijlrapport',
@@ -2021,7 +2046,10 @@ function buildRobinList() {
         colors: o.tags.map(t => (KLEUREN.find(k=>k.v===t)||{dot:'#ccc'}).dot),
         tags: o.tags.slice(),
       };
-      comboGekozen(selPreset);
+      comboGekozen(startpunt, {
+        items: robinNaarItems(o), ankers: [], kantEnKlaar: true,
+        bron: 'Robin stelde deze outfit samen uit je stijlrapport',
+      });
     });
     list.appendChild(card);
   });
@@ -2058,11 +2086,74 @@ function vulTitelAan() {
   if (t && !t.value.trim() && gel) t.value = gel.toUpperCase().slice(0, 40);
 }
 
-function comboGekozen(p) {
+function comboGekozen(p, opts) {
+  const o = opts || {};
   selPreset = p;
+  if (o.items)  selItems = o.items;
+  if (o.ankers) anchorItems = o.ankers;
+  if (typeof o.kantEnKlaar === 'boolean') kantEnKlaar = o.kantEnKlaar;
+  startpuntBron = o.bron || (p && p.typeName) || '';
   const btn = document.getElementById('btn-next');
   if (btn) btn.disabled = false;
+  toonStartpunt();
   toonVoorwaardenBalk();
+}
+
+let startpuntBron = '';
+
+// Wat je nu in handen hebt, in dezelfde vorm ongeacht welke route je nam.
+// Zonder dit moest je zelf onthouden wat een route had opgeleverd — bij de
+// ene stond het in een aangetikte kaart, bij de andere nergens.
+function toonStartpunt() {
+  const el = document.getElementById('startpunt');
+  if (!el) return;
+  if (!selPreset) { el.style.display = 'none'; el.innerHTML = ''; return; }
+
+  const p = selPreset;
+  const dots = (p.colors || []).slice(0, 5)
+    .map(c => `<span class="cap-dot" style="background:${esc(c)}"></span>`).join('');
+  const eigen = selItems.filter(i => !i._suggestion);
+  const voorstel = selItems.filter(i => i._suggestion);
+
+  el.style.display = 'block';
+  el.innerHTML = '<div class="startpunt-kaart">'
+    + '<div class="sp-kop">Hiermee ga je verder</div>'
+    + `<div class="sp-naam">${esc(p.name || 'Je startpunt')}</div>`
+    + (dots ? `<div class="cap-kleurrij" style="margin:6px 0;">${dots}</div>` : '')
+    + (p.vibe ? `<div class="sp-vibe">${esc(p.vibe)}</div>` : '')
+    + (startpuntBron ? `<div class="sp-bron">${esc(startpuntBron)}</div>` : '')
+    + (anchorItems.length
+        ? '<div class="sp-rij"><span>Blijft staan</span><div class="cap-stukken">'
+          + anchorItems.map(i => `<span class="cap-chip">${esc(i.name)}</span>`).join('')
+          + '</div></div>' : '')
+    + (eigen.length
+        ? '<div class="sp-rij"><span>Uit je kast</span><div class="cap-stukken">'
+          + eigen.map(i => `<span class="cap-chip">${esc(i.name)}</span>`).join('')
+          + '</div></div>' : '')
+    + (voorstel.length
+        ? '<div class="sp-rij"><span>Nog niet in je kast</span><div class="cap-stukken">'
+          + voorstel.map(i => `<span class="cap-chip">${esc(i.name)}</span>`).join('')
+          + '</div></div>' : '')
+    + `<div class="sp-volgende">Volgende: ${selItems.length
+        ? 'je items nalopen en de gelegenheid invullen'
+        : 'items kiezen en de gelegenheid invullen'}</div>`
+    + '<button class="cap-vervang-btn" style="width:100%;margin-top:8px;" '
+    + 'onclick="wisStartpunt()">↺ Andere keuze maken</button>'
+    + '</div>';
+}
+
+// Terug naar de route waar je in zat, met een schone lei. Voorheen moest je
+// van route wisselen en weer terug om je keuze kwijt te raken.
+function wisStartpunt() {
+  selPreset = null; selItems = []; anchorItems = []; kantEnKlaar = false;
+  startpuntBron = '';
+  const btn = document.getElementById('btn-next');
+  if (btn) btn.disabled = true;
+  document.querySelectorAll('.preset-card.selected, .robin-card.selected')
+    .forEach(c => c.classList.remove('selected'));
+  toonStartpunt();
+  renderAnchorPicked();
+  document.getElementById('startpunt').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 // ── STEP 1: STARTKEUZE ────────────────────────────────────────────────────────
@@ -2082,6 +2173,8 @@ function setStartMode(mode) {
 
   // Route wisselen betekent opnieuw beginnen met de combo
   selPreset = null;
+  startpuntBron = '';
+  toonStartpunt();
   document.getElementById('btn-next').disabled = true;
   document.getElementById('preset-area').style.display = 'none';
   document.getElementById('custom-area').style.display = 'none';
@@ -2304,7 +2397,7 @@ Antwoord ALLEEN met een JSON-array:
       const card = makePresetCard(p, () => {
         document.querySelectorAll('#anchor-preset-list .preset-card').forEach(b=>b.classList.remove('selected'));
         card.classList.add('selected');
-        comboGekozen(p);
+        comboGekozen(p, { bron: 'Gebouwd rond ' + opsom(anchorItems.map(a=>a.name)) });
       });
       list.appendChild(card);
     });
@@ -2371,7 +2464,7 @@ function buildPresets(ct) {
     const card = makePresetCard(p, () => {
       document.querySelectorAll('#preset-list .preset-card').forEach(b=>b.classList.remove('selected'));
       card.classList.add('selected');
-      comboGekozen(p);
+      comboGekozen(p, { bron: 'Kleurcombo uit ' + (selType && selType.label || 'je kleurstrategie') });
     });
     list.appendChild(card);
   });
@@ -2465,7 +2558,7 @@ function buildAlgorithmicCombos() {
     const card = makePresetCard(p, () => {
       document.querySelectorAll('#custom-preset-list .preset-card').forEach(b=>b.classList.remove('selected'));
       card.classList.add('selected');
-      comboGekozen(p);
+      comboGekozen(p, { bron: 'Rond de kleuren die je zelf koos' });
     });
     list.appendChild(card);
   });
@@ -2528,7 +2621,7 @@ Antwoord ALLEEN met een geldig JSON array, geen uitleg eromheen.`;
       const card = makePresetCard(p, () => {
         document.querySelectorAll('#custom-preset-list .preset-card').forEach(b=>b.classList.remove('selected'));
         card.classList.add('selected');
-        comboGekozen(p);
+        comboGekozen(p, { bron: 'Voorgesteld bij je eigen kleuren' });
       });
       list.appendChild(card);
     });
@@ -2886,7 +2979,7 @@ Antwoord ALLEEN met JSON:
     const arr = pickArray(data, ['items','outfit'], true);
     if (!arr || !arr.length) throw new Error('Geen items voorgesteld');
 
-    selItems = arr.slice(0,6).map(x => {
+    const gevonden = arr.slice(0,6).map(x => {
       const echt = x && x.id ? allItems.find(i => i.id === x.id) : null;
       if (echt) return Object.assign({}, echt, { _waarom: (x.waarom||'') });
       return { id:'sugg-i-'+Math.random().toString(36).slice(2,7),
@@ -2903,10 +2996,12 @@ Antwoord ALLEEN met JSON:
       + (data.vertaling ? '<br><br><b>Voor jou aangepast</b><br>' + esc(data.vertaling) : '')
       + '</div>';
 
-    const eigen = selItems.filter(i=>!i._suggestion).length;
-    st.innerHTML = `<b>${eigen}</b> van ${selItems.length} uit je eigen kast. Ga door naar de volgende stap.`;
+    const eigen = gevonden.filter(i=>!i._suggestion).length;
+    st.innerHTML = `<b>${eigen}</b> van ${gevonden.length} uit je eigen kast.`;
     comboGekozen(selPreset || { name:'Nagemaakt van je inspiratiefoto', vibe:'zelfde rollen, jouw kleuren',
-      typeName:'Van je inspiratiefoto', stijl:'streetstyle', colors:['#c4c4c8','#e8407a','#0047AB','#f0e8d8'], tags:[] });
+      typeName:'Van je inspiratiefoto', stijl:'streetstyle', colors:['#c4c4c8','#e8407a','#0047AB','#f0e8d8'], tags:[] },
+      { items: gevonden, ankers: [], kantEnKlaar: false,
+        bron: 'Nagemaakt van je inspiratiefoto' });
     btn.textContent = '🔍 Opnieuw lezen';
   } catch(e) {
     st.textContent = 'Mislukt: ' + e.message;
@@ -3277,7 +3372,7 @@ function toonVragen() {
 
 function toggleVragen() {
   const el  = document.getElementById('vraag-area');
-  const btn = document.getElementById('vraag-btn');
+  const btn = document.getElementById('vraag-btn');   // de stijlvragen-knop
   const uit = el.style.display === 'none' || !el.style.display;
   el.style.display = uit ? 'block' : 'none';
   btn.textContent = uit ? 'Vragen inklappen' : vraagKnopTekst();
@@ -3302,7 +3397,7 @@ function wisselAntwoord(qi, oi) {
   const tel = document.getElementById(`vt-${qi}`);
   if (tel) tel.textContent = huidig.size ? huidig.size + ' gekozen' : 'meerdere antwoorden mogen';
 
-  const btn = document.getElementById('vraag-btn');
+  const btn = document.getElementById('vraag-btn');   // de stijlvragen-knop
   if (btn && !/inklappen/.test(btn.textContent)) btn.textContent = vraagKnopTekst();
   bijwerkProfielKnop();
   bewaarAntwoorden();
@@ -3506,6 +3601,22 @@ function kleurenVan(item) {
   const tekst = kleurTekstVan(item);
   const raak = KLEUREN.map(k => k.v).filter(v => kleurMatcht(v, tekst));
   return raak.filter(v => !raak.some(a => a !== v && a.includes(v)));
+}
+
+// De buitenlaag werd overgeslagen omdat deze regel maar op één plek stond: in
+// de kaartroute. De weekendtas kende hem niet, en dus kwam er geen jas uit een
+// weekendoutfit — en stond hij ook niet op de kaart die je daarvan maakte.
+// Eén tekst, overal gebruikt.
+function buitenlaagRegel(weer) {
+  const koud = weer === 'koud';
+  return `\nDENK AAN DE BUITENLAAG. Een outfit voor buiten is niet af zonder jas, mantel,
+blazer of vest zodra het seizoen of de gelegenheid daarom vraagt. Sla die laag
+niet over omdat de rest al klopt: kies hem bewust, op kleur en op lengte ten
+opzichte van de zoom eronder.${koud ? `
+Het is koud, dus een buitenlaag is hier geen keuze maar noodzaak. Zit er geen
+passende jas of mantel in de lijst, zeg dat dan met zoveel woorden bij
+"ontbreekt" in plaats van de outfit zonder af te leveren.` : `
+Past er echt geen buitenlaag bij, zeg dat dan.`}\n`;
 }
 
 // Heldere kleuren die een outfit kunnen dragen, en de zware kleuren die er
@@ -4353,6 +4464,7 @@ ${kast}
 
 Kies per outfit 4 tot 6 stukken die samen kloppen: één blikvanger, de rest
 ondersteunt; taille zichtbaar; nooit wijd op wijd; twee materiaalfamilies.
+${buitenlaagRegel(weer)}
 Noem de stijlgreep bij naam (ton-sur-ton, monochroom, neutraal met één accent,
 kleurblokken, contrast in textuur) en geef elke outfit een gelegenheid.
 Ontbreekt er iets waardoor dit pas echt werkt, zeg dat apart.
@@ -4431,6 +4543,7 @@ ${o.naam} (${o.stijl}) — ${(o.items||[]).join(', ')}
 Maak één ANDERE outfit in dezelfde kleurcombinatie: ${o.combo || ''}.
 Neem een andere stijlgreep en een ander silhouet dan de afgewezen outfit, en
 overlap zo min mogelijk met de stukken die daarin zaten.
+${buitenlaagRegel(weer)}
 ${capNietKleuren.length ? 'Gebruik geen stukken in deze kleuren: ' + opsom(capNietKleuren) + '.\n' : ''}
 ${anderen ? 'Deze staan er al, maak niet nog eens hetzelfde:\n' + anderen + '\n' : ''}
 Gelegenheid: ${gel || 'een weekend weg'}. Het weer is ${weer}.
@@ -4994,12 +5107,7 @@ ${wardrobeForAI()}
 Gekozen kleurcombo: ${combo}
 ${vwBlok}${gelBlok}${reedsBlok}
 Stel één complete, draagbare outfit samen van 4 tot 6 stukken.
-
-DENK AAN DE BUITENLAAG. Een outfit voor buiten is niet af zonder jas, mantel,
-blazer of vest zodra het seizoen of de gelegenheid daarom vraagt. Sla die laag
-niet over omdat de rest al klopt: kies hem bewust, op kleur en op lengte ten
-opzichte van de zoom eronder. Past er echt geen buitenlaag bij, zeg dat dan.
-
+${buitenlaagRegel(huidigeVoorwaarden().weer)}
 WERK IN DEZE VOLGORDE. Denk elke stap echt door voordat je verder gaat.
 
 STAP 1 — ANKER EN BLIKVANGER
@@ -5353,6 +5461,111 @@ async function autoComposeOnCard() {
       + '</div>';
     if (fout) showCardNotice('Samenstellen lukte niet: ' + esc(fout.message));
   }
+}
+
+// ── DE STYLIST IETS VRAGEN OVER DE KAART DIE ER STAAT ─────────────────────────
+// Je kon alles laten herschrijven, of zelf terug om items te wisselen. Maar de
+// gewone vraag die je bij een klare kaart stelt — "kan die grijze broek een
+// barrel jeans worden, en welke muts hoort hierbij?" — kon nergens. Die vraag
+// is er één met twee kanten: je wilt een antwoord én je wilt dat de kaart
+// meebeweegt. Dus doet dit allebei: het legt uit, en het voert door wat er
+// veranderd moet worden.
+async function vraagDeStylist() {
+  const vraag = (document.getElementById('stylist-vraag').value || '').trim();
+  const btn = document.getElementById('stylist-vraag-btn');
+  const st  = document.getElementById('stylist-vraag-status');
+  const uit = document.getElementById('stylist-vraag-antwoord');
+  if (!vraag) { st.textContent = 'Typ eerst een vraag.'; return; }
+
+  btn.disabled = true; btn.textContent = '⏳ Denken…';
+  const stopVolgen = volgVoortgang(st);
+  uit.innerHTML = '';
+
+  const opKaart = selItems.map(i =>
+    `- ${i.id} | ${i.cat} | ${i.name}${i._suggestion ? ' (voorstel, heeft ze niet)' : ''}`).join('\n');
+
+  try {
+    const raw = await callClaude(
+      `Je bent Griette's persoonlijke stylist. ${DNA_KORT}${profielBlok()}
+Antwoord in het Nederlands, alsof je naast haar staat. Geef antwoord op wat ze
+vraagt — niet meer. Verander alleen wat ze vraagt te veranderen.`,
+      [{ type:'text', text:
+`Op Griette's outfitkaart staat nu deze outfit:
+${opKaart || '(nog leeg)'}
+${voorwaardenZin()}
+Zij vraagt:
+"${vraag}"
+
+Doe twee dingen.
+
+1. GEEF ANTWOORD. Kort en concreet, alsof je naast haar staat. Vraagt ze om
+   advies (welke muts, welke schoen), geef dan een echt oordeel met de reden
+   erbij — niet "dat kan mooi zijn", maar wat en waarom. Heeft ze iets niet in
+   haar kast, zeg dat en beschrijf wat ze zou moeten zoeken.
+
+2. PAS DE KAART AAN, maar alleen waar ze daarom vraagt. Wil ze een stuk
+   vervangen, kies dan de vervanger uit onderstaande lijst. Zit die er niet in,
+   stel er dan één voor met eigen=false. Vraagt ze alleen om advies zonder iets
+   te willen wisselen, laat de kaart dan met rust en geef een lege lijst terug.
+
+BESCHIKBAAR IN HAAR KAST (id | categorie | naam):
+${wardrobeForAI()}
+
+Antwoord ALLEEN met JSON:
+{"antwoord":"je antwoord op haar vraag, 2 tot 4 zinnen",
+ "wissel":[{"weg":"id van het stuk dat eraf gaat, of lege string",
+            "erbij_id":"id uit de lijst, of null",
+            "erbij_naam":"naam als het geen id heeft",
+            "erbij_categorie":"categorie als het geen id heeft",
+            "eigen":true of false,
+            "waarom":"in het kort waarom dit stuk"}],
+ "let_op":"wat ze hierbij in de gaten moet houden, of leeg"}` }],
+      4000, null, 'kies');
+
+    const d = extractJson(raw);
+    if (!d || !d.antwoord) throw new Error('geen bruikbaar antwoord');
+
+    const wissels = pickArray(d, ['wissel'], true) || [];
+    let veranderd = 0;
+    wissels.forEach(w => {
+      if (!w) return;
+      const nieuw = w.erbij_id ? allItems.find(i => i.id === w.erbij_id) : null;
+      const stuk = nieuw
+        ? Object.assign({}, nieuw, { _waarom: w.waarom || '' })
+        : (w.erbij_naam
+            ? { id:'sugg-v-'+Math.random().toString(36).slice(2,7), name:w.erbij_naam,
+                cat:w.erbij_categorie || 'overig', brand:'', _suggestion:true,
+                _waarom:w.waarom || '' }
+            : null);
+      if (!stuk) return;
+      const i = w.weg ? selItems.findIndex(x => x.id === w.weg) : -1;
+      if (i >= 0) { selItems[i] = stuk; veranderd++; }
+      else if (selItems.length < 6) { selItems.push(stuk); veranderd++; }
+    });
+
+    if (veranderd) { buildKaart(); toonAanvulKnop(); }
+
+    uit.innerHTML = '<div class="cap-verrassing">' + esc(d.antwoord)
+      + (d.let_op ? `<div class="profiel-regel"><span>Let op</span><span>${esc(d.let_op)}</span></div>` : '')
+      + (veranderd
+          ? '<div class="profiel-regel"><span>Gedaan</span><span>'
+            + wissels.filter(w => w && (w.erbij_id || w.erbij_naam)).map(w => {
+                const oud = selItems.find(x => x.id === w.weg);
+                return esc((oud ? oud.name + ' → ' : 'erbij: ')
+                  + (w.erbij_naam || (allItems.find(i=>i.id===w.erbij_id)||{}).name || ''));
+              }).join('<br>') + '</span></div>'
+          : '')
+      + '</div>';
+    stopVolgen();
+    st.textContent = veranderd
+      ? `${veranderd} stuk${veranderd===1?'':'ken'} aangepast op je kaart.`
+      : 'De kaart is niet veranderd — dit was alleen advies.';
+    document.getElementById('stylist-vraag').value = '';
+  } catch(e) {
+    stopVolgen();
+    st.textContent = 'Vragen lukte niet: ' + e.message;
+  }
+  btn.disabled = false; btn.textContent = '💬 Vraag het';
 }
 
 // ── AI ANALYSE + PERFECTIONEREN ───────────────────────────────────────────────
@@ -5962,6 +6175,7 @@ function prevStep() { setStep(Math.max(step-1,1)); }
 function restart() {
   kaartHerkomst = null; toonHerkomstKnop();
   voorwaarden = null; toonVoorwaardenBalk();   // nieuwe kaart, schone lei
+  startpuntBron = '';
   kaartGestart = Date.now();     // vanaf hier tellen de kosten van de nieuwe kaart
   selType=null; selPreset=null; selItems=[]; customColors=[]; outfitUitleg=null; outfitTop='';
   anchorItems=[]; kantEnKlaar=false; renderAnchorPicked();
@@ -5977,6 +6191,7 @@ function restart() {
   const imgWrap = document.getElementById('dl-img-wrap');
   if (imgWrap) imgWrap.remove();
   showCardNotice('');
+  toonStartpunt();
   setStep(1);
   window.scrollTo(0,0);
 }
