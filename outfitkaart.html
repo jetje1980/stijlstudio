@@ -609,6 +609,9 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 </div>
 
 <div id="card-wrap">
+  <!-- Bovenaan, waar je landt. Onderaan de kaart, onder de kostenregel,
+       is hij op een telefoon simpelweg niet in beeld. -->
+  <button class="btn-rescan" id="terug-herkomst-top" style="display:none;margin-bottom:10px;" onclick="terugNaarHerkomst()"></button>
   <div id="card-notice" style="display:none;margin:0 0 12px;padding:11px 13px;border-radius:12px;background:color-mix(in srgb,#b5232a 8%,var(--surface));border:1.5px solid color-mix(in srgb,#b5232a 30%,var(--border));font-size:12px;line-height:1.5;color:var(--text);"></div>
   <div class="kaart" id="the-kaart">
     <div class="kaart-title" id="k-title">OUTFIT</div>
@@ -4414,7 +4417,9 @@ function toonTassen() {
           // Bewaren zonder terug kunnen kijken is geen bewaren. Openklappen
           // laat de outfits zelf zien, met wat er nog miste.
           + `<div id="tas-open-${i}" style="display:none;margin-top:8px;"></div>`
-          + '<div style="display:flex;gap:6px;margin-top:8px;">'
+          + `<button class="ai-btn" style="margin-top:8px;width:100%;" `
+          + `onclick="hervatTas(${i})">↩ Verder met deze tas</button>`
+          + '<div style="display:flex;gap:6px;margin-top:6px;">'
           + `<button class="cap-vervang-btn" style="flex:1;" onclick="klapTas(${i})">`
           + `📖 Bekijken</button>`
           + `<button class="cap-vervang-btn" style="flex:1;" onclick="verwijderTas(${i})">`
@@ -4444,6 +4449,47 @@ function klapTas(i) {
     + (t.zonder && t.zonder.length
         ? `<div class="field-note">Zonder: ${esc(opsom(t.zonder))}</div>` : '')
     + (t.ontbreekt ? `<div class="field-note">Miste nog: ${esc(t.ontbreekt)}</div>` : '');
+}
+
+// Een bewaarde tas terugzetten alsof hij net gemaakt is. Bewaren was tot nu
+// toe een plaatje in het archief: je kon hem teruglezen, maar er niet mee
+// verder. Sluit je de pagina, dan was outfit 2 en 3 alsnog kwijt en moest je
+// de hele tas opnieuw laten samenstellen — en opnieuw betalen. Nu pak je hem
+// op waar je gebleven was.
+function hervatTas(i) {
+  const t = bewaardeTassen[i];
+  if (!t) return;
+
+  capsuleResultaat = { outfits: (t.outfits || []).slice(), ontbreekt: t.ontbreekt || '' };
+  capHuidigeTasId = t.id || null;    // verder werken schrijft in dezelfde regel
+  capNietKleuren = (t.zonder || []).slice();
+  capWilKleuren = [];
+  capItems = (t.moetMee || []).map(n => vindItemOpNaam(n)).filter(Boolean);
+
+  const gel = document.getElementById('cap-gelegenheid');
+  if (gel) gel.value = t.naam && t.naam !== 'Weekendtas' ? t.naam : '';
+  const weer = document.getElementById('cap-weer');
+  if (weer && t.weer) weer.value = t.weer;
+
+  // De kast en de combo's opnieuw uitrekenen, zodat vervangen en aanvullen
+  // blijven werken. De combo's zijn als naam bewaard; die zoeken we terug.
+  capFilterKast();
+  capScoorCombos();
+  const namen = (t.combos || []).map(n => String(n).toLowerCase());
+  capGekozenCombos = capCombos
+    .map((c, k) => namen.includes(String(c.name || '').toLowerCase()) ? k : -1)
+    .filter(k => k >= 0);
+
+  sluitKaarten();
+  setStep(1);
+  setStartMode('capsule');
+  capToonStap(3);
+  toonCapsule();
+  const st = document.getElementById('cap-outfit-status');
+  if (st) st.innerHTML = `<b>${capsuleResultaat.outfits.length} outfits</b> uit je bewaarde tas. `
+    + 'Je kunt er kaarten van maken, er één vervangen, of verder aanvullen.';
+  toonBewaardMelding(true);
+  window.scrollTo(0, 0);
 }
 
 async function verwijderTas(i) {
@@ -4542,7 +4588,7 @@ function vindItemOpNaam(naam) {
 let kaartHerkomst = null;
 
 function toonHerkomstKnop() {
-  [ 'terug-herkomst', 'terug-herkomst-3' ].forEach(id => {
+  [ 'terug-herkomst', 'terug-herkomst-3', 'terug-herkomst-top' ].forEach(id => {
     const b = document.getElementById(id);
     if (!b) return;
     b.style.display = kaartHerkomst ? 'block' : 'none';
