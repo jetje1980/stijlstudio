@@ -179,6 +179,17 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
    "deze" te lezen is — een dikkere rand alleen zegt niet welke kant het op is. */
 .cswatch.uit{opacity:.45;border-color:var(--text-2);}
 .cswatch.uit::after{content:'';position:absolute;left:-2px;right:-2px;top:50%;height:2px;background:var(--text);transform:rotate(-45deg);border-radius:2px;}
+/* Waaronder de stylist werkt, zichtbaar op de kaart zelf. Onzichtbare
+   voorwaarden zijn de reden dat er hakken op een kaart konden staan
+   terwijl je die net had uitgesloten: je zag nergens meer dat het gold. */
+/* Twee soorten routes horen niet als één rijtje te lezen: vijf maken één
+   kaart, de weekendtas plant een hele reis met eigen stappen. */
+.route-scheiding{display:flex;align-items:center;gap:10px;margin:18px 0 14px;color:var(--text-2);font-size:10px;letter-spacing:.1em;text-transform:uppercase;}
+.route-scheiding::before,.route-scheiding::after{content:"";flex:1;height:1px;background:var(--border);}
+.vw-balk{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:10px;padding:8px 10px;background:color-mix(in srgb,var(--accent) 7%,var(--surface));border:1px solid var(--border);border-radius:10px;}
+.vw-balk .vw-kop{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-2);width:100%;}
+.vw-chip{font-size:10.5px;padding:3px 8px;border-radius:12px;background:var(--surface);border:1px solid var(--border);color:var(--text);}
+.vw-balk .vw-wijzig{margin-left:auto;font-size:10px;color:var(--accent);cursor:pointer;background:none;border:none;text-decoration:underline;padding:0;font-family:inherit;}
 .cap-anker{display:inline-block;margin-top:4px;padding:2px 7px;border-radius:10px;font-size:9px;font-weight:600;letter-spacing:.03em;background:color-mix(in srgb,var(--accent) 16%,var(--surface));color:var(--accent);}
 .selected-pills{display:flex;gap:8px;flex-wrap:wrap;min-height:24px;}
 .color-pill{display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--surface);border:1.5px solid var(--border);border-radius:20px;font-size:11px;font-weight:500;}
@@ -373,7 +384,8 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 <!-- STEP 1: COMBO -->
 <div class="panel active" id="p1">
   <div>
-    <div class="sec-label">Waarmee wil je beginnen?</div>
+    <div class="sec-label">Eén outfitkaart maken</div>
+    <div class="field-note" style="margin-bottom:8px;">Kies waar je begint. Daarna loop je langs kleur, items en details naar je kaart.</div>
     <div class="start-mode">
       <button class="mode-btn active" id="mode-combo" onclick="setStartMode('combo')">🎨 Met een kleurcombo</button>
       <button class="mode-btn" id="mode-eigenkleur" onclick="startEigenKleur()">🖌️ Met mijn eigen kleuren</button>
@@ -381,7 +393,12 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     </div>
     <button class="mode-btn" id="mode-robin" onclick="setStartMode('robin')" style="width:100%;margin-top:8px;">📖 Kant-en-klaar: de 33 outfits van Robin</button>
     <button class="mode-btn" id="mode-inspo" onclick="setStartMode('inspo')" style="width:100%;margin-top:8px;">📸 Deze look wil ik namaken</button>
-    <button class="mode-btn" id="mode-capsule" onclick="setStartMode('capsule')" style="width:100%;margin-top:8px;">🧳 Weekendtas: veel outfits uit weinig items</button>
+
+    <div class="route-scheiding"><span>of</span></div>
+
+    <div class="sec-label">Een hele reis plannen</div>
+    <div class="field-note" style="margin-bottom:8px;">Een eigen route met eigen stappen: jij stelt de voorwaarden, ik maak meerdere outfits die elkaar delen. Daarna maak je van elke outfit een kaart.</div>
+    <button class="mode-btn" id="mode-capsule" onclick="setStartMode('capsule')" style="width:100%;">🧳 Weekendtas: veel outfits uit weinig items</button>
   </div>
 
   <!-- ROUTE: weekendtas — jij stelt de voorwaarden, de AI doet het kiezen -->
@@ -563,6 +580,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 <!-- STEP 3: DETAILS -->
 <div class="panel" id="p3">
   <button class="btn-rescan" id="terug-herkomst-3" style="display:none;margin-bottom:12px;" onclick="terugNaarHerkomst()"></button>
+  <div class="vw-balk" id="vw-balk-3" style="display:none;"></div>
   <div>
     <div class="sec-label">Naam van de trip of gelegenheid</div>
     <input class="field" type="text" id="f-title" placeholder="bijv. TERSCHELLING WEEKEND" maxlength="40">
@@ -612,6 +630,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
   <!-- Bovenaan, waar je landt. Onderaan de kaart, onder de kostenregel,
        is hij op een telefoon simpelweg niet in beeld. -->
   <button class="btn-rescan" id="terug-herkomst-top" style="display:none;margin-bottom:10px;" onclick="terugNaarHerkomst()"></button>
+  <div class="vw-balk" id="vw-balk-4" style="display:none;"></div>
   <div id="card-notice" style="display:none;margin:0 0 12px;padding:11px 13px;border-radius:12px;background:color-mix(in srgb,#b5232a 8%,var(--surface));border:1.5px solid color-mix(in srgb,#b5232a 30%,var(--border));font-size:12px;line-height:1.5;color:var(--text);"></div>
   <div class="kaart" id="the-kaart">
     <div class="kaart-title" id="k-title">OUTFIT</div>
@@ -2026,6 +2045,17 @@ function setStartMode(mode) {
   document.querySelectorAll('.combo-type-btn').forEach(b=>b.classList.remove('selected'));
 
   kantEnKlaar = false;
+  // De weekendtas is geen stap in de kaartroute maar een eigen route met eigen
+  // stappen. Tot nu toe stonden er twee stappenbalken tegelijk op het scherm —
+  // "1 Combo · 2 Items · 3 Details · 4 Kaart" bovenaan, terwijl je in
+  // "1. Voorwaarden › 2. Kleurcombo's › 3. Outfits" zat — plus een uitgegrijsde
+  // Volgende-knop die nergens heen ging. Verwarrend, en niet waar.
+  const kaartRoute = mode !== 'capsule';
+  const sb = document.getElementById('steps-bar');
+  const bb = document.getElementById('bottom-bar');
+  if (sb) sb.style.display = kaartRoute ? 'flex' : 'none';
+  if (bb) bb.style.display = kaartRoute ? 'flex' : 'none';
+
   if (mode === 'capsule') {
     capToonStap(1);
     bouwCapNee();
@@ -3469,6 +3499,83 @@ function capsuleOpdracht() {
   };
 }
 
+// ── VOORWAARDEN DIE MEEREIZEN ─────────────────────────────────────────────────
+// Dit was het gat: "koud" en "geen hakken" zette je in de weekendtas, maar
+// zodra daar een outfitkaart uit kwam en de AI die kaart aanvulde, kwam de
+// hele kast weer in beeld — inclusief de pumps die je net had uitgesloten. De
+// voorwaarden hoorden bij de módule in plaats van bij wat je aan het maken
+// bent. Nu is er één set die met de kaart meegaat, en elke stap in het proces
+// leest eruit: het filteren van de kast én de vraag aan de stylist.
+let voorwaarden = null;   // {weer, gelegenheid, nee:[ids], nietKleuren:[]}
+
+function huidigeVoorwaarden() {
+  return voorwaarden || { weer:'wisselend', gelegenheid:'', nee:[], nietKleuren:[] };
+}
+
+function zetVoorwaardenUitCapsule() {
+  const { weer, gel } = capsuleOpdracht();
+  voorwaarden = {
+    weer, gelegenheid: gel,
+    nee: capNee.slice(),
+    nietKleuren: capNietKleuren.slice(),
+  };
+}
+
+// Eén filter voor iedereen. Stond eerst alleen in de weekendmodule; nu gebruikt
+// ook de kaartroute hem, zodat een uitgesloten stuk nergens meer terugkomt.
+function zeefKast(items, vw, altijdMee) {
+  const v = vw || huidigeVoorwaarden();
+  const weerRegel = CAP_WEER[v.weer] || CAP_WEER.wisselend;
+  const nee = CAP_NEE.filter(n => (v.nee || []).includes(n.id));
+  const houden = [], weg = [];
+
+  (items || []).forEach(i => {
+    if (altijdMee && altijdMee.some(x => x.id === i.id)) { houden.push(i); return; }
+    const alles = ((i.name || '') + ' ' + kleurTekstVan(i)).toLowerCase();
+
+    const uitgesloten = nee.find(n =>
+      (n.woorden || []).some(w => alles.includes(w)) &&
+      (!n.cats || n.cats.includes(i.cat)));
+    if (uitgesloten) { weg.push({ item:i, reden:uitgesloten.label.toLowerCase() }); return; }
+
+    const kleurWeg = (v.nietKleuren || []).find(k => kleurMatcht(k, alles));
+    if (kleurWeg) { weg.push({ item:i, reden:'kleur ' + kleurWeg + ' uitgesloten' }); return; }
+
+    const weerWeg = (weerRegel.uit || []).find(w => alles.includes(w));
+    if (weerWeg) { weg.push({ item:i, reden:weerRegel.reden }); return; }
+
+    houden.push(i);
+  });
+  return { houden, weg };
+}
+
+// Wat de stylist erover te horen krijgt. Het filter haalt het meeste er al uit,
+// maar de AI mag ook zelf niets voorstellen dat hiertegen ingaat — zeker niet
+// bij stukken die het filter op naam niet herkent.
+function voorwaardenZin(vw) {
+  const v = vw || huidigeVoorwaarden();
+  const regels = [];
+  if (v.gelegenheid) regels.push(`Gelegenheid: ${v.gelegenheid}.`);
+  if (v.weer && v.weer !== 'wisselend') regels.push(`Het weer is ${v.weer}.`);
+  const nee = CAP_NEE.filter(n => (v.nee || []).includes(n.id))
+                     .map(n => n.label.toLowerCase());
+  if (nee.length) regels.push(`Zij heeft uitgesloten: ${opsom(nee)}. Stel die dus niet voor, ook niet als afwerking.`);
+  if ((v.nietKleuren || []).length) regels.push(`Niet in deze kleuren: ${opsom(v.nietKleuren)}.`);
+  return regels.length ? '\nVOORWAARDEN VAN GRIETTE — hier wijk je niet vanaf:\n' + regels.join('\n') + '\n' : '';
+}
+
+// Korte, leesbare samenvatting voor op het scherm, zodat je ziet waaronder de
+// stylist werkt in plaats van het te moeten onthouden.
+function voorwaardenTekst(vw) {
+  const v = vw || huidigeVoorwaarden();
+  const d = [];
+  if (v.gelegenheid) d.push(v.gelegenheid);
+  if (v.weer && v.weer !== 'wisselend') d.push(v.weer);
+  CAP_NEE.filter(n => (v.nee || []).includes(n.id)).forEach(n => d.push(n.label.toLowerCase()));
+  (v.nietKleuren || []).forEach(k => d.push('geen ' + k));
+  return d;
+}
+
 function capToonStap(n) {
   capStap = n;
   [1,2,3].forEach(i => {
@@ -3741,30 +3848,13 @@ function toonCapGekozen() {
 // het wachten én het geld, en het resultaat is exacter: geen inschatting maar
 // een telling.
 function capFilterKast() {
-  const { weer } = capsuleOpdracht();
-  const weerRegel = CAP_WEER[weer] || CAP_WEER.wisselend;
-  const nee = CAP_NEE.filter(n => capNee.includes(n.id));
-
-  capGefilterd = []; capAfgevallen = [];
-  allItems.forEach(i => {
-    const naam = (i.name || '').toLowerCase();
-    const tags = itemTags[i.id] || {};
-    const kleuren = [].concat(tags.kleur || []).join(' ').toLowerCase();
-    const alles = naam + ' ' + kleuren;
-
-    // wat jij zelf hebt aangewezen gaat altijd mee
-    if (isCapItem(i.id)) { capGefilterd.push(i); return; }
-
-    const weg = nee.find(n =>
-      (n.woorden || []).some(w => alles.includes(w)) &&
-      (!n.cats || n.cats.includes(i.cat)));
-    if (weg) { capAfgevallen.push({ item:i, reden:weg.label.toLowerCase() }); return; }
-
-    const weerWeg = (weerRegel.uit || []).find(w => alles.includes(w));
-    if (weerWeg) { capAfgevallen.push({ item:i, reden:weerRegel.reden }); return; }
-
-    capGefilterd.push(i);
-  });
+  // Eén zeef voor de hele app: dezelfde regels bij het samenstellen van een
+  // tas als bij het aanvullen van een kaart. Voorheen stonden ze hier alleen,
+  // en daardoor golden ze ook alleen hier.
+  zetVoorwaardenUitCapsule();
+  const { houden, weg } = zeefKast(allItems, voorwaarden, capItems);
+  capGefilterd = houden;
+  capAfgevallen = weg;
 }
 
 // Welke van de bestaande kleurcombo's zitten écht in haar kast? Voor elke
@@ -4596,6 +4686,22 @@ function toonHerkomstKnop() {
   });
 }
 
+// Laat zien waaronder de stylist werkt. Zonder dit stonden je voorwaarden
+// onzichtbaar ergens in een andere stap, en kon een kaart iets bevatten dat je
+// net had uitgesloten zonder dat je begreep waar het vandaan kwam.
+function toonVoorwaardenBalk() {
+  const regels = voorwaardenTekst();
+  ['vw-balk-3', 'vw-balk-4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (!regels.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+    el.style.display = 'flex';
+    el.innerHTML = '<span class="vw-kop">Deze kaart houdt rekening met</span>'
+      + regels.map(r => `<span class="vw-chip">${esc(r)}</span>`).join('')
+      + (kaartHerkomst ? '<button class="vw-wijzig" onclick="terugNaarHerkomst()">wijzigen</button>' : '');
+  });
+}
+
 function terugNaarHerkomst() {
   if (!kaartHerkomst) return;
   setStep(1);
@@ -4633,7 +4739,9 @@ function capsuleNaarKaart(idx) {
   selType = { label: 'Uit je weekendtas' };
 
   kaartHerkomst = { type:'capsule' };
+  zetVoorwaardenUitCapsule();   // koud en "geen hakken" gaan mee de kaart op
   toonHerkomstKnop();
+  toonVoorwaardenBalk();
   const t = document.getElementById('f-title');
   if (t) t.value = (o.naam || 'Weekend').toUpperCase();
   const g = document.getElementById('f-gelegenheid');
@@ -4784,7 +4892,12 @@ function voegAccentVoorstel(kleur, itemtype) {
 
 // ── AI: OUTFIT SAMENSTELLEN UIT DE KAST ───────────────────────────────────────
 function wardrobeForAI() {
-  return allItems.map(i => {
+  // Wat je hebt uitgesloten hoort de stylist niet eens te zien. Voorheen ging
+  // hier de hele kast heen, ook als je net "geen hakken" had aangevinkt — en
+  // dan stonden die pumps alsnog op je kaart. Wat je zelf al koos blijft
+  // altijd staan, ook als het tegen een voorwaarde in gaat: dat is jouw keuze.
+  const { houden } = zeefKast(allItems, null, selItems.concat(anchorItems || []));
+  return houden.map(i => {
     const t = itemTags[i.id] || {};
     const val = v => Array.isArray(v) ? v.join('/') : (v || '');
     const extra = [val(t.kleur), val(t.patroon), val(t.materiaal), val(t.pasvorm), val(t.soort)]
@@ -4816,6 +4929,8 @@ async function aiComposeOutfit() {
   const gelBlok = gel.trim()
     ? `\nGELEGENHEID: ${gel.trim()}\nStem hier alles op af: de mate van formaliteit, of ze erin moet kunnen\nbewegen, en of het weer om een laag vraagt.\n`
     : '\nGeen gelegenheid opgegeven. Ga uit van een gewone dag waarop ze zich\nverzorgd maar op haar gemak wil voelen; zeg erbij dat je die aanname doet.\n';
+  // De voorwaarden die je eerder stelde reizen mee tot op de kaart.
+  const vwBlok = voorwaardenZin();
 
   const system = `Je bent een persoonlijke stylist voor Griette. ${DNA_KORT}\nAntwoord in het Nederlands. Wees eerlijk: verzin geen items die niet in de lijst staan als "eigen".`;
 
@@ -4834,7 +4949,7 @@ async function aiComposeOutfit() {
 ${wardrobeForAI()}
 
 Gekozen kleurcombo: ${combo}
-${gelBlok}${reedsBlok}
+${vwBlok}${gelBlok}${reedsBlok}
 Stel één complete, draagbare outfit samen van 4 tot 6 stukken.
 
 DENK AAN DE BUITENLAAG. Een outfit voor buiten is niet af zonder jas, mantel,
@@ -5775,6 +5890,7 @@ function setStep(n) {
     btnNext.disabled = false; // items are optional
   } else if (n === 3) {
     document.getElementById('p3').classList.add('active');
+    toonVoorwaardenBalk();
     btnNext.textContent = 'Kaart genereren →';
     const titleInput = document.getElementById('f-title');
     titleInput.removeEventListener('input', step3Check);
@@ -5784,6 +5900,7 @@ function setStep(n) {
     document.getElementById('steps-bar').style.display = 'none';
     document.getElementById('bottom-bar').style.display = 'none';
     document.getElementById('card-wrap').style.display = 'block';
+    toonVoorwaardenBalk();
     buildKaart();
     // Nog geen complete outfit of nog geen uitleg? Dan vult de AI aan.
     // Je eigen keuzes blijven daarbij altijd staan.
@@ -5797,6 +5914,7 @@ function nextStep() { setStep(Math.min(step+1,4)); }
 function prevStep() { setStep(Math.max(step-1,1)); }
 function restart() {
   kaartHerkomst = null; toonHerkomstKnop();
+  voorwaarden = null; toonVoorwaardenBalk();   // nieuwe kaart, schone lei
   kaartGestart = Date.now();     // vanaf hier tellen de kosten van de nieuwe kaart
   selType=null; selPreset=null; selItems=[]; customColors=[]; outfitUitleg=null; outfitTop='';
   anchorItems=[]; kantEnKlaar=false; renderAnchorPicked();
