@@ -136,8 +136,9 @@ Deno.serve(async (req: Request) => {
         ...cors,
         "content-type": "text/event-stream; charset=utf-8",
         "cache-control": "no-cache, no-transform",
-        "connection": "keep-alive",
         // Zonder dit buffert een tussenliggende proxy het alsnog op.
+        // "connection" staat er bewust NIET bij: dat is een hop-by-hop kop die
+        // een server niet hoort te zetten, en sommige gateways struikelen erover.
         "x-accel-buffering": "no",
       },
     });

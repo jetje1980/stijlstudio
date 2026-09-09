@@ -1252,6 +1252,16 @@ async function sbGet(key) {
 // kan laten zien dat er iets gebeurt in plaats van veertig seconden niets.
 let aiVoortgang = null;
 
+// Blijkt streamen in de praktijk niet te werken — een gateway die het opvreet,
+// een netwerk dat het niet doorlaat — dan onthouden we dat een etmaal. Anders
+// betaal je bij elke aanroep een mislukte poging voordat de terugval het
+// overneemt, en dat is echt geld. Na een dag proberen we het opnieuw.
+let stroomKapot = false;
+try {
+  const t = localStorage.getItem('ai-stroom-kapot');
+  stroomKapot = !!t && (Date.now() - Number(t)) < 864e5;
+} catch(e) {}
+
 // Toont in een statusregel wat de stylist aan het doen is. Zolang hij nadenkt
 // zie je dat; zodra er antwoord komt, telt het mee. Veertig seconden wachten
 // voelt heel anders als je ziet dát er iets gebeurt.
@@ -1267,12 +1277,20 @@ function volgVoortgang(el, sinds) {
   return () => { aiVoortgang = null; };
 }
 
+// Leest het antwoord uit de leiding en beslist op de INHOUD wat het is, niet
+// op de content-type kop. Die kop wordt onderweg door gateways nog weleens
+// vervangen, en dan zou een antwoord dat prima binnenkwam alsnog stukgaan op
+// een verkeerd etiket. Komen er gebeurtenissen binnen, dan tellen we die op;
+// blijkt het gewone JSON te zijn, dan lezen we dat. Beide werken, en de
+// voortgang loopt intussen gewoon mee.
 async function leesStroom(res) {
   const lezer = res.body.getReader();
   const decoder = new TextDecoder();
   let rest = '';
   let tekst = '', denk = '';
   let stopReden = null;
+  let gebeurtenissen = 0;
+  let alles = '';                 // ruwe body, voor het geval het JSON blijkt
   const usage = { input_tokens:0, output_tokens:0,
                   cache_read_input_tokens:0, cache_creation_input_tokens:0 };
 
@@ -1319,7 +1337,9 @@ async function leesStroom(res) {
   while (true) {
     const { done, value } = await lezer.read();
     if (done) break;
-    rest += decoder.decode(value, { stream: true });
+    const stuk = decoder.decode(value, { stream: true });
+    alles += stuk;
+    rest  += stuk;
     const regels = rest.split('\n');
     rest = regels.pop() || '';          // laatste regel kan halverwege zijn
     for (const regel of regels) {
@@ -1328,8 +1348,23 @@ async function leesStroom(res) {
       const kaal = r.slice(5).trim();
       if (!kaal || kaal === '[DONE]') continue;
       let g; try { g = JSON.parse(kaal); } catch(e) { continue; }
+      gebeurtenissen++;
       verwerk(g);
     }
+  }
+
+  // Geen enkele gebeurtenis gezien? Dan was het geen stroom maar een gewoon
+  // antwoord — bijvoorbeeld omdat de Edge Function nog een oudere versie is.
+  // Lees het dan alsnog als JSON in plaats van met lege handen te eindigen.
+  if (!gebeurtenissen) {
+    const kaal = alles.trim();
+    if (kaal) {
+      try { return JSON.parse(kaal); } catch(e) {
+        throw new Error('Onleesbaar antwoord van de server: '
+          + kaal.slice(0, 80).replace(/\s+/g, ' '));
+      }
+    }
+    throw new Error('De server stuurde een leeg antwoord terug.');
   }
 
   const content = [];
@@ -1374,7 +1409,7 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
   // niet — maar omdat er dan continu iets binnenkomt. Een telefoon die veertig
   // seconden niets ontvangt verbreekt de verbinding; dát was de oorzaak van
   // "Failed to fetch". En je ziet meteen dat er iets gebeurt.
-  const streamen = taak === 'kies' || taak === 'zwaar';
+  const streamen = (taak === 'kies' || taak === 'zwaar') && !stroomKapot;
   if (streamen) body.stream = true;
   const headers = { 'content-type': 'application/json' };
   if (appSecret) headers['x-app-secret'] = appSecret;
@@ -1444,15 +1479,31 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
   // hier terug om tot hetzelfde antwoord als een gewone aanroep geeft, zodat
   // alles erachter onveranderd blijft werken.
   //
-  // We kijken naar wat er wérkelijk terugkomt, niet naar wat we vroegen. Een
-  // oudere Edge Function kent stream nog niet en stuurt gewoon JSON; dan moet
-  // de pagina dat gewoon lezen in plaats van op een stroom te wachten die
-  // nooit komt. Zo blijft het werken tijdens het uitrollen van een nieuwe
-  // versie, in welke volgorde die ook live gaat.
-  const soort = res.headers.get('content-type') || '';
-  const data = (streamen && /event-stream/i.test(soort) && res.body)
-    ? await leesStroom(res)
-    : await res.json();
+  // Vroegen we om een stroom, dan lezen we hem ook zo uit — leesStroom kijkt
+  // zelf wat er werkelijk binnenkomt en leest gewone JSON net zo goed. Zo
+  // hangt het niet af van een content-type kop die onderweg vervangen kan zijn.
+  //
+  // Gaat het lezen van de stroom tóch mis, dan is dat geen reden om de gebruiker
+  // met lege handen te laten staan: streamen is een verbetering van het wachten,
+  // geen voorwaarde voor een antwoord. Dus proberen we het dan gewoon nog een
+  // keer op de ouderwetse manier. Trager, maar het werkt.
+  let data;
+  try {
+    data = (streamen && res.body) ? await leesStroom(res) : await res.json();
+  } catch(e) {
+    if (!streamen) throw e;
+    stroomKapot = true;
+    try { localStorage.setItem('ai-stroom-kapot', String(Date.now())); } catch(_){}
+    const zonder = JSON.parse(verzoek);
+    delete zonder.stream;
+    const res2 = await fetch(AI_ENDPOINT, {
+      method: 'POST', headers, body: JSON.stringify(zonder)
+    });
+    // Gaat ook de terugval mis, dan is de oorspronkelijke melding duidelijker
+    // dan een kale JSON-fout: die zegt tenminste wát er terugkwam.
+    if (!res2.ok) throw e;
+    try { data = await res2.json(); } catch(_) { throw e; }
+  }
 
   // Verbruik bijhouden zodat zichtbaar is wat een aanroep kost
   if (data.usage) {
