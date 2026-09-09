@@ -115,7 +115,9 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .cap-chip-foto{width:18px;height:18px;border-radius:50%;object-fit:cover;margin-left:-4px;}
 .cap-chip.nieuw{border-style:dashed;color:var(--text-2);}
 .cap-waarom{font-size:11px;color:var(--text-2);line-height:1.55;}
-.cap-kaart-btn{margin-top:8px;width:100%;padding:8px;background:transparent;border:1.5px solid var(--accent);border-radius:9px;font-family:'Inter',sans-serif;font-size:11px;color:var(--accent);cursor:pointer;}
+.cap-outfit-knoppen{display:flex;gap:6px;margin-top:8px;}
+.cap-vervang-btn{flex:0 0 auto;padding:8px 12px;background:transparent;border:1.5px solid var(--border);border-radius:9px;font-family:'Inter',sans-serif;font-size:11px;color:var(--text-2);cursor:pointer;}
+.cap-kaart-btn{margin-top:0;flex:1;width:auto;padding:8px;background:transparent;border:1.5px solid var(--accent);border-radius:9px;font-family:'Inter',sans-serif;font-size:11px;color:var(--accent);cursor:pointer;}
 .cap-verrassing{background:color-mix(in srgb,var(--green) 8%,var(--surface));border:1.5px solid color-mix(in srgb,var(--green) 30%,var(--border));border-radius:12px;padding:12px 13px;margin-bottom:10px;font-size:11.5px;line-height:1.6;color:var(--text-2);}
 .cap-verrassing b{color:var(--text);}
 /* Pijltje op foto's die nog niet geüpload zijn: dan weet je dat die er op je
@@ -218,7 +220,12 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
    en de navigatie eronder net zo groot als het kledingstuk. Bijsnijden op het
    midden laat zien waar het om gaat, en het is dezelfde uitsnede als in de
    rest van de app, dus de kaart sluit aan bij wat je bij het kiezen zag. */
-.kaart-photo img{width:100%;height:100%;object-fit:cover;background:#fff;}
+/* De foto zit als ACHTERGROND in het vakje, niet als <img> met object-fit.
+   html2canvas 1.4.1 - waarmee de kaart als afbeelding wordt vastgelegd -
+   kent object-fit niet en rekt de foto dan uit. Precies wat er op de kaart te
+   zien was: op het scherm netjes bijgesneden, in de download platgedrukt.
+   background-size begrijpt hij wel, dus dat werkt in allebei. */
+.kaart-photo.heeft-foto{background-size:cover;background-position:center;background-repeat:no-repeat;}
 .kaart-brand{font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1a1510;text-align:center;line-height:1.2;}
 .kaart-desc{font-size:8px;color:#5a4030;text-align:center;line-height:1.3;}
 .kaart-why{font-size:6.5px;color:#9B7B5C;text-align:center;line-height:1.35;font-style:italic;margin-top:1px;}
@@ -437,7 +444,8 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <div class="sec-label">Je outfits</div>
       <div class="field-note" id="cap-outfit-status" style="margin-bottom:8px;"></div>
       <div id="cap-uitkomst"></div>
-      <button class="btn-rescan" id="cap-terug2" style="margin-top:10px;" onclick="capTerug(2)">← Andere combo's kiezen</button>
+      <button class="ai-btn" id="cap-bewaar-tas" style="margin-top:10px;" onclick="bewaarTas()">💾 Bewaar deze tas</button>
+      <button class="btn-rescan" id="cap-terug2" style="margin-top:8px;" onclick="capTerug(2)">← Andere combo's kiezen</button>
     </div>
   </div>
 
@@ -565,6 +573,10 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <div class="modal-note" id="kaarten-uitleg">Elke kaart die je bewaart of opslaat als afbeelding komt hier terecht. Ze staan online, dus ook op je andere apparaten.</div>
     <div class="kaart-grid" id="kaarten-grid"></div>
     <div class="field-note" id="kaarten-status" style="margin-top:8px;"></div>
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+      <div class="sec-label">Mijn weekendtassen</div>
+      <div id="tassen-lijst"></div>
+    </div>
     <div class="modal-actions">
       <button class="modal-cancel" onclick="sluitKaarten()">Sluiten</button>
     </div>
@@ -1382,6 +1394,7 @@ async function init() {
   await laadVisueel();
   await laadPlaat();
   await laadKaarten();
+  await laadTassen();
 
   buildComboTypes();
 }
@@ -1566,7 +1579,7 @@ async function leesStroom(res, bewaker) {
 // ── AI API CALL ───────────────────────────────────────────────────────────────
 // taak 'licht'  = kiezen, beschrijven, invullen — gaat op het goedkoopste model
 // taak 'zwaar'  = de uitgebreide beeldanalyse — gebruikt het gekozen model
-async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
+async function callClaude(systemPrompt, userContent, maxTokens, effort, taak, alTweedeKans) {
   // Wat voor soort taak is dit?
   //   scan   = beschrijven wat je op een foto ziet -> waarnemen, goedkoop kan
   //   licht  = tekst formatteren, velden invullen  -> goedkoop kan
@@ -1762,7 +1775,16 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
   // Tegen de tokenlimiet aangelopen: het antwoord is afgekapt en de JSON
   // is onvolledig. Zeg dat, in plaats van stil te falen.
   if (data.stop_reason === 'max_tokens') {
-    const err = new Error('Het antwoord werd afgekapt door de tokenlimiet. Probeer het opnieuw, of kies een lichter model in ⚙ Instellingen.');
+    // Afgekapt betekent: de ruimte was te krap voor dit antwoord. Dat is geen
+    // fout van jou en ook niet iets om over te melden — gewoon nog een keer
+    // doen met meer ruimte. Eén keer, en alleen als er nog ruimte ís, zodat
+    // dit nooit een lus wordt.
+    const ruimer = Math.min((body.max_tokens || 8000) * 3, 24000);
+    if (!alTweedeKans && ruimer > (body.max_tokens || 0)) {
+      return await callClaude(systemPrompt, userContent, ruimer, effort, taak, true);
+    }
+    const err = new Error('Het antwoord bleef ook met meer ruimte te lang. '
+      + 'Vraag om minder outfits tegelijk, of kies een lichter model via ⚙ Instellingen.');
     err.truncated = true;
     throw err;
   }
@@ -3687,6 +3709,148 @@ Antwoord ALLEEN met JSON:
   btn.disabled = false;
 }
 
+
+// ── ÉÉN OUTFIT VERVANGEN ──────────────────────────────────────────────────────
+// Was het alles of niets per combo: viel één outfit tegen, dan moest je de hele
+// reeks opnieuw laten maken. Nu vervang je er één, en krijg je expliciet iets
+// anders — de afgekeurde gaat als "niet dit" mee in de vraag.
+async function vervangOutfit(i) {
+  const o = capsuleResultaat && capsuleResultaat.outfits[i];
+  if (!o) return;
+  const st = document.getElementById('cap-outfit-status');
+  const stopVolgen = volgVoortgang(st);
+  const { weer, gel } = capsuleOpdracht();
+
+  const kast = capGefilterd.map(x => {
+    const t = itemTags[x.id] || {};
+    const k = [].concat(t.kleur || []).join('/');
+    return `- ${x.name} (${x.cat}${k ? ', ' + k : ''})`;
+  }).join('\n');
+  const anderen = capsuleResultaat.outfits
+    .filter((_, k) => k !== i)
+    .map(x => `${x.naam} (${x.stijl}): ${(x.items||[]).join(', ')}`).join('\n');
+
+  try {
+    const raw = await callClaude(
+      `Je bent een persoonlijke stylist voor Griette. ${DNA_KORT}${profielBlok()}
+Antwoord in het Nederlands. Kies alleen uit de gegeven lijst.`,
+      [{ type:'text', text:
+`Griette wees deze outfit af:
+${o.naam} (${o.stijl}) — ${(o.items||[]).join(', ')}
+
+Maak één ANDERE outfit in dezelfde kleurcombinatie: ${o.combo || ''}.
+Neem een andere stijlgreep en een ander silhouet dan de afgewezen outfit, en
+overlap zo min mogelijk met de stukken die daarin zaten.
+${anderen ? 'Deze staan er al, maak niet nog eens hetzelfde:\n' + anderen + '\n' : ''}
+Gelegenheid: ${gel || 'een weekend weg'}. Het weer is ${weer}.
+
+BESCHIKBAAR (alleen hieruit kiezen):
+${kast}
+
+Antwoord ALLEEN met JSON:
+{"outfits":[{"naam":"korte naam","stijl":"de stijlgreep","gelegenheid":"waarvoor",
+  "items":["exacte namen uit de lijst"],"waarom":"1 tot 2 zinnen"}]}` }],
+      3000, null, 'kies');
+
+    const nieuw = (pickArray(extractJson(raw), ['outfits'], true) || [])[0];
+    if (!nieuw) throw new Error('geen alternatief ontvangen');
+    nieuw.combo = o.combo;
+    capsuleResultaat.outfits[i] = nieuw;
+    toonCapsule();
+    stopVolgen();
+    st.textContent = `Outfit ${i+1} vervangen.`;
+  } catch(e) {
+    stopVolgen();
+    st.textContent = `Vervangen lukte niet: ${e.message} — de oude staat er nog.`;
+  }
+}
+
+// ── DE HELE TAS BEWAREN ───────────────────────────────────────────────────────
+// Losse kaarten konden al bewaard worden, de reis als geheel niet. Terwijl
+// juist dat het ding is waar je later naar terug wilt: welke stukken gingen
+// mee, welke outfits had ik bedacht, en waarvoor.
+let bewaardeTassen = [];
+
+async function laadTassen() {
+  try { bewaardeTassen = JSON.parse(localStorage.getItem('griette-tassen-v1') || '[]'); } catch(e){}
+  if (!Array.isArray(bewaardeTassen)) bewaardeTassen = [];
+  const sb = await sbGet('bewaarde-tassen');
+  if (Array.isArray(sb)) bewaardeTassen = sb;
+}
+
+async function bewaarTas() {
+  const btn = document.getElementById('cap-bewaar-tas');
+  const st  = document.getElementById('cap-outfit-status');
+  if (!capsuleResultaat || !capsuleResultaat.outfits.length) return;
+  btn.disabled = true; btn.textContent = '⏳ Bewaren…';
+
+  const { gel, weer } = capsuleOpdracht();
+  const tel = new Map();
+  capsuleResultaat.outfits.forEach(o => (o.items || []).forEach(n =>
+    tel.set(n, (tel.get(n) || 0) + 1)));
+
+  bewaardeTassen.unshift({
+    id: 'tas-' + Date.now().toString(36),
+    naam: gel || 'Weekendtas',
+    datum: new Date().toISOString(),
+    weer,
+    combos: capGekozenCombos.map(ci => capCombos[ci].name),
+    paklijst: [...tel.entries()].map(([naam, keer]) => ({ naam, keer })),
+    outfits: capsuleResultaat.outfits,
+    ontbreekt: capsuleResultaat.ontbreekt || '',
+  });
+  bewaardeTassen = bewaardeTassen.slice(0, 20);
+  try { localStorage.setItem('griette-tassen-v1', JSON.stringify(bewaardeTassen)); } catch(e){}
+  await sbSet('bewaarde-tassen', bewaardeTassen);
+
+  btn.textContent = '✓ Tas bewaard';
+  st.innerHTML = 'Staat nu bij <b>🗂 Mijn kaarten</b>, onderaan bij je tassen.';
+  btn.disabled = false;
+}
+
+function toonTassen() {
+  const el = document.getElementById('tassen-lijst');
+  if (!el) return;
+  el.innerHTML = bewaardeTassen.length
+    ? bewaardeTassen.map((t, i) => {
+        const d = new Date(t.datum);
+        const datum = isNaN(d) ? '' : d.toLocaleDateString('nl-NL', {day:'numeric', month:'short'});
+        return `<div class="cap-outfit" style="margin-bottom:8px;">`
+          + `<div class="cap-kop"><span class="cap-naam">${esc(t.naam)}</span>`
+          + `<span class="cap-stijl">${esc(datum)}</span></div>`
+          + `<div class="cap-waarom">${(t.paklijst||[]).length} stuks · `
+          + `${(t.outfits||[]).length} outfits · ${esc((t.combos||[]).join(', '))}</div>`
+          + '<div class="cap-stukken" style="margin-top:6px;">'
+          + (t.paklijst||[]).slice(0,8).map(p =>
+              `<span class="cap-chip">${esc(p.naam)} <span style="opacity:.6">${p.keer}×</span></span>`).join('')
+          + '</div>'
+          + `<button class="cap-vervang-btn" style="margin-top:8px;width:100%;" `
+          + `onclick="verwijderTas(${i})">🗑 Verwijderen</button>`
+          + '</div>';
+      }).join('')
+    : '<div class="kaart-leeg">Nog geen tassen bewaard.</div>';
+}
+
+async function verwijderTas(i) {
+  if (!confirm('Deze tas weggooien?')) return;
+  bewaardeTassen.splice(i, 1);
+  try { localStorage.setItem('griette-tassen-v1', JSON.stringify(bewaardeTassen)); } catch(e){}
+  await sbSet('bewaarde-tassen', bewaardeTassen);
+  toonTassen();
+}
+
+// ── WINKELLIJSTJE ─────────────────────────────────────────────────────────────
+// "Wat de tas nog mist" stond er al, maar zonder ergens heen te kunnen. De
+// Robin-route had die zoeklinks al; hier ontbraken ze.
+function winkelLinks(zoekterm) {
+  const q = encodeURIComponent(String(zoekterm || '').trim().slice(0, 60));
+  if (!q) return '';
+  return '<div class="cap-stukken" style="margin-top:6px;">'
+    + WINKELS.map(([naam, url]) => `<a class="cap-chip" style="text-decoration:none;color:var(--accent)" `
+        + `href="${url}${q}" target="_blank" rel="noopener">${esc(naam)} ↗</a>`).join('')
+    + '</div>';
+}
+
 function toonCapsule() {
   const el = document.getElementById('cap-uitkomst');
   if (!el || !capsuleResultaat) return;
@@ -3733,11 +3897,15 @@ function toonCapsule() {
         }).join('')
       + '</div>'
       + (o.waarom ? `<div class="cap-waarom">${esc(o.waarom)}</div>` : '')
-      + `<button class="cap-kaart-btn" onclick="capsuleNaarKaart(${i})">Maak hier een outfitkaart van →</button>`
+      + '<div class="cap-outfit-knoppen">'
+      + `<button class="cap-kaart-btn" onclick="capsuleNaarKaart(${i})">Outfitkaart →</button>`
+      + `<button class="cap-vervang-btn" onclick="vervangOutfit(${i})">↻ Andere</button>`
+      + '</div>'
       + '</div>';
   });
   if (capsuleResultaat.ontbreekt) {
-    html += `<div class="recept-blok"><b>Eerlijk gezegd</b><br>${esc(capsuleResultaat.ontbreekt)}</div>`;
+    html += `<div class="recept-blok"><b>Eerlijk gezegd</b><br>${esc(capsuleResultaat.ontbreekt)}`
+      + winkelLinks(capsuleResultaat.ontbreekt) + '</div>';
   }
   el.innerHTML = html;
 }
@@ -4298,9 +4466,18 @@ function buildKaart() {
     grid.appendChild(col);
 
     if (photoUrl) {
-      const img = document.createElement('img');
-      img.crossOrigin = 'anonymous'; img.src = photoUrl;
-      document.getElementById('kp-'+item.id)?.appendChild(img);
+      // Eerst laden, dan pas als achtergrond zetten: zo weten we zeker dat de
+      // foto er is voordat html2canvas de kaart vastlegt.
+      const vak = document.getElementById('kp-'+item.id);
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        if (!vak) return;
+        vak.classList.add('heeft-foto');
+        vak.style.backgroundImage = `url("${photoUrl}")`;
+        vak.textContent = '';
+      };
+      img.src = photoUrl;
     }
   });
 }
@@ -4732,6 +4909,7 @@ async function bewaarKaart(bestaandeDataUrl, stil) {
 
 function openKaarten() {
   toonKaarten();
+  toonTassen();
   document.getElementById('kaarten-modal').classList.add('open');
 }
 function sluitKaarten() {
