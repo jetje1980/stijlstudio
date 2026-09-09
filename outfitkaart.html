@@ -175,6 +175,11 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .cswatch.selected{border-color:var(--text);transform:scale(1.15);}
 .cswatch .check{display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:14px;color:#fff;text-shadow:0 0 3px rgba(0,0,0,.6);}
 .cswatch.selected .check{display:flex;}
+/* Uitgesloten kleur: doorgestreept, zodat "niet deze" ook echt niet als
+   "deze" te lezen is — een dikkere rand alleen zegt niet welke kant het op is. */
+.cswatch.uit{opacity:.45;border-color:var(--text-2);}
+.cswatch.uit::after{content:'';position:absolute;left:-2px;right:-2px;top:50%;height:2px;background:var(--text);transform:rotate(-45deg);border-radius:2px;}
+.cap-anker{display:inline-block;margin-top:4px;padding:2px 7px;border-radius:10px;font-size:9px;font-weight:600;letter-spacing:.03em;background:color-mix(in srgb,var(--accent) 16%,var(--surface));color:var(--accent);}
 .selected-pills{display:flex;gap:8px;flex-wrap:wrap;min-height:24px;}
 .color-pill{display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--surface);border:1.5px solid var(--border);border-radius:20px;font-size:11px;font-weight:500;}
 .color-pill .cdot{width:12px;height:12px;border-radius:50%;}
@@ -411,8 +416,26 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <div class="field-note" style="margin-bottom:8px;">Tik aan wat er sowieso thuisblijft. De rest laat je aan mij over.</div>
       <div class="cap-nee" id="cap-nee"></div>
 
+      <div class="sec-label" style="margin-top:14px;">Liever niet deze kleuren <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">optioneel</span></div>
+      <div class="field-note" style="margin-bottom:8px;">Tik kleuren aan die je er nu even niet bij wilt. Combo's met die kleur stel ik dan niet voor, en ik houd ze uit je outfits.</div>
+      <div class="color-swatch-grid" id="cap-nietkleuren"></div>
+      <div class="field-note" id="cap-nietkleuren-uit" style="margin-top:6px;"></div>
+
+      <div class="sec-label" style="margin-top:14px;">Inspiratie voor deze reis <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">optioneel</span></div>
+      <div class="field-note" style="margin-bottom:8px;">Een foto van een look of een kleurenpalet waar je nu zin in hebt. Ik lees eruit welke kleuren en sfeer erin zitten en neem dat mee.</div>
+      <input type="file" id="cap-inspo-input" accept="image/*" multiple style="display:none" onchange="capInspoToevoegen(event)">
+      <button class="btn-rescan" onclick="document.getElementById('cap-inspo-input').click()">📷 Foto toevoegen</button>
+      <div id="cap-inspo-lijst" style="margin-top:8px;"></div>
+      <div class="field-note" id="cap-inspo-status" style="margin-top:6px;"></div>
+
+      <div class="sec-label" style="margin-top:14px;">Kleuren die je wél wilt <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">optioneel</span></div>
+      <div class="field-note" style="margin-bottom:8px;">Tik een kleur aan en zeg erbij welke rol hij krijgt. De rest van de combinatie vul ik aan.</div>
+      <div class="color-swatch-grid" id="cap-wilkleuren"></div>
+      <div id="cap-rolkiezer" style="display:none;margin-top:8px;"></div>
+      <div id="cap-wil-uit" style="margin-top:6px;"></div>
+
       <div class="sec-label" style="margin-top:14px;">Moet mee <span style="font-size:9px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-2);">optioneel — hoeft niet</span></div>
-      <div class="field-note" style="margin-bottom:8px;">Heb je iets wat sowieso meegaat, kies het hier. Anders sla je dit gewoon over.</div>
+      <div class="field-note" style="margin-bottom:8px;">Heb je iets wat sowieso meegaat, kies het hier. Dan zoek ik combo's die om díé kleuren heen zijn gebouwd.</div>
       <div id="cap-gekozen"></div>
       <input class="anchor-search" id="cap-search" type="text" placeholder="Zoek in je kast…" autocomplete="off">
       <div class="anchor-grid" id="cap-grid"></div>
@@ -433,6 +456,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
         <div id="cap-kleurkiezer" style="display:none;margin-top:8px;"></div>
         <div id="cap-kleuradvies" style="margin-top:10px;"></div>
       </div>
+      <button class="btn-rescan" id="cap-derde-kleur" style="margin-top:10px;display:none;" onclick="capDerdeKleur()">🎨 Welke kleur kan hier nog bij?</button>
       <button class="btn-rescan" id="cap-meer-combos" style="margin-top:10px;" onclick="capMeerCombos()">✨ Nog meer ideeën van de stylist</button>
       <div class="field-note" id="cap-palet-status" style="margin-top:6px;"></div>
       <button class="ai-btn" id="cap-maak-outfits" style="margin-top:12px;" disabled onclick="capMaakOutfits()">Kies eerst twee combo's</button>
@@ -444,6 +468,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <div class="sec-label">Je outfits</div>
       <div class="field-note" id="cap-outfit-status" style="margin-bottom:8px;"></div>
       <div id="cap-uitkomst"></div>
+      <div id="cap-bewaard" style="margin-top:8px;"></div>
       <button class="ai-btn" id="cap-bewaar-tas" style="margin-top:10px;" onclick="bewaarTas()">💾 Bewaar deze tas</button>
       <button class="btn-rescan" id="cap-terug2" style="margin-top:8px;" onclick="capTerug(2)">← Andere combo's kiezen</button>
     </div>
@@ -675,6 +700,24 @@ KLEUR
 - Concrete combinaties die het rapport noemt: donkerblauw met felroze, bruin
   met lichtblauw, rood met gebroken wit.
 
+DIE ACCENTLIJST IS EEN VOORBEELD, GEEN HEK. Het rapport somt op wat het
+tegenkwam, niet wat is toegestaan. Een heldere kleur die er niet in staat —
+turquoise, petrol, smaragd, kobalt — is daarmee NIET afgekeurd. Zeg dus nooit
+"die kleur past niet in jouw profiel" alleen omdat hij niet in het rijtje staat.
+Toets aan het principe: één heldere kleur die de leiding neemt, de rest rustig.
+Voldoet hij daaraan, dan werkt hij, en zeg je hoe je hem draagt.
+
+HELDERE KLEUR ALS STATEMENT — de belangrijkste regel bij het combineren.
+Heeft een outfit één uitgesproken kleur (een rode tas, een turquoise trui), dan
+is dát het statement en gaat al het andere een stap terug. Rustig betekent hier:
+denim, gebroken wit, camel, zand, zacht groen, lichtgrijs, donkerblauw, bruin.
+Een tweede zware of dramatische kleur ernaast — zwart, bordeaux, aubergine —
+maakt er een krachtmeting van: twee kleuren die allebei de aandacht pakken, en
+dan valt de outfit uit elkaar en verdwijnt juist het stuk waar het om ging.
+Zet zwart of bordeaux dus niet standaard naast een heldere kleur. Alleen als
+Griette daar zelf om vraagt, of als het echt de beste keuze is — en leg dan uit
+waarom. Zoek de rust liever in denim, gebroken wit of een aardse tint.
+
 OVER GRIJS EN CHAMPAGNE — wees hier genuanceerd, niet stellig:
 Champagne en grijzige tinten maken haar uitstraling fletser als hoofdkleur en
 vlak bij het gezicht. Maar het rapport verbiedt grijs NIET:
@@ -759,8 +802,16 @@ ook niet onbeantwoord omdat het rapport erover zwijgt.`;
 // Dit korte blok scheelt ruim duizend tokens per aanroep.
 const DNA_KORT = `Griette's stijlregels, kort:
 - Basis: donkerblauw, bruin, zwart, gebroken-wit
-- Accenten: felroze, paars, geel, oranje, oranje-rood, rood, lichtblauw, groen
-- Krachtige kleuren altijd tegen een rustige basistoon
+- Accenten die het rapport noemt: felroze, paars, geel, oranje, oranje-rood,
+  rood, lichtblauw, groen. VOORBEELDLIJST, geen hek — het rapport somde op wat
+  het tegenkwam, niet wat mag. Turquoise, petrol, smaragd of kobalt zijn dus
+  niet afgekeurd. Zeg nooit dat een kleur "niet in haar profiel past" omdat
+  hij niet in dat rijtje staat.
+- EEN HELDERE KLEUR IS HET STATEMENT; de rest gaat een stap terug naar denim,
+  gebroken wit, camel, zand, zacht groen, lichtgrijs, donkerblauw of bruin.
+  Geen tweede zwaargewicht ernaast (zwart, bordeaux, aubergine): dan pakken
+  twee kleuren de aandacht en verdwijnt juist het stuk waar het om ging.
+  Alleen als zij erom vraagt of het echt beter is — en zeg dan waarom.
 - Champagne en grijzige tinten dof haar gezicht; lichtgrijs werkt juist wel als
   rustige steunkleur, en in zachte casual stof mag grijs gewoon
 - Silhouet: taille benadrukken, nooit wijd op wijd, hoge taille geeft vorm
@@ -1122,7 +1173,7 @@ const AI_ENDPOINT = SUPABASE_URL + '/functions/v1/claude';
 // ── SETTINGS ──────────────────────────────────────────────────────────────────
 // Deze versie staat in de instellingen. Klaagt er iets, dan is meteen te zien
 // of de telefoon een oude pagina uit de cache draait in plaats van deze.
-const APP_VERSIE = '2026-09-09 · streamen + zelftest';
+const APP_VERSIE = '2026-09-09b · kleuren uitsluiten + ankercombo\'s';
 
 function toonVersie() {
   const vr = document.getElementById('versie-regel');
@@ -1590,11 +1641,25 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak, al
                   ? (zuinig ? MODEL_OORDEEL : aiModel)
                   : MODEL_LICHT;
 
+  // Denken kost ruimte, en die ruimte komt uit max_tokens. Opus 5 en Sonnet 5
+  // denken uit zichzelf, en zonder opgegeven effort doen ze dat grondig: bij
+  // een krappe max_tokens is het denkwerk op vóór er één letter JSON staat, en
+  // dan komt het antwoord er afgekapt uit. Dat was geen incident maar de regel.
+  // Twee dingen dus: een effort die bij de taak past, en een bodem onder de
+  // ruimte zodat het denken en het antwoord er allebei in passen.
+  //
+  // Niet: het denken uitzetten. Op Opus 5 gaat het model dan soms zijn keuze
+  // in gewone tekst zetten in plaats van in het antwoord, en lekken er
+  // denk-tags in de uitvoer. Minder diep laten denken werkt beter dan niet.
+  const denkt = !/haiku/i.test(model);
+  const effortDef = effort || (taak === 'kies' || taak === 'zwaar' ? 'medium' : 'low');
+  const bodem = denkt ? (taak === 'kies' || taak === 'zwaar' ? 8000 : 4000) : 0;
+
   const body = {
     model,
     // Ruim bemeten: denk-tokens tellen mee in max_tokens. Te krap en het
     // antwoord wordt midden in de JSON afgekapt.
-    max_tokens: maxTokens || 16000,
+    max_tokens: Math.max(maxTokens || 16000, bodem),
     // Systeemtekst als blok met cache_control: de stijlregels zijn elke
     // aanroep identiek, dus die hoeven niet steeds opnieuw betaald te worden.
     // Haar eigen smaak hoort overal mee te reizen, niet alleen op de plek waar
@@ -1607,7 +1672,7 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak, al
   };
   // Let op: Haiku 4.5 kent de effort-parameter niet en geeft dan een fout.
   // Alleen meesturen bij modellen die hem wel ondersteunen.
-  if (effort && !/haiku/i.test(model)) body.output_config = { effort };
+  if (denkt) body.output_config = { effort: effortDef };
   // Streamen bij het zware werk. Niet omdat het sneller rekent — dat doet het
   // niet — maar omdat er dan continu iets binnenkomt. Een telefoon die veertig
   // seconden niets ontvangt verbreekt de verbinding; dát was de oorzaak van
@@ -1779,9 +1844,11 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak, al
     // fout van jou en ook niet iets om over te melden — gewoon nog een keer
     // doen met meer ruimte. Eén keer, en alleen als er nog ruimte ís, zodat
     // dit nooit een lus wordt.
-    const ruimer = Math.min((body.max_tokens || 8000) * 3, 24000);
+    // Meer ruimte én minder diep denken: de ruimte die het denken opeiste gaat
+    // zo naar het antwoord toe, in plaats van dat allebei groeit.
+    const ruimer = Math.min((body.max_tokens || 8000) * 3, 32000);
     if (!alTweedeKans && ruimer > (body.max_tokens || 0)) {
-      return await callClaude(systemPrompt, userContent, ruimer, effort, taak, true);
+      return await callClaude(systemPrompt, userContent, ruimer, 'low', taak, true);
     }
     const err = new Error('Het antwoord bleef ook met meer ruimte te lang. '
       + 'Vraag om minder outfits tegelijk, of kies een lichter model via ⚙ Instellingen.');
@@ -1959,6 +2026,9 @@ function setStartMode(mode) {
   if (mode === 'capsule') {
     capToonStap(1);
     bouwCapNee();
+    bouwCapNietKleuren();
+    bouwCapWilKleuren();
+    toonCapInspo();
     bouwCapGrid('');
     toonCapGekozen();
     const zoek = document.getElementById('cap-search');
@@ -2801,9 +2871,14 @@ async function laadPlaat() {
   try { stijlAntwoorden = JSON.parse(localStorage.getItem('griette-stijlantwoorden-v1') || '[]'); } catch(e){}
   if (!Array.isArray(stijlAntwoorden)) stijlAntwoorden = [];
 
-  const [sbProfiel, sbPlaat, sbAntw] = await Promise.all([
-    sbGet('stijlprofiel'), sbGet('inspiratieplaat'), sbGet('stijlantwoorden')
+  try { eigenAccenten = JSON.parse(localStorage.getItem('griette-eigenkleuren-v1') || '[]'); } catch(e){}
+  if (!Array.isArray(eigenAccenten)) eigenAccenten = [];
+
+  const [sbProfiel, sbPlaat, sbAntw, sbKleur] = await Promise.all([
+    sbGet('stijlprofiel'), sbGet('inspiratieplaat'), sbGet('stijlantwoorden'),
+    sbGet('eigen-accentkleuren')
   ]);
+  if (Array.isArray(sbKleur)) eigenAccenten = sbKleur;
   if (sbProfiel && typeof sbProfiel === 'object') stijlProfiel = sbProfiel;
   if (Array.isArray(sbAntw)) stijlAntwoorden = sbAntw;
   if (Array.isArray(sbPlaat)) {
@@ -2970,11 +3045,43 @@ function bijwerkProfielKnop() {
     btn.textContent = `✨ Nog ${MIN_PLAAT - fotos} foto's of een paar antwoorden nodig`;
 }
 
+// Het stijlrapport is een momentopname en jouw smaak loopt door. Deze kleuren
+// zet je er zelf bij, en dan houdt de stylist op met tegenspreken.
+function eigenKleurenUI() {
+  return '<div class="profiel-blok" style="margin-top:10px;">'
+    + '<b>Mijn eigen kleuren</b>'
+    + '<div class="field-note" style="margin:4px 0 8px;">Kleuren die jij mooi vindt en draagt, '
+    + 'ook als ze niet in je stijlrapport staan. De stylist behandelt ze als volwaardig '
+    + 'en zegt er niet meer bij dat ze niet bij je passen.</div>'
+    + (eigenAccenten.length
+        ? '<div class="cap-stukken" style="margin-bottom:8px;">'
+          + eigenAccenten.map(k => {
+              const dot = (KLEUREN.find(x => x.v === k) || {}).dot || '#ccc';
+              return `<span class="cap-chip"><span class="cap-dot" style="background:${esc(dot)}"></span> `
+                + `${esc(k)} <span style="cursor:pointer;opacity:.6" onclick="wisselEigenKleur('${esc(k)}')">×</span></span>`;
+            }).join('') + '</div>'
+        : '')
+    + '<div class="color-swatch-grid" id="eigen-kleurgrid">'
+    + KLEUREN.map(k => `<button class="cswatch${eigenAccenten.includes(k.v) ? ' selected' : ''}" `
+        + `style="background:${k.dot}" title="${esc(k.v)}" `
+        + `onclick="wisselEigenKleur('${esc(k.v)}')"><span class="check">✓</span></button>`).join('')
+    + '</div></div>';
+}
+
+async function wisselEigenKleur(v) {
+  const i = eigenAccenten.indexOf(v);
+  if (i >= 0) eigenAccenten.splice(i, 1); else eigenAccenten.push(v);
+  try { localStorage.setItem('griette-eigenkleuren-v1', JSON.stringify(eigenAccenten)); } catch(e){}
+  toonProfiel();
+  await sbSet('eigen-accentkleuren', eigenAccenten);
+}
+
 function toonProfiel() {
   const el = document.getElementById('profiel-area');
   if (!el) return;
   if (!stijlProfiel) {
-    el.innerHTML = '<div class="field-note">Nog geen stijlprofiel. De stylist gaat nu alleen op je stijlrapport af.</div>';
+    el.innerHTML = '<div class="field-note">Nog geen stijlprofiel. De stylist gaat nu alleen op je stijlrapport af.</div>'
+      + eigenKleurenUI();
     return;
   }
   const p = stijlProfiel;
@@ -2993,7 +3100,8 @@ function toonProfiel() {
           + '</div>' : '')
     + (p.spanning ? `<div style="margin-top:8px;"><b>Waar dit botst met je rapport</b><br>${esc(p.spanning)}</div>` : '')
     + '</div>'
-    + '<button class="btn-rescan" onclick="wisProfiel()">Profiel wissen</button>';
+    + eigenKleurenUI()
+    + '<button class="btn-rescan" id="wis-profiel-btn" onclick="wisProfiel()">Profiel wissen</button>';
 }
 
 async function wisProfiel() {
@@ -3008,7 +3116,9 @@ async function wisProfiel() {
 // dit gaat mee bij élke aanroep, dus elke zin telt door in de kosten.
 function profielBlok() {
   const p = stijlProfiel;
-  if (!p) return '';
+  // Ook zonder profiel horen haar eigen kleuren mee te reizen: juist dán is er
+  // niets anders dat de stylist tegenspreekt als het rapport ze niet noemt.
+  if (!p) return eigenAccenten.length ? '\n' + eigenKleurenBlok() : '';
   const stukken = [
     p.kern, p.silhouet, p.kleuren, p.texturen, p.accessoires,
     Array.isArray(p.regels) ? p.regels.join(' ') : ''
@@ -3019,10 +3129,25 @@ function profielBlok() {
     : p.bron === 'uitgevraagd' ? 'uit haar antwoorden op stijlvragen'
     : 'gedestilleerd uit haar inspiratieplaat';
   return `\n\nHAAR EIGEN SMAAK (${herkomst}):
-${stukken.slice(0, 900)}
-Dit is wat zij zelf mooi vindt. Het stijlrapport blijft leidend voor wat haar
-staat; dit profiel bepaalt de richting binnen die grenzen. Botsen ze, kies dan
-het rapport en zeg erbij dat je dat doet.`;
+${stukken.slice(0, 900)}${eigenKleurenBlok()}
+Dit is wat zij zelf mooi vindt. Verdeel de rollen zo: over WELKE kleur zij
+mooi vindt en wil dragen gaat zij — dat is smaak, en het rapport is daar geen
+scheidsrechter over; het somde op wat het tegenkwam, niet wat mag. Over HOE die
+kleur werkt gaat het rapport: waar op het lichaam, hoe groot het vlak, en waar
+je rust tegenover zet. Noemt zij een kleur die niet in het rapport staat, keur
+die dan niet af — vertel hoe ze hem het mooist draagt.`;
+}
+
+// Kleuren die zij zelf heeft toegevoegd. Het stijlrapport is van een jaar
+// geleden en een kast staat niet stil: koopt zij iets in een kleur die er niet
+// in staat, dan hoort de stylist niet te blijven zeggen dat het niet bij haar
+// past. Hier zet zij dat recht, één keer, en dan weet elke aanroep het.
+let eigenAccenten = [];
+function eigenKleurenBlok() {
+  if (!eigenAccenten.length) return '';
+  return `\nKleuren die zij er zelf bij heeft gezet: ${opsom(eigenAccenten)}. `
+    + 'Deze horen bij haar, ook als het rapport ze niet noemt. Behandel ze als '
+    + 'volwaardige accentkleuren en zeg nooit dat ze niet in haar profiel passen.';
 }
 
 // ── DE ZES VRAGEN ─────────────────────────────────────────────────────────────
@@ -3260,6 +3385,68 @@ const CAP_NEE = [
     woorden:['wit','ecru','creme','crème','gebroken'] },
 ];
 let capNee = [];
+let capNietKleuren = [];     // kleuren die je er nu even niet bij wilt
+
+// Kleurnamen staan in de kast anders dan in de kleurenlijst: een spijkerbroek
+// heet "denim" en niet "denimblauw", turquoise wordt turkoois geschreven. Zonder
+// deze vertaalslag herkent de pagina de kleur van je eigen stukken niet, en dan
+// kan ze er ook geen combinaties omheen bouwen.
+const KLEUR_SYNONIEM = {
+  'denimblauw':  ['denim','jeans','spijker'],
+  'turquoise':   ['turkoois','aqua'],
+  'olijf/khaki': ['olijf','khaki'],
+  'lila/paars':  ['lila'],
+  'nude/huid':   ['nude'],
+  'gebroken-wit':['gebroken wit','offwhite','off-white','off white'],
+  'ecru':        ['creme','crème'],
+  'antraciet':   ['charcoal'],
+  'marine':      ['navy'],
+  'bordeaux':    ['wijnrood','burgundy','wijn'],
+  'smaragdgroen':['smaragd','emerald'],
+  'kobaltblauw': ['kobalt','cobalt'],
+  'terra cotta': ['terracotta','terra'],
+  'mosterd':     ['okergeel','oker'],
+};
+
+// Alle woorden waaraan je één kleur kunt herkennen: de naam zelf, de delen
+// vóór en na de schuine streep, en de synoniemen.
+function kleurWoorden(naam) {
+  const v = String(naam || '').toLowerCase();
+  return [v].concat(v.split('/'), KLEUR_SYNONIEM[v] || [])
+            .map(w => w.trim()).filter(w => w.length > 2);
+}
+function kleurMatcht(naam, tekst) {
+  const t = String(tekst || '').toLowerCase();
+  return kleurWoorden(naam).some(w => t.includes(w));
+}
+
+// De kleurtekst van één stuk: getagd, uit de naam, en wat er visueel van is
+// afgelezen. Alle drie, want geen van drieën is altijd ingevuld.
+function kleurTekstVan(item) {
+  const t = itemTags[item.id] || {};
+  const v = itemVisueel[item.id];
+  return (([].concat(t.kleur || []).join(' ') + ' ' + (item.name || '')
+           + ' ' + ((v && v.kleur) || '')).toLowerCase());
+}
+
+// Welke kleuren uit de lijst zitten er in dit stuk? Bij overlap wint de
+// specifiekste: "gebroken-wit" verdringt "wit", "felroze" verdringt "roze".
+function kleurenVan(item) {
+  const tekst = kleurTekstVan(item);
+  const raak = KLEUREN.map(k => k.v).filter(v => kleurMatcht(v, tekst));
+  return raak.filter(v => !raak.some(a => a !== v && a.includes(v)));
+}
+
+// Heldere kleuren die een outfit kunnen dragen, en de zware kleuren die er
+// een krachtmeting van maken. Dit is geen smaakoordeel maar een verhouding:
+// twee kleuren die allebei de aandacht pakken laten een outfit uit elkaar
+// vallen, en dan verdwijnt juist het stuk waar het je om ging. Rood met zwart
+// is niet lelijk — het is alleen zelden wat je bedoelde toen je die rode tas
+// pakte. Vandaar dat combinaties van helder + zwaar hier zakken, niet verdwijnen.
+const HELDER = ['turquoise','felroze','fuchsia','rood','oranje-rood','oranje','koraal',
+  'geel','mosterd','paars','lila/paars','kobaltblauw','smaragdgroen','petrol',
+  'hemelsblauw','groen','mintgroen'];
+const ZWAAR  = ['zwart','bordeaux','aubergine','antraciet'];
 
 // Weer bepaalt mee wat er afvalt. Ook dit op naam, en het staat er straks bij
 // zodat je kunt zien waarom iets is weggelaten.
@@ -3307,7 +3494,199 @@ function wisselNee(id) {
   bouwCapNee();
 }
 
+function bouwCapNietKleuren() {
+  const el = document.getElementById('cap-nietkleuren');
+  if (!el) return;
+  el.innerHTML = KLEUREN.map(k =>
+    `<button class="cswatch${capNietKleuren.includes(k.v) ? ' uit' : ''}" `
+    + `style="background:${k.dot}" title="${esc(k.v)}" `
+    + `onclick="wisselNietKleur('${esc(k.v)}')"></button>`).join('');
+  const uit = document.getElementById('cap-nietkleuren-uit');
+  if (uit) uit.innerHTML = capNietKleuren.length
+    ? 'Blijft weg: <b>' + capNietKleuren.map(esc).join(', ') + '</b>'
+    : '';
+}
+function wisselNietKleur(v) {
+  const i = capNietKleuren.indexOf(v);
+  if (i >= 0) capNietKleuren.splice(i, 1); else capNietKleuren.push(v);
+  bouwCapNietKleuren();
+}
+
+// Inspiratie voor déze reis. De vaste inspiratieplaat beschrijft haar smaak in
+// het algemeen; dit gaat over waar ze nu zin in heeft, en dat is niet elk
+// weekend hetzelfde. De foto wordt één keer gelezen — kleuren en sfeer — en
+// daarna reist alleen die korte beschrijving mee. Dat scheelt bij elke
+// vervolgvraag een hele foto aan verzendtijd.
+let capInspo = [];           // [{id, thumb, kleuren:[], sfeer}]
+
+async function capInspoToevoegen(ev) {
+  const files = [...(ev.target.files || [])].slice(0, 3);
+  ev.target.value = '';
+  if (!files.length) return;
+  const st = document.getElementById('cap-inspo-status');
+  st.textContent = '⏳ Foto lezen…';
+
+  for (const f of files) {
+    if (capInspo.length >= 3) break;
+    try {
+      const base64 = await verkleinFoto(f, 900);
+      const id = 'ci-' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+      capInspo.push({ id, thumb: 'data:image/jpeg;base64,' + base64, bezig: true });
+      toonCapInspo();
+
+      const raw = await callClaude(
+        'Je beschrijft wat je op een foto ziet. Geen smaakoordeel, geen advies. '
+        + 'Antwoord in het Nederlands.',
+        [{ type:'image', source:{ type:'base64', media_type:'image/jpeg', data: base64 } },
+         { type:'text', text:
+`Noem de kleuren die je in deze foto ziet, met gewone kleurnamen, en beschrijf
+de sfeer in één korte zin. Zeg er ook bij welke kleur de leiding neemt.
+
+Antwoord ALLEEN met JSON:
+{"kleuren":["kleurnamen, maximaal 5"],"hoofdkleur":"de kleur die leidt",
+ "sfeer":"1 korte zin"}` }],
+        800, null, 'scan');
+
+      const d = extractJson(raw) || {};
+      const rec = capInspo.find(x => x.id === id);
+      if (rec) {
+        rec.bezig = false;
+        rec.kleuren = [].concat(d.kleuren || []).slice(0, 5);
+        rec.hoofdkleur = d.hoofdkleur || '';
+        rec.sfeer = d.sfeer || '';
+      }
+      toonCapInspo();
+    } catch(e) {
+      capInspo = capInspo.filter(x => !x.bezig);
+      toonCapInspo();
+      st.textContent = 'Deze foto lukte niet: ' + e.message;
+      return;
+    }
+  }
+  st.textContent = capInspo.length
+    ? 'Deze sfeer neem ik mee in de kleurcombo\'s en de outfits.' : '';
+}
+
+function toonCapInspo() {
+  const el = document.getElementById('cap-inspo-lijst');
+  if (!el) return;
+  el.innerHTML = capInspo.map((p, i) =>
+    '<div class="cap-outfit" style="margin-bottom:6px;display:flex;gap:8px;align-items:flex-start;">'
+    + `<img src="${p.thumb}" style="width:54px;height:72px;object-fit:cover;border-radius:6px;flex-shrink:0;">`
+    + '<div style="flex:1;min-width:0;">'
+    + (p.bezig ? '<div class="field-note">⏳ Lezen…</div>'
+        : '<div class="cap-stukken">'
+          + (p.kleuren || []).map(k => `<span class="cap-chip">${esc(k)}</span>`).join('')
+          + '</div>'
+          + (p.sfeer ? `<div class="cap-waarom">${esc(p.sfeer)}</div>` : ''))
+    + '</div>'
+    + `<span style="cursor:pointer;opacity:.6;padding:2px 6px;" onclick="wisCapInspo(${i})">×</span>`
+    + '</div>').join('');
+}
+
+function wisCapInspo(i) { capInspo.splice(i, 1); toonCapInspo(); }
+
+// Wat er van die foto's meereist naar elke vraag: alleen de woorden.
+function inspoZin() {
+  const klaar = capInspo.filter(p => !p.bezig && (p.kleuren || []).length);
+  if (!klaar.length) return '';
+  return 'Ze heeft inspiratiefoto\'s meegegeven. Daarin zit: '
+    + klaar.map(p => (p.kleuren || []).join(', ')
+        + (p.hoofdkleur ? ` (${p.hoofdkleur} leidt)` : '')
+        + (p.sfeer ? ` — ${p.sfeer}` : '')).join(' | ')
+    + '. Laat die sfeer terugkomen, maar kies alleen uit wat zij echt heeft.\n';
+}
+
+// Een kleur noemen is niet genoeg: rood als tas is iets heel anders dan rood
+// als broek. Dezelfde kleur, andere outfit. Dus vraagt de pagina er meteen bij
+// welke rol hij krijgt, en dat gaat mee in elke vraag aan de stylist.
+const CAP_ROLLEN = [
+  { id:'statement', label:'Statement',   uitleg:'dit is de blikvanger, de rest gaat een stap terug' },
+  { id:'accessoire',label:'Accessoire',  uitleg:'klein vlak: tas, schoen, sjaal' },
+  { id:'top',       label:'Bovenstuk',   uitleg:'bij het gezicht' },
+  { id:'broek',     label:'Onderstuk',   uitleg:'broek of rok' },
+  { id:'rustig',    label:'Rustige basis', uitleg:'de kleur waar de rest tegenaan mag' },
+];
+let capWilKleuren = [];      // [{kleur, rol}]
+let capRolVoor = null;       // welke kleur staat te wachten op een rol
+
+function bouwCapWilKleuren() {
+  const el = document.getElementById('cap-wilkleuren');
+  if (!el) return;
+  el.innerHTML = KLEUREN.map(k =>
+    `<button class="cswatch${capWilKleuren.some(w=>w.kleur===k.v) ? ' selected' : ''}" `
+    + `style="background:${k.dot}" title="${esc(k.v)}" `
+    + `onclick="kiesWilKleur('${esc(k.v)}')"><span class="check">✓</span></button>`).join('');
+
+  const uit = document.getElementById('cap-wil-uit');
+  if (uit) uit.innerHTML = capWilKleuren.length
+    ? '<div class="cap-stukken">' + capWilKleuren.map((w, i) => {
+        const rol = CAP_ROLLEN.find(r => r.id === w.rol);
+        return `<span class="cap-chip">${esc(w.kleur)} <b>als ${esc(rol ? rol.label.toLowerCase() : w.rol)}</b> `
+          + `<span style="cursor:pointer;opacity:.6" onclick="wisWilKleur(${i})">×</span></span>`;
+      }).join('') + '</div>'
+    : '';
+}
+
+function kiesWilKleur(v) {
+  const bestaand = capWilKleuren.findIndex(w => w.kleur === v);
+  if (bestaand >= 0) { capWilKleuren.splice(bestaand, 1); capRolVoor = null;
+                       document.getElementById('cap-rolkiezer').style.display='none';
+                       bouwCapWilKleuren(); return; }
+  capRolVoor = v;
+  const kiezer = document.getElementById('cap-rolkiezer');
+  kiezer.style.display = 'block';
+  kiezer.innerHTML = `<div class="field-note" style="margin-bottom:6px;">Wil je <b>${esc(v)}</b> als:</div>`
+    + '<div class="cap-nee">'
+    + CAP_ROLLEN.map(r => `<button class="cap-neeknop" onclick="zetWilRol('${r.id}')">`
+        + `${esc(r.label)}<span style="display:block;font-size:9px;opacity:.65">${esc(r.uitleg)}</span></button>`).join('')
+    + '</div>';
+}
+
+function zetWilRol(rol) {
+  if (!capRolVoor) return;
+  capWilKleuren.push({ kleur: capRolVoor, rol });
+  capRolVoor = null;
+  document.getElementById('cap-rolkiezer').style.display = 'none';
+  bouwCapWilKleuren();
+}
+
+function wisWilKleur(i) { capWilKleuren.splice(i, 1); bouwCapWilKleuren(); }
+
+// Hoe die keuzes aan de stylist worden verteld.
+function wilKleurenZin() {
+  if (!capWilKleuren.length) return '';
+  const per = capWilKleuren.map(w => {
+    const r = CAP_ROLLEN.find(x => x.id === w.rol);
+    return `${w.kleur} als ${r ? r.label.toLowerCase() : w.rol}${r ? ' (' + r.uitleg + ')' : ''}`;
+  });
+  return 'Griette wil deze kleuren erin, met deze rol: ' + opsom(per)
+    + '. Houd je aan die rollen — dezelfde kleur op een andere plek geeft een '
+    + 'andere outfit.\n';
+}
+
 function isCapItem(id) { return capItems.some(i => i.id === id); }
+
+// "turquoise en wit en denimblauw" leest als een kind dat opsomt. Bij drie of
+// meer hoort het "turquoise, wit en denimblauw" te zijn.
+function opsom(lijst) {
+  const l = (lijst || []).filter(Boolean);
+  if (l.length < 2) return l.join('');
+  return l.slice(0, -1).join(', ') + ' en ' + l[l.length - 1];
+}
+
+// De kleuren waar het om draait: die van de stukken die sowieso meegaan. Kies
+// je een turkooizen shirt en een spijkerbroek, dan zijn turquoise en denimblauw
+// de ankers, en moet elke combo die je te zien krijgt daar iets mee.
+function capAnkers() {
+  const uit = [];
+  const bij = k => { if (!uit.includes(k) && !capNietKleuren.includes(k)) uit.push(k); };
+  capItems.forEach(i => kleurenVan(i).forEach(bij));
+  // Kleuren die zij zelf noemde tellen net zo goed als een stuk uit de kast:
+  // "ik wil rood als tas" is precies zo goed een vertrekpunt als de tas zelf.
+  capWilKleuren.forEach(w => bij(w.kleur));
+  return uit;
+}
 
 function bouwCapGrid(filter) {
   const grid = document.getElementById('cap-grid');
@@ -3392,38 +3771,79 @@ function capScoorCombos() {
   const alle = COMBO_TYPES.filter(t => t.id !== 'custom')
     .flatMap(t => t.presets.map(p => ({ ...p, typeName: t.label, bron: t.bron })));
 
-  const kleurVan = i => {
-    const t = itemTags[i.id] || {};
-    const v = itemVisueel[i.id];
-    return ([].concat(t.kleur || []).join(' ') + ' ' + (i.name || '')
-            + ' ' + ((v && v.kleur) || '')).toLowerCase();
-  };
-  const kast = capGefilterd.map(i => ({ i, kleur: kleurVan(i) }));
+  const kast = capGefilterd.map(i => ({ i, kleur: kleurTekstVan(i) }));
+  const ankers = capAnkers();
 
   const scored = alle.map(p => {
     const tags = (p.tags || []).map(t => String(t).toLowerCase());
-    const passend = kast.filter(x =>
-      tags.some(t => t.split('/').some(deel => deel.length > 2 && x.kleur.includes(deel))));
+    const passend = kast.filter(x => tags.some(t => kleurMatcht(t, x.kleur)));
     const cats = new Set(passend.map(x => x.i.cat));
+    // Welke van jouw ankerkleuren zitten in deze combo? Alleen combo's die daar
+    // iets mee doen zijn een antwoord op "ik wil dít shirt met díé broek".
+    const gedekt = ankers.filter(a => tags.some(t => kleurMatcht(a, t) || kleurMatcht(t, a)));
+    // Zit er een zware kleur in naast haar heldere anker? Dan is dit een
+    // krachtmeting en geen statement — bruikbaar, maar niet als eerste keus.
+    const zwaar = ZWAAR.filter(z => tags.some(t => kleurMatcht(z, t)))
+                       .filter(z => !ankers.includes(z));
     return { ...p,
       aantal: passend.length,
+      ankers: gedekt,
+      zwaar,
       // een combo is pas bruikbaar met een boven- én een onderstuk
       bruikbaar: cats.has('tops') && (cats.has('bottoms') || cats.has('jurken')),
       cats: [...cats] };
   });
 
-  capCombos = scored
-    .filter(p => p.bruikbaar && p.aantal >= 3)
-    .sort((a,b) => b.aantal - a.aantal)
-    .slice(0, 20);
+  // Kleuren die je niet wilt zien horen ook niet in een voorstel te staan.
+  const gewenst = scored.filter(p => !(p.tags || []).some(t =>
+    capNietKleuren.some(n => kleurMatcht(n, String(t)) || kleurMatcht(String(t), n))));
+
+  // Draagt zij een heldere kleur, dan telt bij het rangschikken mee of een
+  // combo daar rust tegenover zet of juist een tweede zwaargewicht.
+  const heeftHelder = ankers.some(a => HELDER.includes(a));
+  const rang = p => (heeftHelder && p.zwaar.length) ? 1 : 0;
+
+  if (ankers.length) {
+    // Met ankers telt eerst hoeveel van jouw kleuren gedekt zijn, dan of het
+    // een statement blijft, en pas daarna hoeveel stuks je ervan hebt. Een
+    // combo met turquoise én denim hoort boven een zwart-wit-combo waar je
+    // toevallig veel van hebt.
+    const raak = gewenst.filter(p => p.ankers.length)
+      .sort((a,b) => b.ankers.length - a.ankers.length
+                  || rang(a) - rang(b)
+                  || b.aantal - a.aantal);
+    const rest = gewenst.filter(p => !p.ankers.length && p.bruikbaar && p.aantal >= 3)
+      .sort((a,b) => b.aantal - a.aantal);
+    capCombos = raak.concat(rest).slice(0, 20);
+  } else {
+    capCombos = gewenst
+      .filter(p => p.bruikbaar && p.aantal >= 3)
+      .sort((a,b) => b.aantal - a.aantal)
+      .slice(0, 20);
+  }
 
   // Niets bruikbaars? Toon dan toch de best scorende, met een eerlijk woord.
   if (!capCombos.length) {
-    capCombos = scored.sort((a,b) => b.aantal - a.aantal).slice(0, 8);
+    capCombos = (gewenst.length ? gewenst : scored)
+      .sort((a,b) => b.aantal - a.aantal).slice(0, 8);
   }
 }
 
+// Hoeveel van de getoonde combo's zijn écht om jouw stukken heen gebouwd? Let
+// op: om ál je kleuren heen. Een combinatie die alleen turquoise bevat is geen
+// antwoord op "dit shirt bij die broek" — die broek moet er ook in zitten.
+// Zijn er weinig van die volledige treffers, dan heeft de vaste lijst het niet
+// en moet de stylist er zelf een paar bedenken.
+function heldereAnker() { return capAnkers().some(a => HELDER.includes(a)); }
+
+function capAnkerTreffers() {
+  const n = capAnkers().length;
+  if (!n) return 0;
+  return capCombos.filter(p => (p.ankers || []).length >= n).length;
+}
+
 function capNaarCombos() {
+  capHuidigeTasId = null;   // andere opzet, dus een nieuwe tas in je lijst
   capFilterKast();
   capScoorCombos();
   capGekozenCombos = [];
@@ -3431,6 +3851,17 @@ function capNaarCombos() {
   toonCombos();
   bijwerkComboKnop();
   capToonStap(2);
+
+  // Heb je stukken aangewezen, dan is de vraag die daarna komt bijna altijd
+  // "en wat kan er nog bij?". Die knop hoort er dan te staan — en als de vaste
+  // lijst te weinig oplevert, stel ik hem meteen zelf.
+  const knop = document.getElementById('cap-derde-kleur');
+  const ankers = capAnkers();
+  if (knop) {
+    knop.style.display = ankers.length ? 'block' : 'none';
+    knop.textContent = `🎨 Welke kleur kan er bij ${opsom(ankers)}?`;
+  }
+  if (ankers.length && capAnkerTreffers() < 3) capDerdeKleur();
 }
 
 function toonFilterUitleg() {
@@ -3444,8 +3875,13 @@ function toonFilterUitleg() {
             .map(([r,n]) => `${n}× weggelaten: ${esc(r)}`).join('<br>') + '</div>'
         : '')
     + (capItems.length
-        ? `<div class="cap-groep"><b>Gaat sowieso mee:</b> ${capItems.map(i=>esc(i.name)).join(', ')}</div>`
-        : '');
+        ? `<div class="cap-groep"><b>Gaat sowieso mee:</b> ${capItems.map(i=>esc(i.name)).join(', ')}`
+          + (capAnkers().length
+              ? ` — ik bouw de combo's om <b>${opsom(capAnkers().map(esc))}</b> heen.` : '')
+          + '</div>'
+        : '')
+    + (capNietKleuren.length
+        ? `<div class="cap-groep"><b>Zonder:</b> ${capNietKleuren.map(esc).join(', ')}</div>` : '');
 }
 
 function toonCombos() {
@@ -3460,8 +3896,17 @@ function toonCombos() {
       + '</div>'
       + `<div class="cap-palet-naam">${esc(p.name)}</div>`
       + `<div class="cap-palet-kleuren">${esc(p.vibe || '')}</div>`
-      + `<div class="cap-waarom" style="opacity:.75">${p.aantal} stuks in je kast · ${esc(p.typeName || '')}`
+      // Een bedachte combo heeft geen telling — "? stuks in je kast" is dan
+      // geen informatie maar een vraagteken. Zeg dan gewoon waar hij vandaan komt.
+      + '<div class="cap-waarom" style="opacity:.75">'
+      + (typeof p.aantal === 'number' ? `${p.aantal} stuks in je kast · ` : '')
+      + `${esc(p.typeName || '')}`
       + (p.aangepast ? ' · <b>door jou aangepast</b>' : '') + '</div>'
+      + ((p.ankers || []).length
+          ? `<div class="cap-anker">past bij je ${esc(opsom(p.ankers))}</div>` : '')
+      + (heldereAnker() && (p.zwaar || []).length
+          ? `<div class="cap-anker" style="background:color-mix(in srgb,var(--text-2) 12%,var(--surface));color:var(--text-2)">`
+            + `${esc(opsom(p.zwaar))} ernaast — dat wordt een krachtmeting</div>` : '')
       + '</div>';
   }).join('');
 }
@@ -3485,6 +3930,83 @@ function bijwerkComboKnop() {
     : `Maak outfits met ${n} combo\'s →`;
 }
 
+// ── DE DERDE KLEUR ────────────────────────────────────────────────────────────
+// De vaste lijst van vijfenzestig combinaties is een goede kast om uit te
+// putten, maar hij is niet om jóúw stukken heen bedacht. Wil je dit shirt bij
+// die broek en zoek je er iets bij, dan is de kans klein dat daar precies een
+// combinatie voor klaarligt — en dat is waarom het zo vaak op zwart uitkwam:
+// niet omdat zwart het antwoord was, maar omdat de zwarte combo's de meeste
+// stuks scoorden. Dus vraag ik het hier gericht: gegeven deze twee kleuren,
+// zonder de kleuren die je niet wilt, wat kan erbij — en wat doet het.
+async function capDerdeKleur() {
+  const btn = document.getElementById('cap-derde-kleur');
+  const st = document.getElementById('cap-palet-status');
+  const ankers = capAnkers();
+  if (!ankers.length) return;
+  const label = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Kleuren zoeken…'; }
+  const stopVolgen = volgVoortgang(st);
+
+  // Alleen de kleuren die zij écht heeft: een advies voor een kleur die niet
+  // in de kast hangt levert geen outfit op.
+  const inKast = [...new Set(capGefilterd.flatMap(kleurenVan))]
+    .filter(k => !capNietKleuren.includes(k) && !ankers.includes(k));
+
+  try {
+    const raw = await callClaude(
+      `Je bent een kleurexpert en stylist voor Griette. ${DNA_KORT}${profielBlok()}
+Antwoord in het Nederlands.`,
+      [{ type:'text', text:
+`${capItems.length ? 'Griette wil deze stukken dragen: ' + capItems.map(i => i.name).join(' + ') + '.\n' : ''}${wilKleurenZin()}De kleuren waar het om draait: ${opsom(ankers)}.
+${capNietKleuren.length ? `Ze wil er NIET bij: ${capNietKleuren.join(', ')}. Noem die kleuren niet.\n` : ''}
+Deze kleuren hangen verder in haar kast: ${inKast.join(', ') || 'onbekend'}.
+${inspoZin()}
+
+Geef 6 verschillende manieren om hier een derde kleur bij te zetten. Kies
+alleen kleuren die in haar kast hangen. Maak ze onderling echt verschillend:
+niet zes varianten op hetzelfde, maar zes richtingen — denk aan een warme
+tegenhanger, een kleur die de blauwtoon juist versterkt, iets zachts dat het
+rustig houdt, iets fels dat het optilt, een aardse kleur, en een verrassende.
+${opsom(ankers)} blijft in alle zes staan.
+${heldereAnker() ? `LET OP: ${opsom(ankers.filter(a=>HELDER.includes(a)))} is een heldere kleur en
+die is hier het statement. De derde kleur ondersteunt dus — denim, gebroken wit,
+camel, zand, zacht groen, lichtgrijs, donkerblauw, bruin. Kies GEEN tweede zware
+kleur zoals zwart, bordeaux of aubergine: dan pakken twee kleuren de aandacht en
+verdwijnt juist het stuk waar het om gaat. Hoogstens één van de zes mag een
+felle tegenkleur zijn, en zeg daar dan expliciet bij dat het een dubbel
+statement is.\n` : ''}
+
+Zeg per combinatie in één zin wat die derde kleur doet met de uitstraling, en
+waar je hem zet (klein accent bij het gezicht, schoen, tas, of een heel vlak).
+
+Antwoord ALLEEN met JSON:
+{"combos":[{"name":"korte naam","vibe":"1 zin: wat de derde kleur doet",
+  "plek":"waar je die kleur zet","tags":["${ankers.join('","')}","de derde kleur"],
+  "colors":["#rrggbb per kleur, in dezelfde volgorde als tags"]}]}` }],
+      2500, null, 'licht');
+
+    const extra = pickArray(extractJson(raw), ['combos'], true) || [];
+    if (!extra.length) throw new Error('geen kleuren ontvangen');
+    extra.forEach(p => {
+      p.typeName = 'Om jouw stukken heen bedacht';
+      p.aantal = '?';
+      p.ankers = ankers;
+      if (p.plek) p.vibe = `${p.vibe || ''} ${p.plek}`.trim();
+    });
+    capCombos = extra.concat(capCombos);
+    capGekozenCombos = capGekozenCombos.map(i => i + extra.length);  // keuzes verschuiven mee
+    toonCombos();
+    toonBijstel();
+    stopVolgen();
+    st.innerHTML = `<b>${extra.length}</b> combinaties met ${esc(opsom(ankers))}, `
+      + 'bovenaan gezet.';
+  } catch(e) {
+    stopVolgen();
+    st.textContent = 'Kleuren zoeken lukte niet: ' + e.message;
+  }
+  if (btn) { btn.disabled = false; btn.textContent = label || '🎨 Welke kleur kan hier nog bij?'; }
+}
+
 // Meer ideeën: hier mag de AI wel even meedenken, maar het is een kleine
 // vraag — alleen kleuren, geen outfits.
 async function capMeerCombos() {
@@ -3493,16 +4015,15 @@ async function capMeerCombos() {
   btn.disabled = true; btn.textContent = '⏳ Denken…';
   const stopVolgen = volgVoortgang(st);
   try {
-    const kleuren = [...new Set(capGefilterd.map(i => {
-      const t = itemTags[i.id] || {};
-      return [].concat(t.kleur || []).join(', ');
-    }).filter(Boolean))].slice(0, 30).join('; ');
+    const kleuren = [...new Set(capGefilterd.flatMap(kleurenVan))]
+      .filter(k => !capNietKleuren.includes(k)).slice(0, 30).join(', ');
+    const ankers = capAnkers();
 
     const raw = await callClaude(
       `Je bent een kleurexpert. ${DNA_KORT}\nAntwoord in het Nederlands.`,
       [{ type:'text', text:
 `In Griette's kast zitten deze kleuren: ${kleuren || 'onbekend'}.
-
+${ankers.length ? `Ze draagt sowieso ${opsom(ankers)} — laat die erin terugkomen.\n` : ''}${capNietKleuren.length ? `NIET gebruiken: ${capNietKleuren.join(', ')}.\n` : ''}
 Geef 6 kleurcombinaties die zij hiermee kan maken en die NIET voor de hand
 liggen. Maak ze onderling zo verschillend mogelijk. Blijf bij kleuren die in
 haar kast voorkomen.
@@ -3648,6 +4169,8 @@ async function capMaakOutfits() {
   capsuleResultaat = { outfits: [], ontbreekt: '' };
   capToonStap(3);
   document.getElementById('cap-uitkomst').innerHTML = '';
+  const bew = document.getElementById('cap-bewaard');
+  if (bew) bew.innerHTML = '';
   btn.disabled = true;
 
   // Alleen naam, categorie en kleur: de AI hoeft niet alles te weten, alleen
@@ -3658,17 +4181,39 @@ async function capMaakOutfits() {
     return `- ${i.name} (${i.cat}${k ? ', ' + k : ''})`;
   }).join('\n');
 
-  for (let n_i = 0; n_i < capGekozenCombos.length; n_i++) {
-    const combo = capCombos[capGekozenCombos[n_i]];
-    st.textContent = `Combo ${n_i+1} van ${capGekozenCombos.length}: ${combo.name}…`;
-    const stopVolgen = volgVoortgang(st);
+  // De combo's stonden achter elkaar in de rij: pas als de eerste klaar was
+  // begon de tweede. Twee of drie keer een halve minuut wachten is dus twee of
+  // drie keer die halve minuut. Ze zijn onafhankelijk van elkaar, dus ze gaan
+  // nu tegelijk — het wachten is nog maar zo lang als de traagste. En valt er
+  // één om, dan blijven de andere gewoon staan in plaats van dat alles stopt.
+  const klaar = new Array(capGekozenCombos.length).fill(null);
+  const stuk  = new Array(capGekozenCombos.length).fill(null);
+  let af = 0;
+  st.textContent = `${capGekozenCombos.length} combo's tegelijk aan het samenstellen…`;
+  const stopVolgen = volgVoortgang(st);
+
+  // Binnengekomen resultaten meteen tonen, in de volgorde van de combo's —
+  // niet in de volgorde waarin ze toevallig terugkomen.
+  const bouwOp = () => {
+    capsuleResultaat.outfits = [];
+    capsuleResultaat.ontbreekt = '';
+    klaar.forEach(r => {
+      if (!r) return;
+      capsuleResultaat.outfits = capsuleResultaat.outfits.concat(r.outfits);
+      if (r.ontbreekt && !capsuleResultaat.ontbreekt) capsuleResultaat.ontbreekt = r.ontbreekt;
+    });
+    toonCapsule();
+  };
+
+  await Promise.all(capGekozenCombos.map(async (ci, n_i) => {
+    const combo = capCombos[ci];
     try {
       const raw = await callClaude(
         `Je bent een persoonlijke stylist voor Griette. ${DNA_KORT}${profielBlok()}
 Antwoord in het Nederlands. Kies alleen uit de gegeven lijst.`,
         [{ type:'text', text:
 `Griette gaat weg${gel ? ': ' + gel : ''}. Het weer is ${weer}.
-${capItems.length ? 'Deze stukken gaan sowieso mee: ' + capItems.map(i=>i.name).join(', ') + '.\n' : ''}
+${capItems.length ? 'Deze stukken gaan sowieso mee, verwerk ze: ' + capItems.map(i=>i.name).join(', ') + '.\n' : ''}${capNietKleuren.length ? 'Ze wil deze kleuren er NIET bij: ' + opsom(capNietKleuren) + '. Laat stukken in die kleuren staan, ook als ze in de lijst voorkomen.\n' : ''}${wilKleurenZin()}${inspoZin()}
 Maak ${verdeling[n_i]} outfit${verdeling[n_i]===1?'':'s'} in deze kleurcombinatie:
 ${combo.name} — ${combo.vibe || ''} (${(combo.tags||[]).join(', ')})
 
@@ -3690,22 +4235,36 @@ Antwoord ALLEEN met JSON:
       const data = extractJson(raw);
       const outfits = pickArray(data, ['outfits'], true) || [];
       outfits.forEach(o => { o.combo = combo.name; });
-      capsuleResultaat.outfits = capsuleResultaat.outfits.concat(outfits);
-      if (data && data.ontbreekt && !capsuleResultaat.ontbreekt) {
-        capsuleResultaat.ontbreekt = data.ontbreekt;
-      }
-      stopVolgen();
-      toonCapsule();
+      klaar[n_i] = { outfits, ontbreekt: (data && data.ontbreekt) || '' };
     } catch(e) {
-      stopVolgen();
-      st.innerHTML = `Combo ${n_i+1} lukte niet: ${esc(e.message)}<br>`
-        + `<b>${capsuleResultaat.outfits.length}</b> outfits staan er al — die blijven staan.`;
-      btn.disabled = false;
-      return;
+      stuk[n_i] = e.message;
     }
+    af++;
+    bouwOp();
+    if (af < capGekozenCombos.length) {
+      st.textContent = `${af} van ${capGekozenCombos.length} klaar…`;
+    }
+  }));
+
+  stopVolgen();
+  const mislukt = stuk.filter(Boolean);
+  const nGoed = capsuleResultaat.outfits.length;
+  if (mislukt.length && nGoed) {
+    // Deels gelukt is geen mislukking: laat staan wat er is, en zeg wat er
+    // ontbreekt en hoe je dat alsnog haalt.
+    st.innerHTML = `<b>${nGoed} outfits</b> staan er al — die blijven staan. `
+      + `${mislukt.length} van de ${capGekozenCombos.length} combo's lukte niet `
+      + `(${esc(mislukt[0])}).<br>`
+      + '<button class="cap-vervang-btn" style="margin-top:8px;" onclick="capMaakOutfits()">'
+      + '↻ De rest opnieuw proberen</button>';
+  } else if (mislukt.length) {
+    st.innerHTML = `Het lukte niet: ${esc(mislukt[0])}<br>`
+      + '<button class="cap-vervang-btn" style="margin-top:8px;" onclick="capMaakOutfits()">'
+      + '↻ Opnieuw proberen</button>';
+  } else {
+    st.innerHTML = `<b>${nGoed} outfits</b> uit ${capGekozenCombos.length} kleurcombo's.`;
+    await bewaarAdvies();
   }
-  st.innerHTML = `<b>${capsuleResultaat.outfits.length} outfits</b> uit `
-    + `${capGekozenCombos.length} kleurcombo's.`;
   btn.disabled = false;
 }
 
@@ -3741,6 +4300,7 @@ ${o.naam} (${o.stijl}) — ${(o.items||[]).join(', ')}
 Maak één ANDERE outfit in dezelfde kleurcombinatie: ${o.combo || ''}.
 Neem een andere stijlgreep en een ander silhouet dan de afgewezen outfit, en
 overlap zo min mogelijk met de stukken die daarin zaten.
+${capNietKleuren.length ? 'Gebruik geen stukken in deze kleuren: ' + opsom(capNietKleuren) + '.\n' : ''}
 ${anderen ? 'Deze staan er al, maak niet nog eens hetzelfde:\n' + anderen + '\n' : ''}
 Gelegenheid: ${gel || 'een weekend weg'}. Het weer is ${weer}.
 
@@ -3759,6 +4319,7 @@ Antwoord ALLEEN met JSON:
     toonCapsule();
     stopVolgen();
     st.textContent = `Outfit ${i+1} vervangen.`;
+    await bewaarAdvies();   // wat je ziet is ook wat er bewaard staat
   } catch(e) {
     stopVolgen();
     st.textContent = `Vervangen lukte niet: ${e.message} — de oude staat er nog.`;
@@ -3778,33 +4339,59 @@ async function laadTassen() {
   if (Array.isArray(sb)) bewaardeTassen = sb;
 }
 
-async function bewaarTas() {
-  const btn = document.getElementById('cap-bewaar-tas');
-  const st  = document.getElementById('cap-outfit-status');
-  if (!capsuleResultaat || !capsuleResultaat.outfits.length) return;
-  btn.disabled = true; btn.textContent = '⏳ Bewaren…';
+// Alles wat de stylist bedenkt hoort ergens te blijven staan. Bewaren op een
+// knop klinkt netjes, maar de ene keer dat je vergeet te drukken ben je het
+// kwijt — en dan is het werk voor niets gedaan én betaald. Dus bewaart de
+// pagina het zelf, meteen als er iets af is. Later opnieuw draaien schrijft
+// over dezelfde regel, zodat één weekend niet vijf keer in je lijst staat.
+let capHuidigeTasId = null;
 
+async function bewaarAdvies(handmatig) {
+  if (!capsuleResultaat || !capsuleResultaat.outfits.length) return;
   const { gel, weer } = capsuleOpdracht();
   const tel = new Map();
   capsuleResultaat.outfits.forEach(o => (o.items || []).forEach(n =>
     tel.set(n, (tel.get(n) || 0) + 1)));
 
-  bewaardeTassen.unshift({
-    id: 'tas-' + Date.now().toString(36),
+  const record = {
+    id: capHuidigeTasId || ('tas-' + Date.now().toString(36)),
     naam: gel || 'Weekendtas',
     datum: new Date().toISOString(),
     weer,
-    combos: capGekozenCombos.map(ci => capCombos[ci].name),
+    combos: capGekozenCombos.map(ci => (capCombos[ci] || {}).name).filter(Boolean),
+    zonder: capNietKleuren.slice(),
+    moetMee: capItems.map(i => i.name),
     paklijst: [...tel.entries()].map(([naam, keer]) => ({ naam, keer })),
     outfits: capsuleResultaat.outfits,
     ontbreekt: capsuleResultaat.ontbreekt || '',
-  });
-  bewaardeTassen = bewaardeTassen.slice(0, 20);
-  try { localStorage.setItem('griette-tassen-v1', JSON.stringify(bewaardeTassen)); } catch(e){}
-  await sbSet('bewaarde-tassen', bewaardeTassen);
+  };
+  capHuidigeTasId = record.id;
 
+  const bestaand = bewaardeTassen.findIndex(t => t && t.id === record.id);
+  if (bestaand >= 0) bewaardeTassen[bestaand] = record;
+  else bewaardeTassen.unshift(record);
+  bewaardeTassen = bewaardeTassen.slice(0, 20);
+
+  try { localStorage.setItem('griette-tassen-v1', JSON.stringify(bewaardeTassen)); } catch(e){}
+  try { await sbSet('bewaarde-tassen', bewaardeTassen); } catch(e){}
+  toonBewaardMelding(handmatig);
+}
+
+function toonBewaardMelding(handmatig) {
+  const el = document.getElementById('cap-bewaard');
+  if (!el) return;
+  el.innerHTML = '<div class="field-note">'
+    + (handmatig ? '✓ Opgeslagen. ' : '✓ Automatisch bewaard. ')
+    + 'Terug te vinden bij <b>🗂 Mijn kaarten</b>, onderaan bij je tassen — '
+    + 'daar kun je hem ook weggooien.</div>';
+}
+
+async function bewaarTas() {
+  const btn = document.getElementById('cap-bewaar-tas');
+  if (!capsuleResultaat || !capsuleResultaat.outfits.length) return;
+  btn.disabled = true; btn.textContent = '⏳ Bewaren…';
+  await bewaarAdvies(true);
   btn.textContent = '✓ Tas bewaard';
-  st.innerHTML = 'Staat nu bij <b>🗂 Mijn kaarten</b>, onderaan bij je tassen.';
   btn.disabled = false;
 }
 
@@ -3824,11 +4411,39 @@ function toonTassen() {
           + (t.paklijst||[]).slice(0,8).map(p =>
               `<span class="cap-chip">${esc(p.naam)} <span style="opacity:.6">${p.keer}×</span></span>`).join('')
           + '</div>'
-          + `<button class="cap-vervang-btn" style="margin-top:8px;width:100%;" `
-          + `onclick="verwijderTas(${i})">🗑 Verwijderen</button>`
+          // Bewaren zonder terug kunnen kijken is geen bewaren. Openklappen
+          // laat de outfits zelf zien, met wat er nog miste.
+          + `<div id="tas-open-${i}" style="display:none;margin-top:8px;"></div>`
+          + '<div style="display:flex;gap:6px;margin-top:8px;">'
+          + `<button class="cap-vervang-btn" style="flex:1;" onclick="klapTas(${i})">`
+          + `📖 Bekijken</button>`
+          + `<button class="cap-vervang-btn" style="flex:1;" onclick="verwijderTas(${i})">`
+          + `🗑 Verwijderen</button></div>`
           + '</div>';
       }).join('')
     : '<div class="kaart-leeg">Nog geen tassen bewaard.</div>';
+}
+
+function klapTas(i) {
+  const el = document.getElementById('tas-open-' + i);
+  const t = bewaardeTassen[i];
+  if (!el || !t) return;
+  if (el.style.display === 'block') { el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = 'block';
+  el.innerHTML = (t.outfits || []).map(o =>
+      '<div class="cap-outfit" style="margin-bottom:6px;">'
+      + `<div class="cap-kop"><span class="cap-naam">${esc(o.naam || '')}</span>`
+      + `<span class="cap-stijl">${esc(o.stijl || '')}</span></div>`
+      + '<div class="cap-stukken">'
+      + (o.items || []).map(n => `<span class="cap-chip">${esc(n)}</span>`).join('')
+      + '</div>'
+      + (o.waarom ? `<div class="cap-waarom">${esc(o.waarom)}</div>` : '')
+      + '</div>').join('')
+    + (t.moetMee && t.moetMee.length
+        ? `<div class="field-note">Moest mee: ${esc(opsom(t.moetMee))}</div>` : '')
+    + (t.zonder && t.zonder.length
+        ? `<div class="field-note">Zonder: ${esc(opsom(t.zonder))}</div>` : '')
+    + (t.ontbreekt ? `<div class="field-note">Miste nog: ${esc(t.ontbreekt)}</div>` : '');
 }
 
 async function verwijderTas(i) {
