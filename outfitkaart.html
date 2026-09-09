@@ -1025,6 +1025,12 @@ const AI_ENDPOINT = SUPABASE_URL + '/functions/v1/claude';
 // of de telefoon een oude pagina uit de cache draait in plaats van deze.
 const APP_VERSIE = '2026-09-09 · streamen + zelftest';
 
+function toonVersie() {
+  const vr = document.getElementById('versie-regel');
+  if (vr) vr.textContent = 'Versie: ' + APP_VERSIE
+    + (stroomKapot ? ' · streamen staat tijdelijk uit' : '');
+}
+
 // De zelftest doet wat ik van hieruit niet kan: een echte aanroep vanaf jouw
 // toestel. Twee piepkleine vragen — een gewone en een gestreamde — zodat
 // zichtbaar wordt of het aan de verbinding ligt, aan het streamen, of aan iets
@@ -1090,6 +1096,9 @@ async function zelftest() {
         stroomKapot = false;
         try { localStorage.removeItem('ai-stroom-kapot'); } catch(e){}
         zet(true, 'Streamen werkt weer — de noodrem is losgezet.');
+        // De regel eronder stond er nog van vóór de test. Die klopt nu niet
+        // meer, en een verkeerde regel is erger dan geen regel.
+        toonVersie();
       }
     }
   } catch(e) {
@@ -1231,9 +1240,7 @@ function openSettings() {
   ms.onchange = () => { aiModel = ms.value; bijwerkZuinigPrijs(); };
   document.getElementById('zuinig-check').onchange = bijwerkZuinigPrijs;
   bijwerkZuinigPrijs();
-  const vr = document.getElementById('versie-regel');
-  if (vr) vr.textContent = 'Versie: ' + APP_VERSIE
-    + (stroomKapot ? ' · streamen staat tijdelijk uit' : '');
+  toonVersie();
   toonPlaat();
   document.getElementById('settings-modal').classList.add('open');
 }
