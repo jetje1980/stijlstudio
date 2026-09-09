@@ -1243,6 +1243,101 @@ async function sbGet(key) {
   } catch(e){return null;}
 }
 
+// Een gestreamd antwoord komt binnen als server-sent events: regels die met
+// "data: " beginnen, elk met een stukje tekst of een stukje boekhouding. Hier
+// worden ze opgeteld tot precies dezelfde vorm als een gewoon antwoord —
+// {content, stop_reason, usage} — zodat de rest van de app niets merkt.
+//
+// Onderweg roepen we aiVoortgang aan met de tekst tot nu toe, zodat een scherm
+// kan laten zien dat er iets gebeurt in plaats van veertig seconden niets.
+let aiVoortgang = null;
+
+// Toont in een statusregel wat de stylist aan het doen is. Zolang hij nadenkt
+// zie je dat; zodra er antwoord komt, telt het mee. Veertig seconden wachten
+// voelt heel anders als je ziet dát er iets gebeurt.
+function volgVoortgang(el, sinds) {
+  if (!el) return () => {};
+  const start = sinds || Date.now();
+  aiVoortgang = (tot, soort) => {
+    const s = Math.round((Date.now() - start) / 1000);
+    el.textContent = soort === 'denken'
+      ? `Denkt na… ${s} sec`
+      : `Schrijft… ${Math.round(tot.length / 5)} woorden, ${s} sec`;
+  };
+  return () => { aiVoortgang = null; };
+}
+
+async function leesStroom(res) {
+  const lezer = res.body.getReader();
+  const decoder = new TextDecoder();
+  let rest = '';
+  let tekst = '', denk = '';
+  let stopReden = null;
+  const usage = { input_tokens:0, output_tokens:0,
+                  cache_read_input_tokens:0, cache_creation_input_tokens:0 };
+
+  const verwerk = (gebeurtenis) => {
+    if (!gebeurtenis || !gebeurtenis.type) return;
+    switch (gebeurtenis.type) {
+      case 'message_start': {
+        const u = gebeurtenis.message && gebeurtenis.message.usage;
+        if (u) {
+          usage.input_tokens = u.input_tokens || 0;
+          usage.cache_read_input_tokens = u.cache_read_input_tokens || 0;
+          usage.cache_creation_input_tokens = u.cache_creation_input_tokens || 0;
+          usage.output_tokens = u.output_tokens || 0;
+        }
+        break;
+      }
+      case 'content_block_delta': {
+        const d = gebeurtenis.delta || {};
+        if (d.type === 'text_delta' && d.text) {
+          tekst += d.text;
+          if (aiVoortgang) { try { aiVoortgang(tekst, 'tekst'); } catch(e){} }
+        } else if (d.type === 'thinking_delta' && d.thinking) {
+          denk += d.thinking;
+          if (aiVoortgang) { try { aiVoortgang(denk, 'denken'); } catch(e){} }
+        }
+        break;
+      }
+      case 'message_delta': {
+        if (gebeurtenis.delta && gebeurtenis.delta.stop_reason) {
+          stopReden = gebeurtenis.delta.stop_reason;
+        }
+        if (gebeurtenis.usage && gebeurtenis.usage.output_tokens != null) {
+          usage.output_tokens = gebeurtenis.usage.output_tokens;
+        }
+        break;
+      }
+      case 'error': {
+        const m = (gebeurtenis.error && gebeurtenis.error.message) || 'onbekende fout';
+        throw new Error(m);
+      }
+    }
+  };
+
+  while (true) {
+    const { done, value } = await lezer.read();
+    if (done) break;
+    rest += decoder.decode(value, { stream: true });
+    const regels = rest.split('\n');
+    rest = regels.pop() || '';          // laatste regel kan halverwege zijn
+    for (const regel of regels) {
+      const r = regel.trim();
+      if (!r.startsWith('data:')) continue;
+      const kaal = r.slice(5).trim();
+      if (!kaal || kaal === '[DONE]') continue;
+      let g; try { g = JSON.parse(kaal); } catch(e) { continue; }
+      verwerk(g);
+    }
+  }
+
+  const content = [];
+  if (denk)  content.push({ type:'thinking', thinking: denk });
+  if (tekst) content.push({ type:'text', text: tekst });
+  return { content, stop_reason: stopReden, usage };
+}
+
 // ── AI API CALL ───────────────────────────────────────────────────────────────
 // taak 'licht'  = kiezen, beschrijven, invullen — gaat op het goedkoopste model
 // taak 'zwaar'  = de uitgebreide beeldanalyse — gebruikt het gekozen model
@@ -1275,6 +1370,12 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
   // Let op: Haiku 4.5 kent de effort-parameter niet en geeft dan een fout.
   // Alleen meesturen bij modellen die hem wel ondersteunen.
   if (effort && !/haiku/i.test(model)) body.output_config = { effort };
+  // Streamen bij het zware werk. Niet omdat het sneller rekent — dat doet het
+  // niet — maar omdat er dan continu iets binnenkomt. Een telefoon die veertig
+  // seconden niets ontvangt verbreekt de verbinding; dát was de oorzaak van
+  // "Failed to fetch". En je ziet meteen dat er iets gebeurt.
+  const streamen = taak === 'kies' || taak === 'zwaar';
+  if (streamen) body.stream = true;
   const headers = { 'content-type': 'application/json' };
   if (appSecret) headers['x-app-secret'] = appSecret;
 
@@ -1339,7 +1440,19 @@ async function callClaude(systemPrompt, userContent, maxTokens, effort, taak) {
     throw new Error(msg || `Fout ${res.status}`);
   }
 
-  const data = await res.json();
+  // Een gestreamd antwoord komt binnen als losse gebeurtenissen. Die bouwen we
+  // hier terug om tot hetzelfde antwoord als een gewone aanroep geeft, zodat
+  // alles erachter onveranderd blijft werken.
+  //
+  // We kijken naar wat er wérkelijk terugkomt, niet naar wat we vroegen. Een
+  // oudere Edge Function kent stream nog niet en stuurt gewoon JSON; dan moet
+  // de pagina dat gewoon lezen in plaats van op een stroom te wachten die
+  // nooit komt. Zo blijft het werken tijdens het uitrollen van een nieuwe
+  // versie, in welke volgorde die ook live gaat.
+  const soort = res.headers.get('content-type') || '';
+  const data = (streamen && /event-stream/i.test(soort) && res.body)
+    ? await leesStroom(res)
+    : await res.json();
 
   // Verbruik bijhouden zodat zichtbaar is wat een aanroep kost
   if (data.usage) {
@@ -2926,12 +3039,8 @@ async function aiCapsule() {
   uit.innerHTML = '';
   // Dit is de zwaarste vraag in de app en duurt makkelijk een halve minuut.
   // Zonder teller lijkt het scherm vast te zitten en gaat er getikt worden.
-  let sec = 0;
-  st.textContent = 'Dit duurt ongeveer een halve minuut. Laat je scherm aan.';
-  const klok = setInterval(() => {
-    sec += 1;
-    st.textContent = `Bezig… ${sec} seconden. Laat je scherm aan.`;
-  }, 1000);
+  st.textContent = 'Dit duurt ongeveer een halve minuut.';
+  const stopVolgen = volgVoortgang(st);
 
   const jasRegel = jas === 'jas'
     ? 'Er gaat één jas of mantel mee. Die moet over ELKE outfit passen, dus kies hem op de kleurkern en niet op één look.'
@@ -3023,15 +3132,13 @@ Antwoord ALLEEN met JSON:
 
     capsuleResultaat = { data, outfits, paklijst };
     toonCapsule();
-    clearInterval(klok);
     st.innerHTML = `<b>${outfits.length} outfits</b> uit ${paklijst.length} stuks.`;
     btn.textContent = '🧳 Opnieuw samenstellen';
   } catch(e) {
-    clearInterval(klok);
     st.textContent = 'Mislukt: ' + e.message;
     btn.textContent = '🧳 Stel mijn weekendtas samen';
   }
-  clearInterval(klok);
+  stopVolgen();
   btn.disabled = false;
 }
 
@@ -3315,6 +3422,7 @@ async function aiComposeOutfit() {
   btn.disabled = true;
   btn.textContent = '⏳ AI stelt een outfit samen…';
   status.textContent = 'Bezig met kiezen uit je garderobe…';
+  const stopVolgen = volgVoortgang(status);
 
   const combo = selPreset
     ? `${selPreset.name} — ${selPreset.vibe}${selPreset.stijl ? ' (' + selPreset.stijl + ')' : ''}, kleuren: ${(selPreset.tags||[]).join(', ')}`
@@ -3491,11 +3599,13 @@ Antwoord ALLEEN met JSON, geen tekst eromheen:
       + (nNieuw ? ` en stelt <b>${nNieuw}</b> nieuw${nNieuw===1?' item':'e items'} voor.` : '.')
       + (outfitUitleg ? ' Uitleg komt op de kaart.' : '');
   } catch(e) {
+    stopVolgen();
     btn.textContent = orig;
     status.textContent = 'Mislukt: ' + e.message;
     btn.disabled = false;
     throw e;              // zodat de kaart de reden kan tonen
   }
+  stopVolgen();
   btn.disabled = false;
 }
 
@@ -3710,6 +3820,9 @@ async function aiAnalyseOutfit() {
   btn.disabled = true;
   btn.textContent = '⏳ AI beoordeelt en verbetert…';
   panel.style.display = 'none';
+  // De analyse duurt het langst van alles; laat zien dat er iets gebeurt.
+  const voortgangEl = document.getElementById('kaart-kosten');
+  const stopVolgen = volgVoortgang(voortgangEl);
 
   const combo = selPreset
     ? `${selPreset.name} — ${selPreset.vibe}${selPreset.stijl?' ('+selPreset.stijl+')':''}, kleuren: ${(selPreset.tags||[]).join(', ')}`
@@ -3825,6 +3938,7 @@ Verzin nooit een id dat niet in de garderobelijst staat.`;
       renderAiAnalysis({ analyse: String(raw || '').trim() }, 0);
       panel.style.display = 'block';
       btn.textContent = '✓ Analyse hieronder (kaart ongewijzigd)';
+      stopVolgen(); toonLaatsteKosten();
       btn.disabled = false;
       return;
     }
@@ -3908,6 +4022,8 @@ Verzin nooit een id dat niet in de garderobelijst staat.`;
     alert('AI-fout: ' + e.message);
     btn.textContent = orig;
   }
+  stopVolgen();
+  toonLaatsteKosten();      // de voortgangsregel weer vervangen door de kosten
   btn.disabled = false;
 }
 

@@ -125,6 +125,24 @@ Deno.serve(async (req: Request) => {
     return err("Kon Anthropic niet bereiken.", 502, cors);
   }
 
+  // Streamt de pagina, dan streamen wij mee: het antwoord gaat regel voor regel
+  // door zodra Anthropic het stuurt. Dat scheelt geen rekentijd, maar de
+  // verbinding blijft levend en de pagina kan meteen iets laten zien. Een
+  // telefoon die veertig seconden niets binnenkrijgt, verbreekt hem namelijk.
+  if (body.stream === true && upstream.ok && upstream.body) {
+    return new Response(upstream.body, {
+      status: upstream.status,
+      headers: {
+        ...cors,
+        "content-type": "text/event-stream; charset=utf-8",
+        "cache-control": "no-cache, no-transform",
+        "connection": "keep-alive",
+        // Zonder dit buffert een tussenliggende proxy het alsnog op.
+        "x-accel-buffering": "no",
+      },
+    });
+  }
+
   const text = await upstream.text();
   return new Response(text, {
     status: upstream.status,
