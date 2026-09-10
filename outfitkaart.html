@@ -1124,7 +1124,7 @@ const WINKELS = [
   ['& Other Stories','https://www.stories.com/nl_nl/search.html?q='],
 ];
 
-const CAT_ICONS = {tops:'👕',bottoms:'👖',layers:'🧥',jurken:'👗',bags:'👜',shoes:'👟',accessories:'🕶️',swimwear:'🩱',overig:'📦'};
+const CAT_ICONS = {tops:'👕',bottoms:'👖',layers:'🧥',jurken:'👗',eendelig:'🕺',bags:'👜',shoes:'👟',accessories:'🕶️',swimwear:'🩱',overig:'📦'};
 
 const DEFAULT_ITEMS = [
   {id:'bershka-raglan',name:'Bershka raglan trui',brand:'Bershka',cat:'tops'},
@@ -3547,6 +3547,9 @@ const CAP_NEE = [
     woorden:['short','korte broek'] },
   { id:'rok',      label:'Geen rokken',  cats:['bottoms'], woorden:['rok'] },
   { id:'jurk',     label:'Geen jurken',  cats:['jurken'],  woorden:['jurk','dress'] },
+  // Apart van de jurken: wie geen jurk wil, wil soms juist wél een jumpsuit.
+  { id:'eendelig', label:'Geen jumpsuits of co-ords',
+    woorden:['jumpsuit','playsuit','overall','co-ord','coord','catsuit','salopette'] },
   { id:'wit',      label:'Niks lichts of wits',
     woorden:['wit','ecru','creme','crème','gebroken'] },
 ];
@@ -3607,6 +3610,16 @@ function kleurenVan(item) {
 // de kaartroute. De weekendtas kende hem niet, en dus kwam er geen jas uit een
 // weekendoutfit — en stond hij ook niet op de kaart die je daarvan maakte.
 // Eén tekst, overal gebruikt.
+// Een eendelig stuk vult twee rollen. Zonder deze regel stelde de stylist er
+// netjes een broek bij voor, want hij telde gewoon door tot hij een boven- en
+// onderstuk had.
+const EENDELIG_REGEL = `
+EENDELIGE STUKKEN. Een jurk, jumpsuit of co-ord set is boven- én onderstuk in
+één. Kies je zo'n stuk, zet er dan GEEN losse top of broek bij — de outfit is
+op dat punt al compleet van boven tot onder. Wat er nog bij mag: een laag
+eroverheen, schoenen, een tas, een riem of sieraad.
+`;
+
 function buitenlaagRegel(weer) {
   const koud = weer === 'koud';
   return `\nDENK AAN DE BUITENLAAG. Een outfit voor buiten is niet af zonder jas, mantel,
@@ -3617,6 +3630,23 @@ Het is koud, dus een buitenlaag is hier geen keuze maar noodzaak. Zit er geen
 passende jas of mantel in de lijst, zeg dat dan met zoveel woorden bij
 "ontbreekt" in plaats van de outfit zonder af te leveren.` : `
 Past er echt geen buitenlaag bij, zeg dat dan.`}\n`;
+}
+
+// Een jumpsuit of co-ord set is geen jurk, en ook geen top of broek: hij neemt
+// de rol van boven- én onderstuk in één keer over. Die categorie bestond niet,
+// dus zulke stukken belandden bij "overig" of bij de jurken — en dan kreeg je
+// er alsnog een losse broek bij voorgesteld. Ook op naam herkennen, want wat er
+// al in je kast staat draagt de nieuwe categorie nog niet.
+const EENDELIG_WOORDEN = ['jumpsuit','playsuit','overall','co-ord','coord','co ord',
+  'setje','twinset','catsuit','salopette','tuinbroek','onesie'];
+
+// Neemt dit stuk zowel het boven- als het onderstuk voor zijn rekening?
+// Geldt voor jurken én voor het nieuwe eendelig.
+function isEendelig(item) {
+  if (!item) return false;
+  if (item.cat === 'eendelig' || item.cat === 'jurken') return true;
+  const n = String(item.name || '').toLowerCase();
+  return EENDELIG_WOORDEN.some(w => n.includes(w)) || /\bjurk|dress/.test(n);
 }
 
 // Heldere kleuren die een outfit kunnen dragen, en de zware kleuren die er
@@ -4020,6 +4050,7 @@ function capScoorCombos() {
     const tags = (p.tags || []).map(t => String(t).toLowerCase());
     const passend = kast.filter(x => tags.some(t => kleurMatcht(t, x.kleur)));
     const cats = new Set(passend.map(x => x.i.cat));
+    const eendeligErbij = passend.some(x => isEendelig(x.i));
     // Welke van jouw ankerkleuren zitten in deze combo? Alleen combo's die daar
     // iets mee doen zijn een antwoord op "ik wil dít shirt met díé broek".
     const gedekt = ankers.filter(a => tags.some(t => kleurMatcht(a, t) || kleurMatcht(t, a)));
@@ -4031,8 +4062,13 @@ function capScoorCombos() {
       aantal: passend.length,
       ankers: gedekt,
       zwaar,
-      // een combo is pas bruikbaar met een boven- én een onderstuk
-      bruikbaar: cats.has('tops') && (cats.has('bottoms') || cats.has('jurken')),
+      // Een combo is pas bruikbaar met een boven- én een onderstuk. Maar dat
+      // hoeven geen twee stukken te zijn: een jurk, jumpsuit of co-ord set
+      // vult allebei die rollen. Hier stond eerst dat een top verplicht was,
+      // óók naast een jurk — dus een combinatie die om een jurk of jumpsuit
+      // draaide viel af, ook al kon je hem gewoon aan.
+      bruikbaar: eendeligErbij
+        || (cats.has('tops') && cats.has('bottoms')),
       cats: [...cats] };
   });
 
@@ -4464,7 +4500,7 @@ ${kast}
 
 Kies per outfit 4 tot 6 stukken die samen kloppen: één blikvanger, de rest
 ondersteunt; taille zichtbaar; nooit wijd op wijd; twee materiaalfamilies.
-${buitenlaagRegel(weer)}
+${EENDELIG_REGEL}${buitenlaagRegel(weer)}
 Noem de stijlgreep bij naam (ton-sur-ton, monochroom, neutraal met één accent,
 kleurblokken, contrast in textuur) en geef elke outfit een gelegenheid.
 Ontbreekt er iets waardoor dit pas echt werkt, zeg dat apart.
@@ -4543,7 +4579,7 @@ ${o.naam} (${o.stijl}) — ${(o.items||[]).join(', ')}
 Maak één ANDERE outfit in dezelfde kleurcombinatie: ${o.combo || ''}.
 Neem een andere stijlgreep en een ander silhouet dan de afgewezen outfit, en
 overlap zo min mogelijk met de stukken die daarin zaten.
-${buitenlaagRegel(weer)}
+${EENDELIG_REGEL}${buitenlaagRegel(weer)}
 ${capNietKleuren.length ? 'Gebruik geen stukken in deze kleuren: ' + opsom(capNietKleuren) + '.\n' : ''}
 ${anderen ? 'Deze staan er al, maak niet nog eens hetzelfde:\n' + anderen + '\n' : ''}
 Gelegenheid: ${gel || 'een weekend weg'}. Het weer is ${weer}.
@@ -5107,7 +5143,7 @@ ${wardrobeForAI()}
 Gekozen kleurcombo: ${combo}
 ${vwBlok}${gelBlok}${reedsBlok}
 Stel één complete, draagbare outfit samen van 4 tot 6 stukken.
-${buitenlaagRegel(huidigeVoorwaarden().weer)}
+${EENDELIG_REGEL}${buitenlaagRegel(huidigeVoorwaarden().weer)}
 WERK IN DEZE VOLGORDE. Denk elke stap echt door voordat je verder gaat.
 
 STAP 1 — ANKER EN BLIKVANGER
@@ -5198,7 +5234,7 @@ Elk stukje maximaal 20 woorden. Schrijf "wijde maxi tegen strak shirt", niet
 "mooie balans tussen de stukken".
 
 Antwoord ALLEEN met JSON, geen tekst eromheen:
-{"items":[{"id":"exact-id-uit-de-lijst-of-null","naam":"korte naam","categorie":"tops|bottoms|layers|jurken|bags|shoes|accessories","eigen":true,"waarom":"max 7 woorden, positieve reden waarom dit item hier ligt"}],
+{"items":[{"id":"exact-id-uit-de-lijst-of-null","naam":"korte naam","categorie":"tops|bottoms|layers|jurken|eendelig|bags|shoes|accessories","eigen":true,"waarom":"max 7 woorden, positieve reden waarom dit item hier ligt"}],
  "uitleg":{"kleur":"...","vorm":"...","textuur":"..."},
  "waarom_top":"2 zinnen: waarom dit als geheel een sterke combinatie is"}`;
 
@@ -5662,7 +5698,7 @@ CONTROLEER VOORDAT JE ANTWOORDT:
 
 Antwoord ALLEEN met JSON:
 {
- "outfit":[{"id":"exact-id-of-null","naam":"...","categorie":"tops|bottoms|layers|jurken|bags|shoes|accessories","eigen":true,"waarom":"max 7 woorden, positieve reden waarom dit item hier ligt"}],
+ "outfit":[{"id":"exact-id-of-null","naam":"...","categorie":"tops|bottoms|layers|jurken|eendelig|bags|shoes|accessories","eigen":true,"waarom":"max 7 woorden, positieve reden waarom dit item hier ligt"}],
  "wissels":[{"van":"naam oud item","naar":"naam nieuw item","reden":"waarom dit beter is"}],
  "uitleg":{"kleur":"max 20 woorden","vorm":"max 20 woorden","textuur":"max 20 woorden"},
  "waarom_top":"2 zinnen: waarom dit als geheel een sterke combinatie is",
