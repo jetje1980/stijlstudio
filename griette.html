@@ -583,6 +583,7 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
     <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('bottoms',this)">Onderkleding</button>
     <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('layers',this)">Laagjes</button>
     <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('jurken',this)">Jurken</button>
+    <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('eendelig',this)">Jumpsuits</button>
     <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('shoes',this)">Schoenen</button>
     <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;" onclick="setFilter('bags',this)">Tassen</button>
   </div>
@@ -855,6 +856,7 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
       <option value="bottoms">Rokken & Broeken</option>
       <option value="layers">Laagje / vest / jas</option>
       <option value="jurken">Jurk</option>
+      <option value="eendelig">Jumpsuit / co-ord set</option>
       <option value="bags">Tassen</option>
       <option value="shoes">Schoenen</option>
       <option value="overig">Overig</option>
@@ -1500,12 +1502,29 @@ async function restoreCustomItemPhotos() {
   }
 }
 
+// Een jumpsuit of co-ord set is geen jurk en ook geen top of broek: hij neemt
+// de rol van boven- én onderstuk in één keer over. Dat gold al voor jurken,
+// maar niet voor deze — die belandden in "overig" of bij de jurken, en dan
+// kreeg je er alsnog een broek bij voorgesteld. Ook op naam herkennen, want de
+// stukken die er al in staan hebben de nieuwe categorie nog niet.
+const EENDELIG_WOORDEN = ['jumpsuit','playsuit','overall','co-ord','coord','co ord',
+  'setje','twinset','catsuit','salopette','tuinbroek','onesie'];
+function isEendeligItem(i) {
+  if (!i) return false;
+  if (i.cat === 'jurken' || i.cat === 'eendelig') return true;
+  const n = String(i.name || '').toLowerCase();
+  return EENDELIG_WOORDEN.some(function(w){ return n.includes(w); });
+}
+
 // ============ DATA ============
 const categories = [
   { id:'tops', label:'Tops' },
   { id:'bottoms', label:'Rokken & Broeken' },
   { id:'layers', label:'Laagjes' },
   { id:'jurken', label:'Jurken' },
+  // Eendelig: een jumpsuit of co-ord set is geen jurk en ook geen top of
+  // broek — hij neemt de rol van boven- én onderstuk in één keer over.
+  { id:'eendelig', label:'Jumpsuits & co-ords' },
   { id:'accessories', label:'Accessoires' },
   { id:'swimwear', label:'Zwemkleding' },
   { id:'bags', label:'Tassen' },
@@ -1933,10 +1952,10 @@ const kleurDots = {
 function renderTagButtons(itemId, container) {
   var cat = getAllItems().find(function(i){ return i.id === itemId; })?.cat;
   container.innerHTML = '';
-  var showHals    = ['tops','layers','jurken'].includes(cat);
-  var showPasvorm = ['tops','bottoms','layers','jurken'].includes(cat);
-  var showMouw    = ['tops','layers','jurken'].includes(cat);
-  var showLengte  = ['tops','bottoms','layers','jurken'].includes(cat);
+  var showHals    = ['tops','layers','jurken','eendelig'].includes(cat);
+  var showPasvorm = ['tops','bottoms','layers','jurken','eendelig'].includes(cat);
+  var showMouw    = ['tops','layers','jurken','eendelig'].includes(cat);
+  var showLengte  = ['tops','bottoms','layers','jurken','eendelig'].includes(cat);
   function val(type) { return getTag(itemId, type); }
   function makeSection(lbl) {
     var l=document.createElement('div');l.style.cssText='font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;margin-top:4px;';l.textContent=lbl;container.appendChild(l);
@@ -2020,7 +2039,7 @@ function renderTagButtons(itemId, container) {
   // LENGTE
   if(showLengte){
     var r5=makeSection('Lengte');
-    var lengteOpties = cat==='bottoms'||cat==='jurken'
+    var lengteOpties = cat==='bottoms'||cat==='jurken'||cat==='eendelig'
       ? ['mini (boven knie)','midi (onder knie)','maxi/vloerlang','crop/kort','normaal']
       : ['crop','normaal','lang/tunic'];
     lengteOpties.forEach(function(v){makeBtn(r5,v,val('lengte')===v,function(){setTag(itemId,'lengte',v);});});
@@ -3897,7 +3916,9 @@ function generateTodayOutfits() {
     const shoes = anchorCat === 'shoes' ? [anchorItem] : (secondCat === 'shoes' ? [secondItem] : getPool('shoes'));
     const bags = anchorCat === 'bags' ? [anchorItem] : (secondCat === 'bags' ? [secondItem] : getPool('bags'));
     // Dresses (jurken) are standalone items — never add as a layer on top of a top+bottom combo
-    const dressIds = getAllItems().filter(function(i){return i.cat==='jurken';}).map(function(i){return i.id;});
+    // Eendelig: jurken, maar ook jumpsuits en co-ord sets. Die nemen de rol van
+    // boven- én onderstuk over, dus er hoort geen losse top of broek bij.
+    const dressIds = getAllItems().filter(isEendeligItem).map(function(i){return i.id;});
     // Seasonal filtering based on current month
     const currentMonth = new Date().getMonth() + 1; // 1-12
     const isWinter = currentMonth <= 2 || currentMonth >= 11;
@@ -4892,7 +4913,9 @@ function generateSuggestions(append = false) {
       return [...inList2, ...rest2];
     }
 
-    const dressIds = getAllItems().filter(function(i){return i.cat==='jurken';}).map(function(i){return i.id;});
+    // Eendelig: jurken, maar ook jumpsuits en co-ord sets. Die nemen de rol van
+    // boven- én onderstuk over, dus er hoort geen losse top of broek bij.
+    const dressIds = getAllItems().filter(isEendeligItem).map(function(i){return i.id;});
     const _month = new Date().getMonth() + 1;
     const _isWinter = _month <= 2 || _month >= 11;
     const _isZomer = _month >= 6 && _month <= 8;
