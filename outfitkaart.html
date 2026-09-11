@@ -187,6 +187,20 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
    terwijl je die net had uitgesloten: je zag nergens meer dat het gold. */
 /* Twee soorten routes horen niet als één rijtje te lezen: vijf maken één
    kaart, de weekendtas plant een hele reis met eigen stappen. */
+/* Drie richtingen: elk een compleet advies, niet alleen een kleurenrijtje. */
+.richting-kaart{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;
+  padding:14px;margin-bottom:10px;}
+.richting-kaart.gekozen{border-color:var(--accent);border-width:2px;}
+.ri-naam{font-size:15px;font-weight:600;line-height:1.3;}
+.ri-kort{font-size:12px;color:var(--text-2);line-height:1.5;margin:3px 0 9px;}
+.ri-regel{font-size:11.5px;line-height:1.5;margin-top:5px;}
+.ri-regel span{display:block;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-2);}
+.ri-blok{margin-top:10px;padding-top:8px;border-top:1px solid var(--border);}
+.ri-kop{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);
+  font-weight:600;margin-bottom:5px;}
+.ri-mist{font-size:11.5px;line-height:1.5;margin-bottom:4px;}
+.ri-past{margin-top:10px;font-size:11.5px;line-height:1.5;font-style:italic;color:var(--text-2);}
+
 /* De aankleedpop: de outfit op een lijf gestapeld in plaats van als raster.
    Hoogtes zijn de verhouding die een kleding\u00adlaag op het lichaam inneemt, zodat
    je ziet waar het volume en de zomen vallen. */
@@ -572,6 +586,18 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <input class="anchor-search" id="anchor-search" type="text" placeholder="Zoek in je kast…" autocomplete="off">
       <div class="anchor-grid" id="anchor-grid"></div>
     </div>
+    <!-- Drie richtingen: niet "welke kleur past hierbij" maar "wat heb ik nog
+         nodig, en hoe maak ik het af". Zit in deze route en niet in een eigen
+         tool, want de stukken, de voorwaarden en het startpunt zijn hier al. -->
+    <div id="richting-wrap" style="display:none;margin-top:16px;">
+      <div class="sec-label">Waar ga je heen?</div>
+      <div class="field-note" style="margin-bottom:6px;">Hoe concreter, hoe beter het advies. Bijvoorbeeld: festival, hele dag buiten.</div>
+      <input class="field" type="text" id="richting-gel" placeholder="bijv. festival, hele dag buiten" style="margin-bottom:8px;">
+      <button class="ai-btn" id="richting-btn" onclick="drieRichtingen()">🧭 Drie richtingen om dit af te maken</button>
+      <div class="field-note" id="richting-status" style="margin-top:6px;"></div>
+      <div id="richting-lijst" style="margin-top:10px;"></div>
+    </div>
+
     <div id="anchor-combo-wrap" style="display:none;margin-top:16px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <div class="sec-label" style="margin-bottom:0">Kleurcombo's rond dit item</div>
@@ -2405,6 +2431,14 @@ function kiesAnker(item) {
 
 function renderAnchorPicked() {
   const wrap = document.getElementById('anchor-picked');
+  // Het richtingen-blok hoort te verschijnen zodra er iets vastligt om op te
+  // bouwen, en weer weg zodra je alles loslaat.
+  const rw = document.getElementById('richting-wrap');
+  if (rw) {
+    rw.style.display = anchorItems.length ? 'block' : 'none';
+    const g = document.getElementById('richting-gel');
+    if (g && !g.value) g.value = huidigeVoorwaarden().gelegenheid || '';
+  }
   if (!anchorItems.length) { wrap.innerHTML = ''; return; }
 
   wrap.innerHTML = anchorItems.map(it => {
@@ -2667,6 +2701,159 @@ function makePresetCard(p, onClick) {
     + '</div>';
   card.addEventListener('click', onClick);
   return card;
+}
+
+// ── DRIE RICHTINGEN ───────────────────────────────────────────────────────────
+// "Ik pak mijn co-ord khaki en mijn rode crossbody — wat heb ik dan nog nodig
+// qua kleur en qua stijl, voor een festival?" Dat is een andere vraag dan
+// "welke kleur past hierbij". Hier ligt al iets vast en gaat het om het gat
+// ertussen: wat mist er, waar haal je dat vandaan, en hoe maak je het af tot
+// aan de sieraden. Drie richtingen, want één advies is een gok en tien is een
+// lijst waar je niets mee doet.
+async function drieRichtingen() {
+  if (!anchorItems.length) return;
+  const btn = document.getElementById('richting-btn');
+  const st  = document.getElementById('richting-status');
+  const lijst = document.getElementById('richting-lijst');
+
+  // De gelegenheid die je hier invult is dezelfde als overal: één antwoord.
+  const gelEl = document.getElementById('richting-gel');
+  const gel = (gelEl.value || '').trim();
+  voorwaarden = voorwaarden || { weer:'wisselend', gelegenheid:'', nee:[], nietKleuren:[] };
+  if (gel) voorwaarden.gelegenheid = gel;
+
+  btn.disabled = true; btn.textContent = '⏳ Drie richtingen bedenken…';
+  lijst.innerHTML = '';
+  const stopVolgen = volgVoortgang(st);
+
+  const vast = anchorItems.map(i => {
+    const t = itemTags[i.id] || {};
+    const k = [].concat(t.kleur || []).join('/');
+    return `- ${i.name} (${i.cat}${k ? ', ' + k : ''})`;
+  }).join('\n');
+
+  const inhoud = [{ type:'text', text:
+`Griette heeft deze stukken al gekozen en die blijven staan:
+${vast}
+${voorwaardenZin()}
+Kijk naar wat hier nog aan ontbreekt — in kleur én in stijl — en geef DRIE
+verschillende richtingen om het af te maken${gel ? ' voor: ' + gel : ''}.
+
+Maak de drie richtingen echt verschillend van elkaar. Niet drie varianten op
+hetzelfde, maar drie keuzes die een ander gevoel geven: bijvoorbeeld één die
+het rauw en stoer houdt, één die het verfijnt, en één die juist op kleur
+speelt. Zeg per richting eerlijk of ze het met haar eigen kast af kan of dat
+er echt iets mist.
+
+Let hierbij op:
+- KLEUR. Wat doen de kleuren die er al liggen samen, en wat heeft dat nog
+  nodig? Geef de rollen: welke kleur voert, welke ondersteunt, wat is accent,
+  met een aandeel in procenten dat samen 100 is, en waar op het lichaam elke
+  kleur zit.
+- STIJL. Welke stijlgreep maakt dit één geheel — en wat moet er in het
+  silhouet gebeuren: waar zit het volume, waar breekt het, waar valt de zoom.
+- AFSTYLING. Juist hier gaat het vaak mis: dit is wat een outfit áf maakt.
+  Sieraden (welk metaal, hoe groot, waar), riem, hoe je een zoom of mouw
+  draagt, haar, een pet of sjaal. Wees concreet — niet "leuke oorbellen" maar
+  "grote zilveren hoops, want de co-ord is strak en dat vraagt om één stoer
+  detail bij je gezicht".
+
+Kies uit haar kast waar het kan:
+${wardrobeForAI()}
+
+Antwoord ALLEEN met JSON:
+{"richtingen":[{
+  "naam":"korte naam voor deze richting",
+  "kort":"1 zin: wat dit voor gevoel geeft",
+  "stijlgreep":"de stijlgreep bij naam",
+  "silhouet":"1 zin: waar het volume zit en waar het breekt",
+  "uit_je_kast":[{"id":"exact id uit de lijst","naam":"...","rol":"wat dit stuk doet"}],
+  "mist":[{"wat":"wat ze niet heeft","waarom":"waarom dit het verschil maakt"}],
+  "rollen":[{"kleur":"kleurnaam","hex":"#hex","rol":"voert|ondersteunt|accent",
+             "deel":60,"waar":"waar op het lichaam","doet":"wat deze kleur doet"}],
+  "afstyling":[{"wat":"concreet detail","waarom":"waarom juist dit"}],
+  "past_omdat":"1 zin: waarom deze richting bij haar en bij de gelegenheid past"}]}` }];
+
+  anchorItems.forEach(it => {
+    if (cloudMap[it.id]) {
+      inhoud.push({ type:'image', source:{ type:'url', url: cloudMap[it.id] } });
+      inhoud.push({ type:'text', text:`(Foto van: ${it.name})` });
+    }
+  });
+
+  try {
+    const raw = await callClaude(
+      `Je bent een persoonlijke stylist voor Griette. ${DNA_KORT}${profielBlok()}
+Antwoord in het Nederlands. Wees concreet en eerlijk: zeg het als er iets mist.`,
+      inhoud, 8000, null, 'kies');
+
+    const r = pickArray(extractJson(raw), ['richtingen'], true) || [];
+    if (!r.length) throw new Error('geen richtingen ontvangen');
+    toonRichtingen(r);
+    stopVolgen();
+    st.textContent = `${r.length} richtingen. Kies er één om verder te gaan.`;
+  } catch(e) {
+    stopVolgen();
+    st.textContent = 'Mislukt: ' + e.message;
+  }
+  btn.disabled = false; btn.textContent = '🧭 Drie richtingen om dit af te maken';
+}
+
+function toonRichtingen(richtingen) {
+  const lijst = document.getElementById('richting-lijst');
+  lijst.innerHTML = '';
+  richtingen.forEach((r, i) => {
+    const kaart = document.createElement('div');
+    kaart.className = 'richting-kaart';
+    const uit = (r.uit_je_kast || []).map(x => {
+      const echt = x && x.id ? allItems.find(a => a.id === x.id) : null;
+      return echt ? Object.assign({}, echt, { _waarom: x.rol || '' }) : null;
+    }).filter(Boolean);
+
+    kaart.innerHTML = `<div class="ri-naam">${esc(r.naam || 'Richting ' + (i+1))}</div>`
+      + (r.kort ? `<div class="ri-kort">${esc(r.kort)}</div>` : '')
+      + verhoudingsBalk(r.rollen)
+      + (r.stijlgreep ? `<div class="ri-regel"><span>Stijlgreep</span>${esc(r.stijlgreep)}</div>` : '')
+      + (r.silhouet ? `<div class="ri-regel"><span>Silhouet</span>${esc(r.silhouet)}</div>` : '')
+      + (uit.length
+          ? '<div class="ri-blok"><div class="ri-kop">Uit je kast</div><div class="cap-stukken">'
+            + uit.map(x => `<span class="cap-chip">${esc(x.name)}</span>`).join('')
+            + '</div></div>' : '')
+      + ((r.mist || []).length
+          ? '<div class="ri-blok"><div class="ri-kop">Dit mis je nog</div>'
+            + r.mist.map(m => `<div class="ri-mist"><b>${esc(m.wat || '')}</b>`
+                + (m.waarom ? ` — ${esc(m.waarom)}` : '') + '</div>').join('')
+            + '</div>' : '')
+      + ((r.afstyling || []).length
+          ? '<div class="ri-blok"><div class="ri-kop">Afstyling</div>'
+            + r.afstyling.map(a => `<div class="ri-mist"><b>${esc(a.wat || '')}</b>`
+                + (a.waarom ? ` — ${esc(a.waarom)}` : '') + '</div>').join('')
+            + '</div>' : '')
+      + rollenUitleg(r.rollen)
+      + (r.past_omdat ? `<div class="ri-past">${esc(r.past_omdat)}</div>` : '')
+      + '<button class="ai-btn" style="margin-top:10px;">Verder met deze richting →</button>';
+
+    kaart.querySelector('button').addEventListener('click', () => {
+      document.querySelectorAll('.richting-kaart').forEach(k=>k.classList.remove('gekozen'));
+      kaart.classList.add('gekozen');
+      comboGekozen({
+        name: r.naam || 'Richting ' + (i+1),
+        vibe: r.kort || '',
+        typeName: 'Richting rond je eigen stukken',
+        stijl: r.stijlgreep || '',
+        colors: (r.rollen || []).map(x => x.hex).filter(Boolean),
+        tags: (r.rollen || []).map(x => x.kleur).filter(Boolean),
+        rollen: r.rollen || [],
+        gelegenheid: r.past_omdat || '',
+      }, {
+        items: anchorItems.concat(uit.filter(x => !anchorItems.some(a => a.id === x.id))).slice(0, 6),
+        ankers: anchorItems.slice(),
+        bron: 'Gebouwd rond ' + opsom(anchorItems.map(a => a.name)),
+      });
+      document.getElementById('startpunt').scrollIntoView({behavior:'smooth', block:'nearest'});
+    });
+    lijst.appendChild(kaart);
+  });
 }
 
 // ── CUSTOM COLOR PICKER ────────────────────────────────────────────────────────
