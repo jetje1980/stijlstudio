@@ -163,6 +163,9 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .preset-list{display:flex;flex-direction:column;gap:10px;}
 .preset-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;-webkit-tap-highlight-color:transparent;}
 .preset-card.selected{border-color:var(--accent);}
+/* Met een verhoudingsbalk stapelt de kaart: de balk hoort over de volle
+   breedte, anders krimpt hij in de flex-rij tot niets. */
+.preset-card.met-verhouding{flex-direction:column;align-items:stretch;gap:0;}
 .preset-swatches{display:flex;gap:4px;flex-shrink:0;}
 .swatch{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.4);}
 .preset-info .pi-name{font-size:12px;font-weight:600;color:var(--text);}
@@ -184,6 +187,43 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
    terwijl je die net had uitgesloten: je zag nergens meer dat het gold. */
 /* Twee soorten routes horen niet als één rijtje te lezen: vijf maken één
    kaart, de weekendtas plant een hele reis met eigen stappen. */
+/* De aankleedpop: de outfit op een lijf gestapeld in plaats van als raster.
+   Hoogtes zijn de verhouding die een kleding\u00adlaag op het lichaam inneemt, zodat
+   je ziet waar het volume en de zomen vallen. */
+.pop-wrap{margin-top:14px;padding:12px;border-radius:14px;background:var(--surface);border:1px solid var(--border);}
+.pop-kop{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2);margin-bottom:8px;}
+.pop-lijf{width:128px;margin:0 auto;height:330px;display:flex;flex-direction:column;gap:3px;}
+.pop-laag{position:relative;border-radius:7px;overflow:hidden;background:var(--ph-bg);
+  display:flex;align-items:center;justify-content:center;min-height:22px;}
+.pop-laag img{width:100%;height:100%;object-fit:cover;}
+.pop-icoon{font-size:20px;}
+.pop-naam{position:absolute;left:0;right:0;bottom:0;padding:3px 5px;font-size:8.5px;line-height:1.25;
+  background:linear-gradient(transparent,rgba(0,0,0,.62));color:#fff;}
+.pop-rol{position:absolute;top:3px;left:3px;font-size:7.5px;letter-spacing:.06em;text-transform:uppercase;
+  padding:1px 5px;border-radius:6px;background:rgba(255,255,255,.85);color:#333;}
+.pop-ernaast{display:flex;gap:6px;justify-content:center;margin-top:9px;flex-wrap:wrap;}
+.pop-klein{width:52px;text-align:center;}
+.pop-klein img{width:52px;height:52px;object-fit:cover;border-radius:7px;display:block;}
+.pop-klein>span:first-child{display:flex;width:52px;height:52px;border-radius:7px;background:var(--ph-bg);
+  align-items:center;justify-content:center;font-size:19px;}
+.pop-klein-naam{display:block;font-size:8px;line-height:1.3;color:var(--text-2);margin-top:3px;}
+.pop-mist{margin-top:9px;font-size:10.5px;color:var(--text-2);text-align:center;}
+
+/* De verhoudingsbalk. Breedte = aandeel, dus je ziet in één oogopslag dat een
+   accent klein hoort te zijn. */
+.verhouding{display:flex;height:34px;border-radius:8px;overflow:hidden;margin-bottom:5px;}
+.verhouding span{display:block;height:100%;}
+.verhouding-tekst{font-size:9.5px;letter-spacing:.04em;color:var(--text-2);margin-bottom:7px;}
+.rollen{margin-top:9px;padding-top:8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;}
+.rol-regel{display:flex;gap:8px;align-items:flex-start;}
+.rol-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0;margin-top:2px;border:1px solid rgba(0,0,0,.12);}
+.rol-kop{display:flex;align-items:center;gap:6px;font-size:12px;}
+.rol-tag{font-size:8.5px;letter-spacing:.07em;text-transform:uppercase;padding:1px 6px;border-radius:8px;
+  background:color-mix(in srgb,var(--accent) 13%,var(--surface));color:var(--accent);}
+.rol-doet{font-size:11.5px;line-height:1.5;color:var(--text);margin-top:2px;}
+.rol-waar{font-size:11px;line-height:1.45;color:var(--text-2);margin-top:2px;}
+.pi-gel{font-size:10.5px;color:var(--text-2);margin-top:4px;font-style:italic;}
+
 /* Het startpunt: hetzelfde blok, welke route je ook nam. */
 .startpunt-kaart{margin-top:16px;padding:14px;border-radius:14px;background:var(--surface);border:2px solid var(--accent);}
 .sp-kop{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:600;}
@@ -595,6 +635,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 
     <div class="sec-label" id="item-count-label">Items — optioneel (max 6)</div>
     <div class="item-grid" id="item-grid"></div>
+    <div class="pop-wrap" id="pop-2" style="display:none;"></div>
   </div>
 </div>
 
@@ -685,6 +726,8 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
          alles laten herschrijven of zelf terug om items te wisselen; een
          gewone vraag als "vervang die broek door barrel jeans, en welke muts
          hoort erbij?" kon nergens. -->
+    <div class="pop-wrap" id="pop-4" style="display:none;"></div>
+
     <div class="sec-label" style="margin-top:16px;">Vraag het de stylist</div>
     <div class="field-note" style="margin-bottom:7px;">Bijvoorbeeld: <i>kan die grijze broek een barrel jeans worden, en welke muts hoort hierbij?</i> Je krijgt antwoord, en wat vervangen moet worden pas ik meteen aan op je kaart.</div>
     <textarea class="field" id="stylist-vraag" rows="2" placeholder="Typ je vraag…"></textarea>
@@ -2101,6 +2144,81 @@ function comboGekozen(p, opts) {
 
 let startpuntBron = '';
 
+// ── DE AANKLEEDPOP ────────────────────────────────────────────────────────────
+// Een raster van vierkantjes laat zien wélke stukken je hebt, maar niet hoe ze
+// op elkaar liggen. Op een lijf gestapeld — buitenlaag, top, onderstuk, schoen,
+// en de kleine dingen ernaast — zie je in één blik of het klopt: waar het
+// volume zit, waar de zomen vallen, en of je accentkleur inderdaad klein blijft.
+const POP_LAGEN = [
+  { sleutel:'jas',    cats:['jassen'],            hoogte:22, label:'buitenlaag' },
+  { sleutel:'laag',   cats:['layers'],            hoogte:18, label:'laagje' },
+  { sleutel:'top',    cats:['tops'],              hoogte:20, label:'boven' },
+  { sleutel:'onder',  cats:['bottoms'],           hoogte:30, label:'onder' },
+  { sleutel:'schoen', cats:['shoes','schoenen'],  hoogte:10, label:'schoenen' },
+];
+
+function popIndeling(items) {
+  const rest = (items || []).slice();
+  const pak = cats => {
+    const i = rest.findIndex(x => cats.includes(x.cat));
+    return i >= 0 ? rest.splice(i, 1)[0] : null;
+  };
+  // Een jurk, jumpsuit of co-ord vult boven én onder in één keer.
+  const eendeligIdx = rest.findIndex(isEendelig);
+  const eendeligStuk = eendeligIdx >= 0 ? rest.splice(eendeligIdx, 1)[0] : null;
+
+  const lagen = POP_LAGEN.map(l => {
+    if (eendeligStuk && (l.sleutel === 'top' || l.sleutel === 'onder')) {
+      return { ...l, item: l.sleutel === 'top' ? eendeligStuk : null,
+               hoogte: l.sleutel === 'top' ? 50 : 0,
+               label: l.sleutel === 'top' ? 'eendelig' : '' };
+    }
+    return { ...l, item: pak(l.cats) };
+  }).filter(l => l.hoogte > 0);
+
+  return { lagen, ernaast: rest };   // tassen, sieraden, sjaals
+}
+
+function toonPop(items, doelId) {
+  const el = document.getElementById(doelId);
+  if (!el) return;
+  const gekozen = (items || []).filter(Boolean);
+  if (!gekozen.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+
+  const { lagen, ernaast } = popIndeling(gekozen);
+  const gevuld = lagen.filter(l => l.item);
+  if (!gevuld.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+
+  const totaal = gevuld.reduce((n, l) => n + l.hoogte, 0) || 1;
+  el.style.display = 'block';
+  el.innerHTML = '<div class="pop-kop">Zo ligt het op elkaar</div>'
+    + '<div class="pop-lijf">'
+    + gevuld.map(l => {
+        const h = Math.round(l.hoogte / totaal * 100);
+        const foto = cloudMap[l.item.id];
+        return `<div class="pop-laag" style="height:${h}%">`
+          + (foto ? `<img src="${esc(foto)}" alt="${esc(l.item.name)}">`
+                  : `<span class="pop-icoon">${CAT_ICONS[l.item.cat] || '📦'}</span>`)
+          + `<span class="pop-naam">${esc(l.item.name)}</span>`
+          + `<span class="pop-rol">${esc(l.label)}</span>`
+          + '</div>';
+      }).join('')
+    + '</div>'
+    + (ernaast.length
+        ? '<div class="pop-ernaast">'
+          + ernaast.map(i => {
+              const foto = cloudMap[i.id];
+              return '<div class="pop-klein">'
+                + (foto ? `<img src="${esc(foto)}" alt="${esc(i.name)}">`
+                        : `<span>${CAT_ICONS[i.cat] || '📦'}</span>`)
+                + `<span class="pop-klein-naam">${esc(i.name)}</span></div>`;
+            }).join('') + '</div>'
+        : '')
+    + (lagen.some(l => !l.item)
+        ? `<div class="pop-mist">Nog leeg: ${esc(opsom(lagen.filter(l=>!l.item).map(l=>l.label)))}</div>`
+        : '');
+}
+
 // Wat je nu in handen hebt, in dezelfde vorm ongeacht welke route je nam.
 // Zonder dit moest je zelf onthouden wat een route had opgeleverd — bij de
 // ene stond het in een aangetikte kaart, bij de andere nergens.
@@ -2357,26 +2475,49 @@ async function aiCombosVoorItem() {
   const meervoud  = anchorItems.length > 1;
 
   const kleurNamen = KLEUREN.map(k => k.v).join(', ');
-  const system = `Je bent een kleur- en stijlexpert. ${DNA_KORT}`;
+  const vwBlok = voorwaardenZin();   // je gelegenheid ging hier nooit mee
+  const system = `Je bent een kleur- en stijlexpert. ${DNA_KORT}${profielBlok()}`;
   const userContent = [{ type:'text', text:
 `Griette wil een outfit bouwen rond ${meervoud ? 'deze items' : 'dit item'} uit haar kast:
 
 ${itemsBlok}
 ${anchorItems.some(i=>cloudMap[i.id]) ? 'De foto\'s staan hieronder — beoordeel de werkelijke kleur en textuur daarvan.' : ''}
 
-Geef precies 4 kleurcombo's die ${meervoud ? 'DEZE ITEMS' : 'DIT ITEM'} als uitgangspunt nemen.
+Geef precies 5 kleurcombo's die ${meervoud ? 'DEZE ITEMS' : 'DIT ITEM'} als uitgangspunt nemen.
 ${meervoud
   ? 'Beide items moeten samen in elke combo werken; de overige kleuren bouwen eromheen. Botsen ze qua kleur of textuur, zeg dat dan in de vibe van de combo die dat het beste oplost.'
   : 'Het item moet in elke combo passen; de overige kleuren bouwen eromheen.'}
-
+${vwBlok}
 Varieer de stijlrichtingen: geef zowel gedurfde streetstyle keuzes als
 elegante en klassieke opties.
+
+DIT IS HET BELANGRIJKSTE DEEL. Griette weet wel wélke kleuren mooi zijn, maar
+niet wat ze dóén en in welke verhouding ze horen. Geef dus per kleur:
+- de ROL: één kleur voert, één ondersteunt, één is accent. Nooit twee die
+  allebei de aandacht pakken.
+- het AANDEEL in procenten: grofweg 60 voor de kleur die voert, 30 voor de
+  ondersteunende, 10 voor het accent. Laat ze samen 100 zijn. Een accent dat de
+  helft van de outfit beslaat is geen accent meer.
+- WAAR op het lichaam die kleur zit. Bij het gezicht (top, sjaal, oorbel),
+  op het onderlichaam, als hele buitenlaag, of klein als schoen of tas. Dit is
+  wat het verschil maakt, dus wees concreet — niet "als accent" maar "als tas
+  of sjaal, niet als broek".
+- WAT die kleur doet met de kleur van haar eigen stuk. Vergelijkend en concreet:
+  warmer of koeler, zachter of scherper, rustiger of opvallender — en waarom.
+  Niet "mooi erbij" maar "khaki is koel-groenig; roest trekt hem naar warm,
+  waardoor het aards wordt in plaats van militair".
 
 Gebruik in "tags" uitsluitend namen uit deze lijst:
 ${kleurNamen}
 
 Antwoord ALLEEN met een JSON-array:
-[{"name":"korte naam","vibe":"paar woorden","stijl":"streetstyle|elegant|klassiek|gedurfd","colors":["#hex","#hex","#hex","#hex"],"tags":["kleur","kleur","kleur","kleur"]}]` }];
+[{"name":"korte naam","vibe":"1 zin: wat deze combinatie uitstraalt",
+  "stijl":"streetstyle|elegant|klassiek|gedurfd",
+  "colors":["#hex","#hex","#hex"],"tags":["kleur","kleur","kleur"],
+  "rollen":[{"kleur":"kleurnaam","hex":"#hex","rol":"voert|ondersteunt|accent",
+             "deel":60,"waar":"waar op het lichaam, concreet",
+             "doet":"1 zin: wat deze kleur doet en waarom"}],
+  "gelegenheid":"1 zin: waarvoor deze combinatie het sterkst is"}]` }];
 
   anchorItems.forEach(it => {
     if (cloudMap[it.id]) {
@@ -2472,12 +2613,58 @@ function buildPresets(ct) {
   area.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
+// Vier even grote vierkantjes zeggen: 25/25/25/25. Dat is precies niet hoe je
+// kleur draagt — één kleur voert, één ondersteunt, het accent blijft klein. Die
+// regel zat wel in de opdracht aan de stylist, maar was voor Griette nergens te
+// zien. Staan de rollen in het antwoord, dan tekenen we de verhouding.
+function verhoudingsBalk(rollen) {
+  const r = (rollen || []).filter(x => x && x.hex);
+  if (r.length < 2) return '';
+  const som = r.reduce((n, x) => n + (Number(x.deel) || 0), 0) || 100;
+  return '<div class="verhouding">'
+    + r.map(x => {
+        const pct = Math.max(4, Math.round((Number(x.deel) || 0) / som * 100));
+        return `<span style="width:${pct}%;background:${esc(x.hex)}" `
+             + `title="${esc(x.kleur || '')} ${pct}%"></span>`;
+      }).join('')
+    + '</div>'
+    + '<div class="verhouding-tekst">'
+    + r.map(x => `${esc(x.kleur || '')} ${Math.round((Number(x.deel)||0)/som*100)}%`).join(' · ')
+    + '</div>';
+}
+
+// En dan per kleur: wat hij doet, en waar je hem draagt. Dat was het antwoord
+// dat ontbrak op "welke kleur kan ik hierbij, en wat doet die dan".
+function rollenUitleg(rollen) {
+  const r = (rollen || []).filter(x => x && (x.doet || x.waar));
+  if (!r.length) return '';
+  return '<div class="rollen">' + r.map(x =>
+      '<div class="rol-regel">'
+      + `<span class="rol-dot" style="background:${esc(x.hex || '#ccc')}"></span>`
+      + '<div><div class="rol-kop">'
+      + `<b>${esc(x.kleur || '')}</b>`
+      + (x.rol ? `<span class="rol-tag">${esc(x.rol)}</span>` : '')
+      + '</div>'
+      + (x.doet ? `<div class="rol-doet">${esc(x.doet)}</div>` : '')
+      + (x.waar ? `<div class="rol-waar">Waar: ${esc(x.waar)}</div>` : '')
+      + '</div></div>').join('') + '</div>';
+}
+
 function makePresetCard(p, onClick) {
   const card = document.createElement('div');
-  card.className = 'preset-card';
-  const swatches = p.colors.map(c=>`<div class="swatch" style="background:${c}"></div>`).join('');
+  const balk = verhoudingsBalk(p.rollen);
+  card.className = 'preset-card' + (balk ? ' met-verhouding' : '');
+  const swatches = balk ? '' : (p.colors || [])
+    .map(c=>`<div class="swatch" style="background:${c}"></div>`).join('');
   const stijlBadge = p.stijl ? `<div class="pi-stijl">${p.stijl}</div>` : '';
-  card.innerHTML = `<div class="preset-swatches">${swatches}</div><div class="preset-info"><div class="pi-name">${p.name}</div><div class="pi-vibe">${p.vibe}</div>${stijlBadge}</div>`;
+  card.innerHTML = (balk || `<div class="preset-swatches">${swatches}</div>`)
+    + '<div class="preset-info">'
+    + `<div class="pi-name">${p.name}</div>`
+    + `<div class="pi-vibe">${p.vibe || ''}</div>`
+    + stijlBadge
+    + (p.gelegenheid ? `<div class="pi-gel">Sterkst voor: ${esc(p.gelegenheid)}</div>` : '')
+    + rollenUitleg(p.rollen)
+    + '</div>';
   card.addEventListener('click', onClick);
   return card;
 }
@@ -2699,6 +2886,7 @@ function toggleItem(item, card) {
     c.classList.toggle('dim', !c.classList.contains('selected') && selItems.length >= 6);
   });
   updateItemCount();
+  toonPop(selItems, 'pop-2');   // meteen zien hoe het op elkaar ligt
 }
 
 function updateItemCount() {
@@ -6180,6 +6368,7 @@ function setStep(n) {
     vulGelegenheidAan();
     toonVoorwaardenBalk();
     buildItemGrid();
+    toonPop(selItems, 'pop-2');
     btnNext.textContent = 'Volgende →';
     btnNext.disabled = false; // items are optional
   } else if (n === 3) {
@@ -6198,6 +6387,7 @@ function setStep(n) {
     document.getElementById('card-wrap').style.display = 'block';
     toonVoorwaardenBalk();
     buildKaart();
+    toonPop(selItems, 'pop-4');
     // Nog geen complete outfit of nog geen uitleg? Dan vult de AI aan.
     // Je eigen keuzes blijven daarbij altijd staan.
     // Niet vanzelf aanroepen: dat kost geld zonder dat erom gevraagd is.
