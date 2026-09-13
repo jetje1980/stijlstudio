@@ -197,6 +197,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .pt-hoofd .pt-kleur{font-weight:600;background:var(--surface);}
 .pt-knop{cursor:pointer;font-family:inherit;color:var(--text);transition:border-color .12s;}
 .pt-knop:hover,.pt-knop:active{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface));}
+.pt-knop.gekozen{border-color:var(--accent);border-width:2px;font-weight:600;background:color-mix(in srgb,var(--accent) 16%,var(--surface));}
 
 /* Drie richtingen: elk een compleet advies, niet alleen een kleurenrijtje. */
 .richting-kaart{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;
@@ -602,8 +603,9 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
        schema's hoort in de instellingen; er iets mee máken hoort hier. -->
   <div id="paar-area" style="display:none">
     <div class="sec-label">Kleurenparen uit jouw schema's</div>
-    <div class="field-note" style="margin-bottom:10px;">Tik een partnerkleur aan; ik zoek er een outfit bij uit je eigen kast, in de verhouding die bij dat soort paar hoort. Nieuwe schema's voeg je toe bij ⚙ Instellingen.</div>
+    <div class="field-note" style="margin-bottom:10px;">Elke rij is een hoofdkleur met kleuren die daarbij kunnen — vier losse alternatieven, niet een setje. <b>Tik er één aan</b> voor een combinatie van twee, of <b>twee</b> voor een palet van drie. Nieuwe schema's voeg je toe bij ⚙ Instellingen.</div>
     <div id="paar-tabellen"></div>
+    <div id="paar-keuze" style="display:none;margin-top:12px;"></div>
     <div id="paar-uitkomst" style="display:none;margin-top:12px;"></div>
   </div>
 
@@ -1305,12 +1307,14 @@ function parenTabelHTML(paren, soort, klikbaar) {
   const dotVan = k => (KLEUREN.find(x => x.v === k) || {}).dot || '#ccc';
   const bol = k =>
     `<span class="pt-kleur"><span class="cap-dot" style="background:${esc(dotVan(k))}"></span>${esc(k)}</span>`;
-  // De partners zijn knoppen: een paar aantikken levert meteen een outfit uit
-  // je eigen kast op. Zonder dat bleef deze tabel iets om naar te kijken.
-  const knop = (hoofd, partner) =>
-    `<button class="pt-kleur pt-knop" title="Maak hier een outfit mee" `
-    + `onclick="outfitVoorPaar('${esc(hoofd)}','${esc(partner)}','${esc(soort || '')}')">`
-    + `<span class="cap-dot" style="background:${esc(dotVan(partner))}"></span>${esc(partner)}</button>`;
+  // De partners zijn knoppen. Je kiest er één — dat is hoe zo'n schema bedoeld
+  // is, vier losse alternatieven — of twee, als je een palet van drie wilt.
+  const knop = (hoofd, partner) => {
+    const aan = paarKeuze.hoofd === hoofd && paarKeuze.partners.includes(partner);
+    return `<button class="pt-kleur pt-knop${aan ? ' gekozen' : ''}" `
+      + `onclick="kiesPartner('${esc(hoofd)}','${esc(partner)}','${esc(soort || '')}')">`
+      + `<span class="cap-dot" style="background:${esc(dotVan(partner))}"></span>${esc(partner)}</button>`;
+  };
 
   return '<div class="paren-tabel">' + rijen.map(([hoofd, partners]) =>
       '<div class="pt-rij">'
@@ -1356,6 +1360,60 @@ function toonPaarTabellen() {
           b.paren || {}, b.soort === 'palet' ? 'blok' : 'basis')).join('');
 }
 
+// ── KIEZEN: ÉÉN PARTNER, OF TWEE ─────────────────────────────────────────────
+// Een rij in zo'n schema is vier losse alternatieven: bordeaux kan met grijs,
+// óf met roze, óf met lichtblauw, óf met bruin. Meestal kies je er dus één.
+// Maar een palet van drie is net zo gewoon, dus twee mag ook — met één
+// kanttekening die het schema zelf niet geeft en die je wel moet weten: dat
+// allebei bij bordeaux passen zegt niet dat ze bij elkáár passen. Soms staat
+// dat wél ergens anders in het schema, en dan zeggen we het erbij.
+let paarKeuze = { hoofd: null, partners: [], soort: '' };
+
+function kiesPartner(hoofd, partner, soort) {
+  if (paarKeuze.hoofd !== hoofd) paarKeuze = { hoofd, partners: [], soort };
+  paarKeuze.soort = soort;
+  const i = paarKeuze.partners.indexOf(partner);
+  if (i >= 0) paarKeuze.partners.splice(i, 1);
+  else if (paarKeuze.partners.length < 2) paarKeuze.partners.push(partner);
+  else paarKeuze.partners = [paarKeuze.partners[1], partner];  // oudste valt af
+  toonPaarTabellen();
+  toonPaarKeuze();
+}
+
+function toonPaarKeuze() {
+  const el = document.getElementById('paar-keuze');
+  if (!el) return;
+  const { hoofd, partners } = paarKeuze;
+  if (!hoofd || !partners.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+
+  // Passen de twee partners volgens de schema's ook bij elkáár?
+  let onderling = '';
+  if (partners.length === 2) {
+    const samen = bekendePartners(partners[0]).includes(partners[1]);
+    onderling = samen
+      ? `<div class="field-note">✓ ${esc(partners[0])} en ${esc(partners[1])} staan ook als paar in je schema's, dus die drie kloppen onderling.</div>`
+      : `<div class="field-note">Let op: je schema's zeggen dat ${esc(partners[0])} én ${esc(partners[1])} bij ${esc(hoofd)} passen, maar niets over die twee onderling. Ik laat de stylist beoordelen of het als drietal werkt.</div>`;
+  }
+
+  el.style.display = 'block';
+  el.innerHTML = `<div class="cap-outfit">`
+    + `<div class="cap-kop"><span class="cap-naam">${esc(opsom([hoofd].concat(partners)))}</span>`
+    + `<span class="cap-stijl">${partners.length === 2 ? 'drie kleuren' : 'twee kleuren'}</span></div>`
+    + (partners.length === 1
+        ? '<div class="cap-waarom">Wil je er drie? Tik nog een kleur uit dezelfde rij aan.</div>'
+        : '')
+    + onderling
+    + `<button class="ai-btn" style="margin-top:9px;" onclick="outfitVoorKeuze()">`
+    + `Maak hier een outfit mee →</button>`
+    + '</div>';
+  el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function outfitVoorKeuze() {
+  const { hoofd, partners, soort } = paarKeuze;
+  if (hoofd && partners.length) outfitVoorPaar(hoofd, partners, soort);
+}
+
 // ── EEN OUTFIT BIJ EEN KLEURENPAAR ────────────────────────────────────────────
 // Een schema zegt "bordeaux kan met grijs". Leuk, maar wat heb je daaraan als
 // je voor je kast staat? Dit vertaalt het paar naar stukken die je écht hebt,
@@ -1366,8 +1424,12 @@ let paarSuggestie = null;
 async function outfitVoorPaar(hoofd, partner, soort) {
   const el = document.getElementById('paar-uitkomst');
   if (!el) return;
+  // Eén partner of twee — allebei mag binnenkomen.
+  const partners = [].concat(partner || []).filter(Boolean);
+  if (!partners.length) return;
+  const alle = [hoofd].concat(partners);
   el.style.display = 'block';
-  el.innerHTML = `<div class="field-note">⏳ Outfit zoeken met <b>${esc(hoofd)}</b> en <b>${esc(partner)}</b>…</div>`;
+  el.innerHTML = `<div class="field-note">⏳ Outfit zoeken met <b>${esc(opsom(alle))}</b>…</div>`;
   el.scrollIntoView({ behavior:'smooth', block:'nearest' });
 
   const { houden } = zeefKast(allItems, null, []);
@@ -1378,29 +1440,42 @@ async function outfitVoorPaar(hoofd, partner, soort) {
   }).join('\n');
 
   const model = soort === 'blok'
-    ? `Dit is een KLEURBLOK-paar: twee verzadigde kleuren die allebei een groot
-vlak mogen zijn. Geen van beide is het kleine accent. Zet er wel iets neutraals
-bij om het draagbaar te houden — dat is juist wat dit soort paren nodig heeft.`
-    : `Dit is een BASISPAAR: twee gedempte of neutrale kleuren die samen de hele
-outfit kunnen dragen, grofweg 60/40. Er is geen derde kleur nodig en geen
+    ? `Dit komt uit een KLEURBLOK-schema: verzadigde kleuren die allebei een
+groot vlak mogen zijn. Geen ervan is het kleine accent. Zet er wel iets
+neutraals bij om het draagbaar te houden — dat is juist wat dit soort
+combinaties nodig heeft.`
+    : `Dit komt uit een BASIS-schema: gedempte of neutrale kleuren die samen de
+hele outfit kunnen dragen, grofweg 60/40. Er is geen extra kleur nodig en geen
 accentlogica. Wil je toch een accent, houd het dan klein en zeg waarom.`;
+
+  // Twee partners is geen paar maar een drietal, en dat vraagt iets extra's.
+  const drietal = partners.length > 1
+    ? `\nZij koos er twee partners bij, dus dit is een palet van drie. Het schema
+zegt dat ${esc(partners[0])} én ${esc(partners[1])} bij ${esc(hoofd)} passen, maar
+${bekendePartners(partners[0]).includes(partners[1])
+  ? `het zegt óók dat die twee onderling samengaan — dat zit dus goed.`
+  : `het zegt niets over die twee onderling. Beoordeel zelf of het als drietal
+werkt; vind je van niet, zeg dat dan eerlijk en leg uit welke van de twee je
+zou laten vallen.`}
+Verdeel over drie: één kleur voert, één ondersteunt, één blijft klein.\n`
+    : '';
 
   try {
     const raw = await callClaude(
       `Je bent een persoonlijke stylist voor Griette. ${DNA_KORT}${profielBlok()}
 Antwoord in het Nederlands. Kies alleen uit de gegeven lijst.`,
       [{ type:'text', text:
-`Griette wil een outfit met dit kleurenpaar uit haar eigen kleurenschema:
-${hoofd} + ${partner}
+`Griette wil een outfit met deze kleuren uit haar eigen kleurenschema:
+${alle.join(' + ')}
 
-${model}
-${parenZin([hoofd, partner])}${voorwaardenZin()}
+${model}${drietal}
+${parenZin(alle)}${voorwaardenZin()}
 BESCHIKBAAR IN HAAR KAST (id | categorie | naam | kleur):
 ${kast}
 
-Stel één draagbare outfit samen van 4 tot 6 stukken waarin dit paar echt te
-zien is. Kies stukken waarvan de kleur klopt; laat je niet verleiden tot een
-outfit waarin het paar alleen in een klein detail zit.
+Stel één draagbare outfit samen van 4 tot 6 stukken waarin deze kleuren echt
+te zien zijn. Kies stukken waarvan de kleur klopt; laat je niet verleiden tot
+een outfit waarin een van deze kleuren alleen in een klein detail zit.
 ${buitenlaagRegel(huidigeVoorwaarden().weer)}${EENDELIG_REGEL}
 Heeft ze te weinig in deze kleuren om dit te maken, zeg dat dan eerlijk en
 noem wat er precies mist.
@@ -1422,12 +1497,12 @@ Antwoord ALLEEN met JSON:
       return echt ? Object.assign({}, echt, { _waarom: x.waarom || '' }) : null;
     }).filter(Boolean);
 
-    paarSuggestie = { hoofd, partner, soort, data: d, stukken };
+    paarSuggestie = { hoofd, partners, soort, data: d, stukken };
 
     const kanKleur = /nee/i.test(d.kan_het || '') ? '#b5232a'
                    : /deels/i.test(d.kan_het || '') ? '#9B7B5C' : 'var(--green)';
     el.innerHTML = '<div class="cap-outfit">'
-      + `<div class="cap-kop"><span class="cap-naam">${esc(d.naam || hoofd + ' + ' + partner)}</span>`
+      + `<div class="cap-kop"><span class="cap-naam">${esc(d.naam || alle.join(' + '))}</span>`
       + `<span class="cap-stijl" style="color:${kanKleur}">${esc((d.kan_het||'').toUpperCase())}</span></div>`
       + verhoudingsBalk(d.rollen)
       + (stukken.length
@@ -1453,9 +1528,9 @@ Antwoord ALLEEN met JSON:
 // andere route, zodat je daarna gewoon verder kunt.
 function paarNaarKaart() {
   if (!paarSuggestie) return;
-  const { hoofd, partner, data, stukken } = paarSuggestie;
+  const { hoofd, partners, data, stukken } = paarSuggestie;
   comboGekozen({
-    name: data.naam || `${hoofd} + ${partner}`,
+    name: data.naam || [hoofd].concat(partners).join(' + '),
     vibe: data.waarom || '',
     typeName: 'Uit je eigen kleurenschema',
     stijl: '',
@@ -1465,7 +1540,7 @@ function paarNaarKaart() {
   }, {
     items: stukken.slice(0, 6),
     ankers: [],
-    bron: `Kleurenpaar ${hoofd} + ${partner} uit je eigen schema`,
+    bron: `Kleuren ${opsom([hoofd].concat(partners))} uit je eigen schema`,
   });
   document.getElementById('startpunt').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
@@ -2838,7 +2913,12 @@ function setStartMode(mode) {
   if (sb) sb.style.display = kaartRoute ? 'flex' : 'none';
   if (bb) bb.style.display = kaartRoute ? 'flex' : 'none';
 
-  if (mode === 'paar') toonPaarTabellen();
+  if (mode === 'paar') {
+    paarKeuze = { hoofd: null, partners: [], soort: '' };
+    toonPaarTabellen(); toonPaarKeuze();
+    const u = document.getElementById('paar-uitkomst');
+    if (u) { u.style.display = 'none'; u.innerHTML = ''; }
+  }
 
   if (mode === 'capsule') {
     capToonStap(1);
