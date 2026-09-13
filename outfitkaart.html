@@ -423,6 +423,16 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <button class="btn-rescan" onclick="if(confirm('Alle beschrijvingen wissen en opnieuw scannen?'))scanKast(true)">Opnieuw scannen</button>
     </div>
 
+    <!-- MIJN KLEURENBRONNEN — kleurkennis die zij zelf tegenkomt -->
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);" id="bron-sectie">
+      <div class="sec-label">Mijn kleurenbronnen</div>
+      <div class="modal-note" style="margin-bottom:9px;">Kom je een kleurenschema tegen — een matrix van combinaties, een seizoenspalet, een "pairs with"-plaatje — zet er dan een schermafdruk van neer. Ik lees eruit welke kleuren volgens die bron samengaan en wat er precies beweerd wordt, en zet dat bij je eigen kleurkennis. De stylist gebruikt het daarna bij elk kleuradvies. Let op: zulke schema's zeggen meestal alleen wélke kleuren kunnen, niet in welke verhouding — die vul ik aan volgens jouw eigen regel.</div>
+      <input type="file" id="bron-file" accept="image/*" multiple style="display:none">
+      <button class="plaat-add" onclick="document.getElementById('bron-file').click()">＋ Kleurenschema toevoegen</button>
+      <div class="field-note" id="bron-status" style="margin-top:6px;"></div>
+      <div id="bron-lijst" style="margin-top:10px;"></div>
+    </div>
+
     <!-- MIJN INSPIRATIEPLAAT -->
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);" id="plaat-sectie">
       <div class="sec-label">Mijn inspiratieplaat</div>
@@ -796,7 +806,7 @@ const KLEUREN = [
   {v:'hemelsblauw',dot:'#4aa8d8'},{v:'denimblauw',dot:'#4a6d94'},{v:'kobaltblauw',dot:'#0047AB'},
   {v:'petrol',dot:'#1a4d5c'},{v:'turquoise',dot:'#2ab0a8'},{v:'smaragdgroen',dot:'#0f7361'},
   {v:'mintgroen',dot:'#88c8b0'},{v:'salie',dot:'#9caa8c'},{v:'groen',dot:'#4a8a5c'},
-  {v:'olijf/khaki',dot:'#6b7c45'},{v:'zilver',dot:'#bbb'},
+  {v:'olijf/khaki',dot:'#6b7c45'},{v:'chartreuse',dot:'#c4d21e'},{v:'zilver',dot:'#bbb'},
 ];
 
 // Griette's stijl DNA — embedded in all AI prompts
@@ -1097,6 +1107,268 @@ const COMBO_TYPES = [
   },
 ];
 
+
+// ── KLEURPAREN UIT GRIETTE'S EIGEN BRONNEN ────────────────────────────────────
+// Twee soorten kennis die zij zelf aandroeg. De eerste is een herfstmatrix:
+// per kleur vier partners die "altijd werken". De tweede zijn vier seizoens-
+// kleuren met elk hun tegenspelers.
+//
+// Let op wat deze bronnen WEL en NIET zeggen. Ze zeggen wélke kleuren samen
+// kunnen. Over verhouding zeggen ze niets — behalve de turquoise-bron, die
+// "pair with neutrals to tone down the brightness" meegeeft. De verhouding die
+// de tool hieraan hangt is dus een invulling volgens de regel die er al lag:
+// één kleur voert, één ondersteunt, het accent blijft klein. Dat staat er ook
+// bij, zodat het niet als bronkennis wordt gelezen.
+// Schema's die zij zelf toevoegt. Staat hier omdat de parenlogica hieronder
+// er meteen uit leest.
+let eigenBronnen = [];   // [{id, naam, datum, soort, paren:{}, notities:{}, zegt}]
+
+const KLEURPAREN = {
+  // ── SOORT 1: BASISPAREN (uit de herfstmatrix) ──────────────────────────────
+  // Kijk naar wat er in die matrix staat: bordeaux, olijf, zwart, bruin,
+  // lichtblauw, lichtroze, grijs, marine, camel. Bijna allemaal neutraal of
+  // gedempt. Elke rij koppelt zo'n kleur aan vier andere van dezelfde soort.
+  // Daar zit een verhoudingsmodel in dat de bron niet uitspreekt maar wel
+  // laat zien: dit zijn paren waar je een hele outfit uit kunt bouwen. Beide
+  // kleuren mogen een groot vlak zijn; er is geen derde kleur nodig en geen
+  // accentlogica. 60/40 tussen de twee, en een accent alleen als jij dat wilt.
+  basis: {
+    bordeaux:      ['grijs','roze','lichtblauw','bruin'],
+    'olijf/khaki': ['camel','marine','bordeaux','grijs'],
+    zwart:         ['wit','beige','camel','lichtblauw'],
+    bruin:         ['bordeaux','lichtblauw','marine','olijf/khaki'],
+    lichtblauw:    ['beige','bruin','grijs','bordeaux'],
+    roze:          ['bruin','grijs','marine','olijf/khaki'],
+    grijs:         ['roze','bordeaux','olijf/khaki','wit'],
+    marine:        ['camel','wit','beige','bordeaux'],
+    camel:         ['olijf/khaki','bordeaux','bruin','wit'],
+    beige:         ['zwart','marine','lichtblauw'],
+    wit:           ['zwart','grijs','marine','camel'],
+  },
+
+  // ── SOORT 2: BLOKPAREN (uit de vier seizoenskleuren) ───────────────────────
+  // Hier staat steeds één verzadigde kleur centraal, met vier partners die
+  // óók verzadigd zijn: turquoise met vuurrood, chartreuse met bordeaux,
+  // paars met kersentomaat. Op de voorbeeldfoto's zijn allebei die kleuren
+  // grote vlakken — een turquoise trui bij een rode rok, een limoengroene jas
+  // bij een rode rok. Dat is kleurblokken, geen accent.
+  // Dit is een ander verhoudingsmodel dan hierboven, en het vraagt om iets
+  // extra's: de turquoise-bron zegt zelf "zet er neutralen tegenover om de
+  // felheid te temperen". Twee verzadigde kleuren dus, met een neutrale derde
+  // die het draagbaar houdt.
+  blok: {
+    turquoise:  ['chartreuse','oranje','paars','rood'],
+    felroze:    ['chartreuse','groen','perzik','rood'],
+    chartreuse: ['bordeaux','lichtblauw','rood','roze'],
+    paars:      ['chartreuse','ijsblauw','oranje-rood','chocolade'],
+  },
+
+  // Wat de bronnen zélf over een kleur zeggen — niet meer dan dat. De rest van
+  // wat hierboven staat is mijn lezing van de voorbeeldfoto's, en dat hoort
+  // niet door elkaar te lopen.
+  notities: {
+    turquoise:  'Onverwacht voor het najaar, en dat is precies de bedoeling. Zet er neutralen tegenover om de felheid te temperen.',
+    felroze:    'Roze met meer diepte — rijpe bes in plaats van kauwgom. Romantisch zonder zoet te worden.',
+    chartreuse: 'Zit tussen geel en groen in: fel, vrolijk en niet te negeren.',
+    paars:      'Draagt drama in zich, zeker naast een onverwachte kleur.',
+  },
+};
+
+// ── KLEURENBRONNEN DIE ZIJ ZELF AANDRAAGT ─────────────────────────────────────
+// De twee schema's hierboven zette ik er met de hand in. Dat schaalt niet: zij
+// komt zulke plaatjes wekelijks tegen. Dus kan ze ze nu zelf invoeren — één
+// keer lezen, daarna is het kennis die bij elk kleuradvies meereist. De foto
+// zelf gaat niet mee in latere vragen; alleen wat eruit gelezen is.
+async function laadBronnen() {
+  try { eigenBronnen = JSON.parse(localStorage.getItem('griette-kleurbronnen-v1') || '[]'); } catch(e){}
+  if (!Array.isArray(eigenBronnen)) eigenBronnen = [];
+  const sb = await sbGet('kleurbronnen');
+  if (Array.isArray(sb)) eigenBronnen = sb;
+}
+
+async function bewaarBronnen() {
+  try { localStorage.setItem('griette-kleurbronnen-v1', JSON.stringify(eigenBronnen)); } catch(e){}
+  try { await sbSet('kleurbronnen', eigenBronnen); } catch(e){}
+}
+
+async function bronToevoegen(ev) {
+  const files = [...(ev.target.files || [])].slice(0, 4);
+  ev.target.value = '';
+  if (!files.length) return;
+  const st = document.getElementById('bron-status');
+  const kleurNamen = KLEUREN.map(k => k.v).join(', ');
+
+  for (const f of files) {
+    st.textContent = '⏳ Schema lezen…';
+    try {
+      const base64 = await verkleinFoto(f, 1400);
+      const raw = await callClaude(
+        'Je leest kleurenschema\'s uit de mode en zet ze om in data. Antwoord in het Nederlands.',
+        [{ type:'image', source:{ type:'base64', media_type:'image/jpeg', data: base64 } },
+         { type:'text', text:
+`Lees dit kleurenschema en zet om in data.
+
+Geef per kleur die als uitgangspunt wordt genoemd, welke kleuren er volgens dit
+schema bij passen. Is het een matrix met rijen en kolommen, neem dan elke rij
+over. Is het één kleur met "pairs with", neem die kleur en zijn partners.
+
+Vertaal alle kleurnamen naar deze lijst; kies steeds de dichtstbijzijnde:
+${kleurNamen}
+Staat er een kleur die echt in geen enkele naam te vangen is, laat hem dan weg.
+
+Zeg ook wat voor soort schema dit is. Een matrix van gedempte en neutrale
+kleuren is een "matrix": daar kunnen beide kleuren een groot vlak zijn. Eén
+verzadigde kleur met verzadigde tegenspelers is een "palet": dat zijn
+kleurblokken en die vragen meestal om iets neutraals erbij.
+
+Zegt de bron iets over verhouding, over waar je een kleur draagt, of waarom een
+combinatie werkt, neem dat dan over in "zegt" en in "notities". Zegt de bron
+daar niets over — en dat is meestal zo — laat het dan leeg. Verzin niets bij:
+schrijf alleen op wat er staat.
+
+Antwoord ALLEEN met JSON:
+{"naam":"korte naam voor dit schema, bijv. Herfstcombinaties of Turquoise",
+ "soort":"matrix of palet",
+ "paren":{"kleurnaam":["partner","partner"]},
+ "notities":{"kleurnaam":"wat de bron over deze kleur zegt, of laat weg"},
+ "zegt":"wat de bron beweert over verhouding of toepassing, of leeg"}` }],
+        3000, null, 'scan');
+
+      const d = extractJson(raw);
+      if (!d || !d.paren) throw new Error('geen bruikbaar schema herkend');
+
+      // alleen kleuren die de tool kent, anders vervuilt het de kennis
+      const geldig = new Set(KLEUREN.map(k => k.v));
+      const paren = {};
+      Object.entries(d.paren).forEach(([k, lijst]) => {
+        const kk = String(k).toLowerCase();
+        if (!geldig.has(kk)) return;
+        const p = [].concat(lijst || []).map(x => String(x).toLowerCase()).filter(x => geldig.has(x));
+        if (p.length) paren[kk] = p;
+      });
+      if (!Object.keys(paren).length) throw new Error('geen kleuren herkend die de tool kent');
+
+      eigenBronnen.unshift({
+        id: 'bron-' + Date.now().toString(36),
+        naam: d.naam || 'Kleurenschema',
+        datum: new Date().toISOString(),
+        soort: d.soort || '',
+        paren,
+        notities: d.notities || {},
+        zegt: d.zegt || '',
+      });
+      eigenBronnen = eigenBronnen.slice(0, 12);
+      await bewaarBronnen();
+      toonBronnen();
+      st.textContent = `"${d.naam || 'Schema'}" toegevoegd: ${Object.keys(paren).length} kleuren.`;
+    } catch(e) {
+      st.textContent = 'Dit schema lezen lukte niet: ' + e.message;
+      return;
+    }
+  }
+}
+
+function toonBronnen() {
+  const el = document.getElementById('bron-lijst');
+  if (!el) return;
+  el.innerHTML = eigenBronnen.length
+    ? eigenBronnen.map((b, i) => {
+        const kleuren = Object.keys(b.paren || {});
+        const soort = b.soort === 'palet' ? 'kleurblokken' : b.soort === 'matrix' ? 'basisparen' : '';
+        return '<div class="cap-outfit" style="margin-bottom:8px;">'
+          + `<div class="cap-kop"><span class="cap-naam">${esc(b.naam)}</span>`
+          + `<span class="cap-stijl">${kleuren.length} kleuren</span></div>`
+          + (soort ? `<div class="cap-waarom">${esc(soort)}</div>` : '')
+          + '<div class="cap-stukken" style="margin-top:6px;">'
+          + kleuren.slice(0, 10).map(k => {
+              const dot = (KLEUREN.find(x => x.v === k) || {}).dot || '#ccc';
+              return `<span class="cap-chip"><span class="cap-dot" style="background:${esc(dot)}"></span> ${esc(k)}</span>`;
+            }).join('')
+          + '</div>'
+          + (b.zegt ? `<div class="cap-waarom">${esc(b.zegt)}</div>` : '')
+          + `<button class="cap-vervang-btn" style="margin-top:8px;width:100%;" `
+          + `onclick="verwijderBron(${i})">🗑 Verwijderen</button></div>`;
+      }).join('')
+    : '<div class="field-note">Nog geen eigen schema\'s. De twee die je eerder aandroeg zitten al vast in de tool.</div>';
+}
+
+async function verwijderBron(i) {
+  if (!confirm('Dit kleurenschema weggooien?')) return;
+  eigenBronnen.splice(i, 1);
+  await bewaarBronnen();
+  toonBronnen();
+}
+
+// Welke partners kent de tool voor deze kleur? Werkt beide kanten op, want een
+// matrix die zegt "camel past bij bordeaux" zegt ook dat bordeaux bij camel past.
+function bekendePartners(kleur) {
+  return bekendeParen(kleur).map(p => p.kleur);
+}
+
+// Hetzelfde, maar met de soort erbij — want die bepaalt de verhouding.
+// "basis" betekent: allebei mogen groot, samen dragen ze de outfit.
+// "blok" betekent: twee verzadigde kleuren, zet er iets neutraals bij.
+function bekendeParen(kleur) {
+  const k = String(kleur || '').toLowerCase();
+  const uit = new Map();
+  const bekijk = (tabel, soort) => {
+    (tabel[k] || []).forEach(p => uit.set(p, soort));
+    Object.entries(tabel).forEach(([a, lijst]) => {
+      if ([].concat(lijst || []).includes(k)) uit.set(a, soort);
+    });
+  };
+  bekijk(KLEURPAREN.basis, 'basis');
+  bekijk(KLEURPAREN.blok, 'blok');
+  // Wat zij zelf heeft ingevoerd kent die tweedeling niet; die blijft neutraal.
+  eigenBronnen.forEach(bron => bekijk(bron.paren || {}, bron.soort === 'palet' ? 'blok' : 'eigen'));
+  uit.delete(k);
+  return [...uit.entries()].map(([kleur, soort]) => ({ kleur, soort }));
+}
+
+// Wat haar eigen bronnen over deze kleuren zeggen.
+function bronNotitie(kleur) {
+  const k = String(kleur || '').toLowerCase();
+  for (const b of eigenBronnen) {
+    if (b.notities && b.notities[k]) return b.notities[k];
+  }
+  return KLEURPAREN.notities[k] || '';
+}
+
+// Wat de stylist hierover te horen krijgt bij een vraag over een kleur.
+function parenZin(kleuren) {
+  const regels = [];
+  let heeftBlok = false, heeftBasis = false;
+  (kleuren || []).forEach(k => {
+    const paren = bekendeParen(k);
+    if (!paren.length) return;
+    const basis = paren.filter(p => p.soort === 'basis').map(p => p.kleur);
+    const blok  = paren.filter(p => p.soort === 'blok').map(p => p.kleur);
+    const eigen = paren.filter(p => p.soort === 'eigen').map(p => p.kleur);
+    if (basis.length) { heeftBasis = true;
+      regels.push(`- ${k} + ${basis.join(', ')} — basisparen: allebei mogen een groot vlak zijn`); }
+    if (blok.length) { heeftBlok = true;
+      regels.push(`- ${k} + ${blok.join(', ')} — kleurblokken: twee verzadigde kleuren tegenover elkaar`); }
+    if (eigen.length)
+      regels.push(`- ${k} + ${eigen.join(', ')} — uit een schema dat zij zelf toevoegde`);
+    const n = bronNotitie(k);
+    if (n) regels.push(`  De bron zegt hierover: "${n}"`);
+  });
+  if (!regels.length) return '';
+
+  return `\nUIT GRIETTE'S EIGEN KLEURENBRONNEN:\n${regels.join('\n')}\n`
+    + 'Die bronnen noemen alleen wélke kleuren samen kunnen. Over verhouding\n'
+    + 'zeggen ze niets; de tweedeling hierboven is afgeleid uit wat de\n'
+    + 'voorbeeldfoto\'s laten zien, niet uit een uitspraak van de bron.\n'
+    + (heeftBasis
+        ? 'BASISPAREN vragen geen derde kleur en geen accentlogica: twee gedempte\n'
+        + 'of neutrale kleuren die samen de hele outfit dragen, grofweg 60/40.\n' : '')
+    + (heeftBlok
+        ? 'KLEURBLOKKEN zijn twee verzadigde kleuren die allebei groot mogen. Die\n'
+        + 'vragen juist wél om iets neutraals erbij om het draagbaar te houden —\n'
+        + 'dat zegt de bron zelf. Hier geldt de accentregel dus niet: geen van\n'
+        + 'beide is het kleine accent.\n' : '')
+    + 'Wijk af als het voor haar beter uitpakt, maar zeg dan waarom.\n';
+}
 
 // ── OUTFITS DIE STYLIST ROBIN UIT DE KAST SAMENSTELDE (stijlrapport, p.65-97) ──
 // id = item uit de digitale garderobe. mis:true = stond wel in het rapport,
@@ -1515,6 +1787,7 @@ function bijwerkZuinigPrijs() {
 }
 
 function openSettings() {
+  toonBronnen();
   bijwerkScanKnop();
   bijwerkVerbruik();
   document.getElementById('zuinig-check').checked = zuinig;
@@ -1582,6 +1855,7 @@ async function init() {
   customCount = allItems.filter(i=>String(i.id).startsWith('custom-')).length;
   await laadVisueel();
   await laadPlaat();
+  await laadBronnen();
   await laadKaarten();
   await laadTassen();
 
@@ -2536,6 +2810,7 @@ ${meervoud
   ? 'Beide items moeten samen in elke combo werken; de overige kleuren bouwen eromheen. Botsen ze qua kleur of textuur, zeg dat dan in de vibe van de combo die dat het beste oplost.'
   : 'Het item moet in elke combo passen; de overige kleuren bouwen eromheen.'}
 ${vwBlok}
+${parenZin(anchorItems.flatMap(kleurenVan))}
 Varieer de stijlrichtingen: geef zowel gedurfde streetstyle keuzes als
 elegante en klassieke opties.
 
@@ -2750,6 +3025,7 @@ async function drieRichtingen() {
 `Griette heeft deze stukken al gekozen en die blijven staan:
 ${vast}
 ${voorwaardenZin()}
+${parenZin(anchorItems.flatMap(kleurenVan))}
 Kijk naar wat hier nog aan ontbreekt — in kleur én in stijl — en geef DRIE
 verschillende richtingen om het af te maken${gel ? ' voor: ' + gel : ''}.
 
@@ -4627,7 +4903,7 @@ Antwoord in het Nederlands.`,
 `${capItems.length ? 'Griette wil deze stukken dragen: ' + capItems.map(i => i.name).join(' + ') + '.\n' : ''}${wilKleurenZin()}De kleuren waar het om draait: ${opsom(ankers)}.
 ${capNietKleuren.length ? `Ze wil er NIET bij: ${capNietKleuren.join(', ')}. Noem die kleuren niet.\n` : ''}
 Deze kleuren hangen verder in haar kast: ${inKast.join(', ') || 'onbekend'}.
-${inspoZin()}
+${parenZin(ankers)}${inspoZin()}
 
 Geef 6 verschillende manieren om hier een derde kleur bij te zetten. Kies
 alleen kleuren die in haar kast hangen. Maak ze onderling echt verschillend:
@@ -6627,6 +6903,8 @@ function restart() {
 document.getElementById('anchor-search').addEventListener('input', e => buildAnchorGrid(e.target.value));
 koppelInspo();
 koppelPlaat();
+const bronInput = document.getElementById('bron-file');
+if (bronInput) bronInput.addEventListener('change', bronToevoegen);
 init().then(()=>{ setStep(1); toonPlaat(); });
 </script>
 </body>
