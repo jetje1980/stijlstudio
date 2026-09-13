@@ -442,9 +442,11 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <button class="plaat-add" onclick="document.getElementById('bron-file').click()">＋ Kleurenschema toevoegen</button>
       <div class="field-note" id="bron-status" style="margin-top:6px;"></div>
       <div id="bron-lijst" style="margin-top:10px;"></div>
+      <button class="btn-rescan" style="margin-top:8px;" onclick="naarKleurenparen()">🎨 Er een outfit mee maken →</button>
 
       <div class="sec-label" style="margin-top:14px;">Wat de tool al weet</div>
-      <div class="modal-note" style="margin-bottom:8px;">De schema's die je eerder aandroeg, overgenomen zoals ze er staan. Leg ze gerust naast je schermafdruk. Wil je er een outfit uit maken, kies dan op het beginscherm <b>Met een kleurenpaar uit mijn schema's</b>.</div>
+      <div class="modal-note" style="margin-bottom:8px;">De schema's die je eerder aandroeg, overgenomen zoals ze er staan. Leg ze gerust naast je schermafdruk. Hier kijk je alleen na of het klopt — een outfit maak je met de knop hieronder.</div>
+      <button class="ai-btn" style="margin-bottom:10px;" onclick="naarKleurenparen()">🎨 Outfit maken met een kleurenpaar →</button>
       <div id="bron-vast"></div>
     </div>
 
@@ -1320,6 +1322,16 @@ function parenTabelHTML(paren, soort, klikbaar) {
 
 // De tabellen zoals je ze in deze route te zien krijgt: klikbaar, met je eigen
 // schema's erbij als je die hebt toegevoegd.
+// Vanuit de instellingen rechtstreeks naar de route waar je er wél iets mee
+// kunt. Zonder dit stond je in een tabel die nergens op reageerde.
+function naarKleurenparen() {
+  closeSettings();
+  setStep(1);
+  setStartMode('paar');
+  const el = document.getElementById('paar-area');
+  if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
 function toonPaarTabellen() {
   const el = document.getElementById('paar-tabellen');
   if (!el) return;
@@ -1783,7 +1795,7 @@ const AI_ENDPOINT = SUPABASE_URL + '/functions/v1/claude';
 // ── SETTINGS ──────────────────────────────────────────────────────────────────
 // Deze versie staat in de instellingen. Klaagt er iets, dan is meteen te zien
 // of de telefoon een oude pagina uit de cache draait in plaats van deze.
-const APP_VERSIE = '2026-09-09b · kleuren uitsluiten + ankercombo\'s';
+const APP_VERSIE = '2026-09-13 · kleurenparen + aankleedpop';
 
 function toonVersie() {
   const vr = document.getElementById('versie-regel');
