@@ -187,6 +187,15 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
    terwijl je die net had uitgesloten: je zag nergens meer dat het gold. */
 /* Twee soorten routes horen niet als één rijtje te lezen: vijf maken één
    kaart, de weekendtas plant een hele reis met eigen stappen. */
+/* De parentabel: per hoofdkleur zijn partners, zoals in het schema zelf. */
+.paren-tabel{margin-top:8px;display:flex;flex-direction:column;gap:5px;}
+.pt-rij{display:flex;gap:7px;align-items:flex-start;}
+.pt-hoofd{flex:0 0 92px;}
+.pt-partners{display:flex;flex-wrap:wrap;gap:4px;flex:1;}
+.pt-kleur{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 7px;
+  border-radius:10px;background:var(--ph-bg);border:1px solid var(--border);white-space:nowrap;}
+.pt-hoofd .pt-kleur{font-weight:600;background:var(--surface);}
+
 /* Drie richtingen: elk een compleet advies, niet alleen een kleurenrijtje. */
 .richting-kaart{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;
   padding:14px;margin-bottom:10px;}
@@ -431,6 +440,10 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <button class="plaat-add" onclick="document.getElementById('bron-file').click()">＋ Kleurenschema toevoegen</button>
       <div class="field-note" id="bron-status" style="margin-top:6px;"></div>
       <div id="bron-lijst" style="margin-top:10px;"></div>
+
+      <div class="sec-label" style="margin-top:14px;">Wat de tool al weet</div>
+      <div class="modal-note" style="margin-bottom:8px;">De schema's die je eerder aandroeg, overgenomen zoals ze er staan. Leg ze gerust naast je schermafdruk.</div>
+      <div id="bron-vast"></div>
     </div>
 
     <!-- MIJN INSPIRATIEPLAAT -->
@@ -1142,8 +1155,9 @@ const KLEURPAREN = {
     grijs:         ['roze','bordeaux','olijf/khaki','wit'],
     marine:        ['camel','wit','beige','bordeaux'],
     camel:         ['olijf/khaki','bordeaux','bruin','wit'],
-    beige:         ['zwart','marine','lichtblauw'],
-    wit:           ['zwart','grijs','marine','camel'],
+    // Beige en wit staan niet als eigen rij in de matrix; ze komen alleen voor
+    // als partner. Ze zijn hier niet opgenomen, want bekendeParen() kijkt toch
+    // al beide kanten op — dan blijft deze tabel een letterlijke overname.
   },
 
   // ── SOORT 2: BLOKPAREN (uit de vier seizoenskleuren) ───────────────────────
@@ -1268,6 +1282,24 @@ Antwoord ALLEEN met JSON:
   }
 }
 
+// Zo zie je terug wat er is ingelezen: per hoofdkleur de partners, net als in
+// het schema waar je hem vandaan haalt. Zonder dit zag je alleen een aantal,
+// en kon je niet nakijken of hij je plaatje goed gelezen had.
+function parenTabelHTML(paren) {
+  const rijen = Object.entries(paren || {});
+  if (!rijen.length) return '';
+  const bol = k => {
+    const dot = (KLEUREN.find(x => x.v === k) || {}).dot || '#ccc';
+    return `<span class="pt-kleur"><span class="cap-dot" style="background:${esc(dot)}"></span>${esc(k)}</span>`;
+  };
+  return '<div class="paren-tabel">' + rijen.map(([hoofd, partners]) =>
+      '<div class="pt-rij">'
+      + `<div class="pt-hoofd">${bol(hoofd)}</div>`
+      + '<div class="pt-partners">'
+      + [].concat(partners || []).map(bol).join('')
+      + '</div></div>').join('') + '</div>';
+}
+
 function toonBronnen() {
   const el = document.getElementById('bron-lijst');
   if (!el) return;
@@ -1279,17 +1311,27 @@ function toonBronnen() {
           + `<div class="cap-kop"><span class="cap-naam">${esc(b.naam)}</span>`
           + `<span class="cap-stijl">${kleuren.length} kleuren</span></div>`
           + (soort ? `<div class="cap-waarom">${esc(soort)}</div>` : '')
-          + '<div class="cap-stukken" style="margin-top:6px;">'
-          + kleuren.slice(0, 10).map(k => {
-              const dot = (KLEUREN.find(x => x.v === k) || {}).dot || '#ccc';
-              return `<span class="cap-chip"><span class="cap-dot" style="background:${esc(dot)}"></span> ${esc(k)}</span>`;
-            }).join('')
-          + '</div>'
+          + parenTabelHTML(b.paren)
           + (b.zegt ? `<div class="cap-waarom">${esc(b.zegt)}</div>` : '')
           + `<button class="cap-vervang-btn" style="margin-top:8px;width:100%;" `
           + `onclick="verwijderBron(${i})">🗑 Verwijderen</button></div>`;
       }).join('')
-    : '<div class="field-note">Nog geen eigen schema\'s. De twee die je eerder aandroeg zitten al vast in de tool.</div>';
+    : '<div class="field-note">Nog geen eigen schema\'s toegevoegd.</div>';
+
+  const vast = document.getElementById('bron-vast');
+  if (vast) vast.innerHTML =
+      '<div class="cap-outfit" style="margin-bottom:8px;">'
+    + '<div class="cap-kop"><span class="cap-naam">Herfstcombinaties</span>'
+    + `<span class="cap-stijl">${Object.keys(KLEURPAREN.basis).length} kleuren</span></div>`
+    + '<div class="cap-waarom">Basisparen: allebei mogen een groot vlak zijn, grofweg 60/40.</div>'
+    + parenTabelHTML(KLEURPAREN.basis)
+    + '</div>'
+    + '<div class="cap-outfit">'
+    + '<div class="cap-kop"><span class="cap-naam">Seizoenskleuren</span>'
+    + `<span class="cap-stijl">${Object.keys(KLEURPAREN.blok).length} kleuren</span></div>`
+    + '<div class="cap-waarom">Kleurblokken: twee verzadigde kleuren, met iets neutraals erbij.</div>'
+    + parenTabelHTML(KLEURPAREN.blok)
+    + '</div>';
 }
 
 async function verwijderBron(i) {
