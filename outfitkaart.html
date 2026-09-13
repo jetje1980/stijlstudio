@@ -195,6 +195,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .pt-kleur{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 7px;
   border-radius:10px;background:var(--ph-bg);border:1px solid var(--border);white-space:nowrap;}
 .pt-hoofd .pt-kleur{font-weight:600;background:var(--surface);}
+.pt-knop{cursor:pointer;font-family:inherit;color:var(--text);transition:border-color .12s;}
+.pt-knop:hover,.pt-knop:active{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface));}
 
 /* Drie richtingen: elk een compleet advies, niet alleen een kleurenrijtje. */
 .richting-kaart{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;
@@ -442,7 +444,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <div id="bron-lijst" style="margin-top:10px;"></div>
 
       <div class="sec-label" style="margin-top:14px;">Wat de tool al weet</div>
-      <div class="modal-note" style="margin-bottom:8px;">De schema's die je eerder aandroeg, overgenomen zoals ze er staan. Leg ze gerust naast je schermafdruk.</div>
+      <div class="modal-note" style="margin-bottom:8px;">De schema's die je eerder aandroeg, overgenomen zoals ze er staan. Leg ze gerust naast je schermafdruk. Wil je er een outfit uit maken, kies dan op het beginscherm <b>Met een kleurenpaar uit mijn schema's</b>.</div>
       <div id="bron-vast"></div>
     </div>
 
@@ -479,6 +481,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     </div>
     <button class="mode-btn" id="mode-robin" onclick="setStartMode('robin')" style="width:100%;margin-top:8px;">📖 Kant-en-klaar: de 33 outfits van Robin</button>
     <button class="mode-btn" id="mode-inspo" onclick="setStartMode('inspo')" style="width:100%;margin-top:8px;">📸 Deze look wil ik namaken</button>
+    <button class="mode-btn" id="mode-paar" onclick="setStartMode('paar')" style="width:100%;margin-top:8px;">🎨 Met een kleurenpaar uit mijn schema's</button>
 
     <div class="route-scheiding"><span>of</span></div>
 
@@ -591,6 +594,15 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <div class="field-note" id="inspo-status" style="margin-top:6px;"></div>
     <div id="inspo-recept" style="margin-top:12px;"></div>
     <button class="btn-rescan" style="margin-top:10px;" onclick="openSettings();setTimeout(()=>{const e=document.getElementById('plaat-sectie');if(e)e.scrollIntoView({behavior:'smooth'});},120)">Meer foto's? Maak een inspiratieplaat en laat me je stijl leren →</button>
+  </div>
+
+  <!-- ROUTE: een kleurenpaar uit haar eigen schema's. Het beheren van die
+       schema's hoort in de instellingen; er iets mee máken hoort hier. -->
+  <div id="paar-area" style="display:none">
+    <div class="sec-label">Kleurenparen uit jouw schema's</div>
+    <div class="field-note" style="margin-bottom:10px;">Tik een partnerkleur aan; ik zoek er een outfit bij uit je eigen kast, in de verhouding die bij dat soort paar hoort. Nieuwe schema's voeg je toe bij ⚙ Instellingen.</div>
+    <div id="paar-tabellen"></div>
+    <div id="paar-uitkomst" style="display:none;margin-top:12px;"></div>
   </div>
 
   <!-- ROUTE: outfits uit het stijlrapport -->
@@ -1285,19 +1297,165 @@ Antwoord ALLEEN met JSON:
 // Zo zie je terug wat er is ingelezen: per hoofdkleur de partners, net als in
 // het schema waar je hem vandaan haalt. Zonder dit zag je alleen een aantal,
 // en kon je niet nakijken of hij je plaatje goed gelezen had.
-function parenTabelHTML(paren) {
+function parenTabelHTML(paren, soort, klikbaar) {
   const rijen = Object.entries(paren || {});
   if (!rijen.length) return '';
-  const bol = k => {
-    const dot = (KLEUREN.find(x => x.v === k) || {}).dot || '#ccc';
-    return `<span class="pt-kleur"><span class="cap-dot" style="background:${esc(dot)}"></span>${esc(k)}</span>`;
-  };
+  const dotVan = k => (KLEUREN.find(x => x.v === k) || {}).dot || '#ccc';
+  const bol = k =>
+    `<span class="pt-kleur"><span class="cap-dot" style="background:${esc(dotVan(k))}"></span>${esc(k)}</span>`;
+  // De partners zijn knoppen: een paar aantikken levert meteen een outfit uit
+  // je eigen kast op. Zonder dat bleef deze tabel iets om naar te kijken.
+  const knop = (hoofd, partner) =>
+    `<button class="pt-kleur pt-knop" title="Maak hier een outfit mee" `
+    + `onclick="outfitVoorPaar('${esc(hoofd)}','${esc(partner)}','${esc(soort || '')}')">`
+    + `<span class="cap-dot" style="background:${esc(dotVan(partner))}"></span>${esc(partner)}</button>`;
+
   return '<div class="paren-tabel">' + rijen.map(([hoofd, partners]) =>
       '<div class="pt-rij">'
       + `<div class="pt-hoofd">${bol(hoofd)}</div>`
       + '<div class="pt-partners">'
-      + [].concat(partners || []).map(bol).join('')
+      + [].concat(partners || []).map(p => klikbaar ? knop(hoofd, p) : bol(p)).join('')
       + '</div></div>').join('') + '</div>';
+}
+
+// De tabellen zoals je ze in deze route te zien krijgt: klikbaar, met je eigen
+// schema's erbij als je die hebt toegevoegd.
+function toonPaarTabellen() {
+  const el = document.getElementById('paar-tabellen');
+  if (!el) return;
+  const blok = (naam, uitleg, paren, soort) =>
+      '<div class="cap-outfit" style="margin-bottom:10px;">'
+    + `<div class="cap-kop"><span class="cap-naam">${esc(naam)}</span>`
+    + `<span class="cap-stijl">${Object.keys(paren).length} kleuren</span></div>`
+    + `<div class="cap-waarom">${esc(uitleg)}</div>`
+    + parenTabelHTML(paren, soort, true)
+    + '</div>';
+
+  el.innerHTML =
+      blok('Herfstcombinaties',
+           'Basisparen: allebei mogen een groot vlak zijn, grofweg 60/40.',
+           KLEURPAREN.basis, 'basis')
+    + blok('Seizoenskleuren',
+           'Kleurblokken: twee verzadigde kleuren, met iets neutraals erbij.',
+           KLEURPAREN.blok, 'blok')
+    + eigenBronnen.map(b => blok(b.naam,
+          b.soort === 'palet' ? 'Kleurblokken uit je eigen schema.'
+                              : 'Basisparen uit je eigen schema.',
+          b.paren || {}, b.soort === 'palet' ? 'blok' : 'basis')).join('');
+}
+
+// ── EEN OUTFIT BIJ EEN KLEURENPAAR ────────────────────────────────────────────
+// Een schema zegt "bordeaux kan met grijs". Leuk, maar wat heb je daaraan als
+// je voor je kast staat? Dit vertaalt het paar naar stukken die je écht hebt,
+// in de verhouding die bij dát soort paar hoort — bij een basispaar mogen
+// beide kleuren groot, bij een kleurblok hoort er iets neutraals bij.
+let paarSuggestie = null;
+
+async function outfitVoorPaar(hoofd, partner, soort) {
+  const el = document.getElementById('paar-uitkomst');
+  if (!el) return;
+  el.style.display = 'block';
+  el.innerHTML = `<div class="field-note">⏳ Outfit zoeken met <b>${esc(hoofd)}</b> en <b>${esc(partner)}</b>…</div>`;
+  el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+
+  const { houden } = zeefKast(allItems, null, []);
+  const kast = houden.map(i => {
+    const t = itemTags[i.id] || {};
+    const k = [].concat(t.kleur || []).join('/');
+    return `- ${i.id} | ${i.cat} | ${i.name}${k ? ' | ' + k : ''}`;
+  }).join('\n');
+
+  const model = soort === 'blok'
+    ? `Dit is een KLEURBLOK-paar: twee verzadigde kleuren die allebei een groot
+vlak mogen zijn. Geen van beide is het kleine accent. Zet er wel iets neutraals
+bij om het draagbaar te houden — dat is juist wat dit soort paren nodig heeft.`
+    : `Dit is een BASISPAAR: twee gedempte of neutrale kleuren die samen de hele
+outfit kunnen dragen, grofweg 60/40. Er is geen derde kleur nodig en geen
+accentlogica. Wil je toch een accent, houd het dan klein en zeg waarom.`;
+
+  try {
+    const raw = await callClaude(
+      `Je bent een persoonlijke stylist voor Griette. ${DNA_KORT}${profielBlok()}
+Antwoord in het Nederlands. Kies alleen uit de gegeven lijst.`,
+      [{ type:'text', text:
+`Griette wil een outfit met dit kleurenpaar uit haar eigen kleurenschema:
+${hoofd} + ${partner}
+
+${model}
+${parenZin([hoofd, partner])}${voorwaardenZin()}
+BESCHIKBAAR IN HAAR KAST (id | categorie | naam | kleur):
+${kast}
+
+Stel één draagbare outfit samen van 4 tot 6 stukken waarin dit paar echt te
+zien is. Kies stukken waarvan de kleur klopt; laat je niet verleiden tot een
+outfit waarin het paar alleen in een klein detail zit.
+${buitenlaagRegel(huidigeVoorwaarden().weer)}${EENDELIG_REGEL}
+Heeft ze te weinig in deze kleuren om dit te maken, zeg dat dan eerlijk en
+noem wat er precies mist.
+
+Antwoord ALLEEN met JSON:
+{"naam":"korte naam voor deze outfit",
+ "kan_het":"ja of deels of nee",
+ "items":[{"id":"exact id uit de lijst","waarom":"max 8 woorden"}],
+ "rollen":[{"kleur":"kleurnaam","hex":"#hex","rol":"voert|ondersteunt|accent",
+            "deel":60,"waar":"waar op het lichaam","doet":"1 zin"}],
+ "waarom":"1 tot 2 zinnen: waarom deze outfit werkt",
+ "mist":"wat ze mist om dit goed te doen, of leeg"}` }],
+      4000, null, 'kies');
+
+    const d = extractJson(raw);
+    if (!d) throw new Error('geen bruikbaar antwoord');
+    const stukken = (d.items || []).map(x => {
+      const echt = x && x.id ? allItems.find(i => i.id === x.id) : null;
+      return echt ? Object.assign({}, echt, { _waarom: x.waarom || '' }) : null;
+    }).filter(Boolean);
+
+    paarSuggestie = { hoofd, partner, soort, data: d, stukken };
+
+    const kanKleur = /nee/i.test(d.kan_het || '') ? '#b5232a'
+                   : /deels/i.test(d.kan_het || '') ? '#9B7B5C' : 'var(--green)';
+    el.innerHTML = '<div class="cap-outfit">'
+      + `<div class="cap-kop"><span class="cap-naam">${esc(d.naam || hoofd + ' + ' + partner)}</span>`
+      + `<span class="cap-stijl" style="color:${kanKleur}">${esc((d.kan_het||'').toUpperCase())}</span></div>`
+      + verhoudingsBalk(d.rollen)
+      + (stukken.length
+          ? '<div class="cap-stukken" style="margin-top:6px;">'
+            + stukken.map(i => `<span class="cap-chip">${esc(i.name)}</span>`).join('')
+            + '</div>'
+          : '')
+      + (d.waarom ? `<div class="cap-waarom">${esc(d.waarom)}</div>` : '')
+      + (d.mist ? `<div class="ri-blok"><div class="ri-kop">Dit mis je nog</div>`
+                 + `<div class="ri-mist">${esc(d.mist)}</div></div>` : '')
+      + rollenUitleg(d.rollen)
+      + (stukken.length
+          ? '<button class="ai-btn" style="margin-top:10px;" onclick="paarNaarKaart()">'
+            + 'Maak hier een outfitkaart van →</button>'
+          : '')
+      + '</div>';
+  } catch(e) {
+    el.innerHTML = `<div class="field-note">Dit lukte niet: ${esc(e.message)}</div>`;
+  }
+}
+
+// Vanuit het schema door naar een kaart — via hetzelfde startpunt als elke
+// andere route, zodat je daarna gewoon verder kunt.
+function paarNaarKaart() {
+  if (!paarSuggestie) return;
+  const { hoofd, partner, data, stukken } = paarSuggestie;
+  comboGekozen({
+    name: data.naam || `${hoofd} + ${partner}`,
+    vibe: data.waarom || '',
+    typeName: 'Uit je eigen kleurenschema',
+    stijl: '',
+    colors: (data.rollen || []).map(r => r.hex).filter(Boolean),
+    tags: (data.rollen || []).map(r => r.kleur).filter(Boolean),
+    rollen: data.rollen || [],
+  }, {
+    items: stukken.slice(0, 6),
+    ankers: [],
+    bron: `Kleurenpaar ${hoofd} + ${partner} uit je eigen schema`,
+  });
+  document.getElementById('startpunt').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 function toonBronnen() {
@@ -1311,7 +1469,7 @@ function toonBronnen() {
           + `<div class="cap-kop"><span class="cap-naam">${esc(b.naam)}</span>`
           + `<span class="cap-stijl">${kleuren.length} kleuren</span></div>`
           + (soort ? `<div class="cap-waarom">${esc(soort)}</div>` : '')
-          + parenTabelHTML(b.paren)
+          + parenTabelHTML(b.paren, b.soort === 'palet' ? 'blok' : 'basis', false)
           + (b.zegt ? `<div class="cap-waarom">${esc(b.zegt)}</div>` : '')
           + `<button class="cap-vervang-btn" style="margin-top:8px;width:100%;" `
           + `onclick="verwijderBron(${i})">🗑 Verwijderen</button></div>`;
@@ -1324,13 +1482,13 @@ function toonBronnen() {
     + '<div class="cap-kop"><span class="cap-naam">Herfstcombinaties</span>'
     + `<span class="cap-stijl">${Object.keys(KLEURPAREN.basis).length} kleuren</span></div>`
     + '<div class="cap-waarom">Basisparen: allebei mogen een groot vlak zijn, grofweg 60/40.</div>'
-    + parenTabelHTML(KLEURPAREN.basis)
+    + parenTabelHTML(KLEURPAREN.basis, 'basis', false)
     + '</div>'
     + '<div class="cap-outfit">'
     + '<div class="cap-kop"><span class="cap-naam">Seizoenskleuren</span>'
     + `<span class="cap-stijl">${Object.keys(KLEURPAREN.blok).length} kleuren</span></div>`
     + '<div class="cap-waarom">Kleurblokken: twee verzadigde kleuren, met iets neutraals erbij.</div>'
-    + parenTabelHTML(KLEURPAREN.blok)
+    + parenTabelHTML(KLEURPAREN.blok, 'blok', false)
     + '</div>';
 }
 
@@ -2637,12 +2795,14 @@ function setStartMode(mode) {
   document.getElementById('mode-item').classList.toggle('active', mode === 'item');
   document.getElementById('mode-robin').classList.toggle('active', mode === 'robin');
   document.getElementById('mode-inspo').classList.toggle('active', mode === 'inspo');
+  document.getElementById('mode-paar').classList.toggle('active', mode === 'paar');
   document.getElementById('mode-capsule').classList.toggle('active', mode === 'capsule');
   document.getElementById('mode-eigenkleur').classList.remove('active');
   document.getElementById('combo-area').style.display  = mode === 'combo' ? 'block' : 'none';
   document.getElementById('anchor-area').style.display = mode === 'item'  ? 'block' : 'none';
   document.getElementById('robin-area').style.display  = mode === 'robin' ? 'block' : 'none';
   document.getElementById('inspo-area').style.display  = mode === 'inspo' ? 'block' : 'none';
+  document.getElementById('paar-area').style.display   = mode === 'paar'  ? 'block' : 'none';
   document.getElementById('capsule-area').style.display = mode === 'capsule' ? 'block' : 'none';
 
   // Route wisselen betekent opnieuw beginnen met de combo
@@ -2665,6 +2825,8 @@ function setStartMode(mode) {
   const bb = document.getElementById('bottom-bar');
   if (sb) sb.style.display = kaartRoute ? 'flex' : 'none';
   if (bb) bb.style.display = kaartRoute ? 'flex' : 'none';
+
+  if (mode === 'paar') toonPaarTabellen();
 
   if (mode === 'capsule') {
     capToonStap(1);
