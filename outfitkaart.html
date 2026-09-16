@@ -377,6 +377,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 <div class="top-bar">
   <a class="back-link" href="griette.html">←</a>
   <h1>Outfit<span>kaart</span></h1>
+  <button class="gear-btn" id="lijst-btn" onclick="openLijst()" title="Nog aan te schaffen" style="margin-right:2px;">🛍</button>
   <button class="gear-btn" id="kaarten-btn" onclick="openKaarten()" title="Mijn kaarten" style="margin-right:2px;">🗂</button>
   <button class="gear-btn" id="settings-btn" onclick="openSettings()" title="Instellingen">⚙</button>
 </div>
@@ -737,6 +738,28 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 </div>
 
 <!-- STEP 4: CARD + DOWNLOAD -->
+<!-- NOG AAN TE SCHAFFEN -->
+<div class="modal-backdrop" id="lijst-modal" onclick="if(event.target===this)sluitLijst()">
+  <div class="modal-sheet">
+    <div class="modal-title">Nog aan te schaffen</div>
+    <div class="modal-note" id="lijst-uitleg"></div>
+    <div id="lijst-open"></div>
+
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+      <div class="sec-label">Zelf iets toevoegen</div>
+      <input class="modal-field" id="lijst-nieuw" type="text" placeholder="bijv. camel trenchcoat" autocomplete="off">
+      <button class="btn-rescan" style="margin-top:6px;" onclick="lijstToevoegen()">＋ Op mijn lijst</button>
+    </div>
+
+    <div id="lijst-gekocht" style="margin-top:14px;"></div>
+    <input type="file" id="lijst-foto" accept="image/*" style="display:none">
+
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="sluitLijst()">Sluiten</button>
+    </div>
+  </div>
+</div>
+
 <!-- MIJN KAARTEN -->
 <div class="modal-backdrop" id="kaarten-modal" onclick="if(event.target===this)sluitKaarten()">
   <div class="modal-sheet">
@@ -1136,6 +1159,277 @@ const COMBO_TYPES = [
   },
 ];
 
+
+// ── NOG AAN TE SCHAFFEN ───────────────────────────────────────────────────────
+// Twee bronnen, en ze zijn niet gelijkwaardig.
+//
+// 1. "Jouw basis garderobe" — de aanschaftips die Robin zelf in het rapport
+//    zette (pagina 25 t/m 29), verdeeld over vijf categorieën. Dit is wat zij
+//    aanraadt te kopen. Dat gaat voor.
+// 2. Wat er daarnaast uit de 33 outfits volgt: elk stuk dat Robin gebruikt en
+//    dat niet in de kast zit. Dat staat niet als advies in het rapport, maar
+//    het is wél nodig om die outfits te kunnen dragen.
+//
+// Allebei houden ze zichzelf bij: koop je iets en zet je het in je kast, dan
+// verdwijnt het hier vanzelf. De afgeleide lijst staat op volgorde van hoeveel
+// outfits een stuk openzet, want één stuk dat zes outfits mogelijk maakt is een
+// betere aankoop dan één dat er één redt.
+
+// Wat het rapport letterlijk aanraadt. De zoekwoorden zijn er om te merken dat
+// zij zo'n stuk al heeft — het paarse gilet van American Vintage bijvoorbeeld.
+const RAPPORT_BASIS = [
+  { groep:'Trui/vesten', items:[
+    { naam:'Mouwloos gebreid gilet paars', merk:'American Vintage', cat:'layers', kleur:'paars', zoek:['gilet','spencer'] },
+    { naam:'Bruin cropped vest',           merk:'American Vintage', cat:'layers', kleur:'bruin', zoek:['vest','cardigan'] },
+    { naam:'Zwarte gebreide trui',         cat:'tops',   kleur:'zwart', zoek:['trui','sweater'] },
+    { naam:'Crème fluffy vest',            cat:'layers', zoek:['fluffy','teddy vest'] },
+  ]},
+  { groep:'Basic shirts', items:[
+    { naam:'Wit T-shirt',                     cat:'tops', kleur:'wit',   zoek:['t-shirt','tshirt'] },
+    { naam:'Bruine longsleeve body',          cat:'tops', kleur:'bruin', zoek:['body'] },
+    { naam:'Rood T-shirt',                    cat:'tops', kleur:'rood',  zoek:['t-shirt','tshirt'] },
+    { naam:'Bruine fijngebreide longsleeve',  cat:'tops', kleur:'bruin', zoek:['longsleeve','long sleeve'] },
+    { naam:'Limegeel T-shirt', merk:'Stieglitz', cat:'tops', kleur:'geel', zoek:['t-shirt','tshirt'] },
+  ]},
+  { groep:'Broeken', items:[
+    { naam:'Zwarte geplooide wijde pantalon', cat:'bottoms', kleur:'zwart', zoek:['pantalon'] },
+    { naam:'Bruine geplooide wijde pantalon', cat:'bottoms', kleur:'bruin', zoek:['pantalon'] },
+    { naam:'Blauwe wide-leg jeans',           cat:'bottoms', kleur:'blauw', zoek:['jeans','denim'] },
+    { naam:'Luipaardprint jeans',             cat:'bottoms', zoek:['luipaard','leopard','panter'] },
+  ]},
+  { groep:'Jassen en blazers', items:[
+    { naam:'Bruin lakleren peplum jasje',              cat:'layers', kleur:'bruin',  zoek:['peplum','lak'] },
+    { naam:'Marineblauw cropped jasje met goud',       cat:'layers', kleur:'marine', zoek:['jasje','jacket'] },
+    { naam:'Zwarte oversized blazer',                  cat:'layers', kleur:'zwart',  zoek:['blazer'] },
+    { naam:'Bruin teddy cropped jack',                 cat:'layers', kleur:'bruin',  zoek:['teddy','bont','fur'] },
+    { naam:'Camel trenchcoat',                         cat:'layers', kleur:'camel',  zoek:['trench'] },
+  ]},
+  { groep:'Schoenen', items:[
+    { naam:'Bruine croco teenslippers',                   cat:'shoes', kleur:'bruin', zoek:['slipper','sandaal','sandalen'] },
+    { naam:'Zwarte croco laarsjes met kitten heel',       cat:'shoes', kleur:'zwart', zoek:['laars','laarzen','boot'] },
+    { naam:'Bruine suède enkellaarsjes met kitten heel',  cat:'shoes', kleur:'bruin', zoek:['enkellaars','laars','boot'] },
+    { naam:'Zwarte croco platte enkellaarsjes',           cat:'shoes', kleur:'zwart', zoek:['enkellaars','laars','boot'] },
+    { naam:'Zwarte loafers met gouden gesp',              cat:'shoes', kleur:'zwart', zoek:['loafer','mocassin'] },
+  ]},
+];
+
+// Welke stukken uit die basisgarderobe zij nog niet heeft. Eén item uit de kast
+// kan maar één regel afvinken: heeft ze één paar zwarte laarzen, dan blijft het
+// tweede zwarte paar uit het rapport gewoon staan.
+function basisNogNodig() {
+  const bezet = new Set();
+  const uit = [];
+  RAPPORT_BASIS.forEach(g => g.items.forEach(it => {
+    // Strenger dan elders: een regel uit het rapport mag alleen wegvallen als
+    // ook de categorie klopt. Anders zou een rode tas een rood T-shirt afvinken.
+    const heeft = zoekInKast(it, bezet);
+    if (heeft && heeft.cat === it.cat) { bezet.add(heeft.id); return; }
+    uit.push({ naam: it.naam, cat: it.cat, merk: it.merk || '', groep: g.groep,
+               outfits: [], bron: 'basis' });
+  }));
+  return uit;
+}
+let lijstEigen = [];    // wat zij er zelf bij zet
+// { sleutel: {datum, foto} } — let op: alleen een datum betekent gekocht. Een
+// foto erbij zetten is iets anders dan het gekocht hebben, en die twee mogen
+// niet door hetzelfde veld worden bepaald.
+let lijstGekocht = {};
+const isGekocht = k => !!(lijstGekocht[k] && lijstGekocht[k].datum);
+
+async function laadLijst() {
+  try { lijstEigen = JSON.parse(localStorage.getItem('griette-kooplijst-v1') || '[]'); } catch(e){}
+  try { lijstGekocht = JSON.parse(localStorage.getItem('griette-gekocht-v1') || '{}'); } catch(e){}
+  if (!Array.isArray(lijstEigen)) lijstEigen = [];
+  if (!lijstGekocht || typeof lijstGekocht !== 'object') lijstGekocht = {};
+  const [e, g] = await Promise.all([sbGet('kooplijst'), sbGet('gekocht')]);
+  if (Array.isArray(e)) lijstEigen = e;
+  if (g && typeof g === 'object' && !Array.isArray(g)) lijstGekocht = g;
+}
+
+async function bewaarLijst() {
+  try {
+    localStorage.setItem('griette-kooplijst-v1', JSON.stringify(lijstEigen));
+    localStorage.setItem('griette-gekocht-v1', JSON.stringify(lijstGekocht));
+  } catch(e){}
+  try { await Promise.all([sbSet('kooplijst', lijstEigen), sbSet('gekocht', lijstGekocht)]); } catch(e){}
+}
+
+const lijstSleutel = naam => String(naam || '').toLowerCase().trim();
+
+// De basisgarderobe uit het rapport, daarna wat Robins outfits nog nodig
+// hebben, daarna wat je zelf toevoegde. Staat een stuk in allebei — de zwarte
+// oversized blazer bijvoorbeeld — dan blijft het één regel, met de outfits
+// erbij die het openzet.
+function bouwKooplijst() {
+  const uit = new Map();
+  basisNogNodig().forEach(x => uit.set(lijstSleutel(x.naam), x));
+
+  const robin = [];
+  ROBIN_OUTFITS.forEach(o => {
+    robinNaarItems(o).forEach(i => {
+      if (!i._suggestion) return;
+      const k = lijstSleutel(i.name);
+      if (!uit.has(k)) {
+        const nieuw = { naam:i.name, cat:i.cat, merk:'', groep:'', outfits:[], bron:'robin' };
+        uit.set(k, nieuw); robin.push(nieuw);
+      }
+      uit.get(k).outfits.push(o.nr);
+    });
+  });
+
+  const eigen = [];
+  lijstEigen.forEach(n => {
+    const k = lijstSleutel(n);
+    if (uit.has(k)) return;
+    const nieuw = { naam:n, cat:'', merk:'', groep:'', outfits:[], bron:'zelf' };
+    uit.set(k, nieuw); eigen.push(nieuw);
+  });
+
+  // Binnen de afgeleide lijst: wat de meeste outfits openzet eerst. De
+  // basisgarderobe houdt de volgorde van het rapport aan.
+  robin.sort((a, b) => b.outfits.length - a.outfits.length);
+  return [...uit.values()].filter(x => x.bron === 'basis').concat(robin, eigen);
+}
+
+// Zoeken doe je buiten de app, dus geef er goede links bij: kijken wat het is,
+// kopen, en — als er een foto bij staat — Google Lens op die foto.
+function zoekLinks(naam, foto) {
+  const q = encodeURIComponent(naam);
+  const l = (url, tekst) =>
+    `<a class="cap-chip" style="text-decoration:none;color:var(--accent)" href="${url}" target="_blank" rel="noopener">${tekst} ↗</a>`;
+  return '<div class="cap-stukken" style="margin-top:6px;">'
+    + l(`https://www.google.com/search?tbm=isch&q=${q}`, '🖼 Afbeeldingen')
+    + l(`https://www.google.com/search?tbm=shop&q=${q}`, '🛒 Shopping')
+    + (foto ? l(`https://lens.google.com/uploadbyurl?url=${encodeURIComponent(foto)}`, '🔍 Lens') : '')
+    + WINKELS.map(([naam, url]) => l(url + q, naam)).join('')
+    + '</div>';
+}
+
+function openLijst() { toonLijst(); document.getElementById('lijst-modal').classList.add('open'); }
+function sluitLijst() { document.getElementById('lijst-modal').classList.remove('open'); }
+
+function toonLijst() {
+  const open = document.getElementById('lijst-open');
+  const klaar = document.getElementById('lijst-gekocht');
+  const uitleg = document.getElementById('lijst-uitleg');
+  if (!open) return;
+
+  const alles = bouwKooplijst();
+  const nog = alles.filter(x => !isGekocht(lijstSleutel(x.naam)));
+  const gedaan = alles.filter(x => isGekocht(lijstSleutel(x.naam)));
+
+  if (uitleg) uitleg.innerHTML =
+      'Bovenaan staat <b>Jouw basis garderobe</b>: de aanschaftips die Robin zelf '
+    + 'in je rapport zette, pagina 25 t/m 29. Daaronder staat wat haar 33 outfits '
+    + 'verder nog nodig hebben — dat staat niet als advies in het rapport, maar je '
+    + 'hebt het wel nodig om die outfits te kunnen dragen. Voeg je iets toe aan je '
+    + 'kast, dan verdwijnt het hier vanzelf.'
+    + '<div style="margin-top:6px;">Wat Robin er zelf bij schrijft: kies key pieces '
+    + 'in jouw tinten — felroze, paars, geel, rood of lichtblauw — naast rustige '
+    + 'basiskleuren als donkerblauw, bruin, zwart of gebroken wit. En broeken met '
+    + 'een hogere taille, die geven je silhouet vorm.</div>';
+
+  const kaart = (x, isGekocht) => {
+    const k = lijstSleutel(x.naam);
+    const g = lijstGekocht[k];
+    const foto = g && g.foto;
+    return '<div class="cap-outfit" style="margin-bottom:8px;">'
+      + '<div style="display:flex;gap:9px;align-items:flex-start;">'
+      + (foto ? `<img src="${esc(foto)}" style="width:56px;height:70px;object-fit:cover;border-radius:7px;flex-shrink:0;">` : '')
+      + '<div style="flex:1;min-width:0;">'
+      + `<div class="cap-kop"><span class="cap-naam">${esc(x.naam)}</span>`
+      + `<span class="cap-stijl">${x.merk ? esc(x.merk) : (x.cat ? esc(x.cat) : 'zelf toegevoegd')}</span></div>`
+      + (x.bron === 'basis'
+          ? '<div class="cap-waarom">Staat in je rapport onder <b>' + esc(x.groep) + '</b>.'
+            + (x.outfits.length
+                ? ` Robin gebruikt hem ook in outfit ${x.outfits.join(', ')}.` : '')
+            + '</div>'
+          : x.outfits.length
+          ? `<div class="cap-waarom">Zet <b>${x.outfits.length} outfit${x.outfits.length===1?'':'s'}</b> van Robin open`
+            + ` — nummer ${x.outfits.join(', ')}.</div>`
+          : '<div class="cap-waarom">Door jou toegevoegd.</div>')
+      + (isGekocht && g.datum
+          ? `<div class="field-note">Gekocht op ${esc(new Date(g.datum).toLocaleDateString('nl-NL',{day:'numeric',month:'long'}))}</div>`
+          : '')
+      + '</div></div>'
+      + zoekLinks(x.naam, foto)
+      + '<div style="display:flex;gap:6px;margin-top:8px;">'
+      + `<button class="cap-vervang-btn" style="flex:1;" onclick="lijstFoto('${esc(k)}')">`
+      + `${foto ? '🔄 Andere foto' : '📷 Foto erbij'}</button>`
+      + `<button class="cap-vervang-btn" style="flex:1;" onclick="lijstAfvinken('${esc(k)}')">`
+      + `${isGekocht ? '↩ Toch niet' : '✓ Gekocht'}</button>`
+      + (x.bron === 'zelf'
+          ? `<button class="cap-vervang-btn" onclick="lijstWeg('${esc(k)}')">🗑</button>` : '')
+      + '</div></div>';
+  };
+
+  const basis = nog.filter(x => x.bron === 'basis');
+  const rest  = nog.filter(x => x.bron !== 'basis');
+  open.innerHTML = nog.length
+    ? (basis.length
+        ? '<div class="sec-label">Jouw basis garderobe — uit je rapport</div>'
+          + basis.map(x => kaart(x, false)).join('') : '')
+      + (rest.length
+        ? '<div class="sec-label">Wat Robins outfits verder nog nodig hebben</div>'
+          + rest.map(x => kaart(x, false)).join('') : '')
+    : '<div class="kaart-leeg">Niets meer op je lijst. Alles wat Robin gebruikt zit in je kast.</div>';
+
+  klaar.innerHTML = gedaan.length
+    ? '<div class="sec-label">Al gekocht</div>' + gedaan.map(x => kaart(x, true)).join('')
+    : '';
+}
+
+async function lijstAfvinken(k) {
+  // Alleen de datum omzetten: een foto die je erbij zette blijft staan.
+  const nu = lijstGekocht[k] || {};
+  if (nu.datum) delete nu.datum;
+  else nu.datum = new Date().toISOString();
+  if (Object.keys(nu).length) lijstGekocht[k] = nu; else delete lijstGekocht[k];
+  toonLijst();
+  await bewaarLijst();
+}
+
+async function lijstToevoegen() {
+  const el = document.getElementById('lijst-nieuw');
+  const naam = (el.value || '').trim();
+  if (!naam) return;
+  if (!lijstEigen.some(n => lijstSleutel(n) === lijstSleutel(naam))) lijstEigen.push(naam);
+  el.value = '';
+  toonLijst();
+  await bewaarLijst();
+}
+
+async function lijstWeg(k) {
+  lijstEigen = lijstEigen.filter(n => lijstSleutel(n) !== k);
+  delete lijstGekocht[k];
+  toonLijst();
+  await bewaarLijst();
+}
+
+// Een foto erbij maakt twee dingen mogelijk: je ziet waar je naar zoekt, en
+// Google Lens kan op die foto zoeken in plaats van op een omschrijving.
+let lijstFotoVoor = null;
+function lijstFoto(k) {
+  lijstFotoVoor = k;
+  document.getElementById('lijst-foto').click();
+}
+
+async function lijstFotoGekozen(ev) {
+  const f = (ev.target.files || [])[0];
+  ev.target.value = '';
+  if (!f || !lijstFotoVoor) return;
+  const k = lijstFotoVoor; lijstFotoVoor = null;
+  try {
+    const base64 = await verkleinFoto(f, 900);
+    const url = await uploadInspo(base64, 'koop-' + k.replace(/[^a-z0-9]+/g, '-').slice(0, 40));
+    lijstGekocht[k] = Object.assign({}, lijstGekocht[k], { foto: url });
+    toonLijst();
+    await bewaarLijst();
+  } catch(e) {
+    const st = document.getElementById('lijst-uitleg');
+    if (st) st.textContent = 'Foto toevoegen lukte niet: ' + e.message;
+  }
+}
 
 // ── KLEURPAREN UIT GRIETTE'S EIGEN BRONNEN ────────────────────────────────────
 // Twee soorten kennis die zij zelf aandroeg. De eerste is een herfstmatrix:
@@ -2143,6 +2437,7 @@ async function init() {
   await laadVisueel();
   await laadPlaat();
   await laadBronnen();
+  await laadLijst();
   await laadKaarten();
   await laadTassen();
 
@@ -2574,12 +2869,15 @@ try { robinKoppel = JSON.parse(localStorage.getItem('robin-koppel') || '{}'); } 
 // Zoekt een item uit de LIVE garderobe dat bij Robins omschrijving past.
 // Zo verschijnen items die zelf zijn toegevoegd vanzelf, zonder dat ik ze
 // hoef te kennen.
-function zoekInKast(it) {
+// negeer: ids die al aan een ander stuk zijn toegewezen. Zonder dat zou één
+// zwart laarsje twee regels uit de basisgarderobe tegelijk afvinken.
+function zoekInKast(it, negeer) {
   if (!it.zoek) return null;
   const woorden = it.zoek.map(w => w.toLowerCase());
   let beste = null, besteScore = 0;
 
   allItems.forEach(item => {
+    if (negeer && negeer.has(item.id)) return;
     const naam = (item.name || '').toLowerCase();
     const t = itemTags[item.id] || {};
     const kleuren = (Array.isArray(t.kleur) ? t.kleur : [t.kleur])
@@ -2750,8 +3048,19 @@ let startpuntBron = '';
 // op elkaar liggen. Op een lijf gestapeld — buitenlaag, top, onderstuk, schoen,
 // en de kleine dingen ernaast — zie je in één blik of het klopt: waar het
 // volume zit, waar de zomen vallen, en of je accentkleur inderdaad klein blijft.
+// Let op: een jas zit in de kast onder "layers", net als een vest. Er is dus
+// geen categorie om op te filteren — de buitenlaag herken je aan de naam.
+// Een gilet of vest hoort hier bewust niet bij: dat is het laagje eronder.
+const JAS_WOORDEN = ['jas','jack','coat','trench','parka','blazer','mantel',
+                     'bomber','anorak'];
+function isBuitenlaag(item) {
+  if (!item || item.cat !== 'layers') return false;
+  const n = String(item.name || '').toLowerCase();
+  return JAS_WOORDEN.some(w => n.includes(w));
+}
+
 const POP_LAGEN = [
-  { sleutel:'jas',    cats:['jassen'],            hoogte:22, label:'buitenlaag' },
+  { sleutel:'jas',    cats:['layers'],            hoogte:22, label:'buitenlaag' },
   { sleutel:'laag',   cats:['layers'],            hoogte:18, label:'laagje' },
   { sleutel:'top',    cats:['tops'],              hoogte:20, label:'boven' },
   { sleutel:'onder',  cats:['bottoms'],           hoogte:30, label:'onder' },
@@ -2760,8 +3069,8 @@ const POP_LAGEN = [
 
 function popIndeling(items) {
   const rest = (items || []).slice();
-  const pak = cats => {
-    const i = rest.findIndex(x => cats.includes(x.cat));
+  const pak = (cats, test) => {
+    const i = rest.findIndex(x => cats.includes(x.cat) && (!test || test(x)));
     return i >= 0 ? rest.splice(i, 1)[0] : null;
   };
   // Een jurk, jumpsuit of co-ord vult boven én onder in één keer.
@@ -2774,6 +3083,9 @@ function popIndeling(items) {
                hoogte: l.sleutel === 'top' ? 50 : 0,
                label: l.sleutel === 'top' ? 'eendelig' : '' };
     }
+    // De buitenlaag krijgt eerst de kans: staat er een jas tussen, dan gaat die
+    // bovenop en blijft een vest gewoon het laagje eronder.
+    if (l.sleutel === 'jas') return { ...l, item: pak(l.cats, isBuitenlaag) };
     return { ...l, item: pak(l.cats) };
   }).filter(l => l.hoogte > 0);
 
@@ -7201,6 +7513,8 @@ koppelInspo();
 koppelPlaat();
 const bronInput = document.getElementById('bron-file');
 if (bronInput) bronInput.addEventListener('change', bronToevoegen);
+const lijstInput = document.getElementById('lijst-foto');
+if (lijstInput) lijstInput.addEventListener('change', lijstFotoGekozen);
 init().then(()=>{ setStep(1); toonPlaat(); });
 </script>
 </body>
