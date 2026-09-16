@@ -1198,8 +1198,8 @@ const RAPPORT_BASIS = [
     { naam:'Luipaardprint jeans',             cat:'bottoms', zoek:['luipaard','leopard','panter'] },
   ]},
   { groep:'Jassen en blazers', items:[
-    { naam:'Bruin lakleren peplum jasje',              cat:'layers', kleur:'bruin',  zoek:['peplum','lak'] },
-    { naam:'Marineblauw cropped jasje met goud',       cat:'layers', kleur:'marine', zoek:['jasje','jacket'] },
+    { naam:'Bruin lakleren peplum jasje',              cat:'layers', kleur:'bruin',  zoek:['peplum','lak','leer'] },
+    { naam:'Marineblauw cropped jasje met goud',       cat:'layers', kleur:'marine', zoek:['jasje','jacket','vest'] },
     { naam:'Zwarte oversized blazer',                  cat:'layers', kleur:'zwart',  zoek:['blazer'] },
     { naam:'Bruin teddy cropped jack',                 cat:'layers', kleur:'bruin',  zoek:['teddy','bont','fur'] },
     { naam:'Camel trenchcoat',                         cat:'layers', kleur:'camel',  zoek:['trench'] },
@@ -1216,19 +1216,24 @@ const RAPPORT_BASIS = [
 // Welke stukken uit die basisgarderobe zij nog niet heeft. Eén item uit de kast
 // kan maar één regel afvinken: heeft ze één paar zwarte laarzen, dan blijft het
 // tweede zwarte paar uit het rapport gewoon staan.
-function basisNogNodig() {
+function basisDoorlopen() {
   const bezet = new Set();
-  const uit = [];
+  const nodig = [], al = [];
   RAPPORT_BASIS.forEach(g => g.items.forEach(it => {
     // Strenger dan elders: een regel uit het rapport mag alleen wegvallen als
     // ook de categorie klopt. Anders zou een rode tas een rood T-shirt afvinken.
     const heeft = zoekInKast(it, bezet);
-    if (heeft && heeft.cat === it.cat) { bezet.add(heeft.id); return; }
-    uit.push({ naam: it.naam, cat: it.cat, merk: it.merk || '', groep: g.groep,
-               outfits: [], bron: 'basis' });
+    if (heeft && heeft.cat === it.cat) {
+      bezet.add(heeft.id);
+      al.push({ naam: it.naam, groep: g.groep, via: heeft.name });
+      return;
+    }
+    nodig.push({ naam: it.naam, cat: it.cat, merk: it.merk || '', groep: g.groep,
+                 outfits: [], bron: 'basis' });
   }));
-  return uit;
+  return { nodig, al };
 }
+function basisNogNodig() { return basisDoorlopen().nodig; }
 let lijstEigen = [];    // wat zij er zelf bij zet
 // { sleutel: {datum, foto} } — let op: alleen een datum betekent gekocht. Een
 // foto erbij zetten is iets anders dan het gekocht hebben, en die twee mogen
@@ -1365,10 +1370,21 @@ function toonLijst() {
 
   const basis = nog.filter(x => x.bron === 'basis');
   const rest  = nog.filter(x => x.bron !== 'basis');
+  // Wat de tool denkt dat je al hebt, staat er open bij — met het stuk uit je
+  // kast erachter. Zo kun je nakijken of hij het goed ziet, en zo niet: het
+  // stuk in je kast anders benoemen.
+  const al = basisDoorlopen().al;
+  const alRegel = al.length
+    ? '<div class="field-note" style="margin-bottom:8px;">'
+      + `Van deze selectie heb je er <b>${al.length}</b> al: `
+      + al.map(a => `${esc(a.naam)} <span style="opacity:.6">→ ${esc(a.via)}</span>`).join(' · ')
+      + '. Klopt dat niet, pas dan de naam in je kast aan.</div>'
+    : '';
+
   open.innerHTML = nog.length
     ? (basis.length
         ? '<div class="sec-label">Jouw basis garderobe — uit je rapport</div>'
-          + basis.map(x => kaart(x, false)).join('') : '')
+          + alRegel + basis.map(x => kaart(x, false)).join('') : '')
       + (rest.length
         ? '<div class="sec-label">Wat Robins outfits verder nog nodig hebben</div>'
           + rest.map(x => kaart(x, false)).join('') : '')
