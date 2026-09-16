@@ -377,7 +377,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 <div class="top-bar">
   <a class="back-link" href="griette.html">←</a>
   <h1>Outfit<span>kaart</span></h1>
-  <button class="gear-btn" id="lijst-btn" onclick="openLijst()" title="Nog aan te schaffen" style="margin-right:2px;">🛍</button>
+  <button class="gear-btn" id="lijst-btn" onclick="openLijst()" title="Jouw basis garderobe" style="margin-right:2px;">🛍</button>
   <button class="gear-btn" id="kaarten-btn" onclick="openKaarten()" title="Mijn kaarten" style="margin-right:2px;">🗂</button>
   <button class="gear-btn" id="settings-btn" onclick="openSettings()" title="Instellingen">⚙</button>
 </div>
@@ -741,7 +741,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 <!-- NOG AAN TE SCHAFFEN -->
 <div class="modal-backdrop" id="lijst-modal" onclick="if(event.target===this)sluitLijst()">
   <div class="modal-sheet">
-    <div class="modal-title">Nog aan te schaffen</div>
+    <div class="modal-title">Jouw basis garderobe</div>
     <div class="modal-note" id="lijst-uitleg"></div>
     <div id="lijst-open"></div>
 
@@ -1161,57 +1161,81 @@ const COMBO_TYPES = [
 
 
 // ── NOG AAN TE SCHAFFEN ───────────────────────────────────────────────────────
-// Twee bronnen, en ze zijn niet gelijkwaardig.
+// Dit is "Jouw basis garderobe" uit het rapport, pagina 25 t/m 29: de stukken
+// die Robin zelf aanraadt, met háár voorbeeldfoto erbij. Verder niets — geen
+// lijst van wat er toevallig ontbreekt om een outfit van haar na te kunnen
+// maken. Dat is een ander soort lijst en hij hoort hier niet.
 //
-// 1. "Jouw basis garderobe" — de aanschaftips die Robin zelf in het rapport
-//    zette (pagina 25 t/m 29), verdeeld over vijf categorieën. Dit is wat zij
-//    aanraadt te kopen. Dat gaat voor.
-// 2. Wat er daarnaast uit de 33 outfits volgt: elk stuk dat Robin gebruikt en
-//    dat niet in de kast zit. Dat staat niet als advies in het rapport, maar
-//    het is wél nodig om die outfits te kunnen dragen.
+// De foto's komen uit het rapport en staan in /rapport/. Ze staan naast de
+// app op GitHub Pages, zodat ze ook werken als je offline bent en zodat Google
+// Lens erop kan zoeken.
 //
-// Allebei houden ze zichzelf bij: koop je iets en zet je het in je kast, dan
-// verdwijnt het hier vanzelf. De afgeleide lijst staat op volgorde van hoeveel
-// outfits een stuk openzet, want één stuk dat zes outfits mogelijk maakt is een
-// betere aankoop dan één dat er één redt.
-
-// Wat het rapport letterlijk aanraadt. De zoekwoorden zijn er om te merken dat
-// zij zo'n stuk al heeft — het paarse gilet van American Vintage bijvoorbeeld.
+// Over het merk: het rapport schrijft nergens merknamen. Wat hieronder staat is
+// wat er op de foto zelf te lezen valt — het labeltje van American Vintage, de
+// print van Stieglitz, H&M in de zool. Bij de rest staat niets, want dan weet
+// ik het niet en ga ik het niet verzinnen.
+//
+// De lijst houdt zichzelf bij: koop je iets en zet je het in je kast, dan
+// verdwijnt het hier vanzelf.
 const RAPPORT_BASIS = [
   { groep:'Trui/vesten', items:[
-    { naam:'Mouwloos gebreid gilet paars', merk:'American Vintage', cat:'layers', kleur:'paars', zoek:['gilet','spencer'] },
-    { naam:'Bruin cropped vest',           merk:'American Vintage', cat:'layers', kleur:'bruin', zoek:['vest','cardigan'] },
-    { naam:'Zwarte gebreide trui',         cat:'tops',   kleur:'zwart', zoek:['trui','sweater'] },
-    { naam:'Crème fluffy vest',            cat:'layers', zoek:['fluffy','teddy vest'] },
+    { naam:'Mouwloos gebreid gilet paars', merk:'American Vintage', foto:'gilet-paars',
+      cat:'layers', kleur:'paars', zoek:['gilet','spencer'] },
+    { naam:'Bruin cropped vest', merk:'American Vintage', foto:'vest-bruin',
+      cat:'layers', kleur:'bruin', zoek:['vest','cardigan'] },
+    { naam:'Zwarte gebreide trui', merk:'American Vintage', foto:'trui-zwart',
+      cat:'tops', kleur:'zwart', zoek:['trui','sweater'] },
+    { naam:'Crème fluffy vest met kraagje', foto:'vest-creme',
+      cat:'layers', zoek:['fluffy','teddy vest'] },
   ]},
   { groep:'Basic shirts', items:[
-    { naam:'Wit T-shirt',                     cat:'tops', kleur:'wit',   zoek:['t-shirt','tshirt'] },
-    { naam:'Bruine longsleeve body',          cat:'tops', kleur:'bruin', zoek:['body'] },
-    { naam:'Rood T-shirt',                    cat:'tops', kleur:'rood',  zoek:['t-shirt','tshirt'] },
-    { naam:'Bruine fijngebreide longsleeve',  cat:'tops', kleur:'bruin', zoek:['longsleeve','long sleeve'] },
-    { naam:'Limegeel T-shirt', merk:'Stieglitz', cat:'tops', kleur:'geel', zoek:['t-shirt','tshirt'] },
+    { naam:'Wit T-shirt', foto:'tshirt-wit',
+      cat:'tops', kleur:'wit', zoek:['t-shirt','tshirt'] },
+    { naam:'Rood T-shirt', foto:'tshirt-rood',
+      cat:'tops', kleur:'rood', zoek:['t-shirt','tshirt'] },
+    { naam:'Limegeel T-shirt met print', merk:'Stieglitz', foto:'tshirt-limegeel',
+      cat:'tops', kleur:'geel', zoek:['t-shirt','tshirt'] },
+    { naam:'Bruine longsleeve body', foto:'body-bruin',
+      cat:'tops', kleur:'bruin', zoek:['body'] },
+    { naam:'Bruine fijngebreide longsleeve', foto:'longsleeve-bruin',
+      cat:'tops', kleur:'bruin', zoek:['longsleeve','long sleeve'] },
   ]},
   { groep:'Broeken', items:[
-    { naam:'Zwarte geplooide wijde pantalon', cat:'bottoms', kleur:'zwart', zoek:['pantalon'] },
-    { naam:'Bruine geplooide wijde pantalon', cat:'bottoms', kleur:'bruin', zoek:['pantalon'] },
-    { naam:'Blauwe wide-leg jeans',           cat:'bottoms', kleur:'blauw', zoek:['jeans','denim'] },
-    { naam:'Luipaardprint jeans',             cat:'bottoms', zoek:['luipaard','leopard','panter'] },
+    { naam:'Zwarte geplooide wijde pantalon', foto:'pantalon-zwart',
+      cat:'bottoms', kleur:'zwart', zoek:['pantalon'] },
+    { naam:'Bruine geplooide wijde pantalon', foto:'pantalon-bruin',
+      cat:'bottoms', kleur:'bruin', zoek:['pantalon'] },
+    { naam:'Blauwe wide-leg jeans', foto:'jeans-blauw',
+      cat:'bottoms', kleur:'blauw', zoek:['jeans','denim'] },
+    { naam:'Luipaardprint barrel jeans', foto:'jeans-luipaard',
+      cat:'bottoms', zoek:['luipaard','leopard','panter'] },
   ]},
   { groep:'Jassen en blazers', items:[
-    { naam:'Bruin lakleren peplum jasje',              cat:'layers', kleur:'bruin',  zoek:['peplum','lak','leer'] },
-    { naam:'Marineblauw cropped jasje met goud',       cat:'layers', kleur:'marine', zoek:['jasje','jacket','vest'] },
-    { naam:'Zwarte oversized blazer',                  cat:'layers', kleur:'zwart',  zoek:['blazer'] },
-    { naam:'Bruin teddy cropped jack',                 cat:'layers', kleur:'bruin',  zoek:['teddy','bont','fur'] },
-    { naam:'Camel trenchcoat',                         cat:'layers', kleur:'camel',  zoek:['trench'] },
+    { naam:'Marineblauw cropped jasje met gouden knopen', foto:'jasje-marine',
+      cat:'layers', kleur:'marine', zoek:['jasje','jacket','vest'] },
+    { naam:'Bruin lakleren jack met ceintuur', foto:'jasje-lak-bruin',
+      cat:'layers', kleur:'bruin', zoek:['peplum','lak','leer'] },
+    { naam:'Zwarte oversized blazer', foto:'blazer-zwart',
+      cat:'layers', kleur:'zwart', zoek:['blazer'] },
+    { naam:'Bruin faux fur cropped jasje', foto:'jasje-fur-bruin',
+      cat:'layers', kleur:'bruin', zoek:['teddy','bont','fur'] },
+    { naam:'Camel trenchcoat', foto:'trenchcoat-camel',
+      cat:'layers', kleur:'camel', zoek:['trench'] },
   ]},
   { groep:'Schoenen', items:[
-    { naam:'Bruine croco teenslippers',                   cat:'shoes', kleur:'bruin', zoek:['slipper','sandaal','sandalen'] },
-    { naam:'Zwarte croco laarsjes met kitten heel',       cat:'shoes', kleur:'zwart', zoek:['laars','laarzen','boot'] },
-    { naam:'Bruine suède enkellaarsjes met kitten heel',  cat:'shoes', kleur:'bruin', zoek:['enkellaars','laars','boot'] },
-    { naam:'Zwarte croco platte enkellaarsjes',           cat:'shoes', kleur:'zwart', zoek:['enkellaars','laars','boot'] },
-    { naam:'Zwarte loafers met gouden gesp',              cat:'shoes', kleur:'zwart', zoek:['loafer','mocassin'] },
+    { naam:'Bruine croco teenslippers', merk:'H&M', foto:'sandalen-bruin',
+      cat:'shoes', kleur:'bruin', zoek:['slipper','sandaal','sandalen'] },
+    { naam:'Bruine suède enkellaarsjes met kitten heel', foto:'enkellaarsjes-bruin',
+      cat:'shoes', kleur:'bruin', zoek:['enkellaars','laars','boot'] },
+    { naam:'Zwarte croco laarsjes met kitten heel', foto:'laarsjes-zwart',
+      cat:'shoes', kleur:'zwart', zoek:['laars','laarzen','boot'] },
+    { naam:'Zwarte croco platte enkellaarsjes', foto:'enkellaarsjes-zwart',
+      cat:'shoes', kleur:'zwart', zoek:['enkellaars','laars','boot'] },
+    { naam:'Zwarte loafers met gouden gesp', foto:'loafers-zwart',
+      cat:'shoes', kleur:'zwart', zoek:['loafer','mocassin'] },
   ]},
 ];
+const rapportFoto = f => f ? 'rapport/' + f + '.jpg' : '';
 
 // Welke stukken uit die basisgarderobe zij nog niet heeft. Eén item uit de kast
 // kan maar één regel afvinken: heeft ze één paar zwarte laarzen, dan blijft het
@@ -1229,7 +1253,7 @@ function basisDoorlopen() {
       return;
     }
     nodig.push({ naam: it.naam, cat: it.cat, merk: it.merk || '', groep: g.groep,
-                 outfits: [], bron: 'basis' });
+                 foto: rapportFoto(it.foto), outfits: [], bron: 'basis' });
   }));
   return { nodig, al };
 }
@@ -1267,51 +1291,43 @@ const CAT_NAMEN = { tops:'top', bottoms:'broek of rok', layers:'laagje',
   accessories:'accessoire', swimwear:'zwemkleding', overig:'overig' };
 const catNaam = c => CAT_NAMEN[c] || c;
 
-// De basisgarderobe uit het rapport, daarna wat Robins outfits nog nodig
-// hebben, daarna wat je zelf toevoegde. Staat een stuk in allebei — de zwarte
-// oversized blazer bijvoorbeeld — dan blijft het één regel, met de outfits
-// erbij die het openzet.
+// Alleen wat Robin aanraadt, in de volgorde van het rapport, plus wat je er
+// zelf bij zet. Stukken die ze toevallig ook in een outfit gebruikt krijgen
+// dat als aantekening mee — maar de outfits bepalen niet wat er op de lijst
+// staat, want dit is een aanschafadvies, geen gatenlijst.
 function bouwKooplijst() {
   const uit = new Map();
   basisNogNodig().forEach(x => uit.set(lijstSleutel(x.naam), x));
 
-  const robin = [];
   ROBIN_OUTFITS.forEach(o => {
     robinNaarItems(o).forEach(i => {
-      if (!i._suggestion) return;
-      const k = lijstSleutel(i.name);
-      if (!uit.has(k)) {
-        const nieuw = { naam:i.name, cat:i.cat, merk:'', groep:'', outfits:[], bron:'robin' };
-        uit.set(k, nieuw); robin.push(nieuw);
-      }
-      uit.get(k).outfits.push(o.nr);
+      const r = uit.get(lijstSleutel(i.name));
+      if (r) r.outfits.push(o.nr);
     });
   });
 
-  const eigen = [];
   lijstEigen.forEach(n => {
     const k = lijstSleutel(n);
-    if (uit.has(k)) return;
-    const nieuw = { naam:n, cat:'', merk:'', groep:'', outfits:[], bron:'zelf' };
-    uit.set(k, nieuw); eigen.push(nieuw);
+    if (!uit.has(k))
+      uit.set(k, { naam:n, cat:'', merk:'', groep:'', foto:'', outfits:[], bron:'zelf' });
   });
 
-  // Binnen de afgeleide lijst: wat de meeste outfits openzet eerst. De
-  // basisgarderobe houdt de volgorde van het rapport aan.
-  robin.sort((a, b) => b.outfits.length - a.outfits.length);
-  return [...uit.values()].filter(x => x.bron === 'basis').concat(robin, eigen);
+  return [...uit.values()];
 }
 
 // Zoeken doe je buiten de app, dus geef er goede links bij: kijken wat het is,
-// kopen, en — als er een foto bij staat — Google Lens op die foto.
-function zoekLinks(naam, foto) {
-  const q = encodeURIComponent(naam);
+// kopen, en Google Lens op de foto. Lens moet bij die foto kunnen, dus een
+// pad als rapport/x.jpg wordt eerst een volledige URL.
+function zoekLinks(naam, foto, merk) {
+  const q = encodeURIComponent(merk ? merk + ' ' + naam : naam);
   const l = (url, tekst) =>
     `<a class="cap-chip" style="text-decoration:none;color:var(--accent)" href="${url}" target="_blank" rel="noopener">${tekst} ↗</a>`;
+  const vol = foto && !/^https?:/.test(foto)
+    ? new URL(foto, location.href).href : foto;
   return '<div class="cap-stukken" style="margin-top:6px;">'
+    + (vol ? l(`https://lens.google.com/uploadbyurl?url=${encodeURIComponent(vol)}`, '🔍 Zoek op deze foto') : '')
     + l(`https://www.google.com/search?tbm=isch&q=${q}`, '🖼 Afbeeldingen')
     + l(`https://www.google.com/search?tbm=shop&q=${q}`, '🛒 Shopping')
-    + (foto ? l(`https://lens.google.com/uploadbyurl?url=${encodeURIComponent(foto)}`, '🔍 Lens') : '')
     + WINKELS.map(([naam, url]) => l(url + q, naam)).join('')
     + '</div>';
 }
@@ -1330,11 +1346,9 @@ function toonLijst() {
   const gedaan = alles.filter(x => isGekocht(lijstSleutel(x.naam)));
 
   if (uitleg) uitleg.innerHTML =
-      'Bovenaan staat <b>Jouw basis garderobe</b>: de aanschaftips die Robin zelf '
-    + 'in je rapport zette, pagina 25 t/m 29. Daaronder staat wat haar 33 outfits '
-    + 'verder nog nodig hebben — dat staat niet als advies in het rapport, maar je '
-    + 'hebt het wel nodig om die outfits te kunnen dragen. Voeg je iets toe aan je '
-    + 'kast, dan verdwijnt het hier vanzelf.'
+      'Dit is <b>Jouw basis garderobe</b> uit je rapport, pagina 25 t/m 29: de '
+    + 'stukken die Robin aanraadt, met háár voorbeeldfoto erbij. Voeg je er een '
+    + 'toe aan je kast, dan verdwijnt hij hier vanzelf.'
     + '<div style="margin-top:6px;">Wat Robin er zelf bij schrijft: kies key pieces '
     + 'in jouw tinten — felroze, paars, geel, rood of lichtblauw — naast rustige '
     + 'basiskleuren als donkerblauw, bruin, zwart of gebroken wit. En broeken met '
@@ -1343,30 +1357,32 @@ function toonLijst() {
   const kaart = (x, isGekocht) => {
     const k = lijstSleutel(x.naam);
     const g = lijstGekocht[k];
-    const foto = g && g.foto;
+    // Zet je zelf een foto bij een stuk, dan gaat die voor op die van Robin.
+    const eigenFoto = g && g.foto;
+    const foto = eigenFoto || x.foto || '';
     return '<div class="cap-outfit" style="margin-bottom:8px;">'
       + '<div style="display:flex;gap:9px;align-items:flex-start;">'
-      + (foto ? `<img src="${esc(foto)}" style="width:56px;height:70px;object-fit:cover;border-radius:7px;flex-shrink:0;">` : '')
+      + (foto ? `<img src="${esc(foto)}" alt="${esc(x.naam)}" loading="lazy"`
+              + ` style="width:74px;height:92px;object-fit:contain;background:var(--cream);`
+              + `border-radius:7px;flex-shrink:0;">` : '')
       + '<div style="flex:1;min-width:0;">'
       + `<div class="cap-kop"><span class="cap-naam">${esc(x.naam)}</span>`
       + `<span class="cap-stijl">${x.merk ? esc(x.merk) : (x.cat ? esc(catNaam(x.cat)) : 'zelf toegevoegd')}</span></div>`
       + (x.bron === 'basis'
           ? '<div class="cap-waarom">Staat in je rapport onder <b>' + esc(x.groep) + '</b>.'
+            + (x.merk ? ` Robins voorbeeld is van ${esc(x.merk)}.` : '')
             + (x.outfits.length
-                ? ` Robin gebruikt hem ook in outfit ${x.outfits.join(', ')}.` : '')
+                ? ` Ze gebruikt hem ook in outfit ${x.outfits.join(', ')}.` : '')
             + '</div>'
-          : x.outfits.length
-          ? `<div class="cap-waarom">Zet <b>${x.outfits.length} outfit${x.outfits.length===1?'':'s'}</b> van Robin open`
-            + ` — nummer ${x.outfits.join(', ')}.</div>`
           : '<div class="cap-waarom">Door jou toegevoegd.</div>')
       + (isGekocht && g.datum
           ? `<div class="field-note">Gekocht op ${esc(new Date(g.datum).toLocaleDateString('nl-NL',{day:'numeric',month:'long'}))}</div>`
           : '')
       + '</div></div>'
-      + zoekLinks(x.naam, foto)
+      + zoekLinks(x.naam, foto, x.merk)
       + '<div style="display:flex;gap:6px;margin-top:8px;">'
       + `<button class="cap-vervang-btn" style="flex:1;" onclick="lijstFoto('${esc(k)}')">`
-      + `${foto ? '🔄 Andere foto' : '📷 Foto erbij'}</button>`
+      + `${eigenFoto ? '🔄 Andere foto' : '📷 Eigen foto'}</button>`
       + `<button class="cap-vervang-btn" style="flex:1;" onclick="lijstAfvinken('${esc(k)}')">`
       + `${isGekocht ? '↩ Toch niet' : '✓ Gekocht'}</button>`
       + (x.bron === 'zelf'
@@ -1374,27 +1390,34 @@ function toonLijst() {
       + '</div></div>';
   };
 
-  const basis = nog.filter(x => x.bron === 'basis');
-  const rest  = nog.filter(x => x.bron !== 'basis');
   // Wat de tool denkt dat je al hebt, staat er open bij — met het stuk uit je
   // kast erachter. Zo kun je nakijken of hij het goed ziet, en zo niet: het
   // stuk in je kast anders benoemen.
   const al = basisDoorlopen().al;
   const alRegel = al.length
-    ? '<div class="field-note" style="margin-bottom:8px;">'
-      + `Van deze selectie heb je er <b>${al.length}</b> al: `
-      + al.map(a => `${esc(a.naam)} <span style="opacity:.6">→ ${esc(a.via)}</span>`).join(' · ')
-      + '. Klopt dat niet, pas dan de naam in je kast aan.</div>'
+    ? '<details style="margin-bottom:10px;"><summary class="field-note" style="cursor:pointer;">'
+      + `Van deze ${RAPPORT_BASIS.reduce((n,g)=>n+g.items.length,0)} stukken heb je er `
+      + `<b>${al.length}</b> al — tik om te zien welke</summary>`
+      + '<div class="field-note" style="margin-top:6px;">'
+      + al.map(a => `<div>${esc(a.naam)} <span style="opacity:.55">→ ${esc(a.via)}</span></div>`).join('')
+      + '<div style="margin-top:4px;">Klopt een regel niet, pas dan de naam in je kast aan.</div>'
+      + '</div></details>'
     : '';
 
+  // Per categorie van het rapport, in dezelfde volgorde als daar.
+  const groepen = [];
+  nog.forEach(x => {
+    const naam = x.bron === 'basis' ? x.groep : 'Zelf toegevoegd';
+    let g = groepen.find(y => y.naam === naam);
+    if (!g) groepen.push(g = { naam, items: [] });
+    g.items.push(x);
+  });
+
   open.innerHTML = nog.length
-    ? (basis.length
-        ? '<div class="sec-label">Jouw basis garderobe — uit je rapport</div>'
-          + alRegel + basis.map(x => kaart(x, false)).join('') : '')
-      + (rest.length
-        ? '<div class="sec-label">Wat Robins outfits verder nog nodig hebben</div>'
-          + rest.map(x => kaart(x, false)).join('') : '')
-    : '<div class="kaart-leeg">Niets meer op je lijst. Alles wat Robin gebruikt zit in je kast.</div>';
+    ? alRegel + groepen.map(g =>
+        `<div class="sec-label">${esc(g.naam)}</div>`
+        + g.items.map(x => kaart(x, false)).join('')).join('')
+    : '<div class="kaart-leeg">Alles uit Robins basis garderobe zit in je kast.</div>';
 
   klaar.innerHTML = gedaan.length
     ? '<div class="sec-label">Al gekocht</div>' + gedaan.map(x => kaart(x, true)).join('')
