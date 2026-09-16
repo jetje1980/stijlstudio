@@ -1261,6 +1261,12 @@ async function bewaarLijst() {
 
 const lijstSleutel = naam => String(naam || '').toLowerCase().trim();
 
+// 'layers' op een kaartje zetten is programmeurstaal. Zo heet het in de kast.
+const CAT_NAMEN = { tops:'top', bottoms:'broek of rok', layers:'laagje',
+  jurken:'jurk', eendelig:'jumpsuit of co-ord', shoes:'schoenen', bags:'tas',
+  accessories:'accessoire', swimwear:'zwemkleding', overig:'overig' };
+const catNaam = c => CAT_NAMEN[c] || c;
+
 // De basisgarderobe uit het rapport, daarna wat Robins outfits nog nodig
 // hebben, daarna wat je zelf toevoegde. Staat een stuk in allebei — de zwarte
 // oversized blazer bijvoorbeeld — dan blijft het één regel, met de outfits
@@ -1343,7 +1349,7 @@ function toonLijst() {
       + (foto ? `<img src="${esc(foto)}" style="width:56px;height:70px;object-fit:cover;border-radius:7px;flex-shrink:0;">` : '')
       + '<div style="flex:1;min-width:0;">'
       + `<div class="cap-kop"><span class="cap-naam">${esc(x.naam)}</span>`
-      + `<span class="cap-stijl">${x.merk ? esc(x.merk) : (x.cat ? esc(x.cat) : 'zelf toegevoegd')}</span></div>`
+      + `<span class="cap-stijl">${x.merk ? esc(x.merk) : (x.cat ? esc(catNaam(x.cat)) : 'zelf toegevoegd')}</span></div>`
       + (x.bron === 'basis'
           ? '<div class="cap-waarom">Staat in je rapport onder <b>' + esc(x.groep) + '</b>.'
             + (x.outfits.length
