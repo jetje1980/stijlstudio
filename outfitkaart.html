@@ -1237,33 +1237,36 @@ const RAPPORT_BASIS = [
 ];
 const rapportFoto = f => f ? 'rapport/' + f + '.jpg' : '';
 
-// Welke stukken uit die basisgarderobe zij nog niet heeft. Eén item uit de kast
-// kan maar één regel afvinken: heeft ze één paar zwarte laarzen, dan blijft het
-// tweede zwarte paar uit het rapport gewoon staan.
+// Alle 23 stukken uit het rapport, altijd. Denkt de tool dat je er al een hebt,
+// dan staat dat als vermoeden op het kaartje — maar het stuk verdwijnt niet.
+// Dat deed hij eerst wel, en dan zag je er nog maar tien van de 23; het leek
+// alsof het rapport half was ingevoerd. Bovendien zat de tool er geregeld
+// naast: een cropped mid-waist jeans is geen wijde jeans en chunky loafers
+// zijn geen platte loafers met een gesp. Zo'n gok mag een suggestie zijn, geen
+// besluit. Eén item uit de kast kan maar aan één regel gekoppeld worden.
 function basisDoorlopen() {
   const bezet = new Set();
-  const nodig = [], al = [];
+  const uit = [];
   RAPPORT_BASIS.forEach(g => g.items.forEach(it => {
-    // Strenger dan elders: een regel uit het rapport mag alleen wegvallen als
-    // ook de categorie klopt. Anders zou een rode tas een rood T-shirt afvinken.
+    // Strenger dan elders: alleen een vermoeden als ook de categorie klopt.
+    // Anders zou een rode tas voor een rood T-shirt doorgaan.
     const heeft = zoekInKast(it, bezet);
-    if (heeft && heeft.cat === it.cat) {
-      bezet.add(heeft.id);
-      al.push({ naam: it.naam, groep: g.groep, via: heeft.name });
-      return;
-    }
-    nodig.push({ naam: it.naam, cat: it.cat, merk: it.merk || '', groep: g.groep,
-                 foto: rapportFoto(it.foto), outfits: [], bron: 'basis' });
+    const raak = heeft && heeft.cat === it.cat ? heeft : null;
+    if (raak) bezet.add(raak.id);
+    uit.push({ naam: it.naam, cat: it.cat, merk: it.merk || '', groep: g.groep,
+               foto: rapportFoto(it.foto), lijktOp: raak ? raak.name : '',
+               outfits: [], bron: 'basis' });
   }));
-  return { nodig, al };
+  return uit;
 }
-function basisNogNodig() { return basisDoorlopen().nodig; }
 let lijstEigen = [];    // wat zij er zelf bij zet
 // { sleutel: {datum, foto} } — let op: alleen een datum betekent gekocht. Een
 // foto erbij zetten is iets anders dan het gekocht hebben, en die twee mogen
 // niet door hetzelfde veld worden bepaald.
 let lijstGekocht = {};
 const isGekocht = k => !!(lijstGekocht[k] && lijstGekocht[k].datum);
+// Zeg je "nee, die heb ik niet", dan houdt de tool op met dat vermoeden.
+const afgewezen = k => !!(lijstGekocht[k] && lijstGekocht[k].niet);
 
 async function laadLijst() {
   try { lijstEigen = JSON.parse(localStorage.getItem('griette-kooplijst-v1') || '[]'); } catch(e){}
@@ -1297,7 +1300,7 @@ const catNaam = c => CAT_NAMEN[c] || c;
 // staat, want dit is een aanschafadvies, geen gatenlijst.
 function bouwKooplijst() {
   const uit = new Map();
-  basisNogNodig().forEach(x => uit.set(lijstSleutel(x.naam), x));
+  basisDoorlopen().forEach(x => uit.set(lijstSleutel(x.naam), x));
 
   ROBIN_OUTFITS.forEach(o => {
     robinNaarItems(o).forEach(i => {
@@ -1345,10 +1348,12 @@ function toonLijst() {
   const nog = alles.filter(x => !isGekocht(lijstSleutel(x.naam)));
   const gedaan = alles.filter(x => isGekocht(lijstSleutel(x.naam)));
 
+  const totaal = RAPPORT_BASIS.reduce((n, g) => n + g.items.length, 0);
   if (uitleg) uitleg.innerHTML =
-      'Dit is <b>Jouw basis garderobe</b> uit je rapport, pagina 25 t/m 29: de '
-    + 'stukken die Robin aanraadt, met háár voorbeeldfoto erbij. Voeg je er een '
-    + 'toe aan je kast, dan verdwijnt hij hier vanzelf.'
+      `Dit is <b>Jouw basis garderobe</b> uit je rapport, pagina 25 t/m 29: alle `
+    + `${totaal} stukken die Robin aanraadt, met háár voorbeeldfoto erbij. Denkt de `
+    + 'tool dat je er al een hebt, dan staat dat als vermoeden op het kaartje — je '
+    + 'beslist zelf of dat klopt.'
     + '<div style="margin-top:6px;">Wat Robin er zelf bij schrijft: kies key pieces '
     + 'in jouw tinten — felroze, paars, geel, rood of lichtblauw — naast rustige '
     + 'basiskleuren als donkerblauw, bruin, zwart of gebroken wit. En broeken met '
@@ -1376,7 +1381,16 @@ function toonLijst() {
             + '</div>'
           : '<div class="cap-waarom">Door jou toegevoegd.</div>')
       + (isGekocht && g.datum
-          ? `<div class="field-note">Gekocht op ${esc(new Date(g.datum).toLocaleDateString('nl-NL',{day:'numeric',month:'long'}))}</div>`
+          ? `<div class="field-note">Afgevinkt op ${esc(new Date(g.datum).toLocaleDateString('nl-NL',{day:'numeric',month:'long'}))}</div>`
+          : '')
+      // Een vermoeden, geen besluit: het stuk blijft staan tot zij het bevestigt.
+      + (!isGekocht && x.lijktOp && !afgewezen(k)
+          ? '<div class="field-note" style="margin-top:5px;">Lijkt op iets uit je kast: '
+            + `<b>${esc(x.lijktOp)}</b>`
+            + '<div style="display:flex;gap:6px;margin-top:5px;">'
+            + `<button class="cap-vervang-btn" style="flex:1;" onclick="lijstAfvinken('${esc(k)}')">✓ Klopt, heb ik</button>`
+            + `<button class="cap-vervang-btn" style="flex:1;" onclick="lijstNiet('${esc(k)}')">✗ Nee, is iets anders</button>`
+            + '</div></div>'
           : '')
       + '</div></div>'
       + zoekLinks(x.naam, foto, x.merk)
@@ -1384,27 +1398,14 @@ function toonLijst() {
       + `<button class="cap-vervang-btn" style="flex:1;" onclick="lijstFoto('${esc(k)}')">`
       + `${eigenFoto ? '🔄 Andere foto' : '📷 Eigen foto'}</button>`
       + `<button class="cap-vervang-btn" style="flex:1;" onclick="lijstAfvinken('${esc(k)}')">`
-      + `${isGekocht ? '↩ Toch niet' : '✓ Gekocht'}</button>`
+      + `${isGekocht ? '↩ Terug op de lijst' : '✓ Heb ik'}</button>`
       + (x.bron === 'zelf'
           ? `<button class="cap-vervang-btn" onclick="lijstWeg('${esc(k)}')">🗑</button>` : '')
       + '</div></div>';
   };
 
-  // Wat de tool denkt dat je al hebt, staat er open bij — met het stuk uit je
-  // kast erachter. Zo kun je nakijken of hij het goed ziet, en zo niet: het
-  // stuk in je kast anders benoemen.
-  const al = basisDoorlopen().al;
-  const alRegel = al.length
-    ? '<details style="margin-bottom:10px;"><summary class="field-note" style="cursor:pointer;">'
-      + `Van deze ${RAPPORT_BASIS.reduce((n,g)=>n+g.items.length,0)} stukken heb je er `
-      + `<b>${al.length}</b> al — tik om te zien welke</summary>`
-      + '<div class="field-note" style="margin-top:6px;">'
-      + al.map(a => `<div>${esc(a.naam)} <span style="opacity:.55">→ ${esc(a.via)}</span></div>`).join('')
-      + '<div style="margin-top:4px;">Klopt een regel niet, pas dan de naam in je kast aan.</div>'
-      + '</div></details>'
-    : '';
-
-  // Per categorie van het rapport, in dezelfde volgorde als daar.
+  // Per categorie van het rapport, in dezelfde volgorde als daar. Alle stukken
+  // blijven staan; alleen wat jij zelf afvinkt schuift naar onderen.
   const groepen = [];
   nog.forEach(x => {
     const naam = x.bron === 'basis' ? x.groep : 'Zelf toegevoegd';
@@ -1414,13 +1415,15 @@ function toonLijst() {
   });
 
   open.innerHTML = nog.length
-    ? alRegel + groepen.map(g =>
-        `<div class="sec-label">${esc(g.naam)}</div>`
+    ? groepen.map(g =>
+        `<div class="sec-label">${esc(g.naam)} <span style="opacity:.5;font-weight:400">`
+        + `${g.items.length}</span></div>`
         + g.items.map(x => kaart(x, false)).join('')).join('')
-    : '<div class="kaart-leeg">Alles uit Robins basis garderobe zit in je kast.</div>';
+    : '<div class="kaart-leeg">Je hebt alles uit Robins basis garderobe afgevinkt.</div>';
 
   klaar.innerHTML = gedaan.length
-    ? '<div class="sec-label">Al gekocht</div>' + gedaan.map(x => kaart(x, true)).join('')
+    ? `<div class="sec-label">Heb ik al — ${gedaan.length} van de ${totaal}</div>`
+      + gedaan.map(x => kaart(x, true)).join('')
     : '';
 }
 
@@ -1430,6 +1433,13 @@ async function lijstAfvinken(k) {
   if (nu.datum) delete nu.datum;
   else nu.datum = new Date().toISOString();
   if (Object.keys(nu).length) lijstGekocht[k] = nu; else delete lijstGekocht[k];
+  toonLijst();
+  await bewaarLijst();
+}
+
+// "Nee, is iets anders": het vermoeden verdwijnt, het stuk blijft op de lijst.
+async function lijstNiet(k) {
+  lijstGekocht[k] = Object.assign({}, lijstGekocht[k], { niet: true });
   toonLijst();
   await bewaarLijst();
 }
