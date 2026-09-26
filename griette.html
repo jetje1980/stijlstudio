@@ -462,7 +462,7 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
     <span style="font-size:18px;flex-shrink:0;">🧬</span><span style="flex:1;">Stijl DNA <span style="color:var(--muted);font-size:10px;">— jouw stijlprofiel &amp; kleurenstrategie</span></span><span style="color:var(--muted);">›</span>
   </button>
   <button type="button" data-meer-panel="shop" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:18px;flex-shrink:0;">🛍</span><span style="flex:1;">Wat je nog wilt <span style="color:var(--muted);font-size:10px;">— de aanschaftips uit je rapport</span></span><span style="color:var(--muted);">›</span>
+    <span style="font-size:18px;flex-shrink:0;">🛍</span><span style="flex:1;">Shoppen <span style="color:var(--muted);font-size:10px;">— zoek items bij jouw winkels</span></span><span style="color:var(--muted);">›</span>
   </button>
   <button type="button" data-meer-action="outfitcal" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
     <span style="font-size:18px;flex-shrink:0;">🗓</span><span style="flex:1;">Wat je droeg <span style="color:var(--muted);font-size:10px;">— je outfitgeschiedenis</span></span><span style="color:var(--muted);">›</span>
@@ -3053,6 +3053,21 @@ function renderOutfit(boardId, outfit) {
   inp.addEventListener('change', (function(oid){ return function(){ renameOutfit(oid, this.value); }; })(outfit.id));
   nameInput.appendChild(inp);
 
+  // Komt deze look uit de outfitkaart, dan hoort dat plaatje erbij te staan.
+  if (outfit.kaartUrl) {
+    var kaartLink = document.createElement('a');
+    kaartLink.href = outfit.kaartUrl;
+    kaartLink.target = '_blank';
+    kaartLink.rel = 'noopener';
+    kaartLink.title = 'De outfitkaart van deze look';
+    kaartLink.style.cssText = 'flex-shrink:0;margin-right:6px;line-height:0;';
+    kaartLink.innerHTML = '<img loading="lazy" src="' + outfit.kaartUrl + '" alt="outfitkaart" '
+      + 'style="width:26px;height:33px;object-fit:cover;border-radius:4px;border:1px solid var(--cream-dark);">';
+    nameInput.insertBefore(kaartLink, nameInput.firstChild);
+    nameInput.style.display = 'flex';
+    nameInput.style.alignItems = 'center';
+  }
+
   var acts = document.createElement('div');
   acts.className = 'outfit-actions';
 
@@ -3473,29 +3488,13 @@ function dagStukken(namen) {
   }).filter(Boolean);
 }
 
-async function maakDagKaarten(ctx, opnieuw) {
-  const vak = document.getElementById('dag-kaarten');
-  if (!vak) return;
-  if (!opnieuw && dagKaarten.length) { toonDagKaarten(); return; }
-
-  const kast = getAllItems().filter(function(i){ return !deletedItemIds.has(i.id); });
-  if (kast.length < 8) {
-    vak.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:10px 0;">'
-      + 'Nog te weinig in je kast om tien looks te maken.</div>';
-    return;
-  }
-
-  vak.innerHTML = '<div class="ai-thinking"><div class="ai-dot"></div><div class="ai-dot"></div>'
-    + '<div class="ai-dot"></div><span style="margin-left:6px;">Tien looks voor vandaag…</span></div>';
-
-  const regels = kast.map(function(i) {
-    const k = getTag(i.id, 'kleur'), pv = getTag(i.id, 'pasvorm'), mt = getTag(i.id, 'materiaal');
-    const extra = [k, pv, mt].filter(Boolean).map(function(v){ return Array.isArray(v) ? v.join('/') : v; }).join(', ');
-    return '- ' + i.name + ' [' + i.cat + ']' + (extra ? ' (' + extra + ')' : '');
-  }).join('\n');
-
-  const opdrachten = DAG_SLOTS.map(function(sl, n) {
-    return (n+1) + '. ' + sl.n + ' looks — ' + sl.opdracht;
+// Tien looks in één vraag betekent één lang antwoord, en dus lang niets zien.
+// Ze worden nu in twee vragen tegelijk gesteld — de eerste twee assen en de
+// laatste twee — en elke helft verschijnt zodra hij binnen is. Half zo lang
+// wachten op de eerste kaarten, en valt er één om, dan staat de andere er nog.
+async function vraagLooks(ctx, regels, slots, aantal) {
+  const opdrachten = slots.map(function(sl, n) {
+    return (n + 1) + '. ' + sl.n + ' looks — ' + sl.opdracht;
   }).join('\n');
 
   const prompt = 'Je bent de persoonlijke stylist van Griette. Haar stijlrapport noemt haar stijl '
@@ -3508,56 +3507,117 @@ async function maakDagKaarten(ctx, opnieuw) {
     + dagMoodZin()
     + dagCyclusZin()
     + 'HAAR KAST:\n' + regels + '\n\n'
-    + 'Maak precies 10 looks, verdeeld als volgt:\n' + opdrachten + '\n\n'
+    + 'Maak precies ' + aantal + ' looks, verdeeld als volgt:\n' + opdrachten + '\n\n'
     + 'Regels:\n'
     + '- Gebruik per look 3 tot 6 stukken, met exacte namen uit de lijst.\n'
     + '- Geen twee looks met dezelfde stukken.\n'
-    + '- Hoogstens ' + DAG_MAX_NETNIET + ' looks mogen één stuk bevatten dat NIET in de lijst staat, '
-    + 'als dat de look echt beter maakt. Zet dat stuk dan ook in "items" en beschrijf in "netniet" '
-    + 'wat het is en waarom het werkt. De andere looks gebruiken alleen wat ze heeft.\n\n'
+    + '- Hoogstens één look mag een stuk bevatten dat NIET in de lijst staat, als dat de look '
+    + 'echt beter maakt. Zet dat stuk dan ook in "items" en beschrijf in "netniet" wat het is en '
+    + 'waarom het werkt. De andere looks gebruiken alleen wat ze heeft.\n\n'
     + 'Antwoord ALLEEN met JSON:\n'
     + '{"looks":[{"naam":"korte naam","merk":"karakter, kleur of gelegenheid","waarom":"1 zin: '
     + 'waarom dit werkt voor haar","items":["exacte naam"],"rodedraad":"het stuk dat terugkomt, of leeg",'
     + '"netniet":"wat ontbreekt en waarom het zou werken, of leeg"}]}';
 
-  try {
-    const res = await aiFetch(null, { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ model: aiModelNu(), max_tokens: 3000,
-        messages:[{ role:'user', content: prompt }] }) });
-    if (!res.ok) throw new Error('API ' + res.status);
-    const data = await res.json();
-    const raw = (data.content || []).filter(function(b){ return b.type === 'text'; })
-      .map(function(b){ return b.text; }).join('');
-    const m = raw.match(/\{[\s\S]*\}/);
-    if (!m) throw new Error('geen JSON');
-    const looks = (JSON.parse(m[0]).looks || []);
-    if (!looks.length) throw new Error('geen looks');
+  const res = await aiFetch(null, { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ model: aiModelNu(), max_tokens: 2000,
+      messages:[{ role:'user', content: prompt }] }) });
+  if (!res.ok) throw new Error('API ' + res.status);
+  const data = await res.json();
+  const raw = (data.content || []).filter(function(b){ return b.type === 'text'; })
+    .map(function(b){ return b.text; }).join('');
+  const m = raw.match(/\{[\s\S]*\}/);
+  if (!m) throw new Error('geen JSON');
+  const looks = (JSON.parse(m[0]).looks || []);
+  if (!looks.length) throw new Error('geen looks');
+  return looks;
+}
 
-    // Deterministisch nakijken wat de stylist terugstuurt.
-    let netniet = 0;
-    const gezien = new Set();
-    dagKaarten = looks.map(function(l) {
-      const stukken = dagStukken(l.items);
-      const sleutel = stukken.map(function(x){ return x.id || x.naam; }).sort().join('|');
-      if (gezien.has(sleutel)) return null;      // twee keer hetzelfde: weg
-      gezien.add(sleutel);
-      const mist = stukken.filter(function(x){ return !x.heeft; });
-      if (mist.length && netniet >= DAG_MAX_NETNIET) return null;
-      if (mist.length) netniet++;
-      return { naam: l.naam || 'Look', merk: l.merk || '', waarom: l.waarom || '',
+// Nakijken wat er terugkomt: namen terugzoeken in de kast, dubbele looks eruit,
+// en niet meer dan een paar met een stuk dat ze niet heeft.
+function verwerkLooks(looks, gezien) {
+  const uit = [];
+  looks.forEach(function(l) {
+    const stukken = dagStukken(l.items);
+    if (stukken.length < 2) return;
+    const sleutel = stukken.map(function(x){ return x.id || x.naam; }).sort().join('|');
+    if (gezien.sleutels.has(sleutel)) return;
+    const mist = stukken.filter(function(x){ return !x.heeft; });
+    if (mist.length && gezien.netniet >= DAG_MAX_NETNIET) return;
+    if (mist.length) gezien.netniet++;
+    gezien.sleutels.add(sleutel);
+    uit.push({ naam: l.naam || 'Look', merk: l.merk || '', waarom: l.waarom || '',
                rodedraad: l.rodedraad || '', netniet: mist.length ? (l.netniet || '') : '',
-               stukken: stukken };
-    }).filter(Boolean).filter(function(k){ return k.stukken.length >= 2; });
+               stukken: stukken });
+  });
+  return uit;
+}
 
-    dagBewaard = {};
-    bewaarDagKaarten();
-    toonDagKaarten();
-  } catch(e) {
-    vak.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:10px 0;line-height:1.6;">'
-      + 'De stylist kon even geen looks maken — ' + esc2(dagFoutReden(e))
-      + ' <button onclick="maakDagKaarten(dagContext, true)" style="background:none;border:none;'
-      + 'color:var(--brown);text-decoration:underline;cursor:pointer;font-family:Jost,sans-serif;'
-      + 'font-size:11px;padding:0;">Opnieuw proberen</button></div>';
+// Lege kaarten in de goede vorm, zodat de pagina meteen staat zoals hij komt.
+function toonDagSkelet(n) {
+  const vak = document.getElementById('dag-kaarten');
+  if (!vak) return;
+  const leegVak = '<div class="dk-stuk"><div class="dk-foto"></div>'
+    + '<div class="dk-naampje">&nbsp;</div></div>';
+  vak.innerHTML = new Array(n).fill(0).map(function() {
+    return '<div class="dagkaart" style="opacity:.45;pointer-events:none;">'
+      + '<div class="dk-naam" style="color:#cfc4b6;">· · ·</div>'
+      + '<div class="dk-rij">' + leegVak + leegVak + leegVak + '</div></div>';
+  }).join('');
+}
+
+async function maakDagKaarten(ctx, opnieuw) {
+  const vak = document.getElementById('dag-kaarten');
+  if (!vak) return;
+  if (!opnieuw && dagKaarten.length) { toonDagKaarten(); return; }
+
+  const kast = getAllItems().filter(function(i){ return !deletedItemIds.has(i.id); });
+  if (kast.length < 8) {
+    vak.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:10px 0;">'
+      + 'Nog te weinig in je kast om tien looks te maken.</div>';
+    return;
+  }
+
+  const regels = kast.map(function(i) {
+    const k = getTag(i.id, 'kleur'), pv = getTag(i.id, 'pasvorm'), mt = getTag(i.id, 'materiaal');
+    const extra = [k, pv, mt].filter(Boolean).map(function(v){ return Array.isArray(v) ? v.join('/') : v; }).join(', ');
+    return '- ' + i.name + ' [' + i.cat + ']' + (extra ? ' (' + extra + ')' : '');
+  }).join('\n');
+
+  const helften = [DAG_SLOTS.slice(0, 2), DAG_SLOTS.slice(2)];
+  const gezien = { sleutels: new Set(), netniet: 0 };
+  let mislukt = 0;
+
+  dagKaarten = [];
+  dagBewaard = {};
+  toonDagSkelet(DAG_SLOTS.reduce(function(n, sl){ return n + sl.n; }, 0));
+
+  await Promise.all(helften.map(async function(slots) {
+    const aantal = slots.reduce(function(n, sl){ return n + sl.n; }, 0);
+    try {
+      const looks = await vraagLooks(ctx, regels, slots, aantal);
+      dagKaarten = dagKaarten.concat(verwerkLooks(looks, gezien));
+      bewaarDagKaarten();
+      toonDagKaarten();
+    } catch(e) {
+      mislukt++;
+      if (!dagKaarten.length && mislukt === helften.length) {
+        vak.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:10px 0;line-height:1.6;">'
+          + 'De stylist kon even geen looks maken — ' + esc2(dagFoutReden(e))
+          + ' <button onclick="maakDagKaarten(dagContext, true)" style="background:none;border:none;'
+          + 'color:var(--brown);text-decoration:underline;cursor:pointer;font-family:Jost,sans-serif;'
+          + 'font-size:11px;padding:0;">Opnieuw proberen</button></div>';
+      }
+    }
+  }));
+
+  // Eén helft gelukt, de andere niet: zeg dat, maar houd wat je hebt.
+  if (mislukt && dagKaarten.length) {
+    const u = document.getElementById('dag-uitleg');
+    if (u) u.innerHTML = u.textContent + ' <span style="color:var(--brown-mid);">'
+      + 'Een deel lukte niet — <button onclick="maakDagKaarten(dagContext, true)" '
+      + 'style="background:none;border:none;color:var(--brown);text-decoration:underline;'
+      + 'cursor:pointer;font-family:Jost,sans-serif;font-size:10px;padding:0;">opnieuw</button></span>';
   }
 }
 
@@ -7246,8 +7306,10 @@ openDB().then(async () => {
   // De tien van vandaag: uit de cache als ze er al zijn, anders één keer maken.
   // Na de Supabase-sync, zodat hij de hele kast kent en niet alleen wat er
   // lokaal stond.
-  setTimeout(function(){ if (dagKaarten.length) toonDagKaarten(); }, 100);
-  setTimeout(function(){ if (!dagKaarten.length) maakDagKaarten(dagContext, false); }, 2500);
+  // Meteen: de kast staat al uit localStorage, dus wachten op Supabase kost
+  // alleen maar tijd waarin jij naar niets kijkt.
+  if (dagKaarten.length) toonDagKaarten();
+  else { toonDagSkelet(10); setTimeout(function(){ maakDagKaarten(dagContext, false); }, 250); }
   setTimeout(function(){applyGarderobeFilter();showMondayBanner();addMorningBannerBtn();updateHomeGreeting();},600);
   setTimeout(checkUnwornItems, 500);
   setTimeout(checkSeizoenswissel, 800);

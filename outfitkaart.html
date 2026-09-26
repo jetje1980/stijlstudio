@@ -7771,6 +7771,27 @@ async function uploadKaart(dataUrl, id) {
 
 // Bewaart de kaart die nu op het scherm staat. Wordt ook automatisch
 // aangeroepen als je hem downloadt — dan is de afbeelding er toch al.
+// Een afgemaakte kaart hoorde bij "Mijn kaarten": een eigen stapel met alleen
+// een plaatje en wat namen. Haar 216 looks staan ergens anders, als echte
+// outfits met item-ids. Twee verzamelingen van hetzelfde ding, die elkaar niet
+// kenden. Een kaart gaat nu óók naar haar Looks, als volwaardige look met de
+// stukken erin en het plaatje eraan — dan is er één plek waar outfits wonen.
+async function bewaarInLooks(titel, kaartUrl) {
+  const ids = selItems.filter(i => i && !i._suggestion && i.id).map(i => i.id);
+  if (!ids.length) return '';
+  try {
+    const borden = await sbGet('boards');
+    if (!Array.isArray(borden) || !borden.length) return '';
+    const bord = borden.find(b => b.id === 'inspiratie') || borden[0];
+    bord.outfits = bord.outfits || [];
+    if (bord.outfits.some(o => o.kaartUrl === kaartUrl)) return bord.label || bord.id;
+    bord.outfits.push({ id: 'outfit-kaart-' + Date.now().toString(36),
+                        name: titel, items: ids, kaartUrl: kaartUrl });
+    await sbSet('boards', borden);
+    return bord.label || bord.id;
+  } catch(e) { return ''; }
+}
+
 async function bewaarKaart(bestaandeDataUrl, stil) {
   const btn = document.getElementById('bewaar-btn');
   const st  = document.getElementById('bewaar-status');
@@ -7796,8 +7817,12 @@ async function bewaarKaart(bestaandeDataUrl, stil) {
     if (bewaardeKaarten.length > MAX_KAARTEN) bewaardeKaarten = bewaardeKaarten.slice(0, MAX_KAARTEN);
     await schrijfKaarten();
 
-    if (btn && !stil) { btn.textContent = '✓ Bewaard bij je kaarten'; }
-    if (st && !stil) st.innerHTML = `Staat nu bij <b>🗂 Mijn kaarten</b>, ook op je andere apparaten.`;
+    const bord = await bewaarInLooks(titel, url);
+
+    if (btn && !stil) { btn.textContent = '✓ Bewaard'; }
+    if (st && !stil) st.innerHTML = bord
+      ? `Staat nu bij <b>🗂 Mijn kaarten</b> én in je Looks, op board <b>${esc(bord)}</b>.`
+      : `Staat nu bij <b>🗂 Mijn kaarten</b>, ook op je andere apparaten.`;
     return true;
   } catch(e) {
     if (btn && !stil) btn.textContent = '💾 Bewaar bij mijn kaarten';
