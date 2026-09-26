@@ -805,6 +805,8 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
   <!-- Tot nu toe kon je alleen de hele kaart laten herschrijven of in een
        tekstveld typen wat je wilde. Een stuk even wegdenken, of één stuk
        vervangen, is iets wat je per item wilt kunnen — met één tik. -->
+  <div id="overwogen" style="display:none;margin-bottom:12px;"></div>
+
   <div class="sec-label" style="margin-top:4px;">Sleutel aan deze outfit</div>
   <div class="field-note" style="margin-bottom:8px;">Haal een stuk weg om te zien of het blijft staan, of vraag om iets anders op die plek.</div>
   <div id="werkbank"></div>
@@ -6522,12 +6524,53 @@ function voegAccentVoorstel(kleur, itemtype) {
 }
 
 // ── AI: OUTFIT SAMENSTELLEN UIT DE KAST ───────────────────────────────────────
+let laatsteZeef = null;
+
+// ── WAT IS ER OVERWOGEN ──────────────────────────────────────────────────────
+// "Ik twijfel of alle opties uit mijn kast wel bekeken zijn." De zeef rekent
+// uit wat er afvalt en waarom, dus dat hoeft niet gegist te worden — het hoort
+// gewoon op de kaart te staan.
+function toonOverwogen() {
+  const el = document.getElementById('overwogen');
+  if (!el) return;
+  if (!laatsteZeef) { el.style.display = 'none'; el.innerHTML = ''; return; }
+
+  const z = laatsteZeef;
+  const perReden = {};
+  (z.weg || []).forEach(w => { perReden[w.reden] = (perReden[w.reden] || 0) + 1; });
+  const redenen = Object.keys(perReden).sort((a, b) => perReden[b] - perReden[a]);
+
+  el.style.display = 'block';
+  el.innerHTML = '<details><summary class="field-note" style="cursor:pointer;">'
+    + `Ik keek naar <b>${z.bekeken}</b> van je ${z.totaal} stukken`
+    + (redenen.length
+        ? `, ${(z.weg || []).length} vielen af — tik om te zien welke`
+        : '. Alles was in beeld.')
+    + '</summary>'
+    + (redenen.length
+        ? '<div class="field-note" style="margin-top:6px;">'
+          + redenen.map(r => {
+              const stukken = z.weg.filter(w => w.reden === r);
+              return `<div style="margin-bottom:4px;"><b>${esc(r)}</b> (${stukken.length}): `
+                + esc(stukken.slice(0, 6).map(w => w.item.name).join(', '))
+                + (stukken.length > 6 ? ` en nog ${stukken.length - 6}` : '') + '</div>';
+            }).join('')
+          + '<div style="margin-top:5px;">Klopt een reden niet, pas dan je voorwaarden aan.</div>'
+          + '</div>'
+        : '')
+    + '</details>';
+}
+
 function wardrobeForAI() {
   // Wat je hebt uitgesloten hoort de stylist niet eens te zien. Voorheen ging
   // hier de hele kast heen, ook als je net "geen hakken" had aangevinkt — en
   // dan stonden die pumps alsnog op je kaart. Wat je zelf al koos blijft
   // altijd staan, ook als het tegen een voorwaarde in gaat: dat is jouw keuze.
-  const { houden } = zeefKast(allItems, null, selItems.concat(anchorItems || []));
+  const { houden, weg } = zeefKast(allItems, null, selItems.concat(anchorItems || []));
+  // Bewaren wát er afviel en waarom. Dat werd hier berekend en meteen
+  // weggegooid, terwijl het precies de vraag beantwoordt of alle opties wel
+  // bekeken zijn.
+  laatsteZeef = { bekeken: houden.length, totaal: (allItems || []).length, weg: weg };
   return houden.map(i => {
     const t = itemTags[i.id] || {};
     const val = v => Array.isArray(v) ? v.join('/') : (v || '');
@@ -7853,6 +7896,7 @@ function setStep(n) {
     toonVoorwaardenBalk();
     buildKaart();
     toonWerkbank();
+    toonOverwogen();
     zonderStapel = [];
     var wu = document.getElementById('werkbank-uitkomst');
     if (wu) wu.innerHTML = '';
