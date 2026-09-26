@@ -800,6 +800,17 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
   </div>
 
   <div style="height:12px;"></div>
+
+  <!-- ===== SLEUTELEN AAN DE OUTFIT ===== -->
+  <!-- Tot nu toe kon je alleen de hele kaart laten herschrijven of in een
+       tekstveld typen wat je wilde. Een stuk even wegdenken, of één stuk
+       vervangen, is iets wat je per item wilt kunnen — met één tik. -->
+  <div class="sec-label" style="margin-top:4px;">Sleutel aan deze outfit</div>
+  <div class="field-note" style="margin-bottom:8px;">Haal een stuk weg om te zien of het blijft staan, of vraag om iets anders op die plek.</div>
+  <div id="werkbank"></div>
+  <div id="werkbank-uitkomst" style="margin-top:10px;"></div>
+  <div style="height:14px;"></div>
+
   <div class="dl-bar">
     <button class="ai-btn" id="aanvul-btn" style="display:none;" onclick="autoComposeOnCard()">✨ Laat AI een outfit samenstellen</button>
     <button class="btn-dl" id="dl-btn" onclick="downloadKaart()">⬇ Opslaan als afbeelding</button>
@@ -6874,6 +6885,222 @@ function buildKaart() {
   });
 }
 
+// ── SLEUTELEN AAN DE OUTFIT ──────────────────────────────────────────────────
+// Twee dingen die je per stuk wilt kunnen, met één tik:
+//
+//   "even zonder"  — haal de jas weg en zeg me of het blijft staan
+//   "iets anders"  — geef me alternatieven op die plek, met de reden erbij
+//
+// Allebei gaan ze over één stuk in een bestaande outfit, en allebei vragen ze
+// om een oordeel. Wat deterministisch is — welke laag verdwijnt, blijft de
+// silhouetregel overeind, welke stukken uit de kast komen in aanmerking —
+// rekenen we hier uit; het oordeel is aan de stylist.
+let zonderStapel = [];   // wat je wegnam, om terug te kunnen
+
+function toonWerkbank() {
+  const vak = document.getElementById('werkbank');
+  if (!vak) return;
+  const items = selItems.filter(i => i && !i._suggestion);
+  if (!items.length) { vak.innerHTML = ''; return; }
+
+  vak.innerHTML = items.map(i =>
+    '<div class="cap-outfit" style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:8px 10px;">'
+    + (cloudMap[i.id]
+        ? `<img src="${esc(cloudMap[i.id])}" loading="lazy" alt="" style="width:34px;height:42px;object-fit:cover;border-radius:6px;flex-shrink:0;">`
+        : '<div style="width:34px;height:42px;border-radius:6px;background:var(--cream);flex-shrink:0;"></div>')
+    + `<span style="flex:1;min-width:0;font-size:12px;">${esc(i.name)}</span>`
+    + `<button class="cap-vervang-btn" onclick="zonderDitStuk('${esc(i.id)}')">even zonder</button>`
+    + `<button class="cap-vervang-btn" onclick="ietsAndersHier('${esc(i.id)}')">iets anders</button>`
+    + '</div>').join('')
+    + (zonderStapel.length
+        ? '<button class="btn-rescan" style="margin-top:4px;" onclick="zetTerug()">↩ '
+          + esc(zonderStapel[zonderStapel.length-1].name) + ' weer terug</button>'
+        : '');
+}
+
+function werkbankBezig(tekst) {
+  const el = document.getElementById('werkbank-uitkomst');
+  if (el) el.innerHTML = `<div class="field-note">${esc(tekst)}</div>`;
+}
+
+// callClaude maakt zelf al een leesbare melding van wat er misging — die
+// hoeft hier niet nog eens geraden te worden. Alleen als de fout geen zin is
+// maar een code, maken we er zelf een zin van.
+function werkbankFout(e) {
+  const el = document.getElementById('werkbank-uitkomst');
+  if (!el) return;
+  const m = String((e && e.message) || e || '');
+  const isZin = m.length > 30 && /\s/.test(m);
+  const reden = isZin ? m
+    : !navigator.onLine ? 'Je hebt geen verbinding.'
+    : /JSON|leeg/i.test(m) ? 'Het antwoord was niet te lezen.'
+    : /\b5\d\d\b/.test(m) ? 'De stylist had even een storing.'
+    : 'Er ging iets mis bij de stylist.';
+  el.innerHTML = `<div class="cap-outfit" style="padding:10px 12px;">`
+    + `<div class="cap-waarom"><b>Dat lukte even niet.</b> ${esc(reden)}</div></div>`;
+}
+
+// Welke rol speelt dit stuk in de outfit? Dat is te bepalen zonder AI, en het
+// scheelt de stylist giswerk.
+function rolVan(item) {
+  if (!item) return '';
+  if (isEendelig(item)) return 'boven- én onderstuk in één';
+  if (isBuitenlaag(item)) return 'buitenlaag';
+  const r = { tops:'bovenstuk', bottoms:'onderstuk', layers:'laagje',
+              shoes:'schoenen', bags:'tas', accessories:'accessoire' };
+  return r[item.cat] || item.cat || '';
+}
+
+async function zonderDitStuk(id) {
+  const item = selItems.find(i => i.id === id);
+  if (!item) return;
+  const rest = selItems.filter(i => i.id !== id);
+  if (rest.filter(i => !i._suggestion).length < 2) {
+    werkbankBezig('Dan blijft er te weinig over om iets over te zeggen.');
+    return;
+  }
+  werkbankBezig('Even kijken hoe het staat zonder ' + item.name + '…');
+
+  try {
+    const raw = await callClaude(
+      `Je bent een eerlijke stylist voor Griette. ${DNA_KORT}${profielBlok()}
+Antwoord in het Nederlands, kort en concreet. Geen complimenten om het compliment.`,
+      [{ type:'text', text:
+`Deze outfit stond er:
+${selItems.map(i => '- ' + i.name + ' (' + rolVan(i) + ')').join('\n')}
+
+Nu haalt ze dit weg: ${item.name} — ${rolVan(item)}.
+
+Wat blijft er over:
+${rest.map(i => '- ' + i.name + ' (' + rolVan(i) + ')').join('\n')}
+${voorwaardenZin()}
+Zeg eerlijk of dit zo blijft staan. Let op wat dat stuk deed: droeg het de
+taille, de warmte, het contrast, of de kleur die het geheel verbond? Als het
+zonder net zo goed of beter is, zeg dat ook gewoon.
+
+Antwoord ALLEEN met JSON:
+{"oordeel":"blijft staan|zwakker|valt uit elkaar",
+ "waarom":"2 zinnen: wat je wint en wat je verliest",
+ "watMist":"wat dat stuk droeg, of leeg als het niets miste",
+ "oplossing":"als het zwakker wordt: wat het zou redden, in 1 zin. Anders leeg"}` }],
+      1200, 'low', 'kies');
+    const d = extractJson(raw);
+    if (!d) throw new Error('leeg');
+
+    zonderStapel.push(item);
+    selItems = rest;
+    buildKaart();
+    toonWerkbank();
+
+    const kleur = d.oordeel === 'blijft staan' ? 'var(--accent)'
+                : d.oordeel === 'valt uit elkaar' ? '#b5232a' : 'var(--text-2)';
+    document.getElementById('werkbank-uitkomst').innerHTML =
+      '<div class="cap-outfit" style="padding:11px 13px;">'
+      + `<div class="cap-kop"><span class="cap-naam">Zonder ${esc(item.name)}</span>`
+      + `<span class="cap-stijl" style="color:${kleur}">${esc(d.oordeel || '')}</span></div>`
+      + `<div class="cap-waarom">${esc(d.waarom || '')}</div>`
+      + (d.watMist ? `<div class="field-note" style="margin-top:5px;">Wat dat stuk deed: ${esc(d.watMist)}</div>` : '')
+      + (d.oplossing ? `<div class="field-note" style="margin-top:4px;">Wat het zou redden: ${esc(d.oplossing)}</div>` : '')
+      + '</div>';
+  } catch(e) { werkbankFout(e); }
+}
+
+function zetTerug() {
+  const item = zonderStapel.pop();
+  if (!item) return;
+  selItems = selItems.concat([item]);
+  buildKaart();
+  toonPop(selItems, 'pop-4');
+  toonWerkbank();
+  const el = document.getElementById('werkbank-uitkomst');
+  if (el) el.innerHTML = '';
+}
+
+async function ietsAndersHier(id) {
+  const item = selItems.find(i => i.id === id);
+  if (!item) return;
+  // Alleen wat in aanmerking komt: zelfde rol, uit haar kast, niet al gekozen,
+  // en niet weggezeefd door de voorwaarden die bij deze kaart horen.
+  const { houden } = zeefKast(allItems, null, selItems);
+  const inBeeld = houden.filter(i =>
+    i.id !== item.id &&
+    !selItems.some(x => x.id === i.id) &&
+    (isEendelig(item) ? isEendelig(i) : i.cat === item.cat));
+  if (!inBeeld.length) {
+    document.getElementById('werkbank-uitkomst').innerHTML =
+      '<div class="cap-outfit" style="padding:10px 12px;"><div class="cap-waarom">'
+      + `Je hebt niets anders in je kast dat de rol van ${esc(rolVan(item))} kan overnemen.`
+      + '</div></div>';
+    return;
+  }
+  werkbankBezig('Alternatieven zoeken voor ' + item.name + ' (' + inBeeld.length + ' stukken in beeld)…');
+
+  try {
+    const raw = await callClaude(
+      `Je bent een stylist voor Griette. ${DNA_KORT}${profielBlok()}
+Antwoord in het Nederlands. Kies ALLEEN uit de gegeven lijst.`,
+      [{ type:'text', text:
+`Deze outfit ligt klaar:
+${selItems.filter(i => i.id !== item.id).map(i => '- ' + i.name + ' (' + rolVan(i) + ')').join('\n')}
+
+Op de plek van het ${rolVan(item)} lag: ${item.name}. Ze wil daar iets anders.
+${voorwaardenZin()}
+KANDIDATEN (alleen hieruit kiezen):
+${inBeeld.map(i => {
+  const t = itemTags[i.id] || {};
+  const val = v => Array.isArray(v) ? v.join('/') : (v || '');
+  const extra = [val(t.kleur), val(t.materiaal), val(t.pasvorm)].filter(Boolean).join(', ');
+  const v = itemVisueel[i.id];
+  return '- ' + i.id + ' | ' + i.name + (extra ? ' | ' + extra : '')
+    + (v ? ' | op foto: ' + [v.kleur, v.vorm, v.textuur].filter(Boolean).join('; ') : '');
+}).join('\n')}
+
+Geef er 4 tot 6, van sterkst naar zwakst, en laat ze ECHT van elkaar
+verschillen — niet vier varianten op hetzelfde. Zeg per stuk waarom het hier
+werkt: wat het doet met kleur, silhouet of textuur in déze combinatie. Werkt
+er iets juist niet terwijl je het zou verwachten, noem dat apart.
+
+Antwoord ALLEEN met JSON:
+{"opties":[{"id":"exacte id","waarom":"1 zin: wat dit stuk hier doet",
+            "verandert":"wat er anders wordt aan de look, in 3 tot 6 woorden"}],
+ "let_op":"iets dat juist niet werkt, of leeg"}` }],
+      2000, 'low', 'kies');
+    const d = extractJson(raw);
+    const opties = (d && d.opties || []).map(o => {
+      const kand = inBeeld.find(i => i.id === o.id);
+      return kand ? { item: kand, waarom: o.waarom || '', verandert: o.verandert || '' } : null;
+    }).filter(Boolean);
+    if (!opties.length) throw new Error('leeg');
+
+    document.getElementById('werkbank-uitkomst').innerHTML =
+      `<div class="sec-label">In plaats van ${esc(item.name)}</div>`
+      + opties.map(o =>
+          `<button type="button" class="cap-outfit" onclick="ruilOm('${esc(item.id)}','${esc(o.item.id)}')" `
+          + 'style="display:block;width:100%;text-align:left;margin-bottom:6px;padding:9px 11px;cursor:pointer;">'
+          + '<div style="display:flex;gap:9px;align-items:center;">'
+          + (cloudMap[o.item.id]
+              ? `<img src="${esc(cloudMap[o.item.id])}" loading="lazy" alt="" style="width:38px;height:47px;object-fit:cover;border-radius:6px;flex-shrink:0;">`
+              : '<div style="width:38px;height:47px;border-radius:6px;background:var(--cream);flex-shrink:0;"></div>')
+          + '<div style="flex:1;min-width:0;">'
+          + `<div class="cap-naam">${esc(o.item.name)}</div>`
+          + `<div class="cap-waarom">${esc(o.waarom)}</div>`
+          + (o.verandert ? `<div class="field-note" style="margin-top:3px;">wordt: ${esc(o.verandert)}</div>` : '')
+          + '</div></div></button>').join('')
+      + (d.let_op ? `<div class="field-note" style="margin-top:4px;">Let op: ${esc(d.let_op)}</div>` : '');
+  } catch(e) { werkbankFout(e); }
+}
+
+function ruilOm(uitId, inId) {
+  const nieuw = allItems.find(i => i.id === inId);
+  if (!nieuw) return;
+  selItems = selItems.map(i => i.id === uitId ? nieuw : i);
+  buildKaart();
+  toonPop(selItems, 'pop-4');
+  toonWerkbank();
+  const el = document.getElementById('werkbank-uitkomst');
+  if (el) el.innerHTML = `<div class="field-note">${esc(nieuw.name)} ligt nu op de kaart.</div>`;
+}
+
 // Vult de kaart zelf als de gebruiker geen items koos.
 // Biedt aanvullen aan in plaats van het ongevraagd te doen
 function toonAanvulKnop() {
@@ -7625,6 +7852,10 @@ function setStep(n) {
     document.getElementById('card-wrap').style.display = 'block';
     toonVoorwaardenBalk();
     buildKaart();
+    toonWerkbank();
+    zonderStapel = [];
+    var wu = document.getElementById('werkbank-uitkomst');
+    if (wu) wu.innerHTML = '';
     toonPop(selItems, 'pop-4');
     // Nog geen complete outfit of nog geen uitleg? Dan vult de AI aan.
     // Je eigen keuzes blijven daarbij altijd staan.
