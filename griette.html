@@ -35,21 +35,21 @@ body{background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);min
 /* BOTTOM NAV */
 .dag-ctx{flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;}
 .dag-ctx.actief{border-color:var(--brown);background:var(--brown);color:var(--cream);}
-.dagkaart{width:100%;text-align:left;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:14px;padding:11px;margin-bottom:9px;cursor:pointer;font-family:'Jost',sans-serif;-webkit-tap-highlight-color:transparent;}
-.dagkaart.bewaard{border-color:var(--brown);background:#faf8f5;}
+.dagkaart{display:block;width:100%;text-align:left;background:#F5F2EE;border:1.5px solid var(--cream-dark);border-radius:16px;padding:18px 16px 14px;margin-bottom:12px;cursor:pointer;font-family:'Jost',sans-serif;-webkit-tap-highlight-color:transparent;}
+.dagkaart.bewaard{border-color:var(--brown);box-shadow:0 0 0 1px var(--brown) inset;}
 .dagkaart.netniet{border-style:dashed;}
-.dk-kop{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:2px;}
-.dk-naam{font-family:'Bodoni Moda',serif;font-size:15px;color:var(--brown);line-height:1.2;}
-.dk-merk{font-size:8px;letter-spacing:1.4px;text-transform:uppercase;color:var(--brown-warm);white-space:nowrap;}
-.dk-waarom{font-size:10px;color:var(--muted);line-height:1.5;margin-bottom:7px;}
-.dk-rij{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;}
-.dk-rij::-webkit-scrollbar{display:none;}
-.dk-stuk{flex-shrink:0;width:46px;}
-.dk-foto{width:46px;height:57px;border-radius:7px;overflow:hidden;background:var(--cream-dark);display:flex;align-items:center;justify-content:center;}
-.dk-foto img{width:100%;height:100%;object-fit:cover;}
-.dk-naampje{font-size:7px;color:var(--muted);text-align:center;margin-top:2px;line-height:1.2;}
-.dk-mist{border:1.5px dashed var(--brown-warm);background:transparent;font-size:15px;color:var(--brown-warm);}
-.dk-tip{font-size:9.5px;color:var(--brown-warm);line-height:1.5;margin-top:7px;padding-top:7px;border-top:1px solid var(--cream-dark);}
+.dk-naam{font-family:'Bodoni Moda',serif;font-size:21px;line-height:1.05;color:#1a1510;text-align:center;text-transform:uppercase;letter-spacing:.01em;}
+.dk-merk{display:block;font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:#7a6350;text-align:center;margin-top:5px;}
+.dk-rij{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+.dk-stuk{display:flex;flex-direction:column;gap:4px;}
+.dk-foto{width:100%;aspect-ratio:1;background:#e8ddd2;border-radius:9px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:17px;color:#9b8974;}
+.dk-foto img{width:100%;height:100%;object-fit:cover;display:block;}
+.dk-naampje{font-size:7.5px;color:#7a6350;text-align:center;line-height:1.25;}
+.dk-mist{border:1.5px dashed #b9a48c;background:#faf7f3;}
+.dk-stippen{display:flex;justify-content:center;gap:6px;margin-top:12px;}
+.dk-stip{width:17px;height:17px;border-radius:50%;border:1px solid rgba(0,0,0,.08);}
+.dk-waarom{font-family:'Bodoni Moda',serif;font-style:italic;font-size:11.5px;color:#5a4030;text-align:center;line-height:1.5;margin-top:10px;border-top:1px solid #ddd5c8;padding-top:9px;}
+.dk-tip{font-size:9.5px;color:#7a6350;line-height:1.5;margin-top:8px;text-align:center;}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--brown);z-index:300;display:flex;align-items:stretch;box-shadow:0 -2px 16px rgba(28,26,24,0.18);padding-bottom:env(safe-area-inset-bottom,0);}
 .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px 10px;cursor:pointer;border:none;background:transparent;color:rgba(245,242,238,0.45);font-family:'Jost',sans-serif;font-size:8px;letter-spacing:1px;text-transform:uppercase;gap:4px;transition:color 0.18s;position:relative;}
 .bnav-item.active{color:var(--cream);}
@@ -2629,9 +2629,28 @@ function deleteItem(itemId) {
   });
   deletePhoto(itemId);
   if (extraFotos[itemId]) { delete extraFotos[itemId]; bewaarExtraFotos(); }
+  // Weg is weg, ook op de plekken die je niet meteen ziet. Anders staat een
+  // verwijderd stuk nog in je weekplanning of in de kaarten van vandaag, en
+  // duikt het dus toch weer op in een advies.
+  Object.keys(weekPlan || {}).forEach(function(dag) {
+    const plan = weekPlan[dag];
+    if (!plan || !Array.isArray(plan.items)) return;
+    plan.items = plan.items.filter(function(id){ return id !== itemId; });
+  });
+  saveWeekPlan();
+  if (dagKaarten.length) {
+    dagKaarten.forEach(function(k) {
+      k.stukken = (k.stukken || []).filter(function(st){ return st.id !== itemId; });
+    });
+    dagKaarten = dagKaarten.filter(function(k){ return (k.stukken || []).length >= 2; });
+    bewaarDagKaarten();
+    toonDagKaarten();
+  }
+  if (catAnders[itemId]) { delete catAnders[itemId]; bewaarCatAnders(); }
   const card = document.getElementById('card-' + itemId);
   if (card) card.remove();
   saveAppData();
+  buildBoards();
   showToast('Item verwijderd ✓');
 }
 
@@ -3560,6 +3579,28 @@ function esc2(t) {
   });
 }
 
+// Een naam als "top zara longsleeve bruin" past niet onder een vakje van een
+// derde scherm. Twee woorden die het stuk herkenbaar maken is genoeg.
+function kortStuk(naam) {
+  const n = String(naam || '').replace(/\s*\([^)]*\)/g, '').trim();
+  const w = n.split(/\s+/);
+  return w.slice(0, 2).join(' ') + (w.length > 2 ? '…' : '');
+}
+
+// De kleuren van de stukken die er echt in zitten, hoogstens vier.
+function dagStippen(k) {
+  const uit = [];
+  (k.stukken || []).forEach(function(st) {
+    if (!st.id) return;
+    const kl = getTag(st.id, 'kleur');
+    [].concat(kl || []).forEach(function(c) {
+      const hex = kleurDots[String(c).toLowerCase()];
+      if (hex && uit.indexOf(hex) < 0) uit.push(hex);
+    });
+  });
+  return uit.slice(0, 4);
+}
+
 function toonDagKaarten() {
   const vak = document.getElementById('dag-kaarten');
   if (!vak) return;
@@ -3570,15 +3611,20 @@ function toonDagKaarten() {
       const foto = st.id && photos[st.id];
       return '<div class="dk-stuk"><div class="dk-foto' + (st.heeft ? '' : ' dk-mist') + '">'
         + (foto ? '<img loading="lazy" src="' + esc2(foto) + '" alt="">'
-                : (st.heeft ? '<span style="font-size:14px;">👕</span>' : '＋'))
-        + '</div><div class="dk-naampje">' + esc2(st.naam.split(' ').slice(0,2).join(' ')) + '</div></div>';
+                : (st.heeft ? '👕' : '＋'))
+        + '</div><div class="dk-naampje">' + esc2(kortStuk(st.naam)) + '</div></div>';
+    }).join('');
+    // De kleuren van de stukken zelf, net als onderaan een echte outfitkaart.
+    const stippen = dagStippen(k).map(function(c) {
+      return '<span class="dk-stip" style="background:' + c + '"></span>';
     }).join('');
     return '<button type="button" class="dagkaart' + (dagBewaard[n] ? ' bewaard' : '')
       + (k.netniet ? ' netniet' : '') + '" onclick="bewaarDagKaart(' + n + ')">'
-      + '<div class="dk-kop"><span class="dk-naam">' + esc2(k.naam) + '</span>'
-      + (k.merk ? '<span class="dk-merk">' + esc2(k.merk) + '</span>' : '') + '</div>'
-      + (k.waarom ? '<div class="dk-waarom">' + esc2(k.waarom) + '</div>' : '')
+      + '<div class="dk-naam">' + esc2(k.naam) + '</div>'
+      + (k.merk ? '<span class="dk-merk">' + esc2(k.merk) + '</span>' : '')
       + '<div class="dk-rij">' + stukken + '</div>'
+      + (stippen ? '<div class="dk-stippen">' + stippen + '</div>' : '')
+      + (k.waarom ? '<div class="dk-waarom">' + esc2(k.waarom) + '</div>' : '')
       + (k.netniet ? '<div class="dk-tip">Dit had gekund als je dit had: ' + esc2(k.netniet) + '</div>' : '')
       + (dagBewaard[n] ? '<div class="dk-tip">✓ Bewaard bij je Looks</div>' : '')
       + '</button>';
