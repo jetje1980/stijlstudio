@@ -52,6 +52,10 @@ body {
 /* PHOTO */
 .photo-wrap { position:relative; }
 .photo-zone {
+  /* position:relative hoort hier: de preview-img erbinnen staat op
+     position:absolute en zonder dit anker valt hij terug op de pagina zelf —
+     dan ligt de foto als een deken over alles eronder. */
+  position:relative;
   width:100%; aspect-ratio:4/3;
   background:var(--ph-bg);
   border:2px dashed var(--border);
@@ -191,7 +195,13 @@ body {
       <button class="photo-btn" onclick="document.getElementById('file-gallery').click()">🖼 Galerij</button>
     </div>
     <input type="file" id="file-camera"  accept="image/*" capture="environment">
-    <input type="file" id="file-gallery" accept="image/*">
+    <input type="file" id="file-gallery" accept="image/*" multiple>
+    <div class="field-note" id="foto-hint" style="font-size:9px;color:var(--text-2);line-height:1.5;margin-top:6px;">
+      Kies er gerust meer dan één. De eerste wordt de hoofdfoto; van de rest kun
+      je zeggen wat ze laten zien — op een model, of hoe jij het draagt. Daar
+      heeft de stylist meer aan dan aan nog een productfoto.
+    </div>
+    <div id="extra-strip" style="display:none;margin-top:8px;"></div>
   </div>
 
   <!-- NAAM -->
@@ -497,8 +507,57 @@ function handleFile(file) {
   checkReady();
 }
 
-document.getElementById('file-camera').addEventListener('change',  e => handleFile(e.target.files[0]));
-document.getElementById('file-gallery').addEventListener('change', e => handleFile(e.target.files[0]));
+// Meerdere foto's per item: de eerste is de hoofdfoto, de rest komt eromheen
+// te staan met erbij wát ze laten zien.
+const FOTO_SOORTEN = [
+  { id:'model',    label:'op een model' },
+  { id:'gedragen', label:'zoals ik het draag' },
+  { id:'detail',   label:'detail' },
+  { id:'plat',     label:'plat gelegd' },
+];
+let extraFiles = [];   // [{file, soort, url}]
+
+function handleFiles(lijst) {
+  const files = [...(lijst || [])];
+  if (!files.length) return;
+  if (!selectedFile) handleFile(files.shift());
+  files.forEach(f => extraFiles.push({ file:f, soort:'', url:URL.createObjectURL(f) }));
+  tekenExtraStrip();
+}
+
+function tekenExtraStrip() {
+  const el = document.getElementById('extra-strip');
+  if (!el) return;
+  if (!extraFiles.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = 'block';
+  el.innerHTML = extraFiles.map((f, i) =>
+    '<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-top:1px solid var(--line,#e8e2d9);">'
+    + `<img src="${f.url}" style="width:48px;height:60px;object-fit:cover;border-radius:6px;flex-shrink:0;">`
+    + '<div style="flex:1;min-width:0;">'
+    + '<div style="font-size:9px;color:var(--text-2);margin-bottom:4px;">Wat laat deze foto zien?</div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:4px;">'
+    + FOTO_SOORTEN.map(so =>
+        `<button type="button" onclick="zetExtraSoort(${i},'${so.id}')" `
+        + 'style="padding:4px 8px;font-size:9px;border-radius:12px;cursor:pointer;'
+        + (f.soort === so.id
+            ? 'border:1px solid var(--text,#2b2b2b);background:var(--text,#2b2b2b);color:#fff;'
+            : 'border:1px solid var(--line,#e8e2d9);background:#fff;color:var(--text-2,#888);')
+        + `">${so.label}</button>`).join('')
+    + `<button type="button" onclick="haalExtraWeg(${i})" style="padding:4px 8px;font-size:9px;`
+    + 'border-radius:12px;border:1px solid var(--line,#e8e2d9);background:#fff;cursor:pointer;">🗑</button>'
+    + '</div></div></div>').join('');
+}
+
+function zetExtraSoort(i, soort) {
+  if (!extraFiles[i]) return;
+  extraFiles[i].soort = extraFiles[i].soort === soort ? '' : soort;
+  tekenExtraStrip();
+}
+
+function haalExtraWeg(i) { extraFiles.splice(i, 1); tekenExtraStrip(); }
+
+document.getElementById('file-camera').addEventListener('change',  e => handleFiles(e.target.files));
+document.getElementById('file-gallery').addEventListener('change', e => handleFiles(e.target.files));
 document.getElementById('item-name').addEventListener('input', checkReady);
 
 function checkReady() {
@@ -589,6 +648,34 @@ async function saveItem() {
   }
   pf.style.width = '80%';
 
+  // 4a. Extra foto's uploaden en opslaan
+  if (extraFiles.length) {
+    sm.textContent = "Extra foto's uploaden…";
+    const gelukt = [];
+    for (let i = 0; i < extraFiles.length; i++) {
+      try {
+        const fd = new FormData();
+        fd.append('file', extraFiles[i].file);
+        fd.append('upload_preset', CLOUDINARY_PRESET);
+        fd.append('public_id', 'griette-wardrobe/griette_' + id + '-extra-' + i);
+        fd.append('folder', 'griette-wardrobe');
+        const res = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/image/upload', { method:'POST', body:fd });
+        const json = await res.json();
+        if (json.secure_url) gelukt.push({ url: json.secure_url, soort: extraFiles[i].soort || '' });
+      } catch(e) {}
+    }
+    if (gelukt.length) {
+      const alle = await sbGet('extra-photos') || {};
+      alle[id] = gelukt;
+      await sbSet('extra-photos', alle);
+      try {
+        const lse = JSON.parse(localStorage.getItem('griette-extra-photos-v1') || '{}');
+        lse[id] = gelukt;
+        localStorage.setItem('griette-extra-photos-v1', JSON.stringify(lse));
+      } catch(e) {}
+    }
+  }
+
   // 4. Foto-URL opslaan
   if (photoUrl) {
     const photos = await sbGet('cloud-photos') || {};
@@ -630,6 +717,8 @@ function resetForm() {
   document.getElementById('photo-zone').classList.remove('has-photo');
   document.getElementById('file-camera').value  = '';
   document.getElementById('file-gallery').value = '';
+  extraFiles = [];
+  tekenExtraStrip();
   document.getElementById('item-name').value = '';
   document.getElementById('item-desc').value  = '';
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
