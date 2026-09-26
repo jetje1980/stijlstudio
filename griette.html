@@ -452,42 +452,22 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 <div class="meer-sheet" id="meer-sheet">
   <div style="width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 20px;"></div>
 
-  <a href="snel-toevoegen.html" style="width:100%;padding:15px 16px;background:var(--brown);border:none;border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--cream);text-decoration:none;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:20px;flex-shrink:0;">➕</span><span style="flex:1;font-weight:500;">Snel item toevoegen <span style="color:rgba(245,242,238,0.55);font-size:10px;font-weight:400;">— foto + naam + categorie</span></span><span style="color:rgba(245,242,238,0.55);">›</span>
-  </a>
-  <a href="outfitkaart.html" style="width:100%;padding:15px 16px;background:var(--brown);border:none;border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:10px;color:var(--cream);text-decoration:none;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:20px;flex-shrink:0;">🎨</span><span style="flex:1;font-weight:500;">Outfitkaart maken <span style="color:rgba(245,242,238,0.55);font-size:10px;font-weight:400;">— kleurcombo + items + download</span></span><span style="color:rgba(245,242,238,0.55);">›</span>
-  </a>
+  <!-- Wat hier stond deed voor een deel hetzelfde als de tegels op Home
+       (snel toevoegen, outfitkaart, weekplan), of leunde op een logboek dat
+       leeg blijft zolang je het met de hand moet bijhouden. Wat over is, is
+       waarvoor je hier echt komt. -->
+  <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-mid);font-family:Jost,sans-serif;font-weight:500;margin-bottom:10px;padding:0 2px;">Naslaan</div>
 
-  <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-mid);font-family:’Jost’,sans-serif;font-weight:500;margin-bottom:10px;padding:0 2px;">Verkennen</div>
-
-  <button type="button" data-meer-panel="week" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:18px;flex-shrink:0;">📅</span><span style="flex:1;">Weekplan</span><span style="color:var(--muted);">›</span>
-  </button>
-  <button type="button" data-meer-panel="inspo" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:18px;flex-shrink:0;">✦</span><span style="flex:1;">Inspo Scan <span style="color:var(--muted);font-size:10px;">— analyseer een outfit of foto</span></span><span style="color:var(--muted);">›</span>
-  </button>
   <button type="button" data-meer-panel="regels" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:18px;flex-shrink:0;">🧬</span><span style="flex:1;">Stijl DNA <span style="color:var(--muted);font-size:10px;">— jouw stijlprofiel & kleurenstrategie</span></span><span style="color:var(--muted);">›</span>
-  </button>
-  <button type="button" data-meer-action="inzichten" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:18px;flex-shrink:0;">🧠</span><span style="flex:1;">Stijlpatronen <span style="color:var(--muted);font-size:10px;">— wat draag je het meest?</span></span><span style="color:var(--muted);">›</span>
+    <span style="font-size:18px;flex-shrink:0;">🧬</span><span style="flex:1;">Stijl DNA <span style="color:var(--muted);font-size:10px;">— jouw stijlprofiel &amp; kleurenstrategie</span></span><span style="color:var(--muted);">›</span>
   </button>
   <button type="button" data-meer-panel="shop" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:18px;flex-shrink:0;">🛍</span><span style="flex:1;">Shopping <span style="color:var(--muted);font-size:10px;">— wat ontbreekt in jouw kast?</span></span><span style="color:var(--muted);">›</span>
+    <span style="font-size:18px;flex-shrink:0;">🛍</span><span style="flex:1;">Wat je nog wilt <span style="color:var(--muted);font-size:10px;">— de aanschaftips uit je rapport</span></span><span style="color:var(--muted);">›</span>
   </button>
-
-  <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-mid);font-family:’Jost’,sans-serif;font-weight:500;margin:16px 0 10px;padding:0 2px;">Bijhouden</div>
-
   <button type="button" data-meer-action="outfitcal" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:18px;flex-shrink:0;">🗓</span><span style="flex:1;">Outfitgeschiedenis <span style="color:var(--muted);font-size:10px;">— wat droeg je wanneer?</span></span><span style="color:var(--muted);">›</span>
+    <span style="font-size:18px;flex-shrink:0;">🗓</span><span style="flex:1;">Wat je droeg <span style="color:var(--muted);font-size:10px;">— je outfitgeschiedenis</span></span><span style="color:var(--muted);">›</span>
   </button>
-  <button type="button" data-meer-action="yesterday" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:18px;flex-shrink:0;">📆</span><span style="flex:1;">Gisteren loggen <span style="color:var(--muted);font-size:10px;">— wat droeg je?</span></span><span style="color:var(--muted);">›</span>
-  </button>
-  <button type="button" data-meer-action="cyclus" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:18px;flex-shrink:0;">🧡</span><span style="flex:1;">Cyclus <span style="color:var(--muted);font-size:10px;">— fases & outfit tips</span></span><span style="color:var(--muted);">›</span>
-  </button>
+
 
   <!-- Beheer collapsible -->
   <button type="button" onclick="toggleMeerBeheer()" style="width:100%;padding:10px;background:none;border:none;cursor:pointer;font-family:’Jost’,sans-serif;color:var(--muted);font-size:10px;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:5px;letter-spacing:0.5px;">
@@ -12020,46 +12000,11 @@ function checkMorningAdvice() {
   }
 }
 
-// Morning advice banner button in garderobe panel
-function addMorningBannerBtn() {
-  var gc = document.getElementById('garderobe-content');
-  if (!gc) return;
-  var existing = document.getElementById('morning-banner-btn');
-  if (existing) return;
-  // Add worn-today button (once)
-  if (!document.getElementById('worn-today-btn')) {
-    var wb = document.createElement('button');
-    wb.id = 'worn-today-btn';
-    wb.type = 'button';
-    wb.style.cssText = 'width:100%;padding:11px 16px;background:var(--white);color:var(--brown);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:11px;font-family:Jost,sans-serif;cursor:pointer;display:flex;align-items:center;gap:10px;margin-bottom:10px;';
-    wb.innerHTML = '<span style="font-size:16px;">👗</span><span style="flex:1;text-align:left;">Wat heb ik vandaag gedragen?</span><span style="font-size:11px;color:var(--muted);">→</span>';
-    wb.addEventListener('click', openWornTodayPicker);
-    gc.insertBefore(wb, gc.firstChild);
-  }
-  // Add daily inspiration button (once)
-  if (!document.getElementById('daily-inspo-btn')) {
-    var inspoB = document.createElement('button');
-    inspoB.id = 'daily-inspo-btn';
-    inspoB.type = 'button';
-    inspoB.style.cssText = 'width:100%;padding:11px 16px;background:linear-gradient(135deg,rgba(155,98,64,0.1),rgba(162,138,80,0.1));color:var(--brown);border:1.5px solid rgba(155,98,64,0.3);border-radius:12px;font-size:11px;font-family:Jost,sans-serif;cursor:pointer;display:flex;align-items:center;gap:10px;margin-bottom:10px;';
-    inspoB.innerHTML = '<span style="font-size:16px;">✨</span><span style="flex:1;text-align:left;">Dagelijkse stijlinspiratie</span><span style="font-size:11px;color:var(--muted);">→</span>';
-    inspoB.addEventListener('click', showDailyInspirationTip);
-    gc.insertBefore(inspoB, gc.firstChild);
-  }
-
-  var btn = document.createElement('button');
-  btn.id = 'morning-banner-btn';
-  btn.type = 'button';
-  btn.style.cssText = 'width:100%;padding:13px 16px;background:linear-gradient(135deg,var(--brown-warm),var(--brown));color:var(--cream);border:none;border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;display:flex;align-items:center;gap:10px;margin-bottom:14px;letter-spacing:0.5px;';
-  btn.innerHTML = '<span style="font-size:18px;">🌅</span><span style="flex:1;text-align:left;">Dagadvies — wat trek ik vandaag aan?</span><span style="font-size:16px;">→</span>';
-  btn.addEventListener('click', function() {
-    buildMorningOccGrid();
-    document.getElementById('morning-result').style.display = 'none';
-    document.getElementById('morning-dismiss-btn').style.display = 'none';
-    document.getElementById('morning-overlay').classList.add('open');
-  });
-  gc.insertBefore(btn, gc.firstChild);
-}
+// De drie banners die hier stonden — "Dagadvies", "Dagelijkse stijlinspiratie"
+// en "Wat heb ik vandaag gedragen?" — deden wat de kaart bovenaan Home en de
+// tien looks eronder al doen. Drie ingangen naar hetzelfde, midden in je kast.
+// Het ochtendadvies verschijnt 's ochtends nog gewoon vanzelf.
+function addMorningBannerBtn() {}
 
 // ============ BOTTOM NAV ============
 function toggleMeerBeheer() {
