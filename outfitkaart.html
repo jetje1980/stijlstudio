@@ -4926,21 +4926,60 @@ let capsuleResultaat = null;
 
 // Wat je kunt uitsluiten. Bewust op naam en categorie: de tags zijn niet bij
 // elk item ingevuld, de naam bijna altijd wel.
+// Twee dingen gingen hier mis, en allebei stilletjes.
+//
+// Ten eerste werd er op losse letterreeksen gezocht. "hak" zit in k-HAK-i, dus
+// wie "geen hakken" aanvinkte, zag al zijn khaki broeken verdwijnen. "short"
+// zit in "SHORT faux fur coat" en in "wide SHORT sleeve shirt" — een winterjas
+// en een blouse die afvielen omdat je geen korte broek wilde. Er wordt nu op
+// hele woorden gematcht, met de verbuigingen erbij genoemd.
+//
+// Ten tweede miste de helft van deze regels een categorie. "Geen hakken" gaat
+// over schoenen, "geen shorts" over onderstukken. Zonder dat mocht elke regel
+// in de hele kast grasduinen.
 const CAP_NEE = [
-  { id:'slippers', label:'Geen slippers of sandalen',
-    woorden:['slipper','sandaal','sandalen','teen','flip'] },
-  { id:'hakken',   label:'Geen hakken',
-    woorden:['hak','heel','pump','stiletto'] },
-  { id:'shorts',   label:'Geen shorts',
-    woorden:['short','korte broek'] },
-  { id:'rok',      label:'Geen rokken',  cats:['bottoms'], woorden:['rok'] },
-  { id:'jurk',     label:'Geen jurken',  cats:['jurken'],  woorden:['jurk','dress'] },
+  { id:'slippers', label:'Geen slippers of sandalen', cats:['shoes','swimwear'],
+    woorden:['slipper','slippers','sandaal','sandalen','teenslipper','teenslippers','flipflop','flipflops','slides'] },
+  { id:'hakken',   label:'Geen hakken', cats:['shoes'],
+    woorden:['hak','hakken','hakje','sleehak','sleehakken','blokhak','blokhakken',
+             'plateauhak','heel','heels','pump','pumps','stiletto','stilettos'] },
+  { id:'shorts',   label:'Geen shorts', cats:['bottoms','swimwear'],
+    woorden:['short','shorts','korte broek','bermuda'] },
+  { id:'rok',      label:'Geen rokken',  cats:['bottoms'], woorden:['rok','rokje','rokken'] },
+  // Geen woorden nodig: alles in de categorie jurken ís een jurk. Op de naam
+  // zoeken ging juist mis — "Hemdjurk" is één woord en viel er dan buiten.
+  { id:'jurk',     label:'Geen jurken',  cats:['jurken'] },
   // Apart van de jurken: wie geen jurk wil, wil soms juist wél een jumpsuit.
   { id:'eendelig', label:'Geen jumpsuits of co-ords',
     woorden:['jumpsuit','playsuit','overall','co-ord','coord','catsuit','salopette'] },
   { id:'wit',      label:'Niks lichts of wits',
-    woorden:['wit','ecru','creme','crème','gebroken'] },
+    woorden:['wit','witte','ecru','creme','crème','gebroken-wit','gebroken wit','off white','offwhite'] },
 ];
+
+// Categorieën zijn in de loop van de tijd zowel Engels als Nederlands
+// opgeschreven. Een regel die alleen 'shoes' kent, laat schoenen die onder
+// 'schoenen' staan ongemoeid — en dan sluit "geen hakken" niets uit.
+const CAT_SYNONIEM = {
+  shoes:'shoes', schoenen:'shoes',
+  bags:'bags', tassen:'bags',
+  accessories:'accessories', accessoires:'accessories',
+  layers:'layers', jassen:'layers', laagjes:'layers',
+  bottoms:'bottoms', broeken:'bottoms',
+  tops:'tops', jurken:'jurken', eendelig:'eendelig',
+  swimwear:'swimwear', zwemkleding:'swimwear', overig:'overig',
+};
+const catGelijk = c => CAT_SYNONIEM[String(c || '').toLowerCase()] || String(c || '').toLowerCase();
+const catIn = (cat, lijst) => (lijst || []).some(x => catGelijk(x) === catGelijk(cat));
+
+// Hele woorden, niet zomaar letters ergens in een naam. Een Nederlandse
+// verbuiging erachter mag wel: hak → hakken, rok → rokje, wit → witte. Vóór
+// het woord moet een grens staan, en dáár zit de bescherming: "khaki" begint
+// niet bij "hak", dus die glipt er niet meer doorheen.
+const VERBUIGING = '(en|s|je|jes|ken|tje|tjes|te|ten)?';
+function bevatWoord(tekst, woord) {
+  const w = String(woord).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp('(^|[^a-z0-9])' + w + VERBUIGING + '([^a-z0-9]|$)', 'i').test(tekst);
+}
 let capNee = [];
 let capNietKleuren = [];     // kleuren die je er nu even niet bij wilt
 
@@ -5101,8 +5140,9 @@ function zeefKast(items, vw, altijdMee) {
     const alles = ((i.name || '') + ' ' + kleurTekstVan(i)).toLowerCase();
 
     const uitgesloten = nee.find(n =>
-      (n.woorden || []).some(w => alles.includes(w)) &&
-      (!n.cats || n.cats.includes(i.cat)));
+      (!n.cats || catIn(i.cat, n.cats)) &&
+      // Een regel zonder woorden geldt voor de hele categorie.
+      (!n.woorden || !n.woorden.length || n.woorden.some(w => bevatWoord(alles, w))));
     if (uitgesloten) { weg.push({ item:i, reden:uitgesloten.label.toLowerCase() }); return; }
 
     const kleurWeg = (v.nietKleuren || []).find(k => kleurMatcht(k, alles));
