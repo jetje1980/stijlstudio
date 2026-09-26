@@ -586,7 +586,6 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <div id="cap-s3" style="display:none">
       <div class="sec-label">Je outfits</div>
       <div class="field-note" id="cap-outfit-status" style="margin-bottom:8px;"></div>
-      <div id="cap-koffer" style="display:none;margin-bottom:12px;"></div>
       <div id="cap-uitkomst"></div>
       <div id="cap-bewaard" style="margin-top:8px;"></div>
       <button class="ai-btn" id="cap-bewaar-tas" style="margin-top:10px;" onclick="bewaarTas()">💾 Bewaar deze tas</button>
@@ -5959,48 +5958,6 @@ Antwoord ALLEEN met JSON:
   return d;
 }
 
-// Tellen wie zijn plek verdient. Puur rekenwerk, en precies wat inpakken is.
-function kofferTelling(outfits) {
-  const telling = {};
-  (outfits || []).forEach(o => (o.items || []).forEach(n => {
-    const k = String(n).toLowerCase().trim();
-    telling[k] = (telling[k] || 0) + 1;
-  }));
-  const rijen = Object.keys(telling).map(k => ({ naam: k, n: telling[k] }))
-    .sort((a, b) => b.n - a.n);
-  return { rijen, passagiers: rijen.filter(r => r.n <= 1) };
-}
-
-function toonKofferTelling(outfits) {
-  const el = document.getElementById('cap-koffer');
-  if (!el) return;
-  if (capHoe === 'ruim' || !(outfits || []).length) { el.style.display = 'none'; return; }
-  const t = kofferTelling(outfits);
-  if (!t.rijen.length) { el.style.display = 'none'; return; }
-
-  const stuks = t.rijen.length;
-  // De maat die ertoe doet bij inpakken: hoe vaak gaat een stuk gemiddeld mee?
-  // Onder de 1,5 neem je te veel mee dat maar één keer dienst doet.
-  const beurten = t.rijen.reduce((n, r) => n + r.n, 0);
-  const gemiddeld = (beurten / stuks).toFixed(1).replace('.', ',');
-  el.style.display = 'block';
-  el.innerHTML = '<div class="cap-outfit" style="padding:11px 13px;">'
-    + `<div class="cap-kop"><span class="cap-naam">${stuks} stuks voor ${outfits.length} outfits</span>`
-    + `<span class="cap-stijl">elk stuk ${gemiddeld}× mee</span></div>`
-    + '<div class="field-note" style="margin-top:6px;">'
-    + t.rijen.slice(0, 8).map(r =>
-        `<div>${esc(r.naam)} <span style="opacity:.6">— in ${r.n} outfit${r.n===1?'':'s'}</span></div>`).join('')
-    + (t.rijen.length > 8 ? `<div style="opacity:.6">en nog ${t.rijen.length - 8}</div>` : '')
-    + '</div>'
-    + (t.passagiers.length
-        ? '<div class="cap-waarom" style="margin-top:8px;">'
-          + `<b>${t.passagiers.length} stuk${t.passagiers.length===1?'':'ken'} ${t.passagiers.length===1?'gaat':'gaan'} maar in één outfit mee</b> `
-          + `(${esc(t.passagiers.slice(0,4).map(r=>r.naam).join(', '))}). `
-          + 'Laat die thuis, of geef ze een tweede rol.</div>'
-        : '<div class="cap-waarom" style="margin-top:8px;">Elk stuk komt in meer dan één outfit terug. Dit is een koffer die zijn plek verdient.</div>')
-    + '</div>';
-}
-
 async function capMaakOutfits() {
   const btn = document.getElementById('cap-maak-outfits');
   const st  = document.getElementById('cap-outfit-status');
@@ -6062,7 +6019,6 @@ Antwoord ALLEEN met JSON:
       capsuleResultaat = { outfits: d.outfits, kofferWaarom: koffer.waarom || '',
                            ontbreekt: d.ontbreekt || koffer.ontbreekt || '' };
       toonCapsule();
-      toonKofferTelling(d.outfits);
       st.textContent = '';
       btn.disabled = false;
       return;
@@ -6418,14 +6374,22 @@ function toonCapsule() {
 
   let html = '';
   if (paklijst.length) {
+    // De maat die ertoe doet bij inpakken: hoe vaak gaat een stuk gemiddeld
+    // mee? Onder de 1,5 neem je te veel mee dat maar één keer dienst doet.
+    const beurten = paklijst.reduce((n, [, k]) => n + k, 0);
+    const gemiddeld = (beurten / paklijst.length).toFixed(1).replace('.', ',');
+    const passagiers = paklijst.filter(([, k]) => k === 1);
     html = '<div class="cap-paklijst"><b>In je tas</b>'
       + `<div class="cap-groep">` + paklijst.map(([naam, keer]) =>
           `${esc(naam)} <span style="opacity:.6">(${keer}×)</span>`).join('<br>') + '</div>'
       + `<div class="cap-tel"><b>${paklijst.length}</b> stuks → `
-      + `<b>${capsuleResultaat.outfits.length}</b> outfits`
-      + (paklijst.some(([,k]) => k === 1)
-          ? ` · ${paklijst.filter(([,k]) => k===1).length} stuk${paklijst.filter(([,k])=>k===1).length===1?'':'s'} `
-            + 'komt maar één keer terug — dat kun je thuislaten' : '')
+      + `<b>${capsuleResultaat.outfits.length}</b> outfits · elk stuk <b>${gemiddeld}×</b> mee`
+      + (passagiers.length
+          ? `<br>${passagiers.length} stuk${passagiers.length===1?'':'ken'} `
+            + `${passagiers.length===1?'gaat':'gaan'} maar in één outfit mee `
+            + `(${esc(passagiers.slice(0,4).map(([n]) => n).join(', '))}). `
+            + 'Laat die thuis, of geef ze een tweede rol.'
+          : '<br>Elk stuk komt in meer dan één outfit terug — deze tas verdient zijn plek.')
       + '</div></div>';
   }
   capsuleResultaat.outfits.forEach((o, i) => {
