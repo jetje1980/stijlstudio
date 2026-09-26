@@ -848,7 +848,13 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
       <button type="button" onclick="document.getElementById('new-photo-gallery').click()" style="flex:1;padding:10px 6px;background:var(--cream);border:1.5px solid var(--cream-dark);border-radius:10px;font-size:11px;font-family:'Jost',sans-serif;color:var(--brown);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">🖼 Galerij</button>
     </div>
     <input type="file" id="new-photo-camera"  accept="image/*" capture="environment" style="display:none">
-    <input type="file" id="new-photo-gallery" accept="image/*" style="display:none">
+    <input type="file" id="new-photo-gallery" accept="image/*" multiple style="display:none">
+    <div style="font-size:9px;color:var(--muted);line-height:1.5;margin:-8px 0 12px;">
+      Kies er gerust meer dan één. De eerste wordt de hoofdfoto; van de rest kun
+      je zeggen wat ze laten zien — op een model, of hoe jij het draagt. Daar
+      heeft de stylist meer aan dan aan nog een productfoto.
+    </div>
+    <div id="new-extra-strip" style="display:none;margin-bottom:12px;"></div>
 
     <input type="text" id="new-item-name" placeholder="Naam (bijv. Beige linnen broek)">
     <select id="new-item-cat" onchange="updateNewItemTagVisibility()">
@@ -3006,6 +3012,7 @@ function closePickerIfOutside(e) {
 function openAddModal() {
   document.getElementById('new-item-name').value = '';
   document.getElementById('new-item-cat').value = 'tops';
+  wisNieuweFotos();   // schoon beginnen, ook als de vorige keer werd afgebroken
   document.querySelectorAll('.new-tag-btn').forEach(b => b.classList.remove('active'));
   buildNewKleurRow();
   buildNewPatroonRow();
@@ -3097,6 +3104,10 @@ function updateNewItemTagVisibility() {
 }
 
 // Photo handling for add-item modal
+// Ook hier meerdere foto's: de eerste wordt de hoofdfoto, de rest komt eromheen
+// te staan met erbij wát ze laten zien.
+var nieuweExtra = [];   // [{file, soort, url}]
+
 (function() {
   function handleNewPhoto(file) {
     if (!file) return;
@@ -3110,13 +3121,70 @@ function updateNewItemTagVisibility() {
       nameEl.value = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     }
   }
+  function handleNewPhotos(lijst) {
+    const files = [...(lijst || [])];
+    if (!files.length) return;
+    if (!window._newItemFile) handleNewPhoto(files.shift());
+    files.forEach(f => nieuweExtra.push({ file:f, soort:'', url:URL.createObjectURL(f) }));
+    tekenNieuweExtra();
+  }
   document.addEventListener('DOMContentLoaded', function() {
     const cam = document.getElementById('new-photo-camera');
     const gal = document.getElementById('new-photo-gallery');
-    if (cam) cam.addEventListener('change', e => handleNewPhoto(e.target.files[0]));
-    if (gal) gal.addEventListener('change', e => handleNewPhoto(e.target.files[0]));
+    if (cam) cam.addEventListener('change', e => handleNewPhotos(e.target.files));
+    if (gal) gal.addEventListener('change', e => handleNewPhotos(e.target.files));
   });
 })();
+
+function tekenNieuweExtra() {
+  const el = document.getElementById('new-extra-strip');
+  if (!el) return;
+  if (!nieuweExtra.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = 'block';
+  el.innerHTML = nieuweExtra.map((f, i) =>
+    '<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-top:1px solid var(--cream-dark);">'
+    + `<img src="${f.url}" style="width:44px;height:56px;object-fit:cover;border-radius:6px;flex-shrink:0;">`
+    + '<div style="flex:1;min-width:0;">'
+    + '<div style="font-size:9px;color:var(--muted);margin-bottom:4px;">Wat laat deze foto zien?</div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:4px;">'
+    + FOTO_SOORTEN.map(so =>
+        `<button type="button" onclick="zetNieuweSoort(${i},'${so.id}')" `
+        + 'style="padding:4px 8px;font-size:9px;border-radius:12px;cursor:pointer;font-family:Jost,sans-serif;'
+        + (f.soort === so.id
+            ? 'border:1px solid var(--brown);background:var(--brown);color:var(--cream);'
+            : 'border:1px solid var(--cream-dark);background:var(--white);color:var(--muted);')
+        + `">${so.label}</button>`).join('')
+    + `<button type="button" onclick="haalNieuweWeg(${i})" style="padding:4px 8px;font-size:9px;`
+    + 'border-radius:12px;border:1px solid var(--cream-dark);background:var(--white);cursor:pointer;">🗑</button>'
+    + '</div></div></div>').join('');
+}
+
+function zetNieuweSoort(i, soort) {
+  if (!nieuweExtra[i]) return;
+  nieuweExtra[i].soort = nieuweExtra[i].soort === soort ? '' : soort;
+  tekenNieuweExtra();
+}
+
+function haalNieuweWeg(i) { nieuweExtra.splice(i, 1); tekenNieuweExtra(); }
+
+// Uploadt de extra foto's van een net toegevoegd item en zet ze bij het item.
+async function uploadNieuweExtra(id) {
+  if (!nieuweExtra.length) return;
+  const mee = nieuweExtra.slice();
+  nieuweExtra = [];
+  tekenNieuweExtra();
+  const gelukt = [];
+  for (let i = 0; i < mee.length; i++) {
+    try {
+      const url = await uploadToCloudinary(mee[i].file, id + '-extra-' + i);
+      gelukt.push({ url, soort: mee[i].soort || '' });
+    } catch(e) {}
+  }
+  if (!gelukt.length) return;
+  extraFotos[id] = (extraFotos[id] || []).concat(gelukt);
+  bewaarExtraFotos();
+  buildGarderobe();
+}
 
 function clearNewItemPhoto() {
   window._newItemFile = null;
@@ -3124,6 +3192,15 @@ function clearNewItemPhoto() {
   document.getElementById('new-item-photo-preview').style.display = 'none';
   document.getElementById('new-photo-camera').value  = '';
   document.getElementById('new-photo-gallery').value = '';
+}
+
+// Het formulier helemaal leegmaken, inclusief de extra foto's. Apart van
+// clearNewItemPhoto, want dat wordt ook aangeroepen nádat de hoofdfoto al
+// veilig is weggeschreven — dan moeten de extra's juist blijven staan.
+function wisNieuweFotos() {
+  clearNewItemPhoto();
+  nieuweExtra = [];
+  tekenNieuweExtra();
 }
 
 async function confirmAddItem() {
@@ -3183,9 +3260,11 @@ async function confirmAddItem() {
         showToast(name + ' + foto opgeslagen ✓');
       }
     } catch(e) { showToast(name + ' toegevoegd (foto mislukt)'); }
+    await uploadNieuweExtra(id);
   } else {
     clearNewItemPhoto();
     showToast(name + ' toegevoegd ✓');
+    await uploadNieuweExtra(id);
   }
 
   // Offer to scan combinations for new item
