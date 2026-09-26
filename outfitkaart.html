@@ -522,6 +522,15 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
         </div>
       </div>
 
+      <div class="sec-label" style="margin-top:14px;">Hoe wil je het?</div>
+      <div class="field-note" style="margin-bottom:8px;">Compact inpakken en verkennen zijn niet hetzelfde. Dezelfde reis, ander soort uitkomst.</div>
+      <div class="cap-nee" id="cap-hoe">
+        <button class="nee-btn" data-hoe="compact" onclick="kiesCapHoe('compact')">🧳 Zo compact mogelijk</button>
+        <button class="nee-btn actief" data-hoe="midden" onclick="kiesCapHoe('midden')">Middenin</button>
+        <button class="nee-btn" data-hoe="ruim" onclick="kiesCapHoe('ruim')">✨ Laat me van alles zien</button>
+      </div>
+      <div class="field-note" id="cap-hoe-uit" style="margin-bottom:6px;"></div>
+
       <div class="sec-label" style="margin-top:14px;">Wat wil je níét</div>
       <div class="field-note" style="margin-bottom:8px;">Tik aan wat er sowieso thuisblijft. De rest laat je aan mij over.</div>
       <div class="cap-nee" id="cap-nee"></div>
@@ -577,6 +586,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <div id="cap-s3" style="display:none">
       <div class="sec-label">Je outfits</div>
       <div class="field-note" id="cap-outfit-status" style="margin-bottom:8px;"></div>
+      <div id="cap-koffer" style="display:none;margin-bottom:12px;"></div>
       <div id="cap-uitkomst"></div>
       <div id="cap-bewaard" style="margin-top:8px;"></div>
       <button class="ai-btn" id="cap-bewaar-tas" style="margin-top:10px;" onclick="bewaarTas()">💾 Bewaar deze tas</button>
@@ -5110,6 +5120,29 @@ const CAP_WEER = {
   wisselend: { uit:[], reden:'' },
 };
 
+// Compact inpakken en geïnspireerd raken zijn twee verschillende vragen aan
+// dezelfde reis. Links één koffer waar alles uit te combineren valt, rechts
+// meerdere kleurrichtingen naast elkaar om uit te kiezen.
+let capHoe = 'midden';
+const CAP_HOE_UITLEG = {
+  compact: 'Eén koffer. Ik kies eerst wat er meegaat en bouw de outfits daar '
+         + 'uit op, zodat stukken terugkomen. Daarna tel ik welk stuk zijn plek verdient.',
+  midden:  'Een koffer met wat ruimte. Stukken komen terug, maar ik hoef niet '
+         + 'alles tot het uiterste te hergebruiken.',
+  ruim:    'Geen koffer maar een waaier: meerdere kleurrichtingen naast elkaar, '
+         + 'om uit te kiezen en van te leren. Hergebruik is dan bijzaak.',
+};
+const CAP_KOFFER = { compact: 10, midden: 14 };
+
+function kiesCapHoe(hoe) {
+  capHoe = hoe;
+  document.querySelectorAll('#cap-hoe .nee-btn').forEach(b =>
+    b.classList.toggle('actief', b.dataset.hoe === hoe));
+  const uit = document.getElementById('cap-hoe-uit');
+  if (uit) uit.textContent = CAP_HOE_UITLEG[hoe] || '';
+  if (typeof bijwerkComboKnop === 'function') bijwerkComboKnop();
+}
+
 function capsuleOpdracht() {
   return {
     aantal: Number((document.getElementById('cap-aantal')||{}).value) || 4,
@@ -5643,9 +5676,14 @@ function bijwerkComboKnop() {
   const btn = document.getElementById('cap-maak-outfits');
   if (!btn) return;
   const n = capGekozenCombos.length;
-  btn.disabled = n < 2;
-  btn.textContent = n < 2
-    ? (n === 0 ? 'Kies eerst twee combo\'s' : 'Kies er nog één')
+  // Twee richtingen eisen hoort bij de waaier: die leeft van verschil. Wil je
+  // juist zo compact mogelijk inpakken, dan werkt die eis tegen je — één
+  // kleurrichting is dan precies wat je wilt.
+  const minimum = capHoe === 'compact' ? 1 : 2;
+  btn.disabled = n < minimum;
+  btn.textContent = n < minimum
+    ? (n === 0 ? (minimum === 1 ? 'Kies eerst een kleurrichting' : 'Kies eerst twee combo\'s')
+               : 'Kies er nog één')
     : `Maak outfits met ${n} combo\'s →`;
 }
 
@@ -5875,6 +5913,94 @@ Antwoord ALLEEN met JSON:
 // ── STAP 3: OUTFITS ───────────────────────────────────────────────────────────
 // Per combo een eigen, kleine aanroep. Kort genoeg om te overleven op een
 // telefoon, en je ziet ze binnendruppelen.
+// ── EERST DE KOFFER, DAARNA DE OUTFITS ───────────────────────────────────────
+// "Veel outfits uit weinig items" stond in de knop maar nergens in de
+// opdracht: er werd per kleurcombinatie een losse, gelijktijdige aanvraag
+// gedaan, en die aanvragen wisten niets van elkaar. Twee outfits konden dus
+// onmogelijk bewust een broek delen.
+//
+// Bij compact gaat het nu in twee stappen. Eerst kiezen we één koffer met als
+// expliciete opdracht dat de stukken moeten herkombineren. Dan bouwen we de
+// outfits uit alléén die koffer, in één aanvraag die het overzicht heeft.
+// De kleurcombo's die zij koos zijn haar richting; die mogen niet stilletjes
+// verdwijnen zodra we koffer-eerst werken. Ze gaan mee als kleurkader.
+function capComboZin() {
+  const gekozen = capGekozenCombos.map(i => capCombos[i]).filter(Boolean);
+  if (!gekozen.length) return '';
+  return 'Ze koos deze kleurrichting'
+    + (gekozen.length > 1 ? 'en' : '') + ': '
+    + gekozen.map(c => c.name + ' (' + (c.tags || []).join(', ') + ')').join('; ')
+    + '. Houd de koffer daarbinnen.\n';
+}
+
+async function capKiesKoffer(kast, aantal, weer, gel, max) {
+  const raw = await callClaude(
+    `Je bent een stylist die voor Griette inpakt. ${DNA_KORT}${profielBlok()}
+Antwoord in het Nederlands. Kies ALLEEN uit de gegeven lijst.`,
+    [{ type:'text', text:
+`Griette gaat weg${gel ? ': ' + gel : ''}. Het weer is ${weer}. Ze wil er ${aantal} outfits uit halen.
+${capItems.length ? 'Deze stukken gaan sowieso mee: ' + capItems.map(i=>i.name).join(', ') + '.\n' : ''}${capNietKleuren.length ? 'Deze kleuren wil ze niet: ' + opsom(capNietKleuren) + '.\n' : ''}${capComboZin()}${wilKleurenZin()}${inspoZin()}
+BESCHIKBAAR:
+${kast}
+
+Kies hoogstens ${max} stukken die samen mee de koffer in gaan. Het doel is
+niet ${aantal} losse outfits, maar ${aantal} outfits uit zo weinig mogelijk
+stukken. Dat betekent: kies onderstukken en schoenen die bij meerdere
+bovenstukken werken, houd de kleuren op elkaar afgestemd, en neem niets mee
+dat maar in één outfit past.
+${EENDELIG_REGEL}${buitenlaagRegel(weer)}
+Antwoord ALLEEN met JSON:
+{"koffer":["exacte namen uit de lijst"],
+ "waarom":"2 zinnen: waarom deze stukken samen veel opleveren",
+ "ontbreekt":"één stuk dat de koffer veel sterker zou maken, of leeg"}` }],
+    1600, 'low', 'kies');
+  const d = extractJson(raw);
+  if (!d || !(d.koffer || []).length) throw new Error('geen koffer');
+  return d;
+}
+
+// Tellen wie zijn plek verdient. Puur rekenwerk, en precies wat inpakken is.
+function kofferTelling(outfits) {
+  const telling = {};
+  (outfits || []).forEach(o => (o.items || []).forEach(n => {
+    const k = String(n).toLowerCase().trim();
+    telling[k] = (telling[k] || 0) + 1;
+  }));
+  const rijen = Object.keys(telling).map(k => ({ naam: k, n: telling[k] }))
+    .sort((a, b) => b.n - a.n);
+  return { rijen, passagiers: rijen.filter(r => r.n <= 1) };
+}
+
+function toonKofferTelling(outfits) {
+  const el = document.getElementById('cap-koffer');
+  if (!el) return;
+  if (capHoe === 'ruim' || !(outfits || []).length) { el.style.display = 'none'; return; }
+  const t = kofferTelling(outfits);
+  if (!t.rijen.length) { el.style.display = 'none'; return; }
+
+  const stuks = t.rijen.length;
+  // De maat die ertoe doet bij inpakken: hoe vaak gaat een stuk gemiddeld mee?
+  // Onder de 1,5 neem je te veel mee dat maar één keer dienst doet.
+  const beurten = t.rijen.reduce((n, r) => n + r.n, 0);
+  const gemiddeld = (beurten / stuks).toFixed(1).replace('.', ',');
+  el.style.display = 'block';
+  el.innerHTML = '<div class="cap-outfit" style="padding:11px 13px;">'
+    + `<div class="cap-kop"><span class="cap-naam">${stuks} stuks voor ${outfits.length} outfits</span>`
+    + `<span class="cap-stijl">elk stuk ${gemiddeld}× mee</span></div>`
+    + '<div class="field-note" style="margin-top:6px;">'
+    + t.rijen.slice(0, 8).map(r =>
+        `<div>${esc(r.naam)} <span style="opacity:.6">— in ${r.n} outfit${r.n===1?'':'s'}</span></div>`).join('')
+    + (t.rijen.length > 8 ? `<div style="opacity:.6">en nog ${t.rijen.length - 8}</div>` : '')
+    + '</div>'
+    + (t.passagiers.length
+        ? '<div class="cap-waarom" style="margin-top:8px;">'
+          + `<b>${t.passagiers.length} stuk${t.passagiers.length===1?'':'ken'} ${t.passagiers.length===1?'gaat':'gaan'} maar in één outfit mee</b> `
+          + `(${esc(t.passagiers.slice(0,4).map(r=>r.naam).join(', '))}). `
+          + 'Laat die thuis, of geef ze een tweede rol.</div>'
+        : '<div class="cap-waarom" style="margin-top:8px;">Elk stuk komt in meer dan één outfit terug. Dit is een koffer die zijn plek verdient.</div>')
+    + '</div>';
+}
+
 async function capMaakOutfits() {
   const btn = document.getElementById('cap-maak-outfits');
   const st  = document.getElementById('cap-outfit-status');
@@ -5899,6 +6025,53 @@ async function capMaakOutfits() {
     const k = [].concat(t.kleur || []).join('/');
     return `- ${i.name} (${i.cat}${k ? ', ' + k : ''})`;
   }).join('\n');
+
+  // Compact of middenin: eerst de koffer, dan de outfits daaruit. Alleen bij
+  // "laat me van alles zien" blijven het losse kleurrichtingen naast elkaar.
+  if (capHoe !== 'ruim') {
+    try {
+      st.textContent = 'Eerst kijken wat er mee moet…';
+      const koffer = await capKiesKoffer(kast, aantal, weer, gel, CAP_KOFFER[capHoe] || 12);
+      const regels = koffer.koffer.map(n => '- ' + n).join('\n');
+      st.textContent = `${koffer.koffer.length} stuks in de koffer. Nu de outfits…`;
+
+      const raw = await callClaude(
+        `Je bent een stylist voor Griette. ${DNA_KORT}${profielBlok()}
+Antwoord in het Nederlands. Kies ALLEEN uit de koffer.`,
+        [{ type:'text', text:
+`Dit gaat mee de koffer in${gel ? ' naar ' + gel : ''}, bij ${weer} weer:
+${regels}
+${capComboZin()}
+
+Maak hier ${aantal} outfits uit. Alleen deze stukken, niets anders. Ze mogen
+— en moeten — terugkomen in meerdere outfits; dat is het punt van een koffer.
+Zorg wel dat elke outfit een eigen karakter heeft.
+${EENDELIG_REGEL}${buitenlaagRegel(weer)}
+Kies per outfit 3 tot 6 stukken: één blikvanger, de rest ondersteunt; taille
+zichtbaar; nooit wijd op wijd. Noem de stijlgreep bij naam en geef elke outfit
+een gelegenheid.
+
+Antwoord ALLEEN met JSON:
+{"outfits":[{"naam":"korte naam","stijl":"de stijlgreep","gelegenheid":"waarvoor",
+  "items":["exacte namen uit de koffer"],"waarom":"1 tot 2 zinnen"}],
+ "ontbreekt":"wat er nog mist, of leeg"}` }],
+        3000, null, 'kies');
+      const d = extractJson(raw);
+      if (!d || !(d.outfits || []).length) throw new Error('geen outfits');
+
+      capsuleResultaat = { outfits: d.outfits, kofferWaarom: koffer.waarom || '',
+                           ontbreekt: d.ontbreekt || koffer.ontbreekt || '' };
+      toonCapsule();
+      toonKofferTelling(d.outfits);
+      st.textContent = '';
+      btn.disabled = false;
+      return;
+    } catch(e) {
+      st.textContent = 'De koffer lukte niet: ' + e.message;
+      btn.disabled = false;
+      return;
+    }
+  }
 
   // De combo's stonden achter elkaar in de rij: pas als de eerste klaar was
   // begon de tweede. Twee of drie keer een halve minuut wachten is dus twee of
