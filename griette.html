@@ -848,7 +848,13 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
       <button type="button" onclick="document.getElementById('new-photo-gallery').click()" style="flex:1;padding:10px 6px;background:var(--cream);border:1.5px solid var(--cream-dark);border-radius:10px;font-size:11px;font-family:'Jost',sans-serif;color:var(--brown);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">🖼 Galerij</button>
     </div>
     <input type="file" id="new-photo-camera"  accept="image/*" capture="environment" style="display:none">
-    <input type="file" id="new-photo-gallery" accept="image/*" style="display:none">
+    <input type="file" id="new-photo-gallery" accept="image/*" multiple style="display:none">
+    <div style="font-size:9px;color:var(--muted);line-height:1.5;margin:-8px 0 12px;">
+      Kies er gerust meer dan één. De eerste wordt de hoofdfoto; van de rest kun
+      je zeggen wat ze laten zien — op een model, of hoe jij het draagt. Daar
+      heeft de stylist meer aan dan aan nog een productfoto.
+    </div>
+    <div id="new-extra-strip" style="display:none;margin-bottom:12px;"></div>
 
     <input type="text" id="new-item-name" placeholder="Naam (bijv. Beige linnen broek)">
     <select id="new-item-cat" onchange="updateNewItemTagVisibility()">
@@ -1408,6 +1414,38 @@ function saveCloudinaryUrl(itemId, url) {
     // Also save to Supabase
     supabaseSet('cloud-photos', map).catch(() => {});
   } catch(e) {}
+}
+
+// ── MEERDERE FOTO'S PER ITEM ─────────────────────────────────────────────────
+// Eén productfoto zegt wat iets is, niet hoe het valt of hoe je het draagt.
+// Daarom kan er per item een reeks extra foto's bij: op een model, zoals jij
+// het draagt, of een detail. Het soort staat erbij, want daar heeft de AI meer
+// aan dan aan nóg een plaatje. De hoofdfoto blijft één vaste foto — die staat
+// overal in de app als miniatuur en moet dus voorspelbaar blijven.
+var extraFotos = {};   // { itemId: [{url, soort}] }
+const FOTO_SOORTEN = [
+  { id:'model',    label:'op een model' },
+  { id:'gedragen', label:'zoals ik het draag' },
+  { id:'detail',   label:'detail' },
+  { id:'plat',     label:'plat gelegd' },
+];
+const soortLabel = s => (FOTO_SOORTEN.find(x => x.id === s) || {}).label || 'extra';
+
+function laadExtraFotos() {
+  try {
+    const s = localStorage.getItem('griette-extra-photos-v1');
+    if (s) extraFotos = JSON.parse(s) || {};
+  } catch(e) { extraFotos = {}; }
+}
+
+function bewaarExtraFotos() {
+  try { localStorage.setItem('griette-extra-photos-v1', JSON.stringify(extraFotos)); } catch(e) {}
+  supabaseSet('extra-photos', extraFotos).catch(() => {});
+}
+
+function extraVan(itemId) {
+  const a = extraFotos[itemId];
+  return Array.isArray(a) ? a.filter(f => f && f.url) : [];
 }
 
 function deleteCloudinaryUrl(itemId) {
@@ -2085,6 +2123,7 @@ function buildItemCard(item) {
   const fi = document.createElement('input');
   fi.type = 'file';
   fi.accept = 'image/*';
+  fi.multiple = true;   // meerdere foto's per item
 
   if (item.badge) {
     const b = document.createElement('div');
@@ -2113,8 +2152,9 @@ function buildItemCard(item) {
 
   const btnPhoto = document.createElement('button');
   btnPhoto.style.cssText = 'flex:1;padding:4px;background:var(--cream);border:1px solid var(--cream-dark);border-radius:6px;font-size:9px;color:var(--muted);cursor:pointer;font-family:"Jost",sans-serif;';
-  btnPhoto.textContent = photos[item.id] ? '📷 Foto' : '📷 Foto';
-  btnPhoto.onclick = (e) => { e.stopPropagation(); fi.click(); };
+  const nExtra = extraVan(item.id).length;
+  btnPhoto.textContent = nExtra ? `📷 Foto's ${nExtra + (photos[item.id] ? 1 : 0)}` : '📷 Foto';
+  btnPhoto.onclick = (e) => { e.stopPropagation(); openFotoModal(item.id); };
 
   const btnDelPhoto = document.createElement('button');
   btnDelPhoto.style.cssText = 'padding:4px 6px;background:var(--cream);border:1px solid var(--cream-dark);border-radius:6px;font-size:9px;color:var(--muted);cursor:pointer;display:' + (photos[item.id] ? 'block' : 'none') + ';';
@@ -2142,6 +2182,12 @@ function buildItemCard(item) {
   actions.appendChild(btnDelPhoto);
   actions.appendChild(btnDelItem);
   card.appendChild(actions);
+
+  const strip = document.createElement('div');
+  strip.id = 'strip-' + item.id;
+  strip.style.cssText = 'display:none;gap:3px;padding:0 6px 6px;';
+  tekenStrip(item.id, strip);
+  card.appendChild(strip);
 
   // Tags toggle
   const tagToggle = document.createElement('button');
@@ -2176,8 +2222,39 @@ function buildItemCard(item) {
 }
 
 // ============ PHOTO HANDLING ============
+// Kies je meerdere foto's tegelijk, dan wordt de eerste de hoofdfoto (als die
+// er nog niet is) en gaat de rest naar de reeks eromheen.
 function handlePhoto(e, itemId) {
-  const file = e.target.files[0];
+  const files = [...(e.target.files || [])];
+  e.target.value = '';
+  if (!files.length) return;
+  const nogGeenHoofd = !photos[itemId];
+  const rest = nogGeenHoofd ? files.slice(1) : files;
+  if (nogGeenHoofd) handleHoofdFoto(files[0], itemId);
+  if (rest.length) voegExtraFotosToe(rest, itemId);
+}
+
+async function voegExtraFotosToe(files, itemId) {
+  showToast(files.length + ' foto' + (files.length === 1 ? '' : "'s") + ' uploaden…');
+  if (!Array.isArray(extraFotos[itemId])) extraFotos[itemId] = [];
+  let gelukt = 0;
+  for (const f of files) {
+    try {
+      const url = await uploadToCloudinary(f, itemId + '-extra-' + Date.now() + '-' + gelukt);
+      extraFotos[itemId].push({ url, soort: '' });
+      gelukt++;
+      bewaarExtraFotos();
+      if (document.getElementById('fotos-modal-lijst')) toonFotoModal(itemId);
+      const strip = document.getElementById('strip-' + itemId);
+      if (strip) tekenStrip(itemId, strip);
+    } catch(err) {
+      showToast('Een foto lukte niet: ' + err.message);
+    }
+  }
+  if (gelukt) showToast(gelukt + ' foto' + (gelukt === 1 ? '' : "'s") + ' erbij ✓');
+}
+
+function handleHoofdFoto(file, itemId) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = async ev => {
@@ -2206,6 +2283,137 @@ function handlePhoto(e, itemId) {
     } catch(e) {}
   };
   reader.readAsDataURL(file);
+}
+
+// ── FOTOREEKS PER ITEM ───────────────────────────────────────────────────────
+// Een apart venster, want op het kaartje in het raster is geen ruimte om per
+// foto te zeggen wát het is. En dat is juist het nuttige deel: "op een model"
+// en "zoals ik het draag" vertellen de stylist iets wat een productfoto niet
+// kan laten zien.
+var fotoModalVoor = null;
+
+function openFotoModal(itemId) {
+  fotoModalVoor = itemId;
+  let m = document.getElementById('fotos-modal');
+  if (!m) {
+    m = document.createElement('div');
+    m.id = 'fotos-modal';
+    m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900;'
+      + 'display:flex;align-items:flex-end;justify-content:center;';
+    m.onclick = ev => { if (ev.target === m) sluitFotoModal(); };
+    m.innerHTML =
+      '<div style="background:var(--white);width:100%;max-width:520px;max-height:88vh;'
+      + 'overflow:auto;border-radius:16px 16px 0 0;padding:16px;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'
+      + '<div id="fotos-modal-titel" style="font-size:14px;letter-spacing:1px;"></div>'
+      + '<button onclick="sluitFotoModal()" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--muted);">×</button>'
+      + '</div>'
+      + '<div style="font-size:10px;color:var(--muted);line-height:1.5;margin-bottom:10px;">'
+      + 'De eerste foto is de hoofdfoto en staat overal in de app. Zet er gerust '
+      + 'meer bij: op een model, zoals jij het draagt, of een detail. Zeg er per '
+      + 'foto bij wat het is — daar heeft de stylist meer aan dan aan nog een plaatje.'
+      + '</div>'
+      + '<div id="fotos-modal-lijst"></div>'
+      + '<input type="file" id="fotos-modal-input" accept="image/*" multiple style="display:none">'
+      + '<button id="fotos-modal-add" style="width:100%;margin-top:10px;padding:10px;'
+      + 'background:var(--brown);color:var(--cream);border:none;border-radius:8px;'
+      + 'font-size:11px;letter-spacing:1px;cursor:pointer;font-family:Jost,sans-serif;">'
+      + '＋ Foto\'s toevoegen</button>'
+      + '</div>';
+    document.body.appendChild(m);
+    m.querySelector('#fotos-modal-add').onclick = () =>
+      document.getElementById('fotos-modal-input').click();
+    m.querySelector('#fotos-modal-input').onchange = ev => {
+      const files = [...(ev.target.files || [])];
+      ev.target.value = '';
+      if (!files.length || !fotoModalVoor) return;
+      if (!photos[fotoModalVoor]) { handleHoofdFoto(files.shift(), fotoModalVoor); }
+      if (files.length) voegExtraFotosToe(files, fotoModalVoor);
+    };
+  }
+  m.style.display = 'flex';
+  toonFotoModal(itemId);
+}
+
+function sluitFotoModal() {
+  const m = document.getElementById('fotos-modal');
+  if (m) m.style.display = 'none';
+  fotoModalVoor = null;
+  buildGarderobe();
+}
+
+function toonFotoModal(itemId) {
+  const titel = document.getElementById('fotos-modal-titel');
+  const lijst = document.getElementById('fotos-modal-lijst');
+  if (!lijst) return;
+  if (titel) titel.textContent = getItemName(itemId) || 'Foto\'s';
+
+  const extra = extraVan(itemId);
+  const vak = (src, kop, knoppen) =>
+    '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;'
+    + 'border-bottom:1px solid var(--cream-dark);">'
+    + `<img src="${src}" style="width:64px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0;">`
+    + `<div style="flex:1;min-width:0;">${kop}${knoppen}</div></div>`;
+
+  let html = '';
+  if (photos[itemId]) {
+    html += vak(photos[itemId],
+      '<div style="font-size:11px;">Hoofdfoto</div>'
+      + '<div style="font-size:9px;color:var(--muted);margin-bottom:6px;">Staat overal in de app als miniatuur.</div>',
+      `<button onclick="deletePhoto('${itemId}');toonFotoModal('${itemId}')" `
+      + 'style="padding:4px 8px;font-size:9px;border:1px solid var(--cream-dark);'
+      + 'background:var(--cream);border-radius:6px;cursor:pointer;">🗑 verwijderen</button>');
+  } else {
+    html += '<div style="font-size:10px;color:var(--muted);padding:8px 0;">'
+      + 'Nog geen hoofdfoto. De eerste die je toevoegt wordt het.</div>';
+  }
+
+  extra.forEach((f, i) => {
+    const chips = FOTO_SOORTEN.map(s =>
+      `<button onclick="zetFotoSoort('${itemId}',${i},'${s.id}')" style="padding:4px 8px;`
+      + 'font-size:9px;border-radius:12px;cursor:pointer;font-family:Jost,sans-serif;'
+      + (f.soort === s.id
+          ? 'border:1px solid var(--brown);background:var(--brown);color:var(--cream);'
+          : 'border:1px solid var(--cream-dark);background:var(--white);color:var(--muted);')
+      + `">${s.label}</button>`).join(' ');
+    html += vak(f.url,
+      '<div style="font-size:9px;color:var(--muted);margin-bottom:5px;">Wat laat deze foto zien?</div>',
+      `<div style="display:flex;flex-wrap:wrap;gap:4px;">${chips}</div>`
+      + `<button onclick="verwijderExtraFoto('${itemId}',${i})" style="margin-top:6px;padding:4px 8px;`
+      + 'font-size:9px;border:1px solid var(--cream-dark);background:var(--cream);'
+      + 'border-radius:6px;cursor:pointer;">🗑 verwijderen</button>');
+  });
+
+  lijst.innerHTML = html;
+}
+
+function zetFotoSoort(itemId, i, soort) {
+  const a = extraFotos[itemId];
+  if (!a || !a[i]) return;
+  a[i].soort = a[i].soort === soort ? '' : soort;
+  bewaarExtraFotos();
+  toonFotoModal(itemId);
+}
+
+function verwijderExtraFoto(itemId, i) {
+  const a = extraFotos[itemId];
+  if (!a) return;
+  a.splice(i, 1);
+  if (!a.length) delete extraFotos[itemId];
+  bewaarExtraFotos();
+  toonFotoModal(itemId);
+}
+
+// Een rijtje kleine miniaturen onder de hoofdfoto, zodat je op het kaartje
+// meteen ziet dat er meer foto's bij zitten.
+function tekenStrip(itemId, el) {
+  const extra = extraVan(itemId);
+  if (!extra.length) { el.innerHTML = ''; el.style.display = 'none'; return; }
+  el.style.display = 'flex';
+  el.innerHTML = extra.slice(0, 4).map(f =>
+    `<img src="${f.url}" alt="${soortLabel(f.soort)}" title="${soortLabel(f.soort)}" `
+    + 'style="width:20px;height:24px;object-fit:cover;border-radius:4px;">').join('')
+    + (extra.length > 4 ? `<span style="font-size:8px;color:var(--muted);align-self:center;">+${extra.length-4}</span>` : '');
 }
 
 function deletePhoto(itemId) {
@@ -2239,6 +2447,7 @@ function deleteItem(itemId) {
     });
   });
   deletePhoto(itemId);
+  if (extraFotos[itemId]) { delete extraFotos[itemId]; bewaarExtraFotos(); }
   const card = document.getElementById('card-' + itemId);
   if (card) card.remove();
   saveAppData();
@@ -2803,6 +3012,7 @@ function closePickerIfOutside(e) {
 function openAddModal() {
   document.getElementById('new-item-name').value = '';
   document.getElementById('new-item-cat').value = 'tops';
+  wisNieuweFotos();   // schoon beginnen, ook als de vorige keer werd afgebroken
   document.querySelectorAll('.new-tag-btn').forEach(b => b.classList.remove('active'));
   buildNewKleurRow();
   buildNewPatroonRow();
@@ -2894,6 +3104,10 @@ function updateNewItemTagVisibility() {
 }
 
 // Photo handling for add-item modal
+// Ook hier meerdere foto's: de eerste wordt de hoofdfoto, de rest komt eromheen
+// te staan met erbij wát ze laten zien.
+var nieuweExtra = [];   // [{file, soort, url}]
+
 (function() {
   function handleNewPhoto(file) {
     if (!file) return;
@@ -2907,13 +3121,70 @@ function updateNewItemTagVisibility() {
       nameEl.value = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     }
   }
+  function handleNewPhotos(lijst) {
+    const files = [...(lijst || [])];
+    if (!files.length) return;
+    if (!window._newItemFile) handleNewPhoto(files.shift());
+    files.forEach(f => nieuweExtra.push({ file:f, soort:'', url:URL.createObjectURL(f) }));
+    tekenNieuweExtra();
+  }
   document.addEventListener('DOMContentLoaded', function() {
     const cam = document.getElementById('new-photo-camera');
     const gal = document.getElementById('new-photo-gallery');
-    if (cam) cam.addEventListener('change', e => handleNewPhoto(e.target.files[0]));
-    if (gal) gal.addEventListener('change', e => handleNewPhoto(e.target.files[0]));
+    if (cam) cam.addEventListener('change', e => handleNewPhotos(e.target.files));
+    if (gal) gal.addEventListener('change', e => handleNewPhotos(e.target.files));
   });
 })();
+
+function tekenNieuweExtra() {
+  const el = document.getElementById('new-extra-strip');
+  if (!el) return;
+  if (!nieuweExtra.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = 'block';
+  el.innerHTML = nieuweExtra.map((f, i) =>
+    '<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-top:1px solid var(--cream-dark);">'
+    + `<img src="${f.url}" style="width:44px;height:56px;object-fit:cover;border-radius:6px;flex-shrink:0;">`
+    + '<div style="flex:1;min-width:0;">'
+    + '<div style="font-size:9px;color:var(--muted);margin-bottom:4px;">Wat laat deze foto zien?</div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:4px;">'
+    + FOTO_SOORTEN.map(so =>
+        `<button type="button" onclick="zetNieuweSoort(${i},'${so.id}')" `
+        + 'style="padding:4px 8px;font-size:9px;border-radius:12px;cursor:pointer;font-family:Jost,sans-serif;'
+        + (f.soort === so.id
+            ? 'border:1px solid var(--brown);background:var(--brown);color:var(--cream);'
+            : 'border:1px solid var(--cream-dark);background:var(--white);color:var(--muted);')
+        + `">${so.label}</button>`).join('')
+    + `<button type="button" onclick="haalNieuweWeg(${i})" style="padding:4px 8px;font-size:9px;`
+    + 'border-radius:12px;border:1px solid var(--cream-dark);background:var(--white);cursor:pointer;">🗑</button>'
+    + '</div></div></div>').join('');
+}
+
+function zetNieuweSoort(i, soort) {
+  if (!nieuweExtra[i]) return;
+  nieuweExtra[i].soort = nieuweExtra[i].soort === soort ? '' : soort;
+  tekenNieuweExtra();
+}
+
+function haalNieuweWeg(i) { nieuweExtra.splice(i, 1); tekenNieuweExtra(); }
+
+// Uploadt de extra foto's van een net toegevoegd item en zet ze bij het item.
+async function uploadNieuweExtra(id) {
+  if (!nieuweExtra.length) return;
+  const mee = nieuweExtra.slice();
+  nieuweExtra = [];
+  tekenNieuweExtra();
+  const gelukt = [];
+  for (let i = 0; i < mee.length; i++) {
+    try {
+      const url = await uploadToCloudinary(mee[i].file, id + '-extra-' + i);
+      gelukt.push({ url, soort: mee[i].soort || '' });
+    } catch(e) {}
+  }
+  if (!gelukt.length) return;
+  extraFotos[id] = (extraFotos[id] || []).concat(gelukt);
+  bewaarExtraFotos();
+  buildGarderobe();
+}
 
 function clearNewItemPhoto() {
   window._newItemFile = null;
@@ -2921,6 +3192,15 @@ function clearNewItemPhoto() {
   document.getElementById('new-item-photo-preview').style.display = 'none';
   document.getElementById('new-photo-camera').value  = '';
   document.getElementById('new-photo-gallery').value = '';
+}
+
+// Het formulier helemaal leegmaken, inclusief de extra foto's. Apart van
+// clearNewItemPhoto, want dat wordt ook aangeroepen nádat de hoofdfoto al
+// veilig is weggeschreven — dan moeten de extra's juist blijven staan.
+function wisNieuweFotos() {
+  clearNewItemPhoto();
+  nieuweExtra = [];
+  tekenNieuweExtra();
 }
 
 async function confirmAddItem() {
@@ -2980,9 +3260,11 @@ async function confirmAddItem() {
         showToast(name + ' + foto opgeslagen ✓');
       }
     } catch(e) { showToast(name + ' toegevoegd (foto mislukt)'); }
+    await uploadNieuweExtra(id);
   } else {
     clearNewItemPhoto();
     showToast(name + ' toegevoegd ✓');
+    await uploadNieuweExtra(id);
   }
 
   // Offer to scan combinations for new item
@@ -3609,6 +3891,12 @@ async function loadAppDataFromSupabase() {
       supabaseGet('custom-occasions'),
       supabaseGet('deleted-items')
     ]);
+
+    const extraData = await supabaseGet('extra-photos').catch(() => null);
+    if (extraData && typeof extraData === 'object' && !Array.isArray(extraData)) {
+      extraFotos = extraData;
+      try { localStorage.setItem('griette-extra-photos-v1', JSON.stringify(extraFotos)); } catch(e) {}
+    }
 
     if (customItems) {
       for (const [cat, list] of Object.entries(customItems)) {
@@ -6206,6 +6494,7 @@ fetchWeather();
 
 // Load Cloudinary photo URLs first (works across devices/versions)
 loadCloudinaryPhotos();
+laadExtraFotos();
 loadBoardSettings();
 loadCyclus();
 loadWellbeing();

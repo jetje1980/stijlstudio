@@ -2193,6 +2193,35 @@ let selType = null, selPreset = null;
 let selItems = [];
 let allItems = [];
 let cloudMap = {};
+// Extra foto's per item: { id: [{url, soort}] }. De hoofdfoto laat zien wát
+// iets is; deze laten zien hoe het valt en hoe het gedragen wordt. Voor een
+// stylist is dat tweede vaak het belangrijkere deel, dus ze gaan mee naar de AI.
+let extraFotos = {};
+const FOTO_SOORT_TEKST = { model:'op een model', gedragen:'zo draagt Griette het',
+                           detail:'detail', plat:'plat gelegd' };
+
+// Alle foto's van één item, hoofdfoto eerst, elk met een bijschrift.
+function fotosVan(item) {
+  if (!item || item._suggestion) return [];
+  const uit = [];
+  if (cloudMap[item.id]) uit.push({ url: cloudMap[item.id], bij: item.name });
+  const extra = extraFotos[item.id];
+  if (Array.isArray(extra)) extra.forEach(f => {
+    if (!f || !f.url) return;
+    const soort = FOTO_SOORT_TEKST[f.soort] || 'extra foto';
+    uit.push({ url: f.url, bij: `${item.name} — ${soort}` });
+  });
+  return uit;
+}
+
+// Duwt alle foto's van een item in een prompt, met bijschrift.
+function fotosInPrompt(lijst, item) {
+  fotosVan(item).forEach(f => {
+    lijst.push({ type:'image', source:{ type:'url', url: f.url } });
+    lijst.push({ type:'text', text:`(Foto van: ${f.bij})` });
+  });
+}
+
 let itemTags = {};
 let customColors = []; // max 2 selected KLEUREN entries
 let customCount = 0;   // aantal geladen eigen items
@@ -2468,14 +2497,19 @@ async function init() {
   let lsCustom = null;
   try { lsCustom = JSON.parse(localStorage.getItem('griette-custom-items-v3')||'{}'); } catch(e){}
 
-  let sbPhotos=null, sbTags=null, sbCustom=null, sbDeleted=null;
+  try { extraFotos = JSON.parse(localStorage.getItem('griette-extra-photos-v1')||'{}'); } catch(e){}
+
+  let sbPhotos=null, sbTags=null, sbCustom=null, sbDeleted=null, sbExtra=null;
   try {
-    [sbPhotos, sbTags, sbCustom, sbDeleted] = await Promise.all([
-      sbGet('cloud-photos'), sbGet('item-tags'), sbGet('custom-items'), sbGet('deleted-items')
+    [sbPhotos, sbTags, sbCustom, sbDeleted, sbExtra] = await Promise.all([
+      sbGet('cloud-photos'), sbGet('item-tags'), sbGet('custom-items'),
+      sbGet('deleted-items'), sbGet('extra-photos')
     ]);
   } catch(e){}
 
   if (sbPhotos) Object.assign(cloudMap, sbPhotos);
+  if (sbExtra && typeof sbExtra === 'object' && !Array.isArray(sbExtra))
+    Object.assign(extraFotos, sbExtra);
   if (sbTags)   Object.assign(itemTags, sbTags);
   const deleted = new Set(Array.isArray(sbDeleted) ? sbDeleted : []);
 
@@ -3505,12 +3539,7 @@ Antwoord ALLEEN met een JSON-array:
              "doet":"1 zin: wat deze kleur doet en waarom"}],
   "gelegenheid":"1 zin: waarvoor deze combinatie het sterkst is"}]` }];
 
-  anchorItems.forEach(it => {
-    if (cloudMap[it.id]) {
-      userContent.push({ type:'image', source:{ type:'url', url: cloudMap[it.id] } });
-      userContent.push({ type:'text', text:`(Foto van: ${it.name})` });
-    }
-  });
+  anchorItems.forEach(it => fotosInPrompt(userContent, it));
 
   try {
     const raw = await callClaude(system, userContent, 8000, 'low', 'kies');
@@ -3727,12 +3756,7 @@ Antwoord ALLEEN met JSON:
   "afstyling":[{"wat":"concreet detail","waarom":"waarom juist dit"}],
   "past_omdat":"1 zin: waarom deze richting bij haar en bij de gelegenheid past"}]}` }];
 
-  anchorItems.forEach(it => {
-    if (cloudMap[it.id]) {
-      inhoud.push({ type:'image', source:{ type:'url', url: cloudMap[it.id] } });
-      inhoud.push({ type:'text', text:`(Foto van: ${it.name})` });
-    }
-  });
+  anchorItems.forEach(it => fotosInPrompt(inhoud, it));
 
   try {
     const raw = await callClaude(
@@ -4108,8 +4132,15 @@ async function bewaarVisueel() {
   await sbSet('item-visueel', itemVisueel);
 }
 
+// Ook opnieuw scannen als er foto's bij zijn gekomen: anders zou een foto van
+// hoe je iets draagt wel opgeslagen zijn, maar nooit bekeken.
 function nogTeScannen() {
-  return allItems.filter(i => cloudMap[i.id] && !itemVisueel[i.id]);
+  return allItems.filter(i => {
+    if (!cloudMap[i.id]) return false;
+    const v = itemVisueel[i.id];
+    if (!v) return true;
+    return (v.n || 1) !== fotosVan(i).length;
+  });
 }
 
 async function scanKast(opnieuw) {
@@ -4127,18 +4158,31 @@ async function scanKast(opnieuw) {
   }
 
   btn.disabled = true;
-  const BATCH = 6;
+  // Tellen in foto's, niet in items: een item met vier foto's erbij is vier
+  // keer zo zwaar en zou een groep van zes anders laten ontsporen.
+  const MAX_FOTOS = 8;
   let klaar = 0, mislukt = 0;
 
   const system = `Je beschrijft kledingstukken op de foto, kort en feitelijk.
 Geen stijladvies, geen complimenten. Alleen wat je ziet.`;
 
-  for (let i = 0; i < todo.length; i += BATCH) {
-    const groep = todo.slice(i, i + BATCH);
+  const groepen = [];
+  todo.forEach(it => {
+    const n = Math.max(1, fotosVan(it).length);
+    const laatste = groepen[groepen.length - 1];
+    if (!laatste || laatste.fotos + n > MAX_FOTOS || laatste.items.length >= 6)
+      groepen.push({ items: [it], fotos: n });
+    else { laatste.items.push(it); laatste.fotos += n; }
+  });
+
+  for (const g of groepen) {
+    const groep = g.items;
     st.textContent = `Scannen… ${klaar} van ${todo.length}`;
 
     const inhoud = [{ type:'text', text:
-`Beschrijf elk kledingstuk hieronder. Per foto krijg je de naam en het volgnummer.
+`Beschrijf elk kledingstuk hieronder. Per item krijg je de naam en het volgnummer.
+Van sommige items zijn er meerdere foto's — bijvoorbeeld op een model of zoals
+Griette het draagt. Die horen bij hetzelfde nummer; kijk ernaar als één stuk.
 
 Geef per item terug:
 - kleur: de werkelijke kleur die je ziet, in gewone woorden (bijv. "diep chocoladebruin", "verwassen lichtblauw")
@@ -4146,13 +4190,24 @@ Geef per item terug:
 - textuur: het materiaaloppervlak (bijv. "grof gebreid", "glad satijn", "ruwe denim", "zacht suède")
 - details: maximaal 3 woorden over opvallende details (bijv. "gouden knopen", "hoge taille", "raglanmouw")
 - volume: een van luchtig, medium, zwaar
+- dracht: alleen als een foto laat zien hoe het gedragen wordt — hoe het valt op
+  het lichaam, waar de zoom of taille uitkomt, of het ingestopt of open gedragen
+  wordt. Zie je dat niet, laat dit dan leeg. Verzin het niet op basis van de
+  productfoto.
 
-Antwoord ALLEEN met een JSON-array in dezelfde volgorde als de foto's:
-[{"nr":1,"kleur":"...","vorm":"...","textuur":"...","details":"...","volume":"..."}]` }];
+Antwoord ALLEEN met een JSON-array in dezelfde volgorde als de items:
+[{"nr":1,"kleur":"...","vorm":"...","textuur":"...","details":"...","volume":"...","dracht":"..."}]` }];
 
     groep.forEach((it, n) => {
-      inhoud.push({ type:'text', text: `Foto ${n+1}: ${it.name} (${it.cat})` });
-      inhoud.push({ type:'image', source:{ type:'url', url: cloudMap[it.id] } });
+      const fotos = fotosVan(it);
+      inhoud.push({ type:'text', text:
+        `Item ${n+1}: ${it.name} (${it.cat})`
+        + (fotos.length > 1 ? ` — ${fotos.length} foto's` : '') });
+      fotos.forEach(f => {
+        inhoud.push({ type:'image', source:{ type:'url', url: f.url } });
+        if (/—/.test(f.bij))
+          inhoud.push({ type:'text', text:`(${f.bij.split('—').pop().trim()})` });
+      });
     });
 
     try {
@@ -4166,6 +4221,7 @@ Antwoord ALLEEN met een JSON-array in dezelfde volgorde als de foto's:
           itemVisueel[item.id] = {
             kleur: b.kleur || '', vorm: b.vorm || '', textuur: b.textuur || '',
             details: b.details || '', volume: b.volume || '',
+            dracht: b.dracht || '', n: fotosVan(item).length,
           };
           klaar++;
         });
@@ -4190,13 +4246,17 @@ function bijwerkScanKosten() {
   const sel = document.getElementById('scan-model');
   const el  = document.getElementById('scan-kosten');
   if (!sel || !el) return;
-  const n = nogTeScannen().length;
+  const todo = nogTeScannen();
+  const n = todo.length;
   if (!n) { el.textContent = ''; return; }
+  // Rekenen in foto's, want items met meerdere foto's kosten navenant meer.
+  const fotos = todo.reduce((t, i) => t + Math.max(1, fotosVan(i).length), 0);
   const [pi, po] = PRIJS[sel.value] || PRIJS[MODEL_LICHT];
-  const groepjes = Math.ceil(n / 6);
-  const euro = (n*1500*pi + groepjes*450*pi + n*120*po) / 1000000;
+  const groepjes = Math.max(1, Math.ceil(fotos / 8));
+  const euro = (fotos*1500*pi + groepjes*500*pi + n*140*po) / 1000000;
   const min  = Math.max(1, Math.round(groepjes * (sel.value.includes('haiku') ? 4 : sel.value.includes('sonnet') ? 7 : 12) / 60));
-  el.innerHTML = `Eenmalig ongeveer <b>€ ${euro.toFixed(2)}</b> voor ${n} foto's, circa ${min} min.`;
+  el.innerHTML = `Eenmalig ongeveer <b>€ ${euro.toFixed(2)}</b> voor ${fotos} foto's`
+    + (fotos !== n ? ` van ${n} item${n===1?'':'s'}` : '') + `, circa ${min} min.`;
 }
 
 function bijwerkScanKnop() {
@@ -4206,7 +4266,7 @@ function bijwerkScanKnop() {
   bijwerkScanKosten();
   const open = nogTeScannen().length;
   const gescand = Object.keys(itemVisueel).length;
-  btn.textContent = open ? `📷 Scan ${open} foto${open===1?'':'\'s'}` : '📷 Alles gescand';
+  btn.textContent = open ? `📷 Scan ${open} item${open===1?'':'s'}` : '📷 Alles gescand';
   btn.disabled = open === 0;
   if (st && !st.textContent) {
     st.textContent = gescand
@@ -6426,6 +6486,7 @@ function wardrobeForAI() {
     const gezien = v
       ? ' | GEZIEN OP FOTO: ' + [v.kleur, v.vorm, v.textuur, v.details, v.volume && ('volume ' + v.volume)]
           .filter(Boolean).join('; ')
+        + (v.dracht ? ' | ZO GEDRAGEN: ' + v.dracht : '')
       : (cloudMap[i.id] ? ' | heeft foto (nog niet gescand)' : '');
     return `${i.id} | ${i.cat} | ${i.name}${extra ? ' | ' + extra : ''}${gezien}`;
   }).join('\n');
@@ -7042,10 +7103,7 @@ Antwoord ALLEEN met JSON:
   const alGescand = metFoto.length > 0 && metFoto.every(i => itemVisueel[i.id]);
 
   if (!alGescand) {
-    metFoto.forEach(item => {
-      userContent.push({ type:'image', source:{ type:'url', url: cloudMap[item.id] } });
-      userContent.push({ type:'text', text:`(Foto van: ${item.name})` });
-    });
+    metFoto.forEach(item => fotosInPrompt(userContent, item));
   } else {
     userContent.push({ type:'text', text:
       'De foto\'s zijn al eerder bekeken; wat erop te zien is staat hierboven ' +
