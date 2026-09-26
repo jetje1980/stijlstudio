@@ -537,23 +537,21 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
     </div>
   </div>
 
-  <!-- Snelle acties 2×2 -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:22px;">
-    <button class="home-tile" onclick="showPanel('suggesties',null)">
-      <span class="tile-icon">✨</span>
-      <span class="tile-label">Outfits</span>
+  <!-- Snelle acties. Outfits, Looks en Stylist stonden hier ook, pal boven de
+       balk onderaan waar ze óók staan — drie van de vier tegels waren dubbel.
+       Hier staat nu wat je anders alleen via "Meer" bereikt. -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:22px;">
+    <button class="home-tile" onclick="location.href='outfitkaart.html'">
+      <span class="tile-icon">🎨</span>
+      <span class="tile-label">Outfitkaart</span>
     </button>
-    <button class="home-tile" onclick="showPanelBnav('boards', document.querySelector('[data-panel=boards]'))">
-      <span class="tile-icon">🗂</span>
-      <span class="tile-label">Looks</span>
+    <button class="home-tile" onclick="location.href='snel-toevoegen.html'">
+      <span class="tile-icon">➕</span>
+      <span class="tile-label">Item erbij</span>
     </button>
     <button class="home-tile" onclick="showPanelFromMeer('week')">
       <span class="tile-icon">📅</span>
       <span class="tile-label">Weekplan</span>
-    </button>
-    <button class="home-tile" onclick="showPanel('chat',null)">
-      <span class="tile-icon">💬</span>
-      <span class="tile-label">Stylist</span>
     </button>
   </div>
 
@@ -654,6 +652,14 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
   </div>
   <p class="panel-sub">Sla outfits op per gelegenheid. Tik + om een nieuwe look te starten.</p>
   <div id="boards-sync-status" style="font-size:10px;color:var(--muted);margin-bottom:8px;"></div>
+
+  <!-- Zoeken over álle boards heen: met tweehonderd looks is bladeren geen
+       manier om iets terug te vinden. -->
+  <input type="text" id="look-zoek" autocomplete="off"
+         placeholder="Zoek een look — item, kleur of gelegenheid"
+         oninput="zoekLooks(this.value)"
+         style="width:100%;padding:10px 12px;border:1.5px solid var(--cream-dark);border-radius:10px;font-size:12px;font-family:Jost,sans-serif;background:var(--white);margin-bottom:12px;box-sizing:border-box;">
+  <div id="look-resultaat" style="display:none;margin-bottom:16px;"></div>
 
   <div class="board-selector" id="board-selector"></div>
   <div id="boards-container"></div>
@@ -1925,7 +1931,7 @@ function setTagMulti(itemId, type, value) {
   else { itemTags[itemId][type] = arr[0]; itemTags[itemId]['materialen'] = arr; }
   saveAppData();
   var tagEl = document.getElementById('tags-' + itemId);
-  if (tagEl) renderTagButtons(itemId, tagEl);
+  if (tagEl) { renderTagButtons(itemId, tagEl); tagEl.dataset.gebouwd = '1'; }
 }
 
 function getMaterialen(itemId) {
@@ -1961,7 +1967,7 @@ function setTag(itemId, type, value) {
   }
   saveAppData();
   const tagEl = document.getElementById('tags-' + itemId);
-  if (tagEl) renderTagButtons(itemId, tagEl);
+  if (tagEl) { renderTagButtons(itemId, tagEl); tagEl.dataset.gebouwd = '1'; }
 }
 
 // Color dot map for visual display
@@ -2107,7 +2113,7 @@ function buildItemCard(item) {
   pa.id = 'pa-' + item.id;
 
   if (photos[item.id]) {
-    pa.innerHTML = `<img src="${photos[item.id]}" alt="">`;
+    pa.innerHTML = `<img loading="lazy" src="${photos[item.id]}" alt="">`;
   } else {
     pa.innerHTML = `<div class="placeholder"><div class="plus">+</div><span>foto toevoegen</span></div>`;
   }
@@ -2173,10 +2179,10 @@ function buildItemCard(item) {
     if (confirm('Item "' + item.name + '" verwijderen?')) deleteItem(item.id);
   };
 
-  const btnToday = document.createElement('button');
-  btnToday.style.cssText = 'width:100%;margin:0 6px 6px;padding:5px;background:var(--brown);color:var(--cream);border:none;border-radius:6px;font-size:9px;cursor:pointer;font-family:"Jost",sans-serif;letter-spacing:1px;';
-  btnToday.textContent = '✦ Draag vandaag';
-  btnToday.onclick = (e) => { e.stopPropagation(); openTodayModal(item.id); };
+  // "Draag vandaag" stond hier als grootste, donkerste knop op élke kaart —
+  // de meest opvallende actie in de hele kast, terwijl het draaglogboek leeg
+  // is. Hij staat nu in het venster van het item zelf; dragen wordt bovendien
+  // vanzelf genoteerd zodra je een outfit kiest.
 
   actions.appendChild(btnPhoto);
   actions.appendChild(btnDelPhoto);
@@ -2197,6 +2203,13 @@ function buildItemCard(item) {
     e.stopPropagation();
     const tagSection = document.getElementById('tags-' + item.id);
     const isOpen = tagSection.style.display !== 'none';
+    // Pas bouwen als je ze opent. Eén item heeft 137 tagknoppen; bij ruim
+    // honderd items zijn dat bijna twintigduizend knoppen die je telefoon
+    // anders bouwt en bijhoudt terwijl er geen enkele te zien is.
+    if (!isOpen && !tagSection.dataset.gebouwd) {
+      renderTagButtons(item.id, tagSection);
+      tagSection.dataset.gebouwd = '1';
+    }
     tagSection.style.display = isOpen ? 'none' : 'block';
     tagToggle.textContent = isOpen ? '+ tags (optioneel)' : '− tags verbergen';
   };
@@ -2204,11 +2217,9 @@ function buildItemCard(item) {
   const tagSection = document.createElement('div');
   tagSection.id = 'tags-' + item.id;
   tagSection.style.cssText = 'display:none;padding:0 6px 8px;';
-  renderTagButtons(item.id, tagSection);
 
   card.appendChild(tagToggle);
   card.appendChild(tagSection);
-  card.appendChild(btnToday);
   fi.addEventListener('change', e => handlePhoto(e, item.id));
 
   // drag - desktop only
@@ -2261,12 +2272,12 @@ function handleHoofdFoto(file, itemId) {
     const dataUrl = ev.target.result;
     photos[itemId] = dataUrl;
     const pa = document.getElementById('pa-' + itemId);
-    if (pa) pa.innerHTML = `<img src="${dataUrl}" alt="">`;
+    if (pa) pa.innerHTML = `<img loading="lazy" src="${dataUrl}" alt="">`;
     // update all outfit slots with this item
     document.querySelectorAll(`.outfit-slot[data-item-id="${itemId}"] img`).forEach(img => img.src = dataUrl);
     document.querySelectorAll(`.outfit-slot[data-item-id="${itemId}"]`).forEach(slot => {
       if (!slot.querySelector('img')) {
-        slot.innerHTML = `<img src="${dataUrl}" alt=""><div class="slot-label">${getItemName(itemId)}</div><button class="remove-slot" onclick="removeSlot(this)">×</button>`;
+        slot.innerHTML = `<img loading="lazy" src="${dataUrl}" alt=""><div class="slot-label">${getItemName(itemId)}</div><button class="remove-slot" onclick="removeSlot(this)">×</button>`;
       }
     });
     showToast('Foto toegevoegd ✓');
@@ -2319,10 +2330,19 @@ function openFotoModal(itemId) {
       + 'background:var(--brown);color:var(--cream);border:none;border-radius:8px;'
       + 'font-size:11px;letter-spacing:1px;cursor:pointer;font-family:Jost,sans-serif;">'
       + '＋ Foto\'s toevoegen</button>'
+      + '<button id="fotos-modal-vandaag" style="width:100%;margin-top:8px;padding:10px;'
+      + 'background:transparent;color:var(--brown);border:1.5px solid var(--cream-dark);'
+      + 'border-radius:8px;font-size:11px;cursor:pointer;font-family:Jost,sans-serif;">'
+      + '✦ Vandaag gedragen</button>'
       + '</div>';
     document.body.appendChild(m);
     m.querySelector('#fotos-modal-add').onclick = () =>
       document.getElementById('fotos-modal-input').click();
+    m.querySelector('#fotos-modal-vandaag').onclick = () => {
+      const id = fotoModalVoor;
+      sluitFotoModal();
+      if (id) openTodayModal(id);
+    };
     m.querySelector('#fotos-modal-input').onchange = ev => {
       const files = [...(ev.target.files || [])];
       ev.target.value = '';
@@ -2352,7 +2372,7 @@ function toonFotoModal(itemId) {
   const vak = (src, kop, knoppen) =>
     '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;'
     + 'border-bottom:1px solid var(--cream-dark);">'
-    + `<img src="${src}" style="width:64px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0;">`
+    + `<img loading="lazy" src="${src}" style="width:64px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0;">`
     + `<div style="flex:1;min-width:0;">${kop}${knoppen}</div></div>`;
 
   let html = '';
@@ -2411,7 +2431,7 @@ function tekenStrip(itemId, el) {
   if (!extra.length) { el.innerHTML = ''; el.style.display = 'none'; return; }
   el.style.display = 'flex';
   el.innerHTML = extra.slice(0, 4).map(f =>
-    `<img src="${f.url}" alt="${soortLabel(f.soort)}" title="${soortLabel(f.soort)}" `
+    `<img loading="lazy" src="${f.url}" alt="${soortLabel(f.soort)}" title="${soortLabel(f.soort)}" `
     + 'style="width:20px;height:24px;object-fit:cover;border-radius:4px;">').join('')
     + (extra.length > 4 ? `<span style="font-size:8px;color:var(--muted);align-self:center;">+${extra.length-4}</span>` : '');
 }
@@ -2460,6 +2480,63 @@ function getItemName(id) {
     if (found) return found.name;
   }
   return id;
+}
+
+// Let op: de items in `items` dragen zelf geen categorie — die is de sleutel
+// van de map. Wie hier alleen het item teruggeeft, krijgt een object zonder
+// `cat` en dat valt pas op als een filter stilletjes niets meer vindt.
+function getItemById(id) {
+  for (const [cat, lijst] of Object.entries(items)) {
+    const found = lijst.find(i => i.id === id);
+    if (found) return Object.assign({ cat }, found);
+  }
+  return null;
+}
+
+// ── LOOKS DIE EEN NAAM HEBBEN ────────────────────────────────────────────────
+// Een look heette standaard "Look 94": een volgnummer. Met tweehonderd looks
+// in de kast zijn die niet uit elkaar te houden en is er niets terug te
+// vinden. Een naam die uit de stukken zelf volgt, is meteen leesbaar en kost
+// geen AI-aanroep: "Top zara longsleeve bruin + Jean Agolde" zegt genoeg.
+// Zij kan hem daarna gewoon overtypen; het veld was altijd al invulbaar.
+const LOOK_PLACEHOLDER = /^(look|outfit)\s*\d+$/i;
+
+function kortItem(naam) {
+  // "(hoort bij rok zwart sezane)" is een aantekening voor haarzelf, geen naam
+  var n = String(naam || '').replace(/\s*\([^)]*\)/g, '').trim();
+  if (n.length <= 22) return n;
+  var kort = n.slice(0, 22);
+  var sp = kort.lastIndexOf(' ');
+  return (sp > 10 ? kort.slice(0, sp) : kort).trim() + '…';
+}
+
+function afgeleideLookNaam(outfit) {
+  var its = (outfit.items || []).map(getItemById).filter(Boolean);
+  if (its.length < 2) return '';
+  var pak = function(cats) { return its.find(function(i){ return cats.indexOf(i.cat) >= 0; }); };
+  // Een jurk of jumpsuit is boven- én onderstuk; dan zegt de tweede laag meer.
+  var eendelig = pak(['jurken','eendelig']);
+  var boven = eendelig || pak(['tops']);
+  var onder = eendelig ? (pak(['layers']) || pak(['shoes'])) : pak(['bottoms']);
+  var kern = [boven, onder].filter(Boolean);
+  if (kern.length < 2) kern = its.slice(0, 2);
+  var naam = kern.map(function(i){ return kortItem(i.name); }).join(' + ');
+  return naam.charAt(0).toUpperCase() + naam.slice(1);
+}
+
+// Eenmalig: elke look die nog een volgnummer als naam heeft, krijgt de naam
+// van zijn eigen stukken. Alleen placeholders worden aangeraakt — een naam
+// die zij zelf gaf blijft staan.
+function geefLooksEenNaam() {
+  var veranderd = 0;
+  boards.forEach(function(b) {
+    (b.outfits || []).forEach(function(o) {
+      if (!LOOK_PLACEHOLDER.test(String(o.name || '').trim())) return;
+      var n = afgeleideLookNaam(o);
+      if (n) { o.name = n; veranderd++; }
+    });
+  });
+  return veranderd;
 }
 
 function getAllItems() {
@@ -2703,6 +2780,100 @@ function addOutfit(boardId, preloadItemId) {
   saveAppData();
 }
 
+// ── ZOEKEN IN JE LOOKS ───────────────────────────────────────────────────────
+// Zoekt over alle boards tegelijk, op de naam van de look, de namen van de
+// stukken erin, hun kleurtag en het board zelf. Een treffer brengt je naar dat
+// board en licht de look op — bewerken doe je daar, niet in de lijst.
+function looksDoorzoeken(term) {
+  var q = String(term || '').toLowerCase().trim();
+  if (q.length < 2) return [];
+  var woorden = q.split(/\s+/);
+  var treffers = [];
+  boards.forEach(function(b) {
+    (b.outfits || []).forEach(function(o) {
+      var its = (o.items || []).map(getItemById).filter(Boolean);
+      var hooi = [o.name || '', b.label || '', o.occasion || '', o.temp || '']
+        .concat(its.map(function(i){ return i.name; }))
+        .concat(its.map(function(i){
+          var k = itemTags[i.id] && itemTags[i.id].kleur;
+          return Array.isArray(k) ? k.join(' ') : (k || '');
+        })).join(' ').toLowerCase();
+      // Alle woorden moeten voorkomen: "bruin jeans" vindt niet elke bruine look.
+      if (woorden.every(function(w){ return hooi.indexOf(w) >= 0; }))
+        treffers.push({ board: b, outfit: o, items: its });
+    });
+  });
+  return treffers;
+}
+
+function zoekLooks(term) {
+  var vak = document.getElementById('look-resultaat');
+  var sel = document.getElementById('board-selector');
+  var cont = document.getElementById('boards-container');
+  if (!vak) return;
+  var q = String(term || '').trim();
+
+  if (q.length < 2) {
+    vak.style.display = 'none';
+    vak.innerHTML = '';
+    if (sel) sel.style.display = '';
+    if (cont) cont.style.display = '';
+    return;
+  }
+
+  var treffers = looksDoorzoeken(q);
+  if (sel) sel.style.display = 'none';
+  if (cont) cont.style.display = 'none';
+  vak.style.display = 'block';
+
+  if (!treffers.length) {
+    vak.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:12px 2px;">'
+      + 'Geen look gevonden met “' + escHtml(q) + '”. Zoek op een stuk uit je kast, '
+      + 'een kleur, of de naam van een board.</div>';
+    return;
+  }
+
+  vak.innerHTML = '<div style="font-size:10px;color:var(--muted);margin-bottom:8px;">'
+    + treffers.length + ' look' + (treffers.length === 1 ? '' : 's') + ' gevonden</div>'
+    + treffers.slice(0, 40).map(function(t) {
+        var mini = t.items.slice(0, 5).map(function(i) {
+          return photos[i.id]
+            ? '<img loading="lazy" src="' + photos[i.id] + '" loading="lazy" alt="" style="width:34px;height:42px;object-fit:cover;border-radius:5px;">'
+            : '<div style="width:34px;height:42px;border-radius:5px;background:var(--cream-dark);"></div>';
+        }).join('');
+        return '<button type="button" onclick="springNaarLook(\'' + t.board.id + '\',\'' + t.outfit.id + '\')" '
+          + 'style="width:100%;text-align:left;background:var(--white);border:1.5px solid var(--cream-dark);'
+          + 'border-radius:12px;padding:10px;margin-bottom:8px;cursor:pointer;font-family:Jost,sans-serif;">'
+          + '<div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:6px;">'
+          + '<span style="font-size:12px;color:var(--brown);">' + escHtml(t.outfit.name || 'Look') + '</span>'
+          + '<span style="font-size:9px;color:var(--muted);white-space:nowrap;">' + escHtml(t.board.emoji + ' ' + t.board.label) + '</span>'
+          + '</div><div style="display:flex;gap:4px;">' + mini + '</div></button>';
+      }).join('')
+    + (treffers.length > 40
+        ? '<div style="font-size:10px;color:var(--muted);">Eerste 40 getoond — typ iets specifiekers.</div>' : '');
+}
+
+function springNaarLook(boardId, outfitId) {
+  var veld = document.getElementById('look-zoek');
+  if (veld) veld.value = '';
+  zoekLooks('');
+  switchBoard(boardId);
+  setTimeout(function() {
+    var el = document.getElementById('ob-' + outfitId);
+    if (!el) return;
+    el.scrollIntoView({ behavior:'smooth', block:'center' });
+    el.style.transition = 'box-shadow .3s';
+    el.style.boxShadow = '0 0 0 2px var(--brown)';
+    setTimeout(function(){ el.style.boxShadow = ''; }, 2000);
+  }, 250);
+}
+
+function escHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+  });
+}
+
 function renderOutfit(boardId, outfit) {
   var list = document.getElementById('outfits-' + boardId);
   if (!list) return;
@@ -2842,6 +3013,16 @@ function addItemToOutfit(outfitId, itemId) {
     const outfit = board.outfits.find(o => o.id === outfitId);
     if (outfit) {
       if (!outfit.items.includes(itemId)) outfit.items.push(itemId);
+      // Zodra een nieuwe look twee stukken heeft, krijgt hij een naam uit die
+      // stukken in plaats van "Look 217" te blijven heten.
+      if (LOOK_PLACEHOLDER.test(String(outfit.name || '').trim())) {
+        var afgeleid = afgeleideLookNaam(outfit);
+        if (afgeleid) {
+          outfit.name = afgeleid;
+          var veld = document.querySelector('#ob-' + outfit.id + ' .outfit-board-name input');
+          if (veld) veld.value = afgeleid;
+        }
+      }
       addItemToOutfitDOM(outfitId, itemId);
       refreshDropZone(outfitId);
       saveAppData();
@@ -2872,7 +3053,7 @@ function addItemToOutfitDOM(outfitId, itemId) {
 
   var swapBtn = `<button class="swap-slot" onclick="openSwapPicker(event)" title="Wissel item">⇄</button>`;
   if (photos[itemId]) {
-    slot.innerHTML = `<img src="${photos[itemId]}" alt=""><div class="slot-label">${shortName}</div><button class="remove-slot" onclick="removeSlot(this)">×</button>${swapBtn}`;
+    slot.innerHTML = `<img loading="lazy" src="${photos[itemId]}" alt=""><div class="slot-label">${shortName}</div><button class="remove-slot" onclick="removeSlot(this)">×</button>${swapBtn}`;
   } else {
     slot.innerHTML = `<span style="font-size:11px;color:var(--muted);padding:4px;text-align:center;">${shortName}</span><button class="remove-slot" onclick="removeSlot(this)">×</button>${swapBtn}`;
   }
@@ -2964,7 +3145,7 @@ function openPicker(outfitId) {
       el.dataset.itemId = item.id;
       el.innerHTML = `
         <div class="mphoto">
-          ${photos[item.id] ? `<img src="${photos[item.id]}" alt="">` : '<span>📷</span>'}
+          ${photos[item.id] ? `<img loading="lazy" src="${photos[item.id]}" alt="">` : '<span>📷</span>'}
           <div class="mcheck">✓</div>
         </div>
         <div class="mname">${item.name}</div>
@@ -3143,7 +3324,7 @@ function tekenNieuweExtra() {
   el.style.display = 'block';
   el.innerHTML = nieuweExtra.map((f, i) =>
     '<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-top:1px solid var(--cream-dark);">'
-    + `<img src="${f.url}" style="width:44px;height:56px;object-fit:cover;border-radius:6px;flex-shrink:0;">`
+    + `<img loading="lazy" src="${f.url}" style="width:44px;height:56px;object-fit:cover;border-radius:6px;flex-shrink:0;">`
     + '<div style="flex:1;min-width:0;">'
     + '<div style="font-size:9px;color:var(--muted);margin-bottom:4px;">Wat laat deze foto zien?</div>'
     + '<div style="display:flex;flex-wrap:wrap;gap:4px;">'
@@ -3875,6 +4056,9 @@ function loadAppData() {
     const tg = localStorage.getItem('griette-tags-v3');
     if (tg) Object.assign(itemTags, JSON.parse(tg));
   } catch(e) { console.warn('LocalStorage load failed', e); }
+  // Ook zonder verbinding leesbare namen: dit draait op wat er lokaal staat,
+  // en straks nog een keer als Supabase binnen is.
+  geefLooksEenNaam();
 }
 
 async function loadAppDataFromSupabase() {
@@ -3989,6 +4173,9 @@ async function loadAppDataFromSupabase() {
     }
     // Rebuild UI with fresh data
     buildGarderobe();
+    // Looks die nog een volgnummer als naam hebben, krijgen er nu een uit hun
+    // eigen stukken. Gebeurt één keer en alleen bij die placeholders.
+    if (geefLooksEenNaam() > 0) saveAppData();
     // Set active board to first one that has outfits
     var firstWithOutfits = boards.find(function(b) { return b.outfits && b.outfits.length > 0; });
     if (firstWithOutfits) activeBoardId = firstWithOutfits.id;
@@ -4122,7 +4309,7 @@ function openTodayModal(itemId) {
   const preview = document.getElementById('today-item-preview');
   const name = getItemName(itemId);
   preview.innerHTML = `
-    ${photos[itemId] ? `<div style="width:50px;height:60px;border-radius:8px;overflow:hidden;flex-shrink:0;"><img src="${photos[itemId]}" style="width:100%;height:100%;object-fit:cover;"></div>` : '<div style="width:50px;height:60px;border-radius:8px;background:var(--cream-dark);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);">📷</div>'}
+    ${photos[itemId] ? `<div style="width:50px;height:60px;border-radius:8px;overflow:hidden;flex-shrink:0;"><img loading="lazy" src="${photos[itemId]}" style="width:100%;height:100%;object-fit:cover;"></div>` : '<div style="width:50px;height:60px;border-radius:8px;background:var(--cream-dark);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);">📷</div>'}
     <div>
       <div style="font-size:13px;font-weight:500;color:var(--brown);">${name}</div>
       <div style="font-size:10px;color:var(--muted);">Basis van je look vandaag</div>
@@ -4322,7 +4509,7 @@ function generateTodayOutfits() {
 
       // Build slots HTML
       const slotsHtml = comboItems.map(function(item) {
-        var ph = photos[item.id] ? '<img src="' + photos[item.id] + '" alt="" style="width:100%;height:100%;object-fit:cover;">' : '<span style="font-size:9px;color:var(--muted);padding:3px;text-align:center;">' + item.name.split(' ')[0] + '</span>';
+        var ph = photos[item.id] ? '<img loading="lazy" src="' + photos[item.id] + '" alt="" style="width:100%;height:100%;object-fit:cover;">' : '<span style="font-size:9px;color:var(--muted);padding:3px;text-align:center;">' + item.name.split(' ')[0] + '</span>';
         var nm = item.name.length > 12 ? item.name.substring(0,11) + '…' : item.name;
         return '<div class="today-slot"><div class="today-slot-photo">' + ph + '</div><div class="today-slot-name">' + nm + '</div></div>';
       }).join('');
@@ -5105,6 +5292,50 @@ function analyzeWornPatterns() {
 }
 
 // ============ AI STYLING TIP via Claude API ============
+// Lukt de stylist niet, dan valt de tip terug op een vuistregel. Twee dingen
+// gingen daar mis. Ten eerste keek hij naar een vaste lijst met item-ids uit
+// de demo-kast ('wit-oversized', 'adidas-broek'); voor Griettes eigen items
+// klopte die nooit, dus kwam elke outfit op dezelfde laatste regel uit — drie
+// keer dezelfde zin op één scherm. Nu kijkt hij naar de pasvorm-tag, die er
+// wél is. Ten tweede zag zo'n regel er precies zo uit als echt stylistadvies.
+// Dat staat er nu bij, want een vuistregel is geen oordeel over dít stuk.
+const WIJDE_PASVORM = ['wijd','oversized','licht oversized','flared','wrap','ballon'];
+
+function isWijd(item) {
+  if (!item) return false;
+  // Een tag die zij zelf zette gaat vóór de naam. Anders zou een "Wit
+  // oversized t-shirt" dat ze als aansluitend tagde alsnog wijd heten.
+  var p = String(getTag(item.id, 'pasvorm') || '').toLowerCase();
+  if (p) return WIJDE_PASVORM.indexOf(p) >= 0;
+  var n = String(item.name || '').toLowerCase();
+  return /oversized|wijd|wide|baggy|balloon|ballon|flared|maxi/.test(n);
+}
+
+function vuistregelTip(comboItems) {
+  var boven = comboItems[0], onder = comboItems[1];
+  var wijdBoven = isWijd(boven), wijdOnder = isWijd(onder);
+  var tk = getTag(boven && boven.id, 'kleur') || '';
+  var bk = getTag(onder && onder.id, 'kleur') || '';
+  var paren = [['donkerblauw','felroze'],['bruin','lichtblauw'],['zwart','geel'],
+               ['gebroken-wit','oranje-rood'],['paars','bruin']];
+  var goedPaar = paren.some(function(c){ return (c[0]===tk&&c[1]===bk)||(c[0]===bk&&c[1]===tk); });
+
+  var tekst;
+  if (goedPaar && !wijdBoven && wijdOnder)
+    tekst = 'Sterke kleurcombo én goed silhouet. Goud bij de oren maakt het af.';
+  else if (goedPaar)
+    tekst = 'Mooie kleurbalans uit jouw palet. ' + (wijdBoven ? 'Stop de top in voor taille.' : 'Riem als finishing touch.');
+  else if (wijdBoven && wijdOnder)
+    tekst = 'Boven en onder allebei wijd — stop de top in of doe er een riem om, anders verdwijnt je taille.';
+  else if (!wijdBoven && wijdOnder)
+    tekst = 'Goed silhouet: aansluitend boven, wijd onder. Schoenen in ' + (bk || 'bruin') + ' houdt het samen.';
+  else if (wijdBoven && !wijdOnder)
+    tekst = 'Oversized top instoppen of een riem toevoegen, voor taille-definitie.';
+  else
+    tekst = 'Rustige basis — één accent via riem, tas of sjaaltje maakt het jouw outfit.';
+  return '<span style="opacity:.6">Vuistregel ·</span> ' + tekst;
+}
+
 async function getAIStylingTip(comboItems, occasionLabel, weatherContext = '') {
   const itemDescriptions = comboItems.map(item => {
     const kleur = getTag(item.id, 'kleur') || '';
@@ -5393,7 +5624,7 @@ function generateSuggestions(append = false) {
         comboItems.map(function(item, itemIdx) {
           var swapBtn = '<button type="button" onclick="swapOutfitItem(\'sug-card-'+idx+'\','+itemIdx+',\''+item.cat+'\')" style="position:absolute;top:2px;right:2px;background:rgba(255,255,255,0.9);border:none;border-radius:50%;width:18px;height:18px;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--brown);padding:0;z-index:2;" title="Vervang dit item">↻</button>';
           return '<div class="sug-item" style="position:relative;">' + swapBtn + '<div class="sug-item-photo">' +
-            (photos[item.id] ? '<img src="' + photos[item.id] + '" alt="">' : '<div class="no-photo">' + item.name.split(' ').slice(0,2).join(' ') + '</div>') +
+            (photos[item.id] ? '<img loading="lazy" src="' + photos[item.id] + '" alt="">' : '<div class="no-photo">' + item.name.split(' ').slice(0,2).join(' ') + '</div>') +
             '</div><div class="sug-item-name">' + (item.name.length > 14 ? item.name.substring(0,13)+'\u2026' : item.name) + '</div></div>';
         }).join('') +
         '</div>' +
@@ -5482,20 +5713,8 @@ function generateSuggestions(append = false) {
             tipEl.style.fontSize = '11px';
             tipEl.innerHTML = '\u2756 ' + tip;
           } else if (tipEl) {
-            const wideTop = ['wit-oversized','geel-shirt','oranje-shirt','gestreept','blauwe-blouse'].includes(combo.top.id);
-            const wideBottom = ['roze-maxi','bruin-maxi','adidas-broek'].includes(combo.bottom.id);
-            const tk2 = getTag(comboItems[0]?.id, 'kleur') || '';
-            const bk2 = getTag(comboItems[1]?.id, 'kleur') || '';
-            const gc2 = [['donkerblauw','felroze'],['bruin','lichtblauw'],['zwart','geel'],['gebroken-wit','oranje-rood'],['paars','bruin']];
-            const isg2 = gc2.some(c => (c[0]===tk2&&c[1]===bk2)||(c[0]===bk2&&c[1]===tk2));
-            let fallback = '';
-            if (isg2 && !wideTop && wideBottom) fallback = '✦ Sterke kleurcombo + perfect silhouet. Voeg oorbellen of ketting in goud toe.';
-            else if (isg2) fallback = '✦ Mooie kleurbalans uit jouw palet. ' + (wideTop ? 'Stop de top in voor taille.' : 'Riem als finishing touch.');
-            else if (!wideTop && wideBottom) fallback = '⚡ Goed silhouet. Kies schoenen in ' + (bk2||'bruin') + ' voor samenhang.';
-            else if (wideTop && !wideBottom) fallback = '→ Oversized top instoppen of riem toevoegen voor taille-definitie.';
-            else fallback = '→ Voeg een accentkleur toe via riem, tas of sjaaltje (felroze, geel of paars).';
             tipEl.style.fontStyle = 'normal';
-            tipEl.innerHTML = fallback;
+            tipEl.innerHTML = vuistregelTip(comboItems);
           }
         } catch(e) {}
       }).catch(function() {});
@@ -6153,7 +6372,7 @@ function buildWeekPlanner(){
           row.innerHTML+='<div style="flex-shrink:0;width:58px;position:relative;">'
             + swapBtnHtml
             + '<div style="width:58px;height:70px;border-radius:8px;background:var(--cream-dark);overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:3px;">'
-            + (photos[id]?'<img src="'+photos[id]+'" alt="" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:8px;color:var(--muted);padding:2px;text-align:center;">'+sh+'</span>')
+            + (photos[id]?'<img loading="lazy" src="'+photos[id]+'" alt="" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:8px;color:var(--muted);padding:2px;text-align:center;">'+sh+'</span>')
             + '</div><div style="font-size:7px;color:var(--brown);text-align:center;line-height:1.3;">'+sh+'</div></div>';
         });
         card.appendChild(row);
@@ -6215,7 +6434,7 @@ function showWeekSavedOutfits(occId) {
       var slot = document.createElement('div');
       slot.style.cssText = 'width:36px;height:44px;border-radius:6px;background:var(--cream-dark);overflow:hidden;display:flex;align-items:center;justify-content:center;';
       if (photos[itemId]) {
-        slot.innerHTML = '<img src="' + photos[itemId] + '" style="width:100%;height:100%;object-fit:cover;">';
+        slot.innerHTML = '<img loading="lazy" src="' + photos[itemId] + '" style="width:100%;height:100%;object-fit:cover;">';
       } else {
         slot.style.fontSize = '8px';
         slot.style.color = 'var(--muted)';
@@ -6286,7 +6505,7 @@ function genWeekOutfit(){
     if(!best){rd.innerHTML='<p style="font-size:11px;color:var(--muted);">Probeer opnieuw.</p>';return;}
     var ci=[best.top,best.bottom,best.shoe,best.bag,best.layer].filter(Boolean);
     window._pwk={ids:ci.map(function(i){return i.id;}),name:(occasionTitles[weekOcc]||weekOcc)+' look'};
-    var sH=ci.map(function(itm){var sh=itm.name.length>11?itm.name.substring(0,10)+'...':itm.name;return '<div style="flex-shrink:0;width:58px;"><div style="width:58px;height:70px;border-radius:8px;background:var(--cream-dark);overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:3px;">'+(photos[itm.id]?'<img src="'+photos[itm.id]+'" alt="" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:8px;color:var(--muted);padding:2px;text-align:center;">'+sh+'</span>')+'</div><div style="font-size:7px;color:var(--brown);text-align:center;line-height:1.3;">'+sh+'</div></div>';}).join('');
+    var sH=ci.map(function(itm){var sh=itm.name.length>11?itm.name.substring(0,10)+'...':itm.name;return '<div style="flex-shrink:0;width:58px;"><div style="width:58px;height:70px;border-radius:8px;background:var(--cream-dark);overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:3px;">'+(photos[itm.id]?'<img loading="lazy" src="'+photos[itm.id]+'" alt="" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:8px;color:var(--muted);padding:2px;text-align:center;">'+sh+'</span>')+'</div><div style="font-size:7px;color:var(--brown);text-align:center;line-height:1.3;">'+sh+'</div></div>';}).join('');
     rd.innerHTML='<div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:10px;scrollbar-width:none;">'+sH+'</div><div style="display:flex;gap:8px;margin-bottom:6px;"><button class="add-modal-btn" style="flex:1;" onclick="confirmWeekOutfit()">✓ Plannen</button><button style="padding:10px 16px;background:var(--brown-warm);color:white;border:none;border-radius:12px;font-size:16px;cursor:pointer;" onclick="confirmWeekAndSelfie()" title="Plannen + foto">📸</button></div><button style="width:100%;margin-top:4px;padding:10px;background:transparent;border:1.5px solid var(--cream-dark);border-radius:12px;font-size:11px;font-family:Jost,sans-serif;cursor:pointer;color:var(--muted);" onclick="genWeekOutfit()">↻ Andere outfit</button>';
   },200);
 }
@@ -6733,7 +6952,7 @@ function buildOutfitFromInspo(itemIds) {
   validItems.forEach(function(id) {
     var nm = getItemName(id);
     var ph = photos[id]
-      ? '<img src="' + photos[id] + '" style="width:100%;height:100%;object-fit:cover;">'
+      ? '<img loading="lazy" src="' + photos[id] + '" style="width:100%;height:100%;object-fit:cover;">'
       : '<span style="font-size:9px;color:var(--muted);padding:4px;text-align:center;">' + nm.split(' ')[0] + '</span>';
     itemsHtml += '<div style="flex-shrink:0;width:72px;">'
       + '<div style="width:72px;height:88px;border-radius:10px;overflow:hidden;background:var(--cream-dark);display:flex;align-items:center;justify-content:center;">' + ph + '</div>'
@@ -6841,10 +7060,10 @@ async function showNewItemCombos(itemId) {
     var partnerName = c.item.name;
     var partnerKleur = getTag(c.item.id,'kleur') || '';
     var photoHtml = photos[c.item.id]
-      ? '<img src="' + photos[c.item.id] + '" style="width:100%;height:100%;object-fit:cover;">'
+      ? '<img loading="lazy" src="' + photos[c.item.id] + '" style="width:100%;height:100%;object-fit:cover;">'
       : '<span style="font-size:10px;color:var(--muted);">' + partnerName.split(' ')[0] + '</span>';
     var myPhotoHtml = photos[itemId]
-      ? '<img src="' + photos[itemId] + '" style="width:100%;height:100%;object-fit:cover;">'
+      ? '<img loading="lazy" src="' + photos[itemId] + '" style="width:100%;height:100%;object-fit:cover;">'
       : '<span style="font-size:10px;color:var(--muted);">' + item.name.split(' ')[0] + '</span>';
 
     var topId = cat === 'tops' ? itemId : c.item.id;
@@ -7209,7 +7428,7 @@ function showDayDetail(dateStr, dayNum) {
       content += '<div style="display:flex;align-items:center;gap:5px;background:var(--white);'
         + 'border-radius:10px;padding:5px 8px;border:1.5px solid var(--cream-dark);">'
         + (photos[id] ? '<div style="width:24px;height:28px;border-radius:4px;overflow:hidden;flex-shrink:0;">'
-          + '<img src="' + photos[id] + '" style="width:100%;height:100%;object-fit:cover;"></div>' : '')
+          + '<img loading="lazy" src="' + photos[id] + '" style="width:100%;height:100%;object-fit:cover;"></div>' : '')
         + '<span style="font-size:10px;color:var(--brown);">' + nm + '</span>'
         + '<button onclick="removeDayWornItem(\''+dateStr+'\',\''+id+'\',this)" '
         + 'style="background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:0 2px;line-height:1;">×</button>'
@@ -7495,7 +7714,7 @@ function renderWornAllItems() {
     card.style.cssText = 'border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid '+(isLogged?'var(--brown-warm)':'var(--cream-dark)')+';background:'+(isLogged?'rgba(155,98,64,0.08)':'var(--white)')+';position:relative;';
     var pd = document.createElement('div');
     pd.style.cssText = 'width:100%;aspect-ratio:1;background:var(--cream-dark);display:flex;align-items:center;justify-content:center;overflow:hidden;';
-    pd.innerHTML = photos[item.id]?'<img src="'+photos[item.id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:8px;color:var(--muted);padding:3px;text-align:center;">'+item.name.split(' ').slice(0,2).join(' ')+'</span>';
+    pd.innerHTML = photos[item.id]?'<img loading="lazy" src="'+photos[item.id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:8px;color:var(--muted);padding:3px;text-align:center;">'+item.name.split(' ').slice(0,2).join(' ')+'</span>';
     var nd = document.createElement('div');
     nd.style.cssText = 'font-size:7px;color:var(--brown);text-align:center;padding:3px 2px;line-height:1.3;';
     nd.textContent = item.name.length>18?item.name.substring(0,17)+'…':item.name;
@@ -7732,7 +7951,7 @@ async function generateBoardOutfitsWithCounts(boardId, counts, extra) {
       var matchedIds = matchItemIds(sug.items, allItems);
       var card=document.createElement('div');
       card.style.cssText='background:var(--white);border-radius:12px;padding:12px;margin-bottom:8px;border:1.5px solid var(--cream-dark);';
-      var photoRow=matchedIds.slice(0,4).map(function(id){return '<div style="width:44px;height:54px;border-radius:7px;overflow:hidden;background:var(--cream-dark);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+(photos[id]?'<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:var(--muted);">'+getItemName(id).split(' ')[0]+'</span>')+'</div>';}).join('');
+      var photoRow=matchedIds.slice(0,4).map(function(id){return '<div style="width:44px;height:54px;border-radius:7px;overflow:hidden;background:var(--cream-dark);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+(photos[id]?'<img loading="lazy" src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:var(--muted);">'+getItemName(id).split(' ')[0]+'</span>')+'</div>';}).join('');
       var occ=sug.gelegenheid?'<span style="font-size:8px;color:var(--brown-warm);background:rgba(155,98,64,0.1);border-radius:6px;padding:2px 7px;margin-left:6px;">'+sug.gelegenheid+'</span>':'';
       card.innerHTML='<div style="display:flex;align-items:center;margin-bottom:8px;"><div style="font-family:Bodoni Moda,serif;font-size:15px;color:var(--brown);">'+(sug.naam||'Look '+(idx+1))+'</div>'+occ+'</div>'
         +'<div style="display:flex;gap:5px;margin-bottom:6px;">'+photoRow+'</div>'
@@ -7813,7 +8032,7 @@ function openBoardSettings(boardId) {
   var allItems2 = getAllItems().filter(function(i){ return !deletedItemIds.has(i.id) && i.cat !== 'bags'; });
   var itemGrid2 = allItems2.map(function(item) {
     var sel2 = (s.favoriteItems||[]).includes(item.id);
-    var ph2 = photos[item.id] ? '<img src="' + photos[item.id] + '" style="width:100%;height:100%;object-fit:cover;">'
+    var ph2 = photos[item.id] ? '<img loading="lazy" src="' + photos[item.id] + '" style="width:100%;height:100%;object-fit:cover;">'
       : '<span style="font-size:7px;color:var(--muted);padding:2px;text-align:center;">' + item.name.split(' ')[0] + '</span>';
     return '<div onclick="bsToggleItem(this)" data-id="' + item.id + '" '
       + 'style="border-radius:8px;cursor:pointer;position:relative;'
@@ -7849,7 +8068,7 @@ function openBoardSettings(boardId) {
       var excIds = s.excludeItems||[];
       return getAllItems().filter(function(i){ return !deletedItemIds.has(i.id); }).map(function(item){
         var excl = excIds.includes(item.id);
-        var ph3 = photos[item.id] ? '<img src="'+photos[item.id]+'" style="width:100%;height:100%;object-fit:cover;">'
+        var ph3 = photos[item.id] ? '<img loading="lazy" src="'+photos[item.id]+'" style="width:100%;height:100%;object-fit:cover;">'
           : '<span style="font-size:7px;color:var(--muted);padding:2px;">' + item.name.split(' ')[0] + '</span>';
         return '<div onclick="bsToggleExclude(this)" data-id="'+item.id+'" '
           + 'style="border-radius:8px;cursor:pointer;position:relative;border:2px solid '+(excl?'#b5232a':'var(--cream-dark)')+';opacity:'+(excl?'0.55':'1')+';">' 
@@ -7867,7 +8086,7 @@ function openBoardSettings(boardId) {
     + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:20px;" id="bs-exclude">'
     + getAllItems().filter(function(i){ return !deletedItemIds.has(i.id); }).map(function(item){
         var excl = (s.excludeItems||[]).includes(item.id);
-        var ph3 = photos[item.id] ? '<img src="' + photos[item.id] + '" style="width:100%;height:100%;object-fit:cover;">'
+        var ph3 = photos[item.id] ? '<img loading="lazy" src="' + photos[item.id] + '" style="width:100%;height:100%;object-fit:cover;">'
           : '<span style="font-size:7px;color:var(--muted);padding:2px;text-align:center;">' + item.name.split(' ')[0] + '</span>';
         return '<div onclick="bsToggleExclude(this)" data-id="' + item.id + '" '
           + 'style="border-radius:8px;cursor:pointer;position:relative;border:2px solid ' + (excl?'#b5232a':'var(--cream-dark)') + ';opacity:' + (excl?'0.55':'1') + ';">'
@@ -8070,7 +8289,7 @@ async function generateBoardOutfits(boardId) {
       card.style.cssText = 'background:var(--white);border-radius:12px;padding:12px;margin-bottom:10px;border:1.5px solid var(--cream-dark);';
       var photoRow = matchedIds.slice(0,4).map(function(id){
         return '<div style="width:44px;height:54px;border-radius:7px;overflow:hidden;background:var(--cream-dark);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'
-          + (photos[id]?'<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:var(--muted);padding:2px;text-align:center;">'+getItemName(id).split(' ')[0]+'</span>')
+          + (photos[id]?'<img loading="lazy" src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:var(--muted);padding:2px;text-align:center;">'+getItemName(id).split(' ')[0]+'</span>')
           + '</div>';
       }).join('');
       var occBadge = sug.gelegenheid ? '<span style="font-size:8px;color:var(--brown-warm);background:rgba(155,98,64,0.1);border-radius:6px;padding:2px 7px;margin-left:6px;">'+sug.gelegenheid+'</span>' : '';
@@ -8125,7 +8344,7 @@ function openItemAnchorPicker(boardId) {
     var div = document.createElement('div');
     div.style.cssText = 'border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid var(--cream-dark);';
     var ph = photos[item.id]
-      ? '<img src="' + photos[item.id] + '" style="width:100%;height:100%;object-fit:cover;">'
+      ? '<img loading="lazy" src="' + photos[item.id] + '" style="width:100%;height:100%;object-fit:cover;">'
       : '<span style="font-size:8px;color:var(--muted);padding:4px;text-align:center;">' + item.name.split(' ')[0] + '</span>';
     div.innerHTML = '<div style="aspect-ratio:1;background:var(--cream-dark);display:flex;align-items:center;justify-content:center;">' + ph + '</div>'
       + '<div style="font-size:7px;color:var(--brown);text-align:center;padding:3px;line-height:1.2;">' + (item.name.length > 14 ? item.name.substring(0, 13) + '…' : item.name) + '</div>';
@@ -8208,7 +8427,7 @@ async function generateOutfitFromAnchor(boardId, anchorId, anchorName) {
       card.style.cssText = 'background:var(--white);border-radius:12px;padding:12px;margin-bottom:10px;border:1.5px solid var(--cream-dark);';
       var photoRow = matchedIds.slice(0,4).map(function(id){
         return '<div style="width:48px;height:58px;border-radius:8px;overflow:hidden;background:var(--cream-dark);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'
-          + (photos[id] ? '<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">' : '<span style="font-size:7px;color:var(--muted);">'+getItemName(id).split(' ')[0]+'</span>')
+          + (photos[id] ? '<img loading="lazy" src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">' : '<span style="font-size:7px;color:var(--muted);">'+getItemName(id).split(' ')[0]+'</span>')
           + '</div>';
       }).join('');
       card.innerHTML = '<div style="font-family:Bodoni Moda,serif;font-size:16px;color:var(--brown);margin-bottom:8px;">' + (sug.naam||'Look '+(idx+1)) + '</div>'
@@ -8584,9 +8803,28 @@ async function generateQuickOutfit(feedback){
     if(tEl)tEl.textContent=parsed.naam||'Jouw look van vandaag';
     if(sEl)sEl.textContent=parsed.reden||'';
     var iDiv=document.getElementById('daily-outfit-items');
-    if(iDiv){iDiv.innerHTML=_quickOutfitIds.map(function(id){var nm=getItemName(id);var ph=photos[id]?'<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:rgba(245,242,238,0.6);padding:2px;">'+nm.split(' ')[0]+'</span>';return '<div style="flex-shrink:0;width:52px;"><div style="width:52px;height:64px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;">'+ph+'</div><div style="font-size:7px;color:rgba(245,242,238,0.6);text-align:center;margin-top:2px;">'+(nm.length>10?nm.substring(0,9)+'\u2026':nm)+'</div></div>';}).join('');}
+    if(iDiv){iDiv.innerHTML=_quickOutfitIds.map(function(id){var nm=getItemName(id);var ph=photos[id]?'<img loading="lazy" src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:rgba(245,242,238,0.6);padding:2px;">'+nm.split(' ')[0]+'</span>';return '<div style="flex-shrink:0;width:52px;"><div style="width:52px;height:64px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;">'+ph+'</div><div style="font-size:7px;color:rgba(245,242,238,0.6);text-align:center;margin-top:2px;">'+(nm.length>10?nm.substring(0,9)+'\u2026':nm)+'</div></div>';}).join('');}
     var pr=document.getElementById('daily-outfit-preview');if(pr)pr.style.display='block';
-  }catch(e2){var s2=document.getElementById('daily-card-sub');if(s2)s2.textContent='Tik voor een outfitsuggestie';}
+  }catch(e2){
+    // Dit is de hoofdactie van de app. Ging er iets mis, dan zette hij de
+    // ondertitel terug op "Tik voor een outfitsuggestie" — niet te
+    // onderscheiden van "er is niets gebeurd". Zeg gewoon wat er is.
+    var s2=document.getElementById('daily-card-sub');
+    var t2=document.getElementById('daily-card-text');
+    if(t2)t2.textContent='Dat lukte even niet';
+    if(s2)s2.textContent=quickOutfitReden(e2)+' Tik om het opnieuw te proberen.';
+  }
+}
+
+// Eén zin die zegt wát er misging, in gewone taal.
+function quickOutfitReden(e) {
+  var m = String((e && e.message) || e || '');
+  if (!navigator.onLine)                 return 'Je hebt geen verbinding.';
+  if (/Failed to fetch|NetworkError/i.test(m)) return 'De stylist was niet bereikbaar.';
+  if (/JSON|Unexpected token/i.test(m))  return 'De stylist gaf een antwoord dat ik niet kon lezen.';
+  if (/\b(429|rate)/i.test(m))           return 'Te veel aanvragen vlak na elkaar.';
+  if (/\b5\d\d\b/.test(m))               return 'De stylist had even een storing.';
+  return 'Er ging iets mis bij de stylist.';
 }
 
 // ============ OUTFIT FEEDBACK PICKER ============
@@ -8761,7 +8999,7 @@ function openOutfitBuilder() {
       var div = document.createElement('div');
       div.id = 'bld-'+item.id;
       div.style.cssText = 'border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid var(--cream-dark);position:relative;';
-      var ph = photos[item.id]?'<img src="'+photos[item.id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:var(--muted);padding:3px;text-align:center;display:block;">'+item.name.split(' ')[0]+'</span>';
+      var ph = photos[item.id]?'<img loading="lazy" src="'+photos[item.id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:var(--muted);padding:3px;text-align:center;display:block;">'+item.name.split(' ')[0]+'</span>';
       div.innerHTML = '<div style="aspect-ratio:1;background:var(--cream-dark);display:flex;align-items:center;justify-content:center;">'+ph+'</div>'
         +'<div style="font-size:7px;color:var(--brown);text-align:center;padding:3px 2px;">'+( item.name.length>13?item.name.substring(0,12)+'\u2026':item.name)+'</div>';
       div.addEventListener('click', (function(itm){ return function(){ toggleBuilderItem(itm); }; })(item));
@@ -8824,7 +9062,7 @@ function toggleBuilderItem(item) {
   } else {
     sel.innerHTML = _builderItems.map(function(id){
       var nm=getItemName(id);
-      var ph=photos[id]?'<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:var(--muted);padding:2px;">'+nm.split(' ')[0]+'</span>';
+      var ph=photos[id]?'<img loading="lazy" src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:var(--muted);padding:2px;">'+nm.split(' ')[0]+'</span>';
       return '<div style="flex-shrink:0;width:52px;"><div style="width:52px;height:64px;border-radius:8px;overflow:hidden;background:var(--cream-dark);display:flex;align-items:center;justify-content:center;">'+ph+'</div><div style="font-size:7px;color:var(--brown);text-align:center;margin-top:2px;">'+(nm.length>9?nm.substring(0,8)+'\u2026':nm)+'</div></div>';
     }).join('');
   }
@@ -8918,7 +9156,7 @@ async function generateFromBuilder() {
 
       var card=document.createElement('div');
       card.style.cssText='background:var(--white);border-radius:12px;padding:12px;margin-bottom:10px;border:1.5px solid var(--cream-dark);';
-      var photos2=mIds.slice(0,4).map(function(id){var nm=getItemName(id);var ph=photos[id]?'<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:var(--muted);padding:2px;">'+nm.split(' ')[0]+'</span>';return '<div style="width:48px;height:58px;border-radius:7px;overflow:hidden;background:var(--cream-dark);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+ph+'</div>';}).join('');
+      var photos2=mIds.slice(0,4).map(function(id){var nm=getItemName(id);var ph=photos[id]?'<img loading="lazy" src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:var(--muted);padding:2px;">'+nm.split(' ')[0]+'</span>';return '<div style="width:48px;height:58px;border-radius:7px;overflow:hidden;background:var(--cream-dark);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+ph+'</div>';}).join('');
       card.innerHTML='<div style="font-family:Bodoni Moda,serif;font-size:16px;color:var(--brown);margin-bottom:6px;">'+(sug.naam||'Look '+(idx+1))+'</div>'
         +'<div style="display:flex;gap:5px;margin-bottom:6px;">'+photos2+'</div>'
         +'<div style="font-size:10px;color:var(--muted);margin-bottom:6px;">'+(sug.items||[]).join(' \u00b7 ')+'</div>'
@@ -9007,7 +9245,7 @@ function openYesterdayLog() {
       var div = document.createElement('div');
       div.id = 'yd-'+item.id;
       div.style.cssText = 'border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid '+(sel?'var(--brown-warm)':'var(--cream-dark)')+';position:relative;';
-      var ph = photos[item.id]?'<img src="'+photos[item.id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:var(--muted);padding:2px;text-align:center;display:block;">'+item.name.split(' ')[0]+'</span>';
+      var ph = photos[item.id]?'<img loading="lazy" src="'+photos[item.id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:var(--muted);padding:2px;text-align:center;display:block;">'+item.name.split(' ')[0]+'</span>';
       div.innerHTML = '<div style="aspect-ratio:1;background:var(--cream-dark);display:flex;align-items:center;justify-content:center;">'+ph+'</div>'
         +'<div style="font-size:7px;color:var(--brown);text-align:center;padding:3px 2px;">'+(item.name.length>13?item.name.substring(0,12)+'\u2026':item.name)+'</div>'
         +(sel?'<div class="yd-check" style="position:absolute;top:2px;right:2px;width:15px;height:15px;background:var(--brown-warm);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:9px;">\u2713</div>':'');
@@ -9386,7 +9624,7 @@ async function getCyclusOutfitAdvies(day, fase) {
     if(subEl)subEl.textContent=parsed.reden||'';
 
     var iDiv=document.getElementById('daily-outfit-items');
-    if(iDiv){iDiv.innerHTML=_quickOutfitIds.map(function(id){var nm=getItemName(id);var ph=photos[id]?'<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:rgba(245,242,238,0.6);padding:2px;">'+nm.split(' ')[0]+'</span>';return '<div style="flex-shrink:0;width:52px;"><div style="width:52px;height:64px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;">'+ph+'</div><div style="font-size:7px;color:rgba(245,242,238,0.6);text-align:center;margin-top:2px;">'+(nm.length>10?nm.substring(0,9)+'\u2026':nm)+'</div></div>';}).join('');}
+    if(iDiv){iDiv.innerHTML=_quickOutfitIds.map(function(id){var nm=getItemName(id);var ph=photos[id]?'<img loading="lazy" src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:rgba(245,242,238,0.6);padding:2px;">'+nm.split(' ')[0]+'</span>';return '<div style="flex-shrink:0;width:52px;"><div style="width:52px;height:64px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;">'+ph+'</div><div style="font-size:7px;color:rgba(245,242,238,0.6);text-align:center;margin-top:2px;">'+(nm.length>10?nm.substring(0,9)+'\u2026':nm)+'</div></div>';}).join('');}
 
     var pr=document.getElementById('daily-outfit-preview');if(pr)pr.style.display='block';
     showPanel('garderobe',null);
@@ -9699,7 +9937,7 @@ async function getWellbeingOutfitAdvies(entry, cyclusDay, fase) {
     if(tEl)tEl.textContent=parsed.naam||'Jouw look van vandaag';
     if(sEl)sEl.textContent=parsed.reden||'';
     var iDiv=document.getElementById('daily-outfit-items');
-    if(iDiv){iDiv.innerHTML=_quickOutfitIds.map(function(id){var nm=getItemName(id);var ph=photos[id]?'<img src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:rgba(245,242,238,0.6);padding:2px;">'+nm.split(' ')[0]+'</span>';return '<div style="flex-shrink:0;width:52px;"><div style="width:52px;height:64px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;">'+ph+'</div><div style="font-size:7px;color:rgba(245,242,238,0.6);text-align:center;margin-top:2px;">'+(nm.length>10?nm.substring(0,9)+'\u2026':nm)+'</div></div>';}).join('');}
+    if(iDiv){iDiv.innerHTML=_quickOutfitIds.map(function(id){var nm=getItemName(id);var ph=photos[id]?'<img loading="lazy" src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:rgba(245,242,238,0.6);padding:2px;">'+nm.split(' ')[0]+'</span>';return '<div style="flex-shrink:0;width:52px;"><div style="width:52px;height:64px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;">'+ph+'</div><div style="font-size:7px;color:rgba(245,242,238,0.6);text-align:center;margin-top:2px;">'+(nm.length>10?nm.substring(0,9)+'\u2026':nm)+'</div></div>';}).join('');}
     var pr=document.getElementById('daily-outfit-preview');if(pr)pr.style.display='block';
     showPanel('garderobe',null);
   } catch(e) { showToast('\u26a0 Kon geen advies ophalen'); }
@@ -10037,7 +10275,7 @@ function renderInzichten() {
       var pct = Math.round((e[1] / Math.max(Object.keys(wornLog).length,1)) * 100);
       var nm = getItemName(e[0]);
       topHtml += '<div style="display:flex;align-items:center;gap:10px;">'
-        + (photos[e[0]] ? '<img src="'+photos[e[0]]+'" style="width:36px;height:44px;border-radius:6px;object-fit:cover;flex-shrink:0;">' : '<div style="width:36px;height:44px;border-radius:6px;background:var(--cream-dark);flex-shrink:0;"></div>')
+        + (photos[e[0]] ? '<img loading="lazy" src="'+photos[e[0]]+'" style="width:36px;height:44px;border-radius:6px;object-fit:cover;flex-shrink:0;">' : '<div style="width:36px;height:44px;border-radius:6px;background:var(--cream-dark);flex-shrink:0;"></div>')
         + '<div style="flex:1;"><div style="font-size:11px;color:var(--brown);font-weight:500;">' + nm + '</div>'
         + '<div style="background:var(--cream-dark);border-radius:4px;height:4px;margin-top:4px;">'
         + '<div style="background:var(--brown-warm);height:4px;border-radius:4px;width:' + Math.min(pct*3,100) + '%;"></div></div>'
@@ -10077,7 +10315,7 @@ function renderInzichten() {
     if (top3.length) {
       top3.forEach(function(e3){
         faseHtml2 += '<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;">'
-          + (photos[e3[0]]?'<img src="'+photos[e3[0]]+'" style="width:24px;height:30px;border-radius:4px;object-fit:cover;">':'<div style="width:24px;height:30px;border-radius:4px;background:var(--cream-dark);"></div>')
+          + (photos[e3[0]]?'<img loading="lazy" src="'+photos[e3[0]]+'" style="width:24px;height:30px;border-radius:4px;object-fit:cover;">':'<div style="width:24px;height:30px;border-radius:4px;background:var(--cream-dark);"></div>')
           + '<span style="font-size:9px;color:var(--muted);">' + getItemName(e3[0]).split(' ').slice(0,2).join(' ') + '</span></div>';
       });
     } else {
@@ -10115,7 +10353,7 @@ function renderInzichten() {
       moodHtml += '<div style="display:flex;align-items:center;gap:10px;">'
         + '<div style="font-size:13px;width:28px;text-align:center;">' + ({blij:'\uD83D\uDE0A',energiek:'\u26A1',zelfverzekerd:'\uD83E\uDD29',moe:'\uD83D\uDE34',prikkelbaar:'\uD83E\uDD75',gevoelig:'\uD83D\uDE22',krachtig:'\uD83D\uDCAA',neutraal:'\uD83D\uDE10'}[e6[0]]||'\uD83D\uDCA1') + '</div>'
         + '<div style="font-size:10px;color:var(--muted);width:70px;">' + e6[0] + '</div>'
-        + (photos[topItem[0]]?'<img src="'+photos[topItem[0]]+'" style="width:32px;height:40px;border-radius:5px;object-fit:cover;">':'<div style="width:32px;height:40px;border-radius:5px;background:var(--cream-dark);"></div>')
+        + (photos[topItem[0]]?'<img loading="lazy" src="'+photos[topItem[0]]+'" style="width:32px;height:40px;border-radius:5px;object-fit:cover;">':'<div style="width:32px;height:40px;border-radius:5px;background:var(--cream-dark);"></div>')
         + '<div style="font-size:9px;color:var(--brown);">' + getItemName(topItem[0]).split(' ').slice(0,3).join(' ') + '</div>'
         + '</div>';
     });
@@ -10166,7 +10404,7 @@ function renderInzichten() {
       var it4 = allItems.find(function(i){return i.name===nm2;});
       if (!it4) return;
       neverHtml += '<div style="text-align:center;width:56px;">'
-        + (photos[it4.id]?'<img src="'+photos[it4.id]+'" style="width:56px;height:68px;border-radius:8px;object-fit:cover;opacity:0.6;">':'<div style="width:56px;height:68px;border-radius:8px;background:var(--cream-dark);opacity:0.6;"></div>')
+        + (photos[it4.id]?'<img loading="lazy" src="'+photos[it4.id]+'" style="width:56px;height:68px;border-radius:8px;object-fit:cover;opacity:0.6;">':'<div style="width:56px;height:68px;border-radius:8px;background:var(--cream-dark);opacity:0.6;"></div>')
         + '<div style="font-size:7px;color:var(--muted);margin-top:3px;">'+(nm2.length>10?nm2.substring(0,9)+'\u2026':nm2)+'</div></div>';
     });
     neverHtml += '</div><p style="font-size:10px;color:var(--muted);margin-top:10px;">Al 30+ dagen niet gedragen. Misschien tijd voor een nieuwe combo?</p>';
@@ -10278,7 +10516,7 @@ function showSeizoenswisselDetail(items, isWarm) {
     + '<p style="font-size:11px;color:var(--muted);margin-bottom:14px;">Deze items zijn getagd als ' + (isWarm ? 'winter' : 'zomer') + ' en kun je wegleggen voor ' + label + ':</p>'
     + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">'
     + items.map(function(item){
-        var ph = photos[item.id]?'<img src="'+photos[item.id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:var(--muted);padding:2px;">'+item.name.split(' ')[0]+'</span>';
+        var ph = photos[item.id]?'<img loading="lazy" src="'+photos[item.id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:var(--muted);padding:2px;">'+item.name.split(' ')[0]+'</span>';
         return '<div style="border-radius:8px;overflow:hidden;border:1.5px solid var(--cream-dark);">'
           +'<div style="aspect-ratio:1;background:var(--cream-dark);display:flex;align-items:center;justify-content:center;">'+ph+'</div>'
           +'<div style="font-size:7px;color:var(--brown);text-align:center;padding:3px;">'+( item.name.length>12?item.name.substring(0,11)+'\u2026':item.name)+'</div></div>';
@@ -10509,7 +10747,7 @@ function openSwapPicker(evtOrBtn) {
     if (lengte2==='crop' && otherItems.some(function(o){var ol=getTag(o.id,'lengte')||'';return ol==='lang/maxi'||ol==='maxi/vloerlang'||ol==='midi (onder knie)';})) hints2.push('crop+lang = top');
     var hint2 = hints2.length ? hints2.join(' \u00b7 ') : score2 >= 4 ? '\u2756 Past goed bij de rest' : score2 >= 2 ? 'Goede combo' : 'Alternatief';
     var ph2 = photos[alt.id]
-      ? '<img src="'+photos[alt.id]+'" style="width:100%;height:100%;object-fit:cover;border-radius:16px;">'
+      ? '<img loading="lazy" src="'+photos[alt.id]+'" style="width:100%;height:100%;object-fit:cover;border-radius:16px;">'
       : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;border-radius:16px;background:var(--cream-dark);"><span style="font-size:13px;color:var(--muted);padding:8px;text-align:center;">'+alt.name+'</span></div>';
     return '<div style="width:220px;background:var(--cream);border-radius:20px;overflow:hidden;box-shadow:0 8px 32px rgba(28,26,24,0.25);">'
       + '<div style="width:220px;height:270px;background:var(--cream-dark);">'+ph2+'</div>'
@@ -10667,7 +10905,7 @@ function showCapsuleOverzicht(boardId) {
         + (e.extra?'var(--brown-warm)':active?'var(--cream-dark)':'#ddd') + ';'
         + (active?'':'opacity:0.3;');
       var ph = photos[it.id]
-        ? '<img src="'+photos[it.id]+'" style="width:60px;height:72px;object-fit:cover;">'
+        ? '<img loading="lazy" src="'+photos[it.id]+'" style="width:60px;height:72px;object-fit:cover;">'
         : '<div style="width:60px;height:72px;background:var(--cream-dark);display:flex;align-items:center;justify-content:center;"><span style="font-size:7px;color:var(--muted);padding:3px;text-align:center;">'+it.name.split(' ').slice(0,2).join(' ')+'</span></div>';
       var strike = active?'':'text-decoration:line-through;';
       d.innerHTML = ph + '<div style="font-size:7px;color:var(--brown);padding:3px;'+strike+'">'+(it.name.length>10?it.name.substring(0,9)+'…':it.name)+'</div>'
@@ -10829,7 +11067,7 @@ function openExtraItemPicker(onSelect) {
       }
       var d5 = document.createElement('div');
       d5.style.cssText = 'border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid var(--cream-dark);';
-      var ph5 = photos[item.id]?'<img src="'+photos[item.id]+'" style="width:100%;height:100%;object-fit:cover;">'
+      var ph5 = photos[item.id]?'<img loading="lazy" src="'+photos[item.id]+'" style="width:100%;height:100%;object-fit:cover;">'
         :'<div style="aspect-ratio:1;background:var(--cream-dark);display:flex;align-items:center;justify-content:center;"><span style="font-size:7px;color:var(--muted);padding:2px;text-align:center;">'+item.name.split(' ')[0]+'</span></div>';
       d5.innerHTML = '<div style="aspect-ratio:1;background:var(--cream-dark);">'+ph5+'</div>'
         +'<div style="font-size:7px;color:var(--brown);text-align:center;padding:3px;">'+(item.name.length>13?item.name.substring(0,12)+'\u2026':item.name)+'</div>';
@@ -10959,7 +11197,7 @@ function swapOutfitItem(cardId, itemIdx, cat) {
     var photoDiv = slots[itemIdx].querySelector('.sug-item-photo');
     var nameDiv = slots[itemIdx].querySelector('.sug-item-name');
     if (photoDiv) photoDiv.innerHTML = photos[newItem.id]
-      ? '<img src="' + photos[newItem.id] + '" alt="">'
+      ? '<img loading="lazy" src="' + photos[newItem.id] + '" alt="">'
       : '<div class="no-photo">' + newItem.name.split(' ').slice(0,2).join(' ') + '</div>';
     if (nameDiv) nameDiv.textContent = newItem.name.length > 14
       ? newItem.name.substring(0,13) + '\u2026' : newItem.name;
@@ -11803,7 +12041,7 @@ function openStijldagboek() {
         // Worn log entry — show item photos
         var itemHtml = (entry.itemIds || []).slice(0, 8).map(function(id) {
           var name = getItemName(id);
-          var ph = photos[id] ? '<img src="' + photos[id] + '" style="width:100%;height:100%;object-fit:cover;">' : '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:10px;color:var(--muted);text-align:center;padding:2px;">' + name.split(' ')[0] + '</div>';
+          var ph = photos[id] ? '<img loading="lazy" src="' + photos[id] + '" style="width:100%;height:100%;object-fit:cover;">' : '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:10px;color:var(--muted);text-align:center;padding:2px;">' + name.split(' ')[0] + '</div>';
           return '<div style="flex-shrink:0;width:60px;"><div style="width:60px;height:70px;border-radius:8px;background:var(--cream-dark);overflow:hidden;margin-bottom:3px;">' + ph + '</div><div style="font-size:7px;color:var(--muted);text-align:center;line-height:1.2;">' + (name.length > 10 ? name.substring(0,9) + '…' : name) + '</div></div>';
         }).join('');
         card.innerHTML = '<div style="padding:10px 12px 4px;font-size:10px;color:var(--brown-warm);letter-spacing:0.5px;">👗 Gedragen</div><div style="display:flex;gap:6px;padding:0 12px 12px;overflow-x:auto;scrollbar-width:none;">' + itemHtml + '</div>';
@@ -11927,7 +12165,7 @@ function openItemSwap(currentItemId, currentCat, comboIds, cardEl) {
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.style.cssText = 'background:var(--white);border:1.5px solid var(--cream-dark);border-radius:10px;padding:8px;cursor:pointer;text-align:center;';
-    var ph = photos[item.id] ? '<img src="' + photos[item.id] + '" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;margin-bottom:4px;">' :
+    var ph = photos[item.id] ? '<img loading="lazy" src="' + photos[item.id] + '" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;margin-bottom:4px;">' :
       '<div style="width:100%;aspect-ratio:1;background:var(--cream-dark);border-radius:6px;margin-bottom:4px;display:flex;align-items:center;justify-content:center;font-size:18px;">👗</div>';
     var warnDays = getLastWornDaysAgo(item.id);
     var warnHtml = (warnDays !== null && warnDays <= 2) ? '<div style="font-size:7px;color:var(--brown-warm);">⚠ ' + (warnDays === 0 ? 'vandaag' : 'gisteren') + '</div>' : '';
@@ -11964,7 +12202,7 @@ function swapItemInCard(oldId, newItem, cardEl, comboIds) {
     if (nameEl.textContent.trim().replace('…','').length > 1 && oldName.toLowerCase().startsWith(nameEl.textContent.trim().replace('…',''))) {
       // Update photo
       photoEl.innerHTML = photos[newItem.id] ?
-        '<img src="' + photos[newItem.id] + '" alt="" style="width:100%;height:100%;object-fit:cover;">' :
+        '<img loading="lazy" src="' + photos[newItem.id] + '" alt="" style="width:100%;height:100%;object-fit:cover;">' :
         '<div style="font-size:8px;color:var(--muted);padding:3px;text-align:center;">' + newItem.name.split(' ')[0] + '</div>';
       // Update name
       var nm = newItem.name.length > 14 ? newItem.name.substring(0,13) + '…' : newItem.name;
