@@ -3787,7 +3787,12 @@ function weerZeef(pool, weer, cat) {
   return over.length >= 2 ? over : pool;
 }
 
+// Hoe vaak de opbouw zichzelf corrigeerde, en waarom. Zonder deze telling is
+// niet te zien of de regels echt werk doen of dat het toeval was.
+let bijstelTeller = { bekeken:0, geruild:0, redenen:{} };
+
 function lokaleLooks() {
+  bijstelTeller = { bekeken:0, geruild:0, redenen:{} };
   const kast = getAllItems().filter(function(i){ return !deletedItemIds.has(i.id); });
   const uit = function(cat) { return kast.filter(function(i){ return i.cat === cat; }); };
   let tops = uit('tops'), onders = uit('bottoms'), schoenen = uit('shoes');
@@ -3886,7 +3891,69 @@ function lokaleLooks() {
       uit.push(kandidaten[beurt % kandidaten.length]);
     }
     beurt++;
-    return uit;
+    return bijstellen(uit);
+  }
+
+  // De vier regels werden wel gemeten maar niet nageleefd: de opbouw koos
+  // gewoon het volgende stuk uit de rij. Hier wordt elke look nog één keer
+  // langs dezelfde regels gehaald, en waar hij zakt wordt precies één stuk
+  // geruild voor de beste kandidaat uit dezelfde categorie.
+  //
+  // Bewust geen herhaalde rondes: de bedoeling is dat een look klopt, niet
+  // dat tien looks op elkaar gaan lijken doordat alles naar hetzelfde
+  // optimum wordt getrokken.
+  function bijstellen(delen) {
+    const kaart = { stukken: delen.map(stuk) };
+    bijstelTeller.bekeken++;
+    const zakt = outfitControle(kaart.stukken).filter(function(r){ return r.ok === false; });
+    if (!zakt.length) return delen;
+
+    // Welk stuk veroorzaakt het? Silhouet en textuur hangen aan een concreet
+    // stuk; bij kleur is het de felste. Ruil dat ene, niet de hele look.
+    for (let n = 0; n < zakt.length; n++) {
+      const regel = zakt[n].kop;
+      let plek = -1;
+      if (regel === 'Silhouet') {
+        const wijd = delen.filter(isWijd).length;
+        plek = delen.findIndex(function(i) { return wijd > 1 ? isWijd(i) : !isWijd(i); });
+      } else if (regel === 'Textuur') {
+        // Het stuk waarvan de stof het minst toevoegt: een van de dubbele.
+        const stoffen = delen.map(stofVan);
+        plek = stoffen.findIndex(function(m, k) { return m && stoffen.indexOf(m) !== k; });
+        if (plek < 0) plek = delen.findIndex(function(i){ return !stofVan(i); });
+      } else if (regel === 'Kleur') {
+        plek = delen.findIndex(function(i){ return isFelleKleurNaam(kleurVanItem(i)); });
+      } else if (regel === 'Weer') {
+        const weg = dagWeer() === 'warm' ? 'winters' : 'zomers';
+        plek = delen.findIndex(function(i){ return weerSoort(i) === weg; });
+      }
+      if (plek < 0) continue;
+
+      const cat = delen[plek].cat;
+      const alIn = delen.map(function(i){ return i.id; });
+      const kandidaten = kast.filter(function(x) {
+        return x.cat === cat && alIn.indexOf(x.id) < 0;
+      });
+      if (!kandidaten.length) continue;
+
+      // Dezelfde weging als bij het ruilen met de hand, zodat de app één
+      // opvatting heeft over wat past.
+      const beste = kandidaten.map(function(x) {
+        return { item:x, score:ruilOordeel(x, kaart, plek).score };
+      }).sort(function(a, b){ return b.score - a.score; })[0];
+      if (!beste) continue;
+
+      const proef = delen.slice();
+      proef[plek] = beste.item;
+      const naZakt = outfitControle(proef.map(stuk)).filter(function(r){ return r.ok === false; });
+      // Alleen doorvoeren als het er écht beter van wordt.
+      if (naZakt.length < zakt.length) {
+        bijstelTeller.geruild++;
+        bijstelTeller.redenen[regel] = (bijstelTeller.redenen[regel] || 0) + 1;
+        return bijstellen(proef);
+      }
+    }
+    return delen;
   }
 
   // 1 · drie keer hetzelfde onderstuk, anders gestyled
@@ -4314,9 +4381,7 @@ function ruilOordeel(kandidaat, kaart, plek) {
   else if (kWijd && restWijd > 0) { score -= 3; slecht.push('dan is alles wijd'); }
 
   // 2 · textuur: twee materiaalfamilies naast elkaar, niet vier dezelfde.
-  const mat = function(i) {
-    return String([].concat((itemTags[i.id] || {}).materiaal || []).join(' ')).toLowerCase();
-  };
+  const mat = stofVan;
   const kMat = mat(kandidaat);
   const restMat = rest.map(mat).filter(Boolean);
   if (kMat && restMat.length && restMat.every(function(m){ return m !== kMat; })) {
@@ -4343,6 +4408,54 @@ function ruilOordeel(kandidaat, kaart, plek) {
   return { score: score, waarom: goed.slice(0, 2).join(', '), let: slecht.slice(0, 1).join('') };
 }
 
+// ── TEXTUUR ZONDER DAT JE IETS HOEFT TE TAGGEN ───────────────────────────────
+// De textuurregel las alleen de materiaal-tag. Die staat bij vrijwel geen enkel
+// stuk ingevuld, dus draaide de hele regel op niets — en zei hij bij één getagd
+// stuk "alles [dat materiaal], dat oogt vlak", terwijl hij van de rest niets
+// wist. Dat was geen oordeel maar een gok die als oordeel klonk.
+//
+// Een materiaal is meestal gewoon af te lezen: uit de naam ("Jeans barrel",
+// "mohair trui", "leren tas"), uit wat de fotoscan zag, en anders uit wat een
+// stuk nu eenmaal is — een spijkerbroek is denim, een sneaker is geen zijde.
+// Wat telt voor de regel is niet het exacte materiaal maar de familie: staat er
+// iets soepels tegenover iets stevigs?
+const STOF_FAMILIES = [
+  { familie:'denim',    woorden:['denim','jeans','spijker'] },
+  { familie:'leer',     woorden:['leer','leren','leather','suède','suede','nubuck','lak'] },
+  { familie:'gebreid',  woorden:['gebreid','knit','trui','sweater','cardigan','vest','mohair',
+                                 'wol','wollen','cashmere','kasjmier','fijngebreid','rib','teddy','fleece'] },
+  { familie:'glanzend', woorden:['satijn','satin','zijde','silk','glans','lurex','metallic','velours','fluweel'] },
+  { familie:'luchtig',  woorden:['linnen','linen','chiffon','voile','kant','broderie','mousseline','gaas'] },
+  { familie:'katoen',   woorden:['katoen','cotton','jersey','tshirt','t-shirt','sweat','poplin','popeline'] },
+  { familie:'stevig',   woorden:['twill','canvas','corduroy','ribfluweel','tweed','gewatteerd','nylon',
+                                 'technical','anorak','parka','softshell'] },
+  { familie:'soepel',   woorden:['viscose','tencel','modal','crêpe','crepe','drape','draped','soft'] },
+];
+
+// Wat een categorie standaard is, als naam en scan niets prijsgeven. Bewust
+// terughoudend: alleen waar het vrijwel altijd klopt.
+const STOF_PER_SOORT = { shoes:'leer', bags:'leer' };
+
+function stofVan(item) {
+  if (!item) return '';
+  const tag = String([].concat((itemTags[item.id] || {}).materiaal || []).join(' ')).toLowerCase();
+  const v = itemVisueel[item.id] || {};
+  const tekst = (tag + ' ' + String(item.name || '') + ' '
+    + String(v.textuur || '') + ' ' + String(v.details || '')).toLowerCase();
+  const raak = STOF_FAMILIES.find(function(f) {
+    return f.woorden.some(function(w){ return tekst.indexOf(w) >= 0; });
+  });
+  if (raak) return raak.familie;
+  return STOF_PER_SOORT[item.cat] || '';
+}
+
+// Soepel tegenover stevig: dát is het contrast waar de regel om vraagt.
+const STOF_SOEPEL = ['glanzend','luchtig','soepel','gebreid'];
+function stofKarakter(familie) {
+  if (!familie) return '';
+  return STOF_SOEPEL.indexOf(familie) >= 0 ? 'soepel' : 'stevig';
+}
+
 // ── DE CONTROLE DIE JE KUNT ZIEN ─────────────────────────────────────────────
 // "Hoe weet ik zeker dat de outfits kloppen?" Door het niet te beloven maar te
 // laten zien. Dit zijn dezelfde vier regels die de stylist in zijn opdracht
@@ -4363,16 +4476,27 @@ function outfitControle(stukken) {
     ? { ok:false, kop:'Silhouet', zin:'alles is wijd, dus je taille verdwijnt' }
     : { ok:true, kop:'Silhouet', zin:wijd + ' wijd tegenover ' + strak + ' aansluitend' });
 
-  // 2 · textuur — minstens twee materiaalfamilies
-  const mats = items.map(function(i) {
-    return String([].concat((itemTags[i.id] || {}).materiaal || []).join(' ')).toLowerCase();
-  }).filter(Boolean);
-  const uniek = mats.filter(function(m, k){ return mats.indexOf(m) === k; });
-  uit.push(!mats.length
-    ? { ok:null, kop:'Textuur', zin:'niet te zeggen — deze stukken hebben nog geen materiaal-tag' }
+  // 2 · textuur — iets soepels tegenover iets stevigs. Wat we niet weten,
+  //     zeggen we ook niet: "alles vlak" op grond van één herkend stuk is een
+  //     gok die als oordeel klinkt.
+  const stoffen = items.map(stofVan);
+  const bekend = stoffen.filter(Boolean);
+  const uniek = bekend.filter(function(m, k){ return bekend.indexOf(m) === k; });
+  const karakters = bekend.map(stofKarakter)
+    .filter(function(k, n, a){ return a.indexOf(k) === n; });
+  uit.push(bekend.length < 2
+    ? { ok:null, kop:'Textuur', zin: bekend.length
+          ? 'niet te zeggen — van ' + (items.length - bekend.length)
+            + ' van deze stukken weet ik het materiaal niet'
+          : 'niet te zeggen — van deze stukken weet ik het materiaal niet' }
+    : karakters.length >= 2
+    ? { ok:true, kop:'Textuur', zin:uniek.slice(0, 3).join(' tegenover ') + ' — soepel naast stevig' }
     : uniek.length >= 2
-    ? { ok:true, kop:'Textuur', zin:uniek.slice(0, 3).join(' tegenover ') }
-    : { ok:false, kop:'Textuur', zin:'alles ' + uniek[0] + ' — dat oogt vlak' });
+    ? { ok:true, kop:'Textuur', zin:uniek.slice(0, 3).join(' en ') + ', alle drie ' + karakters[0] }
+    : { ok:false, kop:'Textuur', zin:'alles ' + uniek[0]
+        + (bekend.length < items.length
+            ? ' voor zover ik het zie — dat oogt vlak'
+            : ' — dat oogt vlak') });
 
   // 3 · kleur — één voert, de rest ondersteunt; drie felle kleuren vechten
   const kleuren = items.map(kleurVanItem).filter(Boolean);

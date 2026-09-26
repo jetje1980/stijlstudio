@@ -3715,6 +3715,92 @@ function kleurenInKast() {
     .sort((a, b) => b.n - a.n);
 }
 
+// ── WELKE KLEUREN HEEFT ZIJ ALS HOOFDKLEUR? ──────────────────────────────────
+// Een platte telling zegt welke kleuren er in haar kast hangen, niet welke
+// kunnen dragen. Zeven sjaals in mosterd maken mosterd geen hoofdkleur; één
+// bruine broek en twee bruine jassen wel. Wat telt is het vlak: een broek of
+// jurk is groot, een jas groot, een top middelgroot, een tas of schoen klein.
+const VLAKGEWICHT = { bottoms:3, jurken:3, eendelig:3, layers:2.5, tops:1.5,
+                      shoes:0.5, bags:0.5, accessories:0.3 };
+
+function hoofdkleurenInKast(minGewicht) {
+  const { houden } = zeefKast(allItems, null, []);
+  const tel = {};
+  houden.forEach(i => {
+    const gewicht = VLAKGEWICHT[i.cat] || 1;
+    kleurenVan(i).forEach(k => {
+      if (!tel[k]) tel[k] = { kleur:k, gewicht:0, n:0, groot:0 };
+      tel[k].gewicht += gewicht;
+      tel[k].n++;
+      if (gewicht >= 2.5) tel[k].groot++;
+    });
+  });
+  return Object.values(tel)
+    // Een kleur die ze alleen op kleine vlakken heeft, kan geen hoofdkleur zijn.
+    .filter(k => k.groot > 0 && k.gewicht >= (minGewicht || 3))
+    .sort((a, b) => b.gewicht - a.gewicht);
+}
+
+// Combo's gebouwd om háár hoofdkleuren heen, in plaats van uit een vaste lijst
+// die niet over haar kast gaat. Per hoofdkleur: een rustige steunkleur die ze
+// heeft, en een accent dat ze heeft. Alles uit de eigen kast, dus per definitie
+// draagbaar — dat is precies wat de vaste lijst niet kan garanderen.
+function eigenKleurCombos(maxAantal) {
+  const hoofd = hoofdkleurenInKast();
+  if (!hoofd.length) return [];
+  const alle = hoofdkleurenInKast(1);
+  const rustigeKleuren = alle.filter(k => !isFelleKleur(k.kleur));
+  const felleKleuren = alle.filter(k => isFelleKleur(k.kleur));
+
+  // Bij "kleur voorop" moet de dragende kleur juist een felle zijn — en wel
+  // een die ze op een groot vlak heeft, anders kan ze hem niet voorop dragen.
+  const dragers = verhoudingStand === 'kleur'
+    ? felleKleuren.filter(k => k.groot > 0)
+    : hoofd.filter(k => !isFelleKleur(k.kleur));
+  const bron = dragers.length ? dragers : hoofd;
+
+  const uit = [];
+  const heeft = k => alle.some(a => a.kleur === k);
+  bron.slice(0, maxAantal || 6).forEach((h, n) => {
+    // Eerst haar eigen kleurschema's: die weten wat bij deze kleur hoort.
+    // Alleen partners die ze ook echt in de kast heeft, anders is het advies.
+    const eigenPartners = bekendeParen(h.kleur)
+      .map(p => p.kleur).filter(heeft).filter(k => k !== h.kleur);
+
+    const kies = (lijst, uitgesloten) => {
+      const over = lijst.filter(k => k !== h.kleur && uitgesloten.indexOf(k) < 0);
+      // Doorschuiven met n, anders krijgt elke combo dezelfde partner en
+      // lijken zes voorstellen op één voorstel met een andere kop.
+      return over.length ? over[n % over.length] : null;
+    };
+
+    const steun = kies(eigenPartners.filter(k => !isFelleKleur(k)), [])
+               || kies(rustigeKleuren.map(k => k.kleur), []);
+    const accent = kies(eigenPartners.filter(isFelleKleur), [steun])
+                || kies(felleKleuren.map(k => k.kleur), [steun])
+                || kies(alle.map(k => k.kleur), [steun]);
+    const tags = [h.kleur, steun, accent].filter(Boolean);
+    if (tags.length < 2) return;
+    uit.push({
+      name: tags.map(hoofdletter).join(' + '),
+      vibe: eigenPartners.length
+        ? 'jouw hoofdkleur, met partners uit je eigen schema\'s'
+        : 'gebouwd op wat je zelf het meest draagt',
+      stijl: 'eigen',
+      typeName: 'Uit jouw kast',
+      eigenBron: true,
+      colors: tags.map(t => KLEUR_HEX[t] || '#ccc'),
+      tags: tags,
+    });
+  });
+  return uit;
+}
+
+function hoofdletter(s) {
+  s = String(s || '');
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 function bouwKleurGrid() {
   const grid = document.getElementById('kleur-grid');
   if (!grid) return;
@@ -5810,8 +5896,11 @@ function capFilterKast() {
 // combo tellen we hoeveel van haar overgebleven stukken erin passen. Combo's
 // waar ze te weinig van heeft vallen af — die leveren toch geen outfit op.
 function capScoorCombos() {
-  const alle = COMBO_TYPES.filter(t => t.id !== 'custom')
-    .flatMap(t => t.presets.map(p => ({ ...p, typeName: t.label, bron: t.bron })));
+  // Eerst de combo's die om háár hoofdkleuren heen gebouwd zijn: die gaan per
+  // definitie over haar kast, waar de vaste lijst dat maar moet hopen.
+  const alle = eigenKleurCombos(6).concat(
+    COMBO_TYPES.filter(t => t.id !== 'custom')
+      .flatMap(t => t.presets.map(p => ({ ...p, typeName: t.label, bron: t.bron }))));
 
   const kast = capGefilterd.map(i => ({ i, kleur: kleurTekstVan(i) }));
   const ankers = capAnkers();
@@ -5860,6 +5949,10 @@ function capScoorCombos() {
   const heeftHelder = ankers.some(a => HELDER.includes(a));
   const rang = p => (heeftHelder && p.zwaar.length) ? 1 : 0;
 
+  // Eigen combo's horen bovenaan: ze zijn uit haar eigen kast opgebouwd, dus
+  // een lagere telling betekent hier niet "onbruikbaar".
+  const voorop = p => p.eigenBron ? 1 : 0;
+
   if (ankers.length) {
     // Met ankers telt eerst hoeveel van jouw kleuren gedekt zijn, dan of het
     // een statement blijft, en pas daarna hoeveel stuks je ervan hebt. Een
@@ -5869,13 +5962,13 @@ function capScoorCombos() {
       .sort((a,b) => b.ankers.length - a.ankers.length
                   || rang(a) - rang(b)
                   || b.aantal - a.aantal);
-    const rest = gewenst.filter(p => !p.ankers.length && p.bruikbaar && p.aantal >= 3)
-      .sort((a,b) => b.aantal - a.aantal);
+    const rest = gewenst.filter(p => !p.ankers.length && (p.eigenBron || (p.bruikbaar && p.aantal >= 3)))
+      .sort((a,b) => voorop(b) - voorop(a) || b.aantal - a.aantal);
     capCombos = raak.concat(rest).slice(0, 20);
   } else {
     capCombos = gewenst
-      .filter(p => p.bruikbaar && p.aantal >= 3)
-      .sort((a,b) => b.aantal - a.aantal)
+      .filter(p => p.eigenBron || (p.bruikbaar && p.aantal >= 3))
+      .sort((a,b) => voorop(b) - voorop(a) || b.aantal - a.aantal)
       .slice(0, 20);
   }
 
