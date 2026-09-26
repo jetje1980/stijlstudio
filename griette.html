@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Griette — Digitale Stylist v18</title>
+<!-- Om een kaart als afbeelding te kunnen opslaan, net als bij de outfitkaart. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Griette Stylist">
@@ -35,22 +37,30 @@ body{background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);min
 /* BOTTOM NAV */
 .dag-ctx{flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;}
 .dag-ctx.actief{border-color:var(--brown);background:var(--brown);color:var(--cream);}
-.dagkaart{display:block;width:100%;text-align:left;background:#F5F2EE;border:1.5px solid var(--cream-dark);border-radius:16px;padding:18px 16px 14px;margin-bottom:12px;cursor:pointer;font-family:'Jost',sans-serif;-webkit-tap-highlight-color:transparent;}
-.dagkaart.bewaard{border-color:var(--brown);box-shadow:0 0 0 1px var(--brown) inset;}
+.dagkaart{position:relative;background:#F7F3EC;border:1px solid #d9cfc0;border-radius:6px;padding:20px 16px 14px;margin-bottom:14px;font-family:'Jost',sans-serif;}
+.dagkaart::before{content:'';position:absolute;inset:6px;border:1px solid #cfc2ae;border-radius:3px;pointer-events:none;}
+.dagkaart.bewaard{border-color:var(--brown);}
 .dagkaart.netniet{border-style:dashed;}
-.dagkaart.vanstylist{border-color:var(--brown-mid);}
-.dk-naam{font-family:'Bodoni Moda',serif;font-size:21px;line-height:1.05;color:#1a1510;text-align:center;text-transform:uppercase;letter-spacing:.01em;}
-.dk-merk{display:block;font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:#7a6350;text-align:center;margin-top:5px;}
-.dk-rij{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
-.dk-stuk{display:flex;flex-direction:column;gap:4px;}
-.dk-foto{width:100%;aspect-ratio:1;background:#e8ddd2;border-radius:9px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:17px;color:#9b8974;}
+.dagkaart.vanstylist::after{content:'✦ van je stylist';position:absolute;top:10px;right:14px;font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:#8a7358;}
+.dk-rij{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:4px 0 12px;position:relative;z-index:1;}
+.dk-stuk{display:flex;flex-direction:column;gap:4px;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;}
+.dk-foto{width:100%;aspect-ratio:1;background:#efe8dd;border-radius:3px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:17px;color:#a89478;}
 .dk-foto img{width:100%;height:100%;object-fit:cover;display:block;}
-.dk-naampje{font-size:7.5px;color:#7a6350;text-align:center;line-height:1.25;}
-.dk-mist{border:1.5px dashed #b9a48c;background:#faf7f3;}
-.dk-stippen{display:flex;justify-content:center;gap:6px;margin-top:12px;}
-.dk-stip{width:17px;height:17px;border-radius:50%;border:1px solid rgba(0,0,0,.08);}
-.dk-waarom{font-family:'Bodoni Moda',serif;font-style:italic;font-size:11.5px;color:#5a4030;text-align:center;line-height:1.5;margin-top:10px;border-top:1px solid #ddd5c8;padding-top:9px;}
-.dk-tip{font-size:9.5px;color:#7a6350;line-height:1.5;margin-top:8px;text-align:center;}
+.dk-naampje{font-size:7.5px;color:#8a7358;text-align:center;line-height:1.25;}
+.dk-mist{border:1px dashed #b9a48c;background:#fbf8f3;}
+.dk-stippen{display:flex;justify-content:center;gap:5px;margin-bottom:10px;position:relative;z-index:1;}
+.dk-stip{width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,.08);}
+.dk-naam{font-family:'Bodoni Moda',serif;font-size:19px;line-height:1.1;color:#2b2318;text-align:center;text-transform:uppercase;letter-spacing:.02em;position:relative;z-index:1;}
+.dk-merk{display:block;font-size:7.5px;letter-spacing:.2em;text-transform:uppercase;color:#8a7358;text-align:center;margin-top:5px;position:relative;z-index:1;}
+.dk-regel{height:1px;background:#d9cfc0;margin:10px 26px 9px;position:relative;z-index:1;}
+.dk-waarom{font-family:'Bodoni Moda',serif;font-style:italic;font-size:11px;color:#6b573f;text-align:center;line-height:1.5;position:relative;z-index:1;}
+.dk-tip{font-size:9px;color:#8a7358;line-height:1.5;margin-top:8px;text-align:center;position:relative;z-index:1;}
+.dk-acties{display:flex;gap:6px;margin-top:12px;position:relative;z-index:1;}
+.dk-actie{flex:1;padding:7px;background:transparent;border:1px solid #d9cfc0;border-radius:4px;font-size:10px;font-family:'Jost',sans-serif;color:#6b573f;cursor:pointer;}
+.dk-actie.aan{background:var(--brown);border-color:var(--brown);color:var(--cream);}
+.dk-ruil{position:relative;z-index:2;background:#fff;border:1px solid #d9cfc0;border-radius:4px;padding:8px;margin-top:10px;max-height:190px;overflow-y:auto;}
+.dk-ruil button{display:flex;align-items:center;gap:7px;width:100%;text-align:left;background:none;border:none;padding:5px 4px;cursor:pointer;font-family:'Jost',sans-serif;font-size:10.5px;color:#2b2318;}
+.dk-ruil img{width:26px;height:32px;object-fit:cover;border-radius:3px;}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--brown);z-index:300;display:flex;align-items:stretch;box-shadow:0 -2px 16px rgba(28,26,24,0.18);padding-bottom:env(safe-area-inset-bottom,0);}
 .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px 10px;cursor:pointer;border:none;background:transparent;color:rgba(245,242,238,0.45);font-family:'Jost',sans-serif;font-size:8px;letter-spacing:1px;text-transform:uppercase;gap:4px;transition:color 0.18s;position:relative;}
 .bnav-item.active{color:var(--cream);}
@@ -527,6 +537,17 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
     <button class="dag-ctx" id="dq-laarzen" onclick="kiesDagMood('shoe','laarzen')">Laarzen</button>
   </div>
   <div id="dag-kaarten"></div>
+
+  <!-- De kaarten die ze eerder maakte stonden alleen in de outfitkaart-app,
+       achter een knopje. Ze horen hier, tussen wat ze vandaag krijgt. -->
+  <div id="mijn-kaarten-blok" style="display:none;margin-top:22px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <div style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--brown-mid);font-family:'Jost',sans-serif;font-weight:500;">Je eigen outfitkaarten</div>
+      <a href="outfitkaart.html" style="font-size:9px;color:var(--brown-mid);text-decoration:none;border:1px solid var(--cream-dark);border-radius:12px;padding:4px 10px;">＋ Nieuwe maken</a>
+    </div>
+    <div id="mijn-kaarten" style="display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;"></div>
+  </div>
+
   <div style="height:22px;"></div>
 
   <!-- Snelle acties. Outfits, Looks en Stylist stonden hier ook, pal boven de
@@ -3413,6 +3434,7 @@ function laadDagKaarten() {
       dagKaarten = d.kaarten || [];
       dagContext = d.context || '';
       dagMood = d.mood || { bottom:'', shoe:'' };
+      dagRonde = d.ronde || 0;
       dagBewaard = d.bewaard || {};
     }
   } catch(e) {}
@@ -3421,7 +3443,7 @@ function laadDagKaarten() {
 function bewaarDagKaarten() {
   try {
     localStorage.setItem('griette-dagkaarten-v1', JSON.stringify({
-      datum: vandaagSleutel(), context: dagContext, mood: dagMood,
+      datum: vandaagSleutel(), context: dagContext, mood: dagMood, ronde: dagRonde,
       kaarten: dagKaarten, bewaard: dagBewaard }));
   } catch(e) {}
 }
@@ -3582,9 +3604,14 @@ function verwerkLooks(looks, gezien, hoogstens) {
 
 // Dezelfde dag dezelfde tien, een andere dag andere. Geen echte willekeur dus,
 // maar een reeks die uit de datum volgt.
+// "Andere tien" gaf dezelfde tien terug: de reeks volgde alleen uit de datum,
+// dus opnieuw vragen leverde exact hetzelfde op. Er gaat nu een teller bij die
+// oploopt zodra je om een andere set vraagt.
+let dagRonde = 0;
+
 function dagRandom(zaad) {
   let x = 0;
-  const t = vandaagSleutel() + '|' + zaad;
+  const t = vandaagSleutel() + '|' + dagRonde + '|' + zaad;
   for (let i = 0; i < t.length; i++) x = (x * 31 + t.charCodeAt(i)) % 2147483647;
   return function() { x = (x * 48271) % 2147483647; return x / 2147483647; };
 }
@@ -3626,6 +3653,35 @@ function lokaleReden(boven, onder, schoen) {
   return zinnen.filter(Boolean).join(' ');
 }
 
+// Het weer van vandaag, of anders een gok op grond van de maand.
+function dagWeer() {
+  if (typeof weatherTemp !== 'undefined' && weatherTemp) return weatherTemp;
+  const m = new Date().getMonth();
+  return [11,0,1,2].indexOf(m) >= 0 ? 'koel' : [5,6,7].indexOf(m) >= 0 ? 'warm' : 'mild';
+}
+
+// Woorden die verraden voor welk weer een stuk bedoeld is. Op naam én op de
+// materiaaltag, want "linnen" zegt evenveel als "short".
+const WEER_WOORDEN = {
+  zomers: ['short','shorts','bermuda','slipper','sandaal','sandalen','teenslipper',
+           'spaghetti','hemdje','linnen','badpak','bikini','flipflop','haivanas'],
+  winters: ['wol','wollen','teddy','fleece','gebreid','trui','coltrui','laars','laarzen',
+            'boot','bont','fur','gewatteerd','parka','winter','mohair','cashmere'],
+};
+function weerSoort(i) {
+  const t = itemTags[i.id] || {};
+  const tekst = (String(i.name || '') + ' ' + [].concat(t.materiaal || []).join(' ')).toLowerCase();
+  if (WEER_WOORDEN.zomers.some(function(w){ return tekst.includes(w); })) return 'zomers';
+  if (WEER_WOORDEN.winters.some(function(w){ return tekst.includes(w); })) return 'winters';
+  return '';
+}
+function weerZeef(pool, weer, cat) {
+  const weg = weer === 'warm' ? 'winters' : weer === 'koel' ? 'zomers' : null;
+  if (!weg) return pool;
+  const over = pool.filter(function(i){ return weerSoort(i) !== weg; });
+  return over.length >= 2 ? over : pool;
+}
+
 function lokaleLooks() {
   const kast = getAllItems().filter(function(i){ return !deletedItemIds.has(i.id); });
   const uit = function(cat) { return kast.filter(function(i){ return i.cat === cat; }); };
@@ -3643,6 +3699,17 @@ function lokaleLooks() {
   });
   if (!onders.length) onders = uit('bottoms');
   if (!schoenen.length) schoenen = uit('shoes');
+  // Het weer stond hier nergens in, terwijl het bepaalt wat er kan. Bij koel
+  // weer vallen slippers, shorts en spaghettibandjes af; bij warm weer de
+  // dikke truien en laarzen. Wat er niets over zegt, blijft gewoon staan.
+  const weer = dagWeer();
+  tops = weerZeef(tops, weer, 'tops');
+  onders = weerZeef(onders, weer, 'bottoms');
+  schoenen = weerZeef(schoenen, weer, 'shoes');
+  if (!onders.length) onders = uit('bottoms');
+  if (!schoenen.length) schoenen = uit('shoes');
+  if (!tops.length) tops = uit('tops');
+
   if (tops.length < 2 || onders.length < 2) return [];
 
   const rnd = dagRandom('looks');
@@ -3675,8 +3742,7 @@ function lokaleLooks() {
   // elke look hier afgemaakt in plaats van per geval te hopen dat het goed
   // gaat: schoenen, dan een tas, dan een laag — en telkens een andere, zodat
   // niet overal dezelfde tas hangt.
-  const koel = ['koel','mild'].indexOf(String(typeof weatherTemp !== 'undefined' ? weatherTemp : '')) >= 0
-            || [10,11,0,1,2,3].indexOf(new Date().getMonth()) >= 0;
+  const koel = dagWeer() !== 'warm';
   let beurt = 0;
 
   // Een jas of blazer is een buitenlaag; een vest of gilet een laagje eronder.
@@ -3771,6 +3837,7 @@ async function maakDagKaarten(ctx, opnieuw) {
   const vak = document.getElementById('dag-kaarten');
   if (!vak) return;
   if (!opnieuw && dagKaarten.length) { toonDagKaarten(); return; }
+  if (opnieuw) dagRonde++;
 
   const kast = getAllItems().filter(function(i){ return !deletedItemIds.has(i.id); });
   if (kast.length < 8) {
@@ -3796,7 +3863,7 @@ async function maakDagKaarten(ctx, opnieuw) {
   if (dagKaarten.length) {
     bewaarDagKaarten();
     toonDagKaarten();
-    zegDagStatus('Acht uit je eigen kast. Je stylist maakt er nog twee bij…');
+    zegDagStatus('Je stylist maakt er nog twee bij…');
   } else {
     toonDagSkelet(DAG_SLOTS.reduce(function(n, sl){ return n + sl.n; }, 0));
     zegDagStatus('De stylist stelt je tien looks samen…');
@@ -3878,30 +3945,35 @@ function toonDagKaarten() {
   if (!dagKaarten.length) { maakDagKaarten(dagContext, false); return; }
 
   vak.innerHTML = dagKaarten.map(function(k, n) {
-    const stukken = k.stukken.map(function(st) {
+    // Elk stuk is aanklikbaar om te ruilen. De kaart zelf is daarom geen knop
+    // meer: bewaren en opslaan staan onderaan als eigen knoppen. Anders kun je
+    // per kaart niets aanpassen, en dat was precies wat er miste.
+    const stukken = k.stukken.map(function(st, i) {
       const foto = st.id && photos[st.id];
-      return '<div class="dk-stuk"><div class="dk-foto' + (st.heeft ? '' : ' dk-mist') + '">'
+      return '<button type="button" class="dk-stuk" onclick="ruilOpen(' + n + ',' + i + ')">'
+        + '<span class="dk-foto' + (st.heeft ? '' : ' dk-mist') + '">'
         + (foto ? '<img loading="lazy" src="' + esc2(foto) + '" alt="">'
                 : (st.heeft ? '👕' : '＋'))
-        + '</div><div class="dk-naampje">' + esc2(kortStuk(st.naam)) + '</div></div>';
+        + '</span><span class="dk-naampje">' + esc2(kortStuk(st.naam)) + '</span></button>';
     }).join('');
-    // De kleuren van de stukken zelf, net als onderaan een echte outfitkaart.
     const stippen = dagStippen(k).map(function(c) {
       return '<span class="dk-stip" style="background:' + c + '"></span>';
     }).join('');
-    return '<button type="button" class="dagkaart' + (dagBewaard[n] ? ' bewaard' : '')
+    return '<div class="dagkaart' + (dagBewaard[n] ? ' bewaard' : '')
       + (k.netniet ? ' netniet' : '') + (k.eigen ? '' : ' vanstylist')
-      + '" onclick="bewaarDagKaart(' + n + ')">'
-      + '<div class="dk-naam">' + esc2(k.naam) + '</div>'
-      + '<span class="dk-merk">'
-      + (k.eigen ? esc2(k.merk || 'uit je kast') : '✦ van je stylist')
-      + '</span>'
+      + '" id="dagkaart-' + n + '">'
       + '<div class="dk-rij">' + stukken + '</div>'
       + (stippen ? '<div class="dk-stippen">' + stippen + '</div>' : '')
-      + (k.waarom ? '<div class="dk-waarom">' + esc2(k.waarom) + '</div>' : '')
+      + '<div class="dk-naam">' + esc2(k.naam) + '</div>'
+      + '<span class="dk-merk">' + esc2(k.eigen ? (k.merk || 'uit je kast') : 'door je stylist') + '</span>'
+      + (k.waarom ? '<div class="dk-regel"></div><div class="dk-waarom">' + esc2(k.waarom) + '</div>' : '')
       + (k.netniet ? '<div class="dk-tip">Dit had gekund als je dit had: ' + esc2(k.netniet) + '</div>' : '')
-      + (dagBewaard[n] ? '<div class="dk-tip">✓ Bewaard bij je Looks</div>' : '')
-      + '</button>';
+      + '<div id="ruil-' + n + '"></div>'
+      + '<div class="dk-acties">'
+      + '<button type="button" class="dk-actie' + (dagBewaard[n] ? ' aan' : '') + '" '
+      + 'onclick="bewaarDagKaart(' + n + ')">' + (dagBewaard[n] ? '✓ Bewaard' : '♡ Bewaren') + '</button>'
+      + '<button type="button" class="dk-actie" onclick="dagKaartAfbeelding(' + n + ')">⬇ Afbeelding</button>'
+      + '</div></div>';
   }).join('');
 
   const u = document.getElementById('dag-uitleg');
@@ -3914,6 +3986,122 @@ function toonDagKaarten() {
       + (mist ? ' Bij ' + (mist === 1 ? 'één' : mist) + ' ervan hoort een stuk dat je nog niet hebt — '
                 + (mist === 1 ? 'die staat' : 'die staan') + ' gestippeld.' : '')
 ;
+  }
+}
+
+// ── JE EIGEN OUTFITKAARTEN ───────────────────────────────────────────────────
+// Ze staan in dezelfde opslag als de outfitkaart-app ze wegschrijft. Hier
+// alleen tonen, niet beheren: tikken opent de kaart op ware grootte.
+let mijnKaarten = [];
+
+async function laadMijnKaarten() {
+  try {
+    const lokaal = JSON.parse(localStorage.getItem('griette-kaarten-v1') || '[]');
+    if (Array.isArray(lokaal)) mijnKaarten = lokaal;
+  } catch(e) {}
+  try {
+    const sb = await supabaseGet('bewaarde-kaarten');
+    if (Array.isArray(sb) && sb.length) mijnKaarten = sb;
+  } catch(e) {}
+  toonMijnKaarten();
+}
+
+function toonMijnKaarten() {
+  const blok = document.getElementById('mijn-kaarten-blok');
+  const rij = document.getElementById('mijn-kaarten');
+  if (!blok || !rij) return;
+  if (!mijnKaarten.length) { blok.style.display = 'none'; return; }
+  blok.style.display = 'block';
+  rij.innerHTML = mijnKaarten.slice(0, 12).map(function(k) {
+    const d = k.datum ? new Date(k.datum).toLocaleDateString('nl-NL', { day:'numeric', month:'short' }) : '';
+    return '<a href="' + esc2(k.url) + '" target="_blank" rel="noopener" '
+      + 'style="flex-shrink:0;width:96px;text-decoration:none;color:inherit;">'
+      + '<img loading="lazy" src="' + esc2(k.url) + '" alt="' + esc2(k.titel || 'outfitkaart') + '" '
+      + 'style="width:96px;height:128px;object-fit:cover;border-radius:5px;border:1px solid var(--cream-dark);display:block;">'
+      + '<div style="font-size:8.5px;color:var(--muted);margin-top:4px;line-height:1.3;">'
+      + esc2((k.titel || 'Outfitkaart')) + (d ? '<br>' + esc2(d) : '') + '</div></a>';
+  }).join('');
+}
+
+// ── EEN STUK RUILEN OP DE KAART ──────────────────────────────────────────────
+// Tik op een stuk en je krijgt wat je er verder voor hebt, uit dezelfde
+// categorie en passend bij het weer van vandaag. Zonder dit kun je een kaart
+// alleen accepteren of negeren.
+function ruilOpen(n, i) {
+  const vak = document.getElementById('ruil-' + n);
+  const kaart = dagKaarten[n];
+  if (!vak || !kaart) return;
+  if (vak.innerHTML) { vak.innerHTML = ''; return; }
+
+  const huidig = kaart.stukken[i];
+  const item = huidig.id && getItemById(huidig.id);
+  const cat = item ? item.cat : null;
+  const alIn = kaart.stukken.map(function(s){ return s.id; });
+  let opties = getAllItems().filter(function(x) {
+    return !deletedItemIds.has(x.id) && alIn.indexOf(x.id) < 0
+      && (!cat || x.cat === cat);
+  });
+  opties = weerZeef(opties, dagWeer(), cat);
+
+  if (!opties.length) {
+    vak.innerHTML = '<div class="dk-ruil"><div class="dk-naampje" style="text-align:left;">'
+      + 'Je hebt hier niets anders voor in je kast.</div></div>';
+    return;
+  }
+  vak.innerHTML = '<div class="dk-ruil">'
+    + '<div class="dk-naampje" style="text-align:left;margin-bottom:4px;">In plaats van '
+    + esc2(kortStuk(huidig.naam)) + ':</div>'
+    + opties.slice(0, 20).map(function(x) {
+        return '<button type="button" onclick="ruilDoe(' + n + ',' + i + ',\'' + esc2(x.id) + '\')">'
+          + (photos[x.id] ? '<img loading="lazy" src="' + esc2(photos[x.id]) + '" alt="">'
+                          : '<span style="width:26px;">👕</span>')
+          + '<span>' + esc2(x.name) + '</span></button>';
+      }).join('')
+    + (huidig.heeft ? '' : '')
+    + '</div>';
+}
+
+function ruilDoe(n, i, id) {
+  const nieuw = getItemById(id);
+  const kaart = dagKaarten[n];
+  if (!nieuw || !kaart) return;
+  kaart.stukken[i] = { id: nieuw.id, naam: nieuw.name, heeft: true };
+  // Zelf gewisseld betekent: niet meer letterlijk wat de stylist voorstelde.
+  kaart.aangepast = true;
+  if (!kaart.stukken.some(function(s){ return !s.heeft; })) kaart.netniet = '';
+  bewaarDagKaarten();
+  toonDagKaarten();
+  showToast(nieuw.name + ' staat nu op deze kaart');
+}
+
+// ── EEN KAART OPSLAAN ALS AFBEELDING ─────────────────────────────────────────
+// Dezelfde manier als bij de outfitkaart: het element wordt getekend en als
+// bestand aangeboden. Zonder html2canvas kan dat niet, en dan zeggen we dat.
+async function dagKaartAfbeelding(n) {
+  const el = document.getElementById('dagkaart-' + n);
+  const kaart = dagKaarten[n];
+  if (!el || !kaart) return;
+  if (typeof html2canvas !== 'function') {
+    showToast('Opslaan lukt hier even niet — probeer het opnieuw met verbinding');
+    return;
+  }
+  showToast('Afbeelding maken…');
+  const acties = el.querySelector('.dk-acties');
+  const ruil = el.querySelector('.dk-ruil');
+  if (acties) acties.style.visibility = 'hidden';
+  if (ruil) ruil.style.display = 'none';
+  try {
+    const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#F7F3EC', useCORS: true });
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/jpeg', 0.92);
+    a.download = (kaart.naam || 'outfit').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) + '.jpg';
+    a.click();
+    showToast('Opgeslagen ✓');
+  } catch(e) {
+    showToast('Opslaan lukte niet: ' + (e && e.message || 'onbekend'));
+  } finally {
+    if (acties) acties.style.visibility = '';
+    if (ruil) ruil.style.display = '';
   }
 }
 
@@ -7562,6 +7750,7 @@ function startDagKaarten() {
   setTimeout(function(){ maakDagKaarten(dagContext, false); }, 250);
 }
 setTimeout(startDagKaarten, 4000);
+laadMijnKaarten();
 
 // ============ SHOPPING LIST ============
 var shopCategory = 'gaps';
