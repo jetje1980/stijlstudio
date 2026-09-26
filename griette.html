@@ -1561,6 +1561,62 @@ function isEendeligItem(i) {
 }
 
 // ============ DATA ============
+// Eigen categorieën die zij er zelf bij zet. Ze staan in dezelfde vorm als de
+// vaste, worden net zo getoond, en gaan net zo mee naar de stylist — die krijgt
+// de categorie van een item letterlijk door, dus een eigen naam werkt vanzelf.
+let eigenCategorieen = [];
+
+function laadEigenCategorieen() {
+  try { eigenCategorieen = JSON.parse(localStorage.getItem('griette-eigen-cats-v1') || '[]'); } catch(e) {}
+  if (!Array.isArray(eigenCategorieen)) eigenCategorieen = [];
+}
+
+function bewaarEigenCategorieen() {
+  try { localStorage.setItem('griette-eigen-cats-v1', JSON.stringify(eigenCategorieen)); } catch(e) {}
+  supabaseSet('eigen-categorieen', eigenCategorieen).catch(function(){});
+}
+
+function alleCategorieen() {
+  return categories.concat(eigenCategorieen);
+}
+
+// Alleen items met een 'custom-' id worden opgeslagen; de ingebouwde stukken
+// komen elke keer vers uit de code. Verplaats je zo'n stuk, dan sprong het na
+// herladen terug. Daarom onthouden we de verplaatsing apart, per id.
+let catAnders = {};
+
+function laadCatAnders() {
+  try { catAnders = JSON.parse(localStorage.getItem('griette-cat-anders-v1') || '{}'); } catch(e) {}
+  if (!catAnders || typeof catAnders !== 'object') catAnders = {};
+}
+
+function bewaarCatAnders() {
+  try { localStorage.setItem('griette-cat-anders-v1', JSON.stringify(catAnders)); } catch(e) {}
+  supabaseSet('cat-anders', catAnders).catch(function(){});
+}
+
+// Zet de onthouden verplaatsingen terug op de kast.
+function pasCatAndersToe() {
+  Object.keys(catAnders).forEach(function(id) {
+    var naar = catAnders[id];
+    if (!naar) return;
+    var item = null, van = null;
+    Object.keys(items).forEach(function(c) {
+      var i = (items[c] || []).findIndex(function(x){ return x.id === id; });
+      if (i >= 0) { item = items[c][i]; van = c; }
+    });
+    if (!item || van === naar) return;
+    items[van] = items[van].filter(function(x){ return x.id !== id; });
+    if (!items[naar]) items[naar] = [];
+    items[naar].push(item);
+  });
+}
+
+function catLabel(id) {
+  var c = alleCategorieen().find(function(x){ return x.id === id; });
+  return c ? c.label : id;
+}
+
 const categories = [
   { id:'tops', label:'Tops' },
   { id:'bottoms', label:'Rokken & Broeken' },
@@ -1775,7 +1831,7 @@ let outfitCounter = 0;
 function buildGarderobe() {
   const cont = document.getElementById('garderobe-content');
   cont.innerHTML = '';
-  categories.forEach(cat => {
+  alleCategorieen().forEach(cat => {
     const catItems = items[cat.id] || [];
     if (catItems.length === 0 && cat.id !== 'overig') return;
     const lbl = document.createElement('div');
@@ -2330,6 +2386,12 @@ function openFotoModal(itemId) {
       + 'background:var(--brown);color:var(--cream);border:none;border-radius:8px;'
       + 'font-size:11px;letter-spacing:1px;cursor:pointer;font-family:Jost,sans-serif;">'
       + '＋ Foto\'s toevoegen</button>'
+      + '<div class="sec-label" style="margin-top:16px;font-size:9px;letter-spacing:2px;'
+      + 'text-transform:uppercase;color:var(--brown-mid);">In welke categorie hoort dit?</div>'
+      + '<div style="font-size:9px;color:var(--muted);line-height:1.5;margin:4px 0 8px;">'
+      + 'De stylist weegt items per categorie mee. Staat er iets verkeerd, dan telt '
+      + 'het ook verkeerd mee.</div>'
+      + '<div id="fotos-modal-cats" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;"></div>'
       + '<button id="fotos-modal-vandaag" style="width:100%;margin-top:8px;padding:10px;'
       + 'background:transparent;color:var(--brown);border:1.5px solid var(--cream-dark);'
       + 'border-radius:8px;font-size:11px;cursor:pointer;font-family:Jost,sans-serif;">'
@@ -2405,6 +2467,65 @@ function toonFotoModal(itemId) {
   });
 
   lijst.innerHTML = html;
+  tekenCatKeuze(itemId);
+}
+
+// ── ITEM IN DE JUISTE CATEGORIE ──────────────────────────────────────────────
+// Categorie is geen etiket maar een rol: de stylist kiest per categorie één
+// stuk en weegt silhouet en lagen daarop. Staat een jas onder "overig", dan
+// telt hij nergens in mee. Daarom kan dat hier recht worden gezet, en kan er
+// een eigen categorie bij voor wat nergens in past.
+function tekenCatKeuze(itemId) {
+  var vak = document.getElementById('fotos-modal-cats');
+  if (!vak) return;
+  var huidig = (getItemById(itemId) || {}).cat;
+  vak.innerHTML = alleCategorieen().map(function(c) {
+    var aan = c.id === huidig;
+    return '<button type="button" onclick="zetItemCategorie(\'' + itemId + '\',\'' + c.id + '\')" '
+      + 'style="padding:5px 10px;font-size:10px;border-radius:14px;cursor:pointer;'
+      + 'font-family:Jost,sans-serif;'
+      + (aan ? 'border:1px solid var(--brown);background:var(--brown);color:var(--cream);'
+             : 'border:1px solid var(--cream-dark);background:var(--white);color:var(--muted);')
+      + '">' + c.label + '</button>';
+  }).join('')
+    + '<button type="button" onclick="nieuweCategorie(\'' + itemId + '\')" '
+    + 'style="padding:5px 10px;font-size:10px;border-radius:14px;cursor:pointer;'
+    + 'border:1px dashed var(--cream-dark);background:transparent;color:var(--muted);'
+    + 'font-family:Jost,sans-serif;">＋ eigen categorie</button>';
+}
+
+function zetItemCategorie(itemId, naarCat) {
+  var item = null, vanCat = null;
+  Object.keys(items).forEach(function(c) {
+    var i = (items[c] || []).findIndex(function(x){ return x.id === itemId; });
+    if (i >= 0) { item = items[c][i]; vanCat = c; }
+  });
+  if (!item || vanCat === naarCat) return;
+  items[vanCat] = items[vanCat].filter(function(x){ return x.id !== itemId; });
+  if (!items[naarCat]) items[naarCat] = [];
+  items[naarCat].push(item);
+  catAnders[itemId] = naarCat;
+  bewaarCatAnders();
+  saveAppData();
+  tekenCatKeuze(itemId);
+  buildGarderobe();
+  showToast(item.name + ' staat nu bij ' + catLabel(naarCat));
+}
+
+function nieuweCategorie(itemId) {
+  var naam = (prompt('Hoe heet de nieuwe categorie?\n\nBijvoorbeeld: Sieraden, Sjaals, Sport') || '').trim();
+  if (!naam) return;
+  var id = naam.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  if (!id) return;
+  if (alleCategorieen().some(function(c){ return c.id === id; })) {
+    showToast('Die categorie bestaat al');
+    zetItemCategorie(itemId, id);
+    return;
+  }
+  eigenCategorieen.push({ id: id, label: naam });
+  bewaarEigenCategorieen();
+  if (!items[id]) items[id] = [];
+  zetItemCategorie(itemId, id);
 }
 
 function zetFotoSoort(itemId, i, soort) {
@@ -4107,6 +4228,21 @@ async function loadAppDataFromSupabase() {
       supabaseGet('custom-occasions'),
       supabaseGet('deleted-items')
     ]);
+
+    const [eigenCats, catOverride] = await Promise.all([
+      supabaseGet('eigen-categorieen').catch(() => null),
+      supabaseGet('cat-anders').catch(() => null),
+    ]);
+    if (Array.isArray(eigenCats)) {
+      eigenCategorieen = eigenCats;
+      try { localStorage.setItem('griette-eigen-cats-v1', JSON.stringify(eigenCats)); } catch(e) {}
+      eigenCategorieen.forEach(function(c){ if (!items[c.id]) items[c.id] = []; });
+    }
+    if (catOverride && typeof catOverride === 'object' && !Array.isArray(catOverride)) {
+      catAnders = catOverride;
+      try { localStorage.setItem('griette-cat-anders-v1', JSON.stringify(catAnders)); } catch(e) {}
+      pasCatAndersToe();
+    }
 
     const extraData = await supabaseGet('extra-photos').catch(() => null);
     if (extraData && typeof extraData === 'object' && !Array.isArray(extraData)) {
@@ -6758,6 +6894,9 @@ fetchWeather();
 // Load Cloudinary photo URLs first (works across devices/versions)
 loadCloudinaryPhotos();
 laadExtraFotos();
+laadEigenCategorieen();
+laadCatAnders();
+pasCatAndersToe();
 loadBoardSettings();
 loadCyclus();
 loadWellbeing();
