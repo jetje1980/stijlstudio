@@ -92,6 +92,21 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .cap-dot.groot{width:20px;height:20px;}
 .cap-palet-naam{font-size:13px;font-weight:600;}
 .cap-palet-kleuren{font-size:11px;color:var(--text-2);margin-top:2px;}
+/* De verhouding zichtbaar: een balk op 60/30/10, en daaronder haar eigen
+   stukken op het formaat van hun rol. Zestig procent hoort er ook zestig
+   procent uit te zien. */
+.vh{margin-top:9px;padding-top:9px;border-top:1px solid var(--border);}
+.vh-balk{display:flex;height:13px;border-radius:3px;overflow:hidden;margin:9px 0 5px;}
+.vh-kort{font-size:10px;color:var(--text-2);line-height:1.4;margin-bottom:2px;}
+.vh-deel{display:block;}
+.vh-regel{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.vh-foto,.vh-stip{flex-shrink:0;border-radius:4px;background-size:cover;background-position:center;border:1px solid var(--border);}
+.vh-hoofd{width:38px;height:46px;}
+.vh-steun{width:28px;height:34px;}
+.vh-accent{width:19px;height:23px;}
+.vh-tekst{font-size:10.5px;line-height:1.45;color:var(--text);}
+.vh-draagt{color:var(--text-2);font-size:10px;}
+.vh-botsing{font-size:10px;color:var(--text-2);font-style:italic;line-height:1.45;margin-top:2px;}
 .cap-palet-uit{font-size:11px;color:var(--text);margin-top:5px;line-height:1.45;}
 .cap-palet-uit b{letter-spacing:.02em;}
 .cap-palet-mager{color:var(--text-2);font-style:italic;}
@@ -5890,6 +5905,113 @@ function toonFilterUitleg() {
         ? `<div class="cap-groep"><b>Zonder:</b> ${capNietKleuren.map(esc).join(', ')}</div>` : '');
 }
 
+// ── WAT IS DE HOOFDKLEUR, EN WAT HET ACCENT ─────────────────────────────────
+// Een rij gelijke stippen zegt wélke kleuren erin zitten, maar niet in welke
+// verhouding — en dáár gaat het om. Haar rapport zegt het al: grofweg zestig
+// procent rustige basis, dertig procent ondersteunende kleur, tien procent
+// accent. Dat stond alleen in de opdracht aan de stylist en nooit op het
+// scherm, dus was er bij het kiezen niets te begrijpen.
+//
+// Welke rol een kleur krijgt volgt uit wat de kleur ís: een rustige kleur
+// draagt, een felle kleur is een accent. Dat is te bepalen zonder AI.
+const VERHOUDING = [
+  { sleutel:'hoofd',  label:'hoofdkleur', deel:60,
+    draagt:'broek, rok of jas', cats:['bottoms','layers','jurken','eendelig'] },
+  { sleutel:'steun',  label:'steunkleur', deel:30,
+    draagt:'top of laagje',     cats:['tops','layers'] },
+  { sleutel:'accent', label:'accent',     deel:10,
+    draagt:'tas, schoenen of sjaal', cats:['bags','shoes','accessories'] },
+];
+
+// Rustig genoeg om zestig procent van een outfit te zijn.
+function isFelleKleur(k) {
+  return HELDER.some(h => kleurMatcht(h, k));
+}
+
+function kleurVerhouding(p) {
+  const tags = (p.tags || []).map(t => String(t).toLowerCase()).filter(Boolean);
+  if (!tags.length) return [];
+  const hex = {};
+  tags.forEach(function(t, i) { if (!hex[t]) hex[t] = (p.colors || [])[i] || '#ccc'; });
+
+  const fel = tags.filter(isFelleKleur);
+  const rustig = tags.filter(function(t){ return !isFelleKleur(t); });
+
+  // Het accent is de felste kleur; is alles rustig, dan de laatste.
+  const accent = fel[0] || tags[tags.length - 1];
+  // De hoofdkleur draagt, dus die is rustig — en niet het accent.
+  const hoofd = rustig.filter(function(t){ return t !== accent; })[0]
+             || tags.filter(function(t){ return t !== accent; })[0] || accent;
+  // De steunkleur draagt dertig procent, dus die hoort ook rustig te zijn. Nam
+  // hij hier de eerstvolgende kleur, dan kon een tweede felle kleur op dertig
+  // procent belanden — precies wat de theorie afraadt.
+  const over = tags.filter(function(t){ return t !== accent && t !== hoofd; });
+  const steun = over.filter(function(t){ return !isFelleKleur(t); })[0] || over[0] || '';
+
+  const uit = [];
+  VERHOUDING.forEach(function(r) {
+    const kleur = r.sleutel === 'hoofd' ? hoofd : r.sleutel === 'steun' ? steun : accent;
+    if (!kleur) return;
+    uit.push({ sleutel:r.sleutel, label:r.label, deel:r.deel, draagt:r.draagt,
+               cats:r.cats, kleur:kleur, hex:hex[kleur] || '#ccc' });
+  });
+  // Zonder steunkleur verdeelt de rest zich: de hoofdkleur neemt die ruimte over.
+  if (!steun) uit.forEach(function(r){ if (r.sleutel === 'hoofd') r.deel = 75; });
+  // Meer dan één felle kleur is geen accent meer maar een krachtmeting. Dat
+  // hoort ze te zien vóórdat ze kiest, niet pas op de kaart.
+  if (fel.length > 1) uit.botsing = fel.slice(0, 3);
+  return uit;
+}
+
+// Haar eigen stukken in die kleur, en in de rol die erbij hoort: een
+// hoofdkleur op een broek is iets anders dan een hoofdkleur op een tas.
+function stukkenVoorRol(rol) {
+  return capGefilterd.filter(function(i) {
+    return rol.cats.indexOf(i.cat) >= 0 && kleurMatcht(rol.kleur, kleurTekstVan(i));
+  });
+}
+
+// Op elke kaart: de balk en één regel die de rollen benoemt. Genoeg om de
+// combo's met elkaar te kunnen vergelijken zonder twintig keer een verhaal.
+function verhoudingBalkHTML(p) {
+  const rollen = kleurVerhouding(p);
+  if (!rollen.length) return '';
+  return '<div class="vh-balk">'
+    + rollen.map(function(r) {
+        return '<span class="vh-deel" style="flex:' + r.deel + ';background:' + esc(r.hex) + '"></span>';
+      }).join('')
+    + '</div><div class="vh-kort">'
+    + rollen.map(function(r){ return esc(r.kleur) + ' ' + esc(r.label.replace('kleur','')); }).join(' · ')
+    + '</div>';
+}
+
+// Op de kaart die je koos: hetzelfde, maar met je eigen stukken op het
+// formaat van hun rol. Het plaatje in de verhouding waarin je het draagt.
+function verhoudingHTML(p) {
+  const rollen = kleurVerhouding(p);
+  if (!rollen.length) return '';
+  const balk = rollen.map(function(r) {
+    return '<span class="vh-deel" style="flex:' + r.deel + ';background:' + esc(r.hex) + '"></span>';
+  }).join('');
+  const regels = rollen.map(function(r) {
+    const stuks = stukkenVoorRol(r);
+    const foto = stuks.map(function(i){ return cloudMap[i.id]; }).filter(Boolean)[0];
+    return '<div class="vh-regel">'
+      + (foto ? '<span class="vh-foto vh-' + r.sleutel + '" style="background-image:url(' + esc(foto) + ')"></span>'
+              : '<span class="vh-stip vh-' + r.sleutel + '" style="background:' + esc(r.hex) + '"></span>')
+      + '<span class="vh-tekst"><b>' + r.deel + '% ' + esc(r.label) + '</b> · ' + esc(r.kleur)
+      + '<br><span class="vh-draagt">' + esc(r.draagt)
+      + ' — ' + (stuks.length ? stuks.length + ' in je kast' : '<i>niets in deze kleur</i>')
+      + '</span></span></div>';
+  }).join('');
+  return '<div class="vh"><div class="vh-balk">' + balk + '</div>' + regels
+    + (rollen.botsing
+        ? '<div class="vh-botsing">' + esc(opsom(rollen.botsing))
+          + ' zijn allebei fel — één ervan moet klein blijven, anders vechten ze.</div>'
+        : '')
+    + '</div>';
+}
+
 // Hoeveel outfits levert deze kleurrichting op? Een top zonder onderstuk is
 // geen outfit, dus het kleinste van die twee is de rem — plus wat jurken en
 // jumpsuits, die allebei de rollen in één doen. Dit is te rekenen, dus het
@@ -5940,6 +6062,9 @@ function toonCombos() {
       + '</div>'
       + `<div class="cap-palet-naam">${esc(p.name)}</div>`
       + `<div class="cap-palet-kleuren">${esc(p.vibe || '')}</div>`
+      // De verhouding hoort bij het kiezen, niet pas op de kaart: vier gelijke
+      // stippen zeggen niet wat draagt en wat een accent is.
+      + (aan ? verhoudingHTML(p) : verhoudingBalkHTML(p))
       // Wat levert dit óp — niet hoeveel stuks het zijn. Een bedachte combo
       // heeft geen telling; zeg dan gewoon waar hij vandaan komt.
       + (typeof p.aantal === 'number' && comboOutfits(p) > 0
@@ -6266,10 +6391,20 @@ Antwoord ALLEEN met JSON:
 function capComboZin() {
   const gekozen = capGekozenCombos.map(i => capCombos[i]).filter(Boolean);
   if (!gekozen.length) return '';
+  // De verhouding staat op haar scherm, dus moet hij ook in de opdracht
+  // staan: anders belooft het plaatje iets wat de uitkomst niet waarmaakt.
+  const rolZin = c => {
+    const r = kleurVerhouding(c);
+    return r.length
+      ? ' — ' + r.map(x => x.kleur + ' als ' + x.label + ' (' + x.deel + '%, ' + x.draagt + ')').join(', ')
+      : '';
+  };
   return 'Ze koos deze kleurrichting'
     + (gekozen.length > 1 ? 'en' : '') + ': '
-    + gekozen.map(c => c.name + ' (' + (c.tags || []).join(', ') + ')').join('; ')
-    + '. Houd de koffer daarbinnen.\n';
+    + gekozen.map(c => c.name + ' (' + (c.tags || []).join(', ') + ')' + rolZin(c)).join('; ')
+    + '.\nHoud de koffer daarbinnen, en houd die verhouding aan: de hoofdkleur op de\n'
+    + 'grote vlakken, het accent klein — op een tas, schoen of sjaal. Een accent dat\n'
+    + 'de helft van de outfit beslaat is geen accent meer.\n';
 }
 
 async function capKiesKoffer(kast, aantal, weer, gel, max) {
