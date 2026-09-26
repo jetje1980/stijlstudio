@@ -4159,7 +4159,10 @@ let netGeveegd = false;
     x0 = y0 = null;
     if (Math.abs(dx) < 35 || Math.abs(dx) < Math.abs(dy)) return;
     netGeveegd = true;
-    setTimeout(function(){ netGeveegd = false; }, 500);
+    // Lang genoeg voor de klik die de browser na het loslaten stuurt (die komt
+    // binnen ~300 ms), kort genoeg om niet in de weg te zitten als je daarna
+    // bewust naast de kaart tikt om hem te sluiten.
+    setTimeout(function(){ netGeveegd = false; }, 350);
     kijkerStap(null, dx < 0 ? 1 : -1);
   };
   document.addEventListener('touchend', afronden, { passive: true });
