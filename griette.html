@@ -4177,6 +4177,59 @@ function anderWeer(n) {
 // ── EEN KAART OPSLAAN ALS AFBEELDING ─────────────────────────────────────────
 // Dezelfde manier als bij de outfitkaart: het element wordt getekend en als
 // bestand aangeboden. Zonder html2canvas kan dat niet, en dan zeggen we dat.
+
+// html2canvas 1.4.1 kent object-fit niet en rekt de foto uit: op het scherm
+// keurig bijgesneden, in de opgeslagen kaart de hele screenshot platgedrukt.
+// Op de outfitkaart staat de foto daarom als achtergrond in het vakje. Hier
+// blijft het een <img loading="lazy">, anders laden tien kaarten vijftig
+// foto's tegelijk — dus gebeurt de omzetting in de kopie die html2canvas
+// maakt. background-size begrijpt hij wel.
+function fotoVlakkenInKopie(doc) {
+  doc.querySelectorAll('.dk-foto img').forEach(function(img) {
+    const vak = img.parentNode;
+    if (!vak || !img.src) return;
+    vak.style.backgroundImage = 'url("' + img.src + '")';
+    vak.style.backgroundSize = 'cover';
+    vak.style.backgroundPosition = 'center';
+    vak.style.backgroundRepeat = 'no-repeat';
+    img.style.display = 'none';
+  });
+}
+
+// De naam van de kaart, bruikbaar als bestandsnaam. Niet platgeslagen tot
+// koppeltekens: "Zara cargo · 1.jpg" is terug te vinden, "zara-cargo-1.jpg"
+// zegt minder.
+function kaartBestandsnaam(kaart) {
+  const naam = String((kaart && kaart.naam) || 'outfit')
+    .replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return (naam || 'outfit').slice(0, 60) + '.jpg';
+}
+
+// Downloaden zet het bestand in de map Downloads, niet in de galerij. Het
+// deelvenster van de telefoon heeft wél "opslaan in galerij" (of Foto's).
+// Dus: delen waar dat kan, downloaden waar dat niet kan.
+async function bewaarAlsAfbeelding(canvas, bestandsnaam) {
+  const blob = await new Promise(function(res) { canvas.toBlob(res, 'image/jpeg', 0.92); });
+  if (!blob) throw new Error('de afbeelding kon niet gemaakt worden');
+  const file = new File([blob], bestandsnaam, { type: 'image/jpeg' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: bestandsnaam.replace(/\.jpg$/, '') });
+      return 'gedeeld';
+    } catch(e) {
+      if (e && e.name === 'AbortError') return 'afgebroken';
+      // Weigert het deelvenster, dan alsnog downloaden.
+    }
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = bestandsnaam;
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  return 'gedownload';
+}
+
 async function dagKaartAfbeelding(n) {
   const el = document.getElementById('dagkaart-' + n);
   const kaart = dagKaarten[n];
@@ -4193,12 +4246,12 @@ async function dagKaartAfbeelding(n) {
   if (ruil) ruil.style.display = 'none';
   if (weerknop) weerknop.style.display = 'none';
   try {
-    const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#F7F3EC', useCORS: true });
-    const a = document.createElement('a');
-    a.href = canvas.toDataURL('image/jpeg', 0.92);
-    a.download = (kaart.naam || 'outfit').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) + '.jpg';
-    a.click();
-    showToast('Opgeslagen ✓');
+    const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#F7F3EC', useCORS: true,
+      onclone: function(doc) { fotoVlakkenInKopie(doc); } });
+    const hoe = await bewaarAlsAfbeelding(canvas, kaartBestandsnaam(kaart));
+    showToast(hoe === 'gedeeld'   ? 'Klaar — kies "opslaan in galerij"'
+            : hoe === 'afgebroken' ? 'Niet opgeslagen'
+            : 'Opgeslagen ✓');
   } catch(e) {
     showToast('Opslaan lukte niet: ' + (e && e.message || 'onbekend'));
   } finally {
