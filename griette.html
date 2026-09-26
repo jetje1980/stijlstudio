@@ -2874,6 +2874,27 @@ function escHtml(s) {
   });
 }
 
+// ── NAAR DE OUTFITKAART ──────────────────────────────────────────────────────
+// De outfitkaart was een losse pagina waar je altijd bij nul begon. Vanaf een
+// look neem je de stukken gewoon mee, plus de naam en een weg terug. Werkt
+// ook vanaf een gegenereerde outfit die nog nergens is opgeslagen.
+function outfitkaartUrl(ids, naam) {
+  var q = 'items=' + encodeURIComponent((ids || []).join(','))
+        + '&naam=' + encodeURIComponent(naam || 'Look uit je kast')
+        + '&terug=' + encodeURIComponent('griette.html#looks');
+  return 'outfitkaart.html?' + q;
+}
+
+function naarOutfitkaart(outfitId) {
+  for (var i = 0; i < boards.length; i++) {
+    var o = (boards[i].outfits || []).find(function(x){ return x.id === outfitId; });
+    if (!o) continue;
+    if (!(o.items || []).length) { showToast('Deze look heeft nog geen stukken'); return; }
+    location.href = outfitkaartUrl(o.items, o.name);
+    return;
+  }
+}
+
 function renderOutfit(boardId, outfit) {
   var list = document.getElementById('outfits-' + boardId);
   if (!list) return;
@@ -2923,7 +2944,18 @@ function renderOutfit(boardId, outfit) {
   copyBtn.title = 'Kopieer naar ander board';
   copyBtn.addEventListener('click', (function(bid,oid){ return function(){ showCopyToBoardPicker(bid,oid); }; })(boardId, outfit.id));
 
+  // De outfitkaart hoort bij dit werk, niet ergens apart: vanaf elke look kun
+  // je er direct een maken, met de stukken van die look al ingevuld.
+  var kaartBtn = document.createElement('button');
+  kaartBtn.className = 'outfit-action-btn';
+  kaartBtn.textContent = '🎨';
+  kaartBtn.title = 'Outfitkaart maken van deze look';
+  kaartBtn.addEventListener('click', (function(oid){
+    return function(){ naarOutfitkaart(oid); };
+  })(outfit.id));
+
   acts.appendChild(addItemBtn);
+  acts.appendChild(kaartBtn);
   acts.appendChild(selfieBtn);
   acts.appendChild(copyBtn);
   acts.appendChild(delBtn);
@@ -5619,7 +5651,6 @@ function generateSuggestions(append = false) {
         '<button class="sug-save-btn" id="sug-btn-' + idx + '">+ Board</button>' +
         '</div>' +
         wornWarning +
-        wornWarning +
         '<div class="sug-items-row">' +
         comboItems.map(function(item, itemIdx) {
           var swapBtn = '<button type="button" onclick="swapOutfitItem(\'sug-card-'+idx+'\','+itemIdx+',\''+item.cat+'\')" style="position:absolute;top:2px;right:2px;background:rgba(255,255,255,0.9);border:none;border-radius:50%;width:18px;height:18px;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--brown);padding:0;z-index:2;" title="Vervang dit item">↻</button>';
@@ -5697,9 +5728,22 @@ function generateSuggestions(append = false) {
         selfieBtn2.title = 'Foto maken';
         selfieBtn2.addEventListener('click', function() { openBoardPicker(ids, true); });
 
+        // Een outfit die je hier ziet, kun je meteen als kaart uitwerken —
+        // zonder hem eerst ergens op te slaan en daarna terug te zoeken.
+        var kaartBtn2 = document.createElement('button');
+        kaartBtn2.type = 'button';
+        kaartBtn2.className = 'outfit-kaart-btn';
+        kaartBtn2.style.cssText = 'padding:9px 12px;border:1.5px solid var(--cream-dark);background:var(--white);border-radius:10px;font-size:13px;cursor:pointer;';
+        kaartBtn2.textContent = '🎨';
+        kaartBtn2.title = 'Outfitkaart maken';
+        kaartBtn2.addEventListener('click', function() {
+          location.href = outfitkaartUrl(ids, (c.querySelector('.sug-card-title')||{}).textContent || 'Outfit');
+        });
+
         actionRow.appendChild(likeBtn);
         actionRow.appendChild(dislikeBtn);
         actionRow.appendChild(selfieBtn2);
+        actionRow.appendChild(kaartBtn2);
         c.appendChild(actionRow);
       })(comboItems.map(function(x){return x.id;}), card, comboItems);
 
