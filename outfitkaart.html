@@ -7628,7 +7628,55 @@ const bronInput = document.getElementById('bron-file');
 if (bronInput) bronInput.addEventListener('change', bronToevoegen);
 const lijstInput = document.getElementById('lijst-foto');
 if (lijstInput) lijstInput.addEventListener('change', lijstFotoGekozen);
-init().then(()=>{ setStep(1); toonPlaat(); });
+// ── BINNENKOMEN VANUIT DE KAST ───────────────────────────────────────────────
+// De outfitkaart stond los van de rest: je begon hier altijd bij nul, ook als
+// je net een look had samengesteld. Komt er een ?items=… in de URL mee, dan is
+// die look het startpunt en sla je stap 1 en 2 over. De herkomst blijft
+// zichtbaar, met een weg terug naar waar je vandaan kwam.
+let terugNaar = '';
+
+function startpuntUitUrl() {
+  let q;
+  try { q = new URLSearchParams(location.search); } catch(e) { return false; }
+  const ids = (q.get('items') || '').split(',').map(s => s.trim()).filter(Boolean);
+  if (!ids.length) return false;
+
+  const gevonden = ids.map(id => allItems.find(i => i.id === id)).filter(Boolean);
+  if (!gevonden.length) return false;
+
+  const naam = q.get('naam') || 'Look uit je kast';
+  terugNaar = q.get('terug') || '';
+  comboGekozen(
+    { name: naam, vibe: 'meegenomen uit je kast', typeName: 'Uit je Looks',
+      stijl: 'eigen', colors: [], tags: [] },
+    { items: gevonden, kantEnKlaar: true, bron: 'Uit je Looks' }
+  );
+  const mis = ids.length - gevonden.length;
+  const st = document.getElementById('startpunt-tekst') || document.getElementById('startpunt');
+  if (mis > 0 && st) st.insertAdjacentHTML('beforeend',
+    `<div class="field-note">${mis} stuk${mis===1?'':'ken'} uit die look zit${mis===1?'':'ten'} niet meer in je kast.</div>`);
+  return true;
+}
+
+function toonTerugKnop() {
+  if (!terugNaar) return;
+  const bar = document.getElementById('steps-bar');
+  if (!bar || document.getElementById('terug-kast')) return;
+  const a = document.createElement('a');
+  a.id = 'terug-kast';
+  a.href = terugNaar;
+  a.textContent = '‹ terug naar je Looks';
+  a.style.cssText = 'display:block;text-align:center;font-size:10px;color:var(--accent);'
+    + 'text-decoration:none;padding:6px 0 0;';
+  bar.parentNode.insertBefore(a, bar);
+}
+
+init().then(()=>{
+  const meegenomen = startpuntUitUrl();
+  setStep(meegenomen ? 3 : 1);
+  toonTerugKnop();
+  toonPlaat();
+});
 </script>
 </body>
 </html>
