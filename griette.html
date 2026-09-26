@@ -498,41 +498,35 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
     <button onclick="openAddModal()" title="Item toevoegen" style="width:38px;height:38px;border-radius:50%;background:var(--brown);color:var(--cream);border:none;font-size:22px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>
   </div>
 
-  <!-- Vandaag card (hero) -->
-  <div id="daily-card" style="background:var(--brown);border-radius:16px;margin-bottom:16px;overflow:hidden;">
-    <div style="padding:16px 16px 12px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="openQuickOutfit()">
-      <div>
-        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,168,122,0.8);margin-bottom:4px;">Vandaag</div>
-        <div id="daily-card-text" style="font-family:'Bodoni Moda',serif;font-size:20px;font-weight:400;color:var(--cream);line-height:1.2;">Wat trek je aan?</div>
-        <div id="daily-card-sub" style="font-size:9px;color:rgba(245,242,238,0.5);margin-top:3px;">Tik voor een outfit van de stylist</div>
-      </div>
-      <div id="daily-card-weather" style="text-align:right;">
-        <div style="font-size:32px;" id="daily-weather-icon">👗</div>
-      </div>
-    </div>
-    <div style="padding:0 16px 12px;border-top:1px solid rgba(255,255,255,0.1);">
-      <div style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(201,168,122,0.6);margin-bottom:6px;margin-top:8px;">Mood</div>
-      <div style="display:flex;gap:5px;flex-wrap:wrap;">
-        <button id="dq-rok" onclick="setDailyPref('bottom','rok',this)" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.2);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.7);">Rok/jurk</button>
-        <button id="dq-broek" onclick="setDailyPref('bottom','broek',this)" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.2);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.7);">Broek</button>
-        <div style="width:1px;background:rgba(255,255,255,0.15);margin:0 1px;"></div>
-        <button id="dq-sneakers" onclick="setDailyPref('shoe','sneakers',this)" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.2);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.7);">Sneakers</button>
-        <button id="dq-sandalen" onclick="setDailyPref('shoe','sandalen',this)" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.2);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.7);">Sandalen</button>
-        <button id="dq-laarzen" onclick="setDailyPref('shoe','laarzen',this)" style="padding:5px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.2);background:transparent;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.7);">Laarzen</button>
-      </div>
-    </div>
-    <div id="daily-outfit-preview" style="display:none;padding:0 16px 14px;">
-      <div id="daily-outfit-items" style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none;"></div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button onclick="logDailyOutfit()" style="flex:1;min-width:100px;padding:8px;background:rgba(255,255,255,0.15);border:none;border-radius:8px;font-size:10px;font-family:Jost,sans-serif;cursor:pointer;color:var(--cream);">❖ Dit draag ik!</button>
-        <button onclick="refreshQuickOutfit()" style="padding:8px 12px;background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:14px;cursor:pointer;color:var(--cream);">&#x21bb;</button>
-        <button onclick="quickOutfitFeedback('te warm')" style="padding:8px 10px;background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:9px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.65);">Te warm</button>
-        <button onclick="quickOutfitFeedback('al gedragen')" style="padding:8px 10px;background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:9px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.65);">Al gedragen</button>
-        <button onclick="quickOutfitFeedback('geen mood')" style="padding:8px 10px;background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-size:9px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.65);">Geen mood</button>
-      </div>
-      <button onclick="showYesterdayQuickLog()" id="gisteren-btn" style="width:100%;margin-top:6px;padding:7px;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:8px;font-size:9px;font-family:Jost,sans-serif;cursor:pointer;color:rgba(245,242,238,0.5);">📆 Gisteren gelogd?</button>
-    </div>
+  <!-- ===== HET DAGADVIES: tien kaarten om uit te kiezen ===== -->
+  <!-- Dit ís het dagadvies. Er stond hier eerst een losse heldenkaart met
+       "Wat trek je aan?" en mood-knoppen, daarnaast een banner "Dagelijkse
+       stijlinspiratie", en daar weer naast deze tien. Drie ingangen naar
+       dezelfde vraag. Wat die knoppen deden — rok of broek, welke schoenen —
+       stuurt nu deze tien, in plaats van een elfde suggestie ernaast. -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+    <div style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--brown-mid);font-family:'Jost',sans-serif;font-weight:500;">Vandaag voor jou</div>
+    <button id="dag-opnieuw" onclick="maakDagKaarten(dagContext, true)" style="font-size:9px;color:var(--brown-mid);background:none;border:1px solid var(--cream-dark);border-radius:12px;padding:4px 10px;cursor:pointer;font-family:'Jost',sans-serif;white-space:nowrap;">↻ Andere tien</button>
   </div>
+  <div style="font-size:10px;color:var(--muted);line-height:1.5;margin-bottom:8px;" id="dag-uitleg">
+    Tien looks uit je eigen kast. Tik er een aan om hem te bewaren.
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:6px;overflow-x:auto;scrollbar-width:none;" id="dag-context">
+    <button class="dag-ctx actief" data-ctx="" onclick="kiesDagContext('')">Verras me</button>
+    <button class="dag-ctx" data-ctx="werkdag" onclick="kiesDagContext('werkdag')">Werkdag</button>
+    <button class="dag-ctx" data-ctx="vrije dag" onclick="kiesDagContext('vrije dag')">Vrije dag</button>
+    <button class="dag-ctx" data-ctx="afspraak of uit" onclick="kiesDagContext('afspraak of uit')">Afspraak / uit</button>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;" id="dag-mood">
+    <button class="dag-ctx" id="dq-rok" onclick="kiesDagMood('bottom','rok')">Rok/jurk</button>
+    <button class="dag-ctx" id="dq-broek" onclick="kiesDagMood('bottom','broek')">Broek</button>
+    <span style="width:1px;background:var(--cream-dark);flex-shrink:0;margin:2px 2px;"></span>
+    <button class="dag-ctx" id="dq-sneakers" onclick="kiesDagMood('shoe','sneakers')">Sneakers</button>
+    <button class="dag-ctx" id="dq-sandalen" onclick="kiesDagMood('shoe','sandalen')">Sandalen</button>
+    <button class="dag-ctx" id="dq-laarzen" onclick="kiesDagMood('shoe','laarzen')">Laarzen</button>
+  </div>
+  <div id="dag-kaarten"></div>
+  <div style="height:22px;"></div>
 
   <!-- Snelle acties. Outfits, Looks en Stylist stonden hier ook, pal boven de
        balk onderaan waar ze óók staan — drie van de vier tegels waren dubbel.
@@ -560,26 +554,6 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
     </div>
     <span style="color:var(--muted);">›</span>
   </button>
-
-  <!-- ===== VANDAAG VOOR JOU: tien kaarten om uit te kiezen ===== -->
-  <!-- Home toonde je hele kast: 144 kaartjes om zelf iets uit te bedenken.
-       Wat je wilt is het omgekeerde — kijken en voelen waar je zin in hebt.
-       Deze tien worden één keer per dag gemaakt en daarna bewaard, zodat het
-       openen van de app niet elke keer wachten en geld kost. -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-    <div style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--brown-mid);font-family:'Jost',sans-serif;font-weight:500;">Vandaag voor jou</div>
-    <button id="dag-opnieuw" onclick="maakDagKaarten(dagContext, true)" style="font-size:9px;color:var(--brown-mid);background:none;border:1px solid var(--cream-dark);border-radius:12px;padding:4px 10px;cursor:pointer;font-family:'Jost',sans-serif;white-space:nowrap;">↻ Andere tien</button>
-  </div>
-  <div style="font-size:10px;color:var(--muted);line-height:1.5;margin-bottom:8px;" id="dag-uitleg">
-    Tien looks uit je eigen kast. Tik er een aan om hem te bewaren.
-  </div>
-  <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;" id="dag-context">
-    <button class="dag-ctx actief" data-ctx="" onclick="kiesDagContext('')">Verras me</button>
-    <button class="dag-ctx" data-ctx="werkdag" onclick="kiesDagContext('werkdag')">Werkdag</button>
-    <button class="dag-ctx" data-ctx="vrije dag" onclick="kiesDagContext('vrije dag')">Vrije dag</button>
-    <button class="dag-ctx" data-ctx="afspraak of uit" onclick="kiesDagContext('afspraak of uit')">Afspraak / uit</button>
-  </div>
-  <div id="dag-kaarten"></div>
 
   <!-- Kledingkast sectie: staat nu ingeklapt, want hij is om iets op te
        zoeken, niet om je ochtend mee te beginnen. -->
@@ -3416,6 +3390,7 @@ function laadDagKaarten() {
     if (d && d.datum === vandaagSleutel()) {
       dagKaarten = d.kaarten || [];
       dagContext = d.context || '';
+      dagMood = d.mood || { bottom:'', shoe:'' };
       dagBewaard = d.bewaard || {};
     }
   } catch(e) {}
@@ -3424,8 +3399,48 @@ function laadDagKaarten() {
 function bewaarDagKaarten() {
   try {
     localStorage.setItem('griette-dagkaarten-v1', JSON.stringify({
-      datum: vandaagSleutel(), context: dagContext, kaarten: dagKaarten, bewaard: dagBewaard }));
+      datum: vandaagSleutel(), context: dagContext, mood: dagMood,
+      kaarten: dagKaarten, bewaard: dagBewaard }));
   } catch(e) {}
+}
+
+// Rok of broek, en welke schoenen. Dat stond als losse mood-knoppen onder een
+// aparte heldenkaart; het stuurt nu gewoon deze tien. Nog een keer tikken zet
+// het weer uit — geen voorkeur is ook een antwoord.
+let dagMood = { bottom:'', shoe:'' };
+
+function kiesDagMood(soort, waarde) {
+  dagMood[soort] = dagMood[soort] === waarde ? '' : waarde;
+  document.querySelectorAll('#dag-mood .dag-ctx').forEach(function(b) {
+    const id = b.id.replace('dq-', '');
+    b.classList.toggle('actief', dagMood.bottom === id || dagMood.shoe === id);
+  });
+  maakDagKaarten(dagContext, true);
+}
+
+// In woorden, zodat de stylist het als wens leest en niet als filter.
+function dagMoodZin() {
+  const d = [];
+  if (dagMood.bottom === 'rok')   d.push('Ze heeft vandaag zin in een rok of jurk.');
+  if (dagMood.bottom === 'broek') d.push('Ze wil vandaag een broek, geen rok of jurk.');
+  if (dagMood.shoe) d.push('Bij de schoenen gaat haar voorkeur uit naar ' + dagMood.shoe + '.');
+  return d.length ? d.join(' ') + '\n\n' : '';
+}
+
+// Waar ze in haar cyclus zit, stuurt hoe kleding moet voelen. Dat stond als
+// eigen pagina in het menu terwijl het hier thuishoort: in wat je vandaag
+// voorgeschoteld krijgt.
+function dagCyclusZin() {
+  if (typeof getCyclusDag !== 'function') return '';
+  const dag = getCyclusDag();
+  if (!dag) return '';
+  const fase = getCyclusFaseVanDag(dag);
+  const richting = { menstruatie:'comfort en zachte stoffen', folliculair:'kleur en energie',
+                     ovulatie:'krachtig en vrouwelijk', luteaal:'soepel en warm' }[fase];
+  const klachten = (cyclusLog[todayStr()] && cyclusLog[todayStr()].klachten) || [];
+  return 'Cyclusdag ' + dag + (fase ? ' (' + fase + ')' : '')
+    + (klachten.length && klachten[0] !== 'geen klachten' ? ', klachten: ' + klachten.join(', ') : '')
+    + (richting ? '. Laat dat meewegen: ' + richting : '') + '.\n\n';
 }
 
 function kiesDagContext(ctx) {
@@ -3490,6 +3505,8 @@ async function maakDagKaarten(ctx, opnieuw) {
     + (ctx ? 'Vandaag is het een ' + ctx + '. Houd daar rekening mee — bij een werkdag hoort '
              + 'bijvoorbeeld een grotere tas die er ook echt bij past.\n\n'
            : 'Geen vaste gelegenheid vandaag: maak het inspirerend en gevarieerd.\n\n')
+    + dagMoodZin()
+    + dagCyclusZin()
     + 'HAAR KAST:\n' + regels + '\n\n'
     + 'Maak precies 10 looks, verdeeld als volgt:\n' + opdrachten + '\n\n'
     + 'Regels:\n'
@@ -6290,20 +6307,6 @@ function getWeatherStyleAdvice(tempC, code) {
   return 'Koel — laagjes, gesloten schoenen';
 }
 
-function updateDailyCard() {
-  const iconEl = document.getElementById('daily-weather-icon');
-  const textEl = document.getElementById('daily-card-text');
-  const subEl = document.getElementById('daily-card-sub');
-  if (!iconEl) return;
-  if (currentWeather) {
-    iconEl.textContent = weatherIcons[currentWeather.code] || '🌤';
-    const cat = {warm:'Warm', mild:'Mild', koel:'Koel'}[weatherTemp];
-    const time = new Date().getHours();
-    const greeting = time < 12 ? 'Goedemorgen' : time < 17 ? 'Goedemiddag' : 'Goedenavond';
-    if (textEl) textEl.textContent = greeting + ' Griette';
-    if (subEl) subEl.textContent = currentWeather.tempC + '°C · ' + (weatherDescriptions[currentWeather.code]||'') + ' — tik voor een outfit';
-  }
-}
 
 function openDailyInspo() {
   // Open today modal with a random item from the garderobe as starting point
@@ -6367,7 +6370,7 @@ async function fetchWeather() {
     // Update weather badge in suggestions
     updateWeatherBadge();
     // Update daily card
-    updateDailyCard();
+    
 
     // Re-generate suggestions with new weather if on suggestions tab
     if (document.getElementById('panel-suggesties')?.classList.contains('active')) {
@@ -6800,13 +6803,6 @@ function applyGarderobeFilter() {
 var weekPlan={}, weekActiveDate=null, weekOcc='casual', weekTmp='warm';
 function loadWeekPlan(){try{var s=localStorage.getItem('griette-weekplan-v1');if(s)weekPlan=JSON.parse(s);var t=new Date();t.setHours(0,0,0,0);Object.keys(weekPlan).forEach(function(d){if(new Date(d)<t)delete weekPlan[d];});}catch(e){}}
 function saveWeekPlan(){try{localStorage.setItem('griette-weekplan-v1',JSON.stringify(weekPlan));}catch(e){}supabaseSet('week-plan',weekPlan).catch(function(){});}
-function updateDailyCardWithPlan(){
-  var today=new Date().toISOString().split('T')[0];
-  var plan=weekPlan[today];
-  var te=document.getElementById('daily-card-text');
-  var se=document.getElementById('daily-card-sub');
-  if(plan&&te){te.textContent=plan.outfitName||'Vandaag gepland';if(se)se.textContent=(occasionTitles[plan.occasion]||plan.occasion||'')+' \u00b7 '+plan.items.length+' items';}
-}
 function buildWeekPlanner(){
   var cont=document.getElementById('week-planner-content');
   if(!cont)return;
@@ -6850,7 +6846,7 @@ function buildWeekPlanner(){
       hdr.innerHTML='<div><span style="font-family:Bodoni Moda,serif;font-size:18px;font-weight:400;color:'+(isT?'var(--brown-warm)':'var(--brown)')+';">'+dn+'</span>'+(occLbl?'<span style="font-size:8px;color:var(--brown-warm);background:rgba(155,98,64,0.08);border-radius:6px;padding:1px 6px;margin-left:5px;">'+occLbl+'</span>':'')+'<div style="font-size:9px;color:var(--muted);margin-top:1px;">'+dl+'</div></div><div style="display:flex;align-items:center;gap:6px;"><span style="font-size:10px;color:'+(plan?'var(--brown)':'var(--muted)')+';font-style:'+(plan?'normal':'italic')+';">'+(plan?plan.outfitName||'Gepland':'Niet gepland')+'</span>'+(plan?'<button style="background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;" id="clr-'+ds+'">&#215;</button>':'')+'</div>';
       if(plan){
         var clrBtn=hdr.querySelector('#clr-'+ds);
-        clrBtn.onclick=function(e){e.stopPropagation();delete weekPlan[ds];saveWeekPlan();buildWeekPlanner();updateDailyCardWithPlan();};
+        clrBtn.onclick=function(e){e.stopPropagation();delete weekPlan[ds];saveWeekPlan();buildWeekPlanner();};
       }
       card.appendChild(hdr);
       if (rotWarn) { var rw=document.createElement('div'); rw.innerHTML=rotWarn; card.appendChild(rw); }
@@ -6953,7 +6949,7 @@ function showWeekSavedOutfits(occId) {
       weekPlan[weekActiveDate] = { occasion: bid, temp: weekTmp, items: o.items, outfitName: o.name };
       saveWeekPlan();
       buildWeekPlanner();
-      updateDailyCardWithPlan();
+      
       document.getElementById('week-overlay').classList.remove('open');
       showToast('✓ ' + o.name + ' gepland');
     }; })(outfit, occId));
@@ -7007,7 +7003,7 @@ function genWeekOutfit(){
 function confirmWeekOutfit(){
   var p=window._pwk;if(!p)return;
   weekPlan[weekActiveDate]={occasion:weekOcc,temp:weekTmp,items:p.ids,outfitName:p.name};
-  saveWeekPlan();buildWeekPlanner();updateDailyCardWithPlan();
+  saveWeekPlan();buildWeekPlanner();
   document.getElementById('week-overlay').classList.remove('open');
   // If planning for today, log as worn
   if (weekActiveDate === todayStr()) logWornItems(p.ids);
@@ -7016,7 +7012,7 @@ function confirmWeekOutfit(){
 function confirmWeekAndSelfie(){
   var p=window._pwk;if(!p)return;
   weekPlan[weekActiveDate]={occasion:weekOcc,temp:weekTmp,items:p.ids,outfitName:p.name};
-  saveWeekPlan();buildWeekPlanner();updateDailyCardWithPlan();
+  saveWeekPlan();buildWeekPlanner();
   document.getElementById('week-overlay').classList.remove('open');
   var outfitId='week-'+weekActiveDate;
   setTimeout(function(){
@@ -7216,7 +7212,6 @@ laadDagKaarten();
 loadBoardSettings();
 loadCyclus();
 loadWellbeing();
-setTimeout(updateDailyCardWithCyclus, 1000);
 loadOutfitFeedback();
 loadCyclusLog();
 loadSelfies();
@@ -7247,7 +7242,7 @@ openDB().then(async () => {
   buildBoards();
   rebuildOccasions();
   renderInspoGallery();
-  updateDailyCardWithPlan();
+  
   // De tien van vandaag: uit de cache als ze er al zijn, anders één keer maken.
   // Na de Supabase-sync, zodat hij de hele kast kent en niet alleen wat er
   // lokaal stond.
@@ -9180,35 +9175,6 @@ function matchItemIds(nameList, allItems, catHints) {
 var _dailyPrefBottom = null; // 'rok' | 'broek' | null
 var _dailyPrefShoe = null;   // 'sneakers' | 'sandalen' | 'laarzen' | null
 
-function setDailyPref(type, val, btn) {
-  var btnMap = {bottom:['dq-rok','dq-broek'], shoe:['dq-sneakers','dq-sandalen','dq-laarzen']};
-  var activeStyle = 'rgba(255,255,255,0.25)';
-  if (type==='bottom') {
-    if (_dailyPrefBottom===val) { _dailyPrefBottom=null; }
-    else { _dailyPrefBottom=val; }
-    btnMap.bottom.forEach(function(id){
-      var b=document.getElementById(id);
-      if(!b) return;
-      var isActive = (id==='dq-'+_dailyPrefBottom);
-      b.style.background = isActive?activeStyle:'transparent';
-      b.style.color = isActive?'var(--cream)':'rgba(245,242,238,0.7)';
-      b.style.borderColor = isActive?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.2)';
-    });
-  } else {
-    if (_dailyPrefShoe===val) { _dailyPrefShoe=null; }
-    else { _dailyPrefShoe=val; }
-    btnMap.shoe.forEach(function(id){
-      var b=document.getElementById(id);
-      if(!b) return;
-      var isActive = (id==='dq-'+_dailyPrefShoe);
-      b.style.background = isActive?activeStyle:'transparent';
-      b.style.color = isActive?'var(--cream)':'rgba(245,242,238,0.7)';
-      b.style.borderColor = isActive?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.2)';
-    });
-  }
-  // Auto-generate with new pref
-  generateQuickOutfit(null);
-}
 
 var _quickOutfitIds = [];
 var outfitFeedback = {};
@@ -9230,106 +9196,8 @@ function recordOutfitFeedback(itemIds, reason){
   showToast('Feedback onthouden \u2713');
 }
 
-function logDailyOutfit(){
-  if(!_quickOutfitIds.length) return;
-  logWornItems(_quickOutfitIds);
-  var p=document.getElementById('daily-outfit-preview');if(p)p.style.display='none';
-  var t=document.getElementById('daily-card-text');if(t)t.textContent='Look gelogd \u2713';
-  var s=document.getElementById('daily-card-sub');if(s)s.textContent='Tik voor een nieuwe suggestie';
-  showToast('\u2756 Outfit gelogd voor vandaag');
-}
 
-function quickOutfitFeedback(reason){
-  _quickOutfitIds.forEach(function(id){likeItem(id,Math.max((outfitLikes[id]||0)-1,-3));});
-  generateQuickOutfit(reason);
-  showToast('Aanpassen op basis van feedback...');
-}
 
-function refreshQuickOutfit(){ generateQuickOutfit(null); }
-
-function openQuickOutfit(){
-  var p=document.getElementById('daily-outfit-preview');
-  if(p && p.style.display!=='none'){p.style.display='none';return;}
-  generateQuickOutfit(null);
-}
-
-async function generateQuickOutfit(feedback){
-  var subEl=document.getElementById('daily-card-sub');
-  if(subEl)subEl.textContent='Even nadenken...';
-  var allIt=getAllItems().filter(function(i){return !deletedItemIds.has(i.id);});
-  var recentW=new Set();
-  for(var d=0;d<3;d++){var dd=new Date();dd.setDate(dd.getDate()-d);var ds=dd.toISOString().split('T')[0];(wornLog[ds]||[]).forEach(function(id){recentW.add(id);});}
-  var wLines=allIt.map(function(i){var k=getTag(i.id,'kleur')||'';return i.name+(k?' ['+k+']':'')+(recentW.has(i.id)?' [RECENT]':'');}).join(', ');
-  // Apply daily prefs BEFORE building prompt
-  if (_dailyPrefBottom) allIt = allIt.filter(function(i2){
-    if (i2.cat==='tops'||i2.cat==='shoes'||i2.cat==='bags'||i2.cat==='accessories') return true;
-    var nm2=i2.name.toLowerCase();
-    if (_dailyPrefBottom==='rok') return i2.cat==='jurken'||nm2.includes('rok')||nm2.includes('skirt')||nm2.includes('mini')||nm2.includes('maxi');
-    if (_dailyPrefBottom==='broek') return !nm2.includes('rok')&&!nm2.includes('skirt')&&i2.cat!=='jurken';
-    return true;
-  });
-  if (_dailyPrefShoe) allIt = allIt.filter(function(i3){
-    if (i3.cat!=='shoes') return true;
-    var nm3=i3.name.toLowerCase();
-    if (_dailyPrefShoe==='sneakers') return nm3.includes('sneaker')||nm3.includes('new balance')||nm3.includes('adidas')||nm3.includes('gympen');
-    if (_dailyPrefShoe==='sandalen') return nm3.includes('sandal')||nm3.includes('kitten')||nm3.includes('slipper')||nm3.includes('muil');
-    if (_dailyPrefShoe==='laarzen') return nm3.includes('laars')||nm3.includes('boot')||nm3.includes('chelsea');
-    return true;
-  });
-  // Rebuild wLines after filtering
-  wLines = allIt.map(function(i){var k=getTag(i.id,'kleur')||'';return i.name+(k?' ['+k+']':'')+(recentW.has(i.id)?' [RECENT]':'');}).join(', ');
-  var tempTxt=currentWeather?currentWeather.tempC+'\u00b0C':'onbekend';
-  var prefTxt = (_dailyPrefBottom==='rok'?' Voorkeur: rok of jurk.':_dailyPrefBottom==='broek'?' Voorkeur: broek.':'')
-    + (_dailyPrefShoe?' Schoenen: '+_dailyPrefShoe+'.':'');
-  var prompt='Je bent Griette\'s persoonlijke stylist. DNA: klassiek casual, krachtig, kleurrijk, vrouwelijk. Taille benadrukken.\n\n'
-    +'Weer: '+tempTxt+'\n'
-    +(feedback?'Vorige feedback: '+feedback+' \u2014 pas aan.\n':'')
-    +(prefTxt?prefTxt+'\n':'')
-    +(function(){ var dag=getCyclusDag(); if(!dag) return ''; var fase=getCyclusFaseVanDag(dag); var today=todayStr(); var kl=(cyclusLog[today]&&cyclusLog[today].klachten)||[]; var adv={menstruatie:'comfort en zachte stoffen',folliculair:'kleur en energie',ovulatie:'krachtig en vrouwelijk',luteaal:'soepel en warm'}; return 'Cyclusdag '+dag+' ('+fase+')'+(kl.length&&kl[0]!=='geen klachten'?' klachten: '+kl.join(', '):'')+(adv[fase]?'. Stijladvies richting: '+adv[fase]:'')+'\n'; })()
-    +'GARDEROBE: '+wLines+'\n\n'
-    +((_dailyPrefBottom==='rok')?' Voorkeur: rok of jurk.':(_dailyPrefBottom==='broek')?' Voorkeur: broek.':'')
-    +((_dailyPrefShoe)?'Schoenen: '+_dailyPrefShoe+'.\n':'')
-    +'Stel 1 outfit voor. Geen recent gedragen items. MAX 4 items. Jurk = geen broek erbij.\n'
-    +'Geef ALLEEN JSON: {"naam":"...","items":["exacte naam","exacte naam","exacte schoenen"],"reden":"1 zin"}';
-  try{
-    var res=await aiFetch(null,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:aiModelNu(),max_tokens:400,messages:[{role:'user',content:prompt}]})});
-    var data=await res.json();
-    var text=(data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
-    var clean=text.replace(/^[^{]*/,'').replace(/[^}]*$/,'');
-    var parsed=JSON.parse(clean);
-    _quickOutfitIds=(parsed.items||[]).map(function(name){
-      var nl=name.toLowerCase().trim();
-      var f=allIt.find(function(i){return i.name.toLowerCase()===nl;})
-        ||allIt.reduce(function(best,i){var words=i.name.toLowerCase().split(' ').filter(function(w){return w.length>3;});var hits=words.filter(function(w){return nl.includes(w);}).length;var score=words.length?hits/words.length:0;return score>0.5&&score>(best?best.score:0)?{item:i,score:score}:best;},null);
-      if(f&&f.item)f=f.item;return f?f.id:null;
-    }).filter(Boolean);
-    var tEl=document.getElementById('daily-card-text');var sEl=document.getElementById('daily-card-sub');
-    if(tEl)tEl.textContent=parsed.naam||'Jouw look van vandaag';
-    if(sEl)sEl.textContent=parsed.reden||'';
-    var iDiv=document.getElementById('daily-outfit-items');
-    if(iDiv){iDiv.innerHTML=_quickOutfitIds.map(function(id){var nm=getItemName(id);var ph=photos[id]?'<img loading="lazy" src="'+photos[id]+'" style="width:100%;height:100%;object-fit:cover;">':'<span style="font-size:7px;color:rgba(245,242,238,0.6);padding:2px;">'+nm.split(' ')[0]+'</span>';return '<div style="flex-shrink:0;width:52px;"><div style="width:52px;height:64px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;">'+ph+'</div><div style="font-size:7px;color:rgba(245,242,238,0.6);text-align:center;margin-top:2px;">'+(nm.length>10?nm.substring(0,9)+'\u2026':nm)+'</div></div>';}).join('');}
-    var pr=document.getElementById('daily-outfit-preview');if(pr)pr.style.display='block';
-  }catch(e2){
-    // Dit is de hoofdactie van de app. Ging er iets mis, dan zette hij de
-    // ondertitel terug op "Tik voor een outfitsuggestie" — niet te
-    // onderscheiden van "er is niets gebeurd". Zeg gewoon wat er is.
-    var s2=document.getElementById('daily-card-sub');
-    var t2=document.getElementById('daily-card-text');
-    if(t2)t2.textContent='Dat lukte even niet';
-    if(s2)s2.textContent=quickOutfitReden(e2)+' Tik om het opnieuw te proberen.';
-  }
-}
-
-// Eén zin die zegt wát er misging, in gewone taal.
-function quickOutfitReden(e) {
-  var m = String((e && e.message) || e || '');
-  if (!navigator.onLine)                 return 'Je hebt geen verbinding.';
-  if (/Failed to fetch|NetworkError/i.test(m)) return 'De stylist was niet bereikbaar.';
-  if (/JSON|Unexpected token/i.test(m))  return 'De stylist gaf een antwoord dat ik niet kon lezen.';
-  if (/\b(429|rate)/i.test(m))           return 'Te veel aanvragen vlak na elkaar.';
-  if (/\b5\d\d\b/.test(m))               return 'De stylist had even een storing.';
-  return 'Er ging iets mis bij de stylist.';
-}
 
 // ============ OUTFIT FEEDBACK PICKER ============
 function showOutfitFeedbackPicker(itemIds) {
@@ -10015,7 +9883,7 @@ function startNieuweCyclusVandaag() {
   var today = new Date().toISOString().split('T')[0];
   startNieuweCyclus(today);
   var ov = document.getElementById('cyclus-overlay'); if(ov) ov.remove();
-  updateDailyCardWithCyclus();
+  
   openCyclusTracker(); // reopen to show dag 1
 }
 
@@ -10041,7 +9909,7 @@ function startCyclusVanDatum() {
   }
   startNieuweCyclus(el.value);
   var ov = document.getElementById('cyclus-overlay'); if(ov) ov.remove();
-  updateDailyCardWithCyclus();
+  
   var day2 = getCyclusDay();
   showToast('\u2756 Cyclus opgeslagen \u2014 vandaag dag ' + (day2||'?'));
 }
@@ -10073,15 +9941,6 @@ function toggleCyclusKlacht(btn) {
   try { localStorage.setItem(key, JSON.stringify(current)); } catch(e) {}
 }
 
-function updateDailyCardWithCyclus() {
-  var day = getCyclusDay();
-  if (!day) return;
-  var fase = getCyclusFase(day);
-  var subEl = document.getElementById('daily-card-sub');
-  if (subEl && fase) {
-    subEl.textContent = fase.emoji + ' Dag ' + day + ' \u00b7 ' + fase.fase;
-  }
-}
 
 async function getCyclusOutfitAdvies(day, fase) {
   showToast('\u2756 Outfit advies ophalen...');
@@ -10232,7 +10091,7 @@ function openCyclusLog() {
     overlay.remove();
     showToast('\u2756 Cyclus opgeslagen \u2713');
     // Update daily card sub if cycle info useful
-    updateDailyCardWithPlan();
+    
   });
 
   var closeBtn = document.createElement('button');
@@ -11055,21 +10914,21 @@ function checkOutfitHerhaling() {
     if (overlap.length > 0 && todayBottoms.some(function(id){ return pastItems.includes(id); })) {
       var daysAgo = d;
       var nm = getItemName(overlap[0]);
+      // Dit hing als bannertje onder de oude heldenkaart. Het hoort bij de
+      // tien van vandaag: één regel erboven, en tikken geeft tien nieuwe.
       setTimeout(function(){
-        // Show as subtle banner on daily card
-        var herhalingBanner = document.getElementById('herhaling-hint');
-        if (!herhalingBanner) {
-          herhalingBanner = document.createElement('div');
-          herhalingBanner.id = 'herhaling-hint';
-          herhalingBanner.style.cssText = 'font-size:9px;color:rgba(245,242,238,0.5);text-align:center;padding:4px 16px 8px;cursor:pointer;';
-          herhalingBanner.addEventListener('click', function(){
-            herhalingBanner.remove();
-            generateQuickOutfit('andere outfit, vermijd eerder gedragen combos');
-          });
-          var dc = document.getElementById('daily-card');
-          if (dc) dc.appendChild(herhalingBanner);
-        }
-        herhalingBanner.textContent = '\uD83D\uDD01 ' + nm.split(' ').slice(0,2).join(' ') + ' droeg je ' + daysAgo + ' dagen geleden ook — tik voor iets nieuws';
+        var uitleg = document.getElementById('dag-uitleg');
+        if (!uitleg || document.getElementById('herhaling-hint')) return;
+        var hint = document.createElement('div');
+        hint.id = 'herhaling-hint';
+        hint.style.cssText = 'font-size:10px;color:var(--brown-mid);margin-top:4px;cursor:pointer;';
+        hint.textContent = '🔁 ' + nm.split(' ').slice(0,2).join(' ') + ' droeg je '
+          + daysAgo + ' dagen geleden ook — tik voor tien nieuwe';
+        hint.addEventListener('click', function(){
+          hint.remove();
+          maakDagKaarten(dagContext, true);
+        });
+        uitleg.parentNode.insertBefore(hint, uitleg.nextSibling);
       }, 2000);
       break;
     }
