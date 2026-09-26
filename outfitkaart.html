@@ -613,6 +613,14 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
            scherm niet meer wat je koos — en waarom de knop iets anders wil. -->
       <div class="field-note" id="cap-hoe-herhaal" style="margin-bottom:6px;"></div>
       <div class="field-note" style="margin-bottom:10px;" id="cap-kies-uitleg">Gerangschikt op wat je er zelf van hebt. De bovenste staat al aan — tik hem weg of kies een andere.</div>
+      <!-- Wie draagt: de rustige kleur, of juist de felle? Dat was geen keuze,
+           en daardoor kon een turkooizen top nooit het grootste vlak worden. -->
+      <div class="sec-label" style="margin-top:4px;">Welke kleur draagt?</div>
+      <div class="cap-nee" id="verhouding-stand">
+        <button class="cap-neeknop aan" data-stand="rustig" onclick="zetVerhoudingStand('rustig')">Rustige kleur draagt</button>
+        <button class="cap-neeknop" data-stand="kleur" onclick="zetVerhoudingStand('kleur')">🎨 Kleur voorop</button>
+      </div>
+      <div class="field-note" id="verhouding-stand-uit" style="margin-bottom:10px;"></div>
       <div id="cap-combo-lijst"></div>
       <!-- Wat je keuze oplevert, terwijl je kiest. Zonder dit moet je na het
            aantikken maar afwachten wat eruit komt. -->
@@ -2295,6 +2303,9 @@ function fotosInPrompt(lijst, item) {
 }
 
 let itemTags = {};
+// Staat de kast er al? Zonder dit verschil is "niets gevonden" niet te
+// onderscheiden van "nog aan het laden", en dat scheelt nogal voor wat je zegt.
+let dataKlaar = false;
 let customColors = []; // max 2 selected KLEUREN entries
 let customCount = 0;   // aantal geladen eigen items
 let outfitUitleg = null; // {kleur, vorm, textuur} van de AI
@@ -2603,6 +2614,13 @@ async function init() {
   await laadTassen();
 
   buildComboTypes();
+
+  // Vanaf hier is de kast er echt. Stond je al op een scherm dat op de kast
+  // wacht, dan wordt dat nu alsnog gevuld — anders blijf je naar een lege
+  // lijst kijken terwijl de gegevens allang binnen zijn.
+  dataKlaar = true;
+  if (startMode === 'kleur') bouwKleurGrid();
+  if (startMode === 'item' && typeof buildAnchorGrid === 'function') buildAnchorGrid();
 }
 
 // Accepteert {cat:[items]}, {cat:item}, een platte array, of rommel.
@@ -3702,8 +3720,13 @@ function bouwKleurGrid() {
   if (!grid) return;
   const kleuren = kleurenInKast();
   if (!kleuren.length) {
-    grid.innerHTML = '<div class="field-note">Je items hebben nog geen kleur meegekregen. '
-      + 'Zet er een kleur bij in je kast, dan kan ik hier verder.</div>';
+    // Tik je hierop voordat je kast binnen is, dan zijn er nog geen kleuren —
+    // maar dat lag niet aan je kast. Die melding gaf jou de schuld én bleef
+    // staan nadat de kleuren er wél waren, dus liep de route hier gewoon dood.
+    grid.innerHTML = dataKlaar
+      ? '<div class="field-note">Je items hebben nog geen kleur meegekregen. '
+        + 'Zet er een kleur bij in je kast, dan kan ik hier verder.</div>'
+      : '<div class="field-note">Je kast wordt nog geladen… de kleuren verschijnen zo vanzelf.</div>';
     return;
   }
   grid.innerHTML = kleuren.map(k => {
@@ -5856,6 +5879,22 @@ function capScoorCombos() {
       .slice(0, 20);
   }
 
+  // Sta je op "kleur voorop", dan hoort een combo zónder felle kleur niet
+  // bovenaan: daar valt niets voorop te zetten. Combo's waarin ze die felle
+  // kleur ook echt op een top, jas of jurk heeft, komen eerst — anders is het
+  // een kleurrichting die ze niet kan dragen.
+  if (verhoudingStand === 'kleur') {
+    const draagbaar = p => {
+      const fel = (p.tags || []).map(t => String(t).toLowerCase()).filter(isFelleKleur);
+      if (!fel.length) return 0;
+      const opGroot = capGefilterd.some(i =>
+        ['tops','layers','jurken','eendelig'].indexOf(i.cat) >= 0
+        && fel.some(f => kleurMatcht(f, kleurTekstVan(i))));
+      return opGroot ? 2 : 1;
+    };
+    capCombos = capCombos.slice().sort((a,b) => draagbaar(b) - draagbaar(a));
+  }
+
   // Niets bruikbaars? Toon dan toch de best scorende, met een eerlijk woord.
   if (!capCombos.length) {
     capCombos = (gewenst.length ? gewenst : scored)
@@ -5943,38 +5982,104 @@ function isFelleKleur(k) {
   return HELDER.some(h => kleurMatcht(h, k));
 }
 
-function kleurVerhouding(p) {
+// Twee manieren om dezelfde kleuren te verdelen. "rustig" is de klassieke uit
+// haar rapport: een kalme basis draagt, de felle kleur is een accent. Maar een
+// turkooizen top of een kobalt jas als grootste vlak is geen fout — dat is een
+// andere keuze, en wel de keuze die nu gedragen wordt. Die kon de tool niet
+// maken: de felle kleur werd altijd naar tien procent geduwd.
+//
+// Bij "kleur voorop" draagt de felste kleur, op een middelgroot vlak (top of
+// jas) in plaats van op een broek, en zakt de rustige kleur naar de basis.
+let verhoudingStand = 'rustig';   // of 'kleur'
+
+const VERHOUDING_KLEUR = [
+  { sleutel:'hoofd',  label:'hoofdkleur', deel:50,
+    draagt:'top, jas of jurk', cats:['tops','layers','jurken','eendelig'] },
+  { sleutel:'steun',  label:'basis',      deel:35,
+    draagt:'broek of rok',     cats:['bottoms'] },
+  { sleutel:'accent', label:'accent',     deel:15,
+    draagt:'tas, schoenen of sjaal', cats:['bags','shoes','accessories'] },
+];
+
+const STAND_UITLEG = {
+  rustig: 'Een kalme kleur op het grootste vlak, de felle kleur klein. Rustig, '
+        + 'en je gezicht krijgt alle aandacht.',
+  kleur:  'De felle kleur draagt, op een top, jas of jurk — het grootste vlak dus, '
+        + 'maar niet op je benen. De rest wordt basis eromheen.',
+};
+
+function zetVerhoudingStand(stand) {
+  const anders = verhoudingStand !== stand;
+  verhoudingStand = stand;
+  document.querySelectorAll('#verhouding-stand .cap-neeknop').forEach(function(b) {
+    b.classList.toggle('aan', b.dataset.stand === stand);
+  });
+  const uit = document.getElementById('verhouding-stand-uit');
+  if (uit) uit.textContent = STAND_UITLEG[stand] || '';
+  // De volgorde hangt van de stand af, dus die wordt opnieuw bepaald. Dat zet
+  // ook de voorselectie opnieuw — je verandert immers de hele premisse.
+  if (anders && capStap === 2 && typeof capScoorCombos === 'function') {
+    capScoorCombos();
+    capZelfGekozen = false;
+    voorselecteerCombos();
+  }
+  if (typeof toonCombos === 'function') toonCombos();
+  if (typeof bijwerkComboKnop === 'function') bijwerkComboKnop();
+  if (typeof buildKaart === 'function' && selItems && selItems.length) buildKaart();
+}
+
+function kleurVerhouding(p, standOverride) {
   const tags = (p.tags || []).map(t => String(t).toLowerCase()).filter(Boolean);
   if (!tags.length) return [];
   const hex = {};
   tags.forEach(function(t, i) { if (!hex[t]) hex[t] = (p.colors || [])[i] || '#ccc'; });
 
+  const stand = standOverride || verhoudingStand;
   const fel = tags.filter(isFelleKleur);
   const rustig = tags.filter(function(t){ return !isFelleKleur(t); });
+  let hoofd, steun, accent;
 
-  // Het accent is de felste kleur; is alles rustig, dan de laatste.
-  const accent = fel[0] || tags[tags.length - 1];
-  // De hoofdkleur draagt, dus die is rustig — en niet het accent.
-  const hoofd = rustig.filter(function(t){ return t !== accent; })[0]
-             || tags.filter(function(t){ return t !== accent; })[0] || accent;
-  // De steunkleur draagt dertig procent, dus die hoort ook rustig te zijn. Nam
-  // hij hier de eerstvolgende kleur, dan kon een tweede felle kleur op dertig
-  // procent belanden — precies wat de theorie afraadt.
-  const over = tags.filter(function(t){ return t !== accent && t !== hoofd; });
-  const steun = over.filter(function(t){ return !isFelleKleur(t); })[0] || over[0] || '';
+  if (stand === 'kleur' && fel.length) {
+    // De felste kleur draagt. Het accent wordt dan de tweede felle kleur als
+    // die er is — en anders een rustige, want twee grote felle vlakken naast
+    // elkaar is geen verhouding meer.
+    hoofd = fel[0];
+    accent = fel[1] || rustig[rustig.length - 1] || tags[tags.length - 1];
+    steun = rustig.filter(function(t){ return t !== accent; })[0]
+         || tags.filter(function(t){ return t !== hoofd && t !== accent; })[0] || '';
+  } else {
+    // Het accent is de felste kleur; is alles rustig, dan de laatste.
+    accent = fel[0] || tags[tags.length - 1];
+    // De hoofdkleur draagt, dus die is rustig — en niet het accent.
+    hoofd = rustig.filter(function(t){ return t !== accent; })[0]
+         || tags.filter(function(t){ return t !== accent; })[0] || accent;
+    // De steunkleur draagt dertig procent, dus die hoort ook rustig te zijn.
+    // Nam hij hier de eerstvolgende kleur, dan kon een tweede felle kleur op
+    // dertig procent belanden — precies wat de theorie afraadt.
+    const over = tags.filter(function(t){ return t !== accent && t !== hoofd; });
+    steun = over.filter(function(t){ return !isFelleKleur(t); })[0] || over[0] || '';
+  }
 
   const uit = [];
-  VERHOUDING.forEach(function(r) {
+  const schema = (stand === 'kleur' && fel.length) ? VERHOUDING_KLEUR : VERHOUDING;
+  schema.forEach(function(r) {
     const kleur = r.sleutel === 'hoofd' ? hoofd : r.sleutel === 'steun' ? steun : accent;
     if (!kleur) return;
     uit.push({ sleutel:r.sleutel, label:r.label, deel:r.deel, draagt:r.draagt,
                cats:r.cats, kleur:kleur, hex:hex[kleur] || '#ccc' });
   });
-  // Zonder steunkleur verdeelt de rest zich: de hoofdkleur neemt die ruimte over.
-  if (!steun) uit.forEach(function(r){ if (r.sleutel === 'hoofd') r.deel = 75; });
-  // Meer dan één felle kleur is geen accent meer maar een krachtmeting. Dat
-  // hoort ze te zien vóórdat ze kiest, niet pas op de kaart.
-  if (fel.length > 1) uit.botsing = fel.slice(0, 3);
+  // Zonder steunkleur neemt de hoofdkleur precies díe ruimte over, zodat het
+  // altijd op honderd procent uitkomt. Er een vast getal van maken liet een
+  // gat vallen: 85 + 10 is geen verhouding.
+  if (!steun) {
+    const vrij = (schema.find(function(r){ return r.sleutel === 'steun'; }) || {}).deel || 0;
+    uit.forEach(function(r){ if (r.sleutel === 'hoofd') r.deel += vrij; });
+  }
+  // Twee felle kleuren naast elkaar. Bij "rustig" is dat een waarschuwing —
+  // dan is er geen accent meer. Bij "kleur voorop" is het juist de bedoeling
+  // dat er een draagt, dus dan hoeft dat niet als probleem te klinken.
+  if (fel.length > 1 && stand !== 'kleur') uit.botsing = fel.slice(0, 3);
+  uit.stand = (stand === 'kleur' && fel.length) ? 'kleur' : 'rustig';
   return uit;
 }
 
