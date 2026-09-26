@@ -479,13 +479,33 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <div class="sec-label">Eén outfitkaart maken</div>
     <div class="field-note" style="margin-bottom:8px;">Kies waar je begint. Daarna loop je langs kleur, items en details naar je kaart.</div>
     <div class="start-mode">
-      <button class="mode-btn active" id="mode-combo" onclick="setStartMode('combo')">🎨 Met een kleurcombo</button>
-      <button class="mode-btn" id="mode-eigenkleur" onclick="startEigenKleur()">🖌️ Met mijn eigen kleuren</button>
+      <button class="mode-btn active" id="mode-kleur" onclick="setStartMode('kleur')">🎨 Met een kleur</button>
       <button class="mode-btn" id="mode-item" onclick="setStartMode('item')">👕 Met een item uit mijn kast</button>
     </div>
     <button class="mode-btn" id="mode-robin" onclick="setStartMode('robin')" style="width:100%;margin-top:8px;">📖 Kant-en-klaar: de 33 outfits van Robin</button>
     <button class="mode-btn" id="mode-inspo" onclick="setStartMode('inspo')" style="width:100%;margin-top:8px;">📸 Deze look wil ik namaken</button>
-    <button class="mode-btn" id="mode-paar" onclick="setStartMode('paar')" style="width:100%;margin-top:8px;">🎨 Met een kleurenpaar uit mijn schema's</button>
+
+    <div id="kleur-area" style="display:none;margin-top:14px;">
+      <!-- Kleur eerst, dan waaróp, dan pas wat erbij kan. Een kleur op een tas
+           is iets heel anders dan dezelfde kleur op een broek, en die vraag
+           stond nergens. Eerst een abstracte kleurcombinatie kiezen en pas
+           veel later kleding zien, is de omgekeerde volgorde. -->
+      <div class="sec-label">1 · Welke kleur?</div>
+      <div class="field-note" style="margin-bottom:8px;" id="kleur-stap1-uit">Deze kleuren hangen in je kast. Tik er een aan.</div>
+      <div id="kleur-grid" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;"></div>
+
+      <div id="kleur-stap2" style="display:none;margin-top:14px;">
+        <div class="sec-label">2 · Waarop?</div>
+        <div class="field-note" style="margin-bottom:8px;" id="kleur-stap2-uit"></div>
+        <div id="kleur-rollen" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+      </div>
+
+      <div id="kleur-stap3" style="display:none;margin-top:14px;">
+        <div class="sec-label">3 · Wat kan daarbij?</div>
+        <div class="field-note" style="margin-bottom:8px;" id="kleur-stap3-uit"></div>
+        <div id="kleur-partners"></div>
+      </div>
+    </div>
 
     <div class="route-scheiding"><span>of</span></div>
 
@@ -525,9 +545,9 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <div class="sec-label" style="margin-top:14px;">Hoe wil je het?</div>
       <div class="field-note" style="margin-bottom:8px;">Compact inpakken en verkennen zijn niet hetzelfde. Dezelfde reis, ander soort uitkomst.</div>
       <div class="cap-nee" id="cap-hoe">
-        <button class="nee-btn" data-hoe="compact" onclick="kiesCapHoe('compact')">🧳 Zo compact mogelijk</button>
-        <button class="nee-btn actief" data-hoe="midden" onclick="kiesCapHoe('midden')">Middenin</button>
-        <button class="nee-btn" data-hoe="ruim" onclick="kiesCapHoe('ruim')">✨ Laat me van alles zien</button>
+        <button class="cap-neeknop" data-hoe="compact" onclick="kiesCapHoe('compact')">🧳 Zo compact mogelijk</button>
+        <button class="cap-neeknop aan" data-hoe="midden" onclick="kiesCapHoe('midden')">Middenin</button>
+        <button class="cap-neeknop" data-hoe="ruim" onclick="kiesCapHoe('ruim')">✨ Laat me van alles zien</button>
       </div>
       <div class="field-note" id="cap-hoe-uit" style="margin-bottom:6px;"></div>
 
@@ -566,7 +586,10 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
     <div id="cap-s2" style="display:none">
       <div id="cap-filter-uitleg" class="cap-paklijst" style="margin-bottom:10px;"></div>
       <div class="sec-label">Kleurcombo's die in je kast zitten</div>
-      <div class="field-note" style="margin-bottom:10px;">Gerangschikt op hoeveel je er zelf van hebt. Kies er <b>twee of meer</b> — dan krijg je outfits die echt van elkaar verschillen.</div>
+      <!-- Hier landt de keuze van stap 1. Stond die er niet, dan wist je op dit
+           scherm niet meer wat je koos — en waarom de knop iets anders wil. -->
+      <div class="field-note" id="cap-hoe-herhaal" style="margin-bottom:6px;"></div>
+      <div class="field-note" style="margin-bottom:10px;" id="cap-kies-uitleg">Gerangschikt op hoeveel je er zelf van hebt.</div>
       <div id="cap-combo-lijst"></div>
       <div id="cap-bijstel" style="display:none;margin-top:12px;">
         <div class="sec-label">Een kleur wisselen</div>
@@ -3301,18 +3324,26 @@ function wisStartpunt() {
 // ── STEP 1: STARTKEUZE ────────────────────────────────────────────────────────
 function setStartMode(mode) {
   startMode = mode;
-  document.getElementById('mode-combo').classList.toggle('active', mode === 'combo');
+  const mk = document.getElementById('mode-kleur');
+  if (mk) mk.classList.toggle('active', mode === 'kleur');
+  const mc = document.getElementById('mode-combo');
+  if (mc) mc.classList.toggle('active', mode === 'combo');
   document.getElementById('mode-item').classList.toggle('active', mode === 'item');
   document.getElementById('mode-robin').classList.toggle('active', mode === 'robin');
   document.getElementById('mode-inspo').classList.toggle('active', mode === 'inspo');
-  document.getElementById('mode-paar').classList.toggle('active', mode === 'paar');
+  const mp = document.getElementById('mode-paar');
+  if (mp) mp.classList.toggle('active', mode === 'paar');
   document.getElementById('mode-capsule').classList.toggle('active', mode === 'capsule');
-  document.getElementById('mode-eigenkleur').classList.remove('active');
-  document.getElementById('combo-area').style.display  = mode === 'combo' ? 'block' : 'none';
+
+  const ka = document.getElementById('kleur-area');
+  if (ka) { ka.style.display = mode === 'kleur' ? 'block' : 'none'; if (mode === 'kleur') bouwKleurGrid(); }
+  const ca = document.getElementById('combo-area');
+  if (ca) ca.style.display = mode === 'combo' ? 'block' : 'none';
   document.getElementById('anchor-area').style.display = mode === 'item'  ? 'block' : 'none';
   document.getElementById('robin-area').style.display  = mode === 'robin' ? 'block' : 'none';
   document.getElementById('inspo-area').style.display  = mode === 'inspo' ? 'block' : 'none';
-  document.getElementById('paar-area').style.display   = mode === 'paar'  ? 'block' : 'none';
+  const pa = document.getElementById('paar-area');
+  if (pa) pa.style.display = mode === 'paar' ? 'block' : 'none';
   document.getElementById('capsule-area').style.display = mode === 'capsule' ? 'block' : 'none';
 
   // Route wisselen betekent opnieuw beginnen met de combo
@@ -3590,6 +3621,188 @@ Antwoord ALLEEN met een JSON-array:
 
 // Zelf een of twee kleuren kiezen kon al, maar zat weggestopt als tiende en
 // laatste type onder "Met een kleurcombo". Deze knop brengt je er direct heen.
+// ── BEGINNEN BIJ EEN KLEUR ───────────────────────────────────────────────────
+// Drie deuren gingen hiernaartoe: "met een kleurcombo", "met mijn eigen
+// kleuren" en "met een kleurenpaar uit mijn schema's". Twee met hetzelfde
+// icoon, en van buitenaf niet uit elkaar te houden. Het is één vraag, in drie
+// stappen: welke kleur, waaróp, en wat kan daarbij.
+//
+// Waarop is de stap die ontbrak. Bordeaux op een tas vraagt iets anders dan
+// bordeaux op een broek — en pas als dat vaststaat, is "wat kan erbij" een
+// zinnige vraag.
+let kleurKeuze = { kleur: '', rol: '' };
+
+// De stippen staan al in KLEUREN; hier als opzoektabel, zodat een kleurnaam
+// uit haar tags meteen een kleurvlakje oplevert.
+const KLEUR_HEX = KLEUREN.reduce(function(m, k) { m[k.v] = k.dot; return m; }, {});
+
+const KLEUR_ROLLEN = [
+  { cat:'tops',        label:'top' },
+  { cat:'bottoms',     label:'broek of rok' },
+  { cat:'layers',      label:'laagje of jas' },
+  { cat:'jurken',      label:'jurk' },
+  { cat:'eendelig',    label:'jumpsuit of co-ord' },
+  { cat:'shoes',       label:'schoenen' },
+  { cat:'bags',        label:'tas' },
+  { cat:'accessories', label:'accessoire' },
+];
+
+// Welke stukken heeft ze in deze kleur? Dat bepaalt wat er te kiezen valt.
+function stukkenInKleur(kleur, cat) {
+  const { houden } = zeefKast(allItems, null, []);
+  return houden.filter(i =>
+    (!cat || i.cat === cat) && kleurMatcht(kleur, kleurTekstVan(i)));
+}
+
+// Alleen kleuren die ze echt heeft, met hoeveel. Een kleur aanbieden waar ze
+// niets in heeft, loopt gegarandeerd dood.
+function kleurenInKast() {
+  const { houden } = zeefKast(allItems, null, []);
+  const tel = {};
+  houden.forEach(i => {
+    const t = itemTags[i.id] || {};
+    [].concat(t.kleur || []).forEach(k => {
+      const naam = String(k || '').toLowerCase().trim();
+      if (naam) tel[naam] = (tel[naam] || 0) + 1;
+    });
+  });
+  return Object.keys(tel).map(k => ({ kleur:k, n:tel[k] }))
+    .sort((a, b) => b.n - a.n);
+}
+
+function bouwKleurGrid() {
+  const grid = document.getElementById('kleur-grid');
+  if (!grid) return;
+  const kleuren = kleurenInKast();
+  if (!kleuren.length) {
+    grid.innerHTML = '<div class="field-note">Je items hebben nog geen kleur meegekregen. '
+      + 'Zet er een kleur bij in je kast, dan kan ik hier verder.</div>';
+    return;
+  }
+  grid.innerHTML = kleuren.map(k => {
+    const hex = KLEUR_HEX[k.kleur] || '#ccc';
+    const aan = kleurKeuze.kleur === k.kleur;
+    return `<button class="cap-neeknop${aan ? ' aan' : ''}" onclick="kiesKleur('${esc(k.kleur)}')" `
+      + 'style="display:flex;align-items:center;gap:6px;">'
+      + `<span style="width:13px;height:13px;border-radius:50%;background:${hex};`
+      + 'border:1px solid rgba(0,0,0,.12);display:inline-block;"></span>'
+      + `${esc(k.kleur)} <span style="opacity:.55">${k.n}</span></button>`;
+  }).join('');
+}
+
+function kiesKleur(kleur) {
+  kleurKeuze = { kleur: kleur, rol: '' };
+  bouwKleurGrid();
+  const s2 = document.getElementById('kleur-stap2');
+  const s3 = document.getElementById('kleur-stap3');
+  if (s3) s3.style.display = 'none';
+  if (!s2) return;
+
+  const rollen = KLEUR_ROLLEN
+    .map(r => ({ ...r, stukken: stukkenInKleur(kleur, r.cat) }))
+    .filter(r => r.stukken.length);
+
+  document.getElementById('kleur-stap2-uit').textContent =
+    'Waar wil je ' + kleur + ' dragen? Dat bepaalt hoe groot het vlak is, en dus wat eromheen kan.';
+  document.getElementById('kleur-rollen').innerHTML = rollen.map(r =>
+    `<button class="cap-neeknop" onclick="kiesKleurRol('${esc(r.cat)}')">`
+    + `${esc(r.label)} <span style="opacity:.55">${r.stukken.length}</span></button>`).join('');
+  s2.style.display = 'block';
+  s2.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// Hoe groot het vlak is, volgt uit de rol. Een broek is een groot vlak, een
+// tas een klein. Dat verandert wat er als tegenkleur werkt.
+function vlakVan(cat) {
+  if (cat === 'bottoms' || cat === 'jurken' || cat === 'eendelig') return 'groot';
+  if (cat === 'tops' || cat === 'layers') return 'middelgroot';
+  return 'klein';
+}
+
+function kiesKleurRol(cat) {
+  kleurKeuze.rol = cat;
+  document.querySelectorAll('#kleur-rollen .cap-neeknop').forEach(b =>
+    b.classList.toggle('aan', b.getAttribute('onclick').includes("'" + cat + "'")));
+
+  const rol = KLEUR_ROLLEN.find(r => r.cat === cat) || { label: cat };
+  const mijn = stukkenInKleur(kleurKeuze.kleur, cat);
+  const vlak = vlakVan(cat);
+  const paren = bekendeParen(kleurKeuze.kleur);
+
+  const s3 = document.getElementById('kleur-stap3');
+  document.getElementById('kleur-stap3-uit').innerHTML =
+    kleurKeuze.kleur + ' op een ' + esc(rol.label) + ' is een <b>' + vlak + '</b> vlak. '
+    + (vlak === 'groot'
+        ? 'Dat draagt de outfit, dus de rest mag rustig blijven.'
+        : vlak === 'klein'
+        ? 'Dat is een accent: het mag juist botsen met de rest.'
+        : 'Dat vraagt om één rustige kant eronder of erboven.');
+
+  const vak = document.getElementById('kleur-partners');
+  vak.innerHTML =
+    (paren.length
+      ? '<div class="field-note" style="margin-bottom:6px;">Uit je eigen schema\'s:</div>'
+        + '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">'
+        + paren.map(pr => {
+            const heeft = stukkenInKleur(pr.kleur, null).length;
+            const hex = KLEUR_HEX[pr.kleur] || '#ccc';
+            return '<span class="cap-neeknop" style="display:flex;align-items:center;gap:6px;cursor:default;">'
+              + `<span style="width:12px;height:12px;border-radius:50%;background:${hex};`
+              + 'border:1px solid rgba(0,0,0,.12);"></span>'
+              + `${esc(pr.kleur)} <span style="opacity:.55">${heeft ? heeft + ' in je kast' : 'heb je niet'}</span></span>`;
+          }).join('')
+        + '</div>'
+      : '<div class="field-note" style="margin-bottom:8px;">Voor deze kleur staat nog niets in je eigen schema\'s.</div>')
+    + '<div class="field-note" style="margin-bottom:6px;">Je hebt hiervoor:</div>'
+    + '<div class="cap-stukken" style="margin-bottom:10px;">'
+    + mijn.slice(0, 8).map(i => `<span class="cap-chip">${esc(i.name)}</span>`).join('')
+    + (mijn.length > 8 ? `<span class="cap-chip">en nog ${mijn.length - 8}</span>` : '')
+    + '</div>'
+    + '<button class="ai-btn" onclick="kleurNaarOutfit()">✦ Maak hier een outfit mee</button>'
+    + '<button class="btn-rescan" style="margin-top:8px;" onclick="kleurSpelen()">🎲 Verras me met een combinatie</button>';
+  s3.style.display = 'block';
+  s3.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// Het stuk in die kleur wordt het anker; de stylist vult de rest aan.
+function kleurNaarOutfit() {
+  const mijn = stukkenInKleur(kleurKeuze.kleur, kleurKeuze.rol);
+  if (!mijn.length) return;
+  const partners = bekendeParen(kleurKeuze.kleur).map(p => p.kleur);
+  anchorItems = [mijn[0]];
+  comboGekozen(
+    { name: kleurKeuze.kleur + ' als ' + vlakVan(kleurKeuze.rol) + ' vlak',
+      vibe: partners.length ? 'past bij ' + opsom(partners.slice(0, 3)) : '',
+      typeName: 'Begonnen bij kleur', stijl:'eigen',
+      colors: [KLEUR_HEX[kleurKeuze.kleur] || '#ccc'].concat(
+        partners.slice(0, 3).map(p => KLEUR_HEX[p]).filter(Boolean)),
+      tags: [kleurKeuze.kleur].concat(partners.slice(0, 3)) },
+    { ankers: [mijn[0]], bron: 'Begonnen bij kleur' });
+  nextStep();
+}
+
+// Spelenderwijs: een willekeurig stuk in deze kleur, met een willekeurige
+// partner uit je schema's. Niets kiezen, gewoon kijken wat het doet.
+function kleurSpelen() {
+  const mijn = stukkenInKleur(kleurKeuze.kleur, kleurKeuze.rol);
+  if (!mijn.length) return;
+  const stuk = mijn[Math.floor(Math.random() * mijn.length)];
+  const paren = bekendeParen(kleurKeuze.kleur);
+  const partner = paren.length ? paren[Math.floor(Math.random() * paren.length)].kleur : '';
+  const erbij = partner ? stukkenInKleur(partner, null) : [];
+  anchorItems = erbij.length
+    ? [stuk, erbij[Math.floor(Math.random() * erbij.length)]]
+    : [stuk];
+  comboGekozen(
+    { name: partner ? kleurKeuze.kleur + ' × ' + partner : kleurKeuze.kleur,
+      vibe: 'zomaar een combinatie om te proberen',
+      typeName: 'Spelenderwijs', stijl:'eigen',
+      colors: [KLEUR_HEX[kleurKeuze.kleur], KLEUR_HEX[partner]].filter(Boolean),
+      tags: [kleurKeuze.kleur, partner].filter(Boolean) },
+    { ankers: anchorItems, bron: 'Spelenderwijs' });
+  nextStep();
+}
+
 function startEigenKleur() {
   setStartMode('combo');
   const knoppen = [...document.querySelectorAll('.combo-type-btn')];
@@ -5133,13 +5346,29 @@ const CAP_HOE_UITLEG = {
 };
 const CAP_KOFFER = { compact: 10, midden: 14 };
 
+// Op stap 2 herhalen wat je op stap 1 koos, en wat dat hier betekent.
+function toonCapHoeHerhaling() {
+  const el = document.getElementById('cap-hoe-herhaal');
+  const uit = document.getElementById('cap-kies-uitleg');
+  const naam = { compact:'zo compact mogelijk', midden:'middenin', ruim:'laat me van alles zien' }[capHoe];
+  if (el) el.innerHTML = 'Je koos: <b>' + naam + '</b> · '
+    + '<button onclick="capToonStap(1)" style="background:none;border:none;padding:0;'
+    + 'color:var(--accent);text-decoration:underline;cursor:pointer;font-family:inherit;'
+    + 'font-size:inherit;">wijzigen</button>';
+  if (uit) uit.innerHTML = 'Gerangschikt op hoeveel je er zelf van hebt. '
+    + (capHoe === 'compact'
+        ? 'Eén kleurrichting is genoeg — daar gaat compact juist om.'
+        : 'Kies er <b>twee of meer</b>, dan verschillen de outfits echt van elkaar.');
+}
+
 function kiesCapHoe(hoe) {
   capHoe = hoe;
-  document.querySelectorAll('#cap-hoe .nee-btn').forEach(b =>
-    b.classList.toggle('actief', b.dataset.hoe === hoe));
+  document.querySelectorAll('#cap-hoe .cap-neeknop').forEach(b =>
+    b.classList.toggle('aan', b.dataset.hoe === hoe));
   const uit = document.getElementById('cap-hoe-uit');
   if (uit) uit.textContent = CAP_HOE_UITLEG[hoe] || '';
   if (typeof bijwerkComboKnop === 'function') bijwerkComboKnop();
+  if (capStap === 2) toonCapHoeHerhaling();
 }
 
 function capsuleOpdracht() {
@@ -5230,6 +5459,7 @@ function voorwaardenTekst(vw) {
 
 function capToonStap(n) {
   capStap = n;
+  if (n === 2) toonCapHoeHerhaling();
   [1,2,3].forEach(i => {
     const el = document.getElementById('cap-s' + i);
     if (el) el.style.display = (i === n) ? 'block' : 'none';

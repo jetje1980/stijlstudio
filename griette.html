@@ -3519,9 +3519,19 @@ async function vraagLooks(ctx, regels, slots, aantal) {
     + 'waarom dit werkt voor haar","items":["exacte naam"],"rodedraad":"het stuk dat terugkomt, of leeg",'
     + '"netniet":"wat ontbreekt en waarom het zou werken, of leeg"}]}';
 
-  const res = await aiFetch(null, { method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ model: aiModelNu(), max_tokens: 2000,
-      messages:[{ role:'user', content: prompt }] }) });
+  // Zonder tijdslimiet blijft een stille verbinding eeuwig hangen, en dan
+  // blijft het skelet staan zonder dat er ooit iets gebeurt of gezegd wordt.
+  const stop = new AbortController();
+  const wekker = setTimeout(function(){ stop.abort(); }, 60000);
+  let res;
+  try {
+    res = await aiFetch(null, { method:'POST', headers:{'Content-Type':'application/json'},
+      signal: stop.signal,
+      body: JSON.stringify({ model: aiModelNu(), max_tokens: 2000,
+        messages:[{ role:'user', content: prompt }] }) });
+  } catch(e) {
+    throw new Error(stop.signal.aborted ? 'duurde te lang' : (e && e.message) || 'verbinding');
+  } finally { clearTimeout(wekker); }
   if (!res.ok) throw new Error('API ' + res.status);
   const data = await res.json();
   const raw = (data.content || []).filter(function(b){ return b.type === 'text'; })
@@ -3554,6 +3564,154 @@ function verwerkLooks(looks, gezien) {
 }
 
 // Lege kaarten in de goede vorm, zodat de pagina meteen staat zoals hij komt.
+// ── TIEN LOOKS ZONDER DE STYLIST ─────────────────────────────────────────────
+// De tien hingen volledig aan een AI-aanroep. Kwam die niet terug, dan bleef
+// Home leeg — en dat is precies wat er gebeurde. Ze worden nu eerst hier
+// samengesteld, uit haar eigen kast, met de regels die vastliggen: nooit wijd
+// op wijd, een jurk vervangt top én broek, schoenen die bij het weer passen.
+// Dat kost niets en is er meteen. De stylist mag er daarna overheen — lukt
+// dat niet, dan staat er nog steeds iets.
+
+// Dezelfde dag dezelfde tien, een andere dag andere. Geen echte willekeur dus,
+// maar een reeks die uit de datum volgt.
+function dagRandom(zaad) {
+  let x = 0;
+  const t = vandaagSleutel() + '|' + zaad;
+  for (let i = 0; i < t.length; i++) x = (x * 31 + t.charCodeAt(i)) % 2147483647;
+  return function() { x = (x * 48271) % 2147483647; return x / 2147483647; };
+}
+
+function kleurVanItem(i) {
+  const k = getTag(i.id, 'kleur');
+  return String((Array.isArray(k) ? k[0] : k) || '').toLowerCase();
+}
+
+function wijdItem(i) {
+  const p = String(getTag(i.id, 'pasvorm') || '').toLowerCase();
+  if (p) return ['wijd','oversized','licht oversized','flared','ballon','baggy'].indexOf(p) >= 0;
+  return /oversized|wijd|wide|baggy|ballon|balloon|flared|maxi/.test(String(i.name || '').toLowerCase());
+}
+
+const SCHOEN_KARAKTER = [
+  { woorden:['sneaker','samba','adidas','new balance','gympen'], karakter:'streetstyle' },
+  { woorden:['loafer','kitten','pump','mocassin','laars','boot'], karakter:'parisienne' },
+  { woorden:['slipper','sandaal','teen','fleece','sok'],          karakter:'comfy' },
+];
+function karakterVanSchoen(i) {
+  const n = String(i && i.name || '').toLowerCase();
+  const m = SCHOEN_KARAKTER.find(function(k){ return k.woorden.some(function(w){ return n.includes(w); }); });
+  return m ? m.karakter : 'klassiek';
+}
+
+// Eén zin die zegt wat er klopt, op grond van wat we zeker weten.
+function lokaleReden(boven, onder, schoen) {
+  const zinnen = [];
+  const bw = wijdItem(boven), ow = wijdItem(onder);
+  if (!bw && ow) zinnen.push('Aansluitend boven, wijd onder — daar blijft je taille zichtbaar.');
+  else if (bw && !ow) zinnen.push('Wijd boven, smal onder: stop de top in of doe er een riem om.');
+  else if (bw && ow) zinnen.push('Allebei wijd, dus instoppen of riemen is hier geen extraatje.');
+  else zinnen.push('Rustig silhouet — één accent maakt het af.');
+  const kb = kleurVanItem(boven), ko = kleurVanItem(onder);
+  if (kb && ko && kb !== ko) zinnen.push(kb + ' bij ' + ko + '.');
+  if (schoen) zinnen.push(karakterVanSchoen(schoen) === 'parisienne'
+    ? 'De schoenen trekken het net aan.' : '');
+  return zinnen.filter(Boolean).join(' ');
+}
+
+function lokaleLooks() {
+  const kast = getAllItems().filter(function(i){ return !deletedItemIds.has(i.id); });
+  const uit = function(cat) { return kast.filter(function(i){ return i.cat === cat; }); };
+  let tops = uit('tops'), onders = uit('bottoms'), schoenen = uit('shoes');
+  const lagen = uit('layers'), eendelig = uit('jurken').concat(uit('eendelig'));
+  const tassen = uit('bags');
+
+  // Wat ze vandaag aangaf, telt hier gewoon mee.
+  if (dagMood.bottom === 'rok') onders = onders.filter(function(i){ return /rok|skirt/i.test(i.name); });
+  if (dagMood.bottom === 'broek') onders = onders.filter(function(i){ return !/rok|skirt/i.test(i.name); });
+  if (dagMood.shoe) schoenen = schoenen.filter(function(i){
+    return karakterVanSchoen(i) === (dagMood.shoe === 'sneakers' ? 'streetstyle'
+         : dagMood.shoe === 'laarzen' ? 'parisienne' : 'comfy')
+      || new RegExp(dagMood.shoe.slice(0, 5), 'i').test(i.name);
+  });
+  if (!onders.length) onders = uit('bottoms');
+  if (!schoenen.length) schoenen = uit('shoes');
+  if (tops.length < 2 || onders.length < 2) return [];
+
+  const rnd = dagRandom('looks');
+  const meng = function(a) {
+    const b = a.slice();
+    for (let i = b.length - 1; i > 0; i--) {
+      const j = Math.floor(rnd() * (i + 1));
+      const t = b[i]; b[i] = b[j]; b[j] = t;
+    }
+    return b;
+  };
+  const stuk = function(i) { return { id:i.id, naam:i.name, heeft:true }; };
+  const looks = [], gezien = new Set();
+  const voegToe = function(naam, merk, delen) {
+    const echt = delen.filter(Boolean);
+    if (echt.length < 2) return;
+    const sleutel = echt.map(function(i){ return i.id; }).sort().join('|');
+    if (gezien.has(sleutel)) return;
+    gezien.add(sleutel);
+    looks.push({ naam: naam, merk: merk, eigen: true,
+      waarom: lokaleReden(echt[0], echt[1], echt.find(function(i){ return i.cat === 'shoes'; })),
+      rodedraad: '', netniet: '', stukken: echt.map(stuk) });
+  };
+
+  const T = meng(tops), O = meng(onders), S = meng(schoenen),
+        L = meng(lagen), E = meng(eendelig), B = meng(tassen);
+
+  // 1 · drie keer hetzelfde onderstuk, anders gestyled
+  const draad = O[0];
+  if (draad) for (let i = 0; i < 3 && i < T.length; i++)
+    voegToe(kortStuk(draad.name) + ' · ' + (i + 1), 'rode draad',
+            [T[i], draad, S[i % Math.max(S.length, 1)], i === 2 ? L[0] : null]);
+
+  // 2 · drie karakters, herkenbaar aan de schoenen
+  ['streetstyle','parisienne','comfy'].forEach(function(k, n) {
+    const sch = S.find(function(i){ return karakterVanSchoen(i) === k; }) || S[n % Math.max(S.length,1)];
+    voegToe(k.charAt(0).toUpperCase() + k.slice(1), k,
+            [T[(n + 3) % T.length], O[(n + 1) % O.length], sch]);
+  });
+
+  // 3 · twee vanuit één kleur
+  const kleur = kleurVanItem(T[0]) || kleurVanItem(O[0]);
+  if (kleur) {
+    const zelfde = kast.filter(function(i){ return kleurVanItem(i) === kleur; });
+    for (let n = 0; n < 2; n++) {
+      const anker = zelfde[n % Math.max(zelfde.length, 1)];
+      if (!anker) break;
+      voegToe(kleur.charAt(0).toUpperCase() + kleur.slice(1) + ' voorop', kleur,
+        anker.cat === 'bottoms' ? [T[(n + 6) % T.length], anker, S[(n + 2) % S.length]]
+                                : [anker, O[(n + 2) % O.length], S[(n + 3) % S.length]]);
+    }
+  }
+
+  // 4 · twee gelegenheden
+  if (E[0]) voegToe('Jurk, klaar', 'uit', [E[0], S[0], B[0]]);
+  voegToe('Werkdag', 'werkdag', [T[(T.length - 1)], O[(O.length - 1)], S[0], B[0] || L[0]]);
+  voegToe('Vrije dag', 'vrij', [T[(T.length - 2) % T.length], O[(O.length - 2) % O.length],
+                                S[S.length - 1]]);
+
+  return looks.slice(0, 10);
+}
+
+// Eén regel onder de kop die zegt wat er gebeurt. Leeg maakt hem weg.
+function zegDagStatus(tekst) {
+  let el = document.getElementById('dag-status');
+  if (!el) {
+    const uitleg = document.getElementById('dag-uitleg');
+    if (!uitleg) return;
+    el = document.createElement('div');
+    el.id = 'dag-status';
+    el.style.cssText = 'font-size:10px;color:var(--brown-mid);margin:-4px 0 8px;';
+    uitleg.parentNode.insertBefore(el, uitleg.nextSibling);
+  }
+  el.textContent = tekst || '';
+  el.style.display = tekst ? 'block' : 'none';
+}
+
 function toonDagSkelet(n) {
   const vak = document.getElementById('dag-kaarten');
   if (!vak) return;
@@ -3587,21 +3745,43 @@ async function maakDagKaarten(ctx, opnieuw) {
   const helften = [DAG_SLOTS.slice(0, 2), DAG_SLOTS.slice(2)];
   const gezien = { sleutels: new Set(), netniet: 0 };
   let mislukt = 0;
+  let vanStylist = false;
 
-  dagKaarten = [];
+  // Eerst uit je eigen kast, hier en nu. Er staat dus altijd iets, ook als de
+  // stylist niet thuis geeft.
+  dagKaarten = lokaleLooks();
   dagBewaard = {};
-  toonDagSkelet(DAG_SLOTS.reduce(function(n, sl){ return n + sl.n; }, 0));
+  if (dagKaarten.length) {
+    bewaarDagKaarten();
+    toonDagKaarten();
+    zegDagStatus('Dit zijn combinaties uit je eigen kast. De stylist kijkt er nog even naar…');
+  } else {
+    toonDagSkelet(DAG_SLOTS.reduce(function(n, sl){ return n + sl.n; }, 0));
+    zegDagStatus('De stylist stelt je tien looks samen…');
+  }
+  const eigenLooks = dagKaarten.slice();
 
   await Promise.all(helften.map(async function(slots) {
     const aantal = slots.reduce(function(n, sl){ return n + sl.n; }, 0);
     try {
       const looks = await vraagLooks(ctx, regels, slots, aantal);
-      dagKaarten = dagKaarten.concat(verwerkLooks(looks, gezien));
-      bewaarDagKaarten();
-      toonDagKaarten();
+      const nieuw = verwerkLooks(looks, gezien);
+      if (nieuw.length) {
+        // De eerste keer dat de stylist iets teruggeeft, gaan onze eigen
+        // combinaties eraf — zijn versie is beter onderbouwd.
+        if (!vanStylist) { dagKaarten = []; vanStylist = true; }
+        dagKaarten = dagKaarten.concat(nieuw);
+        bewaarDagKaarten();
+        toonDagKaarten();
+        zegDagStatus(dagKaarten.length < 10 ? 'De rest komt zo…' : '');
+      }
     } catch(e) {
       mislukt++;
-      if (!dagKaarten.length && mislukt === helften.length) {
+      if (dagKaarten.length && !vanStylist && mislukt === helften.length) {
+        // We hebben onze eigen tien nog. Dat is geen storing, hooguit jammer.
+        zegDagStatus('Uit je eigen kast samengesteld — de stylist was even niet bereikbaar.');
+      } else if (!dagKaarten.length && mislukt === helften.length) {
+        zegDagStatus('');
         vak.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:10px 0;line-height:1.6;">'
           + 'De stylist kon even geen looks maken — ' + esc2(dagFoutReden(e))
           + ' <button onclick="maakDagKaarten(dagContext, true)" style="background:none;border:none;'
@@ -3611,20 +3791,32 @@ async function maakDagKaarten(ctx, opnieuw) {
     }
   }));
 
-  // Eén helft gelukt, de andere niet: zeg dat, maar houd wat je hebt.
-  if (mislukt && dagKaarten.length) {
-    const u = document.getElementById('dag-uitleg');
-    if (u) u.innerHTML = u.textContent + ' <span style="color:var(--brown-mid);">'
-      + 'Een deel lukte niet — <button onclick="maakDagKaarten(dagContext, true)" '
-      + 'style="background:none;border:none;color:var(--brown);text-decoration:underline;'
-      + 'cursor:pointer;font-family:Jost,sans-serif;font-size:10px;padding:0;">opnieuw</button></span>';
+  // Kwam er maar een deel terug, vul dan aan met onze eigen combinaties in
+  // plaats van haar met vier kaarten achter te laten.
+  if (dagKaarten.length < 10 && eigenLooks.length) {
+    const alIn = new Set(dagKaarten.map(function(k) {
+      return k.stukken.map(function(s){ return s.id || s.naam; }).sort().join('|');
+    }));
+    eigenLooks.forEach(function(k) {
+      if (dagKaarten.length >= 10) return;
+      const sleutel = k.stukken.map(function(s){ return s.id || s.naam; }).sort().join('|');
+      if (alIn.has(sleutel)) return;
+      alIn.add(sleutel);
+      dagKaarten.push(k);
+    });
+    bewaarDagKaarten();
+    toonDagKaarten();
   }
+
+  if (!mislukt) zegDagStatus('');
+  else if (vanStylist) zegDagStatus('Een deel kwam van de stylist, de rest uit je eigen kast.');
 }
 
 function dagFoutReden(e) {
   const m = String((e && e.message) || e || '');
   if (!navigator.onLine) return 'je hebt geen verbinding.';
   if (/Failed to fetch|NetworkError/i.test(m)) return 'hij was niet bereikbaar.';
+  if (/duurde te lang/i.test(m)) return 'het duurde te lang — soms is het druk.';
   if (/JSON|geen looks/i.test(m)) return 'het antwoord was niet te lezen.';
   if (/\b5\d\d\b/.test(m)) return 'er was een storing.';
   return 'er ging iets mis.';
