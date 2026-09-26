@@ -1220,7 +1220,7 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
   </div>
 </div>
 
-<footer>Digitale Stylist · Iconic Wardrobe</footer>
+<footer>Digitale Stylist · Iconic Wardrobe<br><span style="opacity:.5;font-size:9px;">versie 27 sep · tien kaarten op Home</span></footer>
 
 <script>
 // Alleen toegankelijk met Griette's persoonlijke code
@@ -7303,13 +7303,7 @@ openDB().then(async () => {
   rebuildOccasions();
   renderInspoGallery();
   
-  // De tien van vandaag: uit de cache als ze er al zijn, anders één keer maken.
-  // Na de Supabase-sync, zodat hij de hele kast kent en niet alleen wat er
-  // lokaal stond.
-  // Meteen: de kast staat al uit localStorage, dus wachten op Supabase kost
-  // alleen maar tijd waarin jij naar niets kijkt.
-  if (dagKaarten.length) toonDagKaarten();
-  else { toonDagSkelet(10); setTimeout(function(){ maakDagKaarten(dagContext, false); }, 250); }
+  startDagKaarten();
   setTimeout(function(){applyGarderobeFilter();showMondayBanner();addMorningBannerBtn();updateHomeGreeting();},600);
   setTimeout(checkUnwornItems, 500);
   setTimeout(checkSeizoenswissel, 800);
@@ -7321,15 +7315,32 @@ openDB().then(async () => {
   restoreCloudinaryPhotos(false);
   // Herstel foto's van eigen items die niet in cloudMap staan (domeinmigratie)
   setTimeout(restoreCustomItemPhotos, 2000);
-}).catch(() => {
+}).catch((e) => {
+  // Hier kwam je terecht als het inladen van de foto's uit IndexedDB misging —
+  // en dan werden de tien kaarten nooit gestart. Op een telefoon met weinig
+  // opslag, of in een privévenster, was Home dus gewoon leeg.
+  console.warn('Opstart viel terug:', e);
   loadAppData();
   buildGarderobe();
   buildBoards();
   rebuildOccasions();
   renderInspoGallery();
+  startDagKaarten();
   setTimeout(checkUnwornItems, 500);
   loadAppDataFromSupabase();
 });
+
+// De tien horen er te staan, wat er in de opstart ook misgaat. Dit is de
+// enige plek die ze start, en als vangnet draait hij nog een keer: staan ze
+// er al, dan doet hij niets.
+function startDagKaarten() {
+  if (!document.getElementById('dag-kaarten')) return;
+  if (dagKaarten.length) { toonDagKaarten(); return; }
+  if (document.querySelector('#dag-kaarten .dagkaart')) return;   // al bezig
+  toonDagSkelet(10);
+  setTimeout(function(){ maakDagKaarten(dagContext, false); }, 250);
+}
+setTimeout(startDagKaarten, 4000);
 
 // ============ SHOPPING LIST ============
 var shopCategory = 'gaps';
