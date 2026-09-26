@@ -556,14 +556,20 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
     <button class="dag-ctx" data-ctx="vrije dag" onclick="kiesDagContext('vrije dag')">Vrije dag</button>
     <button class="dag-ctx" data-ctx="afspraak of uit" onclick="kiesDagContext('afspraak of uit')">Afspraak / uit</button>
   </div>
-  <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;" id="dag-mood">
+  <!-- Meerdere tegelijk mag: rok EN sneakers EN festival. Niets aantikken is
+       ook een antwoord — dan kiest de stylist vrij. -->
+  <div style="display:flex;gap:6px;margin-bottom:6px;overflow-x:auto;scrollbar-width:none;" id="dag-mood">
     <button class="dag-ctx" id="dq-rok" onclick="kiesDagMood('bottom','rok')">Rok/jurk</button>
     <button class="dag-ctx" id="dq-broek" onclick="kiesDagMood('bottom','broek')">Broek</button>
     <span style="width:1px;background:var(--cream-dark);flex-shrink:0;margin:2px 2px;"></span>
     <button class="dag-ctx" id="dq-sneakers" onclick="kiesDagMood('shoe','sneakers')">Sneakers</button>
+    <button class="dag-ctx" id="dq-hakken" onclick="kiesDagMood('shoe','hakken')">Hakken</button>
     <button class="dag-ctx" id="dq-sandalen" onclick="kiesDagMood('shoe','sandalen')">Sandalen</button>
     <button class="dag-ctx" id="dq-laarzen" onclick="kiesDagMood('shoe','laarzen')">Laarzen</button>
+    <span style="width:1px;background:var(--cream-dark);flex-shrink:0;margin:2px 2px;"></span>
+    <button class="dag-ctx" id="dq-festival" onclick="kiesDagMood('thema','festival')">🎪 Festival</button>
   </div>
+  <div id="dag-mood-uit" style="font-size:9.5px;color:var(--muted);margin-bottom:12px;line-height:1.5;"></div>
   <div id="dag-kaarten"></div>
 
   <!-- De kaarten die ze eerder maakte stonden alleen in de outfitkaart-app,
@@ -3480,7 +3486,10 @@ function laadDagKaarten() {
     if (d && d.datum === vandaagSleutel()) {
       dagKaarten = d.kaarten || [];
       dagContext = d.context || '';
-      dagMood = d.mood || { bottom:'', shoe:'' };
+      // Wat er gisteren bewaard is, kan nog de oude vorm hebben ('rok' in
+      // plaats van ['rok']). Alles wat binnenkomt wordt daarom een lijst,
+      // anders klapt de eerste .indexOf erop stuk.
+      dagMood = normaliseerMood(d.mood);
       dagRonde = d.ronde || 0;
       dagBewaard = d.bewaard || {};
     }
@@ -3498,25 +3507,67 @@ function bewaarDagKaarten() {
 // Rok of broek, en welke schoenen. Dat stond als losse mood-knoppen onder een
 // aparte heldenkaart; het stuurt nu gewoon deze tien. Nog een keer tikken zet
 // het weer uit — geen voorkeur is ook een antwoord.
-let dagMood = { bottom:'', shoe:'' };
+// Per soort een lijstje in plaats van één waarde: je wilt "rok of broek, maar
+// wel sneakers of hakken" kunnen zeggen. Niets aantikken blijft geldig — dan
+// staat er geen wens en kiest de stylist vrij.
+let dagMood = { bottom:[], shoe:[], thema:[] };
+
+function normaliseerMood(m) {
+  const lijst = function(v) {
+    if (Array.isArray(v)) return v.filter(Boolean);
+    return v ? [v] : [];
+  };
+  m = m || {};
+  return { bottom: lijst(m.bottom), shoe: lijst(m.shoe), thema: lijst(m.thema) };
+}
 
 function kiesDagMood(soort, waarde) {
-  dagMood[soort] = dagMood[soort] === waarde ? '' : waarde;
+  if (!Array.isArray(dagMood[soort])) dagMood[soort] = [];
+  const n = dagMood[soort].indexOf(waarde);
+  if (n >= 0) dagMood[soort].splice(n, 1); else dagMood[soort].push(waarde);
+  const aan = [].concat(dagMood.bottom, dagMood.shoe, dagMood.thema);
   document.querySelectorAll('#dag-mood .dag-ctx').forEach(function(b) {
-    const id = b.id.replace('dq-', '');
-    b.classList.toggle('actief', dagMood.bottom === id || dagMood.shoe === id);
+    b.classList.toggle('actief', aan.indexOf(b.id.replace('dq-', '')) >= 0);
   });
+  toonDagMoodUit();
   maakDagKaarten(dagContext, true);
+}
+
+// Wat je koos, in gewone woorden — en wat het betekent als je niets koos.
+function toonDagMoodUit() {
+  const el = document.getElementById('dag-mood-uit');
+  if (!el) return;
+  const aan = [].concat(dagMood.bottom, dagMood.shoe, dagMood.thema);
+  el.textContent = aan.length
+    ? 'Tien looks met ' + aan.join(', ') + '. Nog een keer tikken zet het uit.'
+    : 'Niets gekozen — dan kies ik vrij uit je kast. Tik aan wat je wél wilt; meerdere mag.';
 }
 
 // In woorden, zodat de stylist het als wens leest en niet als filter.
 function dagMoodZin() {
   const d = [];
-  if (dagMood.bottom === 'rok')   d.push('Ze heeft vandaag zin in een rok of jurk.');
-  if (dagMood.bottom === 'broek') d.push('Ze wil vandaag een broek, geen rok of jurk.');
-  if (dagMood.shoe) d.push('Bij de schoenen gaat haar voorkeur uit naar ' + dagMood.shoe + '.');
+  const b = dagMood.bottom || [], s = dagMood.shoe || [], t = dagMood.thema || [];
+  if (b.indexOf('rok') >= 0 && b.indexOf('broek') >= 0)
+    d.push('Rok en broek mogen allebei.');
+  else if (b.indexOf('rok') >= 0)   d.push('Ze heeft vandaag zin in een rok of jurk.');
+  else if (b.indexOf('broek') >= 0) d.push('Ze wil vandaag een broek, geen rok of jurk.');
+  if (s.length) d.push('Bij de schoenen gaat haar voorkeur uit naar ' + opsomNL(s) + '.');
+  if (t.indexOf('festival') >= 0) d.push(FESTIVAL_ZIN);
   return d.length ? d.join(' ') + '\n\n' : '';
 }
+
+function opsomNL(lijst) {
+  if (lijst.length <= 1) return lijst[0] || '';
+  return lijst.slice(0, -1).join(', ') + ' of ' + lijst[lijst.length - 1];
+}
+
+// Festival is geen categorie in haar kast maar een manier van dragen. Wat het
+// betekent staat hier één keer, zodat de stylist en de lokale opbouw hetzelfde
+// bedoelen.
+const FESTIVAL_ZIN = 'Het is voor een festival: de hele dag staan en lopen, vaak stoffig '
+  + 'en \'s avonds kouder. Dus schoenen waar ze uren op kan, iets luchtigs met een laag '
+  + 'die mee kan, en accessoires die tegen een stootje kunnen. Uitgesproken mag hier: '
+  + 'kleur, print en iets opvallends werken juist.';
 
 // Waar ze in haar cyclus zit, stuurt hoe kleding moet voelen. Dat stond als
 // eigen pagina in het menu terwijl het hier thuishoort: in wat je vandaag
@@ -3743,14 +3794,35 @@ function lokaleLooks() {
   const lagen = uit('layers'), eendelig = uit('jurken').concat(uit('eendelig'));
   const tassen = uit('bags');
 
-  // Wat ze vandaag aangaf, telt hier gewoon mee.
-  if (dagMood.bottom === 'rok') onders = onders.filter(function(i){ return /rok|skirt/i.test(i.name); });
-  if (dagMood.bottom === 'broek') onders = onders.filter(function(i){ return !/rok|skirt/i.test(i.name); });
-  if (dagMood.shoe) schoenen = schoenen.filter(function(i){
-    return karakterVanSchoen(i) === (dagMood.shoe === 'sneakers' ? 'streetstyle'
-         : dagMood.shoe === 'laarzen' ? 'parisienne' : 'comfy')
-      || new RegExp(dagMood.shoe.slice(0, 5), 'i').test(i.name);
-  });
+  // Wat ze vandaag aangaf, telt hier gewoon mee. Meerdere keuzes verbreden de
+  // selectie in plaats van hem te versmallen: rok én broek aangetikt betekent
+  // "allebei goed", niet "geen van beide".
+  const wilBottom = dagMood.bottom || [], wilShoe = dagMood.shoe || [];
+  const isRok = function(i){ return /rok|skirt|jurk|dress/i.test(i.name); };
+  if (wilBottom.length === 1) {
+    onders = wilBottom[0] === 'rok' ? onders.filter(isRok)
+                                    : onders.filter(function(i){ return !isRok(i); });
+  }
+  if (wilShoe.length) {
+    const past = function(i) {
+      return wilShoe.some(function(w) {
+        const karakter = w === 'sneakers' ? 'streetstyle'
+                       : w === 'laarzen'  ? 'parisienne'
+                       : w === 'hakken'   ? 'parisienne' : 'comfy';
+        return karakterVanSchoen(i) === karakter
+          || new RegExp(w.slice(0, 5), 'i').test(i.name)
+          || (w === 'hakken' && /hak|heel|pump|stiletto|sandalet/i.test(i.name));
+      });
+    };
+    schoenen = schoenen.filter(past);
+  }
+  // Festival: schoenen waar je uren op staat, en iets wat tegen een dag kan.
+  if ((dagMood.thema || []).indexOf('festival') >= 0) {
+    const opStaan = schoenen.filter(function(i) {
+      return !/hak|heel|pump|stiletto/i.test(String(i.name || ''));
+    });
+    if (opStaan.length >= 2) schoenen = opStaan;
+  }
   if (!onders.length) onders = uit('bottoms');
   if (!schoenen.length) schoenen = uit('shoes');
   // Het weer stond hier nergens in, terwijl het bepaalt wat er kan. Bij koel
@@ -8287,6 +8359,13 @@ openDB().then(async () => {
 // er al, dan doet hij niets.
 function startDagKaarten() {
   if (!document.getElementById('dag-kaarten')) return;
+  // De knoppen weer aan zetten zoals je ze liet staan, en de regel eronder
+  // invullen — anders lijkt het na herladen of je niets gekozen had.
+  const aan = [].concat(dagMood.bottom || [], dagMood.shoe || [], dagMood.thema || []);
+  document.querySelectorAll('#dag-mood .dag-ctx').forEach(function(b) {
+    b.classList.toggle('actief', aan.indexOf(b.id.replace('dq-', '')) >= 0);
+  });
+  toonDagMoodUit();
   if (dagKaarten.length) { toonDagKaarten(); return; }
   if (document.querySelector('#dag-kaarten .dagkaart')) return;   // al bezig
   toonDagSkelet(10);
