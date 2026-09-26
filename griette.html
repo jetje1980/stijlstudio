@@ -4304,12 +4304,16 @@ function fotoVlakkenInKopie(doc) {
   });
 }
 
-// De naam van de kaart, bruikbaar als bestandsnaam. Niet platgeslagen tot
-// koppeltekens: "Zara cargo · 1.jpg" is terug te vinden, "zara-cargo-1.jpg"
-// zegt minder.
+// De naam van de kaart, bruikbaar als bestandsnaam. Zo leesbaar mogelijk —
+// "Rover island 1.jpg" is terug te vinden — maar wel binnen wat de browser
+// accepteert. Chrome keurt een download-attribuut met tekens als … of · in
+// stilte af en noemt het bestand dan gewoon "download"; accenten worden
+// platgeslagen zodat de naam ook op een ander systeem heel blijft.
 function kaartBestandsnaam(kaart) {
   const naam = String((kaart && kaart.naam) || 'outfit')
-    .replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim();
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')   // é → e
+    .replace(/[^A-Za-z0-9 _()-]+/g, ' ')                // … · / : * ? " < > | → spatie
+    .replace(/\s+/g, ' ').trim();
   return (naam || 'outfit').slice(0, 60) + '.jpg';
 }
 
@@ -4333,8 +4337,13 @@ async function bewaarAlsAfbeelding(canvas, bestandsnaam) {
   const a = document.createElement('a');
   a.href = url;
   a.download = bestandsnaam;
+  // De link moet in het document hángen, anders negeert Chrome bij een
+  // blob-url het download-attribuut en heet het bestand gewoon "download".
+  // Bij een data-url viel dat niet op, want daar werkt het los ook.
+  a.style.display = 'none';
+  document.body.appendChild(a);
   a.click();
-  setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 4000);
   return 'gedownload';
 }
 
