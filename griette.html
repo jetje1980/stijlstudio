@@ -38,6 +38,7 @@ body{background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);min
 .dagkaart{display:block;width:100%;text-align:left;background:#F5F2EE;border:1.5px solid var(--cream-dark);border-radius:16px;padding:18px 16px 14px;margin-bottom:12px;cursor:pointer;font-family:'Jost',sans-serif;-webkit-tap-highlight-color:transparent;}
 .dagkaart.bewaard{border-color:var(--brown);box-shadow:0 0 0 1px var(--brown) inset;}
 .dagkaart.netniet{border-style:dashed;}
+.dagkaart.vanstylist{border-color:var(--brown-mid);}
 .dk-naam{font-family:'Bodoni Moda',serif;font-size:21px;line-height:1.05;color:#1a1510;text-align:center;text-transform:uppercase;letter-spacing:.01em;}
 .dk-merk{display:block;font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:#7a6350;text-align:center;margin-top:5px;}
 .dk-rij{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
@@ -3385,13 +3386,19 @@ function closePickerIfOutside(e) {
 //
 // Ze worden één keer per dag gemaakt en bewaard. Het openen van de app hoort
 // niet elke keer te wachten en geld te kosten.
+// Acht uit haar eigen kast, hier samengesteld: gratis, meteen, altijd. En
+// twee van de stylist, want dat is waar hij iets toevoegt wat een vaste regel
+// niet kan — een combinatie waar je zelf niet op komt, en zien wat er had
+// gekund met één stuk dat ze niet heeft. Eén kleine aanroep per dag.
 const DAG_SLOTS = [
-  { as:'item',      n:3, opdracht:'Kies ÉÉN stuk uit haar kast en style dat drie keer totaal anders. Noem dat stuk in "rode draad".' },
-  { as:'karakter',  n:3, opdracht:'Drie looks met een ander stijlkarakter: streetstyle, parisienne (klassiek Frans, verzorgd nonchalant) en comfy. Zet het karakter in "merk".' },
-  { as:'kleur',     n:2, opdracht:'Twee looks die vertrekken vanuit één kleur van de dag. Zet die kleur in "merk".' },
-  { as:'gelegenheid', n:2, opdracht:'Twee looks voor duidelijk verschillende gelegenheden. Zet de gelegenheid in "merk".' },
+  { as:'stylist', n:2, opdracht:
+      'Maak er twee, en maak ze bijzonder:\n'
+    + '- De eerste: een combinatie uit haar kast waar ze zelf niet op zou komen, '
+    + 'maar die écht klopt. Leg in "waarom" uit waaróm dit werkt — kleur, silhouet of textuur.\n'
+    + '- De tweede: een look die net niet kan omdat één stuk ontbreekt. Zet dat stuk '
+    + 'wél in "items" en beschrijf in "netniet" wat het is en waarom het de look afmaakt.' },
 ];
-const DAG_MAX_NETNIET = 3;
+const DAG_MAX_NETNIET = 1;   // eentje is genoeg om iets van te leren
 
 let dagKaarten = [];
 let dagContext = '';
@@ -3545,9 +3552,10 @@ async function vraagLooks(ctx, regels, slots, aantal) {
 
 // Nakijken wat er terugkomt: namen terugzoeken in de kast, dubbele looks eruit,
 // en niet meer dan een paar met een stuk dat ze niet heeft.
-function verwerkLooks(looks, gezien) {
+function verwerkLooks(looks, gezien, hoogstens) {
   const uit = [];
   looks.forEach(function(l) {
+    if (hoogstens && uit.length >= hoogstens) return;
     const stukken = dagStukken(l.items);
     if (stukken.length < 2) return;
     const sleutel = stukken.map(function(x){ return x.id || x.naam; }).sort().join('|');
@@ -3662,17 +3670,49 @@ function lokaleLooks() {
   const T = meng(tops), O = meng(onders), S = meng(schoenen),
         L = meng(lagen), E = meng(eendelig), B = meng(tassen);
 
+  // Een outfit is niet af met alleen top, broek en schoenen. Een tas hoort er
+  // in de praktijk altijd bij, en een laag zodra het koeler is. Daarom wordt
+  // elke look hier afgemaakt in plaats van per geval te hopen dat het goed
+  // gaat: schoenen, dan een tas, dan een laag — en telkens een andere, zodat
+  // niet overal dezelfde tas hangt.
+  const koel = ['koel','mild'].indexOf(String(typeof weatherTemp !== 'undefined' ? weatherTemp : '')) >= 0
+            || [10,11,0,1,2,3].indexOf(new Date().getMonth()) >= 0;
+  let beurt = 0;
+
+  // Een jas of blazer is een buitenlaag; een vest of gilet een laagje eronder.
+  function isJasje(i) {
+    return /jas|jack|coat|trench|parka|blazer|mantel|bomber|anorak/i.test(String(i.name || ''));
+  }
+
+  function afmaken(delen, opties) {
+    const o = opties || {};
+    const uit = delen.filter(Boolean);
+    const heeft = function(cat) { return uit.some(function(i){ return i.cat === cat; }); };
+    if (!heeft('shoes') && S.length) uit.push(S[beurt % S.length]);
+    if (!heeft('bags') && B.length && o.tas !== false) uit.push(B[beurt % B.length]);
+    // Een laag hoort er bij koeler weer altijd bij, en ook daarbuiten bij
+    // ongeveer de helft — een vest of jasje maakt een outfit vaak juist af.
+    if (!heeft('layers') && L.length
+        && (o.laag === true || (o.laag !== false && (koel || beurt % 2 === 0)))) {
+      // Bij koud weer liever een jas; anders een vest of gilet.
+      const kandidaten = koel ? L.filter(isJasje).concat(L.filter(function(i){ return !isJasje(i); })) : L;
+      uit.push(kandidaten[beurt % kandidaten.length]);
+    }
+    beurt++;
+    return uit;
+  }
+
   // 1 · drie keer hetzelfde onderstuk, anders gestyled
   const draad = O[0];
   if (draad) for (let i = 0; i < 3 && i < T.length; i++)
     voegToe(kortStuk(draad.name) + ' · ' + (i + 1), 'rode draad',
-            [T[i], draad, S[i % Math.max(S.length, 1)], i === 2 ? L[0] : null]);
+            afmaken([T[i], draad], { laag: i !== 1 }));
 
   // 2 · drie karakters, herkenbaar aan de schoenen
   ['streetstyle','parisienne','comfy'].forEach(function(k, n) {
     const sch = S.find(function(i){ return karakterVanSchoen(i) === k; }) || S[n % Math.max(S.length,1)];
     voegToe(k.charAt(0).toUpperCase() + k.slice(1), k,
-            [T[(n + 3) % T.length], O[(n + 1) % O.length], sch]);
+            afmaken([T[(n + 3) % T.length], O[(n + 1) % O.length], sch]));
   });
 
   // 3 · twee vanuit één kleur
@@ -3682,19 +3722,22 @@ function lokaleLooks() {
     for (let n = 0; n < 2; n++) {
       const anker = zelfde[n % Math.max(zelfde.length, 1)];
       if (!anker) break;
-      voegToe(kleur.charAt(0).toUpperCase() + kleur.slice(1) + ' voorop', kleur,
-        anker.cat === 'bottoms' ? [T[(n + 6) % T.length], anker, S[(n + 2) % S.length]]
-                                : [anker, O[(n + 2) % O.length], S[(n + 3) % S.length]]);
+      const basis = anker.cat === 'bottoms'
+        ? [T[(n + 6) % T.length], anker]
+        : anker.cat === 'tops' ? [anker, O[(n + 2) % O.length]]
+        : [T[(n + 6) % T.length], O[(n + 2) % O.length], anker];
+      voegToe(kortStuk(anker.name) + ' voorop', kleur, afmaken(basis));
     }
   }
 
-  // 4 · twee gelegenheden
-  if (E[0]) voegToe('Jurk, klaar', 'uit', [E[0], S[0], B[0]]);
-  voegToe('Werkdag', 'werkdag', [T[(T.length - 1)], O[(O.length - 1)], S[0], B[0] || L[0]]);
-  voegToe('Vrije dag', 'vrij', [T[(T.length - 2) % T.length], O[(O.length - 2) % O.length],
-                                S[S.length - 1]]);
+  // 4 · twee gelegenheden, en een jurk als ze er een heeft
+  if (E[0]) voegToe('Jurk, klaar', 'uit', afmaken([E[0]]));
+  voegToe('Werkdag', 'werkdag',
+          afmaken([T[T.length - 1], O[O.length - 1]], { laag: true }));
+  voegToe('Vrije dag', 'vrij',
+          afmaken([T[(T.length - 2) % T.length], O[(O.length - 2) % O.length]]));
 
-  return looks.slice(0, 10);
+  return looks.slice(0, 8);
 }
 
 // Eén regel onder de kop die zegt wat er gebeurt. Leeg maakt hem weg.
@@ -3742,10 +3785,9 @@ async function maakDagKaarten(ctx, opnieuw) {
     return '- ' + i.name + ' [' + i.cat + ']' + (extra ? ' (' + extra + ')' : '');
   }).join('\n');
 
-  const helften = [DAG_SLOTS.slice(0, 2), DAG_SLOTS.slice(2)];
+  const helften = [DAG_SLOTS];
   const gezien = { sleutels: new Set(), netniet: 0 };
   let mislukt = 0;
-  let vanStylist = false;
 
   // Eerst uit je eigen kast, hier en nu. Er staat dus altijd iets, ook als de
   // stylist niet thuis geeft.
@@ -3754,7 +3796,7 @@ async function maakDagKaarten(ctx, opnieuw) {
   if (dagKaarten.length) {
     bewaarDagKaarten();
     toonDagKaarten();
-    zegDagStatus('Dit zijn combinaties uit je eigen kast. De stylist kijkt er nog even naar…');
+    zegDagStatus('Acht uit je eigen kast. Je stylist maakt er nog twee bij…');
   } else {
     toonDagSkelet(DAG_SLOTS.reduce(function(n, sl){ return n + sl.n; }, 0));
     zegDagStatus('De stylist stelt je tien looks samen…');
@@ -3765,22 +3807,20 @@ async function maakDagKaarten(ctx, opnieuw) {
     const aantal = slots.reduce(function(n, sl){ return n + sl.n; }, 0);
     try {
       const looks = await vraagLooks(ctx, regels, slots, aantal);
-      const nieuw = verwerkLooks(looks, gezien);
+      const nieuw = verwerkLooks(looks, gezien, aantal);
       if (nieuw.length) {
-        // De eerste keer dat de stylist iets teruggeeft, gaan onze eigen
-        // combinaties eraf — zijn versie is beter onderbouwd.
-        if (!vanStylist) { dagKaarten = []; vanStylist = true; }
-        dagKaarten = dagKaarten.concat(nieuw);
+        // Bovenaan, want dit is het stuk waar je voor komt kijken.
+        dagKaarten = nieuw.concat(dagKaarten);
         bewaarDagKaarten();
         toonDagKaarten();
-        zegDagStatus(dagKaarten.length < 10 ? 'De rest komt zo…' : '');
+        zegDagStatus('');
       }
     } catch(e) {
       mislukt++;
-      if (dagKaarten.length && !vanStylist && mislukt === helften.length) {
-        // We hebben onze eigen tien nog. Dat is geen storing, hooguit jammer.
-        zegDagStatus('Uit je eigen kast samengesteld — de stylist was even niet bereikbaar.');
-      } else if (!dagKaarten.length && mislukt === helften.length) {
+      if (dagKaarten.length) {
+        // We hebben de acht uit haar eigen kast nog. Dat is geen storing.
+        zegDagStatus('Acht uit je eigen kast — je stylist was even niet bereikbaar.');
+      } else {
         zegDagStatus('');
         vak.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:10px 0;line-height:1.6;">'
           + 'De stylist kon even geen looks maken — ' + esc2(dagFoutReden(e))
@@ -3791,25 +3831,7 @@ async function maakDagKaarten(ctx, opnieuw) {
     }
   }));
 
-  // Kwam er maar een deel terug, vul dan aan met onze eigen combinaties in
-  // plaats van haar met vier kaarten achter te laten.
-  if (dagKaarten.length < 10 && eigenLooks.length) {
-    const alIn = new Set(dagKaarten.map(function(k) {
-      return k.stukken.map(function(s){ return s.id || s.naam; }).sort().join('|');
-    }));
-    eigenLooks.forEach(function(k) {
-      if (dagKaarten.length >= 10) return;
-      const sleutel = k.stukken.map(function(s){ return s.id || s.naam; }).sort().join('|');
-      if (alIn.has(sleutel)) return;
-      alIn.add(sleutel);
-      dagKaarten.push(k);
-    });
-    bewaarDagKaarten();
-    toonDagKaarten();
-  }
-
   if (!mislukt) zegDagStatus('');
-  else if (vanStylist) zegDagStatus('Een deel kwam van de stylist, de rest uit je eigen kast.');
 }
 
 function dagFoutReden(e) {
@@ -3868,9 +3890,12 @@ function toonDagKaarten() {
       return '<span class="dk-stip" style="background:' + c + '"></span>';
     }).join('');
     return '<button type="button" class="dagkaart' + (dagBewaard[n] ? ' bewaard' : '')
-      + (k.netniet ? ' netniet' : '') + '" onclick="bewaarDagKaart(' + n + ')">'
+      + (k.netniet ? ' netniet' : '') + (k.eigen ? '' : ' vanstylist')
+      + '" onclick="bewaarDagKaart(' + n + ')">'
       + '<div class="dk-naam">' + esc2(k.naam) + '</div>'
-      + (k.merk ? '<span class="dk-merk">' + esc2(k.merk) + '</span>' : '')
+      + '<span class="dk-merk">'
+      + (k.eigen ? esc2(k.merk || 'uit je kast') : '✦ van je stylist')
+      + '</span>'
       + '<div class="dk-rij">' + stukken + '</div>'
       + (stippen ? '<div class="dk-stippen">' + stippen + '</div>' : '')
       + (k.waarom ? '<div class="dk-waarom">' + esc2(k.waarom) + '</div>' : '')
@@ -3882,9 +3907,13 @@ function toonDagKaarten() {
   const u = document.getElementById('dag-uitleg');
   if (u) {
     const mist = dagKaarten.filter(function(k){ return k.netniet; }).length;
-    u.textContent = 'Tien looks uit je eigen kast. Tik er een aan om hem te bewaren.'
-      + (mist ? ' ' + mist + ' ervan ' + (mist === 1 ? 'gebruikt' : 'gebruiken')
-                + ' een stuk dat je nog niet hebt — die staan gestippeld.' : '');
+    const vanStylist = dagKaarten.filter(function(k){ return !k.eigen; }).length;
+    u.textContent = dagKaarten.length + ' looks'
+      + (vanStylist ? ', waarvan ' + vanStylist + ' van je stylist' : ' uit je eigen kast')
+      + '. Tik er een aan om hem te bewaren.'
+      + (mist ? ' Bij ' + (mist === 1 ? 'één' : mist) + ' ervan hoort een stuk dat je nog niet hebt — '
+                + (mist === 1 ? 'die staat' : 'die staan') + ' gestippeld.' : '')
+;
   }
 }
 
