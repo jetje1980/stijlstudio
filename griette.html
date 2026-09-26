@@ -55,7 +55,8 @@ body{background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);min
 .dk-regel{height:1px;background:#d9cfc0;margin:10px 26px 9px;position:relative;z-index:1;}
 .dk-waarom{font-family:'Bodoni Moda',serif;font-style:italic;font-size:11px;color:#6b573f;text-align:center;line-height:1.5;position:relative;z-index:1;}
 .dk-tip{font-size:9px;color:#8a7358;line-height:1.5;margin-top:8px;text-align:center;position:relative;z-index:1;}
-.dk-acties{display:flex;gap:6px;margin-top:12px;position:relative;z-index:1;}
+.dk-weer{display:block;width:100%;margin-top:10px;padding:6px;background:transparent;border:1px dashed #d9cfc0;border-radius:4px;font-family:'Jost',sans-serif;font-size:9.5px;letter-spacing:.06em;color:#8a7358;cursor:pointer;position:relative;z-index:1;}
+.dk-acties{display:flex;gap:6px;margin-top:6px;position:relative;z-index:1;}
 .dk-actie{flex:1;padding:7px;background:transparent;border:1px solid #d9cfc0;border-radius:4px;font-size:10px;font-family:'Jost',sans-serif;color:#6b573f;cursor:pointer;}
 .dk-actie.aan{background:var(--brown);border-color:var(--brown);color:var(--cream);}
 .dk-ruil{position:relative;z-index:2;background:#fff;border:1px solid #d9cfc0;border-radius:4px;padding:8px;margin-top:10px;max-height:190px;overflow-y:auto;}
@@ -3675,6 +3676,13 @@ function weerSoort(i) {
   if (WEER_WOORDEN.winters.some(function(w){ return tekst.includes(w); })) return 'winters';
   return '';
 }
+// Een jas of blazer is een buitenlaag; een vest of gilet een laagje eronder.
+// Deze regel geldt op meer dan één plek, dus hij staat hier en niet in een
+// functie waar hij toevallig eerst nodig was.
+function isJasje(i) {
+  return /jas|jack|coat|trench|parka|blazer|mantel|bomber|anorak/i.test(String(i.name || ''));
+}
+
 function weerZeef(pool, weer, cat) {
   const weg = weer === 'warm' ? 'winters' : weer === 'koel' ? 'zomers' : null;
   if (!weg) return pool;
@@ -3744,11 +3752,6 @@ function lokaleLooks() {
   // niet overal dezelfde tas hangt.
   const koel = dagWeer() !== 'warm';
   let beurt = 0;
-
-  // Een jas of blazer is een buitenlaag; een vest of gilet een laagje eronder.
-  function isJasje(i) {
-    return /jas|jack|coat|trench|parka|blazer|mantel|bomber|anorak/i.test(String(i.name || ''));
-  }
 
   function afmaken(delen, opties) {
     const o = opties || {};
@@ -3969,6 +3972,9 @@ function toonDagKaarten() {
       + (k.waarom ? '<div class="dk-regel"></div><div class="dk-waarom">' + esc2(k.waarom) + '</div>' : '')
       + (k.netniet ? '<div class="dk-tip">Dit had gekund als je dit had: ' + esc2(k.netniet) + '</div>' : '')
       + '<div id="ruil-' + n + '"></div>'
+      + '<button type="button" class="dk-weer" onclick="anderWeer(' + n + ')">'
+      + (kaartWeer(k) === 'warm' ? '❄ Zelfde look, koeler weer' : '☀ Zelfde look, warmer weer')
+      + '</button>'
       + '<div class="dk-acties">'
       + '<button type="button" class="dk-actie' + (dagBewaard[n] ? ' aan' : '') + '" '
       + 'onclick="bewaarDagKaart(' + n + ')">' + (dagBewaard[n] ? '✓ Bewaard' : '♡ Bewaren') + '</button>'
@@ -4074,6 +4080,100 @@ function ruilDoe(n, i, id) {
   showToast(nieuw.name + ' staat nu op deze kaart');
 }
 
+// ── DEZELFDE LOOK, ANDER WEER ────────────────────────────────────────────────
+// Een outfit met slippers zegt niets over wat je aan moet als het tien graden
+// kouder is. Deze knop laat de look staan en wisselt alleen de stukken die
+// écht over het weer gaan — zomers voor winters in dezelfde categorie, zo veel
+// mogelijk in dezelfde kleur — en zet er een jas bij of haalt die eraf. Wat
+// niets over het weer zegt (je jeans, een effen top) blijft staan; dáárom is
+// het dezelfde soort outfit en niet zomaar een nieuwe.
+function kaartWeer(k) {
+  if (k.weer) return k.weer;
+  const soorten = (k.stukken || []).map(function(s) {
+    const it = s.id && getItemById(s.id);
+    return it ? weerSoort(it) : '';
+  });
+  const zomers = soorten.indexOf('zomers') >= 0, winters = soorten.indexOf('winters') >= 0;
+  if (zomers && !winters) return 'warm';
+  if (winters && !zomers) return 'koel';
+  return dagWeer() === 'warm' ? 'warm' : 'koel';
+}
+
+// Wie er het beste voor in de plaats komt: dezelfde categorie, niet verkeerd
+// voor het doelweer, en van die kandidaten degene die er het meest bij hoort —
+// eerst uitgesproken goed voor dat weer, dan dezelfde kleur.
+function weerVervanger(item, doel, alIn) {
+  const wil = doel === 'koel' ? 'winters' : 'zomers';
+  const weg = doel === 'koel' ? 'zomers' : 'winters';
+  const goed = getAllItems().filter(function(x) {
+    return !deletedItemIds.has(x.id) && alIn.indexOf(x.id) < 0
+      && x.cat === item.cat && weerSoort(x) !== weg;
+  });
+  if (!goed.length) return null;
+  const kleur = kleurVanItem(item);
+  const score = function(x) {
+    return (weerSoort(x) === wil ? 2 : 0) + (kleur && kleurVanItem(x) === kleur ? 1 : 0);
+  };
+  return goed.slice().sort(function(a, b){ return score(b) - score(a); })[0];
+}
+
+function anderWeer(n) {
+  const kaart = dagKaarten[n];
+  if (!kaart) return;
+  const doel = kaartWeer(kaart) === 'warm' ? 'koel' : 'warm';
+  const weg = doel === 'koel' ? 'zomers' : 'winters';
+  const stukken = kaart.stukken.slice();
+  const ids = function() { return stukken.map(function(s){ return s.id; }).filter(Boolean); };
+  let geruild = 0, eraf = 0;
+
+  for (let i = 0; i < stukken.length; i++) {
+    const it = stukken[i].id && getItemById(stukken[i].id);
+    if (!it || weerSoort(it) !== weg) continue;
+    const anders = weerVervanger(it, doel, ids());
+    if (anders) { stukken[i] = { id: anders.id, naam: anders.name, heeft: true }; geruild++; }
+    else if (it.cat === 'layers') { stukken.splice(i, 1); i--; eraf++; }
+  }
+
+  // Naar koeler weer hoort een buitenlaag, ook als er nog geen laag op de kaart
+  // stond. Naar warm weer mag een dikke jas eraf.
+  const heeftLaag = stukken.some(function(s) {
+    const it = s.id && getItemById(s.id);
+    return it && it.cat === 'layers';
+  });
+  let erbij = 0;
+  if (doel === 'koel' && !heeftLaag) {
+    const lagen = getAllItems().filter(function(x) {
+      return !deletedItemIds.has(x.id) && x.cat === 'layers'
+        && ids().indexOf(x.id) < 0 && weerSoort(x) !== 'zomers';
+    });
+    const jas = lagen.filter(isJasje)[0] || lagen[0];
+    if (jas) { stukken.push({ id: jas.id, naam: jas.name, heeft: true }); erbij++; }
+  }
+
+  if (!geruild && !eraf && !erbij) {
+    showToast(doel === 'koel'
+      ? 'Deze look kan zo ook bij koeler weer — er zit niets zomers in'
+      : 'Deze look kan zo ook bij warm weer — er zit niets winters in');
+    kaart.weer = doel;
+    bewaarDagKaarten();
+    toonDagKaarten();
+    return;
+  }
+
+  kaart.stukken = stukken;
+  kaart.weer = doel;
+  kaart.aangepast = true;
+  if (!stukken.some(function(s){ return !s.heeft; })) kaart.netniet = '';
+  bewaarDagKaarten();
+  toonDagKaarten();
+  const woorden = [];
+  if (geruild) woorden.push(geruild + (geruild === 1 ? ' stuk gewisseld' : ' stukken gewisseld'));
+  if (erbij) woorden.push('een laag erbij');
+  if (eraf) woorden.push('een laag eraf');
+  showToast('Dezelfde look voor ' + (doel === 'koel' ? 'koeler' : 'warmer')
+    + ' weer — ' + woorden.join(', '));
+}
+
 // ── EEN KAART OPSLAAN ALS AFBEELDING ─────────────────────────────────────────
 // Dezelfde manier als bij de outfitkaart: het element wordt getekend en als
 // bestand aangeboden. Zonder html2canvas kan dat niet, en dan zeggen we dat.
@@ -4088,8 +4188,10 @@ async function dagKaartAfbeelding(n) {
   showToast('Afbeelding maken…');
   const acties = el.querySelector('.dk-acties');
   const ruil = el.querySelector('.dk-ruil');
+  const weerknop = el.querySelector('.dk-weer');
   if (acties) acties.style.visibility = 'hidden';
   if (ruil) ruil.style.display = 'none';
+  if (weerknop) weerknop.style.display = 'none';
   try {
     const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#F7F3EC', useCORS: true });
     const a = document.createElement('a');
@@ -4102,6 +4204,7 @@ async function dagKaartAfbeelding(n) {
   } finally {
     if (acties) acties.style.visibility = '';
     if (ruil) ruil.style.display = '';
+    if (weerknop) weerknop.style.display = '';
   }
 }
 
