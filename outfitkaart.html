@@ -347,6 +347,11 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 .kaart-note{font-size:9px;color:#5a4030;text-align:center;border-top:1px solid #ddd5c8;padding-top:8px;margin-top:4px;margin-bottom:8px;line-height:1.5;}
 .kaart-swatches{display:flex;justify-content:center;gap:6px;align-items:center;}
 .kaart-swatch{width:20px;height:20px;border-radius:3px;}
+/* Op formaat van hun rol: 60/30/10 wordt ook 60/30/10 groot. */
+.kaart-swatch.kw-hoofd{width:34px;height:20px;}
+.kaart-swatch.kw-steun{width:20px;height:20px;}
+.kaart-swatch.kw-accent{width:11px;height:20px;}
+.kaart-rolregel{font-size:7.5px;color:#8a7060;text-align:center;margin-top:4px;letter-spacing:.04em;}
 .kaart-swatch-label{font-size:7.5px;color:#8a7060;letter-spacing:.1em;text-transform:uppercase;margin-right:4px;}
 .kaart-combo-naam{font-size:8px;color:#8a7060;text-align:center;margin-top:5px;letter-spacing:.02em;}
 /* Waarom deze combinatie werkt */
@@ -849,6 +854,7 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <span class="kaart-swatch-label" id="k-combo-type">kleurcombo</span>
       <div class="kaart-swatches" id="k-swatches"></div>
     </div>
+    <div class="kaart-rolregel" id="k-rolregel" style="display:none;"></div>
     <div class="kaart-combo-naam" id="k-combo-naam"></div>
   </div>
 
@@ -3779,6 +3785,15 @@ function kiesKleurRol(cat) {
     + mijn.slice(0, 8).map(i => `<span class="cap-chip">${esc(i.name)}</span>`).join('')
     + (mijn.length > 8 ? `<span class="cap-chip">en nog ${mijn.length - 8}</span>` : '')
     + '</div>'
+    // Ook hier hoort de verhouding zichtbaar te zijn, niet alleen in de
+    // weekendtas: je kiest hier immers óók een kleurcombinatie.
+    + (paren.length
+        ? '<div class="field-note" style="margin-bottom:4px;">Zo liggen de verhoudingen:</div>'
+          + verhoudingHTML({
+              tags: [kleurKeuze.kleur].concat(paren.slice(0, 2).map(pr => pr.kleur)),
+              colors: [KLEUR_HEX[kleurKeuze.kleur] || '#ccc']
+                .concat(paren.slice(0, 2).map(pr => KLEUR_HEX[pr.kleur] || '#ccc')) })
+        : '')
     + '<button class="ai-btn" onclick="kleurNaarOutfit()">✦ Maak hier een outfit mee</button>'
     + '<button class="btn-rescan" style="margin-top:8px;" onclick="kleurSpelen()">🎲 Verras me met een combinatie</button>';
   s3.style.display = 'block';
@@ -5966,7 +5981,10 @@ function kleurVerhouding(p) {
 // Haar eigen stukken in die kleur, en in de rol die erbij hoort: een
 // hoofdkleur op een broek is iets anders dan een hoofdkleur op een tas.
 function stukkenVoorRol(rol) {
-  return capGefilterd.filter(function(i) {
+  // Buiten de weekendtas is capGefilterd leeg — dan telt gewoon de hele kast,
+  // anders staat overal "niets in deze kleur" terwijl ze het wel heeft.
+  const bron = (capGefilterd && capGefilterd.length) ? capGefilterd : allItems;
+  return bron.filter(function(i) {
     return rol.cats.indexOf(i.cat) >= 0 && kleurMatcht(rol.kleur, kleurTekstVan(i));
   });
 }
@@ -7198,13 +7216,15 @@ function wardrobeForAI() {
   }).join('\n');
 }
 
-async function aiComposeOutfit() {
+// statusEl: waar de voortgang naartoe moet. Zonder opgave is dat het veld op
+// stap 2 — maar wordt dit vanaf de kaart aangeroepen, dan staat dat veld op
+// een scherm dat je niet ziet, en lijkt het alsof er niets gebeurt.
+async function aiComposeOutfit(statusEl) {
   const btn    = document.getElementById('ai-compose-btn');
-  const status = document.getElementById('ai-compose-status');
+  const status = statusEl || document.getElementById('ai-compose-status');
   const orig   = '✨ Laat AI een outfit samenstellen uit mijn kast';
 
-  btn.disabled = true;
-  btn.textContent = '⏳ AI stelt een outfit samen…';
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ AI stelt een outfit samen…'; }
   status.textContent = 'Bezig met kiezen uit je garderobe…';
   const stopVolgen = volgVoortgang(status);
 
@@ -7387,19 +7407,18 @@ Antwoord ALLEEN met JSON, geen tekst eromheen:
     const nEigen = picked.filter(i => !i._suggestion).length;
     const nNieuw = picked.length - nEigen;
 
-    btn.textContent = '✨ Opnieuw laten samenstellen';
+    if (btn) btn.textContent = '✨ Opnieuw laten samenstellen';
     status.innerHTML = `AI koos <b>${nEigen}</b> item${nEigen===1?'':'s'} uit je kast`
       + (nNieuw ? ` en stelt <b>${nNieuw}</b> nieuw${nNieuw===1?' item':'e items'} voor.` : '.')
       + (outfitUitleg ? ' Uitleg komt op de kaart.' : '');
   } catch(e) {
     stopVolgen();
-    btn.textContent = orig;
+    if (btn) { btn.textContent = orig; btn.disabled = false; }
     status.textContent = 'Mislukt: ' + e.message;
-    btn.disabled = false;
     throw e;              // zodat de kaart de reden kan tonen
   }
   stopVolgen();
-  btn.disabled = false;
+  if (btn) btn.disabled = false;
 }
 
 // ── STEP 3: AI SUGGESTIES ─────────────────────────────────────────────────────
@@ -7466,11 +7485,33 @@ function buildKaart() {
   document.getElementById('k-anno2').innerHTML   = anno2;
   document.getElementById('k-note').textContent  = note;
 
+  // Vier even grote stipjes zeggen wélke kleuren erin zitten, niet in welke
+  // verhouding. Op de kaart — waar élke route op uitkomt — staan ze nu op
+  // formaat: de hoofdkleur groot, het accent klein. Kan de verhouding niet
+  // bepaald worden, dan blijven het gewone stipjes.
   const sw = document.getElementById('k-swatches');
   sw.innerHTML = '';
-  (selPreset?.colors||[]).forEach(c=>{
-    const d = document.createElement('div'); d.className='kaart-swatch'; d.style.background=c; sw.appendChild(d);
-  });
+  const rollen = selPreset ? kleurVerhouding(selPreset) : [];
+  if (rollen.length) {
+    rollen.forEach(r => {
+      const d = document.createElement('div');
+      d.className = 'kaart-swatch kw-' + r.sleutel;
+      d.style.background = r.hex;
+      d.title = r.kleur + ' — ' + r.label + ' (' + r.deel + '%)';
+      sw.appendChild(d);
+    });
+  } else {
+    (selPreset?.colors||[]).forEach(c=>{
+      const d = document.createElement('div'); d.className='kaart-swatch'; d.style.background=c; sw.appendChild(d);
+    });
+  }
+  const rolRegel = document.getElementById('k-rolregel');
+  if (rolRegel) {
+    rolRegel.textContent = rollen.length
+      ? rollen.map(r => r.kleur + ' ' + r.label.replace('kleur', '') + ' ' + r.deel + '%').join(' · ')
+      : '';
+    rolRegel.style.display = rollen.length ? 'block' : 'none';
+  }
 
   // Dit zijn de kleuren van de gekozen combo — benoem dat ook zo
   const typeLabel = (selPreset && selPreset.typeName) || (selType && selType.label) || 'kleurcombo';
@@ -7883,10 +7924,23 @@ async function autoComposeOnCard() {
     u.innerHTML = '<div class="ku-txt" style="text-align:center;">✨ AI vult je outfit aan en legt uit waarom het werkt…</div>';
   }
 
+  // Hier ging het mis: aiComposeOutfit schrijft zijn voortgang naar
+  // #ai-compose-status, en dat element staat op stap 2 — op dít scherm is het
+  // onzichtbaar. Je zag dus één regel en daarna tot twee minuten niets, en dat
+  // is niet te onderscheiden van een knop die niets doet. Dus zetten we hier
+  // een eigen teller neer, op een plek die wél in beeld staat.
+  const eigenStatus = document.createElement('div');
+  eigenStatus.className = 'field-note';
+  eigenStatus.id = 'aanvul-voortgang';
+  eigenStatus.style.cssText = 'text-align:center;margin-top:8px;';
+  eigenStatus.textContent = 'De stylist kijkt naar je kast…';
+  const knop = document.getElementById('aanvul-btn');
+  if (knop && knop.parentNode) knop.parentNode.insertBefore(eigenStatus, knop.nextSibling);
   let fout = null;
   try {
-    await aiComposeOutfit();
+    await aiComposeOutfit(eigenStatus);
   } catch(e) { fout = e; }
+  eigenStatus.remove();
 
   toonAanvulKnop();
   if (selItems.length) {

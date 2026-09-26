@@ -57,24 +57,37 @@ body{background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);min
 .dk-tip{font-size:9px;color:#8a7358;line-height:1.5;margin-top:8px;text-align:center;position:relative;z-index:1;}
 /* De kaartkijker: een opgeslagen outfitkaart op ware grootte, met swipen naar
    de volgende. Zwart eromheen, zodat de kaart zelf het enige is wat er staat. */
-.kk{position:fixed;inset:0;z-index:900;background:rgba(20,17,14,.94);display:flex;align-items:center;justify-content:center;padding:14px;}
+/* touch-action:none — binnen de kijker valt niets te scrollen, en anders kan
+   de browser de horizontale veeg halverwege overnemen en als scroll afhandelen.
+   Dan krijgt de pagina alleen nog een touchcancel en blijft het bladeren uit. */
+.kk{position:fixed;inset:0;z-index:900;background:rgba(20,17,14,.94);display:flex;align-items:center;justify-content:center;padding:14px;touch-action:none;}
 .kk-vak{max-width:100%;max-height:100%;display:flex;flex-direction:column;align-items:center;gap:10px;}
 /* min-width/min-height: zonder die twee is de afbeelding nul breed zolang hij
    laadt, en zie je een leeg zwart vlak tot de foto binnen is. Met object-fit
    contain vervormt dat niets — een smalle kaart krijgt gewoon ruimte ernaast. */
-.kk-vak img{max-width:100%;max-height:78vh;min-width:min(60vw,240px);min-height:min(55vh,320px);object-fit:contain;border-radius:6px;background:#F7F3EC;touch-action:pan-y;}
+.kk-vak img{max-width:100%;max-height:78vh;min-width:min(60vw,240px);min-height:min(55vh,320px);object-fit:contain;border-radius:6px;background:#F7F3EC;}
 .kk-onder{text-align:center;color:#f2ebe0;font-family:'Jost',sans-serif;font-size:11px;line-height:1.5;}
 .kk-tel{font-size:9.5px;color:#b9ac9b;letter-spacing:.08em;margin-top:3px;}
 .kk-x{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,.14);color:#f2ebe0;font-size:15px;cursor:pointer;z-index:2;}
 .kk-pijl{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:54px;border:none;border-radius:6px;background:rgba(255,255,255,.1);color:#f2ebe0;font-size:26px;line-height:1;cursor:pointer;z-index:2;}
 .kk-links{left:6px;} .kk-rechts{right:6px;}
 .kk-pijl[disabled]{opacity:.22;cursor:default;}
+.dk-check{margin-top:10px;font-family:'Jost',sans-serif;position:relative;z-index:1;}
+.dk-check summary{font-size:9.5px;color:#8a7358;cursor:pointer;letter-spacing:.03em;list-style:none;}
+.dk-check summary::-webkit-details-marker{display:none;}
+.dk-check summary::before{content:'▸ ';}
+.dk-check[open] summary::before{content:'▾ ';}
+.dk-check-r{display:flex;gap:6px;align-items:flex-start;font-size:9.5px;color:#6b573f;line-height:1.5;margin-top:5px;text-align:left;}
+.dk-check-i{flex-shrink:0;width:11px;font-weight:700;}
+.dk-check-uit{font-size:8.5px;color:#a89478;line-height:1.5;margin-top:7px;text-align:left;font-style:italic;}
 .dk-weer{display:block;width:100%;margin-top:10px;padding:6px;background:transparent;border:1px dashed #d9cfc0;border-radius:4px;font-family:'Jost',sans-serif;font-size:9.5px;letter-spacing:.06em;color:#8a7358;cursor:pointer;position:relative;z-index:1;}
 .dk-acties{display:flex;gap:6px;margin-top:6px;position:relative;z-index:1;}
 .dk-actie{flex:1;padding:7px;background:transparent;border:1px solid #d9cfc0;border-radius:4px;font-size:10px;font-family:'Jost',sans-serif;color:#6b573f;cursor:pointer;}
 .dk-actie.aan{background:var(--brown);border-color:var(--brown);color:var(--cream);}
 .dk-ruil{position:relative;z-index:2;background:#fff;border:1px solid #d9cfc0;border-radius:4px;padding:8px;margin-top:10px;max-height:190px;overflow-y:auto;}
-.dk-ruil button{display:flex;align-items:center;gap:7px;width:100%;text-align:left;background:none;border:none;padding:5px 4px;cursor:pointer;font-family:'Jost',sans-serif;font-size:10.5px;color:#2b2318;}
+.dk-ruil button{display:flex;align-items:center;gap:7px;width:100%;text-align:left;background:none;border:none;padding:6px 4px;cursor:pointer;font-family:'Jost',sans-serif;font-size:10.5px;color:#2b2318;line-height:1.4;}
+.dk-ruil-why{font-size:9px;color:#6b8a5c;}
+.dk-ruil-let{font-size:9px;color:#a8754f;}
 .dk-ruil img{width:26px;height:32px;object-fit:cover;border-radius:3px;}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--brown);z-index:300;display:flex;align-items:stretch;box-shadow:0 -2px 16px rgba(28,26,24,0.18);padding-bottom:env(safe-area-inset-bottom,0);}
 .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px 10px;cursor:pointer;border:none;background:transparent;color:rgba(245,242,238,0.45);font-family:'Jost',sans-serif;font-size:8px;letter-spacing:1px;text-transform:uppercase;gap:4px;transition:color 0.18s;position:relative;}
@@ -4005,6 +4018,7 @@ function toonDagKaarten() {
       + (k.waarom ? '<div class="dk-regel"></div><div class="dk-waarom">' + esc2(k.waarom) + '</div>' : '')
       + (k.netniet ? '<div class="dk-tip">Dit had gekund als je dit had: ' + esc2(k.netniet) + '</div>' : '')
       + '<div id="ruil-' + n + '"></div>'
+      + controleHTML(k.stukken)
       + '<button type="button" class="dk-weer" onclick="anderWeer(' + n + ')">'
       + (kaartWeer(k) === 'warm' ? '❄ Zelfde look, koeler weer' : '☀ Zelfde look, warmer weer')
       + '</button>'
@@ -4107,6 +4121,11 @@ function kijkerStap(e, richting) {
 }
 
 function kijkerSluit(e, altijd) {
+  // Een veeg eindigt bijna altijd náást de kaart, en die lift-af telt voor de
+  // browser als een klik op de achtergrond. Zonder deze rem sloot de kijker
+  // dus precies op het moment dat je wilde bladeren — wat van buitenaf lijkt
+  // alsof swipen niet werkt.
+  if (e && !altijd && netGeveegd) return;
   // Tikken óp de kaart mag hem niet sluiten; ernaast wel.
   if (e && !altijd && e.target && e.target.id !== 'kaart-kijker') return;
   if (e) e.stopPropagation();
@@ -4122,22 +4141,34 @@ document.addEventListener('keydown', function(e) {
   else if (e.key === 'ArrowRight') kijkerStap(null, 1);
 });
 
-// Swipen. Een korte veeg telt pas als veeg vanaf 40 pixels, en alleen als hij
-// meer horizontaal dan verticaal is — anders neemt hij het scrollen over.
+// Swipen. Een veeg telt vanaf 35 pixels, en alleen als hij meer horizontaal
+// dan verticaal is — anders neemt hij het scrollen over. `netGeveegd` blijft
+// even staan zodat de klik die ná het loslaten komt de kijker niet sluit.
+let netGeveegd = false;
 (function() {
   let x0 = null, y0 = null;
   document.addEventListener('touchstart', function(e) {
     if (kijkerNu < 0 || !e.touches[0]) return;
     x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+    netGeveegd = false;
   }, { passive: true });
-  document.addEventListener('touchend', function(e) {
-    if (kijkerNu < 0 || x0 === null || !e.changedTouches[0]) return;
+  const afronden = function(e) {
+    if (kijkerNu < 0 || x0 === null || !e.changedTouches || !e.changedTouches[0]) return;
     const dx = e.changedTouches[0].clientX - x0;
     const dy = e.changedTouches[0].clientY - y0;
     x0 = y0 = null;
-    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+    if (Math.abs(dx) < 35 || Math.abs(dx) < Math.abs(dy)) return;
+    netGeveegd = true;
+    // Lang genoeg voor de klik die de browser na het loslaten stuurt (die komt
+    // binnen ~300 ms), kort genoeg om niet in de weg te zitten als je daarna
+    // bewust naast de kaart tikt om hem te sluiten.
+    setTimeout(function(){ netGeveegd = false; }, 350);
     kijkerStap(null, dx < 0 ? 1 : -1);
-  }, { passive: true });
+  };
+  document.addEventListener('touchend', afronden, { passive: true });
+  // Breekt de browser de reeks toch af, dan komt er geen touchend maar een
+  // touchcancel. Zonder deze regel gaat die veeg stilletjes verloren.
+  document.addEventListener('touchcancel', afronden, { passive: true });
 })();
 
 // ── EEN STUK RUILEN OP DE KAART ──────────────────────────────────────────────
@@ -4159,6 +4190,14 @@ function ruilOpen(n, i) {
       && (!cat || x.cat === cat);
   });
   opties = weerZeef(opties, dagWeer(), cat);
+  // De lijst gaf gewoon álles uit die categorie, in willekeurige volgorde: dan
+  // moet jij bedenken wat past. Nu staat wat het beste bij de rest van deze
+  // outfit past bovenaan, met de reden erbij — en wat botst onderaan, met de
+  // reden dáárvoor. Kiezen mag je nog steeds zelf.
+  opties = opties.map(function(x) {
+    const o = ruilOordeel(x, kaart, i);
+    return { item: x, score: o.score, waarom: o.waarom, let: o.let };
+  }).sort(function(a, b){ return b.score - a.score; });
 
   if (!opties.length) {
     vak.innerHTML = '<div class="dk-ruil"><div class="dk-naampje" style="text-align:left;">'
@@ -4167,15 +4206,150 @@ function ruilOpen(n, i) {
   }
   vak.innerHTML = '<div class="dk-ruil">'
     + '<div class="dk-naampje" style="text-align:left;margin-bottom:4px;">In plaats van '
-    + esc2(kortStuk(huidig.naam)) + ':</div>'
-    + opties.slice(0, 20).map(function(x) {
+    + esc2(kortStuk(huidig.naam)) + ' — <b>op volgorde van wat hier past</b>:</div>'
+    + opties.slice(0, 20).map(function(o) {
+        const x = o.item;
         return '<button type="button" onclick="ruilDoe(' + n + ',' + i + ',\'' + esc2(x.id) + '\')">'
           + (photos[x.id] ? '<img loading="lazy" src="' + esc2(photos[x.id]) + '" alt="">'
                           : '<span style="width:26px;">👕</span>')
-          + '<span>' + esc2(x.name) + '</span></button>';
+          + '<span>' + esc2(x.name)
+          + (o.waarom ? '<br><span class="dk-ruil-why">' + esc2(o.waarom) + '</span>' : '')
+          + (o.let ? '<br><span class="dk-ruil-let">' + esc2(o.let) + '</span>' : '')
+          + '</span></button>';
       }).join('')
-    + (huidig.heeft ? '' : '')
     + '</div>';
+}
+
+// ── WAT PAST HIER, EN WAAROM ─────────────────────────────────────────────────
+// De ruillijst toonde alles uit de categorie, in de volgorde waarin het
+// toevallig in de kast stond. Dan is "iets anders kiezen" gokken. Deze regels
+// zijn dezelfde als die de stylist krijgt — silhouet, textuur en kleur — maar
+// ze zijn hier uit te rekenen, dus dat hoort de pagina zelf te doen.
+function ruilOordeel(kandidaat, kaart, plek) {
+  const rest = (kaart.stukken || [])
+    .filter(function(s, k){ return k !== plek && s.id; })
+    .map(function(s){ return getItemById(s.id); })
+    .filter(Boolean);
+  let score = 0;
+  const goed = [], slecht = [];
+
+  // 1 · silhouet: niet alles wijd, en niet alles strak.
+  const kWijd = isWijd(kandidaat);
+  const restWijd = rest.filter(isWijd).length;
+  const restStrak = rest.filter(function(i){ return !isWijd(i); }).length;
+  if (kWijd && restWijd === 0 && restStrak > 0) { score += 3; goed.push('geeft volume tegenover strak'); }
+  else if (!kWijd && restWijd > 0) { score += 3; goed.push('strak tegenover het wijde'); }
+  else if (kWijd && restWijd > 0) { score -= 3; slecht.push('dan is alles wijd'); }
+
+  // 2 · textuur: twee materiaalfamilies naast elkaar, niet vier dezelfde.
+  const mat = function(i) {
+    return String([].concat((itemTags[i.id] || {}).materiaal || []).join(' ')).toLowerCase();
+  };
+  const kMat = mat(kandidaat);
+  const restMat = rest.map(mat).filter(Boolean);
+  if (kMat && restMat.length && restMat.every(function(m){ return m !== kMat; })) {
+    score += 2; goed.push('ander materiaal dan de rest');
+  } else if (kMat && restMat.filter(function(m){ return m === kMat; }).length >= 2) {
+    score -= 2; slecht.push('zelfde materiaal als twee andere stukken');
+  }
+
+  // 3 · kleur: één kleur die terugkomt bindt de outfit; drie felle kleuren
+  //     vechten. `kleurDots` kent de kleuren die de tool zelf gebruikt.
+  const kKleur = kleurVanItem(kandidaat);
+  const restKleuren = rest.map(kleurVanItem).filter(Boolean);
+  if (kKleur && restKleuren.indexOf(kKleur) >= 0) { score += 2; goed.push('kleur komt terug'); }
+  const felle = restKleuren.concat(kKleur ? [kKleur] : []).filter(isFelleKleurNaam);
+  if (felle.length >= 3) { score -= 2; slecht.push('dan drie felle kleuren'); }
+
+  // 4 · het weer van vandaag telt ook hier.
+  const weer = dagWeer();
+  const soort = weerSoort(kandidaat);
+  if (soort && soort === (weer === 'warm' ? 'zomers' : weer === 'koel' ? 'winters' : '')) {
+    score += 1; goed.push('past bij het weer');
+  }
+
+  return { score: score, waarom: goed.slice(0, 2).join(', '), let: slecht.slice(0, 1).join('') };
+}
+
+// ── DE CONTROLE DIE JE KUNT ZIEN ─────────────────────────────────────────────
+// "Hoe weet ik zeker dat de outfits kloppen?" Door het niet te beloven maar te
+// laten zien. Dit zijn dezelfde vier regels die de stylist in zijn opdracht
+// krijgt — silhouet, textuur, kleurverhouding en het weer — maar ze zijn hier
+// narekenbaar. Dus rekent de pagina ze na, en staat de uitkomst op de kaart.
+// Een regel die niet gehaald wordt verdwijnt niet: die staat er als punt.
+function outfitControle(stukken) {
+  const items = (stukken || []).map(function(s){ return s.id && getItemById(s.id); }).filter(Boolean);
+  if (items.length < 2) return [];
+  const uit = [];
+
+  // 1 · silhouet — niet alles wijd, niet alles strak
+  const wijd = items.filter(isWijd).length;
+  const strak = items.length - wijd;
+  uit.push(wijd === 0
+    ? { ok:false, kop:'Silhouet', zin:'alles is aansluitend — er is geen volume om tegen af te zetten' }
+    : strak === 0
+    ? { ok:false, kop:'Silhouet', zin:'alles is wijd, dus je taille verdwijnt' }
+    : { ok:true, kop:'Silhouet', zin:wijd + ' wijd tegenover ' + strak + ' aansluitend' });
+
+  // 2 · textuur — minstens twee materiaalfamilies
+  const mats = items.map(function(i) {
+    return String([].concat((itemTags[i.id] || {}).materiaal || []).join(' ')).toLowerCase();
+  }).filter(Boolean);
+  const uniek = mats.filter(function(m, k){ return mats.indexOf(m) === k; });
+  uit.push(!mats.length
+    ? { ok:null, kop:'Textuur', zin:'niet te zeggen — deze stukken hebben nog geen materiaal-tag' }
+    : uniek.length >= 2
+    ? { ok:true, kop:'Textuur', zin:uniek.slice(0, 3).join(' tegenover ') }
+    : { ok:false, kop:'Textuur', zin:'alles ' + uniek[0] + ' — dat oogt vlak' });
+
+  // 3 · kleur — één voert, de rest ondersteunt; drie felle kleuren vechten
+  const kleuren = items.map(kleurVanItem).filter(Boolean);
+  const felle = kleuren.filter(isFelleKleurNaam);
+  const herhaald = kleuren.filter(function(k, n){ return kleuren.indexOf(k) !== n; });
+  uit.push(felle.length >= 3
+    ? { ok:false, kop:'Kleur', zin:felle.length + ' felle kleuren naast elkaar — dat wordt een krachtmeting' }
+    : !kleuren.length
+    ? { ok:null, kop:'Kleur', zin:'niet te zeggen — geen kleur-tags op deze stukken' }
+    : herhaald.length
+    ? { ok:true, kop:'Kleur', zin:herhaald[0] + ' komt twee keer terug, dat bindt het' }
+    : felle.length === 1
+    ? { ok:true, kop:'Kleur', zin:felle[0] + ' is het accent, de rest is rustig' }
+    : { ok:true, kop:'Kleur', zin:kleuren.length + ' rustige kleuren bij elkaar' });
+
+  // 4 · weer
+  const weer = dagWeer();
+  const mis = items.filter(function(i) {
+    const s = weerSoort(i);
+    return s && s === (weer === 'warm' ? 'winters' : weer === 'koel' ? 'zomers' : '');
+  });
+  uit.push(mis.length
+    ? { ok:false, kop:'Weer', zin:kortStuk(mis[0].name) + ' past niet bij ' + weer + ' weer' }
+    : { ok:true, kop:'Weer', zin:'past bij ' + weer + ' weer vandaag' });
+
+  return uit;
+}
+
+function controleHTML(stukken) {
+  const regels = outfitControle(stukken);
+  if (!regels.length) return '';
+  const raak = regels.filter(function(r){ return r.ok === true; }).length;
+  return '<details class="dk-check"><summary>' + raak + ' van de ' + regels.length
+    + ' stijlregels kloppen — wat is er gecontroleerd?</summary>'
+    + regels.map(function(r) {
+        return '<div class="dk-check-r"><span class="dk-check-i">'
+          + (r.ok === true ? '✓' : r.ok === false ? '!' : '–') + '</span>'
+          + '<span><b>' + esc2(r.kop) + '</b> — ' + esc2(r.zin) + '</span></div>';
+      }).join('')
+    + '<div class="dk-check-uit">Dit rekent de app zelf na, zonder AI. Het zegt of de '
+    + 'verhoudingen kloppen — niet of je het mooi vindt.</div></details>';
+}
+
+// Dezelfde lijst felle kleuren als op de outfitkaart; hier alleen op naam.
+const FEL = ['turquoise','felroze','fuchsia','rood','oranje','koraal','geel','mosterd',
+  'paars','kobaltblauw','smaragdgroen','petrol','hemelsblauw','groen','mintgroen'];
+function isFelleKleurNaam(k) {
+  const s = String(k || '').toLowerCase();
+  return FEL.some(function(f){ return s.indexOf(f) >= 0; });
 }
 
 function ruilDoe(n, i, id) {
@@ -4362,9 +4536,11 @@ async function dagKaartAfbeelding(n) {
   const acties = el.querySelector('.dk-acties');
   const ruil = el.querySelector('.dk-ruil');
   const weerknop = el.querySelector('.dk-weer');
+  const check = el.querySelector('.dk-check');
   if (acties) acties.style.visibility = 'hidden';
   if (ruil) ruil.style.display = 'none';
   if (weerknop) weerknop.style.display = 'none';
+  if (check) check.style.display = 'none';
   try {
     const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#F7F3EC', useCORS: true,
       onclone: function(doc) { fotoVlakkenInKopie(doc); } });
@@ -4378,6 +4554,7 @@ async function dagKaartAfbeelding(n) {
     if (acties) acties.style.visibility = '';
     if (ruil) ruil.style.display = '';
     if (weerknop) weerknop.style.display = '';
+    if (check) check.style.display = '';
   }
 }
 
