@@ -92,6 +92,24 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .cap-dot.groot{width:20px;height:20px;}
 .cap-palet-naam{font-size:13px;font-weight:600;}
 .cap-palet-kleuren{font-size:11px;color:var(--text-2);margin-top:2px;}
+/* De verhouding zichtbaar: een balk op 60/30/10, en daaronder haar eigen
+   stukken op het formaat van hun rol. Zestig procent hoort er ook zestig
+   procent uit te zien. */
+.vh{margin-top:9px;padding-top:9px;border-top:1px solid var(--border);}
+.vh-balk{display:flex;height:13px;border-radius:3px;overflow:hidden;margin:9px 0 5px;}
+.vh-kort{font-size:10px;color:var(--text-2);line-height:1.4;margin-bottom:2px;}
+.vh-deel{display:block;}
+.vh-regel{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.vh-foto,.vh-stip{flex-shrink:0;border-radius:4px;background-size:cover;background-position:center;border:1px solid var(--border);}
+.vh-hoofd{width:38px;height:46px;}
+.vh-steun{width:28px;height:34px;}
+.vh-accent{width:19px;height:23px;}
+.vh-tekst{font-size:10.5px;line-height:1.45;color:var(--text);}
+.vh-draagt{color:var(--text-2);font-size:10px;}
+.vh-botsing{font-size:10px;color:var(--text-2);font-style:italic;line-height:1.45;margin-top:2px;}
+.cap-palet-uit{font-size:11px;color:var(--text);margin-top:5px;line-height:1.45;}
+.cap-palet-uit b{letter-spacing:.02em;}
+.cap-palet-mager{color:var(--text-2);font-style:italic;}
 .cap-kleurrij{display:flex;flex-wrap:wrap;gap:6px;}
 .cap-kleurknop{display:flex;align-items:center;gap:6px;padding:5px 10px 5px 6px;border:1.5px solid var(--border);border-radius:20px;background:var(--ph-bg);font-family:'Inter',sans-serif;font-size:11px;color:var(--text);cursor:pointer;}
 .cap-kleurknop.actief{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--surface));}
@@ -589,8 +607,11 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <!-- Hier landt de keuze van stap 1. Stond die er niet, dan wist je op dit
            scherm niet meer wat je koos — en waarom de knop iets anders wil. -->
       <div class="field-note" id="cap-hoe-herhaal" style="margin-bottom:6px;"></div>
-      <div class="field-note" style="margin-bottom:10px;" id="cap-kies-uitleg">Gerangschikt op hoeveel je er zelf van hebt.</div>
+      <div class="field-note" style="margin-bottom:10px;" id="cap-kies-uitleg">Gerangschikt op wat je er zelf van hebt. De bovenste staat al aan — tik hem weg of kies een andere.</div>
       <div id="cap-combo-lijst"></div>
+      <!-- Wat je keuze oplevert, terwijl je kiest. Zonder dit moet je na het
+           aantikken maar afwachten wat eruit komt. -->
+      <div class="field-note" id="cap-keuze-uit" style="margin-top:10px;"></div>
       <div id="cap-bijstel" style="display:none;margin-top:12px;">
         <div class="sec-label">Een kleur wisselen</div>
         <div class="field-note" style="margin-bottom:8px;">Tik op een kleur van een gekozen combo om hem te vervangen. Ik zeg er daarna bij of het nog klopt en wat het met de uitstraling doet.</div>
@@ -5367,6 +5388,14 @@ function kiesCapHoe(hoe) {
     b.classList.toggle('aan', b.dataset.hoe === hoe));
   const uit = document.getElementById('cap-hoe-uit');
   if (uit) uit.textContent = CAP_HOE_UITLEG[hoe] || '';
+  // Sta je al bij de combo's en verander je van gedachten, dan hoort de
+  // voorselectie mee te bewegen: "laat me van alles zien" met één richting
+  // aangevinkt is niet wat je vroeg. Wat je zelf hebt aangetikt blijft staan.
+  if (capStap === 2 && !capZelfGekozen) {
+    voorselecteerCombos();
+    toonCombos();
+    toonBijstel();
+  }
   if (typeof bijwerkComboKnop === 'function') bijwerkComboKnop();
   if (capStap === 2) toonCapHoeHerhaling();
 }
@@ -5761,8 +5790,17 @@ function capScoorCombos() {
     // krachtmeting en geen statement — bruikbaar, maar niet als eerste keus.
     const zwaar = ZWAAR.filter(z => tags.some(t => kleurMatcht(z, t)))
                        .filter(z => !ankers.includes(z));
+    // Niet alleen hoevéél stukken erin passen, maar in welke rollen. "14 stuks
+    // in je kast" is een getal; "6 tops en 1 onderstuk" zegt meteen dat je er
+    // niet ver mee komt. Dat scheelt gissen bij het kiezen.
+    const perRol = { tops:0, bottoms:0, shoes:0, layers:0, bags:0, eendelig:0 };
+    passend.forEach(x => {
+      if (isEendelig(x.i)) perRol.eendelig++;
+      else if (perRol[x.i.cat] !== undefined) perRol[x.i.cat]++;
+    });
     return { ...p,
       aantal: passend.length,
+      perRol,
       ankers: gedekt,
       zwaar,
       // Een combo is pas bruikbaar met een boven- én een onderstuk. Maar dat
@@ -5827,10 +5865,12 @@ function capNaarCombos() {
   capHuidigeTasId = null;   // andere opzet, dus een nieuwe tas in je lijst
   capFilterKast();
   capScoorCombos();
-  capGekozenCombos = [];
+  capZelfGekozen = false;
+  voorselecteerCombos();
   toonFilterUitleg();
   toonCombos();
   bijwerkComboKnop();
+  toonBijstel();
   capToonStap(2);
 
   // Heb je stukken aangewezen, dan is de vraag die daarna komt bijna altijd
@@ -5865,6 +5905,151 @@ function toonFilterUitleg() {
         ? `<div class="cap-groep"><b>Zonder:</b> ${capNietKleuren.map(esc).join(', ')}</div>` : '');
 }
 
+// ── WAT IS DE HOOFDKLEUR, EN WAT HET ACCENT ─────────────────────────────────
+// Een rij gelijke stippen zegt wélke kleuren erin zitten, maar niet in welke
+// verhouding — en dáár gaat het om. Haar rapport zegt het al: grofweg zestig
+// procent rustige basis, dertig procent ondersteunende kleur, tien procent
+// accent. Dat stond alleen in de opdracht aan de stylist en nooit op het
+// scherm, dus was er bij het kiezen niets te begrijpen.
+//
+// Welke rol een kleur krijgt volgt uit wat de kleur ís: een rustige kleur
+// draagt, een felle kleur is een accent. Dat is te bepalen zonder AI.
+const VERHOUDING = [
+  { sleutel:'hoofd',  label:'hoofdkleur', deel:60,
+    draagt:'broek, rok of jas', cats:['bottoms','layers','jurken','eendelig'] },
+  { sleutel:'steun',  label:'steunkleur', deel:30,
+    draagt:'top of laagje',     cats:['tops','layers'] },
+  { sleutel:'accent', label:'accent',     deel:10,
+    draagt:'tas, schoenen of sjaal', cats:['bags','shoes','accessories'] },
+];
+
+// Rustig genoeg om zestig procent van een outfit te zijn.
+function isFelleKleur(k) {
+  return HELDER.some(h => kleurMatcht(h, k));
+}
+
+function kleurVerhouding(p) {
+  const tags = (p.tags || []).map(t => String(t).toLowerCase()).filter(Boolean);
+  if (!tags.length) return [];
+  const hex = {};
+  tags.forEach(function(t, i) { if (!hex[t]) hex[t] = (p.colors || [])[i] || '#ccc'; });
+
+  const fel = tags.filter(isFelleKleur);
+  const rustig = tags.filter(function(t){ return !isFelleKleur(t); });
+
+  // Het accent is de felste kleur; is alles rustig, dan de laatste.
+  const accent = fel[0] || tags[tags.length - 1];
+  // De hoofdkleur draagt, dus die is rustig — en niet het accent.
+  const hoofd = rustig.filter(function(t){ return t !== accent; })[0]
+             || tags.filter(function(t){ return t !== accent; })[0] || accent;
+  // De steunkleur draagt dertig procent, dus die hoort ook rustig te zijn. Nam
+  // hij hier de eerstvolgende kleur, dan kon een tweede felle kleur op dertig
+  // procent belanden — precies wat de theorie afraadt.
+  const over = tags.filter(function(t){ return t !== accent && t !== hoofd; });
+  const steun = over.filter(function(t){ return !isFelleKleur(t); })[0] || over[0] || '';
+
+  const uit = [];
+  VERHOUDING.forEach(function(r) {
+    const kleur = r.sleutel === 'hoofd' ? hoofd : r.sleutel === 'steun' ? steun : accent;
+    if (!kleur) return;
+    uit.push({ sleutel:r.sleutel, label:r.label, deel:r.deel, draagt:r.draagt,
+               cats:r.cats, kleur:kleur, hex:hex[kleur] || '#ccc' });
+  });
+  // Zonder steunkleur verdeelt de rest zich: de hoofdkleur neemt die ruimte over.
+  if (!steun) uit.forEach(function(r){ if (r.sleutel === 'hoofd') r.deel = 75; });
+  // Meer dan één felle kleur is geen accent meer maar een krachtmeting. Dat
+  // hoort ze te zien vóórdat ze kiest, niet pas op de kaart.
+  if (fel.length > 1) uit.botsing = fel.slice(0, 3);
+  return uit;
+}
+
+// Haar eigen stukken in die kleur, en in de rol die erbij hoort: een
+// hoofdkleur op een broek is iets anders dan een hoofdkleur op een tas.
+function stukkenVoorRol(rol) {
+  return capGefilterd.filter(function(i) {
+    return rol.cats.indexOf(i.cat) >= 0 && kleurMatcht(rol.kleur, kleurTekstVan(i));
+  });
+}
+
+// Op elke kaart: de balk en één regel die de rollen benoemt. Genoeg om de
+// combo's met elkaar te kunnen vergelijken zonder twintig keer een verhaal.
+function verhoudingBalkHTML(p) {
+  const rollen = kleurVerhouding(p);
+  if (!rollen.length) return '';
+  return '<div class="vh-balk">'
+    + rollen.map(function(r) {
+        return '<span class="vh-deel" style="flex:' + r.deel + ';background:' + esc(r.hex) + '"></span>';
+      }).join('')
+    + '</div><div class="vh-kort">'
+    + rollen.map(function(r){ return esc(r.kleur) + ' ' + esc(r.label.replace('kleur','')); }).join(' · ')
+    + '</div>';
+}
+
+// Op de kaart die je koos: hetzelfde, maar met je eigen stukken op het
+// formaat van hun rol. Het plaatje in de verhouding waarin je het draagt.
+function verhoudingHTML(p) {
+  const rollen = kleurVerhouding(p);
+  if (!rollen.length) return '';
+  const balk = rollen.map(function(r) {
+    return '<span class="vh-deel" style="flex:' + r.deel + ';background:' + esc(r.hex) + '"></span>';
+  }).join('');
+  const regels = rollen.map(function(r) {
+    const stuks = stukkenVoorRol(r);
+    const foto = stuks.map(function(i){ return cloudMap[i.id]; }).filter(Boolean)[0];
+    return '<div class="vh-regel">'
+      + (foto ? '<span class="vh-foto vh-' + r.sleutel + '" style="background-image:url(' + esc(foto) + ')"></span>'
+              : '<span class="vh-stip vh-' + r.sleutel + '" style="background:' + esc(r.hex) + '"></span>')
+      + '<span class="vh-tekst"><b>' + r.deel + '% ' + esc(r.label) + '</b> · ' + esc(r.kleur)
+      + '<br><span class="vh-draagt">' + esc(r.draagt)
+      + ' — ' + (stuks.length ? stuks.length + ' in je kast' : '<i>niets in deze kleur</i>')
+      + '</span></span></div>';
+  }).join('');
+  return '<div class="vh"><div class="vh-balk">' + balk + '</div>' + regels
+    + (rollen.botsing
+        ? '<div class="vh-botsing">' + esc(opsom(rollen.botsing))
+          + ' zijn allebei fel — één ervan moet klein blijven, anders vechten ze.</div>'
+        : '')
+    + '</div>';
+}
+
+// Hoeveel outfits levert deze kleurrichting op? Een top zonder onderstuk is
+// geen outfit, dus het kleinste van die twee is de rem — plus wat jurken en
+// jumpsuits, die allebei de rollen in één doen. Dit is te rekenen, dus het
+// hoort niet aan de stylist gevraagd te worden en ook niet aan haar.
+function comboOutfits(p) {
+  const r = p.perRol || {};
+  return Math.min(r.tops || 0, r.bottoms || 0) + (r.eendelig || 0);
+}
+
+// De rollen in woorden, en alleen wat er is. "6 tops" en verder niets zegt
+// meer dan een rijtje nullen.
+function comboRolZin(p) {
+  const r = p.perRol || {};
+  const delen = [];
+  if (r.eendelig) delen.push(r.eendelig + (r.eendelig === 1 ? ' jurk' : ' jurken'));
+  if (r.tops)     delen.push(r.tops + (r.tops === 1 ? ' top' : ' tops'));
+  if (r.bottoms)  delen.push(r.bottoms + (r.bottoms === 1 ? ' onderstuk' : ' onderstukken'));
+  if (r.shoes)    delen.push(r.shoes + ' schoenen');
+  return delen.join(' · ');
+}
+
+// Alles wat samen gekozen is, geteld zonder dubbeltellingen: twee combo's die
+// allebei op wit leunen leveren niet twee keer die witte broek op.
+function gekozenSamen() {
+  const ids = new Set();
+  let outfits = 0;
+  capGekozenCombos.forEach(i => {
+    const p = capCombos[i];
+    if (!p) return;
+    outfits += comboOutfits(p);
+    const tags = (p.tags || []).map(t => String(t).toLowerCase());
+    capGefilterd.forEach(item => {
+      if (tags.some(t => kleurMatcht(t, kleurTekstVan(item)))) ids.add(item.id);
+    });
+  });
+  return { stuks: ids.size, outfits };
+}
+
 function toonCombos() {
   const lijst = document.getElementById('cap-combo-lijst');
   if (!lijst) return;
@@ -5877,10 +6062,19 @@ function toonCombos() {
       + '</div>'
       + `<div class="cap-palet-naam">${esc(p.name)}</div>`
       + `<div class="cap-palet-kleuren">${esc(p.vibe || '')}</div>`
-      // Een bedachte combo heeft geen telling — "? stuks in je kast" is dan
-      // geen informatie maar een vraagteken. Zeg dan gewoon waar hij vandaan komt.
+      // De verhouding hoort bij het kiezen, niet pas op de kaart: vier gelijke
+      // stippen zeggen niet wat draagt en wat een accent is.
+      + (aan ? verhoudingHTML(p) : verhoudingBalkHTML(p))
+      // Wat levert dit óp — niet hoeveel stuks het zijn. Een bedachte combo
+      // heeft geen telling; zeg dan gewoon waar hij vandaan komt.
+      + (typeof p.aantal === 'number' && comboOutfits(p) > 0
+          ? `<div class="cap-palet-uit"><b>≈ ${comboOutfits(p)} outfit${comboOutfits(p)===1?'':'s'}</b>`
+            + ` · ${esc(comboRolZin(p))}</div>`
+          : typeof p.aantal === 'number'
+            ? `<div class="cap-palet-uit cap-palet-mager">Te weinig om een outfit rond te krijgen`
+              + (comboRolZin(p) ? ` — alleen ${esc(comboRolZin(p))}` : '') + '</div>'
+            : '')
       + '<div class="cap-waarom" style="opacity:.75">'
-      + (typeof p.aantal === 'number' ? `${p.aantal} stuks in je kast · ` : '')
       + `${esc(p.typeName || '')}`
       + (p.aangepast ? ' · <b>door jou aangepast</b>' : '') + '</div>'
       + ((p.ankers || []).length
@@ -5892,7 +6086,26 @@ function toonCombos() {
   }).join('');
 }
 
+// Beginnen bij nul betekent: eerst gokken, dan pas iets zien. De lijst is al
+// gerangschikt op wat het beste in haar kast zit, dus de bovenste staat meteen
+// aan — een werkend antwoord dat ze kan wegtikken. Bij "laat me van alles
+// zien" twee, want die uitkomst leeft van verschil.
+let capZelfGekozen = false;
+
+function voorselecteerCombos() {
+  const hoeveel = capHoe === 'ruim' ? 2 : 1;
+  capGekozenCombos = capCombos
+    .map((p, i) => ({ p, i }))
+    .filter(x => comboOutfits(x.p) > 0)
+    .slice(0, hoeveel)
+    .map(x => x.i);
+  // Geen enkele combo levert een outfit op: dan maar de bovenste, zodat er
+  // iets staat om vanaf te werken.
+  if (!capGekozenCombos.length && capCombos.length) capGekozenCombos = [0];
+}
+
 function wisselCombo(i) {
+  capZelfGekozen = true;
   const k = capGekozenCombos.indexOf(i);
   if (k >= 0) capGekozenCombos.splice(k, 1);
   else capGekozenCombos.push(i);
@@ -5901,19 +6114,41 @@ function wisselCombo(i) {
   toonBijstel();
 }
 
+// Er stond een harde eis van twee combo's bij alles behalve compact. Die eis
+// blokkeert precies op het moment dat je nog niet weet wat je wilt: je moet
+// dan twee keer gokken voordat er íéts gebeurt. Eén kleurrichting is altijd
+// een geldig antwoord — de tweede is een keuze, geen toegangseis. Wat het
+// verschil is, staat er nu gewoon bij.
 function bijwerkComboKnop() {
   const btn = document.getElementById('cap-maak-outfits');
+  const uit = document.getElementById('cap-keuze-uit');
   if (!btn) return;
   const n = capGekozenCombos.length;
-  // Twee richtingen eisen hoort bij de waaier: die leeft van verschil. Wil je
-  // juist zo compact mogelijk inpakken, dan werkt die eis tegen je — één
-  // kleurrichting is dan precies wat je wilt.
-  const minimum = capHoe === 'compact' ? 1 : 2;
-  btn.disabled = n < minimum;
-  btn.textContent = n < minimum
-    ? (n === 0 ? (minimum === 1 ? 'Kies eerst een kleurrichting' : 'Kies eerst twee combo\'s')
-               : 'Kies er nog één')
-    : `Maak outfits met ${n} combo\'s →`;
+  btn.disabled = n < 1;
+  btn.textContent = n < 1 ? 'Kies een kleurrichting'
+    : n === 1 ? 'Maak outfits met deze kleurrichting →'
+    : `Maak outfits met deze ${n} kleurrichtingen →`;
+
+  if (!uit) return;
+  if (n < 1) {
+    uit.innerHTML = 'Tik een combo aan. Eén is genoeg — meer aantikken geeft meer '
+      + 'afwisseling, maar ook een vollere tas.';
+    return;
+  }
+  const s = gekozenSamen();
+  const koffer = CAP_KOFFER[capHoe] || 0;
+  uit.innerHTML = '<b>' + s.stuks + ' stuks uit je kast</b>'
+    + (s.outfits ? ', samen ongeveer ' + s.outfits + ' outfit' + (s.outfits === 1 ? '' : 's') : '')
+    + '. '
+    + (n === 1
+        ? 'Eén kleurrichting: alles mengt met alles, dus dit wordt de kleinste tas. '
+          + 'Wil je meer afwisseling, tik er nog een aan.'
+        : 'Meer richtingen betekent meer afwisseling, maar ook meer stuks die maar '
+          + 'bij één helft passen.')
+    + (koffer && s.stuks > koffer * 1.6
+        ? ' <span class="cap-palet-mager">Je koos ruim meer dan er in deze tas past; '
+          + 'ik kies straks de sterkste stukken eruit.</span>'
+        : '');
 }
 
 // ── DE DERDE KLEUR ────────────────────────────────────────────────────────────
@@ -6156,10 +6391,20 @@ Antwoord ALLEEN met JSON:
 function capComboZin() {
   const gekozen = capGekozenCombos.map(i => capCombos[i]).filter(Boolean);
   if (!gekozen.length) return '';
+  // De verhouding staat op haar scherm, dus moet hij ook in de opdracht
+  // staan: anders belooft het plaatje iets wat de uitkomst niet waarmaakt.
+  const rolZin = c => {
+    const r = kleurVerhouding(c);
+    return r.length
+      ? ' — ' + r.map(x => x.kleur + ' als ' + x.label + ' (' + x.deel + '%, ' + x.draagt + ')').join(', ')
+      : '';
+  };
   return 'Ze koos deze kleurrichting'
     + (gekozen.length > 1 ? 'en' : '') + ': '
-    + gekozen.map(c => c.name + ' (' + (c.tags || []).join(', ') + ')').join('; ')
-    + '. Houd de koffer daarbinnen.\n';
+    + gekozen.map(c => c.name + ' (' + (c.tags || []).join(', ') + ')' + rolZin(c)).join('; ')
+    + '.\nHoud de koffer daarbinnen, en houd die verhouding aan: de hoofdkleur op de\n'
+    + 'grote vlakken, het accent klein — op een tas, schoen of sjaal. Een accent dat\n'
+    + 'de helft van de outfit beslaat is geen accent meer.\n';
 }
 
 async function capKiesKoffer(kast, aantal, weer, gel, max) {
@@ -6978,12 +7223,24 @@ async function aiComposeOutfit() {
 
   // Items die de gebruiker zelf al koos: die moeten blijven staan.
   const reeds = selItems.filter(i => !i._suggestion);
+  const mist = ontbrekendeRollen(reeds);
   const reedsBlok = reeds.length
     ? `\nGriette heeft deze items AL GEKOZEN. Neem ze allemaal over in je antwoord en bouw de outfit eromheen:\n`
       + reeds.map(i => `- ${i.id} | ${i.cat} | ${i.name}`
           + (isAnker(i.id)
              ? '   <-- uitgangspunt van de look; dit blijft altijd staan'
              : '')).join('\n') + '\n'
+      // Zonder dit zoekt het model zelf uit wat er mist, en dat ging mis zodra
+      // de kaart vol stond: dan kwamen dezelfde zes terug en leek de knop stuk.
+      + (mist.length
+         ? `\nWAT ER NOG ONTBREEKT om dit een draagbare outfit te maken: `
+           + mist.map(r => r.naam).join(', ') + `.\nVul dat aan; dat is de opdracht.\n`
+           + (reeds.length >= MAX_OP_KAART
+              ? `De kaart zit vol (${MAX_OP_KAART} stuks). Laat daarom precies zoveel stukken weg\n`
+                + `als je toevoegt, en laat weg wat een rol dubbel doet (twee tops, twee tassen)\n`
+                + `of het minste bijdraagt. Een stuk met "uitgangspunt van de look" blijft staan.\n`
+              : '')
+         : '\nDeze outfit heeft alle rollen al. Voeg niets toe; leg alleen uit waarom het werkt.\n')
     : '';
 
   const userMsg = `Dit is Griette's complete garderobe (formaat: id | categorie | naam | tags):
@@ -7511,29 +7768,110 @@ function ruilOm(uitId, inId) {
   if (el) el.innerHTML = `<div class="field-note">${esc(nieuw.name)} ligt nu op de kaart.</div>`;
 }
 
-// Vult de kaart zelf als de gebruiker geen items koos.
-// Biedt aanvullen aan in plaats van het ongevraagd te doen
+// Een outfit is niet compleet bij een aantal, maar bij een set rollen: iets
+// voor onder, iets voor boven (of één stuk dat allebei doet), schoenen en een
+// tas. Zes tops is zes items en nul outfit. Daarom werd "aanvullen tot een
+// complete outfit (nu 6)" geteld in plaats van gekeken, en gebeurde er bij zes
+// stuks niets zichtbaars.
+const OUTFIT_ROLLEN = [
+  { sleutel:'onder',    naam:'een onderstuk', test: i => i.cat === 'bottoms' || isEendelig(i) },
+  { sleutel:'boven',    naam:'een bovenstuk', test: i => i.cat === 'tops' || isEendelig(i) },
+  { sleutel:'schoenen', naam:'schoenen',      test: i => i.cat === 'shoes' },
+  { sleutel:'tas',      naam:'een tas',       test: i => i.cat === 'bags' },
+];
+
+function ontbrekendeRollen(lijst) {
+  const items = (lijst || selItems).filter(Boolean);
+  if (!items.length) return OUTFIT_ROLLEN.slice();
+  const mist = OUTFIT_ROLLEN.filter(r => !items.some(r.test));
+  // Bij koud weer hoort een jas erbij; bij ander weer is dat een keuze.
+  if (huidigeVoorwaarden().weer === 'koud'
+      && !items.some(i => isBuitenlaag(i) || i.cat === 'layers'))
+    mist.push({ sleutel:'laag', naam:'een laag', test: i => i.cat === 'layers' });
+  return mist;
+}
+
+// "schoenen en een tas" leest beter dan "schoenen, een tas".
+function lijstZin(delen) {
+  if (delen.length <= 1) return delen[0] || '';
+  return delen.slice(0, -1).join(', ') + ' en ' + delen[delen.length - 1];
+}
+
+const MAX_OP_KAART = 6;
+
+// Biedt aanvullen aan in plaats van het ongevraagd te doen. De knop zegt nu
+// precies wat hij gaat doen, zodat je niet op "aanvullen" drukt terwijl er
+// niets aan te vullen valt.
 function toonAanvulKnop() {
   const btn = document.getElementById('aanvul-btn');
   if (!btn) return;
-  const nodig = !kantEnKlaar && (selItems.length < 4 || !outfitUitleg);
-  btn.style.display = nodig ? 'block' : 'none';
-  btn.textContent = selItems.length === 0
-    ? '✨ Laat AI een outfit samenstellen'
-    : `✨ Aanvullen tot een complete outfit (nu ${selItems.length})`;
+  if (kantEnKlaar) { btn.style.display = 'none'; return; }
+
+  const mist = ontbrekendeRollen();
+  if (!selItems.length) {
+    btn.style.display = 'block';
+    btn.textContent = '✨ Laat AI een outfit samenstellen';
+  } else if (mist.length) {
+    btn.style.display = 'block';
+    // Bij een volle kaart kan er niets bij zonder dat er iets af gaat. Dat
+    // hoort op de knop te staan, niet als verrassing achteraf.
+    btn.textContent = '✨ Vul aan met ' + lijstZin(mist.map(r => r.naam))
+      + (selItems.length >= MAX_OP_KAART ? ' (er gaat dan iets af)' : '');
+  } else if (!outfitUitleg) {
+    btn.style.display = 'block';
+    btn.textContent = '✨ Laat de stylist uitleggen waarom dit werkt';
+  } else {
+    btn.style.display = 'none';
+  }
 }
 
-function showCardNotice(html) {
+// Twee tonen: een melding dat er iets misging (rood) en een melding dat er
+// gewoon iets gebeurd is (rustig). Alles rood maken maakt een gelukte actie
+// onnodig alarmerend.
+function showCardNotice(html, rustig) {
   const el = document.getElementById('card-notice');
   if (!el) return;
   el.style.display = html ? 'block' : 'none';
+  // Let op: de kleuren staan in het style-attribuut, dus leegmaken wist ze
+  // voorgoed. Allebei de tonen worden daarom expliciet gezet.
+  el.style.background = rustig ? 'var(--surface)'
+    : 'color-mix(in srgb,#b5232a 8%,var(--surface))';
+  el.style.borderColor = rustig ? 'var(--border)'
+    : 'color-mix(in srgb,#b5232a 30%,var(--border))';
   el.innerHTML = html || '';
+}
+
+// Een knop die stil verdwijnt voelt als een knop die het niet doet. Dus zeggen
+// we altijd wat er gebeurd is, ook als het antwoord "niets" is.
+function zegWatErVeranderde(voorIds, mistVooraf) {
+  const naIds = selItems.map(i => i.id);
+  const erbij = naIds.filter(id => voorIds.indexOf(id) < 0);
+  const eraf  = voorIds.filter(id => naIds.indexOf(id) < 0);
+  const noemNa = id => { const i = selItems.find(x => x.id === id); return i ? i.name : id; };
+
+  if (!erbij.length && !eraf.length) {
+    const mistNu = ontbrekendeRollen();
+    showCardNotice(mistNu.length
+      ? 'De stylist vond hier niets bij voor: ' + esc(lijstZin(mistNu.map(r => r.naam)))
+        + '. De kaart is verder niet veranderd.'
+      : (mistVooraf.length
+         ? 'Er is niets veranderd aan de kaart.'
+         : 'Deze outfit had alle stukken al — de uitleg staat er nu bij.'),
+      !mistNu.length);
+    return;
+  }
+  const delen = [];
+  if (erbij.length) delen.push('erbij: ' + erbij.map(noemNa).join(', '));
+  if (eraf.length)  delen.push(eraf.length + (eraf.length === 1 ? ' stuk eraf' : ' stukken eraf'));
+  showCardNotice(esc(delen.join(' · ')), true);
 }
 
 async function autoComposeOnCard() {
   showCardNotice('');
   const grid = document.getElementById('k-grid');
   const had = selItems.length;
+  const voorIds = selItems.map(i => i.id);
+  const mistVooraf = ontbrekendeRollen();
   if (!had) {
     grid.style.display = 'grid';
     grid.style.gridTemplateColumns = '1fr';
@@ -7557,6 +7895,7 @@ async function autoComposeOnCard() {
     // gewoon klopt terwijl er items ontbreken.
     if (fout) showCardNotice('Aanvullen lukte niet: ' + esc(fout.message)
       + '<br>Je eigen keuze staat wel op de kaart.');
+    else zegWatErVeranderde(voorIds, mistVooraf);
   } else {
     grid.innerHTML = '<div style="padding:18px 8px;text-align:center;font-size:9px;color:#8a7060;line-height:1.6;">'
       + 'Geen items op de kaart.<br>Ga terug en kies items, of laat de AI er een samenstellen.'

@@ -55,6 +55,20 @@ body{background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);min
 .dk-regel{height:1px;background:#d9cfc0;margin:10px 26px 9px;position:relative;z-index:1;}
 .dk-waarom{font-family:'Bodoni Moda',serif;font-style:italic;font-size:11px;color:#6b573f;text-align:center;line-height:1.5;position:relative;z-index:1;}
 .dk-tip{font-size:9px;color:#8a7358;line-height:1.5;margin-top:8px;text-align:center;position:relative;z-index:1;}
+/* De kaartkijker: een opgeslagen outfitkaart op ware grootte, met swipen naar
+   de volgende. Zwart eromheen, zodat de kaart zelf het enige is wat er staat. */
+.kk{position:fixed;inset:0;z-index:900;background:rgba(20,17,14,.94);display:flex;align-items:center;justify-content:center;padding:14px;}
+.kk-vak{max-width:100%;max-height:100%;display:flex;flex-direction:column;align-items:center;gap:10px;}
+/* min-width/min-height: zonder die twee is de afbeelding nul breed zolang hij
+   laadt, en zie je een leeg zwart vlak tot de foto binnen is. Met object-fit
+   contain vervormt dat niets — een smalle kaart krijgt gewoon ruimte ernaast. */
+.kk-vak img{max-width:100%;max-height:78vh;min-width:min(60vw,240px);min-height:min(55vh,320px);object-fit:contain;border-radius:6px;background:#F7F3EC;touch-action:pan-y;}
+.kk-onder{text-align:center;color:#f2ebe0;font-family:'Jost',sans-serif;font-size:11px;line-height:1.5;}
+.kk-tel{font-size:9.5px;color:#b9ac9b;letter-spacing:.08em;margin-top:3px;}
+.kk-x{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,.14);color:#f2ebe0;font-size:15px;cursor:pointer;z-index:2;}
+.kk-pijl{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:54px;border:none;border-radius:6px;background:rgba(255,255,255,.1);color:#f2ebe0;font-size:26px;line-height:1;cursor:pointer;z-index:2;}
+.kk-links{left:6px;} .kk-rechts{right:6px;}
+.kk-pijl[disabled]{opacity:.22;cursor:default;}
 .dk-weer{display:block;width:100%;margin-top:10px;padding:6px;background:transparent;border:1px dashed #d9cfc0;border-radius:4px;font-family:'Jost',sans-serif;font-size:9.5px;letter-spacing:.06em;color:#8a7358;cursor:pointer;position:relative;z-index:1;}
 .dk-acties{display:flex;gap:6px;margin-top:6px;position:relative;z-index:1;}
 .dk-actie{flex:1;padding:7px;background:transparent;border:1px solid #d9cfc0;border-radius:4px;font-size:10px;font-family:'Jost',sans-serif;color:#6b573f;cursor:pointer;}
@@ -547,6 +561,21 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
       <a href="outfitkaart.html" style="font-size:9px;color:var(--brown-mid);text-decoration:none;border:1px solid var(--cream-dark);border-radius:12px;padding:4px 10px;">＋ Nieuwe maken</a>
     </div>
     <div id="mijn-kaarten" style="display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;"></div>
+  </div>
+
+  <!-- Een opgeslagen kaart op ware grootte. Een nieuw tabblad met een kale
+       afbeelding haalde je uit de app en had geen weg naar de volgende. -->
+  <div id="kaart-kijker" class="kk" style="display:none;" onclick="kijkerSluit(event)">
+    <button type="button" class="kk-x" onclick="kijkerSluit(event,true)" aria-label="Sluiten">✕</button>
+    <button type="button" class="kk-pijl kk-links" onclick="kijkerStap(event,-1)" aria-label="Vorige">‹</button>
+    <div class="kk-vak">
+      <img id="kk-img" src="" alt="">
+      <div class="kk-onder">
+        <div id="kk-naam"></div>
+        <div id="kk-tel" class="kk-tel"></div>
+      </div>
+    </div>
+    <button type="button" class="kk-pijl kk-rechts" onclick="kijkerStap(event,1)" aria-label="Volgende">›</button>
   </div>
 
   <div style="height:22px;"></div>
@@ -1088,16 +1117,17 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 
 <!-- ===== INSPO PANEL ===== -->
 <div class="panel" id="panel-inspo">
-  <p class="panel-title">Inspiratie Scan</p>
-  <p class="panel-sub">Upload outfits die je aanspreken — ik zoek welke items uit jouw garderobe die looks benaderen.</p>
+  <p class="panel-title">Je moodboard</p>
+  <p class="panel-sub">Alles wat je mooi vindt op één plek — looks, kleuren, texturen. Dit telt mee als bron naast je stijlrapport: het rapport zegt wat je stáát, je moodboard zegt wat jíj mooi vindt.</p>
 
   <!-- Upload nieuw -->
   <div class="inspo-panel">
     <div class="inspo-drop" id="inspo-drop" onclick="document.getElementById('inspo-file').click()" ondragover="inspoDropOver(event)" ondragleave="inspoDropLeave(event)" ondrop="inspoDropFile(event)">
       <div class="inspo-drop-icon">🖼</div>
-      <div class="inspo-drop-text">Tik om inspiratiefoto toe te voegen</div>
-      <input type="file" id="inspo-file" accept="image/*" style="display:none;" onchange="handleInspoFile(this)">
+      <div class="inspo-drop-text">Tik om foto's toe te voegen — meerdere tegelijk mag</div>
+      <input type="file" id="inspo-file" accept="image/*" multiple style="display:none;" onchange="handleInspoFile(this)">
     </div>
+    <div class="field-note" id="inspo-bulk-status" style="margin-top:8px;text-align:center;font-size:10px;color:var(--muted);"></div>
     <div id="inspo-preview-wrap" style="display:none;">
       <div class="inspo-preview">
         <img id="inspo-preview-img" src="" alt="">
@@ -1113,7 +1143,10 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 
   <!-- Galerij -->
   <div id="inspo-gallery-section" style="display:none;">
-    <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);margin:16px 0 10px;">Opgeslagen looks</div>
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin:16px 0 10px;gap:8px;">
+      <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-warm);">Op je moodboard</div>
+      <div id="inspo-telling" style="font-size:9px;color:var(--muted);"></div>
+    </div>
     <div id="inspo-gallery" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;"></div>
   </div>
 </div>
@@ -4018,16 +4051,94 @@ function toonMijnKaarten() {
   if (!blok || !rij) return;
   if (!mijnKaarten.length) { blok.style.display = 'none'; return; }
   blok.style.display = 'block';
-  rij.innerHTML = mijnKaarten.slice(0, 12).map(function(k) {
+  rij.innerHTML = mijnKaarten.slice(0, 12).map(function(k, i) {
     const d = k.datum ? new Date(k.datum).toLocaleDateString('nl-NL', { day:'numeric', month:'short' }) : '';
-    return '<a href="' + esc2(k.url) + '" target="_blank" rel="noopener" '
-      + 'style="flex-shrink:0;width:96px;text-decoration:none;color:inherit;">'
+    // Tikken opent hem groot in de app. Eerder ging dit naar een nieuw tabblad
+    // met een kale afbeelding: je was de app kwijt en kon niet doorbladeren.
+    return '<button type="button" onclick="kijkerOpen(' + i + ')" '
+      + 'style="flex-shrink:0;width:96px;background:none;border:none;padding:0;text-align:left;'
+      + 'color:inherit;font-family:inherit;cursor:pointer;">'
       + '<img loading="lazy" src="' + esc2(k.url) + '" alt="' + esc2(k.titel || 'outfitkaart') + '" '
       + 'style="width:96px;height:128px;object-fit:cover;border-radius:5px;border:1px solid var(--cream-dark);display:block;">'
       + '<div style="font-size:8.5px;color:var(--muted);margin-top:4px;line-height:1.3;">'
-      + esc2((k.titel || 'Outfitkaart')) + (d ? '<br>' + esc2(d) : '') + '</div></a>';
+      + esc2((k.titel || 'Outfitkaart')) + (d ? '<br>' + esc2(d) : '') + '</div></button>';
   }).join('');
 }
+
+// ── EEN OPGESLAGEN KAART OP WARE GROOTTE ─────────────────────────────────────
+// Bladeren gaat met de pijlen, met swipen, en met de pijltjestoetsen. Escape
+// sluit. Buiten de kaart tikken sluit ook — dat verwacht je van een overlay.
+let kijkerNu = -1;
+
+function kijkerOpen(i) {
+  const zichtbaar = mijnKaarten.slice(0, 12);
+  if (!zichtbaar[i]) return;
+  kijkerNu = i;
+  const vak = document.getElementById('kaart-kijker');
+  if (!vak) return;
+  vak.style.display = 'flex';
+  kijkerToon();
+}
+
+function kijkerToon() {
+  const zichtbaar = mijnKaarten.slice(0, 12);
+  const k = zichtbaar[kijkerNu];
+  if (!k) return;
+  const img = document.getElementById('kk-img');
+  const naam = document.getElementById('kk-naam');
+  const tel = document.getElementById('kk-tel');
+  if (img) { img.src = k.url; img.alt = k.titel || 'outfitkaart'; }
+  const d = k.datum ? new Date(k.datum).toLocaleDateString('nl-NL',
+    { day:'numeric', month:'long', year:'numeric' }) : '';
+  if (naam) naam.textContent = (k.titel || 'Outfitkaart') + (d ? ' · ' + d : '');
+  if (tel) tel.textContent = (kijkerNu + 1) + ' van ' + zichtbaar.length;
+  const l = document.querySelector('.kk-links'), r = document.querySelector('.kk-rechts');
+  if (l) l.disabled = kijkerNu <= 0;
+  if (r) r.disabled = kijkerNu >= zichtbaar.length - 1;
+}
+
+function kijkerStap(e, richting) {
+  if (e) e.stopPropagation();
+  const zichtbaar = mijnKaarten.slice(0, 12);
+  const volgende = kijkerNu + richting;
+  if (volgende < 0 || volgende >= zichtbaar.length) return;
+  kijkerNu = volgende;
+  kijkerToon();
+}
+
+function kijkerSluit(e, altijd) {
+  // Tikken óp de kaart mag hem niet sluiten; ernaast wel.
+  if (e && !altijd && e.target && e.target.id !== 'kaart-kijker') return;
+  if (e) e.stopPropagation();
+  const vak = document.getElementById('kaart-kijker');
+  if (vak) vak.style.display = 'none';
+  kijkerNu = -1;
+}
+
+document.addEventListener('keydown', function(e) {
+  if (kijkerNu < 0) return;
+  if (e.key === 'Escape') kijkerSluit(null, true);
+  else if (e.key === 'ArrowLeft') kijkerStap(null, -1);
+  else if (e.key === 'ArrowRight') kijkerStap(null, 1);
+});
+
+// Swipen. Een korte veeg telt pas als veeg vanaf 40 pixels, en alleen als hij
+// meer horizontaal dan verticaal is — anders neemt hij het scrollen over.
+(function() {
+  let x0 = null, y0 = null;
+  document.addEventListener('touchstart', function(e) {
+    if (kijkerNu < 0 || !e.touches[0]) return;
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', function(e) {
+    if (kijkerNu < 0 || x0 === null || !e.changedTouches[0]) return;
+    const dx = e.changedTouches[0].clientX - x0;
+    const dy = e.changedTouches[0].clientY - y0;
+    x0 = y0 = null;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+    kijkerStap(null, dx < 0 ? 1 : -1);
+  }, { passive: true });
+})();
 
 // ── EEN STUK RUILEN OP DE KAART ──────────────────────────────────────────────
 // Tik op een stuk en je krijgt wat je er verder voor hebt, uit dezelfde
@@ -4177,6 +4288,68 @@ function anderWeer(n) {
 // ── EEN KAART OPSLAAN ALS AFBEELDING ─────────────────────────────────────────
 // Dezelfde manier als bij de outfitkaart: het element wordt getekend en als
 // bestand aangeboden. Zonder html2canvas kan dat niet, en dan zeggen we dat.
+
+// html2canvas 1.4.1 kent object-fit niet en rekt de foto uit: op het scherm
+// keurig bijgesneden, in de opgeslagen kaart de hele screenshot platgedrukt.
+// Op de outfitkaart staat de foto daarom als achtergrond in het vakje. Hier
+// blijft het een <img loading="lazy">, anders laden tien kaarten vijftig
+// foto's tegelijk — dus gebeurt de omzetting in de kopie die html2canvas
+// maakt. background-size begrijpt hij wel.
+function fotoVlakkenInKopie(doc) {
+  doc.querySelectorAll('.dk-foto img').forEach(function(img) {
+    const vak = img.parentNode;
+    if (!vak || !img.src) return;
+    vak.style.backgroundImage = 'url("' + img.src + '")';
+    vak.style.backgroundSize = 'cover';
+    vak.style.backgroundPosition = 'center';
+    vak.style.backgroundRepeat = 'no-repeat';
+    img.style.display = 'none';
+  });
+}
+
+// De naam van de kaart, bruikbaar als bestandsnaam. Zo leesbaar mogelijk —
+// "Rover island 1.jpg" is terug te vinden — maar wel binnen wat de browser
+// accepteert. Chrome keurt een download-attribuut met tekens als … of · in
+// stilte af en noemt het bestand dan gewoon "download"; accenten worden
+// platgeslagen zodat de naam ook op een ander systeem heel blijft.
+function kaartBestandsnaam(kaart) {
+  const naam = String((kaart && kaart.naam) || 'outfit')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')   // é → e
+    .replace(/[^A-Za-z0-9 _()-]+/g, ' ')                // … · / : * ? " < > | → spatie
+    .replace(/\s+/g, ' ').trim();
+  return (naam || 'outfit').slice(0, 60) + '.jpg';
+}
+
+// Downloaden zet het bestand in de map Downloads, niet in de galerij. Het
+// deelvenster van de telefoon heeft wél "opslaan in galerij" (of Foto's).
+// Dus: delen waar dat kan, downloaden waar dat niet kan.
+async function bewaarAlsAfbeelding(canvas, bestandsnaam) {
+  const blob = await new Promise(function(res) { canvas.toBlob(res, 'image/jpeg', 0.92); });
+  if (!blob) throw new Error('de afbeelding kon niet gemaakt worden');
+  const file = new File([blob], bestandsnaam, { type: 'image/jpeg' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: bestandsnaam.replace(/\.jpg$/, '') });
+      return 'gedeeld';
+    } catch(e) {
+      if (e && e.name === 'AbortError') return 'afgebroken';
+      // Weigert het deelvenster, dan alsnog downloaden.
+    }
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = bestandsnaam;
+  // De link moet in het document hángen, anders negeert Chrome bij een
+  // blob-url het download-attribuut en heet het bestand gewoon "download".
+  // Bij een data-url viel dat niet op, want daar werkt het los ook.
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 4000);
+  return 'gedownload';
+}
+
 async function dagKaartAfbeelding(n) {
   const el = document.getElementById('dagkaart-' + n);
   const kaart = dagKaarten[n];
@@ -4193,12 +4366,12 @@ async function dagKaartAfbeelding(n) {
   if (ruil) ruil.style.display = 'none';
   if (weerknop) weerknop.style.display = 'none';
   try {
-    const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#F7F3EC', useCORS: true });
-    const a = document.createElement('a');
-    a.href = canvas.toDataURL('image/jpeg', 0.92);
-    a.download = (kaart.naam || 'outfit').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) + '.jpg';
-    a.click();
-    showToast('Opgeslagen ✓');
+    const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#F7F3EC', useCORS: true,
+      onclone: function(doc) { fotoVlakkenInKopie(doc); } });
+    const hoe = await bewaarAlsAfbeelding(canvas, kaartBestandsnaam(kaart));
+    showToast(hoe === 'gedeeld'   ? 'Klaar — kies "opslaan in galerij"'
+            : hoe === 'afgebroken' ? 'Niet opgeslagen'
+            : 'Opgeslagen ✓');
   } catch(e) {
     showToast('Opslaan lukte niet: ' + (e && e.message || 'onbekend'));
   } finally {
@@ -4791,8 +4964,48 @@ function loadInspoGallery() {
 }
 
 function saveInspoGallery() {
-  try { localStorage.setItem('griette-inspo-gallery-v1', JSON.stringify(inspoGallery)); } catch(e) {}
+  // Data-urls zijn megabytes per stuk. Die horen niet in localStorage: bij een
+  // vol moodboard loopt de quota over en gaat de hele lijst verloren. Wat nog
+  // niet geüpload is, bewaren we zonder foto — de url komt erbij zodra hij er is.
+  try {
+    localStorage.setItem('griette-inspo-gallery-v1', JSON.stringify(
+      inspoGallery.map(function(i) {
+        return (i.dataUrl && i.dataUrl.startsWith('data:'))
+          ? Object.assign({}, i, { dataUrl: null }) : i;
+      })));
+  } catch(e) {}
   supabaseSet('inspo-gallery', inspoGallery.map(i => ({id:i.id, label:i.label, result:i.result, cloudUrl:i.dataUrl && !i.dataUrl.startsWith('data:') ? i.dataUrl : null}))).catch(()=>{});
+}
+
+// Een data-url terug naar een bestand, zodat hij geüpload kan worden. Stond
+// als losse regels in saveInspoToGallery; nu op één plek, want het moodboard
+// wordt vanaf twee kanten gevuld.
+function dataUrlNaarFile(dataUrl, naam) {
+  const arr = String(dataUrl).split(',');
+  const mime = (arr[0].match(/:(.*?);/) || [])[1] || 'image/jpeg';
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8 = new Uint8Array(n);
+  while (n--) u8[n] = bstr.charCodeAt(n);
+  return new File([new Blob([u8], { type: mime })], naam, { type: mime });
+}
+
+// Vanuit de stijlverkenner komen dezelfde soort beelden binnen. Die hoorden
+// op hetzelfde bord te landen in plaats van in een lijstje dat na de sessie
+// weg is.
+async function moodboardUitDataUrl(dataUrl) {
+  const id = 'inspo-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+  const entry = { id: id, dataUrl: dataUrl, label:
+    new Date().toLocaleDateString('nl-NL', { day:'numeric', month:'short' }), result: null };
+  inspoGallery.unshift(entry);
+  saveInspoGallery();
+  renderInspoGallery();
+  try {
+    entry.dataUrl = await uploadToCloudinary(dataUrlNaarFile(dataUrl, id + '.jpg'), id);
+    saveInspoGallery();
+    renderInspoGallery();
+  } catch(e) {}
+  return entry;
 }
 
 async function saveInspoToGallery() {
@@ -4803,15 +5016,10 @@ async function saveInspoToGallery() {
   inspoGallery.unshift(entry);
   saveInspoGallery();
   renderInspoGallery();
-  showToast('Look opgeslagen in galerij ✓');
+  showToast('Op je moodboard gezet ✓');
   // Upload naar Cloudinary voor cloud-persistentie
   try {
-    var arr = inspoDataUrl.split(','); var mime = arr[0].match(/:(.*?);/)[1];
-    var bstr = atob(arr[1]); var n = bstr.length; var u8 = new Uint8Array(n);
-    while (n--) u8[n] = bstr.charCodeAt(n);
-    var blob = new Blob([u8], { type: mime });
-    var file = new File([blob], entryId + '.jpg', { type: mime });
-    var cloudUrl = await uploadToCloudinary(file, entryId);
+    var cloudUrl = await uploadToCloudinary(dataUrlNaarFile(inspoDataUrl, entryId + '.jpg'), entryId);
     entry.dataUrl = cloudUrl;
     saveInspoGallery();
     renderInspoGallery();
@@ -4824,6 +5032,14 @@ function renderInspoGallery() {
   if (!gallery) return;
   if (inspoGallery.length === 0) { section.style.display = 'none'; return; }
   section.style.display = 'block';
+  // Met veel beelden erop wil je weten hoeveel het er zijn, en hoeveel ervan
+  // de stylist al echt gelezen heeft.
+  const tel = document.getElementById('inspo-telling');
+  if (tel) {
+    const gelezen = inspoGallery.filter(function(e){ return e.result; }).length;
+    tel.textContent = inspoGallery.length + ' beeld' + (inspoGallery.length === 1 ? '' : 'en')
+      + (gelezen ? ' · ' + gelezen + ' geanalyseerd' : '');
+  }
   gallery.innerHTML = '';
   inspoGallery.forEach(function(entry) {
     const card = document.createElement('div');
@@ -7152,13 +7368,60 @@ function inspoDropLeave(e) { document.getElementById('inspo-drop').classList.rem
 function inspoDropFile(e) {
   e.preventDefault();
   document.getElementById('inspo-drop').classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('image/')) processInspoFile(file);
+  // Een map foto's in één keer erin slepen hoort net zo goed te werken als
+  // ze één voor één kiezen.
+  const beelden = [].slice.call(e.dataTransfer.files || [])
+    .filter(function(f){ return f.type && f.type.startsWith('image/'); });
+  if (!beelden.length) return;
+  if (beelden.length === 1) processInspoFile(beelden[0]);
+  else inspoVeelToevoegen(beelden);
 }
 
+// Er kon één foto tegelijk in, en die moest je eerst analyseren voordat je
+// hem kon bewaren. Voor een moodboard waar veel in moet is dat de verkeerde
+// volgorde: eerst verzamelen, daarna pas kijken. Meerdere foto's tegelijk gaan
+// nu regelrecht het bord op; de laatste blijft in de voorbeschouwing staan
+// zodat je hem meteen kunt laten analyseren als je dat wilt.
 function handleInspoFile(input) {
-  const file = input.files[0];
-  if (file) processInspoFile(file);
+  const files = [].slice.call(input.files || []);
+  if (!files.length) return;
+  if (files.length === 1) { processInspoFile(files[0]); return; }
+  inspoVeelToevoegen(files);
+  input.value = '';
+}
+
+async function inspoVeelToevoegen(files) {
+  const st = document.getElementById('inspo-bulk-status');
+  let gelukt = 0, mislukt = 0;
+  for (let n = 0; n < files.length; n++) {
+    if (st) st.textContent = 'Toevoegen… ' + (n + 1) + ' van ' + files.length;
+    try {
+      await inspoBewaarBestand(files[n]);
+      gelukt++;
+    } catch(e) { mislukt++; }
+  }
+  renderInspoGallery();
+  if (st) st.textContent = gelukt + ' foto' + (gelukt === 1 ? '' : "'s") + ' op je moodboard'
+    + (mislukt ? ' · ' + mislukt + ' lukte niet' : '');
+  showToast(gelukt + " foto's toegevoegd ✓");
+}
+
+// Eén bestand op het bord. De foto gaat naar Cloudinary en alléén die url
+// wordt bewaard: honderd foto's als data-url passen niet in localStorage, en
+// dan verlies je stilletjes je hele bord.
+async function inspoBewaarBestand(file, resultaat) {
+  const entryId = 'inspo-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+  const entry = {
+    id: entryId,
+    dataUrl: null,
+    label: new Date().toLocaleDateString('nl-NL', { day:'numeric', month:'short' }),
+    result: resultaat || null,
+  };
+  const cloudUrl = await uploadToCloudinary(file, entryId);
+  entry.dataUrl = cloudUrl;
+  inspoGallery.unshift(entry);
+  saveInspoGallery();
+  return entry;
 }
 
 function processInspoFile(file) {
@@ -12601,6 +12864,36 @@ function gecachteSysteemtekst(extra) {
             cache_control: { type:'ephemeral' } }];
 }
 
+// ── HET MOODBOARD ALS BRON ───────────────────────────────────────────────────
+// Ze verzamelt er looks, kleuren en texturen in die ze mooi vindt. Dat is een
+// bron naast haar rapport, de trends en de theorie — maar het bleef hangen in
+// een galerij die alleen zichzelf toonde. Hier wordt het tekst die meereist:
+// hoeveel erop staat, waar ze het zelf over had, en wat de analyses eruit
+// haalden. Geen foto's: die passen niet in elke beurt, en de analyse ervan is
+// al gedaan.
+function inspiratieBron() {
+  if (!Array.isArray(inspoGallery) || !inspoGallery.length) return '';
+  const labels = [];
+  const stukjes = [];
+  inspoGallery.slice(0, 40).forEach(function(e) {
+    if (e.label && labels.indexOf(e.label) < 0 && !/^\d+ \w+$/.test(e.label)) labels.push(e.label);
+    if (!e.result) return;
+    const tmp = document.createElement('div');
+    tmp.innerHTML = e.result;
+    const tekst = (tmp.textContent || '').replace(/\s+/g, ' ').trim();
+    if (tekst) stukjes.push('- ' + (e.label ? e.label + ': ' : '') + tekst.slice(0, 260));
+  });
+  return '\n\n---\n\n## HAAR EIGEN MOODBOARD — wat zij mooi vindt\n\n'
+    + 'Op haar moodboard staan ' + inspoGallery.length + ' beelden die zij zelf heeft verzameld.\n'
+    + (labels.length ? 'Zij noemde ze: ' + labels.slice(0, 15).join(', ') + '.\n' : '')
+    + (stukjes.length
+        ? '\nWat er uit die beelden is gehaald:\n' + stukjes.slice(0, 12).join('\n') + '\n'
+        : '\nDe beelden zijn nog niet geanalyseerd; de aantallen zeggen wel dat dit haar bezighoudt.\n')
+    + '\nWeeg dit mee naast het stijlrapport. Het rapport zegt wat haar stáát; dit '
+    + 'zegt wat zij mooi vindt. Botsen ze, noem dat dan en geef een weg die allebei '
+    + 'recht doet — niet zwijgend één van de twee negeren.';
+}
+
 function getChatSystemPrompt() {
   var allItems = getAllItems();
   var wardrobeByCategory = {};
@@ -12629,6 +12922,11 @@ function getChatSystemPrompt() {
     return '  - '+i.name+' ['+tags+']';
   }).join('\n');
   if (textureContext) wardrobeText += '\n\nEXTRA TEXTUUR/STRUCTUUR DETAILS:\n' + textureContext;
+
+  // Haar moodboard is een bron, net als het rapport en de kleur- en
+  // textuurtheorie — het stond alleen nergens in wat de stylist te zien kreeg.
+  // Het rapport zegt wat haar staat; dit zegt wat zij mooi vindt.
+  var inspoBlok = inspiratieBron();
 
   return `Je bent de persoonlijke digitale stylist, lifestyle coach en vertrouwde begeleider van Griette, opgesteld door Iconic Wardrobe (stylist Robin). Je combineert stijlexpertise met inzicht in welzijn, energie en zelfvertrouwen. Je kent haar stijlrapport, garderobe, cycluspatroon en dagelijkse energie volledig. Je spreekt haar altijd aan als "je" of "jij" — direct, warm, als een goede vriendin die ook stylist én lifestyle coach is. Je geeft advies over kleding én hoe ze zich kan voelen in haar lijf. Bondig, geen lappen tekst. Eindig altijd met één concrete actie.
 
@@ -12731,7 +13029,7 @@ Regel: max 1 print per outfit, combineren met een effen stuk in bijpassende tint
 ---
 
 ## GARDEROBE VAN GRIETTE (live)
-${wardrobeText}
+${wardrobeText}${inspoBlok}
 
 ---
 
@@ -13338,11 +13636,28 @@ function startVerkenner(key) {
     +'Upload <strong>3–10 foto\'s</strong> die jou inspireren — Pinterest-screenshots, Instagram posts of magazine-beelden. '
     +'Ik analyseer de stijl, kleuren en sfeer en stel daarna een look voor uit jouw eigen kast.'
     +'</div>'
+    // Je moodboard staat al vol met precies deze beelden. Opnieuw uploaden is
+    // dubbel werk — dus haal ze er gewoon uit.
+    +(inspoGallery.length
+      ? '<button class="sv-alt-btn" id="sv-uit-moodboard" style="margin-bottom:10px;">'
+        + '🖼 Pak ze van mijn moodboard (' + inspoGallery.length + ')</button>'
+      : '')
     +'<div class="sv-upload-grid" id="sv-upload-grid"></div>'
     +'<button class="sv-gen-btn" id="sv-gen-btn" disabled>📷 Upload minimaal 2 foto\'s</button>'
     +'<button class="sv-alt-btn" id="sv-back-occ">← Andere gelegenheid</button>';
   ov.appendChild(section);
   section.querySelector('#sv-back-occ').addEventListener('click', openStijlVerkenner);
+  var uitBord = section.querySelector('#sv-uit-moodboard');
+  if (uitBord) uitBord.addEventListener('click', function() {
+    const erbij = inspoGallery
+      .filter(function(e){ return e.dataUrl; })
+      .filter(function(e){ return !_sv.liked.some(function(l){ return l.dataUrl === e.dataUrl; }); })
+      .slice(0, 10 - _sv.liked.length);
+    if (!erbij.length) { showToast('Ze staan er al bij'); return; }
+    erbij.forEach(function(e){ _sv.liked.push({ dataUrl: e.dataUrl }); });
+    svRenderUploadGrid();
+    showToast(erbij.length + ' van je moodboard erbij');
+  });
   svRenderUploadGrid();
 }
 
@@ -13376,6 +13691,9 @@ function svRenderUploadGrid() {
       files.forEach(function(file) {
         _biCompressImage(file, function(dataUrl) {
           _sv.liked.push({ dataUrl: dataUrl });
+          // Wat je hier uploadt is hetzelfde soort beeld als op je moodboard.
+          // Het verdween na deze sessie; nu blijft het staan als bron.
+          moodboardUitDataUrl(dataUrl).catch(function(){});
           pending--;
           if (pending === 0) svRenderUploadGrid();
         });
