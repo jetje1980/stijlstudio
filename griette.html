@@ -33,6 +33,23 @@ body{background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);min
 .header p{margin-top:6px;font-size:11px;color:rgba(245,242,238,0.45);font-weight:300;}
 
 /* BOTTOM NAV */
+.dag-ctx{flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--white);font-size:10px;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif;}
+.dag-ctx.actief{border-color:var(--brown);background:var(--brown);color:var(--cream);}
+.dagkaart{display:block;width:100%;text-align:left;background:#F5F2EE;border:1.5px solid var(--cream-dark);border-radius:16px;padding:18px 16px 14px;margin-bottom:12px;cursor:pointer;font-family:'Jost',sans-serif;-webkit-tap-highlight-color:transparent;}
+.dagkaart.bewaard{border-color:var(--brown);box-shadow:0 0 0 1px var(--brown) inset;}
+.dagkaart.netniet{border-style:dashed;}
+.dk-naam{font-family:'Bodoni Moda',serif;font-size:21px;line-height:1.05;color:#1a1510;text-align:center;text-transform:uppercase;letter-spacing:.01em;}
+.dk-merk{display:block;font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:#7a6350;text-align:center;margin-top:5px;}
+.dk-rij{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+.dk-stuk{display:flex;flex-direction:column;gap:4px;}
+.dk-foto{width:100%;aspect-ratio:1;background:#e8ddd2;border-radius:9px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:17px;color:#9b8974;}
+.dk-foto img{width:100%;height:100%;object-fit:cover;display:block;}
+.dk-naampje{font-size:7.5px;color:#7a6350;text-align:center;line-height:1.25;}
+.dk-mist{border:1.5px dashed #b9a48c;background:#faf7f3;}
+.dk-stippen{display:flex;justify-content:center;gap:6px;margin-top:12px;}
+.dk-stip{width:17px;height:17px;border-radius:50%;border:1px solid rgba(0,0,0,.08);}
+.dk-waarom{font-family:'Bodoni Moda',serif;font-style:italic;font-size:11.5px;color:#5a4030;text-align:center;line-height:1.5;margin-top:10px;border-top:1px solid #ddd5c8;padding-top:9px;}
+.dk-tip{font-size:9.5px;color:#7a6350;line-height:1.5;margin-top:8px;text-align:center;}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--brown);z-index:300;display:flex;align-items:stretch;box-shadow:0 -2px 16px rgba(28,26,24,0.18);padding-bottom:env(safe-area-inset-bottom,0);}
 .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px 10px;cursor:pointer;border:none;background:transparent;color:rgba(245,242,238,0.45);font-family:'Jost',sans-serif;font-size:8px;letter-spacing:1px;text-transform:uppercase;gap:4px;transition:color 0.18s;position:relative;}
 .bnav-item.active{color:var(--cream);}
@@ -435,42 +452,22 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 <div class="meer-sheet" id="meer-sheet">
   <div style="width:36px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 20px;"></div>
 
-  <a href="snel-toevoegen.html" style="width:100%;padding:15px 16px;background:var(--brown);border:none;border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--cream);text-decoration:none;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:20px;flex-shrink:0;">➕</span><span style="flex:1;font-weight:500;">Snel item toevoegen <span style="color:rgba(245,242,238,0.55);font-size:10px;font-weight:400;">— foto + naam + categorie</span></span><span style="color:rgba(245,242,238,0.55);">›</span>
-  </a>
-  <a href="outfitkaart.html" style="width:100%;padding:15px 16px;background:var(--brown);border:none;border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:10px;color:var(--cream);text-decoration:none;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:20px;flex-shrink:0;">🎨</span><span style="flex:1;font-weight:500;">Outfitkaart maken <span style="color:rgba(245,242,238,0.55);font-size:10px;font-weight:400;">— kleurcombo + items + download</span></span><span style="color:rgba(245,242,238,0.55);">›</span>
-  </a>
+  <!-- Wat hier stond deed voor een deel hetzelfde als de tegels op Home
+       (snel toevoegen, outfitkaart, weekplan), of leunde op een logboek dat
+       leeg blijft zolang je het met de hand moet bijhouden. Wat over is, is
+       waarvoor je hier echt komt. -->
+  <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-mid);font-family:Jost,sans-serif;font-weight:500;margin-bottom:10px;padding:0 2px;">Naslaan</div>
 
-  <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-mid);font-family:’Jost’,sans-serif;font-weight:500;margin-bottom:10px;padding:0 2px;">Verkennen</div>
-
-  <button type="button" data-meer-panel="week" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:18px;flex-shrink:0;">📅</span><span style="flex:1;">Weekplan</span><span style="color:var(--muted);">›</span>
-  </button>
-  <button type="button" data-meer-panel="inspo" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:18px;flex-shrink:0;">✦</span><span style="flex:1;">Inspo Scan <span style="color:var(--muted);font-size:10px;">— analyseer een outfit of foto</span></span><span style="color:var(--muted);">›</span>
-  </button>
   <button type="button" data-meer-panel="regels" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:18px;flex-shrink:0;">🧬</span><span style="flex:1;">Stijl DNA <span style="color:var(--muted);font-size:10px;">— jouw stijlprofiel & kleurenstrategie</span></span><span style="color:var(--muted);">›</span>
-  </button>
-  <button type="button" data-meer-action="inzichten" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:18px;flex-shrink:0;">🧠</span><span style="flex:1;">Stijlpatronen <span style="color:var(--muted);font-size:10px;">— wat draag je het meest?</span></span><span style="color:var(--muted);">›</span>
+    <span style="font-size:18px;flex-shrink:0;">🧬</span><span style="flex:1;">Stijl DNA <span style="color:var(--muted);font-size:10px;">— jouw stijlprofiel &amp; kleurenstrategie</span></span><span style="color:var(--muted);">›</span>
   </button>
   <button type="button" data-meer-panel="shop" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:18px;flex-shrink:0;">🛍</span><span style="flex:1;">Shopping <span style="color:var(--muted);font-size:10px;">— wat ontbreekt in jouw kast?</span></span><span style="color:var(--muted);">›</span>
+    <span style="font-size:18px;flex-shrink:0;">🛍</span><span style="flex:1;">Wat je nog wilt <span style="color:var(--muted);font-size:10px;">— de aanschaftips uit je rapport</span></span><span style="color:var(--muted);">›</span>
   </button>
-
-  <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-mid);font-family:’Jost’,sans-serif;font-weight:500;margin:16px 0 10px;padding:0 2px;">Bijhouden</div>
-
   <button type="button" data-meer-action="outfitcal" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:18px;flex-shrink:0;">🗓</span><span style="flex:1;">Outfitgeschiedenis <span style="color:var(--muted);font-size:10px;">— wat droeg je wanneer?</span></span><span style="color:var(--muted);">›</span>
+    <span style="font-size:18px;flex-shrink:0;">🗓</span><span style="flex:1;">Wat je droeg <span style="color:var(--muted);font-size:10px;">— je outfitgeschiedenis</span></span><span style="color:var(--muted);">›</span>
   </button>
-  <button type="button" data-meer-action="yesterday" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:18px;flex-shrink:0;">📆</span><span style="flex:1;">Gisteren loggen <span style="color:var(--muted);font-size:10px;">— wat droeg je?</span></span><span style="color:var(--muted);">›</span>
-  </button>
-  <button type="button" data-meer-action="cyclus" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
-    <span style="font-size:18px;flex-shrink:0;">🧡</span><span style="flex:1;">Cyclus <span style="color:var(--muted);font-size:10px;">— fases & outfit tips</span></span><span style="color:var(--muted);">›</span>
-  </button>
+
 
   <!-- Beheer collapsible -->
   <button type="button" onclick="toggleMeerBeheer()" style="width:100%;padding:10px;background:none;border:none;cursor:pointer;font-family:’Jost’,sans-serif;color:var(--muted);font-size:10px;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:5px;letter-spacing:0.5px;">
@@ -564,15 +561,37 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
     <span style="color:var(--muted);">›</span>
   </button>
 
-  <!-- Kledingkast sectie -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-    <div style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--brown-mid);font-family:'Jost',sans-serif;font-weight:500;">Mijn Kledingkast</div>
+  <!-- ===== VANDAAG VOOR JOU: tien kaarten om uit te kiezen ===== -->
+  <!-- Home toonde je hele kast: 144 kaartjes om zelf iets uit te bedenken.
+       Wat je wilt is het omgekeerde — kijken en voelen waar je zin in hebt.
+       Deze tien worden één keer per dag gemaakt en daarna bewaard, zodat het
+       openen van de app niet elke keer wachten en geld kost. -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+    <div style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--brown-mid);font-family:'Jost',sans-serif;font-weight:500;">Vandaag voor jou</div>
+    <button id="dag-opnieuw" onclick="maakDagKaarten(dagContext, true)" style="font-size:9px;color:var(--brown-mid);background:none;border:1px solid var(--cream-dark);border-radius:12px;padding:4px 10px;cursor:pointer;font-family:'Jost',sans-serif;white-space:nowrap;">↻ Andere tien</button>
+  </div>
+  <div style="font-size:10px;color:var(--muted);line-height:1.5;margin-bottom:8px;" id="dag-uitleg">
+    Tien looks uit je eigen kast. Tik er een aan om hem te bewaren.
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;" id="dag-context">
+    <button class="dag-ctx actief" data-ctx="" onclick="kiesDagContext('')">Verras me</button>
+    <button class="dag-ctx" data-ctx="werkdag" onclick="kiesDagContext('werkdag')">Werkdag</button>
+    <button class="dag-ctx" data-ctx="vrije dag" onclick="kiesDagContext('vrije dag')">Vrije dag</button>
+    <button class="dag-ctx" data-ctx="afspraak of uit" onclick="kiesDagContext('afspraak of uit')">Afspraak / uit</button>
+  </div>
+  <div id="dag-kaarten"></div>
+
+  <!-- Kledingkast sectie: staat nu ingeklapt, want hij is om iets op te
+       zoeken, niet om je ochtend mee te beginnen. -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:24px;">
+    <button onclick="toonKastOpHome()" id="kast-toggle" style="font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--brown-mid);font-family:'Jost',sans-serif;font-weight:500;background:none;border:none;cursor:pointer;padding:0;">Mijn Kledingkast ›</button>
     <div style="display:flex;align-items:center;gap:8px;">
       <span id="home-stats" style="font-size:9px;color:var(--muted);font-family:'Jost',sans-serif;"></span>
       <button onclick="runGarderobeCheck()" style="font-size:9px;color:var(--brown-mid);background:none;border:1px solid var(--cream-dark);border-radius:12px;padding:4px 10px;cursor:pointer;font-family:'Jost',sans-serif;white-space:nowrap;letter-spacing:0.3px;">🧹 Check</button>
     </div>
   </div>
 
+  <div id="kast-blok" style="display:none;">
   <!-- Filter chips -->
   <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;">
     <button style="flex-shrink:0;padding:6px 12px;border-radius:16px;border:1.5px solid var(--brown);background:var(--brown);font-size:10px;cursor:pointer;color:var(--cream);font-family:'Jost',sans-serif;" onclick="setFilter('alle',this)" id="fb-alle">Alle</button>
@@ -588,6 +607,7 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 
   <div id="garderobe-content"></div>
   <button class="add-item-btn" onclick="openAddModal()">+ Eigen item toevoegen</button>
+  </div>
 </div>
 
 <!-- ===== SUGGESTIES ===== -->
@@ -1561,6 +1581,62 @@ function isEendeligItem(i) {
 }
 
 // ============ DATA ============
+// Eigen categorieën die zij er zelf bij zet. Ze staan in dezelfde vorm als de
+// vaste, worden net zo getoond, en gaan net zo mee naar de stylist — die krijgt
+// de categorie van een item letterlijk door, dus een eigen naam werkt vanzelf.
+let eigenCategorieen = [];
+
+function laadEigenCategorieen() {
+  try { eigenCategorieen = JSON.parse(localStorage.getItem('griette-eigen-cats-v1') || '[]'); } catch(e) {}
+  if (!Array.isArray(eigenCategorieen)) eigenCategorieen = [];
+}
+
+function bewaarEigenCategorieen() {
+  try { localStorage.setItem('griette-eigen-cats-v1', JSON.stringify(eigenCategorieen)); } catch(e) {}
+  supabaseSet('eigen-categorieen', eigenCategorieen).catch(function(){});
+}
+
+function alleCategorieen() {
+  return categories.concat(eigenCategorieen);
+}
+
+// Alleen items met een 'custom-' id worden opgeslagen; de ingebouwde stukken
+// komen elke keer vers uit de code. Verplaats je zo'n stuk, dan sprong het na
+// herladen terug. Daarom onthouden we de verplaatsing apart, per id.
+let catAnders = {};
+
+function laadCatAnders() {
+  try { catAnders = JSON.parse(localStorage.getItem('griette-cat-anders-v1') || '{}'); } catch(e) {}
+  if (!catAnders || typeof catAnders !== 'object') catAnders = {};
+}
+
+function bewaarCatAnders() {
+  try { localStorage.setItem('griette-cat-anders-v1', JSON.stringify(catAnders)); } catch(e) {}
+  supabaseSet('cat-anders', catAnders).catch(function(){});
+}
+
+// Zet de onthouden verplaatsingen terug op de kast.
+function pasCatAndersToe() {
+  Object.keys(catAnders).forEach(function(id) {
+    var naar = catAnders[id];
+    if (!naar) return;
+    var item = null, van = null;
+    Object.keys(items).forEach(function(c) {
+      var i = (items[c] || []).findIndex(function(x){ return x.id === id; });
+      if (i >= 0) { item = items[c][i]; van = c; }
+    });
+    if (!item || van === naar) return;
+    items[van] = items[van].filter(function(x){ return x.id !== id; });
+    if (!items[naar]) items[naar] = [];
+    items[naar].push(item);
+  });
+}
+
+function catLabel(id) {
+  var c = alleCategorieen().find(function(x){ return x.id === id; });
+  return c ? c.label : id;
+}
+
 const categories = [
   { id:'tops', label:'Tops' },
   { id:'bottoms', label:'Rokken & Broeken' },
@@ -1775,7 +1851,7 @@ let outfitCounter = 0;
 function buildGarderobe() {
   const cont = document.getElementById('garderobe-content');
   cont.innerHTML = '';
-  categories.forEach(cat => {
+  alleCategorieen().forEach(cat => {
     const catItems = items[cat.id] || [];
     if (catItems.length === 0 && cat.id !== 'overig') return;
     const lbl = document.createElement('div');
@@ -2330,6 +2406,12 @@ function openFotoModal(itemId) {
       + 'background:var(--brown);color:var(--cream);border:none;border-radius:8px;'
       + 'font-size:11px;letter-spacing:1px;cursor:pointer;font-family:Jost,sans-serif;">'
       + '＋ Foto\'s toevoegen</button>'
+      + '<div class="sec-label" style="margin-top:16px;font-size:9px;letter-spacing:2px;'
+      + 'text-transform:uppercase;color:var(--brown-mid);">In welke categorie hoort dit?</div>'
+      + '<div style="font-size:9px;color:var(--muted);line-height:1.5;margin:4px 0 8px;">'
+      + 'De stylist weegt items per categorie mee. Staat er iets verkeerd, dan telt '
+      + 'het ook verkeerd mee.</div>'
+      + '<div id="fotos-modal-cats" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;"></div>'
       + '<button id="fotos-modal-vandaag" style="width:100%;margin-top:8px;padding:10px;'
       + 'background:transparent;color:var(--brown);border:1.5px solid var(--cream-dark);'
       + 'border-radius:8px;font-size:11px;cursor:pointer;font-family:Jost,sans-serif;">'
@@ -2405,6 +2487,65 @@ function toonFotoModal(itemId) {
   });
 
   lijst.innerHTML = html;
+  tekenCatKeuze(itemId);
+}
+
+// ── ITEM IN DE JUISTE CATEGORIE ──────────────────────────────────────────────
+// Categorie is geen etiket maar een rol: de stylist kiest per categorie één
+// stuk en weegt silhouet en lagen daarop. Staat een jas onder "overig", dan
+// telt hij nergens in mee. Daarom kan dat hier recht worden gezet, en kan er
+// een eigen categorie bij voor wat nergens in past.
+function tekenCatKeuze(itemId) {
+  var vak = document.getElementById('fotos-modal-cats');
+  if (!vak) return;
+  var huidig = (getItemById(itemId) || {}).cat;
+  vak.innerHTML = alleCategorieen().map(function(c) {
+    var aan = c.id === huidig;
+    return '<button type="button" onclick="zetItemCategorie(\'' + itemId + '\',\'' + c.id + '\')" '
+      + 'style="padding:5px 10px;font-size:10px;border-radius:14px;cursor:pointer;'
+      + 'font-family:Jost,sans-serif;'
+      + (aan ? 'border:1px solid var(--brown);background:var(--brown);color:var(--cream);'
+             : 'border:1px solid var(--cream-dark);background:var(--white);color:var(--muted);')
+      + '">' + c.label + '</button>';
+  }).join('')
+    + '<button type="button" onclick="nieuweCategorie(\'' + itemId + '\')" '
+    + 'style="padding:5px 10px;font-size:10px;border-radius:14px;cursor:pointer;'
+    + 'border:1px dashed var(--cream-dark);background:transparent;color:var(--muted);'
+    + 'font-family:Jost,sans-serif;">＋ eigen categorie</button>';
+}
+
+function zetItemCategorie(itemId, naarCat) {
+  var item = null, vanCat = null;
+  Object.keys(items).forEach(function(c) {
+    var i = (items[c] || []).findIndex(function(x){ return x.id === itemId; });
+    if (i >= 0) { item = items[c][i]; vanCat = c; }
+  });
+  if (!item || vanCat === naarCat) return;
+  items[vanCat] = items[vanCat].filter(function(x){ return x.id !== itemId; });
+  if (!items[naarCat]) items[naarCat] = [];
+  items[naarCat].push(item);
+  catAnders[itemId] = naarCat;
+  bewaarCatAnders();
+  saveAppData();
+  tekenCatKeuze(itemId);
+  buildGarderobe();
+  showToast(item.name + ' staat nu bij ' + catLabel(naarCat));
+}
+
+function nieuweCategorie(itemId) {
+  var naam = (prompt('Hoe heet de nieuwe categorie?\n\nBijvoorbeeld: Sieraden, Sjaals, Sport') || '').trim();
+  if (!naam) return;
+  var id = naam.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  if (!id) return;
+  if (alleCategorieen().some(function(c){ return c.id === id; })) {
+    showToast('Die categorie bestaat al');
+    zetItemCategorie(itemId, id);
+    return;
+  }
+  eigenCategorieen.push({ id: id, label: naam });
+  bewaarEigenCategorieen();
+  if (!items[id]) items[id] = [];
+  zetItemCategorie(itemId, id);
 }
 
 function zetFotoSoort(itemId, i, soort) {
@@ -2468,9 +2609,28 @@ function deleteItem(itemId) {
   });
   deletePhoto(itemId);
   if (extraFotos[itemId]) { delete extraFotos[itemId]; bewaarExtraFotos(); }
+  // Weg is weg, ook op de plekken die je niet meteen ziet. Anders staat een
+  // verwijderd stuk nog in je weekplanning of in de kaarten van vandaag, en
+  // duikt het dus toch weer op in een advies.
+  Object.keys(weekPlan || {}).forEach(function(dag) {
+    const plan = weekPlan[dag];
+    if (!plan || !Array.isArray(plan.items)) return;
+    plan.items = plan.items.filter(function(id){ return id !== itemId; });
+  });
+  saveWeekPlan();
+  if (dagKaarten.length) {
+    dagKaarten.forEach(function(k) {
+      k.stukken = (k.stukken || []).filter(function(st){ return st.id !== itemId; });
+    });
+    dagKaarten = dagKaarten.filter(function(k){ return (k.stukken || []).length >= 2; });
+    bewaarDagKaarten();
+    toonDagKaarten();
+  }
+  if (catAnders[itemId]) { delete catAnders[itemId]; bewaarCatAnders(); }
   const card = document.getElementById('card-' + itemId);
   if (card) card.remove();
   saveAppData();
+  buildBoards();
   showToast('Item verwijderd ✓');
 }
 
@@ -3219,6 +3379,282 @@ function closePicker() {
 
 function closePickerIfOutside(e) {
   if (e.target === document.getElementById('picker-overlay')) closePicker();
+}
+
+// ── VANDAAG VOOR JOU ─────────────────────────────────────────────────────────
+// Tien kaarten waaruit je kiest op gevoel, in plaats van 144 kaartjes waaruit
+// je zelf iets moet bedenken. Vier assen waarlangs ze verschillen, zodat het
+// echt tien verschillende dingen zijn en niet tien varianten op hetzelfde:
+//
+//   3× hetzelfde stuk, drie keer anders gestyled
+//   3× een ander stijlkarakter (streetstyle, parisienne, comfy)
+//   2× vanuit één kleur van de dag
+//   2× een andere gelegenheid
+//
+// Die verdeling wordt hier vastgelegd en niet aan de AI overgelaten, want
+// "maak tien verschillende" levert tien keer bijna hetzelfde op.
+//
+// Ze worden één keer per dag gemaakt en bewaard. Het openen van de app hoort
+// niet elke keer te wachten en geld te kosten.
+const DAG_SLOTS = [
+  { as:'item',      n:3, opdracht:'Kies ÉÉN stuk uit haar kast en style dat drie keer totaal anders. Noem dat stuk in "rode draad".' },
+  { as:'karakter',  n:3, opdracht:'Drie looks met een ander stijlkarakter: streetstyle, parisienne (klassiek Frans, verzorgd nonchalant) en comfy. Zet het karakter in "merk".' },
+  { as:'kleur',     n:2, opdracht:'Twee looks die vertrekken vanuit één kleur van de dag. Zet die kleur in "merk".' },
+  { as:'gelegenheid', n:2, opdracht:'Twee looks voor duidelijk verschillende gelegenheden. Zet de gelegenheid in "merk".' },
+];
+const DAG_MAX_NETNIET = 3;
+
+let dagKaarten = [];
+let dagContext = '';
+let dagBewaard = {};
+
+function vandaagSleutel() { return new Date().toISOString().slice(0,10); }
+
+function laadDagKaarten() {
+  try {
+    const d = JSON.parse(localStorage.getItem('griette-dagkaarten-v1') || 'null');
+    if (d && d.datum === vandaagSleutel()) {
+      dagKaarten = d.kaarten || [];
+      dagContext = d.context || '';
+      dagBewaard = d.bewaard || {};
+    }
+  } catch(e) {}
+}
+
+function bewaarDagKaarten() {
+  try {
+    localStorage.setItem('griette-dagkaarten-v1', JSON.stringify({
+      datum: vandaagSleutel(), context: dagContext, kaarten: dagKaarten, bewaard: dagBewaard }));
+  } catch(e) {}
+}
+
+function kiesDagContext(ctx) {
+  dagContext = ctx;
+  document.querySelectorAll('.dag-ctx').forEach(function(b) {
+    b.classList.toggle('actief', (b.dataset.ctx || '') === ctx);
+  });
+  maakDagKaarten(ctx, true);
+}
+
+// Namen uit het antwoord terugvertalen naar items uit de kast. Wat niet te
+// vinden is, is een stuk dat zij niet heeft — dat mag, maar wordt gemerkt.
+function dagStukken(namen) {
+  const kast = getAllItems();
+  return (namen || []).map(function(naam) {
+    const n = String(naam || '').toLowerCase().trim();
+    if (!n) return null;
+    let item = kast.find(function(i){ return i.name.toLowerCase() === n; });
+    if (!item) {
+      let best = null, score = 0;
+      kast.forEach(function(i) {
+        const w = i.name.toLowerCase().split(/[^a-z0-9]+/).filter(function(x){ return x.length > 3; });
+        if (!w.length) return;
+        const raak = w.filter(function(x){ return n.includes(x); }).length / w.length;
+        if (raak > 0.55 && raak > score) { score = raak; best = i; }
+      });
+      item = best;
+    }
+    return item ? { id:item.id, naam:item.name, heeft:true } : { id:null, naam:naam, heeft:false };
+  }).filter(Boolean);
+}
+
+async function maakDagKaarten(ctx, opnieuw) {
+  const vak = document.getElementById('dag-kaarten');
+  if (!vak) return;
+  if (!opnieuw && dagKaarten.length) { toonDagKaarten(); return; }
+
+  const kast = getAllItems().filter(function(i){ return !deletedItemIds.has(i.id); });
+  if (kast.length < 8) {
+    vak.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:10px 0;">'
+      + 'Nog te weinig in je kast om tien looks te maken.</div>';
+    return;
+  }
+
+  vak.innerHTML = '<div class="ai-thinking"><div class="ai-dot"></div><div class="ai-dot"></div>'
+    + '<div class="ai-dot"></div><span style="margin-left:6px;">Tien looks voor vandaag…</span></div>';
+
+  const regels = kast.map(function(i) {
+    const k = getTag(i.id, 'kleur'), pv = getTag(i.id, 'pasvorm'), mt = getTag(i.id, 'materiaal');
+    const extra = [k, pv, mt].filter(Boolean).map(function(v){ return Array.isArray(v) ? v.join('/') : v; }).join(', ');
+    return '- ' + i.name + ' [' + i.cat + ']' + (extra ? ' (' + extra + ')' : '');
+  }).join('\n');
+
+  const opdrachten = DAG_SLOTS.map(function(sl, n) {
+    return (n+1) + '. ' + sl.n + ' looks — ' + sl.opdracht;
+  }).join('\n');
+
+  const prompt = 'Je bent de persoonlijke stylist van Griette. Haar stijlrapport noemt haar stijl '
+    + 'klassiek, krachtig en kleurrijk, met voorkeur voor kwaliteit en comfort. Schouders en heupen '
+    + 'zijn gelijk breed, dus taille altijd benadrukken: wijd onder vraagt aansluitend boven en '
+    + 'andersom, nooit allebei wijd. Open, zachte halslijnen. Hoge taille werkt goed.\n\n'
+    + (ctx ? 'Vandaag is het een ' + ctx + '. Houd daar rekening mee — bij een werkdag hoort '
+             + 'bijvoorbeeld een grotere tas die er ook echt bij past.\n\n'
+           : 'Geen vaste gelegenheid vandaag: maak het inspirerend en gevarieerd.\n\n')
+    + 'HAAR KAST:\n' + regels + '\n\n'
+    + 'Maak precies 10 looks, verdeeld als volgt:\n' + opdrachten + '\n\n'
+    + 'Regels:\n'
+    + '- Gebruik per look 3 tot 6 stukken, met exacte namen uit de lijst.\n'
+    + '- Geen twee looks met dezelfde stukken.\n'
+    + '- Hoogstens ' + DAG_MAX_NETNIET + ' looks mogen één stuk bevatten dat NIET in de lijst staat, '
+    + 'als dat de look echt beter maakt. Zet dat stuk dan ook in "items" en beschrijf in "netniet" '
+    + 'wat het is en waarom het werkt. De andere looks gebruiken alleen wat ze heeft.\n\n'
+    + 'Antwoord ALLEEN met JSON:\n'
+    + '{"looks":[{"naam":"korte naam","merk":"karakter, kleur of gelegenheid","waarom":"1 zin: '
+    + 'waarom dit werkt voor haar","items":["exacte naam"],"rodedraad":"het stuk dat terugkomt, of leeg",'
+    + '"netniet":"wat ontbreekt en waarom het zou werken, of leeg"}]}';
+
+  try {
+    const res = await aiFetch(null, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model: aiModelNu(), max_tokens: 3000,
+        messages:[{ role:'user', content: prompt }] }) });
+    if (!res.ok) throw new Error('API ' + res.status);
+    const data = await res.json();
+    const raw = (data.content || []).filter(function(b){ return b.type === 'text'; })
+      .map(function(b){ return b.text; }).join('');
+    const m = raw.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('geen JSON');
+    const looks = (JSON.parse(m[0]).looks || []);
+    if (!looks.length) throw new Error('geen looks');
+
+    // Deterministisch nakijken wat de stylist terugstuurt.
+    let netniet = 0;
+    const gezien = new Set();
+    dagKaarten = looks.map(function(l) {
+      const stukken = dagStukken(l.items);
+      const sleutel = stukken.map(function(x){ return x.id || x.naam; }).sort().join('|');
+      if (gezien.has(sleutel)) return null;      // twee keer hetzelfde: weg
+      gezien.add(sleutel);
+      const mist = stukken.filter(function(x){ return !x.heeft; });
+      if (mist.length && netniet >= DAG_MAX_NETNIET) return null;
+      if (mist.length) netniet++;
+      return { naam: l.naam || 'Look', merk: l.merk || '', waarom: l.waarom || '',
+               rodedraad: l.rodedraad || '', netniet: mist.length ? (l.netniet || '') : '',
+               stukken: stukken };
+    }).filter(Boolean).filter(function(k){ return k.stukken.length >= 2; });
+
+    dagBewaard = {};
+    bewaarDagKaarten();
+    toonDagKaarten();
+  } catch(e) {
+    vak.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:10px 0;line-height:1.6;">'
+      + 'De stylist kon even geen looks maken — ' + esc2(dagFoutReden(e))
+      + ' <button onclick="maakDagKaarten(dagContext, true)" style="background:none;border:none;'
+      + 'color:var(--brown);text-decoration:underline;cursor:pointer;font-family:Jost,sans-serif;'
+      + 'font-size:11px;padding:0;">Opnieuw proberen</button></div>';
+  }
+}
+
+function dagFoutReden(e) {
+  const m = String((e && e.message) || e || '');
+  if (!navigator.onLine) return 'je hebt geen verbinding.';
+  if (/Failed to fetch|NetworkError/i.test(m)) return 'hij was niet bereikbaar.';
+  if (/JSON|geen looks/i.test(m)) return 'het antwoord was niet te lezen.';
+  if (/\b5\d\d\b/.test(m)) return 'er was een storing.';
+  return 'er ging iets mis.';
+}
+
+function esc2(t) {
+  return String(t == null ? '' : t).replace(/[&<>"]/g, function(c) {
+    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c];
+  });
+}
+
+// Een naam als "top zara longsleeve bruin" past niet onder een vakje van een
+// derde scherm. Twee woorden die het stuk herkenbaar maken is genoeg.
+function kortStuk(naam) {
+  const n = String(naam || '').replace(/\s*\([^)]*\)/g, '').trim();
+  const w = n.split(/\s+/);
+  return w.slice(0, 2).join(' ') + (w.length > 2 ? '…' : '');
+}
+
+// De kleuren van de stukken die er echt in zitten, hoogstens vier.
+function dagStippen(k) {
+  const uit = [];
+  (k.stukken || []).forEach(function(st) {
+    if (!st.id) return;
+    const kl = getTag(st.id, 'kleur');
+    [].concat(kl || []).forEach(function(c) {
+      const hex = kleurDots[String(c).toLowerCase()];
+      if (hex && uit.indexOf(hex) < 0) uit.push(hex);
+    });
+  });
+  return uit.slice(0, 4);
+}
+
+function toonDagKaarten() {
+  const vak = document.getElementById('dag-kaarten');
+  if (!vak) return;
+  if (!dagKaarten.length) { maakDagKaarten(dagContext, false); return; }
+
+  vak.innerHTML = dagKaarten.map(function(k, n) {
+    const stukken = k.stukken.map(function(st) {
+      const foto = st.id && photos[st.id];
+      return '<div class="dk-stuk"><div class="dk-foto' + (st.heeft ? '' : ' dk-mist') + '">'
+        + (foto ? '<img loading="lazy" src="' + esc2(foto) + '" alt="">'
+                : (st.heeft ? '👕' : '＋'))
+        + '</div><div class="dk-naampje">' + esc2(kortStuk(st.naam)) + '</div></div>';
+    }).join('');
+    // De kleuren van de stukken zelf, net als onderaan een echte outfitkaart.
+    const stippen = dagStippen(k).map(function(c) {
+      return '<span class="dk-stip" style="background:' + c + '"></span>';
+    }).join('');
+    return '<button type="button" class="dagkaart' + (dagBewaard[n] ? ' bewaard' : '')
+      + (k.netniet ? ' netniet' : '') + '" onclick="bewaarDagKaart(' + n + ')">'
+      + '<div class="dk-naam">' + esc2(k.naam) + '</div>'
+      + (k.merk ? '<span class="dk-merk">' + esc2(k.merk) + '</span>' : '')
+      + '<div class="dk-rij">' + stukken + '</div>'
+      + (stippen ? '<div class="dk-stippen">' + stippen + '</div>' : '')
+      + (k.waarom ? '<div class="dk-waarom">' + esc2(k.waarom) + '</div>' : '')
+      + (k.netniet ? '<div class="dk-tip">Dit had gekund als je dit had: ' + esc2(k.netniet) + '</div>' : '')
+      + (dagBewaard[n] ? '<div class="dk-tip">✓ Bewaard bij je Looks</div>' : '')
+      + '</button>';
+  }).join('');
+
+  const u = document.getElementById('dag-uitleg');
+  if (u) {
+    const mist = dagKaarten.filter(function(k){ return k.netniet; }).length;
+    u.textContent = 'Tien looks uit je eigen kast. Tik er een aan om hem te bewaren.'
+      + (mist ? ' ' + mist + ' ervan ' + (mist === 1 ? 'gebruikt' : 'gebruiken')
+                + ' een stuk dat je nog niet hebt — die staan gestippeld.' : '');
+  }
+}
+
+// Tikken is bewaren. Meerdere mogen, en nog een keer tikken maakt het ongedaan.
+async function bewaarDagKaart(n) {
+  const k = dagKaarten[n];
+  if (!k) return;
+  const board = boards.find(function(b){ return b.id === 'inspiratie'; }) || boards[0];
+  if (!board) return;
+
+  if (dagBewaard[n]) {
+    board.outfits = board.outfits.filter(function(o){ return o.id !== dagBewaard[n]; });
+    delete dagBewaard[n];
+    showToast('Weer van je Looks af');
+  } else {
+    const ids = k.stukken.filter(function(x){ return x.heeft; }).map(function(x){ return x.id; });
+    if (!ids.length) { showToast('Deze look heeft nog niets uit je kast'); return; }
+    outfitCounter++;
+    const id = 'outfit-' + outfitCounter;
+    board.outfits.push({ id: id, name: k.naam, items: ids,
+                         notitie: [k.merk, k.waarom].filter(Boolean).join(' — ') });
+    dagBewaard[n] = id;
+    showToast('✓ ' + k.naam + ' bewaard bij ' + board.label);
+  }
+  bewaarDagKaarten();
+  toonDagKaarten();
+  saveAppData();
+  buildBoards();
+}
+
+// De kast op Home staat ingeklapt: hij is om iets op te zoeken, niet om je
+// ochtend mee te beginnen.
+function toonKastOpHome() {
+  const blok = document.getElementById('kast-blok');
+  const knop = document.getElementById('kast-toggle');
+  if (!blok || !knop) return;
+  const open = blok.style.display !== 'none';
+  blok.style.display = open ? 'none' : 'block';
+  knop.textContent = open ? 'Mijn Kledingkast ›' : 'Mijn Kledingkast ⌄';
 }
 
 // ============ ADD ITEM MODAL ============
@@ -4107,6 +4543,21 @@ async function loadAppDataFromSupabase() {
       supabaseGet('custom-occasions'),
       supabaseGet('deleted-items')
     ]);
+
+    const [eigenCats, catOverride] = await Promise.all([
+      supabaseGet('eigen-categorieen').catch(() => null),
+      supabaseGet('cat-anders').catch(() => null),
+    ]);
+    if (Array.isArray(eigenCats)) {
+      eigenCategorieen = eigenCats;
+      try { localStorage.setItem('griette-eigen-cats-v1', JSON.stringify(eigenCats)); } catch(e) {}
+      eigenCategorieen.forEach(function(c){ if (!items[c.id]) items[c.id] = []; });
+    }
+    if (catOverride && typeof catOverride === 'object' && !Array.isArray(catOverride)) {
+      catAnders = catOverride;
+      try { localStorage.setItem('griette-cat-anders-v1', JSON.stringify(catAnders)); } catch(e) {}
+      pasCatAndersToe();
+    }
 
     const extraData = await supabaseGet('extra-photos').catch(() => null);
     if (extraData && typeof extraData === 'object' && !Array.isArray(extraData)) {
@@ -6758,6 +7209,10 @@ fetchWeather();
 // Load Cloudinary photo URLs first (works across devices/versions)
 loadCloudinaryPhotos();
 laadExtraFotos();
+laadEigenCategorieen();
+laadCatAnders();
+pasCatAndersToe();
+laadDagKaarten();
 loadBoardSettings();
 loadCyclus();
 loadWellbeing();
@@ -6793,6 +7248,11 @@ openDB().then(async () => {
   rebuildOccasions();
   renderInspoGallery();
   updateDailyCardWithPlan();
+  // De tien van vandaag: uit de cache als ze er al zijn, anders één keer maken.
+  // Na de Supabase-sync, zodat hij de hele kast kent en niet alleen wat er
+  // lokaal stond.
+  setTimeout(function(){ if (dagKaarten.length) toonDagKaarten(); }, 100);
+  setTimeout(function(){ if (!dagKaarten.length) maakDagKaarten(dagContext, false); }, 2500);
   setTimeout(function(){applyGarderobeFilter();showMondayBanner();addMorningBannerBtn();updateHomeGreeting();},600);
   setTimeout(checkUnwornItems, 500);
   setTimeout(checkSeizoenswissel, 800);
@@ -11540,46 +12000,11 @@ function checkMorningAdvice() {
   }
 }
 
-// Morning advice banner button in garderobe panel
-function addMorningBannerBtn() {
-  var gc = document.getElementById('garderobe-content');
-  if (!gc) return;
-  var existing = document.getElementById('morning-banner-btn');
-  if (existing) return;
-  // Add worn-today button (once)
-  if (!document.getElementById('worn-today-btn')) {
-    var wb = document.createElement('button');
-    wb.id = 'worn-today-btn';
-    wb.type = 'button';
-    wb.style.cssText = 'width:100%;padding:11px 16px;background:var(--white);color:var(--brown);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:11px;font-family:Jost,sans-serif;cursor:pointer;display:flex;align-items:center;gap:10px;margin-bottom:10px;';
-    wb.innerHTML = '<span style="font-size:16px;">👗</span><span style="flex:1;text-align:left;">Wat heb ik vandaag gedragen?</span><span style="font-size:11px;color:var(--muted);">→</span>';
-    wb.addEventListener('click', openWornTodayPicker);
-    gc.insertBefore(wb, gc.firstChild);
-  }
-  // Add daily inspiration button (once)
-  if (!document.getElementById('daily-inspo-btn')) {
-    var inspoB = document.createElement('button');
-    inspoB.id = 'daily-inspo-btn';
-    inspoB.type = 'button';
-    inspoB.style.cssText = 'width:100%;padding:11px 16px;background:linear-gradient(135deg,rgba(155,98,64,0.1),rgba(162,138,80,0.1));color:var(--brown);border:1.5px solid rgba(155,98,64,0.3);border-radius:12px;font-size:11px;font-family:Jost,sans-serif;cursor:pointer;display:flex;align-items:center;gap:10px;margin-bottom:10px;';
-    inspoB.innerHTML = '<span style="font-size:16px;">✨</span><span style="flex:1;text-align:left;">Dagelijkse stijlinspiratie</span><span style="font-size:11px;color:var(--muted);">→</span>';
-    inspoB.addEventListener('click', showDailyInspirationTip);
-    gc.insertBefore(inspoB, gc.firstChild);
-  }
-
-  var btn = document.createElement('button');
-  btn.id = 'morning-banner-btn';
-  btn.type = 'button';
-  btn.style.cssText = 'width:100%;padding:13px 16px;background:linear-gradient(135deg,var(--brown-warm),var(--brown));color:var(--cream);border:none;border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;display:flex;align-items:center;gap:10px;margin-bottom:14px;letter-spacing:0.5px;';
-  btn.innerHTML = '<span style="font-size:18px;">🌅</span><span style="flex:1;text-align:left;">Dagadvies — wat trek ik vandaag aan?</span><span style="font-size:16px;">→</span>';
-  btn.addEventListener('click', function() {
-    buildMorningOccGrid();
-    document.getElementById('morning-result').style.display = 'none';
-    document.getElementById('morning-dismiss-btn').style.display = 'none';
-    document.getElementById('morning-overlay').classList.add('open');
-  });
-  gc.insertBefore(btn, gc.firstChild);
-}
+// De drie banners die hier stonden — "Dagadvies", "Dagelijkse stijlinspiratie"
+// en "Wat heb ik vandaag gedragen?" — deden wat de kaart bovenaan Home en de
+// tien looks eronder al doen. Drie ingangen naar hetzelfde, midden in je kast.
+// Het ochtendadvies verschijnt 's ochtends nog gewoon vanzelf.
+function addMorningBannerBtn() {}
 
 // ============ BOTTOM NAV ============
 function toggleMeerBeheer() {
