@@ -4045,9 +4045,23 @@ function rollenUitleg(rollen) {
       + '</div></div>').join('') + '</div>';
 }
 
+// De vaste combo's hebben geen `rollen` — die komen alleen uit een
+// AI-antwoord. Daardoor viel deze route terug op vier even grote stippen,
+// precies het probleem dat elders al was opgelost. De verdeling is hier
+// gewoon af te leiden, dus dat doen we.
+function rollenVoorPreset(p) {
+  if (p.rollen && p.rollen.length) return p.rollen;
+  const r = (typeof kleurVerhouding === 'function') ? kleurVerhouding(p) : [];
+  return r.map(function(x) {
+    return { kleur:x.kleur, hex:x.hex, deel:x.deel,
+             rol:x.label, doet:x.deel + '% van de outfit', waar:x.draagt };
+  });
+}
+
 function makePresetCard(p, onClick) {
   const card = document.createElement('div');
-  const balk = verhoudingsBalk(p.rollen);
+  const rollen = rollenVoorPreset(p);
+  const balk = verhoudingsBalk(rollen);
   card.className = 'preset-card' + (balk ? ' met-verhouding' : '');
   const swatches = balk ? '' : (p.colors || [])
     .map(c=>`<div class="swatch" style="background:${c}"></div>`).join('');
@@ -4058,7 +4072,7 @@ function makePresetCard(p, onClick) {
     + `<div class="pi-vibe">${p.vibe || ''}</div>`
     + stijlBadge
     + (p.gelegenheid ? `<div class="pi-gel">Sterkst voor: ${esc(p.gelegenheid)}</div>` : '')
-    + rollenUitleg(p.rollen)
+    + rollenUitleg(rollen)
     + '</div>';
   card.addEventListener('click', onClick);
   return card;

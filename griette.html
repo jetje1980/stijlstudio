@@ -80,6 +80,13 @@ body{background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);min
 .dk-check-r{display:flex;gap:6px;align-items:flex-start;font-size:9.5px;color:#6b573f;line-height:1.5;margin-top:5px;text-align:left;}
 .dk-check-i{flex-shrink:0;width:11px;font-weight:700;}
 .dk-check-uit{font-size:8.5px;color:#a89478;line-height:1.5;margin-top:7px;text-align:left;font-style:italic;}
+.dk-vul{margin-top:4px;padding:3px 8px;background:transparent;border:1px solid #c9b79c;border-radius:10px;font-family:'Jost',sans-serif;font-size:9px;color:#6b573f;cursor:pointer;}
+.vul-rij{margin-top:8px;text-align:left;}
+.vul-naam{font-size:9.5px;color:#2b2318;margin-bottom:4px;}
+.vul-knoppen{display:flex;flex-wrap:wrap;gap:4px;}
+.vul-knop{display:flex;align-items:center;gap:4px;padding:4px 8px;background:#fff;border:1px solid #d9cfc0;border-radius:10px;font-family:'Jost',sans-serif;font-size:9px;color:#6b573f;cursor:pointer;}
+.vul-knop.aan{background:var(--brown);border-color:var(--brown);color:var(--cream);}
+.vul-stip{width:8px;height:8px;border-radius:50%;display:inline-block;}
 .dk-weer{display:block;width:100%;margin-top:10px;padding:6px;background:transparent;border:1px dashed #d9cfc0;border-radius:4px;font-family:'Jost',sans-serif;font-size:9.5px;letter-spacing:.06em;color:#8a7358;cursor:pointer;position:relative;z-index:1;}
 .dk-acties{display:flex;gap:6px;margin-top:6px;position:relative;z-index:1;}
 .dk-actie{flex:1;padding:7px;background:transparent;border:1px solid #d9cfc0;border-radius:4px;font-size:10px;font-family:'Jost',sans-serif;color:#6b573f;cursor:pointer;}
@@ -1013,6 +1020,9 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
       <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="modal" onclick="toggleNewTagMulti(this)">modal</button>
       <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="satijn" onclick="toggleNewTagMulti(this)">satijn</button>
       <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="jersey" onclick="toggleNewTagMulti(this)">jersey</button>
+      <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="zijde" onclick="toggleNewTagMulti(this)">zijde</button>
+      <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="crêpe" onclick="toggleNewTagMulti(this)">crêpe</button>
+      <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="chiffon" onclick="toggleNewTagMulti(this)">chiffon</button>
     </div>
     <div style="font-size:8px;color:var(--muted);margin-bottom:6px;">stevig:</div>
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;">
@@ -1022,12 +1032,22 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
       <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="wol" onclick="toggleNewTagMulti(this)">wol</button>
       <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="linnen" onclick="toggleNewTagMulti(this)">linnen</button>
       <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="rib" onclick="toggleNewTagMulti(this)">rib</button>
+      <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="leer" onclick="toggleNewTagMulti(this)">leer</button>
+      <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="suède" onclick="toggleNewTagMulti(this)">suède</button>
+      <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="corduroy" onclick="toggleNewTagMulti(this)">corduroy</button>
+      <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="tweed" onclick="toggleNewTagMulti(this)">tweed</button>
+      <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="canvas" onclick="toggleNewTagMulti(this)">canvas</button>
     </div>
     <div style="font-size:8px;color:var(--muted);margin-bottom:6px;">gemengd/zacht:</div>
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">
       <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="cashmere" onclick="toggleNewTagMulti(this)">cashmere</button>
       <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="merino" onclick="toggleNewTagMulti(this)">merino</button>
       <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="bamboe" onclick="toggleNewTagMulti(this)">bamboe</button>
+      <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="mohair" onclick="toggleNewTagMulti(this)">mohair</button>
+      <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="teddy" onclick="toggleNewTagMulti(this)">teddy</button>
+      <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="fleece" onclick="toggleNewTagMulti(this)">fleece</button>
+      <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="gebreid" onclick="toggleNewTagMulti(this)">gebreid</button>
+      <button class="new-tag-btn new-tag-multi" data-type="materiaal" data-val="bouclé" onclick="toggleNewTagMulti(this)">bouclé</button>
     </div>
 
     <!-- STOFGEWICHT -->
@@ -4436,17 +4456,42 @@ const STOF_FAMILIES = [
 // terughoudend: alleen waar het vrijwel altijd klopt.
 const STOF_PER_SOORT = { shoes:'leer', bags:'leer' };
 
-function stofVan(item) {
-  if (!item) return '';
-  const tag = String([].concat((itemTags[item.id] || {}).materiaal || []).join(' ')).toLowerCase();
+// Wélke stof, én hoe zeker. Dat verschil is het punt: een materiaal dat zij
+// zelf heeft ingevuld is een gegeven, een materiaal dat ik uit de naam raad is
+// een gok. Allebei "klopt" noemen is zekerheid verzinnen — dus houdt deze
+// functie de bron bij en mag de controle er zelf over beslissen.
+//
+//   zeker   — zij heeft het getagd
+//   gezien  — de fotoscan heeft het waargenomen
+//   gok     — afgeleid uit de naam, of uit wat een soort meestal is
+function stofBron(item) {
+  if (!item) return { familie:'', bron:'' };
+  const zoek = function(tekst) {
+    const t = String(tekst || '').toLowerCase();
+    if (!t.trim()) return '';
+    const raak = STOF_FAMILIES.find(function(f) {
+      return f.woorden.some(function(w){ return t.indexOf(w) >= 0; });
+    });
+    return raak ? raak.familie : '';
+  };
+  const tag = [].concat((itemTags[item.id] || {}).materiaal || []).join(' ');
+  const uitTag = zoek(tag);
+  if (uitTag) return { familie:uitTag, bron:'zeker' };
+
   const v = itemVisueel[item.id] || {};
-  const tekst = (tag + ' ' + String(item.name || '') + ' '
-    + String(v.textuur || '') + ' ' + String(v.details || '')).toLowerCase();
-  const raak = STOF_FAMILIES.find(function(f) {
-    return f.woorden.some(function(w){ return tekst.indexOf(w) >= 0; });
-  });
-  if (raak) return raak.familie;
-  return STOF_PER_SOORT[item.cat] || '';
+  const uitFoto = zoek(String(v.textuur || '') + ' ' + String(v.details || ''));
+  if (uitFoto) return { familie:uitFoto, bron:'gezien' };
+
+  const uitNaam = zoek(item.name);
+  if (uitNaam) return { familie:uitNaam, bron:'gok' };
+
+  const uitSoort = STOF_PER_SOORT[item.cat] || '';
+  if (uitSoort) return { familie:uitSoort, bron:'gok' };
+  return { familie:'', bron:'' };
+}
+
+function stofVan(item) {
+  return stofBron(item).familie;
 }
 
 // Soepel tegenover stevig: dát is het contrast waar de regel om vraagt.
@@ -4459,60 +4504,96 @@ function stofKarakter(familie) {
 // ── DE CONTROLE DIE JE KUNT ZIEN ─────────────────────────────────────────────
 // "Hoe weet ik zeker dat de outfits kloppen?" Door het niet te beloven maar te
 // laten zien. Dit zijn dezelfde vier regels die de stylist in zijn opdracht
-// krijgt — silhouet, textuur, kleurverhouding en het weer — maar ze zijn hier
-// narekenbaar. Dus rekent de pagina ze na, en staat de uitkomst op de kaart.
-// Een regel die niet gehaald wordt verdwijnt niet: die staat er als punt.
+// krijgt — silhouet, textuur, kleurverhouding en het weer.
+//
+// Belangrijk: een regel telt alleen als gecontroleerd wanneer hij op gegevens
+// rust die vaststaan. Een materiaal dat uit de naam is geraden is geen bewijs,
+// en dat als "klopt" opschrijven is zekerheid verzinnen. Zulke regels krijgen
+// ok:null en een vraag om aanvulling, met de stukken erbij die het betreft —
+// dan kun je in twee tikken invullen wat ik niet kan lezen.
+//
+//   ok:true   gecontroleerd op gegevens die vaststaan
+//   ok:false  gecontroleerd, en het klopt niet
+//   ok:null   niet te controleren — ik heb iets van je nodig
+function pasvormBron(item) {
+  const p = String(getTag(item.id, 'pasvorm') || '').toLowerCase();
+  if (p) return { wijd: WIJDE_PASVORM.indexOf(p) >= 0, bron:'zeker' };
+  const v = itemVisueel[item.id] || {};
+  const gezien = String(v.vorm || '') + ' ' + String(v.volume || '');
+  if (/oversized|wijd|wide|ruim|volume/i.test(gezien)) return { wijd:true, bron:'gezien' };
+  if (/aansluitend|strak|smal|getailleerd/i.test(gezien)) return { wijd:false, bron:'gezien' };
+  const n = String(item.name || '').toLowerCase();
+  if (/oversized|wijd|wide|baggy|balloon|ballon|flared|maxi/.test(n))
+    return { wijd:true, bron:'gok' };
+  return { wijd:false, bron:'' };
+}
+
 function outfitControle(stukken) {
   const items = (stukken || []).map(function(s){ return s.id && getItemById(s.id); }).filter(Boolean);
   if (items.length < 2) return [];
   const uit = [];
+  const vast = function(bron){ return bron === 'zeker' || bron === 'gezien'; };
 
   // 1 · silhouet — niet alles wijd, niet alles strak
-  const wijd = items.filter(isWijd).length;
-  const strak = items.length - wijd;
-  uit.push(wijd === 0
-    ? { ok:false, kop:'Silhouet', zin:'alles is aansluitend — er is geen volume om tegen af te zetten' }
-    : strak === 0
-    ? { ok:false, kop:'Silhouet', zin:'alles is wijd, dus je taille verdwijnt' }
-    : { ok:true, kop:'Silhouet', zin:wijd + ' wijd tegenover ' + strak + ' aansluitend' });
+  const pas = items.map(pasvormBron);
+  const onbekendePas = items.filter(function(i, n){ return !vast(pas[n].bron); });
+  if (onbekendePas.length) {
+    uit.push({ ok:null, kop:'Silhouet',
+      zin:'ik weet de pasvorm niet van ' + onbekendePas.map(function(i){ return kortStuk(i.name); }).join(', '),
+      vraag:'pasvorm', items:onbekendePas.map(function(i){ return i.id; }) });
+  } else {
+    const wijd = pas.filter(function(p){ return p.wijd; }).length;
+    const strak = items.length - wijd;
+    uit.push(wijd === 0
+      ? { ok:false, kop:'Silhouet', zin:'alles is aansluitend — er is geen volume om tegen af te zetten' }
+      : strak === 0
+      ? { ok:false, kop:'Silhouet', zin:'alles is wijd, dus je taille verdwijnt' }
+      : { ok:true, kop:'Silhouet', zin:wijd + ' wijd tegenover ' + strak + ' aansluitend' });
+  }
 
-  // 2 · textuur — iets soepels tegenover iets stevigs. Wat we niet weten,
-  //     zeggen we ook niet: "alles vlak" op grond van één herkend stuk is een
-  //     gok die als oordeel klinkt.
-  const stoffen = items.map(stofVan);
-  const bekend = stoffen.filter(Boolean);
-  const uniek = bekend.filter(function(m, k){ return bekend.indexOf(m) === k; });
-  const karakters = bekend.map(stofKarakter)
-    .filter(function(k, n, a){ return a.indexOf(k) === n; });
-  uit.push(bekend.length < 2
-    ? { ok:null, kop:'Textuur', zin: bekend.length
-          ? 'niet te zeggen — van ' + (items.length - bekend.length)
-            + ' van deze stukken weet ik het materiaal niet'
-          : 'niet te zeggen — van deze stukken weet ik het materiaal niet' }
-    : karakters.length >= 2
-    ? { ok:true, kop:'Textuur', zin:uniek.slice(0, 3).join(' tegenover ') + ' — soepel naast stevig' }
-    : uniek.length >= 2
-    ? { ok:true, kop:'Textuur', zin:uniek.slice(0, 3).join(' en ') + ', alle drie ' + karakters[0] }
-    : { ok:false, kop:'Textuur', zin:'alles ' + uniek[0]
-        + (bekend.length < items.length
-            ? ' voor zover ik het zie — dat oogt vlak'
-            : ' — dat oogt vlak') });
+  // 2 · textuur — iets soepels tegenover iets stevigs
+  const stof = items.map(stofBron);
+  const onbekendeStof = items.filter(function(i, n){ return !vast(stof[n].bron); });
+  if (onbekendeStof.length) {
+    const geraden = items.filter(function(i, n){ return stof[n].bron === 'gok'; });
+    uit.push({ ok:null, kop:'Textuur',
+      zin:'ik weet het materiaal niet van '
+        + onbekendeStof.map(function(i){ return kortStuk(i.name); }).join(', ')
+        + (geraden.length ? ' (ik gok ' + geraden.map(function(i, n) {
+            return stof[items.indexOf(i)].familie; }).join(', ') + ')' : ''),
+      vraag:'materiaal', items:onbekendeStof.map(function(i){ return i.id; }) });
+  } else {
+    const fam = stof.map(function(x){ return x.familie; });
+    const uniek = fam.filter(function(m, k){ return fam.indexOf(m) === k; });
+    const karakters = fam.map(stofKarakter).filter(function(k, n, a){ return a.indexOf(k) === n; });
+    uit.push(karakters.length >= 2
+      ? { ok:true, kop:'Textuur', zin:uniek.slice(0, 3).join(' tegenover ') + ' — soepel naast stevig' }
+      : uniek.length >= 2
+      ? { ok:true, kop:'Textuur', zin:uniek.slice(0, 3).join(' en ') + ', allemaal ' + karakters[0] }
+      : { ok:false, kop:'Textuur', zin:'alles ' + uniek[0] + ' — dat oogt vlak' });
+  }
 
   // 3 · kleur — één voert, de rest ondersteunt; drie felle kleuren vechten
-  const kleuren = items.map(kleurVanItem).filter(Boolean);
-  const felle = kleuren.filter(isFelleKleurNaam);
-  const herhaald = kleuren.filter(function(k, n){ return kleuren.indexOf(k) !== n; });
-  uit.push(felle.length >= 3
-    ? { ok:false, kop:'Kleur', zin:felle.length + ' felle kleuren naast elkaar — dat wordt een krachtmeting' }
-    : !kleuren.length
-    ? { ok:null, kop:'Kleur', zin:'niet te zeggen — geen kleur-tags op deze stukken' }
-    : herhaald.length
-    ? { ok:true, kop:'Kleur', zin:herhaald[0] + ' komt twee keer terug, dat bindt het' }
-    : felle.length === 1
-    ? { ok:true, kop:'Kleur', zin:felle[0] + ' is het accent, de rest is rustig' }
-    : { ok:true, kop:'Kleur', zin:kleuren.length + ' rustige kleuren bij elkaar' });
+  const zonderKleur = items.filter(function(i){ return !kleurVanItem(i); });
+  if (zonderKleur.length) {
+    uit.push({ ok:null, kop:'Kleur',
+      zin:'ik weet de kleur niet van ' + zonderKleur.map(function(i){ return kortStuk(i.name); }).join(', '),
+      vraag:'kleur', items:zonderKleur.map(function(i){ return i.id; }) });
+  } else {
+    const kleuren = items.map(kleurVanItem);
+    const felle = kleuren.filter(isFelleKleurNaam);
+    const herhaald = kleuren.filter(function(k, n){ return kleuren.indexOf(k) !== n; });
+    uit.push(felle.length >= 3
+      ? { ok:false, kop:'Kleur', zin:felle.length + ' felle kleuren naast elkaar — dat wordt een krachtmeting' }
+      : herhaald.length
+      ? { ok:true, kop:'Kleur', zin:herhaald[0] + ' komt twee keer terug, dat bindt het' }
+      : felle.length === 1
+      ? { ok:true, kop:'Kleur', zin:felle[0] + ' is het accent, de rest is rustig' }
+      : { ok:true, kop:'Kleur', zin:kleuren.length + ' rustige kleuren bij elkaar' });
+  }
 
-  // 4 · weer
+  // 4 · weer — dit rust op het weerbericht en op namen die er eenduidig over
+  //     zijn (slippers, laarzen), dus die durft hij wel.
   const weer = dagWeer();
   const mis = items.filter(function(i) {
     const s = weerSoort(i);
@@ -4529,15 +4610,80 @@ function controleHTML(stukken) {
   const regels = outfitControle(stukken);
   if (!regels.length) return '';
   const raak = regels.filter(function(r){ return r.ok === true; }).length;
-  return '<details class="dk-check"><summary>' + raak + ' van de ' + regels.length
-    + ' stijlregels kloppen — wat is er gecontroleerd?</summary>'
+  const mist = regels.filter(function(r){ return r.ok === null; });
+  const kop = mist.length
+    ? raak + ' van de ' + regels.length + ' gecontroleerd · ' + mist.length
+      + (mist.length === 1 ? ' regel kan ik niet nakijken' : ' regels kan ik niet nakijken')
+    : raak + ' van de ' + regels.length + ' stijlregels kloppen';
+  return '<details class="dk-check"><summary>' + kop + ' — wat is er gecontroleerd?</summary>'
     + regels.map(function(r) {
         return '<div class="dk-check-r"><span class="dk-check-i">'
-          + (r.ok === true ? '✓' : r.ok === false ? '!' : '–') + '</span>'
-          + '<span><b>' + esc2(r.kop) + '</b> — ' + esc2(r.zin) + '</span></div>';
+          + (r.ok === true ? '✓' : r.ok === false ? '!' : '?') + '</span>'
+          + '<span><b>' + esc2(r.kop) + '</b> — ' + esc2(r.zin)
+          + (r.vraag
+              ? '<br><button type="button" class="dk-vul" onclick="vulAanOpen(\'' + r.vraag + '\',\''
+                + r.items.join(',') + '\')">Vul ' + esc2(r.vraag) + ' aan</button>'
+              : '')
+          + '</span></div>';
       }).join('')
-    + '<div class="dk-check-uit">Dit rekent de app zelf na, zonder AI. Het zegt of de '
-    + 'verhoudingen kloppen — niet of je het mooi vindt.</div></details>';
+    + '<div id="vul-aan-vak"></div>'
+    + '<div class="dk-check-uit">Ik reken dit zelf na, zonder AI, en alleen op wat vaststaat. '
+    + 'Wat ik uit een naam zou moeten raden reken ik niet mee — dan vraag ik het je liever.'
+    + '</div></details>';
+}
+
+// ── AANVULLEN WAT IK NIET KAN LEZEN ──────────────────────────────────────────
+// Hier komt de vraag uit de controle bij elkaar met haar wens om zelf iets toe
+// te voegen als zij het beter weet. Geen apart scherm en geen omweg via de
+// kast: de stukken waar het over gaat staan er al, je tikt aan wat het is, en
+// de controle rekent meteen opnieuw. Wat je invult blijft staan — het is
+// dezelfde tag als in je kast, geen aparte notitie die nergens meetelt.
+const VUL_KEUZES = {
+  materiaal: ['denim','leer','suède','wol','mohair','gebreid','katoen','linnen',
+              'zijde','satijn','viscose','jersey','corduroy','tweed','canvas',
+              'teddy','fleece','crêpe','bouclé'],
+  pasvorm:   ['aansluitend','recht','licht oversized','wijd','oversized','flared','ballon'],
+  kleur:     null,   // die komt uit kleurDots, zodat het bij de kast past
+};
+
+let vulAanSoort = '', vulAanItems = [];
+
+function vulAanOpen(soort, ids) {
+  vulAanSoort = soort;
+  vulAanItems = String(ids || '').split(',').filter(Boolean);
+  const vak = document.getElementById('vul-aan-vak');
+  if (!vak) return;
+  if (!vulAanItems.length) { vak.innerHTML = ''; return; }
+  vak.innerHTML = vulAanItems.map(function(id) {
+    const item = getItemById(id);
+    if (!item) return '';
+    const keuzes = soort === 'kleur' ? Object.keys(kleurDots) : VUL_KEUZES[soort] || [];
+    const huidig = String(getTag(id, soort) || '').toLowerCase();
+    return '<div class="vul-rij"><div class="vul-naam">' + esc2(item.name) + '</div>'
+      + '<div class="vul-knoppen">'
+      + keuzes.map(function(k) {
+          const aan = huidig === k;
+          const stip = soort === 'kleur'
+            ? '<span class="vul-stip" style="background:' + (kleurDots[k] || '#ccc') + '"></span>' : '';
+          return '<button type="button" class="vul-knop' + (aan ? ' aan' : '') + '" '
+            + 'onclick="vulAanZet(\'' + esc2(id) + '\',\'' + esc2(k) + '\')">'
+            + stip + esc2(k) + '</button>';
+        }).join('')
+      + '</div></div>';
+  }).join('')
+    + '<div class="dk-check-uit">Weet je het niet zeker? Laat het staan — dan blijf ik '
+    + 'eerlijk zeggen dat ik het niet weet, in plaats van te gokken.</div>';
+}
+
+function vulAanZet(id, waarde) {
+  setTag(id, vulAanSoort, waarde);
+  showToast(waarde + ' bewaard bij dit stuk');
+  // Opnieuw tekenen: de controle telt dit meteen mee, en daar was het om begonnen.
+  toonDagKaarten();
+  // Het vak stond in een kaart die zojuist opnieuw is opgebouwd; weer openen
+  // op hetzelfde stuk, zodat je door kunt met de rest.
+  const rest = vulAanItems.filter(function(x){ return !getTag(x, vulAanSoort); });
+  if (rest.length) setTimeout(function(){ vulAanOpen(vulAanSoort, rest.join(',')); }, 30);
 }
 
 // Dezelfde lijst felle kleuren als op de outfitkaart; hier alleen op naam.
