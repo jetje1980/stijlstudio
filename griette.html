@@ -407,6 +407,31 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 .bi-result-card{background:var(--white);border:1.5px solid var(--cream-dark);border-radius:14px;padding:14px;margin-bottom:12px;}
 .bi-result-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--brown-mid);margin-bottom:6px;}
 .bi-result-val{font-size:12px;color:var(--brown);line-height:1.6;}
+/* Toplooks — dezelfde vorm als de outfitkaarten op Home, zodat het bij de rest
+   van de app hoort en niet als losse functie aanvoelt. */
+.tl-kop{font-family:'Bodoni Moda',serif;font-size:17px;color:var(--brown);margin-bottom:4px;}
+.tl-uitleg{font-size:10.5px;color:var(--muted);line-height:1.6;margin-bottom:10px;}
+.tl-velden{display:flex;gap:6px;margin-bottom:8px;}
+.tl-veld{flex:1;min-width:0;padding:9px 11px;border:1.5px solid var(--cream-dark);border-radius:10px;font-family:'Jost',sans-serif;font-size:12px;background:var(--white);color:var(--brown);}
+.tl-kort{flex:0 0 92px;}
+.tl-knop{width:100%;padding:12px;background:var(--brown);color:var(--cream);border:none;border-radius:12px;font-family:'Jost',sans-serif;font-size:12px;letter-spacing:.04em;cursor:pointer;}
+.tl-knop:disabled{opacity:.55;}
+.toplook{position:relative;background:#F7F3EC;border:1px solid #d9cfc0;border-radius:6px;padding:16px 14px 14px;margin-bottom:12px;}
+.tl-rang{position:absolute;top:10px;left:12px;font-family:'Bodoni Moda',serif;font-size:13px;color:#a89478;}
+.tl-rij{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:6px 0 10px;}
+.tl-stuk{width:52px;}
+.tl-foto{display:flex;width:52px;height:52px;align-items:center;justify-content:center;background:#efe8dd;border-radius:3px;overflow:hidden;font-size:15px;color:#a89478;}
+.tl-foto img{width:100%;height:100%;object-fit:cover;display:block;}
+.tl-naampje{display:block;font-size:7.5px;color:#8a7358;text-align:center;line-height:1.3;margin-top:3px;}
+.tl-naam{font-family:'Bodoni Moda',serif;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#2b2318;text-align:center;}
+.tl-waarom{font-family:'Bodoni Moda',serif;font-style:italic;font-size:11px;color:#6b573f;text-align:center;line-height:1.55;margin-top:6px;}
+.tl-stappen{margin-top:8px;}
+.tl-stap{font-size:10px;color:#2b2318;line-height:1.5;}
+.tl-beter{font-size:9.5px;color:#6b573f;line-height:1.5;margin-top:7px;border-top:1px solid #e3dacb;padding-top:7px;}
+.tl-onzeker{font-size:9.5px;color:#8a7358;font-style:italic;line-height:1.5;margin-top:5px;}
+.tl-score{font-size:8.5px;color:#a89478;margin-top:7px;letter-spacing:.03em;}
+.tl-acties{display:flex;gap:6px;margin-top:10px;}
+.tl-melding{font-size:10.5px;color:#6b573f;line-height:1.6;background:var(--white);border:1px solid var(--cream-dark);border-radius:10px;padding:10px 12px;}
 .chat-chip-bar{overflow-x:auto;display:flex;gap:6px;padding:0 0 12px;margin-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .chat-chip-bar::-webkit-scrollbar{display:none;}
 .chat-chip{flex-shrink:0;padding:8px 14px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:20px;font-size:11px;font-family:Jost,sans-serif;cursor:pointer;color:var(--brown);white-space:nowrap;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
@@ -1194,8 +1219,55 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 <div class="panel" id="panel-chat">
   <p class="panel-title">💬 Stylist</p>
   <p class="panel-sub">Je persoonlijke stylist kent je garderobe, stijlrapport en draagpatronen volledig.</p>
+  <!-- Toplooks uit haar eigen kast. Staat binnen de AI Stylist, zoals gevraagd,
+       en laat de gewone stylist ongemoeid als je hier niets mee doet. -->
+  <div id="toplooks-blok" style="display:none;margin-bottom:16px;">
+    <div class="tl-kop">Mijn beste combinaties</div>
+    <div class="tl-uitleg">Ik bouw honderden complete combinaties uit je eigen kast, scoor ze op
+      silhouet, jouw eigen oordeel, styling, kleur en draagbaarheid, en laat de stylist de
+      sterkste kiezen en uitleggen. Alleen stukken die je hebt.</div>
+    <div class="tl-velden">
+      <input class="tl-veld" id="tl-gelegenheid" type="text" placeholder="Gelegenheid — optioneel">
+      <select class="tl-veld tl-kort" id="tl-aantal">
+        <option value="3">3 looks</option>
+        <option value="5" selected>5 looks</option>
+        <option value="10">10 looks</option>
+      </select>
+    </div>
+    <button type="button" class="tl-knop" onclick="startTopLooks()">✦ Zoek mijn beste combinaties</button>
+    <div class="field-note" id="toplooks-status" style="text-align:center;margin-top:8px;"></div>
+    <div id="toplooks-uitkomst" style="margin-top:14px;"></div>
+  </div>
+
+  <!-- Afgeschermde opslag: het wachtwoord en de referentiefoto. Staat bij de
+       stylist omdat dat de plek is waar de foto ook gebruikt wordt. -->
+  <div id="prive-blok" style="display:none;margin-bottom:16px;">
+    <div class="tl-kop">Afgeschermde opslag</div>
+    <div class="tl-uitleg" id="prive-uitleg"></div>
+    <div class="tl-velden">
+      <input class="tl-veld" id="prive-ww" type="password" autocomplete="off"
+             placeholder="Wachtwoord van de afgeschermde opslag">
+      <button type="button" class="tl-knop tl-kort" onclick="zetPriveWachtwoord()">Bewaren</button>
+    </div>
+    <div class="field-note" id="prive-status" style="margin-top:6px;"></div>
+    <div id="prive-foto-vak" style="display:none;margin-top:12px;">
+      <div class="tl-uitleg">Je referentiefoto voor lichaamsverhoudingen. Die gaat mee als
+        aanvullende bron bij silhouetadvies — niet om maten of pasvorm uit af te leiden,
+        en niet om na te maken.</div>
+      <div id="prive-foto-nu" style="margin-bottom:8px;"></div>
+      <input type="file" id="prive-foto-file" accept="image/*" style="display:none"
+             onchange="kiesLichaamsFoto(event)">
+      <button type="button" class="btn-rescan"
+              onclick="document.getElementById('prive-foto-file').click()">📷 Foto kiezen of vervangen</button>
+      <button type="button" class="btn-rescan" id="prive-foto-wis" style="display:none;margin-top:6px;"
+              onclick="verwijderLichaamsFoto()">× Foto verwijderen</button>
+    </div>
+  </div>
+
   <div class="chat-chip-bar">
     <button type="button" class="chat-chip featured" onclick="sendQuickPrompt('Geef me een uitgebreide stijlanalyse: wat werkt goed in mijn kast, welke combinaties benut ik te weinig, wat mist er, en geef 3 concrete dingen die ik morgen al anders kan doen.')">✦ Stijlanalyse</button>
+    <button type="button" class="chat-chip featured" onclick="openTopLooks()">✦ Mijn beste combinaties</button>
+    <button type="button" class="chat-chip" onclick="openPriveBlok()">🔒 Afgeschermde opslag</button>
     <button type="button" class="chat-chip" onclick="sendQuickPrompt('Stel een complete outfit voor voor vandaag — geef de exacte items, waarom ze werken qua kleur en silhouet, en een stylingtip.')">Outfit nu</button>
     <button type="button" class="chat-chip" onclick="sendQuickPrompt('Analyseer mijn garderobe: welke gaps zijn er? Wat zou mijn kast completer, veelzijdiger en meer op mijn DNA maken? Wees concreet.')">Wat mist er?</button>
     <button type="button" class="chat-chip" onclick="sendQuickPrompt('Geef me uitgebreid kleuradvies: welke kleuren zet ik te weinig in, welke kleurcombinaties passen het beste bij mijn profiel, en geef 3 concrete outfit-ideeën met kleur die ik nu al kan maken.')">Kleuradvies</button>
@@ -4686,6 +4758,719 @@ function vulAanZet(id, waarde) {
   if (rest.length) setTimeout(function(){ vulAanOpen(vulAanSoort, rest.join(',')); }, 30);
 }
 
+// ── TOPLOOKS UIT MIJN KAST ───────────────────────────────────────────────────
+// De vraag: niet "welke items hebben toevallig dezelfde kleur", maar wat is het
+// állerbeste dat uit deze kast te halen valt. Dat vraagt om kiezen uit veel
+// kandidaten, niet om één keer raden.
+//
+// Daarom in twee trappen, zoals de opdracht vraagt:
+//
+//   1. De pagina bouwt honderden geldige, complete combinaties en scoort ze op
+//      het kader uit de opdracht. Dit deel is narekenbaar, dus het hoort hier
+//      en niet bij de stylist: silhouet en proporties 30, stijl-DNA 25,
+//      stylingkwaliteit 20, kleur en materiaal 15, draagbaarheid 10.
+//   2. De stylist krijgt alleen de beste kandidaten te zien en mag herordenen,
+//      verfijnen en uitleggen. Dat is oordeel, en dat is zijn werk.
+//
+// De weging hieronder is een rangschikkingshulp om kandidaten te ordenen —
+// geen cijfer voor hoe iemand eruitziet.
+const TOPLOOK_WEGING = { silhouet:30, dna:25, styling:20, kleur:15, draagbaar:10 };
+
+// Hoe vaak heeft ze dit stuk gedragen? Dat staat in wornLog, per datum een
+// lijst met item-ids.
+let _draagTelCache = null, _draagTelStempel = '';
+function draagTelling() {
+  const stempel = JSON.stringify(Object.keys(wornLog || {}).length);
+  if (_draagTelCache && _draagTelStempel === stempel) return _draagTelCache;
+  const tel = {};
+  Object.values(wornLog || {}).forEach(function(lijst) {
+    [].concat(lijst || []).forEach(function(id){ tel[id] = (tel[id] || 0) + 1; });
+  });
+  _draagTelCache = tel; _draagTelStempel = stempel;
+  return tel;
+}
+function hoeVaakGedragen(id) { return draagTelling()[id] || 0; }
+
+// Haar oordeel over een stuk, van -3 tot +3. Dit is het verschil tussen een
+// weging die ergens op slaat en een die niets doet: de draaglog is leeg, maar
+// outfitLikes zit vol met duimpjes die zij zelf heeft gegeven. Dat is háár
+// stijl-DNA in gedrag, niet in theorie — en dus de bron waar deze weging op
+// hoort te staan.
+//
+// Belangrijk: een -3 betekent "deze vind ik niet staan", niet "dit bestaat
+// niet". Het stuk blijft in de kast en mag nog gekozen worden; het moet alleen
+// een goede reden hebben om bovenaan te eindigen.
+function oordeelOver(id) {
+  const o = (typeof outfitLikes === 'object' && outfitLikes) ? outfitLikes[id] : 0;
+  return typeof o === 'number' ? Math.max(-3, Math.min(3, o)) : 0;
+}
+
+// Heeft ze überhaupt genoeg geoordeeld om hierop te kunnen wegen?
+function heeftOordelen() {
+  return typeof outfitLikes === 'object' && outfitLikes
+    && Object.keys(outfitLikes).length >= 5;
+}
+
+// Welke rollen een complete look nodig heeft. Een jurk of jumpsuit dekt boven
+// en onder in één keer, dus die telt voor allebei.
+function looksRollenCompleet(delen) {
+  const heeft = function(cats) {
+    return delen.some(function(i){ return cats.indexOf(i.cat) >= 0; });
+  };
+  const eendelig = delen.some(isEendelig2);
+  return (eendelig || (heeft(['tops']) && heeft(['bottoms']))) && heeft(['shoes']);
+}
+
+function isEendelig2(i) {
+  if (!i) return false;
+  if (i.cat === 'jurken' || i.cat === 'eendelig') return true;
+  return /\bjurk|dress|jumpsuit|co-?ord/i.test(String(i.name || ''));
+}
+
+// Alles wat meedoet: niet verwijderd, en niet uitgesloten door haar.
+function toplookKast(uitsluiten) {
+  const weg = new Set(uitsluiten || []);
+  return getAllItems().filter(function(i) {
+    return !deletedItemIds.has(i.id) && !weg.has(i.id);
+  });
+}
+
+// Eén kandidaat scoren. Elk onderdeel geeft 0..1, en wordt daarna gewogen.
+function scoorToplook(delen, opties) {
+  const o = opties || {};
+  const n = delen.length;
+  if (n < 2) return { totaal:0 };
+
+  // Silhouet en proporties — het zwaarst, want daar draait het om. Dit is
+  // dezelfde maat als de controle op de kaart gebruikt, zodat de app één
+  // opvatting heeft: wijd tegenover strak, en een breekpunt in de lijn.
+  const pas = delen.map(pasvormBron);
+  const bekendePas = pas.filter(function(p){ return p.bron === 'zeker' || p.bron === 'gezien'; });
+  const wijd = pas.filter(function(p){ return p.wijd; }).length;
+  let silhouet = (wijd > 0 && wijd < n) ? 1 : 0.25;
+  // Weet ik de pasvorm van te weinig stukken, dan is dit een slag in de lucht.
+  // Dan telt het half mee in plaats van als zekerheid — en de look vermeldt
+  // straks dat de pasvorm niet nagekeken is.
+  const pasZeker = bekendePas.length / n;
+  if (pasZeker < 0.5) silhouet = 0.5 + (silhouet - 0.5) * pasZeker * 2;
+
+  // Stijl-DNA — wat vindt zíj hiervan. De draaglog is leeg, dus daar valt niets
+  // uit af te leiden; haar duimpjes zijn er wél, en dat is een directer signaal:
+  // zij heeft ze zelf gegeven. Een look met stukken die ze heeft weggeduimd
+  // hoort niet bovenaan te staan, hoe knap de combinatie ook is.
+  let dna;
+  if (heeftOordelen()) {
+    const som = delen.reduce(function(t, i){ return t + oordeelOver(i.id); }, 0);
+    const gewogen = delen.filter(function(i){ return oordeelOver(i.id) !== 0; }).length;
+    // Van -3 per stuk tot +3 per stuk, naar 0..1. Zonder oordeel blijft een
+    // stuk neutraal in plaats van negatief.
+    dna = 0.5 + (som / (n * 3)) * 0.5;
+    // Heeft ze over bijna niets in deze look iets gezegd, dan is dit geen
+    // oordeel maar een gok — dan trekt hij naar het midden.
+    const dekking = gewogen / n;
+    dna = 0.5 + (dna - 0.5) * Math.min(1, dekking * 1.5);
+  } else if (Object.keys(wornLog || {}).length) {
+    const gedragen = delen.filter(function(i){ return hoeVaakGedragen(i.id) > 0; }).length;
+    dna = 0.45 + 0.55 * (gedragen / n);
+  } else {
+    dna = 0.5;   // niets om op te varen; dan weegt dit onderdeel neutraal mee
+  }
+  dna = Math.max(0, Math.min(1, dna));
+
+  // Stylingkwaliteit en originaliteit — gelaagdheid, textuurcontrast en iets
+  // onverwachts. Een look die alleen top-broek-schoen is, is niet af.
+  const lagen = delen.filter(function(i){ return i.cat === 'layers'; }).length;
+  const extras = delen.filter(function(i) {
+    return ['bags','accessories'].indexOf(i.cat) >= 0;
+  }).length;
+  const stoffen = delen.map(stofVan).filter(Boolean);
+  const karakters = stoffen.map(stofKarakter)
+    .filter(function(k, i, a){ return a.indexOf(k) === i; });
+  let styling = 0;
+  styling += Math.min(lagen, 1) * 0.3;
+  styling += Math.min(extras, 2) * 0.15;
+  styling += karakters.length >= 2 ? 0.3 : 0;
+  // Onderbenutte parels: stukken waar ze nog nooit iets over heeft gezegd en
+  // die ze niet draagt. Een kast vol van die stukken wordt niets als het
+  // algoritme altijd dezelfde vijf pakt. Klein gewicht — het is een duwtje,
+  // geen reden op zich.
+  const ongebruikt = delen.filter(function(i) {
+    return oordeelOver(i.id) === 0 && hoeVaakGedragen(i.id) === 0;
+  }).length;
+  styling += Math.min(ongebruikt, 2) * 0.05;
+  styling = Math.min(styling, 1);
+
+  // Kleur en materiaal — niet alleen matchen, ook samenhang. Eén kleur die
+  // terugkomt bindt; drie felle kleuren vechten.
+  const kleuren = delen.map(kleurVanItem).filter(Boolean);
+  const felle = kleuren.filter(isFelleKleurNaam);
+  const herhaald = kleuren.filter(function(k, i){ return kleuren.indexOf(k) !== i; });
+  let kleur = 0.5;
+  if (herhaald.length) kleur += 0.3;
+  if (felle.length === 1) kleur += 0.2;
+  if (felle.length >= 3) kleur -= 0.4;
+  if (!kleuren.length) kleur = 0.5;      // onbekend is niet slecht, wel onzeker
+  kleur = Math.max(0, Math.min(kleur, 1));
+
+  // Draagbaarheid — past het bij het weer, en is het functioneel compleet.
+  const weer = o.weer || dagWeer();
+  const verkeerd = delen.filter(function(i) {
+    const s = weerSoort(i);
+    return s && s === (weer === 'warm' ? 'winters' : weer === 'koel' ? 'zomers' : '');
+  }).length;
+  let draagbaar = looksRollenCompleet(delen) ? 1 : 0.4;
+  draagbaar -= verkeerd * 0.35;
+  draagbaar = Math.max(0, draagbaar);
+
+  const delenScore = { silhouet:silhouet, dna:dna, styling:styling,
+                       kleur:kleur, draagbaar:draagbaar };
+  // Alleen optellen wat bekend is, en het gewicht herverdelen over die
+  // onderdelen. Zo telt een look niet lager omdat ik iets niet weet, en gaat
+  // het gewicht naar wat ik wél kan nakijken.
+  let totaal = 0, gewichtBekend = 0;
+  const onbekend = [];
+  Object.keys(TOPLOOK_WEGING).forEach(function(k) {
+    if (delenScore[k] === null || delenScore[k] === undefined) { onbekend.push(k); return; }
+    totaal += delenScore[k] * TOPLOOK_WEGING[k];
+    gewichtBekend += TOPLOOK_WEGING[k];
+  });
+  return {
+    totaal: gewichtBekend ? Math.round(totaal / gewichtBekend * 100) : 0,
+    delen: delenScore,
+    onbekend: onbekend,
+    // Hoeveel van de weging op vaststaande gegevens rustte. Een 90 op een
+    // derde van de weging is iets anders dan een 90 op alles, en dat hoort
+    // bij de look te staan in plaats van weggemoffeld te worden.
+    dekking: gewichtBekend,
+    pasZeker: pasZeker,
+  };
+}
+
+// Kandidaten bouwen: breed genoeg om parels te vinden, begrensd genoeg om niet
+// te ontploffen. Geen alle-tegen-alle, maar een geschudde greep per rol.
+function toplookKandidaten(opties) {
+  const o = opties || {};
+  const kast = toplookKast(o.uitsluiten);
+  const uit = function(cat) { return kast.filter(function(i){ return i.cat === cat; }); };
+  const weer = o.weer || dagWeer();
+  const zeef = function(lijst, cat) { return weerZeef(lijst, weer, cat); };
+
+  const tops = zeef(uit('tops'), 'tops');
+  const onders = zeef(uit('bottoms'), 'bottoms');
+  const schoenen = zeef(uit('shoes'), 'shoes');
+  const lagen = zeef(uit('layers'), 'layers');
+  const tassen = uit('bags');
+  const extras = uit('accessories');
+  const eendelig = zeef(uit('jurken').concat(uit('eendelig')), 'jurken');
+
+  if ((!tops.length || !onders.length) && !eendelig.length) return [];
+  if (!schoenen.length) return [];
+
+  const rnd = dagRandom('toplooks|' + (o.zaad || ''));
+  const meng = function(a) {
+    const b = a.slice();
+    for (let i = b.length - 1; i > 0; i--) {
+      const j = Math.floor(rnd() * (i + 1));
+      const t = b[i]; b[i] = b[j]; b[j] = t;
+    }
+    return b;
+  };
+
+  const moet = (o.moeten || []).map(getItemById).filter(Boolean);
+  const kandidaten = [];
+  const gezien = new Set();
+  const voegToe = function(delen) {
+    const echt = delen.filter(Boolean);
+    // Wat sowieso mee moet, hoort erin — anders is het geen antwoord op haar vraag.
+    moet.forEach(function(m) {
+      if (!echt.some(function(i){ return i.id === m.id; })) echt.push(m);
+    });
+    if (!looksRollenCompleet(echt)) return;
+    // Nooit twee keer dezelfde rol dubbel: twee broeken is geen outfit.
+    const perCat = {};
+    let dubbel = false;
+    echt.forEach(function(i) {
+      if (['tops','bottoms','shoes'].indexOf(i.cat) >= 0) {
+        perCat[i.cat] = (perCat[i.cat] || 0) + 1;
+        if (perCat[i.cat] > 1) dubbel = true;
+      }
+    });
+    if (dubbel) return;
+    const sleutel = echt.map(function(i){ return i.id; }).sort().join('|');
+    if (gezien.has(sleutel)) return;
+    gezien.add(sleutel);
+    kandidaten.push(echt);
+  };
+
+  const T = meng(tops), O = meng(onders), S = meng(schoenen),
+        L = meng(lagen), B = meng(tassen), A = meng(extras), E = meng(eendelig);
+  const pak = function(lijst, i) { return lijst.length ? lijst[i % lijst.length] : null; };
+
+  // Twee- en driedelige basis, met en zonder laag, met en zonder tas. Het
+  // aantal is begrensd op ~240 kandidaten: ruim genoeg om te kiezen, en het
+  // scoren kost geen merkbare tijd.
+  const max = Math.min(T.length * O.length, 60);
+  for (let n = 0; n < max; n++) {
+    const t = pak(T, n), b = pak(O, Math.floor(n / Math.max(T.length, 1)) + n % 3);
+    const s = pak(S, n), tas = pak(B, n), laag = pak(L, n), acc = pak(A, n);
+    voegToe([t, b, s]);
+    voegToe([t, b, s, tas]);
+    voegToe([t, b, s, laag]);
+    voegToe([t, b, s, laag, tas]);
+    voegToe([t, b, s, laag, tas, acc]);
+  }
+  // En de eendelige stukken, die vaak over het hoofd worden gezien.
+  E.forEach(function(e, n) {
+    voegToe([e, pak(S, n)]);
+    voegToe([e, pak(S, n), pak(B, n)]);
+    voegToe([e, pak(S, n), pak(L, n), pak(B, n)]);
+  });
+  return kandidaten;
+}
+
+// Twee looks die op elkaar lijken zijn samen één look. De opdracht is expliciet:
+// geen vijf varianten die in feite hetzelfde zijn met een andere tas.
+function looksLijkenOpElkaar(a, b) {
+  const ida = a.map(function(i){ return i.id; });
+  const idb = b.map(function(i){ return i.id; });
+  const gedeeld = ida.filter(function(x){ return idb.indexOf(x) >= 0; }).length;
+  const dragend = function(delen) {
+    return delen.filter(function(i) {
+      return ['tops','bottoms','jurken','eendelig'].indexOf(i.cat) >= 0;
+    }).map(function(i){ return i.id; }).sort().join('|');
+  };
+  // Zelfde dragende stukken = zelfde look, ook al wisselt de tas.
+  if (dragend(a) === dragend(b)) return true;
+  return gedeeld >= Math.max(ida.length, idb.length) - 1;
+}
+
+// De hele trap, zonder AI. Dit is wat de stylist straks te zien krijgt.
+function toplooksLokaal(opties) {
+  const o = opties || {};
+  const kandidaten = toplookKandidaten(o);
+  if (!kandidaten.length) return [];
+  const gescoord = kandidaten.map(function(delen) {
+    return { delen:delen, score:scoorToplook(delen, o) };
+  }).sort(function(a, b){ return b.score.totaal - a.score.totaal; });
+
+  const gekozen = [];
+  for (let i = 0; i < gescoord.length && gekozen.length < (o.aantal || 5) * 3; i++) {
+    const kand = gescoord[i];
+    if (gekozen.some(function(g){ return looksLijkenOpElkaar(g.delen, kand.delen); })) continue;
+    gekozen.push(kand);
+  }
+  return gekozen;
+}
+
+// ── TRAP 2: DE STYLIST HERORDENT EN LEGT UIT ─────────────────────────────────
+// De pagina heeft de kandidaten gebouwd en gescoord; dat is het narekenbare
+// deel. Wat de pagina níét kan is oordelen of een combinatie spannend is, of
+// uitleggen waarom hij beter is dan de voor de hand liggende variant. Dat is
+// het werk van de stylist, en daarom krijgt die alleen de beste kandidaten te
+// zien in plaats van de hele kast.
+//
+// Harde regel: wat er terugkomt wordt nagelopen. Een id dat niet in haar kast
+// bestaat, bestaat niet — die look wordt geweigerd, niet stilletjes gerepareerd
+// met iets dat erop lijkt.
+let topLooks = [];
+let topLooksBezig = false;
+
+function topLookItemsGeldig(ids) {
+  const bestaat = [], verzonnen = [];
+  [].concat(ids || []).forEach(function(id) {
+    const item = getItemById(id);
+    if (item && !deletedItemIds.has(id)) bestaat.push(item); else verzonnen.push(id);
+  });
+  return { bestaat:bestaat, verzonnen:verzonnen };
+}
+
+async function maakTopLooks(opties) {
+  const o = opties || {};
+  const vak = document.getElementById('toplooks-uitkomst');
+  if (!vak || topLooksBezig) return;
+  topLooksBezig = true;
+  const aantal = o.aantal || 5;
+
+  const kandidaten = toplooksLokaal({ aantal: aantal, weer: o.weer, uitsluiten: o.uitsluiten,
+                                      moeten: o.moeten, zaad: o.zaad });
+  if (!kandidaten.length) {
+    vak.innerHTML = '<div class="tl-melding">Ik kan hier geen complete outfit uit halen. '
+      + 'Er is minstens een bovenstuk, een onderstuk en een paar schoenen nodig — '
+      + 'of een jurk met schoenen.</div>';
+    topLooksBezig = false;
+    return;
+  }
+
+  // Eerst tonen wat de pagina zelf al weet. Dan staat er meteen iets, ook als
+  // de stylist er lang over doet of niet antwoordt.
+  topLooks = kandidaten.slice(0, aantal).map(function(k) {
+    return { items:k.delen, score:k.score, naam:'', waarom:'', stappen:[], bron:'lokaal' };
+  });
+  toonTopLooks();
+
+  const status = document.getElementById('toplooks-status');
+  const stop = (typeof volgVoortgang === 'function' && status)
+    ? volgVoortgang(status) : function(){};
+  if (status) status.textContent = 'De stylist kijkt naar je beste kandidaten…';
+
+  try {
+    const verrijkt = await stylistHerordent(kandidaten.slice(0, aantal * 2), o);
+    if (verrijkt && verrijkt.length) {
+      topLooks = verrijkt.slice(0, aantal);
+      toonTopLooks();
+      if (status) status.textContent = '';
+    } else {
+      // Ook hier opnieuw tekenen: zijn álle voorstellen geweigerd, dan stond de
+      // melding daarover wel genoteerd maar nooit op het scherm — en dan lijkt
+      // het alsof er niets is gebeurd terwijl er juist iets is tegengehouden.
+      toonTopLooks();
+      if (status) {
+        status.textContent = topLooksGeweigerd.length
+          ? 'Alle voorstellen van de stylist zijn afgekeurd; dit is mijn eigen rangschikking.'
+          : 'De stylist voegde niets toe; dit is mijn eigen rangschikking.';
+      }
+    }
+  } catch(e) {
+    if (status) status.textContent = 'De stylist kon er niet bij: ' + (e && e.message || 'onbekend')
+      + '. Dit is mijn eigen rangschikking — die klopt, maar zonder zijn oordeel.';
+  } finally {
+    stop();
+    topLooksBezig = false;
+  }
+}
+
+async function stylistHerordent(kandidaten, o) {
+  const regels = kandidaten.map(function(k, n) {
+    return (n + 1) + '. ' + k.delen.map(function(i) {
+      return i.id + ' (' + i.name + ', ' + i.cat + ')';
+    }).join(' + ') + '  [mijn score ' + k.score.totaal
+      + (k.score.onbekend.length ? ', niet te wegen: ' + k.score.onbekend.join('/') : '')
+      + ']';
+  }).join('\n');
+
+  const referentie = await lichaamsReferentieZin();
+  const systeem = getChatSystemPrompt()
+    + '\n\n## NU: DE BESTE COMBINATIES UIT HAAR EIGEN KAST\n'
+    + 'Je krijgt kandidaat-outfits die de app zelf heeft samengesteld en gescoord op '
+    + 'silhouet, haar eigen oordeel, styling, kleur en draagbaarheid. Jouw werk is niet '
+    + 'opnieuw combineren maar kiezen en uitleggen: welke zijn echt sterk, en waarom.\n'
+    + referentie;
+
+  const vraag = 'Dit zijn de kandidaten uit haar kast:\n\n' + regels + '\n\n'
+    + (o.gelegenheid ? 'Gelegenheid: ' + o.gelegenheid + '\n' : '')
+    + (o.sfeer ? 'Gewenste sfeer: ' + o.sfeer + '\n' : '')
+    + 'Het weer is ' + (o.weer || dagWeer()) + '.\n\n'
+    + 'Kies de ' + (o.aantal || 5) + ' sterkste en zet ze op volgorde. Regels:\n'
+    + '- Gebruik UITSLUITEND de item-ids hierboven. Verzin er geen bij en verander ze niet.\n'
+    + '- Je mag een kandidaat laten vallen, maar niet aanvullen met iets dat er niet staat.\n'
+    + '- Geen vijf varianten van dezelfde outfit. Verschillende silhouetten en stemmingen.\n'
+    + '- Liever drie uitzonderlijke dan vijf matige.\n'
+    + '- Noem per look één of twee precieze stylinghandelingen (instoppen, mouwen oprollen, '
+    + 'jas open, riem op de taille) — geen algemeenheden.\n'
+    + '- Zeg per look kort waarom hij hoger staat dan een voor de hand liggend alternatief.\n'
+    + '- Zie je dat de app iets niet kon wegen (pasvorm, materiaal), zeg dan dat de '
+    + 'werkelijke pasvorm niet na te kijken is zonder een gedragen foto.\n\n'
+    + 'Antwoord ALLEEN met JSON:\n'
+    + '{"looks":[{"rang":1,"titel":"korte naam","itemIds":["..."],"waarom":"waarom dit werkt op '
+    + 'haar silhouet en stijl","stappen":["precieze handeling"],"beterDan":"waarom boven het '
+    + 'voor de hand liggende alternatief","pasvormOnzeker":"alleen als dat speelt"}]}';
+
+  const res = await aiFetch(AI_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-opus-5', max_tokens: 4000,
+      system: systeem,
+      messages: [{ role:'user', content: vraag }],
+    }),
+  });
+  if (!res.ok) throw new Error('de stylist gaf ' + res.status);
+  const data = await res.json();
+  const tekst = (((data.content || [])[0] || {}).text) || '';
+  const m = tekst.match(/\{[\s\S]*\}/);
+  if (!m) throw new Error('het antwoord was geen bruikbare JSON');
+  const uit = JSON.parse(m[0]);
+
+  const toegestaan = new Set();
+  kandidaten.forEach(function(k){ k.delen.forEach(function(i){ toegestaan.add(i.id); }); });
+
+  const looks = [];
+  [].concat(uit.looks || []).forEach(function(l) {
+    const ids = [].concat(l.itemIds || []);
+    // Twee controles, geen van beide overslaan: bestaat het id in haar kast, en
+    // stond het in de kandidaten die ik heb aangeboden? Het tweede voorkomt dat
+    // er alsnog een willekeurig stuk uit de kast bij wordt verzonnen.
+    const geldig = topLookItemsGeldig(ids);
+    const buitenAanbod = ids.filter(function(id){ return !toegestaan.has(id); });
+    if (geldig.verzonnen.length || buitenAanbod.length) {
+      topLooksGeweigerd.push({ titel:l.titel || '(zonder naam)',
+        verzonnen:geldig.verzonnen, buitenAanbod:buitenAanbod });
+      return;
+    }
+    if (!looksRollenCompleet(geldig.bestaat)) {
+      topLooksGeweigerd.push({ titel:l.titel || '(zonder naam)', reden:'niet compleet' });
+      return;
+    }
+    looks.push({
+      items: geldig.bestaat,
+      score: scoorToplook(geldig.bestaat, o),
+      naam: String(l.titel || '').slice(0, 60),
+      waarom: String(l.waarom || '').slice(0, 400),
+      stappen: [].concat(l.stappen || []).slice(0, 2).map(function(x){ return String(x).slice(0, 160); }),
+      beterDan: String(l.beterDan || '').slice(0, 240),
+      pasvormOnzeker: String(l.pasvormOnzeker || '').slice(0, 200),
+      bron: 'stylist',
+    });
+  });
+  return looks;
+}
+
+let topLooksGeweigerd = [];
+
+// De referentiefoto reist alleen mee als zij hem heeft toegevoegd. Staat hij er
+// niet, dan zegt de stylist daar niets over — geen verzonnen waarnemingen.
+async function lichaamsReferentieZin() {
+  const foto = await leesLichaamsReferentie();
+  if (!foto) {
+    return '\nEr is GEEN referentiefoto van haar lichaamsverhoudingen beschikbaar. '
+      + 'Doe daarom geen uitspraken over haar proporties alsof je die hebt gezien. '
+      + 'Je mag wel redeneren over silhouet op grond van de pasvorm-tags.\n';
+  }
+  return '\nZij heeft een eigen referentiefoto toegevoegd voor haar zichtbare '
+    + 'lichaamsverhoudingen. Weeg silhouet en lengtes daarop mee. Bepaal daaruit GEEN '
+    + 'maten, kledingmaat of pasvormgarantie: perspectief en houding beïnvloeden de '
+    + 'indruk, en een productfoto laat niet zien hoe een stuk op haar valt.\n';
+}
+
+// ── DE REFERENTIEFOTO, AFGESCHERMD OPGESLAGEN ────────────────────────────────
+// Niet in griette_data: die tabel heeft RLS aan met een beleid "Public access"
+// voor iedereen, en de anon-sleutel staat in de bron van deze pagina. Voor een
+// foto van haar lichaam is dat niet goed genoeg.
+//
+// Daarom legacy_archive.griette_prive: RLS aan en geen enkel beleid, dus daar
+// komt de anon-sleutel niet in. De edge function griette-prive is de enige weg
+// naar binnen en vraagt om een wachtwoord dat server-side staat. Dat wachtwoord
+// typt zij één keer; het blijft op haar toestel en staat niet in de repo.
+// Als functie, niet als constante: SUPABASE_URL wordt verderop in het bestand
+// gedeclareerd met const, en die is hierboven nog niet bereikbaar. Een constante
+// hier haalde bij het laden de hele pagina onderuit.
+function priveFunctieUrl() { return SUPABASE_URL + '/functions/v1/griette-prive'; }
+const PRIVE_SLEUTEL = 'lichaamsreferentie';
+let _lichaamsFoto = null, _lichaamsGelezen = false;
+
+function priveWachtwoord() {
+  try { return localStorage.getItem('griette-prive-wachtwoord') || ''; } catch(e) { return ''; }
+}
+
+async function priveOpslag(actie, value) {
+  const ww = priveWachtwoord();
+  if (!ww) throw new Error('Nog geen wachtwoord ingesteld voor de afgeschermde opslag.');
+  const res = await fetch(priveFunctieUrl(), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-griette-wachtwoord': ww },
+    // Tabel expliciet, niet via de standaardwaarde van de functie: bij een
+    // afgeschermde tabel wil je niet dat het van een default afhangt waar iets
+    // terechtkomt.
+    body: JSON.stringify({ actie: actie, tabel: 'prive', key: PRIVE_SLEUTEL, value: value }),
+  });
+  const d = await res.json().catch(function(){ return {}; });
+  if (!res.ok) throw new Error(d.fout || ('opslag gaf ' + res.status));
+  return d;
+}
+
+async function leesLichaamsReferentie() {
+  if (_lichaamsGelezen) return _lichaamsFoto;
+  _lichaamsGelezen = true;
+  if (!priveWachtwoord()) return null;
+  try {
+    const d = await priveOpslag('lees');
+    _lichaamsFoto = d.value || null;
+  } catch(e) { _lichaamsFoto = null; }
+  return _lichaamsFoto;
+}
+
+async function bewaarLichaamsReferentie(dataUrl) {
+  await priveOpslag('schrijf', dataUrl);
+  _lichaamsFoto = dataUrl; _lichaamsGelezen = true;
+}
+
+async function wisLichaamsReferentie() {
+  await priveOpslag('wis');
+  _lichaamsFoto = null; _lichaamsGelezen = true;
+}
+
+// ── DE KAARTEN ───────────────────────────────────────────────────────────────
+// Dezelfde vorm als de outfitkaarten op Home, met háár echte foto's. Nooit een
+// ander merk of een nagemaakte versie: wat je ziet is wat er in je kast hangt.
+function toonTopLooks() {
+  const vak = document.getElementById('toplooks-uitkomst');
+  if (!vak) return;
+  if (!topLooks.length) { vak.innerHTML = ''; return; }
+
+  vak.innerHTML = topLooks.map(function(l, n) {
+    const stukken = l.items.map(function(i) {
+      const foto = photos[i.id];
+      return '<div class="tl-stuk">'
+        + '<span class="tl-foto">'
+        + (foto ? '<img loading="lazy" src="' + esc2(foto) + '" alt="">' : '👕')
+        + '</span><span class="tl-naampje">' + esc2(kortStuk(i.name)) + '</span></div>';
+    }).join('');
+    const s = l.score || {};
+    return '<div class="toplook" id="toplook-' + n + '">'
+      + '<div class="tl-rang">' + (n + 1) + '</div>'
+      + '<div class="tl-rij">' + stukken + '</div>'
+      + '<div class="tl-naam">' + esc2(l.naam || ('Combinatie ' + (n + 1))) + '</div>'
+      + (l.waarom ? '<div class="tl-waarom">' + esc2(l.waarom) + '</div>' : '')
+      + (l.stappen && l.stappen.length
+          ? '<div class="tl-stappen">' + l.stappen.map(function(x) {
+              return '<div class="tl-stap">→ ' + esc2(x) + '</div>'; }).join('') + '</div>'
+          : '')
+      + (l.beterDan ? '<div class="tl-beter"><b>Waarom deze en niet de voor de hand liggende:</b> '
+          + esc2(l.beterDan) + '</div>' : '')
+      + (l.pasvormOnzeker ? '<div class="tl-onzeker">' + esc2(l.pasvormOnzeker) + '</div>' : '')
+      + '<div class="tl-score">'
+      + (s.totaal ? 'score ' + s.totaal + ' op ' + s.dekking + '% van de weging' : '')
+      + (s.onbekend && s.onbekend.length
+          ? ' · niet na te kijken: ' + esc2(s.onbekend.join(', ')) : '')
+      + (l.bron === 'lokaal' ? ' · nog zonder oordeel van de stylist' : '')
+      + '</div>'
+      + controleHTML(l.items.map(function(i){ return { id:i.id, naam:i.name, heeft:true }; }))
+      + '<div class="tl-acties">'
+      + '<button type="button" class="dk-actie" onclick="bewaarTopLook(' + n + ')">♡ Bewaren</button>'
+      + '<button type="button" class="dk-actie" onclick="maakTopLooks({zaad:String(Date.now())})">↻ Andere</button>'
+      + '</div></div>';
+  }).join('')
+  + (topLooksGeweigerd.length
+      ? '<div class="tl-melding"><b>' + topLooksGeweigerd.length + ' voorstel'
+        + (topLooksGeweigerd.length === 1 ? '' : 'len') + ' geweigerd</b> omdat de stylist naar '
+        + 'items verwees die niet in je kast staan of die ik niet had aangeboden. Die zijn niet '
+        + 'getoond — ik repareer zoiets niet stilletjes met iets dat erop lijkt.</div>'
+      : '');
+}
+
+async function bewaarTopLook(n) {
+  const l = topLooks[n];
+  if (!l) return;
+  const board = boards.find(function(b){ return b.id === 'inspiratie'; }) || boards[0];
+  if (!board) { showToast('Geen board om in te bewaren'); return; }
+  outfitCounter++;
+  board.outfits.push({ id:'outfit-' + outfitCounter,
+    name: l.naam || ('Beste combinatie ' + (n + 1)),
+    items: l.items.map(function(i){ return i.id; }) });
+  saveAppData();
+  if (typeof buildBoards === 'function') buildBoards();
+  showToast('✓ ' + (l.naam || 'Combinatie') + ' bewaard bij je looks');
+}
+
+// Het paneel openen en de zoekopdracht starten. Twee aparte dingen: openen mag
+// zonder meteen te zoeken, zodat je eerst een gelegenheid kunt invullen.
+function openTopLooks() {
+  const blok = document.getElementById('toplooks-blok');
+  if (!blok) return;
+  blok.style.display = 'block';
+  blok.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function startTopLooks() {
+  topLooksGeweigerd = [];
+  const gel = (document.getElementById('tl-gelegenheid') || {}).value || '';
+  const aantal = Number((document.getElementById('tl-aantal') || {}).value) || 5;
+  maakTopLooks({ gelegenheid: gel.trim(), aantal: aantal });
+}
+
+// ── HET WACHTWOORD EN DE FOTO BEHEREN ────────────────────────────────────────
+function openPriveBlok() {
+  const blok = document.getElementById('prive-blok');
+  if (!blok) return;
+  blok.style.display = 'block';
+  toonPriveStatus();
+  blok.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function toonPriveStatus() {
+  const uitleg = document.getElementById('prive-uitleg');
+  const vak = document.getElementById('prive-foto-vak');
+  const heeft = !!priveWachtwoord();
+  if (uitleg) {
+    uitleg.innerHTML = heeft
+      ? 'Je gegevens lopen via de afgeschermde opslag. De anon-sleutel uit de paginabron '
+        + 'komt daar niet bij — alleen deze pagina met jouw wachtwoord.'
+      : 'Zonder wachtwoord loopt je kast nog via de oude, open weg. Vul het wachtwoord in dat '
+        + 'je in Supabase hebt ingesteld onder Edge Functions › Secrets.';
+  }
+  if (vak) vak.style.display = heeft ? 'block' : 'none';
+  if (heeft) toonLichaamsFoto();
+}
+
+async function zetPriveWachtwoord() {
+  const veld = document.getElementById('prive-ww');
+  const status = document.getElementById('prive-status');
+  const ww = (veld && veld.value || '').trim();
+  if (!ww) { if (status) status.textContent = 'Vul eerst een wachtwoord in.'; return; }
+  try { localStorage.setItem('griette-prive-wachtwoord', ww); } catch(e) {}
+  if (veld) veld.value = '';
+  if (status) status.textContent = 'Even controleren…';
+  // Meteen uitproberen: een wachtwoord dat niet werkt, bewaren zonder te
+  // controleren betekent dat haar kast stilletjes niet meer laadt.
+  try {
+    await poortwachter('lees', { key: 'item-tags' });
+    if (status) status.textContent = 'Werkt — je gegevens lopen nu via de afgeschermde opslag.';
+    _lichaamsGelezen = false;
+    toonPriveStatus();
+  } catch(e) {
+    try { localStorage.removeItem('griette-prive-wachtwoord'); } catch(e2) {}
+    if (status) status.textContent = 'Dat wachtwoord werkt niet: ' + e.message
+      + ' Het is niet bewaard, dus je app blijft gewoon werken.';
+    toonPriveStatus();
+  }
+}
+
+async function toonLichaamsFoto() {
+  const vak = document.getElementById('prive-foto-nu');
+  const wis = document.getElementById('prive-foto-wis');
+  if (!vak) return;
+  vak.innerHTML = '<div class="field-note">Kijken of er een foto staat…</div>';
+  const foto = await leesLichaamsReferentie();
+  if (foto) {
+    vak.innerHTML = '<img src="' + esc2(foto) + '" alt="referentiefoto" '
+      + 'style="max-width:120px;border-radius:8px;border:1px solid var(--cream-dark);display:block;">';
+    if (wis) wis.style.display = 'block';
+  } else {
+    vak.innerHTML = '<div class="field-note">Er staat nog geen referentiefoto.</div>';
+    if (wis) wis.style.display = 'none';
+  }
+}
+
+function kiesLichaamsFoto(ev) {
+  const file = (ev.target.files || [])[0];
+  if (!file) return;
+  const status = document.getElementById('prive-status');
+  // Verkleinen voordat hij de deur uitgaat: een foto van de telefoon is zo
+  // vier megabyte, en dat hoeft niet voor een proportiereferentie.
+  _biCompressImage(file, async function(dataUrl) {
+    if (status) status.textContent = 'Foto opslaan in de afgeschermde opslag…';
+    try {
+      await bewaarLichaamsReferentie(dataUrl);
+      if (status) status.textContent = 'Opgeslagen. Hij gaat voortaan mee bij silhouetadvies.';
+      toonLichaamsFoto();
+    } catch(e) {
+      if (status) status.textContent = 'Opslaan lukte niet: ' + e.message;
+    }
+  });
+  ev.target.value = '';
+}
+
+async function verwijderLichaamsFoto() {
+  const status = document.getElementById('prive-status');
+  try {
+    await wisLichaamsReferentie();
+    if (status) status.textContent = 'Foto verwijderd.';
+    toonLichaamsFoto();
+  } catch(e) {
+    if (status) status.textContent = 'Verwijderen lukte niet: ' + e.message;
+  }
+}
+
 // Dezelfde lijst felle kleuren als op de outfitkaart; hier alleen op naam.
 const FEL = ['turquoise','felroze','fuchsia','rood','oranje','koraal','geel','mosterd',
   'paars','kobaltblauw','smaragdgroen','petrol','hemelsblauw','groen','mintgroen'];
@@ -5417,7 +6202,39 @@ function loadAllPhotos() {
 const SUPABASE_URL = 'https://osuqtfsxmquwqsbgzlqn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zdXF0ZnN4bXF1d3FzYmd6bHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNzI0OTksImV4cCI6MjA5MDk0ODQ5OX0.E868cVw3-ClR3OQtJ4fCxmZGoUi1Dgx6pyGHBULZjeU';
 
+// ── DE WEG NAAR DE OPSLAG ────────────────────────────────────────────────────
+// Tot nu toe ging alles rechtstreeks met de anon-sleutel, en die staat in de
+// broncode van deze pagina. Zolang griette_data een beleid "Public access" had,
+// kon iedereen die de bron leest haar kast lezen én overschrijven.
+//
+// Staat er een wachtwoord op dit toestel, dan loopt alles via de edge function
+// die als enige met de service-role naar binnen gaat. Staat er geen, dan blijft
+// de oude weg werken — anders ligt de app plat op het moment dat het beleid
+// dichtgaat en zij het wachtwoord nog niet heeft ingevoerd. Die volgorde is
+// bewust: eerst deze code live, dan het wachtwoord, dan pas het beleid weg.
+function viaPoortwachter() { return !!priveWachtwoord(); }
+
+async function poortwachter(actie, extra) {
+  const res = await fetch(priveFunctieUrl(), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-griette-wachtwoord': priveWachtwoord() },
+    body: JSON.stringify(Object.assign({ actie: actie, tabel: 'data' }, extra || {})),
+  });
+  const d = await res.json().catch(function(){ return {}; });
+  if (!res.ok) throw new Error(d.fout || ('opslag gaf ' + res.status));
+  return d;
+}
+
 async function supabaseSet(key, value) {
+  if (viaPoortwachter()) {
+    try {
+      await poortwachter('schrijf', { key: key, value: JSON.stringify(value) });
+      return true;
+    } catch(e) {
+      console.warn('Opslaan via de poortwachter mislukte:', e.message);
+      return false;
+    }
+  }
   try {
     // Use UPSERT: POST with Prefer: resolution=merge-duplicates
     const res = await fetch(SUPABASE_URL + '/rest/v1/griette_data', {
@@ -5446,6 +6263,15 @@ async function supabaseSet(key, value) {
 }
 
 async function supabaseGet(key) {
+  if (viaPoortwachter()) {
+    try {
+      const d = await poortwachter('lees', { key: key });
+      return d.value ? JSON.parse(d.value) : null;
+    } catch(e) {
+      console.warn('Lezen via de poortwachter mislukte:', e.message);
+      return null;
+    }
+  }
   try {
     const res = await fetch(
       SUPABASE_URL + '/rest/v1/griette_data?key=eq.' + encodeURIComponent(key) + '&select=value&limit=1',
@@ -6817,8 +7643,11 @@ function computeRecentItemUses() {
   });
 }
 
-// Outfit likes: itemId -> 1 (like) or -1 (dislike)
-var outfitLikes = {};
+// outfitLikes stond hier een tweede keer gedeclareerd, met dezelfde opmerking
+// erboven. Twee keer `var x = {}` in hetzelfde script betekent dat de tweede de
+// eerste leegmaakt zodra hij wordt uitgevoerd. Dat ging vandaag net goed omdat
+// het laden erna gebeurt, maar het wacht op de eerste keer dat er iets tussen
+// komt te staan — en dan is haar hele oordeel over haar kast weg.
 // Recent item uses from saved boards (last 7 days)
 var recentItemUses = {};
 
