@@ -432,6 +432,19 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 .tl-score{font-size:8.5px;color:#a89478;margin-top:7px;letter-spacing:.03em;}
 .tl-acties{display:flex;gap:6px;margin-top:10px;}
 .tl-melding{font-size:10.5px;color:#6b573f;line-height:1.6;background:var(--white);border:1px solid var(--cream-dark);border-radius:10px;padding:10px 12px;}
+/* Extra stijlcheck */
+.check-modi{display:flex;flex-direction:column;gap:6px;}
+.check-modus{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-family:'Jost',sans-serif;cursor:pointer;text-align:left;color:var(--brown);}
+.check-modus b{font-size:12px;}
+.check-modus span{font-size:10px;color:var(--muted);}
+.check-modus.aan{background:var(--brown);border-color:var(--brown);color:var(--cream);}
+.check-modus.aan span{color:rgba(245,242,238,.8);}
+.check-foto-nodig{font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--brown-warm);}
+.check-modus.aan .check-foto-nodig{color:rgba(245,242,238,.7);}
+.check-kop{font-family:'Bodoni Moda',serif;font-size:14px;letter-spacing:.05em;text-transform:uppercase;color:var(--brown);margin-bottom:6px;}
+.check-tekst{font-size:12px;line-height:1.65;color:var(--brown);}
+.check-tekst p{margin:0 0 8px;}
+.check-voet{font-size:9.5px;color:var(--muted);line-height:1.55;margin-top:10px;border-top:1px solid var(--cream-dark);padding-top:8px;font-style:italic;}
 .chat-chip-bar{overflow-x:auto;display:flex;gap:6px;padding:0 0 12px;margin-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .chat-chip-bar::-webkit-scrollbar{display:none;}
 .chat-chip{flex-shrink:0;padding:8px 14px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:20px;font-size:11px;font-family:Jost,sans-serif;cursor:pointer;color:var(--brown);white-space:nowrap;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
@@ -1264,9 +1277,32 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
     </div>
   </div>
 
+  <!-- Extra stijlcheck: vijf gerichte modi, optioneel. Laat het bestaande
+       rapport en de gewone stylist ongemoeid als je hier niets mee doet. -->
+  <div id="check-blok" style="display:none;margin-bottom:16px;">
+    <div class="tl-kop">Extra stijlcheck</div>
+    <div class="tl-uitleg">Een tweede, kritische blik náást je stijlrapport — niet eroverheen.
+      Kies waar je hem op wilt zetten. Er verandert niets aan je rapport of je kast.</div>
+    <div id="check-modi" class="check-modi"></div>
+    <div style="margin-top:10px;">
+      <input type="file" id="check-foto-file" accept="image/*" style="display:none"
+             onchange="kiesCheckFoto(event)">
+      <button type="button" class="btn-rescan"
+              onclick="document.getElementById('check-foto-file').click()">📷 Foto toevoegen</button>
+      <button type="button" class="btn-rescan" style="margin-top:6px;" onclick="wisCheckFoto()">× Foto weghalen</button>
+      <div id="check-foto-nu" style="margin-top:8px;"></div>
+      <div class="field-note" id="check-foto-uit" style="margin-top:6px;"></div>
+    </div>
+    <button type="button" class="tl-knop" id="check-start" style="display:none;margin-top:10px;"
+            onclick="voerStijlcheckUit()"></button>
+    <div class="field-note" id="check-status" style="text-align:center;margin-top:8px;"></div>
+    <div id="check-uitkomst" style="margin-top:14px;"></div>
+  </div>
+
   <div class="chat-chip-bar">
     <button type="button" class="chat-chip featured" onclick="sendQuickPrompt('Geef me een uitgebreide stijlanalyse: wat werkt goed in mijn kast, welke combinaties benut ik te weinig, wat mist er, en geef 3 concrete dingen die ik morgen al anders kan doen.')">✦ Stijlanalyse</button>
     <button type="button" class="chat-chip featured" onclick="openTopLooks()">✦ Mijn beste combinaties</button>
+    <button type="button" class="chat-chip" onclick="openStijlcheck()">🔍 Extra stijlcheck</button>
     <button type="button" class="chat-chip" onclick="openPriveBlok()">🔒 Afgeschermde opslag</button>
     <button type="button" class="chat-chip" onclick="sendQuickPrompt('Stel een complete outfit voor voor vandaag — geef de exacte items, waarom ze werken qua kleur en silhouet, en een stylingtip.')">Outfit nu</button>
     <button type="button" class="chat-chip" onclick="sendQuickPrompt('Analyseer mijn garderobe: welke gaps zijn er? Wat zou mijn kast completer, veelzijdiger en meer op mijn DNA maken? Wees concreet.')">Wat mist er?</button>
@@ -5278,7 +5314,14 @@ async function priveOpslag(actie, value) {
   return d;
 }
 
+// Heb je hem deze sessie meegegeven, dan telt die. Dat was haar eigen voorstel
+// toen de afgeschermde opslag niet meewerkte: liever per keer toevoegen dan een
+// foto van je lichaam ergens laten staan. Het is ook de veiligste variant — hij
+// staat nergens en is weg zodra je de app sluit.
+let _lichaamsFotoSessie = null;
+
 async function leesLichaamsReferentie() {
+  if (_lichaamsFotoSessie) return _lichaamsFotoSessie;
   if (_lichaamsGelezen) return _lichaamsFoto;
   _lichaamsGelezen = true;
   if (!priveWachtwoord()) return null;
@@ -5395,11 +5438,15 @@ function toonPriveStatus() {
     uitleg.innerHTML = heeft
       ? 'Je gegevens lopen via de afgeschermde opslag. De anon-sleutel uit de paginabron '
         + 'komt daar niet bij — alleen deze pagina met jouw wachtwoord.'
-      : 'Zonder wachtwoord loopt je kast nog via de oude, open weg. Vul het wachtwoord in dat '
-        + 'je in Supabase hebt ingesteld onder Edge Functions › Secrets.';
+      : 'Zonder wachtwoord loopt je kast via de gewone weg. De referentiefoto kun je hieronder '
+        + 'toch toevoegen: hij telt dan mee zolang deze sessie duurt en wordt nergens bewaard. '
+        + 'Wil je hem laten staan, vul dan het wachtwoord in dat je in Supabase hebt ingesteld '
+        + 'onder Edge Functions › Secrets.';
   }
-  if (vak) vak.style.display = heeft ? 'block' : 'none';
-  if (heeft) toonLichaamsFoto();
+  // Het fotovak staat er altijd: per keer meegeven kan ook zonder wachtwoord,
+  // en dat is zelfs de veiligste manier.
+  if (vak) vak.style.display = 'block';
+  toonLichaamsFoto();
 }
 
 async function zetPriveWachtwoord() {
@@ -5432,8 +5479,12 @@ async function toonLichaamsFoto() {
   vak.innerHTML = '<div class="field-note">Kijken of er een foto staat…</div>';
   const foto = await leesLichaamsReferentie();
   if (foto) {
+    const alleenNu = !!_lichaamsFotoSessie && !priveWachtwoord();
     vak.innerHTML = '<img src="' + esc2(foto) + '" alt="referentiefoto" '
-      + 'style="max-width:120px;border-radius:8px;border:1px solid var(--cream-dark);display:block;">';
+      + 'style="max-width:120px;border-radius:8px;border:1px solid var(--cream-dark);display:block;">'
+      + '<div class="field-note" style="margin-top:4px;">'
+      + (alleenNu ? 'Telt mee zolang deze sessie duurt — nergens bewaard.'
+                  : 'Staat in de afgeschermde opslag.') + '</div>';
     if (wis) wis.style.display = 'block';
   } else {
     vak.innerHTML = '<div class="field-note">Er staat nog geen referentiefoto.</div>';
@@ -5448,13 +5499,23 @@ function kiesLichaamsFoto(ev) {
   // Verkleinen voordat hij de deur uitgaat: een foto van de telefoon is zo
   // vier megabyte, en dat hoeft niet voor een proportiereferentie.
   _biCompressImage(file, async function(dataUrl) {
+    // Altijd eerst voor deze sessie bruikbaar maken, dan werkt het advies
+    // meteen — ook als de afgeschermde opslag hapert.
+    _lichaamsFotoSessie = dataUrl;
+    toonLichaamsFoto();
+    if (!priveWachtwoord()) {
+      if (status) status.textContent = 'Hij telt mee zolang deze sessie duurt. '
+        + 'Hij wordt nergens bewaard — sluit je de app, dan is hij weg.';
+      return;
+    }
     if (status) status.textContent = 'Foto opslaan in de afgeschermde opslag…';
     try {
       await bewaarLichaamsReferentie(dataUrl);
       if (status) status.textContent = 'Opgeslagen. Hij gaat voortaan mee bij silhouetadvies.';
       toonLichaamsFoto();
     } catch(e) {
-      if (status) status.textContent = 'Opslaan lukte niet: ' + e.message;
+      if (status) status.textContent = 'Bewaren lukte niet (' + e.message + '), maar hij telt '
+        + 'wél mee zolang deze sessie duurt.';
     }
   });
   ev.target.value = '';
@@ -5462,12 +5523,209 @@ function kiesLichaamsFoto(ev) {
 
 async function verwijderLichaamsFoto() {
   const status = document.getElementById('prive-status');
+  _lichaamsFotoSessie = null;
+  if (!priveWachtwoord()) {
+    if (status) status.textContent = 'Foto losgelaten.';
+    toonLichaamsFoto();
+    return;
+  }
   try {
     await wisLichaamsReferentie();
     if (status) status.textContent = 'Foto verwijderd.';
     toonLichaamsFoto();
   } catch(e) {
     if (status) status.textContent = 'Verwijderen lukte niet: ' + e.message;
+  }
+}
+
+// ── EXTRA STIJLCHECK — VIJF GERICHTE MODI ────────────────────────────────────
+// Paragraaf 4 van de opdracht: een tweede, kritische beoordeling naast het
+// bestaande rapport. Nadrukkelijk náást: dit verrijkt, het overschrijft niets.
+// Het stijlrapport blijft de basis en wordt nooit automatisch herschreven.
+//
+// Elke modus vraagt om iets anders en heeft dus een eigen opdracht. Wat ze
+// delen: scherp zijn, drie prioriteiten noemen, en niets beweren wat niet op
+// de foto te zien is.
+const CHECK_MODI = [
+  { id:'totaal', label:'Totaalcheck', kort:'outfit, kleur, proporties, haar, houding',
+    fotoNodig:true,
+    opdracht:'Beoordeel op deze foto: de outfit, de kleuren, de pasvorm voor zover zichtbaar, '
+      + 'de proporties, de schoenen, de accessoires, het kapsel, de houding en de totale '
+      + 'visuele presentatie.\n'
+      + 'Geef in deze volgorde: (1) je eerste visuele indruk in twee zinnen, (2) wat hier '
+      + 'specifiek goed werkt, (3) wat zichtbaar minder werkt, (4) de DRIE aanpassingen met de '
+      + 'grootste impact, in volgorde van impact, (5) concrete verbeteringen met stukken uit '
+      + 'haar eigen kast — noem die bij naam.' },
+
+  { id:'richting', label:'Beste stijlrichting', kort:'welke richting past het best',
+    fotoNodig:false,
+    opdracht:'Vergelijk de richtingen die hier spelen — minimalistisch, smart casual, '
+      + 'klassiek, modern, relaxed, streetwear, sophisticated — met haar stijlrapport, haar '
+      + 'eigen voorkeur en wat je van haar verhoudingen weet.\n'
+      + 'Herhaal het rapport NIET. Voeg alleen scherpere observaties toe, of een goed '
+      + 'onderbouwde afwijking ervan — en zeg er dan bij dat je ervan afwijkt en waarom.\n'
+      + 'Adviseer silhouetten, kleuren, materialen, patronen, schoenen, tassen, accessoires, '
+      + 'haar, en twee of drie outfitformules die ze steeds opnieuw kan gebruiken.' },
+
+  { id:'outfit', label:'Outfitcheck', kort:'deze look perfectioneren',
+    fotoNodig:false,
+    opdracht:'Controleer pasvorm (alleen waar die zichtbaar aantoonbaar is), lengte, '
+      + 'proporties, kleur, gelaagdheid, materiaalspanning, schoenen, tas, accessoires en haar.\n'
+      + 'Geef 3 tot 5 verbeteringen — of minder als de look al overtuigt; zeg dat dan ook.\n'
+      + 'Stel daarna een STERKERE versie samen met uitsluitend stukken uit haar kast, en zet '
+      + 'die naast het origineel: wat vervang je, en wat wint ze daarmee.' },
+
+  { id:'haar', label:'Haar & verzorging', kort:'kapsel, make-up, afwerking',
+    fotoNodig:true,
+    opdracht:'Analyseer wat zichtbaar is: haarlengte, kapsel, styling, volume, kleur, '
+      + 'wenkbrauwen, huidpresentatie, make-up, sieraden en afwerking.\n'
+      + 'Adviseer praktische verbeteringen die passen bij haar gezicht, haar stijl en de '
+      + 'uitstraling die ze wil.\n'
+      + 'GEEN medische uitspraken, geen behandelingsclaims, en geen stellige conclusies op '
+      + 'grond van één foto — zeg bij twijfel dat je het niet kunt zien.' },
+
+  { id:'foto', label:'Foto & houding', kort:'poseren, hoek, kadrering',
+    fotoNodig:true,
+    opdracht:'Beoordeel lichaamshouding, positie, schouders, heupen, voeten, handen, blik, '
+      + 'expressie, camerahoogte, afstand en kadrering.\n'
+      + 'Geef een herhaalbare poseerformule in 5 of 6 concrete stappen die ze elke keer kan '
+      + 'volgen.\n'
+      + 'Maak expliciet dat een fotografische indruk — of iets zelfverzekerd oogt — niets '
+      + 'zegt over wie ze is of hoe ze zich voelt.' },
+];
+
+let checkModus = '', checkFoto = null, checkBezig = false;
+
+function openStijlcheck() {
+  const blok = document.getElementById('check-blok');
+  if (!blok) return;
+  blok.style.display = 'block';
+  bouwCheckModi();
+  blok.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function bouwCheckModi() {
+  const vak = document.getElementById('check-modi');
+  if (!vak) return;
+  vak.innerHTML = CHECK_MODI.map(function(m) {
+    return '<button type="button" class="check-modus' + (checkModus === m.id ? ' aan' : '') + '" '
+      + 'onclick="kiesCheckModus(\'' + m.id + '\')">'
+      + '<b>' + esc2(m.label) + '</b><span>' + esc2(m.kort) + '</span>'
+      + (m.fotoNodig ? '<span class="check-foto-nodig">foto nodig</span>' : '')
+      + '</button>';
+  }).join('');
+  toonCheckKlaar();
+}
+
+function kiesCheckModus(id) {
+  checkModus = checkModus === id ? '' : id;
+  bouwCheckModi();
+}
+
+function toonCheckKlaar() {
+  const knop = document.getElementById('check-start');
+  const uit = document.getElementById('check-foto-uit');
+  const m = CHECK_MODI.find(function(x){ return x.id === checkModus; });
+  if (!knop) return;
+  if (!m) {
+    knop.style.display = 'none';
+    if (uit) uit.textContent = '';
+    return;
+  }
+  const heeftFoto = !!checkFoto;
+  knop.style.display = 'block';
+  knop.disabled = m.fotoNodig && !heeftFoto;
+  knop.textContent = (m.fotoNodig && !heeftFoto)
+    ? 'Voeg eerst een foto toe' : '✦ ' + m.label + ' uitvoeren';
+  if (uit) {
+    uit.textContent = m.fotoNodig
+      ? (heeftFoto ? 'Foto staat klaar.' : 'Deze check kan alleen met een actuele foto — '
+          + 'zonder zou ik dingen beweren die ik niet kan zien.')
+      : (heeftFoto ? 'Foto staat klaar en wordt meegewogen.'
+          : 'Kan ook zonder foto. Met een foto wordt het concreter.');
+  }
+}
+
+function kiesCheckFoto(ev) {
+  const file = (ev.target.files || [])[0];
+  if (!file) return;
+  _biCompressImage(file, function(dataUrl) {
+    checkFoto = dataUrl;
+    const vk = document.getElementById('check-foto-nu');
+    if (vk) vk.innerHTML = '<img src="' + esc2(dataUrl) + '" alt="" '
+      + 'style="max-width:110px;border-radius:8px;border:1px solid var(--cream-dark);display:block;">';
+    toonCheckKlaar();
+  });
+  ev.target.value = '';
+}
+
+function wisCheckFoto() {
+  checkFoto = null;
+  const vk = document.getElementById('check-foto-nu');
+  if (vk) vk.innerHTML = '';
+  toonCheckKlaar();
+}
+
+async function voerStijlcheckUit() {
+  const m = CHECK_MODI.find(function(x){ return x.id === checkModus; });
+  const uitvak = document.getElementById('check-uitkomst');
+  const status = document.getElementById('check-status');
+  if (!m || !uitvak || checkBezig) return;
+  if (m.fotoNodig && !checkFoto) return;
+  checkBezig = true;
+  uitvak.innerHTML = '';
+  if (status) status.textContent = 'De stylist kijkt kritisch…';
+
+  // Welke outfit staat er? Bij de outfitcheck is dat wat er op de kaart ligt;
+  // anders de laatst getoonde toplook. Zonder outfit werkt de modus ook, maar
+  // dan zonder stukken bij naam.
+  const opKaart = (topLooks[0] && topLooks[0].items) || [];
+  const kastRegel = opKaart.length
+    ? '\nDe look waar het over gaat bestaat uit:\n'
+      + opKaart.map(function(i){ return '- ' + i.id + ' | ' + i.cat + ' | ' + i.name; }).join('\n') + '\n'
+    : '';
+
+  const refZin = await lichaamsReferentieZin();
+  const systeem = getChatSystemPrompt()
+    + '\n\n## NU: EXTRA STIJLCHECK — ' + m.label.toUpperCase() + '\n'
+    + 'Dit is een tweede, kritische beoordeling naast haar bestaande stijlrapport. Het rapport '
+    + 'blijft de basis en wordt hier niet herschreven; jij voegt toe.\n'
+    + 'Wees scherp en concreet. Geen overmatige complimenten, geen algemeenheden, geen advies '
+    + 'dat voor iedereen zou gelden. Nederlands.\n'
+    + 'Beweer niets wat niet op de foto te zien is. Kun je iets niet beoordelen, zeg dat dan.\n'
+    + 'Noem kledingstukken bij hun naam als je ze kent; verzin nooit stukken die ze niet heeft.\n'
+    + refZin;
+
+  const inhoud = [{ type:'text', text: m.opdracht + '\n' + kastRegel
+    + '\nSluit af met de drie prioriteiten, genummerd, elk met één concrete actie. '
+    + 'Zij bepaalt zelf of ze er iets mee doet — draag niets op.' }];
+  if (checkFoto) {
+    inhoud.unshift({ type:'image', source: { type:'base64',
+      media_type: (checkFoto.match(/^data:(image\/[a-z]+);/) || [])[1] || 'image/jpeg',
+      data: checkFoto.split(',')[1] } });
+  }
+
+  try {
+    const res = await aiFetch(AI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model:'claude-opus-5', max_tokens: 3000,
+        system: systeem, messages: [{ role:'user', content: inhoud }] }),
+    });
+    if (!res.ok) throw new Error('de stylist gaf ' + res.status);
+    const data = await res.json();
+    const tekst = (((data.content || [])[0] || {}).text) || '';
+    if (!tekst.trim()) throw new Error('het antwoord was leeg');
+    uitvak.innerHTML = '<div class="check-kop">' + esc2(m.label) + '</div>'
+      + '<div class="check-tekst">' + (typeof md === 'function' ? md(tekst) : esc2(tekst)) + '</div>'
+      + '<div class="check-voet">Dit staat naast je stijlrapport, niet in plaats daarvan. '
+      + 'Er is niets aan je rapport of je kast veranderd — jij bepaalt wat je ermee doet.</div>';
+    if (status) status.textContent = '';
+  } catch(e) {
+    if (status) status.textContent = 'Dat lukte niet: ' + (e && e.message || 'onbekend')
+      + '. Er is niets gewijzigd.';
+  } finally {
+    checkBezig = false;
   }
 }
 
@@ -6214,6 +6472,25 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 // bewust: eerst deze code live, dan het wachtwoord, dan pas het beleid weg.
 function viaPoortwachter() { return !!priveWachtwoord(); }
 
+// Hapert de afgeschermde opslag, dan valt alles terug op de directe weg en
+// hoort zij dat te weten — anders denkt ze dat haar gegevens beschermd zijn
+// terwijl ze dat op dat moment niet zijn. Eén melding, niet bij elke aanroep.
+let poortwachterHapert = '';
+let poortwachterGemeld = false;
+function meldPoortwachterStoring() {
+  if (poortwachterGemeld) return;
+  poortwachterGemeld = true;
+  if (typeof showToast === 'function') {
+    showToast('De afgeschermde opslag reageert niet; je gegevens lopen nu via de gewone weg');
+  }
+  const status = document.getElementById('prive-status');
+  if (status) {
+    status.textContent = 'Let op: de afgeschermde opslag gaf een fout (' + poortwachterHapert
+      + '). Je gegevens lopen op dit moment via de gewone, open weg — er gaat niets verloren, '
+      + 'maar ze zijn nu niet afgeschermd.';
+  }
+}
+
 async function poortwachter(actie, extra) {
   const res = await fetch(priveFunctieUrl(), {
     method: 'POST',
@@ -6231,8 +6508,12 @@ async function supabaseSet(key, value) {
       await poortwachter('schrijf', { key: key, value: JSON.stringify(value) });
       return true;
     } catch(e) {
-      console.warn('Opslaan via de poortwachter mislukte:', e.message);
-      return false;
+      // Niet stoppen maar terugvallen op de directe weg. Hapert de poortwachter,
+      // dan is het ergste wat er kan gebeuren dat een opslag niet aankomt — en
+      // dan is haar werk weg. Liever langs de oude weg schrijven en het melden.
+      console.warn('Poortwachter deed het niet, val terug op de directe weg:', e.message);
+      poortwachterHapert = e.message;
+      meldPoortwachterStoring();
     }
   }
   try {
@@ -6268,8 +6549,12 @@ async function supabaseGet(key) {
       const d = await poortwachter('lees', { key: key });
       return d.value ? JSON.parse(d.value) : null;
     } catch(e) {
-      console.warn('Lezen via de poortwachter mislukte:', e.message);
-      return null;
+      // Hier null teruggeven zou betekenen: lege kast. Dat is het ergste wat
+      // deze app kan doen — het ziet eruit alsof alles weg is. Dus terugvallen
+      // op de directe weg, en één keer zichtbaar melden dat het misging.
+      console.warn('Poortwachter deed het niet, val terug op de directe weg:', e.message);
+      poortwachterHapert = e.message;
+      meldPoortwachterStoring();
     }
   }
   try {
