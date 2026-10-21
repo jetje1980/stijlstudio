@@ -432,6 +432,14 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 .tl-score{font-size:8.5px;color:#a89478;margin-top:7px;letter-spacing:.03em;}
 .tl-acties{display:flex;gap:6px;margin-top:10px;}
 .tl-melding{font-size:10.5px;color:#6b573f;line-height:1.6;background:var(--white);border:1px solid var(--cream-dark);border-radius:10px;padding:10px 12px;}
+/* Het gesimuleerde beeld. Duidelijk gemerkt, want het is geen foto. */
+.sim{margin-top:8px;border:1.5px dashed var(--brown-warm);border-radius:12px;padding:10px;background:var(--white);}
+.sim-merk{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--brown-warm);margin-bottom:6px;}
+.sim img{width:100%;max-width:240px;border-radius:8px;display:block;}
+.sim-voet{font-size:8.5px;color:var(--muted);line-height:1.55;margin-top:7px;font-style:italic;}
+.sim-melding{font-size:10px;color:var(--muted);line-height:1.55;margin-top:6px;font-style:italic;}
+.sim-knop{display:block;width:100%;margin-top:8px;padding:9px;background:transparent;border:1px dashed var(--cream-dark);border-radius:10px;font-family:'Jost',sans-serif;font-size:10.5px;color:var(--brown);cursor:pointer;line-height:1.4;}
+.sim-knop span{display:block;font-size:8.5px;color:var(--muted);margin-top:2px;}
 /* Je silhouet naast de echte stukken. Nadrukkelijk naast, niet eroverheen:
    de foto staat links, de stukken rechts op hun hoogte, met een balkje dat
    laat zien welk stuk van je lichaam ze beslaan. */
@@ -3436,6 +3444,14 @@ function renderOutfit(boardId, outfit) {
   propVak.id = 'prop-' + outfit.id;
   ob.appendChild(propVak);
 
+  // En het gesimuleerde beeld: knop als er nog geen is, anders het beeld zelf.
+  var simVak = document.createElement('div');
+  simVak.id = 'sim-' + outfit.id;
+  ob.appendChild(simVak);
+  var simKnop = document.createElement('div');
+  simKnop.id = 'simknop-' + outfit.id;
+  ob.appendChild(simKnop);
+
   list.appendChild(ob);
 
   // De eigen controle is gratis en meteen beschikbaar, dus die staat er altijd.
@@ -3456,6 +3472,13 @@ function renderOutfit(boardId, outfit) {
     var propItems = [].concat(outfit.items || []).map(getItemById).filter(Boolean)
       .filter(function(i){ return !deletedItemIds.has(i.id); });
     toonProportieStrook('prop-' + outfit.id, propItems);
+  }
+  if (typeof simulatieKnopHTML === 'function') {
+    if (simulaties[outfit.id]) toonSimulatie(outfit.id);
+    else {
+      var sk = document.getElementById('simknop-' + outfit.id);
+      if (sk) sk.innerHTML = simulatieKnopHTML(outfit.id, outfit.items || []);
+    }
   }
 
   // Render items
@@ -5432,6 +5455,7 @@ function toonTopLooks() {
       if (typeof toonProportieStrook === 'function') {
         toonProportieStrook('tl-prop-' + n, l.items);
       }
+      if (simulaties['tl-' + n]) toonSimulatie('tl-' + n);
     });
   }, 0);
 
@@ -5464,6 +5488,9 @@ function toonTopLooks() {
       + '</div>'
       + controleHTML(l.items.map(function(i){ return { id:i.id, naam:i.name, heeft:true }; }))
       + '<div id="tl-prop-' + n + '"></div>'
+      + '<div id="sim-tl-' + n + '"></div>'
+      + (typeof simulatieKnopHTML === 'function'
+          ? simulatieKnopHTML('tl-' + n, l.items.map(function(i){ return i.id; })) : '')
       + '<div class="tl-acties">'
       + '<button type="button" class="dk-actie" onclick="bewaarTopLook(' + n + ')">♡ Bewaren</button>'
       + '<button type="button" class="dk-actie" onclick="maakTopLooks({zaad:String(Date.now())})">↻ Andere</button>'
@@ -6041,6 +6068,134 @@ async function toonProportieStrook(vakId, items, opties) {
   try {
     vak.innerHTML = await proportieStrookHTML(items, opties);
   } catch(e) { vak.innerHTML = ''; }
+}
+
+// ── GESIMULEERD BEELD VAN EEN OUTFIT ─────────────────────────────────────────
+// Zij vroeg hierom nadat ze zag dat ChatGPT het wel maakt. Het verschil zat niet
+// in slimmer of dommer: Claude maakt geen beelden, en haar app had geen enkele
+// beelddienst aangesloten. Dat is nu wel zo, met haar toestemming.
+//
+// Drie dingen die ik bewust zo heb gebouwd:
+//
+//  1. Op verzoek, per look — niet automatisch over tien boards. Elk beeld kost
+//     geld, en haar eigen opdracht zegt "alleen op expliciet verzoek".
+//  2. Altijd gemerkt als simulatie, en altijd náást de echte productfoto's.
+//     Nooit in plaats daarvan. De patches op een jas en de val van een broek
+//     zijn benaderingen; dat mag niet als foto van haar kleren gelden.
+//  3. De sleutel staat server-side in de edge function. In de paginabron zou
+//     iedereen die kunnen uitlezen en op haar rekening beelden maken.
+function beeldFunctieUrl() { return SUPABASE_URL + '/functions/v1/beeld-simulatie'; }
+
+let simulaties = {};
+try { simulaties = JSON.parse(localStorage.getItem('griette-simulaties') || '{}'); } catch(e) {}
+function bewaarSimulaties() {
+  // Alleen de verwijzing, niet het beeld zelf: een paar van die beelden vullen
+  // localStorage en dan gaat er van alles stuk.
+  try {
+    const klein = {};
+    Object.keys(simulaties).forEach(function(k) {
+      if (simulaties[k] && simulaties[k].url) klein[k] = { url: simulaties[k].url, wanneer: simulaties[k].wanneer };
+    });
+    localStorage.setItem('griette-simulaties', JSON.stringify(klein));
+  } catch(e) {}
+}
+
+async function maakSimulatie(outfitId, itemIds) {
+  const vak = document.getElementById('sim-' + outfitId);
+  if (!vak) return;
+  const foto = await leesLichaamsReferentie();
+  if (!foto) {
+    vak.innerHTML = '<div class="sim-melding">Hiervoor heb ik je referentiefoto nodig. '
+      + 'Voeg hem toe bij \u{1F512} Afgeschermde opslag — hij telt dan mee zolang deze sessie duurt.</div>';
+    return;
+  }
+  const items = [].concat(itemIds || []).map(getItemById).filter(Boolean)
+    .filter(function(i){ return !deletedItemIds.has(i.id); });
+  if (!items.length) return;
+
+  // Zonder productfoto's verzint het model de kleren, en dan kijk je naar iets
+  // wat niet in je kast hangt. Dat is erger dan geen beeld. Dus: minstens twee
+  // stukken met een echte foto, anders niet beginnen — en zeggen waarom.
+  const metFoto = items.filter(function(i){ return !!photos[i.id]; });
+  if (metFoto.length < 2) {
+    const zonder = items.filter(function(i){ return !photos[i.id]; });
+    vak.innerHTML = '<div class="sim-melding">Dit kan ik niet maken: van '
+      + (zonder.length === items.length ? 'deze stukken' : zonder.length + ' van de '
+        + items.length + ' stukken')
+      + ' heb ik geen foto. Zonder die foto’s verzint het beeldmodel de kleren, en dan kijk '
+      + 'je naar iets wat niet in je kast hangt. Voeg eerst foto’s toe bij: '
+      + zonder.slice(0, 4).map(function(i){ return esc2(kortStuk(i.name)); }).join(', ')
+      + (zonder.length > 4 ? ' en nog ' + (zonder.length - 4) : '') + '.</div>';
+    return;
+  }
+
+  vak.innerHTML = '<div class="sim-melding">Beeld maken… dit duurt een halve minuut '
+    + 'en kost een paar cent.'
+    + (metFoto.length < items.length
+        ? ' Let op: van ' + (items.length - metFoto.length) + ' stuk'
+          + (items.length - metFoto.length === 1 ? '' : 'ken') + ' heb ik geen foto, '
+          + 'dus die vult het model zelf in.'
+        : '')
+    + '</div>';
+
+  try {
+    const res = await fetch(beeldFunctieUrl(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json',
+                 'x-griette-wachtwoord': priveWachtwoord() },
+      body: JSON.stringify({
+        persoon: foto,
+        stukken: metFoto.map(function(i){ return photos[i.id]; }).slice(0, 5),
+        // De namen van álle stukken, ook die zonder foto: dan weet het model
+        // tenminste wát er hoort te zijn in plaats van iets te verzinnen.
+        beschrijving: items.map(function(i) {
+          return i.name + (photos[i.id] ? '' : ' (geen foto — benader dit)');
+        }).join(', '),
+      }),
+    });
+    const d = await res.json().catch(function(){ return {}; });
+    if (!res.ok) throw new Error(d.fout || ('de beeldmaker gaf ' + res.status));
+    if (!d.beeld) throw new Error('geen beeld terug');
+    simulaties[outfitId] = { url: d.beeld, wanneer: Date.now(), stukken: items.length };
+    bewaarSimulaties();
+    toonSimulatie(outfitId);
+  } catch(e) {
+    vak.innerHTML = '<div class="sim-melding">Dat lukte niet: ' + esc2(e && e.message || 'onbekend')
+      + '</div>';
+  }
+}
+
+function toonSimulatie(outfitId) {
+  const vak = document.getElementById('sim-' + outfitId);
+  const sim = simulaties[outfitId];
+  if (!vak || !sim || !sim.url) return;
+  vak.innerHTML = '<div class="sim">'
+    + '<div class="sim-merk">simulatie — geen foto</div>'
+    + '<img src="' + esc2(sim.url) + '" alt="gesimuleerd beeld van deze outfit">'
+    + '<div class="sim-voet">Dit beeld is gemaakt door een beeldmodel op grond van je '
+    + 'referentiefoto en de productfoto’s. Het is géén foto van jou in deze kleren: '
+    + 'details als patches, de vorm van een tas en de val van een broek zijn benaderingen. '
+    + 'De echte foto’s van je stukken staan hierboven — die blijven leidend.</div>'
+    + '<button type="button" class="dk-actie" onclick="wisSimulatie(\'' + esc2(outfitId) + '\')">'
+    + '× Weghalen</button></div>';
+}
+
+function wisSimulatie(outfitId) {
+  delete simulaties[outfitId];
+  bewaarSimulaties();
+  const vak = document.getElementById('sim-' + outfitId);
+  if (vak) vak.innerHTML = '';
+}
+
+// De knop. Staat er alleen als er een referentiefoto kán zijn, en zegt wat het
+// kost voordat je erop drukt.
+function simulatieKnopHTML(outfitId, itemIds) {
+  if (simulaties[outfitId]) return '';
+  const ids = JSON.stringify([].concat(itemIds || [])).replace(/"/g, '&quot;');
+  return '<button type="button" class="sim-knop" '
+    + 'onclick="maakSimulatie(\'' + esc2(outfitId) + '\', ' + ids + ')">'
+    + '\u{1F3A8} Laat zien hoe dit er ongeveer uitziet <span>simulatie · kost een paar cent</span>'
+    + '</button>';
 }
 
 // Dezelfde lijst felle kleuren als op de outfitkaart; hier alleen op naam.
