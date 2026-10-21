@@ -432,6 +432,17 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 .tl-score{font-size:8.5px;color:#a89478;margin-top:7px;letter-spacing:.03em;}
 .tl-acties{display:flex;gap:6px;margin-top:10px;}
 .tl-melding{font-size:10.5px;color:#6b573f;line-height:1.6;background:var(--white);border:1px solid var(--cream-dark);border-radius:10px;padding:10px 12px;}
+/* Het automatische oordeel bij een look op een board */
+.bo-vak{margin-top:8px;}
+.bo-eigen{margin-top:4px;}
+.bo{border-radius:10px;padding:9px 11px;font-family:'Jost',sans-serif;border:1.5px solid var(--cream-dark);background:var(--white);}
+.bo-sterk{border-color:#8aa87a;background:color-mix(in srgb,#8aa87a 8%,var(--white));}
+.bo-beter{border-color:#c9a06a;background:color-mix(in srgb,#c9a06a 9%,var(--white));}
+.bo-kop{font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--brown-mid);margin-bottom:3px;}
+.bo-kort{font-size:11.5px;color:var(--brown);line-height:1.5;margin-bottom:5px;}
+.bo-regel{font-size:10.5px;color:var(--brown);line-height:1.55;}
+.bo-voet{font-size:8.5px;color:var(--muted);font-style:italic;line-height:1.5;margin-top:6px;}
+.bo-bezig{font-size:10px;color:var(--muted);font-style:italic;}
 /* Extra stijlcheck */
 .check-modi{display:flex;flex-direction:column;gap:6px;}
 .check-modus{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-family:'Jost',sans-serif;cursor:pointer;text-align:left;color:var(--brown);}
@@ -1284,6 +1295,15 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
     <div class="tl-uitleg">Een tweede, kritische blik náást je stijlrapport — niet eroverheen.
       Kies waar je hem op wilt zetten. Er verandert niets aan je rapport of je kast.</div>
     <div id="check-modi" class="check-modi"></div>
+    <!-- Haar vraag: bij de dagelijkse looks van de AI hoort de check er vanzelf
+         overheen te gaan, zonder dat zij hem aanzet. -->
+    <div style="margin-top:12px;padding-top:10px;border-top:1.5px solid var(--cream-dark);">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" id="autocheck-knop" onchange="zetAutoCheck(this.checked)">
+        <span style="font-size:11.5px;color:var(--brown);">Kijk looks op mijn boards vanzelf na</span>
+      </label>
+      <div class="field-note" id="autocheck-uit" style="margin-top:4px;"></div>
+    </div>
     <div style="margin-top:10px;">
       <input type="file" id="check-foto-file" accept="image/*" style="display:none"
              onchange="kiesCheckFoto(event)">
@@ -3380,7 +3400,34 @@ function renderOutfit(boardId, outfit) {
   };
   ob.appendChild(adviceBtn);
 
+  // Hier hangt de automatische check. Eerst een leeg vak, zodat de plek er al
+  // is; de controle van de app komt er meteen in en het oordeel van de stylist
+  // zodra dat binnen is — of nooit, als zij hem heeft uitgezet.
+  var oordeelVak = document.createElement('div');
+  oordeelVak.id = 'oordeel-' + outfit.id;
+  oordeelVak.className = 'bo-vak';
+  ob.appendChild(oordeelVak);
+
+  var eigenVak = document.createElement('div');
+  eigenVak.className = 'bo-eigen';
+  ob.appendChild(eigenVak);
+
   list.appendChild(ob);
+
+  // De eigen controle is gratis en meteen beschikbaar, dus die staat er altijd.
+  try {
+    var ctrlItems = [].concat(outfit.items || []).map(getItemById).filter(Boolean)
+      .filter(function(i){ return !deletedItemIds.has(i.id); })
+      .map(function(i){ return { id:i.id, naam:i.name, heeft:true }; });
+    if (ctrlItems.length >= 2 && typeof controleHTML === 'function') {
+      eigenVak.innerHTML = controleHTML(ctrlItems);
+    }
+  } catch(e) { /* de controle mag het renderen nooit tegenhouden */ }
+
+  // En dan de stylist, één keer per look.
+  if (typeof checkLookAutomatisch === 'function') {
+    checkLookAutomatisch(outfit, boardId);
+  }
 
   // Render items
   if (outfit.items && outfit.items.length > 0) {
@@ -5600,6 +5647,9 @@ function openStijlcheck() {
   const blok = document.getElementById('check-blok');
   if (!blok) return;
   blok.style.display = 'block';
+  const knop = document.getElementById('autocheck-knop');
+  if (knop) knop.checked = autoCheckAan;
+  zetAutoCheck(autoCheckAan);
   bouwCheckModi();
   blok.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
@@ -5727,6 +5777,128 @@ async function voerStijlcheckUit() {
   } finally {
     checkBezig = false;
   }
+}
+
+// ── DE CHECK DIE VANZELF MEELOOPT OP DE BOARDS ───────────────────────────────
+// Haar vraag: bij de dagelijkse outfits die de AI maakt wil ze de extra check
+// niet zelf hoeven aanzetten — die hoort er gewoon overheen te gaan.
+//
+// Twee dingen waar ik rekening mee houd:
+//  - Eén AI-aanroep per look. Tien looks op een board is tien aanroepen, en dat
+//    kost geld en tijd. Dus: één keer per look, het oordeel wordt bewaard, en
+//    bij het opnieuw tonen komt het uit de opslag in plaats van opnieuw langs
+//    de stylist.
+//  - De controle die de pagina zelf doet (silhouet, textuur, kleur, weer) is
+//    gratis en meteen. Die staat er dus altijd al, ook voordat de stylist iets
+//    heeft gezegd — en zonder te doen alsof hij al gekeken heeft.
+let autoCheckAan = true;
+try { autoCheckAan = localStorage.getItem('griette-autocheck') !== '0'; } catch(e) {}
+
+function zetAutoCheck(aan) {
+  autoCheckAan = !!aan;
+  try { localStorage.setItem('griette-autocheck', aan ? '1' : '0'); } catch(e) {}
+  const t = document.getElementById('autocheck-uit');
+  if (t) t.textContent = autoCheckAan
+    ? 'De stylist kijkt elke nieuwe look van de AI na. Eén keer per look; daarna staat het oordeel erbij.'
+    : 'De stylist kijkt niet vanzelf mee. De eigen controle van de app blijft wel staan.';
+}
+
+// Waar de oordelen staan. Per outfit-id, zodat een look die opnieuw getoond
+// wordt niet opnieuw beoordeeld hoeft te worden.
+let boardOordelen = {};
+try { boardOordelen = JSON.parse(localStorage.getItem('griette-board-oordeel') || '{}'); } catch(e) {}
+function bewaarBoardOordelen() {
+  try { localStorage.setItem('griette-board-oordeel', JSON.stringify(boardOordelen)); } catch(e) {}
+  supabaseSet('board-oordeel', boardOordelen).catch(function(){});
+}
+
+// De automatische check over één look. Geeft niets terug; hij zet het oordeel
+// in de opslag en tekent het bij de look.
+async function checkLookAutomatisch(outfit, boardId) {
+  if (!outfit || !outfit.id) return;
+  if (boardOordelen[outfit.id]) { toonBoardOordeel(outfit.id); return; }
+  if (!autoCheckAan) return;
+
+  const items = [].concat(outfit.items || [])
+    .map(getItemById).filter(Boolean)
+    .filter(function(i){ return !deletedItemIds.has(i.id); });
+  if (items.length < 2) return;
+
+  // Eerst wat de pagina zelf weet: die staat er meteen, en de stylist krijgt
+  // hem mee zodat hij niet gaat herhalen wat al nagerekend is.
+  const eigen = outfitControle(items.map(function(i) {
+    return { id:i.id, naam:i.name, heeft:true };
+  }));
+  const eigenRegels = eigen.map(function(r) {
+    return '- ' + r.kop + ': ' + (r.ok === true ? 'klopt' : r.ok === false ? 'klopt niet' : 'niet na te kijken')
+      + ' — ' + r.zin;
+  }).join('\n');
+
+  const vak = document.getElementById('oordeel-' + outfit.id);
+  if (vak) vak.innerHTML = '<div class="bo-bezig">De stylist kijkt deze look na…</div>';
+
+  const refZin = await lichaamsReferentieZin();
+  const systeem = getChatSystemPrompt()
+    + '\n\n## NU: EEN LOOK NAKIJKEN DIE DE APP HEEFT SAMENGESTELD\n'
+    + 'Dit is een tweede blik naast haar stijlrapport, niet eroverheen. Kort en scherp: '
+    + 'zij ziet dit bij een look op haar board, niet als los advies.\n'
+    + 'De app heeft silhouet, textuur, kleur en weer zelf al nagerekend; dat staat hieronder. '
+    + 'Herhaal dat niet. Voeg toe wat een mens ziet en een rekenregel niet: of het als geheel '
+    + 'klopt, waar de spanning zit, en wat deze look sterker maakt.\n'
+    + 'Beweer niets over pasvorm dat je niet kunt zien. Noem alleen stukken die in de lijst staan.\n'
+    + refZin;
+
+  const vraag = 'De look heet "' + (outfit.name || 'Look') + '" en bestaat uit:\n'
+    + items.map(function(i){ return '- ' + i.id + ' | ' + i.cat + ' | ' + i.name; }).join('\n')
+    + '\n\nWat de app zelf al heeft nagerekend:\n' + eigenRegels
+    + '\n\nHet weer is ' + dagWeer() + '.\n\n'
+    + 'Antwoord ALLEEN met JSON:\n'
+    + '{"oordeel":"sterk|klopt|kan beter","kort":"één zin over het geheel",'
+    + '"sterk":"wat hier goed werkt, concreet","beter":"de één belangrijkste verbetering",'
+    + '"handeling":"één precieze stylinghandeling"}';
+
+  try {
+    const res = await aiFetch(AI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model:'claude-opus-5', max_tokens: 900,
+        system: systeem, messages: [{ role:'user', content: vraag }] }),
+    });
+    if (!res.ok) throw new Error('de stylist gaf ' + res.status);
+    const data = await res.json();
+    const tekst = (((data.content || [])[0] || {}).text) || '';
+    const m = tekst.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('geen bruikbaar antwoord');
+    const uit = JSON.parse(m[0]);
+    boardOordelen[outfit.id] = {
+      oordeel: String(uit.oordeel || '').slice(0, 20),
+      kort: String(uit.kort || '').slice(0, 200),
+      sterk: String(uit.sterk || '').slice(0, 240),
+      beter: String(uit.beter || '').slice(0, 240),
+      handeling: String(uit.handeling || '').slice(0, 160),
+      wanneer: Date.now(),
+    };
+    bewaarBoardOordelen();
+    toonBoardOordeel(outfit.id);
+  } catch(e) {
+    if (vak) vak.innerHTML = '<div class="bo-bezig">De stylist kon er niet bij ('
+      + esc2(e && e.message || 'onbekend') + '). De eigen controle hieronder klopt wel.</div>';
+  }
+}
+
+function toonBoardOordeel(outfitId) {
+  const vak = document.getElementById('oordeel-' + outfitId);
+  const o = boardOordelen[outfitId];
+  if (!vak || !o) return;
+  const kleur = o.oordeel === 'sterk' ? 'bo-sterk' : o.oordeel === 'kan beter' ? 'bo-beter' : 'bo-klopt';
+  vak.innerHTML = '<div class="bo ' + kleur + '">'
+    + '<div class="bo-kop">' + esc2(o.oordeel || 'nagekeken') + '</div>'
+    + (o.kort ? '<div class="bo-kort">' + esc2(o.kort) + '</div>' : '')
+    + (o.sterk ? '<div class="bo-regel"><b>Sterk:</b> ' + esc2(o.sterk) + '</div>' : '')
+    + (o.beter ? '<div class="bo-regel"><b>Beter:</b> ' + esc2(o.beter) + '</div>' : '')
+    + (o.handeling ? '<div class="bo-regel"><b>Doe dit:</b> ' + esc2(o.handeling) + '</div>' : '')
+    + '<div class="bo-voet">Tweede blik van de stylist, naast je rapport. Er is niets gewijzigd.</div>'
+    + '</div>';
 }
 
 // Dezelfde lijst felle kleuren als op de outfitkaart; hier alleen op naam.
