@@ -432,6 +432,32 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 .tl-score{font-size:8.5px;color:#a89478;margin-top:7px;letter-spacing:.03em;}
 .tl-acties{display:flex;gap:6px;margin-top:10px;}
 .tl-melding{font-size:10.5px;color:#6b573f;line-height:1.6;background:var(--white);border:1px solid var(--cream-dark);border-radius:10px;padding:10px 12px;}
+/* Het gesimuleerde beeld. Duidelijk gemerkt, want het is geen foto. */
+.sim{margin-top:8px;border:1.5px dashed var(--brown-warm);border-radius:12px;padding:10px;background:var(--white);}
+.sim-merk{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--brown-warm);margin-bottom:6px;}
+.sim img{width:100%;max-width:240px;border-radius:8px;display:block;}
+.sim-voet{font-size:8.5px;color:var(--muted);line-height:1.55;margin-top:7px;font-style:italic;}
+.sim-melding{font-size:10px;color:var(--muted);line-height:1.55;margin-top:6px;font-style:italic;}
+.sim-knop{display:block;width:100%;margin-top:8px;padding:9px;background:transparent;border:1px dashed var(--cream-dark);border-radius:10px;font-family:'Jost',sans-serif;font-size:10.5px;color:var(--brown);cursor:pointer;line-height:1.4;}
+.sim-knop span{display:block;font-size:8.5px;color:var(--muted);margin-top:2px;}
+/* Je silhouet naast de echte stukken. Nadrukkelijk naast, niet eroverheen:
+   de foto staat links, de stukken rechts op hun hoogte, met een balkje dat
+   laat zien welk stuk van je lichaam ze beslaan. */
+.ps{margin-top:8px;font-family:'Jost',sans-serif;}
+.ps summary{font-size:9.5px;color:var(--brown-mid);cursor:pointer;letter-spacing:.04em;list-style:none;}
+.ps summary::-webkit-details-marker{display:none;}
+.ps summary::before{content:'\25B8  ';}
+.ps[open] summary::before{content:'\25BE  ';}
+.ps-vak{position:relative;display:flex;gap:10px;margin-top:8px;}
+.ps-foto{width:auto;border-radius:6px;object-fit:contain;flex-shrink:0;background:var(--cream);}
+.ps-lijst{position:relative;flex:1;min-width:0;}
+.ps-stuk{position:absolute;left:0;right:0;display:flex;align-items:flex-start;gap:5px;}
+.ps-balk{flex-shrink:0;width:3px;align-self:stretch;border-radius:2px;background:var(--cream-dark);}
+.ps-zeker{background:var(--brown-warm);}
+.ps-stuk img{width:22px;height:28px;object-fit:cover;border-radius:3px;flex-shrink:0;}
+.ps-geen{width:22px;text-align:center;color:var(--muted);}
+.ps-tekst{font-size:8px;line-height:1.35;color:var(--brown);}
+.ps-voet{font-size:8.5px;color:var(--muted);line-height:1.55;margin-top:8px;font-style:italic;}
 /* Het automatische oordeel bij een look op een board */
 .bo-vak{margin-top:8px;}
 .bo-eigen{margin-top:4px;}
@@ -3412,6 +3438,20 @@ function renderOutfit(boardId, outfit) {
   eigenVak.className = 'bo-eigen';
   ob.appendChild(eigenVak);
 
+  // En de proportiestrook, als zij een referentiefoto heeft meegegeven. Dicht
+  // dus niet afleidt van de look zelf; opendoen is één tik.
+  var propVak = document.createElement('div');
+  propVak.id = 'prop-' + outfit.id;
+  ob.appendChild(propVak);
+
+  // En het gesimuleerde beeld: knop als er nog geen is, anders het beeld zelf.
+  var simVak = document.createElement('div');
+  simVak.id = 'sim-' + outfit.id;
+  ob.appendChild(simVak);
+  var simKnop = document.createElement('div');
+  simKnop.id = 'simknop-' + outfit.id;
+  ob.appendChild(simKnop);
+
   list.appendChild(ob);
 
   // De eigen controle is gratis en meteen beschikbaar, dus die staat er altijd.
@@ -3427,6 +3467,18 @@ function renderOutfit(boardId, outfit) {
   // En dan de stylist, één keer per look.
   if (typeof checkLookAutomatisch === 'function') {
     checkLookAutomatisch(outfit, boardId);
+  }
+  if (typeof toonProportieStrook === 'function') {
+    var propItems = [].concat(outfit.items || []).map(getItemById).filter(Boolean)
+      .filter(function(i){ return !deletedItemIds.has(i.id); });
+    toonProportieStrook('prop-' + outfit.id, propItems);
+  }
+  if (typeof simulatieKnopHTML === 'function') {
+    if (simulaties[outfit.id]) toonSimulatie(outfit.id);
+    else {
+      var sk = document.getElementById('simknop-' + outfit.id);
+      if (sk) sk.innerHTML = simulatieKnopHTML(outfit.id, outfit.items || []);
+    }
   }
 
   // Render items
@@ -5396,6 +5448,16 @@ function toonTopLooks() {
   const vak = document.getElementById('toplooks-uitkomst');
   if (!vak) return;
   if (!topLooks.length) { vak.innerHTML = ''; return; }
+  // De strook wordt na het tekenen ingevuld: hij moet de foto eerst ophalen,
+  // en daar hoeft de kaart niet op te wachten.
+  setTimeout(function() {
+    topLooks.forEach(function(l, n) {
+      if (typeof toonProportieStrook === 'function') {
+        toonProportieStrook('tl-prop-' + n, l.items);
+      }
+      if (simulaties['tl-' + n]) toonSimulatie('tl-' + n);
+    });
+  }, 0);
 
   vak.innerHTML = topLooks.map(function(l, n) {
     const stukken = l.items.map(function(i) {
@@ -5425,6 +5487,10 @@ function toonTopLooks() {
       + (l.bron === 'lokaal' ? ' · nog zonder oordeel van de stylist' : '')
       + '</div>'
       + controleHTML(l.items.map(function(i){ return { id:i.id, naam:i.name, heeft:true }; }))
+      + '<div id="tl-prop-' + n + '"></div>'
+      + '<div id="sim-tl-' + n + '"></div>'
+      + (typeof simulatieKnopHTML === 'function'
+          ? simulatieKnopHTML('tl-' + n, l.items.map(function(i){ return i.id; })) : '')
       + '<div class="tl-acties">'
       + '<button type="button" class="dk-actie" onclick="bewaarTopLook(' + n + ')">♡ Bewaren</button>'
       + '<button type="button" class="dk-actie" onclick="maakTopLooks({zaad:String(Date.now())})">↻ Andere</button>'
@@ -5899,6 +5965,237 @@ function toonBoardOordeel(outfitId) {
     + (o.handeling ? '<div class="bo-regel"><b>Doe dit:</b> ' + esc2(o.handeling) + '</div>' : '')
     + '<div class="bo-voet">Tweede blik van de stylist, naast je rapport. Er is niets gewijzigd.</div>'
     + '</div>';
+}
+
+// ── JE SILHOUET NAAST DE ECHTE STUKKEN ───────────────────────────────────────
+// Haar vraag was eerst: mijn foto aangekleed met de outfit. Dat kan deze app
+// niet — er is geen beeldgeneratie, en een virtuele paskamer zou een nieuwe
+// dienst zijn die haar lichaamsfoto krijgt. Dit is wat ze daarna koos: de echte
+// itemfoto's náást haar silhouet, op de hoogte waar ze vallen.
+//
+// Dus nadrukkelijk geen simulatie. Niets wordt over haar heen gelegd en er
+// wordt niets nagemaakt. Het is een maatlat: je ziet waar een zoom uitkomt op
+// jouw figuur, en of twee lengtes elkaar in de weg zitten.
+//
+// Waar een stuk valt, volgt uit de categorie en wordt scherper als zij een
+// lengte-tag heeft gezet. Wat op de tag rust is een gegeven; wat op de
+// categorie rust is een aanname, en dat staat er dan ook bij.
+const ZONE_PER_SOORT = {
+  accessories: { van:0.06, tot:0.20, wat:'bij je gezicht' },
+  tops:        { van:0.20, tot:0.52, wat:'je bovenlijf' },
+  layers:      { van:0.17, tot:0.62, wat:'over je bovenlijf en heup' },
+  jurken:      { van:0.20, tot:0.80, wat:'van schouder tot onder je knie' },
+  eendelig:    { van:0.20, tot:0.86, wat:'van schouder tot enkel' },
+  bottoms:     { van:0.46, tot:0.92, wat:'vanaf je taille omlaag' },
+  bags:        { van:0.48, tot:0.66, wat:'op handhoogte' },
+  shoes:       { van:0.90, tot:1.00, wat:'aan je voeten' },
+};
+
+// Een lengte-tag verschuift waar het stuk ophoudt. Dat is het hele punt van
+// deze strook: een cropped top en een maxi-rok doen iets heel anders met je
+// verhoudingen, en dat is te zien zodra je weet waar ze eindigen.
+const ZONE_PER_LENGTE = {
+  crop:    { tops:0.42, layers:0.44 },
+  normaal: { tops:0.52, layers:0.60 },
+  midi:    { bottoms:0.74, jurken:0.74 },
+  maxi:    { bottoms:0.95, jurken:0.93 },
+};
+
+function lichaamsZone(item) {
+  const basis = ZONE_PER_SOORT[item.cat];
+  if (!basis) return null;
+  const zone = { van:basis.van, tot:basis.tot, wat:basis.wat, bron:'soort' };
+  const lengte = String(getTag(item.id, 'lengte') || '').toLowerCase();
+  const verschuif = ZONE_PER_LENGTE[lengte];
+  if (verschuif && typeof verschuif[item.cat] === 'number') {
+    zone.tot = verschuif[item.cat];
+    zone.bron = 'tag';
+    zone.lengte = lengte;
+  }
+  // Een rok houdt eerder op dan een broek, en dat staat vaak in de naam.
+  if (item.cat === 'bottoms' && /\brok|skirt/i.test(String(item.name || '')) && zone.bron !== 'tag') {
+    zone.tot = 0.70;
+    zone.wat = 'van je taille tot boven je knie';
+  }
+  return zone;
+}
+
+// De strook zelf. Alleen als er een referentiefoto is — zonder foto valt er
+// niets naast te leggen, en dan doen we ook niet alsof.
+async function proportieStrookHTML(items, opties) {
+  const o = opties || {};
+  const foto = await leesLichaamsReferentie();
+  if (!foto) return '';
+  const bruikbaar = (items || []).filter(function(i){ return i && lichaamsZone(i); });
+  if (!bruikbaar.length) return '';
+
+  const H = 240;   // hoogte van het silhouet in de strook
+  const rijen = bruikbaar.map(function(i) {
+    const z = lichaamsZone(i);
+    const top = Math.round(z.van * H);
+    const hoog = Math.max(10, Math.round((z.tot - z.van) * H));
+    const thumb = photos[i.id];
+    return '<div class="ps-stuk" style="top:' + top + 'px;height:' + hoog + 'px;">'
+      + '<span class="ps-balk' + (z.bron === 'tag' ? ' ps-zeker' : '') + '"></span>'
+      + (thumb ? '<img loading="lazy" src="' + esc2(thumb) + '" alt="">' : '<span class="ps-geen">·</span>')
+      + '<span class="ps-tekst"><b>' + esc2(kortStuk(i.name)) + '</b>'
+      + '<br>' + esc2(z.wat)
+      + (z.bron === 'tag' ? ' · ' + esc2(z.lengte) : '')
+      + '</span></div>';
+  }).join('');
+
+  const geschat = bruikbaar.filter(function(i){ return lichaamsZone(i).bron === 'soort'; }).length;
+  return '<details class="ps"' + (o.open ? ' open' : '') + '>'
+    + '<summary>Naast je eigen verhoudingen leggen</summary>'
+    + '<div class="ps-vak" style="height:' + H + 'px;">'
+    + '<img class="ps-foto" src="' + esc2(foto) + '" alt="jouw referentiefoto" '
+    + 'style="height:' + H + 'px;">'
+    + '<div class="ps-lijst">' + rijen + '</div></div>'
+    + '<div class="ps-voet">Dit legt de echte foto’s van je stukken <b>naast</b> je silhouet, '
+    + 'op de hoogte waar ze ongeveer vallen. Niets is over je heen gelegd en niets is nagemaakt — '
+    + 'het is een maatlat voor lengtes, geen voorspelling van hoe iets valt. Daarvoor is een foto '
+    + 'nodig waarop je het dráágt.'
+    + (geschat ? ' Bij ' + geschat + ' stuk' + (geschat === 1 ? '' : 'ken')
+        + ' schat ik de lengte op de categorie; zet je een lengte-tag, dan klopt de plek beter.' : '')
+    + '</div></details>';
+}
+
+// Hem ophangen aan een vak dat al bestaat. Apart, omdat de strook een
+// AI-loze toevoeging is die op meerdere plekken gebruikt wordt.
+async function toonProportieStrook(vakId, items, opties) {
+  const vak = document.getElementById(vakId);
+  if (!vak) return;
+  try {
+    vak.innerHTML = await proportieStrookHTML(items, opties);
+  } catch(e) { vak.innerHTML = ''; }
+}
+
+// ── GESIMULEERD BEELD VAN EEN OUTFIT ─────────────────────────────────────────
+// Zij vroeg hierom nadat ze zag dat ChatGPT het wel maakt. Het verschil zat niet
+// in slimmer of dommer: Claude maakt geen beelden, en haar app had geen enkele
+// beelddienst aangesloten. Dat is nu wel zo, met haar toestemming.
+//
+// Drie dingen die ik bewust zo heb gebouwd:
+//
+//  1. Op verzoek, per look — niet automatisch over tien boards. Elk beeld kost
+//     geld, en haar eigen opdracht zegt "alleen op expliciet verzoek".
+//  2. Altijd gemerkt als simulatie, en altijd náást de echte productfoto's.
+//     Nooit in plaats daarvan. De patches op een jas en de val van een broek
+//     zijn benaderingen; dat mag niet als foto van haar kleren gelden.
+//  3. De sleutel staat server-side in de edge function. In de paginabron zou
+//     iedereen die kunnen uitlezen en op haar rekening beelden maken.
+function beeldFunctieUrl() { return SUPABASE_URL + '/functions/v1/beeld-simulatie'; }
+
+let simulaties = {};
+try { simulaties = JSON.parse(localStorage.getItem('griette-simulaties') || '{}'); } catch(e) {}
+function bewaarSimulaties() {
+  // Alleen de verwijzing, niet het beeld zelf: een paar van die beelden vullen
+  // localStorage en dan gaat er van alles stuk.
+  try {
+    const klein = {};
+    Object.keys(simulaties).forEach(function(k) {
+      if (simulaties[k] && simulaties[k].url) klein[k] = { url: simulaties[k].url, wanneer: simulaties[k].wanneer };
+    });
+    localStorage.setItem('griette-simulaties', JSON.stringify(klein));
+  } catch(e) {}
+}
+
+async function maakSimulatie(outfitId, itemIds) {
+  const vak = document.getElementById('sim-' + outfitId);
+  if (!vak) return;
+  const foto = await leesLichaamsReferentie();
+  if (!foto) {
+    vak.innerHTML = '<div class="sim-melding">Hiervoor heb ik je referentiefoto nodig. '
+      + 'Voeg hem toe bij \u{1F512} Afgeschermde opslag — hij telt dan mee zolang deze sessie duurt.</div>';
+    return;
+  }
+  const items = [].concat(itemIds || []).map(getItemById).filter(Boolean)
+    .filter(function(i){ return !deletedItemIds.has(i.id); });
+  if (!items.length) return;
+
+  // Zonder productfoto's verzint het model de kleren, en dan kijk je naar iets
+  // wat niet in je kast hangt. Dat is erger dan geen beeld. Dus: minstens twee
+  // stukken met een echte foto, anders niet beginnen — en zeggen waarom.
+  const metFoto = items.filter(function(i){ return !!photos[i.id]; });
+  if (metFoto.length < 2) {
+    const zonder = items.filter(function(i){ return !photos[i.id]; });
+    vak.innerHTML = '<div class="sim-melding">Dit kan ik niet maken: van '
+      + (zonder.length === items.length ? 'deze stukken' : zonder.length + ' van de '
+        + items.length + ' stukken')
+      + ' heb ik geen foto. Zonder die foto’s verzint het beeldmodel de kleren, en dan kijk '
+      + 'je naar iets wat niet in je kast hangt. Voeg eerst foto’s toe bij: '
+      + zonder.slice(0, 4).map(function(i){ return esc2(kortStuk(i.name)); }).join(', ')
+      + (zonder.length > 4 ? ' en nog ' + (zonder.length - 4) : '') + '.</div>';
+    return;
+  }
+
+  vak.innerHTML = '<div class="sim-melding">Beeld maken… dit duurt een halve minuut '
+    + 'en kost een paar cent.'
+    + (metFoto.length < items.length
+        ? ' Let op: van ' + (items.length - metFoto.length) + ' stuk'
+          + (items.length - metFoto.length === 1 ? '' : 'ken') + ' heb ik geen foto, '
+          + 'dus die vult het model zelf in.'
+        : '')
+    + '</div>';
+
+  try {
+    const res = await fetch(beeldFunctieUrl(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json',
+                 'x-griette-wachtwoord': priveWachtwoord() },
+      body: JSON.stringify({
+        persoon: foto,
+        stukken: metFoto.map(function(i){ return photos[i.id]; }).slice(0, 5),
+        // De namen van álle stukken, ook die zonder foto: dan weet het model
+        // tenminste wát er hoort te zijn in plaats van iets te verzinnen.
+        beschrijving: items.map(function(i) {
+          return i.name + (photos[i.id] ? '' : ' (geen foto — benader dit)');
+        }).join(', '),
+      }),
+    });
+    const d = await res.json().catch(function(){ return {}; });
+    if (!res.ok) throw new Error(d.fout || ('de beeldmaker gaf ' + res.status));
+    if (!d.beeld) throw new Error('geen beeld terug');
+    simulaties[outfitId] = { url: d.beeld, wanneer: Date.now(), stukken: items.length };
+    bewaarSimulaties();
+    toonSimulatie(outfitId);
+  } catch(e) {
+    vak.innerHTML = '<div class="sim-melding">Dat lukte niet: ' + esc2(e && e.message || 'onbekend')
+      + '</div>';
+  }
+}
+
+function toonSimulatie(outfitId) {
+  const vak = document.getElementById('sim-' + outfitId);
+  const sim = simulaties[outfitId];
+  if (!vak || !sim || !sim.url) return;
+  vak.innerHTML = '<div class="sim">'
+    + '<div class="sim-merk">simulatie — geen foto</div>'
+    + '<img src="' + esc2(sim.url) + '" alt="gesimuleerd beeld van deze outfit">'
+    + '<div class="sim-voet">Dit beeld is gemaakt door een beeldmodel op grond van je '
+    + 'referentiefoto en de productfoto’s. Het is géén foto van jou in deze kleren: '
+    + 'details als patches, de vorm van een tas en de val van een broek zijn benaderingen. '
+    + 'De echte foto’s van je stukken staan hierboven — die blijven leidend.</div>'
+    + '<button type="button" class="dk-actie" onclick="wisSimulatie(\'' + esc2(outfitId) + '\')">'
+    + '× Weghalen</button></div>';
+}
+
+function wisSimulatie(outfitId) {
+  delete simulaties[outfitId];
+  bewaarSimulaties();
+  const vak = document.getElementById('sim-' + outfitId);
+  if (vak) vak.innerHTML = '';
+}
+
+// De knop. Staat er alleen als er een referentiefoto kán zijn, en zegt wat het
+// kost voordat je erop drukt.
+function simulatieKnopHTML(outfitId, itemIds) {
+  if (simulaties[outfitId]) return '';
+  const ids = JSON.stringify([].concat(itemIds || [])).replace(/"/g, '&quot;');
+  return '<button type="button" class="sim-knop" '
+    + 'onclick="maakSimulatie(\'' + esc2(outfitId) + '\', ' + ids + ')">'
+    + '\u{1F3A8} Laat zien hoe dit er ongeveer uitziet <span>simulatie · kost een paar cent</span>'
+    + '</button>';
 }
 
 // Dezelfde lijst felle kleuren als op de outfitkaart; hier alleen op naam.
