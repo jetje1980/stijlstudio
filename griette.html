@@ -6191,6 +6191,11 @@ function wisSimulatie(outfitId) {
 // kost voordat je erop drukt.
 function simulatieKnopHTML(outfitId, itemIds) {
   if (simulaties[outfitId]) return '';
+  // Alleen tonen als het ook echt kan. Zij vond het opzetten te omslachtig en
+  // gaat verder zonder foto; een knop die dan "er is geen sleutel" antwoordt is
+  // geen functie maar een stuk kapotte app. Zet ze de sleutel en het wachtwoord
+  // later alsnog, dan verschijnt hij vanzelf weer — er hoeft niets aangezet.
+  if (!priveWachtwoord()) return '';
   const ids = JSON.stringify([].concat(itemIds || [])).replace(/"/g, '&quot;');
   return '<button type="button" class="sim-knop" '
     + 'onclick="maakSimulatie(\'' + esc2(outfitId) + '\', ' + ids + ')">'
