@@ -5321,7 +5321,8 @@ async function stylistHerordent(kandidaten, o) {
   });
   if (!res.ok) throw new Error('de stylist gaf ' + res.status);
   const data = await res.json();
-  const tekst = (((data.content || [])[0] || {}).text) || '';
+  // aiTekst, niet content[0] — zie de opmerking bij die functie.
+  const tekst = aiTekst(data);
   const m = tekst.match(/\{[\s\S]*\}/);
   if (!m) throw new Error('het antwoord was geen bruikbare JSON');
   const uit = JSON.parse(m[0]);
@@ -5830,7 +5831,10 @@ async function voerStijlcheckUit() {
     });
     if (!res.ok) throw new Error('de stylist gaf ' + res.status);
     const data = await res.json();
-    const tekst = (((data.content || [])[0] || {}).text) || '';
+    // aiTekst, niet content[0]: staat er een denkblok voor, dan is het eerste
+    // blok niet de tekst. Die fout stond al in de app beschreven en ik heb hem
+    // in alle drie mijn nieuwe aanroepen opnieuw gemaakt.
+    const tekst = aiTekst(data);
     if (!tekst.trim()) throw new Error('het antwoord was leeg');
     uitvak.innerHTML = '<div class="check-kop">' + esc2(m.label) + '</div>'
       + '<div class="check-tekst">' + (typeof md === 'function' ? md(tekst) : esc2(tekst)) + '</div>'
@@ -5932,7 +5936,10 @@ async function checkLookAutomatisch(outfit, boardId) {
     });
     if (!res.ok) throw new Error('de stylist gaf ' + res.status);
     const data = await res.json();
-    const tekst = (((data.content || [])[0] || {}).text) || '';
+    // aiTekst, niet content[0]: staat er een denkblok voor, dan is het eerste
+    // blok niet de tekst. Die fout stond al in de app beschreven en ik heb hem
+    // in alle drie mijn nieuwe aanroepen opnieuw gemaakt.
+    const tekst = aiTekst(data);
     const m = tekst.match(/\{[\s\S]*\}/);
     if (!m) throw new Error('geen bruikbaar antwoord');
     const uit = JSON.parse(m[0]);
