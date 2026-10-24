@@ -7689,18 +7689,55 @@ async function maakAlleKaarten() {
   const bewaardUitleg = outfitUitleg;
   const bewaardTop = outfitTop;
 
+  const titelEl = document.getElementById('f-title');
+  const gelEl = document.getElementById('f-gelegenheid');
+  const bewaardTitel = titelEl ? titelEl.value : '';
+  const bewaardGel = gelEl ? gelEl.value : '';
+
+  // Waarom zij gebroken plaatjes zag. Twee dingen misten, en samen leverden
+  // ze een data-url op die eruitzag als een plaatje maar nul bij nul pixels
+  // was:
+  //   1. #card-wrap staat op display:none zolang ze niet op stap 4 is, en
+  //      html2canvas legt vast wat er stáát — verborgen is nul pixels.
+  //   2. capsuleNaarKaart stapte naar stap 3 en bouwde de kaart niet; er was
+  //      dus ook niets om vast te leggen.
+  // Dus: de kaart echt opbouwen, maar buiten beeld, zodat ze niet zes keer
+  // uit haar tas geschopt wordt en het opbouwen niet ziet flitsen.
+  const wrap = document.getElementById('card-wrap');
+  const wrapStijl = wrap ? wrap.getAttribute('style') : null;
+
   try {
     for (let i = 0; i < outfits.length; i++) {
       if (st) st.textContent = 'Kaart ' + (i + 1) + ' van ' + outfits.length + '…';
-      capsuleNaarKaart(i);
+      capsuleNaarKaart(i, true);
+      if (wrap) {
+        wrap.style.display = 'block';
+        wrap.style.position = 'fixed';
+        wrap.style.left = '-9999px';
+        wrap.style.top = '0';
+        wrap.style.width = '420px';
+        wrap.style.height = 'auto';
+        wrap.style.overflow = 'visible';
+      }
+      buildKaart();
       // Even wachten tot de foto's als achtergrond staan: buildKaart zet die
       // pas zodra het beeld geladen is, en html2canvas legt vast wat er stáát.
       await new Promise(function(r){ setTimeout(r, 450); });
       const canvas = await kaartNaarCanvas(2);
+      // Niet blind vertrouwen: een canvas van nul pixels geeft een data-url
+      // die eruitziet als een plaatje maar het niet is. Liever hier stoppen
+      // met een duidelijke reden dan zes gebroken plaatjes tonen.
+      if (!canvas || !canvas.width || !canvas.height) {
+        throw new Error('de kaart was niet in beeld om vast te leggen');
+      }
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+      if (!dataUrl || dataUrl.length < 1000) {
+        throw new Error('er kwam een leeg beeld uit');
+      }
       alleKaarten.push({
         idx: i,
         naam: (outfits[i].naam || ('Outfit ' + (i + 1))),
-        dataUrl: canvas.toDataURL('image/jpeg', 0.9),
+        dataUrl: dataUrl,
       });
     }
     if (st) st.textContent = alleKaarten.length + ' kaarten klaar.';
@@ -7709,7 +7746,13 @@ async function maakAlleKaarten() {
     if (st) st.textContent = 'Dat lukte niet: ' + (e && e.message || 'onbekend')
       + '. Je outfits staan er nog gewoon.';
   } finally {
-    // De kaart terugzetten zoals zij hem had.
+    // De kaart terugzetten zoals zij hem had, en het venster ook.
+    if (wrap) {
+      if (wrapStijl === null) wrap.removeAttribute('style');
+      else wrap.setAttribute('style', wrapStijl);
+    }
+    if (titelEl) titelEl.value = bewaardTitel;
+    if (gelEl) gelEl.value = bewaardGel;
     selItems = bewaardItems; selPreset = bewaardPreset;
     outfitUitleg = bewaardUitleg; outfitTop = bewaardTop;
     if (selItems.length) buildKaart();
@@ -7842,7 +7885,13 @@ async function maakMoodboard() {
     if (typeof html2canvas === 'undefined') throw new Error('de beeldbibliotheek kon niet laden');
     const canvas = await html2canvas(vak, { scale: 2, backgroundColor: '#F5F2EE',
                                             useCORS: true, logging: false });
+    // Dezelfde waarborg als bij de kaarten: een canvas van nul pixels geeft
+    // een data-url die eruitziet als een plaatje en het niet is.
+    if (!canvas || !canvas.width || !canvas.height) {
+      throw new Error('het moodboard stond niet in beeld om vast te leggen');
+    }
     const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    if (!dataUrl || dataUrl.length < 1000) throw new Error('er kwam een leeg beeld uit');
     const toon = document.getElementById('cap-moodboard-vak');
     if (toon) {
       toon.innerHTML = '<img src="' + dataUrl + '" alt="moodboard" class="mb-voorbeeld">'
@@ -7866,7 +7915,10 @@ async function bewaarMoodboard() {
   await bewaarDataUrl(window._moodboardUrl, (gel || 'weekendtas') + ' moodboard.jpg');
 }
 
-function capsuleNaarKaart(idx) {
+// stil = alleen de kaartgegevens klaarzetten, zonder naar stap 3 te stappen.
+// Dat is wat maakAlleKaarten nodig heeft: zes kaarten vastleggen zonder haar
+// zes keer uit haar weekendtas te gooien.
+function capsuleNaarKaart(idx, stil) {
   if (!capsuleResultaat) return;
   const o = capsuleResultaat.outfits[idx];
   if (!o) return;
@@ -7907,6 +7959,7 @@ function capsuleNaarKaart(idx) {
     g.value = [reis, o.gelegenheid].filter(Boolean).filter((x,i,a)=>a.indexOf(x)===i).join(' — ');
   }
 
+  if (stil) return;
   setStep(3);
 }
 
