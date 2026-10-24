@@ -565,6 +565,28 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
         </div>
       </div>
 
+      <!-- Waar begin je? Tot nu toe was de kleurcombo de enige ingang, en zij
+           wilde ook op items of op een gevoel kunnen starten — of helemaal
+           niets kiezen en gewoon de tas krijgen. De route erna is dezelfde;
+           alleen wat de stylist als uitgangspunt meekrijgt verschilt. -->
+      <div class="sec-label" style="margin-top:14px;">Waar begin je?</div>
+      <div class="field-note" style="margin-bottom:8px;">Kies één ingang. Je hoeft geen
+        kleurcombo te kiezen — dan zoek ik er zelf een die bij je kast past.</div>
+      <div class="cap-nee" id="cap-ingang">
+        <button class="cap-neeknop aan" data-ingang="combo" onclick="kiesCapIngang('combo')">🎨 Via kleurcombo's</button>
+        <button class="cap-neeknop" data-ingang="items" onclick="kiesCapIngang('items')">👕 Via stukken die mee moeten</button>
+        <button class="cap-neeknop" data-ingang="vibe" onclick="kiesCapIngang('vibe')">✨ Via een gevoel</button>
+        <button class="cap-neeknop" data-ingang="direct" onclick="kiesCapIngang('direct')">→ Kies jij maar</button>
+      </div>
+      <div class="field-note" id="cap-ingang-uit" style="margin-bottom:8px;"></div>
+      <div id="cap-vibe-vak" style="display:none;margin-bottom:10px;">
+        <input class="field" type="text" id="cap-vibe" maxlength="120"
+               placeholder="bijv. rustig en verzorgd, of juist stoer met kleur"
+               style="font-size:14px;padding:11px 13px;">
+        <div class="field-note" style="margin-top:4px;">In je eigen woorden. Ik zoek daar
+          kleurrichtingen en stukken bij die je echt hebt.</div>
+      </div>
+
       <div class="sec-label" style="margin-top:14px;">Hoe wil je het?</div>
       <div class="field-note" style="margin-bottom:8px;">Compact inpakken en verkennen zijn niet hetzelfde. Dezelfde reis, ander soort uitkomst.</div>
       <div class="cap-nee" id="cap-hoe">
@@ -5967,6 +5989,28 @@ function capScoorCombos() {
   // een lagere telling betekent hier niet "onbruikbaar".
   const voorop = p => p.eigenBron ? 1 : 0;
 
+  // Begon ze bij een gevoel, dan moet dat bepalen wélke combo's in de lijst
+  // komen — niet alleen hoe de twintig die er toevallig in zitten op volgorde
+  // staan. Daarom telt dit mee vóór het afkappen.
+  //
+  // De presets dragen zelf een vibe-tekst ("zachte basis, harde knal") en een
+  // stijl ("streetstyle"); haar woorden overlappen daar vaak mee. Woorden
+  // vergelijken is hier genoeg en kost geen aanroep.
+  const vibeWoorden = (typeof capVibe === 'function' ? capVibe() : '')
+    .toLowerCase().split(/[^a-z\u00e0-\u00ff]+/).filter(function(w){ return w.length >= 4; });
+  // Op hele woorden, niet op stukjes: "kleur" zit in "hoofdkleur", en dan
+  // scoort elke combo met het woord hoofdkleur in zijn omschrijving een
+  // treffer op een woord dat er niet staat. Precies dezelfde val als "hak" in
+  // "khaki", eerder in deze app.
+  const vibeRaak = function(p) {
+    if (!vibeWoorden.length) return 0;
+    const tekst = ((p.vibe || '') + ' ' + (p.stijl || '') + ' ' + (p.name || '')
+      + ' ' + (p.typeName || '')).toLowerCase();
+    return vibeWoorden.filter(function(w) {
+      return new RegExp('(^|[^a-z\u00e0-\u00ff])' + w + '([^a-z\u00e0-\u00ff]|$)').test(tekst);
+    }).length;
+  };
+
   if (ankers.length) {
     // Met ankers telt eerst hoeveel van jouw kleuren gedekt zijn, dan of het
     // een statement blijft, en pas daarna hoeveel stuks je ervan hebt. Een
@@ -5977,12 +6021,12 @@ function capScoorCombos() {
                   || rang(a) - rang(b)
                   || b.aantal - a.aantal);
     const rest = gewenst.filter(p => !p.ankers.length && (p.eigenBron || (p.bruikbaar && p.aantal >= 3)))
-      .sort((a,b) => voorop(b) - voorop(a) || b.aantal - a.aantal);
+      .sort((a,b) => vibeRaak(b) - vibeRaak(a) || voorop(b) - voorop(a) || b.aantal - a.aantal);
     capCombos = raak.concat(rest).slice(0, 20);
   } else {
     capCombos = gewenst
       .filter(p => p.eigenBron || (p.bruikbaar && p.aantal >= 3))
-      .sort((a,b) => voorop(b) - voorop(a) || b.aantal - a.aantal)
+      .sort((a,b) => vibeRaak(b) - vibeRaak(a) || voorop(b) - voorop(a) || b.aantal - a.aantal)
       .slice(0, 20);
   }
 
@@ -6022,6 +6066,57 @@ function capAnkerTreffers() {
   return capCombos.filter(p => (p.ankers || []).length >= n).length;
 }
 
+// ── WAAR BEGIN JE? ───────────────────────────────────────────────────────────
+// De kleurcombo was de enige ingang. Zij wilde ook kunnen starten bij stukken
+// die sowieso mee moeten, bij een gevoel, of bij niets — en dan gewoon de tas
+// krijgen. De route erna is in alle gevallen dezelfde; wat verschilt is wat de
+// stylist als uitgangspunt meekrijgt, en of zij zélf nog een combo aantikt.
+let capIngang = 'combo';
+
+const CAP_INGANG_UITLEG = {
+  combo: 'Je kiest zo een of meer kleurrichtingen, en ik maak daar de tas uit.',
+  items: 'Zet hieronder bij "Moet mee" wat sowieso meegaat. Ik zoek de kleurrichtingen '
+       + 'daar zelf omheen en vul aan met wat erbij past.',
+  vibe:  'Schrijf in je eigen woorden welk gevoel het moet hebben. Ik zoek daar '
+       + 'kleurrichtingen en stukken bij die je echt hebt.',
+  direct:'Ik kies zelf een kleurrichting die bij je kast past en maak de tas. Je hoeft '
+       + 'niets aan te tikken — achteraf kun je nog per stuk wisselen.',
+};
+
+function kiesCapIngang(ingang) {
+  capIngang = ingang;
+  document.querySelectorAll('#cap-ingang .cap-neeknop').forEach(function(b) {
+    b.classList.toggle('aan', b.dataset.ingang === ingang);
+  });
+  const uit = document.getElementById('cap-ingang-uit');
+  if (uit) uit.textContent = CAP_INGANG_UITLEG[ingang] || '';
+  const vibeVak = document.getElementById('cap-vibe-vak');
+  if (vibeVak) vibeVak.style.display = ingang === 'vibe' ? 'block' : 'none';
+  // De knop onderaan zegt wat er gaat gebeuren: bij "kies jij maar" slaat hij
+  // de combostap over, en dat hoort er vóór te staan en niet als verrassing.
+  const knop = document.getElementById('cap-naar-palet');
+  if (knop) {
+    knop.textContent = ingang === 'direct'
+      ? '→ Stel mijn weekendtas samen'
+      : ingang === 'vibe' ? '✨ Zoek kleurrichtingen bij dit gevoel'
+      : ingang === 'items' ? '\U0001F455 Zoek kleurrichtingen bij mijn stukken'
+      : "Zoek kleurcombo's in mijn kast →";
+  }
+}
+
+function capVibe() {
+  const v = document.getElementById('cap-vibe');
+  return capIngang === 'vibe' ? String((v && v.value) || '').trim() : '';
+}
+
+// Die vibe hoort ook in de opdracht aan de stylist te staan, anders is het een
+// invulveld dat nergens aankomt.
+function capVibeZin() {
+  const v = capVibe();
+  return v ? 'Zij wil dat deze tas dit gevoel heeft: "' + v + '". Laat dat terugkomen in '
+    + 'de keuze van kleuren, stukken en de manier waarop je ze combineert.\n' : '';
+}
+
 function capNaarCombos() {
   capHuidigeTasId = null;   // andere opzet, dus een nieuwe tas in je lijst
   capFilterKast();
@@ -6032,6 +6127,14 @@ function capNaarCombos() {
   toonCombos();
   bijwerkComboKnop();
   toonBijstel();
+
+  // "Kies jij maar": niet eerst een scherm met twintig combo's tonen waar zij
+  // niets mee wil. De voorselectie staat al, dus meteen door naar de tas.
+  if (capIngang === 'direct' && capGekozenCombos.length) {
+    capToonStap(2);
+    capMaakOutfits();
+    return;
+  }
   capToonStap(2);
 
   // Heb je stukken aangewezen, dan is de vraag die daarna komt bijna altijd
@@ -6643,7 +6746,7 @@ async function capKiesKoffer(kast, aantal, weer, gel, max) {
 Antwoord in het Nederlands. Kies ALLEEN uit de gegeven lijst.`,
     [{ type:'text', text:
 `Griette gaat weg${gel ? ': ' + gel : ''}. Het weer is ${weer}. Ze wil er ${aantal} outfits uit halen.
-${capItems.length ? 'Deze stukken gaan sowieso mee: ' + capItems.map(i=>i.name).join(', ') + '.\n' : ''}${capNietKleuren.length ? 'Deze kleuren wil ze niet: ' + opsom(capNietKleuren) + '.\n' : ''}${capComboZin()}${wilKleurenZin()}${inspoZin()}
+${capItems.length ? 'Deze stukken gaan sowieso mee: ' + capItems.map(i=>i.name).join(', ') + '.\n' : ''}${capNietKleuren.length ? 'Deze kleuren wil ze niet: ' + opsom(capNietKleuren) + '.\n' : ''}${capVibeZin()}${capComboZin()}${wilKleurenZin()}${inspoZin()}
 BESCHIKBAAR:
 ${kast}
 
