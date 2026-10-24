@@ -314,6 +314,37 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 .btn-next{flex:1;padding:14px;background:var(--text);color:var(--bg);border:none;border-radius:12px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
 .btn-next:disabled{opacity:.35;cursor:default;}
 
+/* Per stuk wisselen in de tas, met het oordeel erna. */
+.cap-chip-klik{cursor:pointer;border:1px solid var(--border);background:var(--white);font-family:'Jost',sans-serif;}
+.cap-chip-pijl{opacity:.45;margin-left:2px;}
+.tasruil{margin-top:8px;background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:9px 10px;max-height:230px;overflow-y:auto;}
+.tasruil-knop{display:flex;align-items:center;gap:7px;width:100%;text-align:left;background:none;border:none;padding:5px 3px;cursor:pointer;font-family:'Jost',sans-serif;font-size:11px;color:var(--text);}
+.tasruil-knop img{width:26px;height:32px;object-fit:cover;border-radius:3px;flex-shrink:0;}
+.tasruil-geen{width:26px;height:32px;border-radius:3px;background:var(--cream);flex-shrink:0;}
+.tr-beter{border-color:#8aa87a;background:color-mix(in srgb,#8aa87a 8%,var(--white));}
+.tr-minder{border-color:#c9a06a;background:color-mix(in srgb,#c9a06a 9%,var(--white));}
+.tr-kop{font-size:8.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--text-2);margin-bottom:4px;}
+.tr-regel{font-size:11px;color:var(--text);line-height:1.5;}
+/* Alle kaarten naast elkaar, en het moodboard van de hele tas. */
+.kaarten-rij{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.kaarten-rij::-webkit-scrollbar{display:none;}
+.kaart-cel2{flex-shrink:0;width:132px;}
+.kaart-cel2 img{width:132px;border-radius:6px;border:1px solid var(--border);display:block;}
+.kaart-cel2-naam{font-size:9px;color:var(--text-2);line-height:1.3;margin:4px 0 4px;}
+.mb-voorbeeld{width:100%;border-radius:8px;border:1px solid var(--border);display:block;}
+.moodboard{background:#F5F2EE;padding:28px;font-family:'Inter',sans-serif;color:#1a1510;}
+.mb-kop{text-align:center;margin-bottom:18px;}
+.mb-titel{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:.02em;text-transform:uppercase;line-height:1;}
+.mb-sub{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#6b573f;margin-top:4px;}
+.mb-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:18px;}
+.mb-cel{text-align:center;}
+.mb-foto{display:block;width:100%;aspect-ratio:3/4;border-radius:5px;background:#e8ddd2;background-size:cover;background-position:center;}
+.mb-geen{display:flex;align-items:center;justify-content:center;color:#b9a48c;}
+.mb-naam{display:block;font-size:7.5px;color:#5a4030;line-height:1.3;margin-top:3px;}
+.mb-keer{display:block;font-size:7px;color:#9B7B5C;font-weight:700;}
+.mb-onder{display:flex;gap:22px;border-top:1px solid #ddd5c8;padding-top:14px;}
+.mb-lijst{flex:1;font-size:9.5px;line-height:1.7;color:#4a3828;}
+.mb-lijst b{display:block;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#1a1510;margin-bottom:5px;}
 /* KAART */
 #card-wrap{display:none;padding:16px 16px calc(100px + env(safe-area-inset-bottom,0px));overflow-y:auto;}
 .kaart{background:#F5F2EE;border-radius:16px;overflow:hidden;width:100%;max-width:420px;margin:0 auto;padding:28px 24px 22px;font-family:'Inter',sans-serif;position:relative;}
@@ -565,6 +596,28 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
         </div>
       </div>
 
+      <!-- Waar begin je? Tot nu toe was de kleurcombo de enige ingang, en zij
+           wilde ook op items of op een gevoel kunnen starten — of helemaal
+           niets kiezen en gewoon de tas krijgen. De route erna is dezelfde;
+           alleen wat de stylist als uitgangspunt meekrijgt verschilt. -->
+      <div class="sec-label" style="margin-top:14px;">Waar begin je?</div>
+      <div class="field-note" style="margin-bottom:8px;">Kies één ingang. Je hoeft geen
+        kleurcombo te kiezen — dan zoek ik er zelf een die bij je kast past.</div>
+      <div class="cap-nee" id="cap-ingang">
+        <button class="cap-neeknop aan" data-ingang="combo" onclick="kiesCapIngang('combo')">🎨 Via kleurcombo's</button>
+        <button class="cap-neeknop" data-ingang="items" onclick="kiesCapIngang('items')">👕 Via stukken die mee moeten</button>
+        <button class="cap-neeknop" data-ingang="vibe" onclick="kiesCapIngang('vibe')">✨ Via een gevoel</button>
+        <button class="cap-neeknop" data-ingang="direct" onclick="kiesCapIngang('direct')">→ Kies jij maar</button>
+      </div>
+      <div class="field-note" id="cap-ingang-uit" style="margin-bottom:8px;"></div>
+      <div id="cap-vibe-vak" style="display:none;margin-bottom:10px;">
+        <input class="field" type="text" id="cap-vibe" maxlength="120"
+               placeholder="bijv. rustig en verzorgd, of juist stoer met kleur"
+               style="font-size:14px;padding:11px 13px;">
+        <div class="field-note" style="margin-top:4px;">In je eigen woorden. Ik zoek daar
+          kleurrichtingen en stukken bij die je echt hebt.</div>
+      </div>
+
       <div class="sec-label" style="margin-top:14px;">Hoe wil je het?</div>
       <div class="field-note" style="margin-bottom:8px;">Compact inpakken en verkennen zijn niet hetzelfde. Dezelfde reis, ander soort uitkomst.</div>
       <div class="cap-nee" id="cap-hoe">
@@ -645,6 +698,33 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
       <div class="field-note" id="cap-outfit-status" style="margin-bottom:8px;"></div>
       <div id="cap-uitkomst"></div>
       <div id="cap-bewaard" style="margin-top:8px;"></div>
+
+      <!-- Wat zij hierna wil: zelf aanpassen, alles als kaarten, één moodboard,
+           en daarna nog meer outfits uit dezelfde tas. -->
+      <div id="cap-vervolg" style="display:none;margin-top:14px;padding-top:12px;border-top:1.5px solid var(--border);">
+        <div class="sec-label">Nog iets aanpassen?</div>
+        <div class="field-note" style="margin-bottom:6px;">Schrijf in je eigen woorden wat je
+          anders wilt nu je het ziet. Bijvoorbeeld: "de zwarte broek eruit" of "meer kleur in
+          outfit 2".</div>
+        <input class="field" type="text" id="cap-wens" maxlength="200"
+               placeholder="wat zou je anders willen?" style="font-size:14px;padding:11px 13px;">
+        <button class="ai-btn" style="margin-top:8px;" onclick="capPasAan()">✨ Pas de tas hierop aan</button>
+        <div class="field-note" id="cap-wens-status" style="margin-top:6px;"></div>
+
+        <div class="sec-label" style="margin-top:16px;">Vastleggen</div>
+        <button class="ai-btn" style="margin-top:6px;" onclick="maakAlleKaarten()">🖼 Maak alle outfitkaarten</button>
+        <button class="btn-rescan" style="margin-top:6px;" onclick="maakMoodboard()">📋 Maak één moodboard met inpaklijst</button>
+        <div class="field-note" id="cap-kaarten-status" style="margin-top:6px;"></div>
+        <div id="cap-kaarten-vak" style="margin-top:8px;"></div>
+        <div id="cap-moodboard-vak" style="margin-top:10px;"></div>
+
+        <div class="sec-label" style="margin-top:16px;">Verder met deze tas</div>
+        <div class="field-note" style="margin-bottom:6px;">Zelfde stukken, meer outfits — en
+          daarna weer kaarten en een moodboard van alles samen.</div>
+        <button class="btn-rescan" onclick="capMeerOutfits()">✚ Nog meer outfits uit deze tas</button>
+        <div class="field-note" id="cap-meer-status" style="margin-top:6px;"></div>
+      </div>
+
       <button class="ai-btn" id="cap-bewaar-tas" style="margin-top:10px;" onclick="bewaarTas()">💾 Bewaar deze tas</button>
       <button class="btn-rescan" id="cap-terug2" style="margin-top:8px;" onclick="capTerug(2)">← Andere combo's kiezen</button>
     </div>
@@ -5967,6 +6047,28 @@ function capScoorCombos() {
   // een lagere telling betekent hier niet "onbruikbaar".
   const voorop = p => p.eigenBron ? 1 : 0;
 
+  // Begon ze bij een gevoel, dan moet dat bepalen wélke combo's in de lijst
+  // komen — niet alleen hoe de twintig die er toevallig in zitten op volgorde
+  // staan. Daarom telt dit mee vóór het afkappen.
+  //
+  // De presets dragen zelf een vibe-tekst ("zachte basis, harde knal") en een
+  // stijl ("streetstyle"); haar woorden overlappen daar vaak mee. Woorden
+  // vergelijken is hier genoeg en kost geen aanroep.
+  const vibeWoorden = (typeof capVibe === 'function' ? capVibe() : '')
+    .toLowerCase().split(/[^a-z\u00e0-\u00ff]+/).filter(function(w){ return w.length >= 4; });
+  // Op hele woorden, niet op stukjes: "kleur" zit in "hoofdkleur", en dan
+  // scoort elke combo met het woord hoofdkleur in zijn omschrijving een
+  // treffer op een woord dat er niet staat. Precies dezelfde val als "hak" in
+  // "khaki", eerder in deze app.
+  const vibeRaak = function(p) {
+    if (!vibeWoorden.length) return 0;
+    const tekst = ((p.vibe || '') + ' ' + (p.stijl || '') + ' ' + (p.name || '')
+      + ' ' + (p.typeName || '')).toLowerCase();
+    return vibeWoorden.filter(function(w) {
+      return new RegExp('(^|[^a-z\u00e0-\u00ff])' + w + '([^a-z\u00e0-\u00ff]|$)').test(tekst);
+    }).length;
+  };
+
   if (ankers.length) {
     // Met ankers telt eerst hoeveel van jouw kleuren gedekt zijn, dan of het
     // een statement blijft, en pas daarna hoeveel stuks je ervan hebt. Een
@@ -5977,12 +6079,12 @@ function capScoorCombos() {
                   || rang(a) - rang(b)
                   || b.aantal - a.aantal);
     const rest = gewenst.filter(p => !p.ankers.length && (p.eigenBron || (p.bruikbaar && p.aantal >= 3)))
-      .sort((a,b) => voorop(b) - voorop(a) || b.aantal - a.aantal);
+      .sort((a,b) => vibeRaak(b) - vibeRaak(a) || voorop(b) - voorop(a) || b.aantal - a.aantal);
     capCombos = raak.concat(rest).slice(0, 20);
   } else {
     capCombos = gewenst
       .filter(p => p.eigenBron || (p.bruikbaar && p.aantal >= 3))
-      .sort((a,b) => voorop(b) - voorop(a) || b.aantal - a.aantal)
+      .sort((a,b) => vibeRaak(b) - vibeRaak(a) || voorop(b) - voorop(a) || b.aantal - a.aantal)
       .slice(0, 20);
   }
 
@@ -6022,6 +6124,57 @@ function capAnkerTreffers() {
   return capCombos.filter(p => (p.ankers || []).length >= n).length;
 }
 
+// ── WAAR BEGIN JE? ───────────────────────────────────────────────────────────
+// De kleurcombo was de enige ingang. Zij wilde ook kunnen starten bij stukken
+// die sowieso mee moeten, bij een gevoel, of bij niets — en dan gewoon de tas
+// krijgen. De route erna is in alle gevallen dezelfde; wat verschilt is wat de
+// stylist als uitgangspunt meekrijgt, en of zij zélf nog een combo aantikt.
+let capIngang = 'combo';
+
+const CAP_INGANG_UITLEG = {
+  combo: 'Je kiest zo een of meer kleurrichtingen, en ik maak daar de tas uit.',
+  items: 'Zet hieronder bij "Moet mee" wat sowieso meegaat. Ik zoek de kleurrichtingen '
+       + 'daar zelf omheen en vul aan met wat erbij past.',
+  vibe:  'Schrijf in je eigen woorden welk gevoel het moet hebben. Ik zoek daar '
+       + 'kleurrichtingen en stukken bij die je echt hebt.',
+  direct:'Ik kies zelf een kleurrichting die bij je kast past en maak de tas. Je hoeft '
+       + 'niets aan te tikken — achteraf kun je nog per stuk wisselen.',
+};
+
+function kiesCapIngang(ingang) {
+  capIngang = ingang;
+  document.querySelectorAll('#cap-ingang .cap-neeknop').forEach(function(b) {
+    b.classList.toggle('aan', b.dataset.ingang === ingang);
+  });
+  const uit = document.getElementById('cap-ingang-uit');
+  if (uit) uit.textContent = CAP_INGANG_UITLEG[ingang] || '';
+  const vibeVak = document.getElementById('cap-vibe-vak');
+  if (vibeVak) vibeVak.style.display = ingang === 'vibe' ? 'block' : 'none';
+  // De knop onderaan zegt wat er gaat gebeuren: bij "kies jij maar" slaat hij
+  // de combostap over, en dat hoort er vóór te staan en niet als verrassing.
+  const knop = document.getElementById('cap-naar-palet');
+  if (knop) {
+    knop.textContent = ingang === 'direct'
+      ? '→ Stel mijn weekendtas samen'
+      : ingang === 'vibe' ? '✨ Zoek kleurrichtingen bij dit gevoel'
+      : ingang === 'items' ? '\U0001F455 Zoek kleurrichtingen bij mijn stukken'
+      : "Zoek kleurcombo's in mijn kast →";
+  }
+}
+
+function capVibe() {
+  const v = document.getElementById('cap-vibe');
+  return capIngang === 'vibe' ? String((v && v.value) || '').trim() : '';
+}
+
+// Die vibe hoort ook in de opdracht aan de stylist te staan, anders is het een
+// invulveld dat nergens aankomt.
+function capVibeZin() {
+  const v = capVibe();
+  return v ? 'Zij wil dat deze tas dit gevoel heeft: "' + v + '". Laat dat terugkomen in '
+    + 'de keuze van kleuren, stukken en de manier waarop je ze combineert.\n' : '';
+}
+
 function capNaarCombos() {
   capHuidigeTasId = null;   // andere opzet, dus een nieuwe tas in je lijst
   capFilterKast();
@@ -6032,6 +6185,14 @@ function capNaarCombos() {
   toonCombos();
   bijwerkComboKnop();
   toonBijstel();
+
+  // "Kies jij maar": niet eerst een scherm met twintig combo's tonen waar zij
+  // niets mee wil. De voorselectie staat al, dus meteen door naar de tas.
+  if (capIngang === 'direct' && capGekozenCombos.length) {
+    capToonStap(2);
+    capMaakOutfits();
+    return;
+  }
   capToonStap(2);
 
   // Heb je stukken aangewezen, dan is de vraag die daarna komt bijna altijd
@@ -6643,7 +6804,7 @@ async function capKiesKoffer(kast, aantal, weer, gel, max) {
 Antwoord in het Nederlands. Kies ALLEEN uit de gegeven lijst.`,
     [{ type:'text', text:
 `Griette gaat weg${gel ? ': ' + gel : ''}. Het weer is ${weer}. Ze wil er ${aantal} outfits uit halen.
-${capItems.length ? 'Deze stukken gaan sowieso mee: ' + capItems.map(i=>i.name).join(', ') + '.\n' : ''}${capNietKleuren.length ? 'Deze kleuren wil ze niet: ' + opsom(capNietKleuren) + '.\n' : ''}${capComboZin()}${wilKleurenZin()}${inspoZin()}
+${capItems.length ? 'Deze stukken gaan sowieso mee: ' + capItems.map(i=>i.name).join(', ') + '.\n' : ''}${capNietKleuren.length ? 'Deze kleuren wil ze niet: ' + opsom(capNietKleuren) + '.\n' : ''}${capVibeZin()}${capComboZin()}${wilKleurenZin()}${inspoZin()}
 BESCHIKBAAR:
 ${kast}
 
@@ -7097,6 +7258,11 @@ function toonCapsule() {
           : '<br>Elk stuk komt in meer dan één outfit terug — deze tas verdient zijn plek.')
       + '</div></div>';
   }
+  // Het vervolg (aanpassen, kaarten, moodboard, meer outfits) hoort pas te
+  // verschijnen als er iets staat om op te reageren.
+  const vervolg = document.getElementById('cap-vervolg');
+  if (vervolg) vervolg.style.display = capsuleResultaat.outfits.length ? 'block' : 'none';
+
   capsuleResultaat.outfits.forEach((o, i) => {
     const namen = Array.isArray(o.items) ? o.items : [];
     html += '<div class="cap-outfit">'
@@ -7112,12 +7278,20 @@ function toonCapsule() {
           const foto = echt && cloudMap[echt.id];
           // met een fotootje erbij zie je in één blik wat het is, in plaats
           // van een naam te moeten vertalen naar een kledingstuk
-          return `<span class="cap-chip${echt ? '' : ' nieuw'}">`
-            + (foto ? `<img class="cap-chip-foto" src="${esc(foto)}" alt="">` : '')
-            + `${esc(n)}</span>`;
+          // Aanklikbaar: zij wilde per stuk kunnen wisselen in de tas zelf,
+          // niet alleen op de losse outfitkaart. Een stuk dat niet in haar
+          // kast zit valt niet te wisselen, dus die blijft een label.
+          const j = namen.indexOf(n);
+          return echt
+            ? `<button type="button" class="cap-chip cap-chip-klik" `
+              + `onclick="tasRuilOpen(${i},${j})">`
+              + (foto ? `<img class="cap-chip-foto" src="${esc(foto)}" alt="">` : '')
+              + `${esc(n)} <span class="cap-chip-pijl">\u21bb</span></button>`
+            : `<span class="cap-chip nieuw">${esc(n)}</span>`;
         }).join('')
       + '</div>'
       + (o.waarom ? `<div class="cap-waarom">${esc(o.waarom)}</div>` : '')
+      + `<div id="tasruil-${i}"></div>`
       + '<div class="cap-outfit-knoppen">'
       + `<button class="cap-kaart-btn" onclick="capsuleNaarKaart(${i})">Outfitkaart →</button>`
       + `<button class="cap-vervang-btn" onclick="vervangOutfit(${i})">↻ Andere</button>`
@@ -7179,6 +7353,517 @@ function terugNaarHerkomst() {
   capToonStap(3);            // de outfits staan er nog
   kaartHerkomst = null;
   toonHerkomstKnop();
+}
+
+// ── PER STUK WISSELEN ÍN DE TAS ──────────────────────────────────────────────
+// "als ik heb samengesteld dan nog kunnen kiezen / switchen voor bijv andere
+//  jas of per item iets kunnen switchen. De tool moet dan wel opnieuw
+//  beoordelen of het vervangende item past bij de samengestelde outfit."
+//
+// Dat laatste is het punt. Een lijst alternatieven geven is makkelijk; het gaat
+// erom dat er daarna opnieuw naar de héle outfit wordt gekeken. Dus twee
+// stappen: eerst wat je ervoor hebt in dezelfde categorie, en na het wisselen
+// een nieuw oordeel over de outfit zoals hij dan is.
+function tasRuilOpen(outfitIdx, itemIdx) {
+  const vak = document.getElementById('tasruil-' + outfitIdx);
+  const o = capsuleResultaat && capsuleResultaat.outfits[outfitIdx];
+  if (!vak || !o) return;
+  if (vak.innerHTML) { vak.innerHTML = ''; return; }
+
+  const namen = Array.isArray(o.items) ? o.items : [];
+  const huidig = vindItemOpNaam(namen[itemIdx]);
+  if (!huidig) return;
+  const alIn = namen.map(function(n){ return (vindItemOpNaam(n) || {}).id; });
+
+  // Alleen uit de gezeefde kast: wat zij heeft uitgesloten of wat niet bij het
+  // weer past, hoort hier niet als alternatief te staan.
+  const opties = (capGefilterd.length ? capGefilterd : allItems).filter(function(x) {
+    return x.cat === huidig.cat && alIn.indexOf(x.id) < 0;
+  });
+
+  if (!opties.length) {
+    vak.innerHTML = '<div class="tasruil"><div class="field-note">Je hebt hier niets anders '
+      + 'voor in je kast dat ook bij deze reis past.</div></div>';
+    return;
+  }
+
+  vak.innerHTML = '<div class="tasruil">'
+    + '<div class="field-note" style="margin-bottom:5px;">In plaats van <b>'
+    + esc(huidig.name) + '</b>:</div>'
+    + opties.slice(0, 18).map(function(x) {
+        const foto = cloudMap[x.id];
+        return '<button type="button" class="tasruil-knop" '
+          + 'onclick="tasRuilDoe(' + outfitIdx + ',' + itemIdx + ',\'' + esc(x.id) + '\')">'
+          + (foto ? '<img src="' + esc(foto) + '" alt="">' : '<span class="tasruil-geen"></span>')
+          // Eigen klasse op de naam: zonder foto staat er een leeg vakje vóór,
+          // en dan is "het eerste span" niet de naam.
+          + '<span class="tasruil-naam">' + esc(x.name) + '</span></button>';
+      }).join('')
+    + '</div>';
+}
+
+async function tasRuilDoe(outfitIdx, itemIdx, nieuwId) {
+  const o = capsuleResultaat && capsuleResultaat.outfits[outfitIdx];
+  const nieuw = allItems.find(function(i){ return i.id === nieuwId; });
+  if (!o || !nieuw) return;
+  const namen = Array.isArray(o.items) ? o.items.slice() : [];
+  const oud = namen[itemIdx];
+  namen[itemIdx] = nieuw.name;
+  o.items = namen;
+  o.geruild = true;
+  toonCapsule();
+
+  // De kaarten en het moodboard kloppen niet meer bij deze tas.
+  alleKaarten = [];
+  const kv = document.getElementById('cap-kaarten-vak');
+  if (kv) kv.innerHTML = '';
+  const mv = document.getElementById('cap-moodboard-vak');
+  if (mv) mv.innerHTML = '';
+
+  // En nu het punt waar het haar om ging: opnieuw beoordelen.
+  await beoordeelTasOutfit(outfitIdx, oud, nieuw.name);
+}
+
+// Opnieuw kijken naar de outfit zoals hij nu is. Niet "past dit stuk" in het
+// algemeen, maar: klopt déze combinatie nog, met dit stuk erin.
+async function beoordeelTasOutfit(outfitIdx, oudeNaam, nieuweNaam) {
+  const vak = document.getElementById('tasruil-' + outfitIdx);
+  const o = capsuleResultaat && capsuleResultaat.outfits[outfitIdx];
+  if (!vak || !o) return;
+  vak.innerHTML = '<div class="tasruil"><div class="field-note">'
+    + esc(nieuweNaam) + ' staat erin. Even kijken of de outfit nog klopt…</div></div>';
+
+  const stukken = (o.items || []).map(function(n) {
+    const i = vindItemOpNaam(n);
+    return '- ' + n + (i ? ' (' + i.cat + ')' : '');
+  }).join('\n');
+
+  try {
+    const raw = await callClaude(
+      "Je bent Griette's stylist. " + DNA_KORT + profielBlok()
+      + '\nAntwoord in het Nederlands, kort en eerlijk. Zij heeft net één stuk gewisseld.',
+      [{ type:'text', text:
+`In deze outfit uit haar weekendtas heeft ze "${oudeNaam}" vervangen door "${nieuweNaam}".
+
+De outfit is nu:
+${stukken}
+
+Beoordeel of deze combinatie nog klopt, met dit stuk erin. Kijk naar silhouet
+(niet alles wijd en niet alles strak, en is er een breekpunt), naar kleur (wat
+voert, wat ondersteunt, komt er iets terug) en naar materiaal (staat er iets
+soepels tegenover iets stevigs). Beweer niets over pasvorm dat je niet kunt zien.
+
+Wees eerlijk: is dit een verbetering, gelijkwaardig, of een verslechtering ten
+opzichte van "${oudeNaam}"? Zeg het gewoon als het minder is.
+
+Antwoord ALLEEN met JSON:
+{"oordeel":"beter|gelijk|minder","kort":"één zin waarom",
+ "let_op":"alleen als er nu iets wringt","handeling":"één precieze stylinghandeling"}` }],
+      1200, 'low', 'kies');
+
+    const d = extractJson(raw);
+    if (!d) throw new Error('geen bruikbaar antwoord');
+    o.ruilOordeel = d;
+    const kleur = d.oordeel === 'beter' ? 'tr-beter'
+                : d.oordeel === 'minder' ? 'tr-minder' : 'tr-gelijk';
+    vak.innerHTML = '<div class="tasruil ' + kleur + '">'
+      + '<div class="tr-kop">' + esc(nieuweNaam) + ' — ' + esc(d.oordeel || 'nagekeken') + '</div>'
+      + (d.kort ? '<div class="tr-regel">' + esc(d.kort) + '</div>' : '')
+      + (d.let_op ? '<div class="tr-regel"><b>Let op:</b> ' + esc(d.let_op) + '</div>' : '')
+      + (d.handeling ? '<div class="tr-regel"><b>Doe dit:</b> ' + esc(d.handeling) + '</div>' : '')
+      + '<button type="button" class="btn-rescan" style="margin-top:6px;" '
+      + 'onclick="tasRuilTerug(' + outfitIdx + ',\'' + esc(oudeNaam) + '\',\''
+      + esc(nieuweNaam) + '\')">↩ Toch terug naar ' + esc(oudeNaam) + '</button>'
+      + '</div>';
+  } catch(e) {
+    // Geen oordeel is geen ramp, maar het mag niet lijken alsof het goedgekeurd is.
+    vak.innerHTML = '<div class="tasruil"><div class="field-note">'
+      + esc(nieuweNaam) + ' staat erin. De stylist kon er niet bij ('
+      + esc(e && e.message || 'onbekend') + '), dus dit is nog niet nagekeken.'
+      + '<br><button type="button" class="btn-rescan" style="margin-top:6px;" '
+      + 'onclick="tasRuilTerug(' + outfitIdx + ',\'' + esc(oudeNaam) + '\',\''
+      + esc(nieuweNaam) + '\')">↩ Toch terug</button></div></div>';
+  }
+}
+
+// Terug kunnen is belangrijker dan het lijkt: zonder dat durf je niet te
+// proberen. Het oordeel gaat mee weg, want dat ging over de andere versie.
+function tasRuilTerug(outfitIdx, oudeNaam, nieuweNaam) {
+  const o = capsuleResultaat && capsuleResultaat.outfits[outfitIdx];
+  if (!o) return;
+  const namen = (o.items || []).slice();
+  const n = namen.indexOf(nieuweNaam);
+  if (n >= 0) namen[n] = oudeNaam;
+  o.items = namen;
+  delete o.ruilOordeel;
+  toonCapsule();
+  alleKaarten = [];
+  const kv = document.getElementById('cap-kaarten-vak');
+  if (kv) kv.innerHTML = '';
+}
+
+// ── WAT ZIJ ER ZELF NOG VAN VINDT ────────────────────────────────────────────
+// "ik wil als alles is samengesteld nog kunnen invoeren welke aanpassingen ik
+//  bij het zien van de samenstelling nog zou willen doen"
+//
+// Dat is iets anders dan opnieuw beginnen: de tas blijft staan, zij zegt wat er
+// anders moet, en de stylist past precies dát aan. Hij krijgt de huidige tas
+// mee én de opdracht om de rest met rust te laten.
+async function capPasAan() {
+  const veld = document.getElementById('cap-wens');
+  const st = document.getElementById('cap-wens-status');
+  const wens = String((veld && veld.value) || '').trim();
+  if (!wens) { if (st) st.textContent = 'Schrijf eerst op wat je anders wilt.'; return; }
+  if (!capsuleResultaat || !(capsuleResultaat.outfits || []).length) return;
+
+  if (st) st.textContent = 'De stylist past het aan…';
+  const stop = (typeof volgVoortgang === 'function' && st) ? volgVoortgang(st) : function(){};
+
+  const huidig = capsuleResultaat.outfits.map(function(o, i) {
+    return (i + 1) + '. ' + (o.naam || 'Outfit ' + (i + 1)) + ': '
+      + (Array.isArray(o.items) ? o.items.join(' + ') : '');
+  }).join('\n');
+
+  try {
+    const raw = await callClaude(
+      "Je bent Griette's stylist. " + DNA_KORT + profielBlok()
+      + '\nAntwoord in het Nederlands. Je past een bestaande weekendtas aan op één wens.',
+      [{ type:'text', text:
+`Dit is haar weekendtas zoals die er nu staat:
+
+${huidig}
+
+Beschikbaar in haar kast:
+${capGefilterd.map(function(i){ return '- ' + i.name; }).join('\n')}
+
+Zij wil dit aangepast zien:
+"${wens}"
+
+Pas ALLEEN dat aan. Laat de rest staan zoals het is — zij heeft er net naar
+gekeken en de rest goedgekeurd. Vervang alleen door stukken die in de lijst
+hierboven staan; verzin er niets bij.
+Zeg per outfit die je verandert kort waarom het nog steeds klopt qua silhouet
+en kleur. Gaat haar wens niet samen met een werkende outfit, zeg dat dan in
+plaats van iets te forceren.
+
+Antwoord ALLEEN met JSON:
+{"outfits":[{"naam":"...","items":["exacte naam uit de lijst"],"stijl":"...","waarom":"..."}],
+ "wat_ik_deed":"één zin","niet_gedaan":"alleen als iets niet kon"}` }],
+      6000, 'medium', 'kies');
+
+    const data = extractJson(raw);
+    if (!data || !Array.isArray(data.outfits) || !data.outfits.length) {
+      throw new Error('het antwoord was niet te lezen');
+    }
+    // Namen terugvertalen naar echte stukken; wat niet bestaat telt niet mee.
+    const schoon = data.outfits.map(function(o) {
+      const namen = [].concat(o.items || []).filter(function(n){ return !!vindItemOpNaam(n); });
+      return Object.assign({}, o, { items: namen });
+    }).filter(function(o){ return o.items.length >= 2; });
+    if (!schoon.length) throw new Error('er bleven geen bruikbare outfits over');
+
+    capsuleResultaat.outfits = schoon;
+    toonCapsule();
+    // De kaarten die er stonden kloppen niet meer bij deze tas.
+    alleKaarten = [];
+    const kv = document.getElementById('cap-kaarten-vak');
+    if (kv) kv.innerHTML = '';
+    const mv = document.getElementById('cap-moodboard-vak');
+    if (mv) mv.innerHTML = '';
+    if (veld) veld.value = '';
+    if (st) st.textContent = (data.wat_ik_deed || 'Aangepast.')
+      + (data.niet_gedaan ? ' Niet gelukt: ' + data.niet_gedaan : '')
+      + ' De kaarten moeten opnieuw gemaakt worden.';
+  } catch(e) {
+    if (st) st.textContent = 'Dat lukte niet: ' + (e && e.message || 'onbekend')
+      + '. Je tas staat nog zoals hij was.';
+  } finally { stop(); }
+}
+
+// ── NOG MEER OUTFITS UIT DEZELFDE TAS ────────────────────────────────────────
+// "aan de hand van deze criteria van de app op basis van de tas nog meer
+//  passende outfits en dan riedel opnieuw"
+//
+// Dezelfde stukken, nieuwe combinaties. Niet de kast opnieuw in: de tas is al
+// gekozen, en juist daaruit meer halen is waar een capsule voor bedoeld is.
+async function capMeerOutfits() {
+  const st = document.getElementById('cap-meer-status');
+  if (!capsuleResultaat || !(capsuleResultaat.outfits || []).length) return;
+  const inTas = [];
+  capsuleResultaat.outfits.forEach(function(o) {
+    (Array.isArray(o.items) ? o.items : []).forEach(function(n) {
+      if (inTas.indexOf(n) < 0) inTas.push(n);
+    });
+  });
+  if (inTas.length < 4) {
+    if (st) st.textContent = 'Daar zitten te weinig stukken in om nieuwe combinaties uit te halen.';
+    return;
+  }
+
+  if (st) st.textContent = 'Nieuwe combinaties uit dezelfde stukken…';
+  const stop = (typeof volgVoortgang === 'function' && st) ? volgVoortgang(st) : function(){};
+  const bestaand = capsuleResultaat.outfits.map(function(o) {
+    return (Array.isArray(o.items) ? o.items : []).slice().sort().join(' + ');
+  });
+
+  try {
+    const raw = await callClaude(
+      "Je bent Griette's stylist. " + DNA_KORT + profielBlok()
+      + '\nAntwoord in het Nederlands. Je haalt meer outfits uit een tas die al ingepakt is.',
+      [{ type:'text', text:
+`In haar tas zitten deze stukken:
+${inTas.map(function(n){ return '- ' + n; }).join('\n')}
+
+Deze outfits heeft ze al:
+${bestaand.map(function(b, i){ return (i + 1) + '. ' + b; }).join('\n')}
+
+Maak 3 NIEUWE outfits uit dezelfde stukken. Regels:
+- Gebruik uitsluitend de stukken hierboven, met hun exacte naam. Niets erbij.
+- Geen herhaling van een outfit die er al staat, ook niet met één stuk verschil.
+- Elke outfit compleet: iets voor boven, iets voor onder (of een jurk) en schoenen.
+- Precies één blikvanger per outfit; niet twee stukken die om aandacht vechten.
+- Niet alles wijd en niet alles strak — één van beide, met een breekpunt in de lijn.
+- Minstens twee materiaalfamilies tegenover elkaar.
+Kun je er maar één of twee maken die echt kloppen, geef er dan één of twee.
+
+Antwoord ALLEEN met JSON:
+{"outfits":[{"naam":"...","items":["..."],"stijl":"...","waarom":"waarom dit werkt"}]}` }],
+      6000, 'medium', 'kies');
+
+    const data = extractJson(raw);
+    const nieuw = (data && Array.isArray(data.outfits) ? data.outfits : [])
+      .map(function(o) {
+        const namen = [].concat(o.items || []).filter(function(n) {
+          return inTas.indexOf(n) >= 0 || !!vindItemOpNaam(n);
+        });
+        return Object.assign({}, o, { items: namen });
+      })
+      .filter(function(o) {
+        if (o.items.length < 2) return false;
+        // Geen dubbele: dezelfde set stukken is dezelfde outfit.
+        return bestaand.indexOf(o.items.slice().sort().join(' + ')) < 0;
+      });
+    if (!nieuw.length) throw new Error('er kwamen geen nieuwe combinaties uit');
+
+    capsuleResultaat.outfits = capsuleResultaat.outfits.concat(nieuw);
+    toonCapsule();
+    alleKaarten = [];
+    const kv = document.getElementById('cap-kaarten-vak');
+    if (kv) kv.innerHTML = '';
+    const mv = document.getElementById('cap-moodboard-vak');
+    if (mv) mv.innerHTML = '';
+    if (st) st.textContent = nieuw.length + ' outfit' + (nieuw.length === 1 ? '' : 's')
+      + ' erbij, uit dezelfde stukken. Maak de kaarten en het moodboard opnieuw voor alles samen.';
+  } catch(e) {
+    if (st) st.textContent = 'Dat lukte niet: ' + (e && e.message || 'onbekend')
+      + '. Je tas staat nog zoals hij was.';
+  } finally { stop(); }
+}
+
+// ── ALLE KAARTEN IN ÉÉN KEER ─────────────────────────────────────────────────
+// Haar vraag: als de tas klaar is, alle outfitkaarten in één keer gemaakt en
+// getoond, elk als losse jpeg die ze kan opslaan. Tot nu toe moest ze per
+// outfit op "Outfitkaart →" en dan weer terug — bij zes outfits zes keer.
+//
+// Hoe dit werkt: de kaart die al bestaat wordt per outfit opgebouwd en
+// vastgelegd, en daarna wordt de kaart weer teruggezet zoals hij stond. Dus
+// geen tweede kaartontwerp dat naast het bestaande gaat verouderen.
+let alleKaarten = [];     // [{idx, naam, dataUrl}]
+let kaartenBezig = false;
+
+async function maakAlleKaarten() {
+  if (!capsuleResultaat || kaartenBezig) return;
+  const outfits = capsuleResultaat.outfits || [];
+  if (!outfits.length) return;
+  const st = document.getElementById('cap-kaarten-status');
+  const vak = document.getElementById('cap-kaarten-vak');
+  if (!vak) return;
+  kaartenBezig = true;
+  alleKaarten = [];
+  vak.innerHTML = '';
+
+  // Wat er nu op de kaart staat, komt straks terug. Anders is haar losse kaart
+  // weg zodra ze deze knop gebruikt.
+  const bewaardItems = selItems.slice();
+  const bewaardPreset = selPreset;
+  const bewaardUitleg = outfitUitleg;
+  const bewaardTop = outfitTop;
+
+  try {
+    for (let i = 0; i < outfits.length; i++) {
+      if (st) st.textContent = 'Kaart ' + (i + 1) + ' van ' + outfits.length + '…';
+      capsuleNaarKaart(i);
+      // Even wachten tot de foto's als achtergrond staan: buildKaart zet die
+      // pas zodra het beeld geladen is, en html2canvas legt vast wat er stáát.
+      await new Promise(function(r){ setTimeout(r, 450); });
+      const canvas = await kaartNaarCanvas(2);
+      alleKaarten.push({
+        idx: i,
+        naam: (outfits[i].naam || ('Outfit ' + (i + 1))),
+        dataUrl: canvas.toDataURL('image/jpeg', 0.9),
+      });
+    }
+    if (st) st.textContent = alleKaarten.length + ' kaarten klaar.';
+    toonAlleKaarten();
+  } catch(e) {
+    if (st) st.textContent = 'Dat lukte niet: ' + (e && e.message || 'onbekend')
+      + '. Je outfits staan er nog gewoon.';
+  } finally {
+    // De kaart terugzetten zoals zij hem had.
+    selItems = bewaardItems; selPreset = bewaardPreset;
+    outfitUitleg = bewaardUitleg; outfitTop = bewaardTop;
+    if (selItems.length) buildKaart();
+    kaartenBezig = false;
+  }
+}
+
+function toonAlleKaarten() {
+  const vak = document.getElementById('cap-kaarten-vak');
+  if (!vak) return;
+  if (!alleKaarten.length) { vak.innerHTML = ''; return; }
+  vak.innerHTML = '<div class="kaarten-rij">'
+    + alleKaarten.map(function(k, n) {
+        return '<div class="kaart-cel2">'
+          + '<img src="' + k.dataUrl + '" alt="' + esc(k.naam) + '">'
+          + '<div class="kaart-cel2-naam">' + esc(k.naam) + '</div>'
+          + '<button type="button" class="btn-rescan" onclick="bewaarEenKaart(' + n + ')">'
+          + '↓ Opslaan</button></div>';
+      }).join('')
+    + '</div>'
+    + '<button class="ai-btn" style="margin-top:10px;" onclick="bewaarAlleKaarten()">'
+    + '↓ Alle ' + alleKaarten.length + ' kaarten opslaan</button>';
+}
+
+// Eén kaart als jpeg. Via het deelvenster waar dat kan, want dáár zit
+// "opslaan in galerij"; downloaden zet hem alleen in Downloads.
+async function bewaarEenKaart(n) {
+  const k = alleKaarten[n];
+  if (!k) return;
+  const naam = String(k.naam).normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^A-Za-z0-9 _()-]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 50);
+  await bewaarDataUrl(k.dataUrl, (naam || 'outfit') + '.jpg');
+}
+
+async function bewaarAlleKaarten() {
+  const st = document.getElementById('cap-kaarten-status');
+  for (let n = 0; n < alleKaarten.length; n++) {
+    if (st) st.textContent = 'Opslaan ' + (n + 1) + ' van ' + alleKaarten.length + '…';
+    await bewaarEenKaart(n);
+    // Even ademruimte: een telefoon die tien downloads tegelijk krijgt,
+    // blokkeert de rest.
+    await new Promise(function(r){ setTimeout(r, 400); });
+  }
+  if (st) st.textContent = 'Klaar.';
+}
+
+// Eén plek voor "zet dit bestand op haar telefoon", zodat de kaarten en het
+// moodboard hetzelfde doen.
+async function bewaarDataUrl(dataUrl, bestandsnaam) {
+  try {
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    const file = new File([blob], bestandsnaam, { type: blob.type || 'image/jpeg' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: bestandsnaam.replace(/\.jpe?g$/, '') });
+            return 'gedeeld'; }
+      catch(e) { if (e && e.name === 'AbortError') return 'afgebroken'; }
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = bestandsnaam;
+    // In het document hangen, anders negeert Chrome bij een blob-url de naam.
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 4000);
+    return 'gedownload';
+  } catch(e) { return 'mislukt'; }
+}
+
+// ── ÉÉN MOODBOARD VAN DE HELE TAS ────────────────────────────────────────────
+// "ik wil alles samen kunnen opslaan tot 1 moodboard met de items + inpaklijst"
+//
+// Dus niet nog een los ontwerp, maar precies wat er al is: haar echte
+// itemfoto's, de inpaklijst die de app al berekent, en de namen van de outfits.
+// Het wordt opgebouwd in een verborgen vak, vastgelegd en weer weggehaald.
+async function maakMoodboard() {
+  if (!capsuleResultaat) return;
+  const st = document.getElementById('cap-kaarten-status');
+  const outfits = capsuleResultaat.outfits || [];
+  if (!outfits.length) return;
+
+  // Welke stukken zitten in de tas, en hoe vaak komen ze terug? Dezelfde
+  // telling als de inpaklijst, zodat er één waarheid is.
+  const tel = {};
+  outfits.forEach(function(o) {
+    (Array.isArray(o.items) ? o.items : []).forEach(function(n) {
+      tel[n] = (tel[n] || 0) + 1;
+    });
+  });
+  const stukken = Object.keys(tel).map(function(naam) {
+    const echt = vindItemOpNaam(naam);
+    return { naam: naam, keer: tel[naam], item: echt, foto: echt && cloudMap[echt.id] };
+  }).sort(function(a, b){ return b.keer - a.keer; });
+
+  if (st) st.textContent = 'Moodboard maken…';
+
+  const gel = ((document.getElementById('cap-gelegenheid') || {}).value || '').trim();
+  const vak = document.createElement('div');
+  vak.className = 'moodboard';
+  vak.innerHTML = '<div class="mb-kop">'
+    + '<div class="mb-titel">' + esc(gel || 'Weekendtas') + '</div>'
+    + '<div class="mb-sub">' + stukken.length + ' stuks · ' + outfits.length + ' outfits</div>'
+    + '</div>'
+    + '<div class="mb-grid">'
+    + stukken.map(function(s) {
+        return '<div class="mb-cel">'
+          + (s.foto ? '<span class="mb-foto" style="background-image:url(' + esc(s.foto) + ')"></span>'
+                    : '<span class="mb-foto mb-geen">·</span>')
+          + '<span class="mb-naam">' + esc(String(s.naam).split(/\s+/).slice(0, 3).join(' ')) + '</span>'
+          + '<span class="mb-keer">' + s.keer + '×</span>'
+          + '</div>';
+      }).join('')
+    + '</div>'
+    + '<div class="mb-onder">'
+    + '<div class="mb-lijst"><b>Inpaklijst</b><br>'
+    + stukken.map(function(s){ return esc(s.naam) + ' (' + s.keer + '×)'; }).join('<br>')
+    + '</div>'
+    + '<div class="mb-lijst"><b>De outfits</b><br>'
+    + outfits.map(function(o, i){ return (i + 1) + '. ' + esc(o.naam || 'Outfit ' + (i + 1)); }).join('<br>')
+    + '</div></div>';
+
+  // Buiten beeld maar wél gerenderd: html2canvas legt vast wat er staat, dus
+  // display:none werkt niet — dan is alles nul pixels breed.
+  vak.style.cssText = 'position:fixed;left:-9999px;top:0;width:720px;';
+  document.body.appendChild(vak);
+
+  try {
+    await new Promise(function(r){ setTimeout(r, 350); });
+    if (typeof html2canvas === 'undefined') throw new Error('de beeldbibliotheek kon niet laden');
+    const canvas = await html2canvas(vak, { scale: 2, backgroundColor: '#F5F2EE',
+                                            useCORS: true, logging: false });
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    const toon = document.getElementById('cap-moodboard-vak');
+    if (toon) {
+      toon.innerHTML = '<img src="' + dataUrl + '" alt="moodboard" class="mb-voorbeeld">'
+        + '<button class="ai-btn" style="margin-top:8px;" '
+        + 'onclick="bewaarMoodboard()">↓ Moodboard opslaan</button>';
+    }
+    window._moodboardUrl = dataUrl;
+    if (st) st.textContent = 'Moodboard klaar.';
+  } catch(e) {
+    if (st) st.textContent = 'Moodboard maken lukte niet: ' + (e && e.message || 'onbekend');
+  } finally {
+    vak.remove();
+  }
+}
+
+async function bewaarMoodboard() {
+  if (!window._moodboardUrl) return;
+  const gel = ((document.getElementById('cap-gelegenheid') || {}).value || 'weekendtas')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^A-Za-z0-9 _()-]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 50);
+  await bewaarDataUrl(window._moodboardUrl, (gel || 'weekendtas') + ' moodboard.jpg');
 }
 
 function capsuleNaarKaart(idx) {
