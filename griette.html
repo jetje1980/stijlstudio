@@ -72,6 +72,30 @@ body{background:var(--cream);font-family:'Jost',sans-serif;color:var(--text);min
 .kk-pijl{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:54px;border:none;border-radius:6px;background:rgba(255,255,255,.1);color:#f2ebe0;font-size:26px;line-height:1;cursor:pointer;z-index:2;}
 .kk-links{left:6px;} .kk-rechts{right:6px;}
 .kk-pijl[disabled]{opacity:.22;cursor:default;}
+/* De opmaak van haar eigen lookbook: genummerde kop, "DE LOOK" met de stukken,
+   een kolom kleurvlakjes ernaast en krabbels in de kantlijn. */
+.lookkaart{padding:14px 13px 13px;}
+.lk-kop{margin-bottom:9px;}
+.lk-nr{font-family:'Jost',sans-serif;font-size:8px;letter-spacing:.22em;color:#a89478;}
+.lk-naam{font-family:'Bodoni Moda',serif;font-size:20px;line-height:1.02;letter-spacing:.01em;text-transform:uppercase;color:#2b2318;margin-top:1px;}
+.lk-onder{font-family:'Bodoni Moda',serif;font-style:italic;font-size:11px;color:#8a7358;margin-top:3px;}
+.lk-body{display:flex;gap:9px;align-items:flex-start;}
+.lk-stukken{flex:1;min-width:0;}
+.lk-kleuren{flex:0 0 22px;}
+.lk-label{font-family:'Jost',sans-serif;font-size:7px;letter-spacing:.17em;text-transform:uppercase;color:#a89478;margin-bottom:4px;}
+.lk-kleuren .dk-stippen{flex-direction:column;gap:4px;justify-content:flex-start;}
+.lk-krabbels{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;}
+.lk-krabbel{font-family:'Bodoni Moda',serif;font-style:italic;font-size:9.5px;color:#6b573f;}
+.dag-zoek{width:100%;padding:9px 11px;border:1.5px solid var(--cream-dark);border-radius:10px;font-family:'Jost',sans-serif;font-size:12px;background:var(--white);color:var(--brown);}
+.niet-knop{display:flex;align-items:center;gap:7px;width:100%;text-align:left;background:none;border:none;padding:5px 3px;cursor:pointer;font-family:'Jost',sans-serif;font-size:11px;color:var(--brown);}
+.niet-knop img{width:24px;height:30px;object-fit:cover;border-radius:3px;flex-shrink:0;}
+.niet-geen{width:24px;height:30px;border-radius:3px;background:var(--cream);flex-shrink:0;}
+.niet-rij{display:flex;flex-wrap:wrap;gap:5px;}
+.niet-chip{padding:4px 9px;background:var(--cream);border:1px solid var(--cream-dark);border-radius:12px;font-family:'Jost',sans-serif;font-size:9.5px;color:var(--brown-mid);cursor:pointer;}
+.dag-start{background:var(--white);border:1.5px solid var(--cream-dark);border-radius:14px;padding:18px 16px;text-align:center;}
+.dag-start-kop{font-family:'Bodoni Moda',serif;font-size:16px;color:var(--brown);margin-bottom:5px;}
+.dag-start-uit{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px;}
+.dag-start-knop{width:100%;padding:13px;background:var(--brown);color:var(--cream);border:none;border-radius:12px;font-family:'Jost',sans-serif;font-size:12.5px;letter-spacing:.04em;cursor:pointer;}
 .dk-check{margin-top:10px;font-family:'Jost',sans-serif;position:relative;z-index:1;}
 .dk-check summary{font-size:9.5px;color:#8a7358;cursor:pointer;letter-spacing:.03em;list-style:none;}
 .dk-check summary::-webkit-details-marker{display:none;}
@@ -650,7 +674,21 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
     <button class="dag-ctx" id="dq-laarzen" onclick="kiesDagMood('shoe','laarzen')">Laarzen</button>
     <span style="width:1px;background:var(--cream-dark);flex-shrink:0;margin:2px 2px;"></span>
     <button class="dag-ctx" id="dq-festival" onclick="kiesDagMood('thema','festival')">🎪 Festival</button>
+    <span style="width:1px;background:var(--cream-dark);flex-shrink:0;margin:2px 2px;"></span>
+    <button class="dag-ctx" id="dq-koel" onclick="kiesDagWeer('koel')">❄ Koud</button>
+    <button class="dag-ctx" id="dq-mild" onclick="kiesDagWeer('mild')">Mild</button>
+    <button class="dag-ctx" id="dq-warm" onclick="kiesDagWeer('warm')">☀ Warm</button>
+    <span style="width:1px;background:var(--cream-dark);flex-shrink:0;margin:2px 2px;"></span>
+    <button class="dag-ctx" id="dq-niet" onclick="openNietVandaag()">🚫 Niet vandaag…</button>
   </div>
+  <!-- Wat vandaag thuisblijft. Een rij knoppen voor 146 stukken werkt niet,
+       dus zoeken met een veld — net als bij "Moet mee" in de weekendtas. -->
+  <div id="niet-vandaag-vak" style="display:none;margin-bottom:10px;">
+    <input class="dag-zoek" id="niet-zoek" type="text" placeholder="Zoek het stuk dat thuisblijft…"
+           oninput="toonNietVandaagLijst()" autocomplete="off">
+    <div id="niet-vandaag-lijst"></div>
+  </div>
+  <div id="niet-vandaag-gekozen" style="margin-bottom:10px;"></div>
   <div id="dag-mood-uit" style="font-size:9.5px;color:var(--muted);margin-bottom:12px;line-height:1.5;"></div>
   <div id="dag-kaarten"></div>
 
@@ -3757,7 +3795,96 @@ function kiesDagMood(soort, waarde) {
     b.classList.toggle('actief', aan.indexOf(b.id.replace('dq-', '')) >= 0);
   });
   toonDagMoodUit();
-  maakDagKaarten(dagContext, true);
+  // Staat er nog niets, dan is aantikken op zichzelf genoeg om te beginnen:
+  // zij heeft net gezegd wat ze wil. Staat er al een set, dan maakt hij een
+  // nieuwe met deze keuze erin.
+  if (!dagKaarten.length) maakDagKaartenNu(false);
+  else maakDagKaarten(dagContext, true);
+}
+
+// ── HET WEER ZELF KIEZEN ─────────────────────────────────────────────────────
+// dagWeer() leest het echte weerbericht, en dat klopt meestal. Maar zij wil
+// kunnen zeggen "doe maar koud" — voor morgen, voor binnen, of omdat ze het
+// gewoon anders inschat. Haar keuze gaat vóór het bericht.
+let dagWeerKeuze = '';
+try { dagWeerKeuze = localStorage.getItem('griette-dagweer') || ''; } catch(e) {}
+
+function kiesDagWeer(w) {
+  dagWeerKeuze = dagWeerKeuze === w ? '' : w;
+  try { localStorage.setItem('griette-dagweer', dagWeerKeuze); } catch(e) {}
+  ['koel','mild','warm'].forEach(function(x) {
+    const b = document.getElementById('dq-' + x);
+    if (b) b.classList.toggle('actief', dagWeerKeuze === x);
+  });
+  toonDagMoodUit();
+  if (!dagKaarten.length) maakDagKaartenNu(false);
+  else maakDagKaarten(dagContext, true);
+}
+
+// ── WAT VANDAAG THUISBLIJFT ──────────────────────────────────────────────────
+// "geen x of x item": stukken die vandaag niet mee hoeven. Niet verwijderen —
+// ze blijven gewoon in haar kast — alleen vandaag even niet.
+let nietVandaag = [];
+try { nietVandaag = JSON.parse(localStorage.getItem('griette-niet-vandaag') || '[]'); } catch(e) {}
+
+function openNietVandaag() {
+  const vak = document.getElementById('niet-vandaag-vak');
+  if (!vak) return;
+  const open = vak.style.display !== 'none';
+  vak.style.display = open ? 'none' : 'block';
+  const knop = document.getElementById('dq-niet');
+  if (knop) knop.classList.toggle('actief', !open || nietVandaag.length > 0);
+  if (!open) toonNietVandaagLijst();
+}
+
+function toonNietVandaagLijst() {
+  const lijst = document.getElementById('niet-vandaag-lijst');
+  const veld = document.getElementById('niet-zoek');
+  if (!lijst) return;
+  const zoek = String((veld && veld.value) || '').toLowerCase().trim();
+  const kast = getAllItems().filter(function(i) {
+    return !deletedItemIds.has(i.id) && nietVandaag.indexOf(i.id) < 0;
+  });
+  const treffers = zoek
+    ? kast.filter(function(i){ return String(i.name).toLowerCase().indexOf(zoek) >= 0; })
+    : kast.slice(0, 8);
+  lijst.innerHTML = treffers.slice(0, 12).map(function(i) {
+    return '<button type="button" class="niet-knop" onclick="zetNietVandaag(\'' + esc2(i.id) + '\')">'
+      + (photos[i.id] ? '<img loading="lazy" src="' + esc2(photos[i.id]) + '" alt="">'
+                      : '<span class="niet-geen"></span>')
+      + '<span>' + esc2(i.name) + '</span></button>';
+  }).join('') || '<div class="field-note">Niets gevonden.</div>';
+}
+
+function zetNietVandaag(id) {
+  if (nietVandaag.indexOf(id) < 0) nietVandaag.push(id);
+  try { localStorage.setItem('griette-niet-vandaag', JSON.stringify(nietVandaag)); } catch(e) {}
+  const veld = document.getElementById('niet-zoek');
+  if (veld) veld.value = '';
+  toonNietVandaagLijst();
+  toonNietVandaagGekozen();
+  toonDagMoodUit();
+  if (dagKaarten.length) maakDagKaarten(dagContext, true);
+}
+
+function haalNietVandaagWeg(id) {
+  nietVandaag = nietVandaag.filter(function(x){ return x !== id; });
+  try { localStorage.setItem('griette-niet-vandaag', JSON.stringify(nietVandaag)); } catch(e) {}
+  toonNietVandaagGekozen();
+  toonNietVandaagLijst();
+  toonDagMoodUit();
+  if (dagKaarten.length) maakDagKaarten(dagContext, true);
+}
+
+function toonNietVandaagGekozen() {
+  const vak = document.getElementById('niet-vandaag-gekozen');
+  if (!vak) return;
+  if (!nietVandaag.length) { vak.innerHTML = ''; return; }
+  vak.innerHTML = '<div class="niet-rij">' + nietVandaag.map(function(id) {
+    const i = getItemById(id);
+    return '<button type="button" class="niet-chip" onclick="haalNietVandaagWeg(\'' + esc2(id) + '\')">'
+      + '× ' + esc2(i ? kortStuk(i.name) : id) + '</button>';
+  }).join('') + '</div>';
 }
 
 // Wat je koos, in gewone woorden — en wat het betekent als je niets koos.
@@ -3765,9 +3892,17 @@ function toonDagMoodUit() {
   const el = document.getElementById('dag-mood-uit');
   if (!el) return;
   const aan = [].concat(dagMood.bottom, dagMood.shoe, dagMood.thema);
-  el.textContent = aan.length
+  if (typeof dagWeerKeuze !== 'undefined' && dagWeerKeuze) aan.push(dagWeerKeuze + ' weer');
+  const weg = (typeof nietVandaag !== 'undefined') ? nietVandaag : [];
+  const zonder = weg.length
+    ? ' Zonder ' + weg.map(function(id) {
+        const i = getItemById(id); return i ? kortStuk(i.name) : '';
+      }).filter(Boolean).join(', ') + '.'
+    : '';
+  el.textContent = (aan.length
     ? 'Tien looks met ' + aan.join(', ') + '. Nog een keer tikken zet het uit.'
-    : 'Niets gekozen — dan kies ik vrij uit je kast. Tik aan wat je wél wilt; meerdere mag.';
+    : 'Niets gekozen — dan kies ik vrij uit je kast. Tik aan wat je wél wilt; meerdere mag.')
+    + zonder;
 }
 
 // In woorden, zodat de stylist het als wens leest en niet als filter.
@@ -3780,6 +3915,18 @@ function dagMoodZin() {
   else if (b.indexOf('broek') >= 0) d.push('Ze wil vandaag een broek, geen rok of jurk.');
   if (s.length) d.push('Bij de schoenen gaat haar voorkeur uit naar ' + opsomNL(s) + '.');
   if (t.indexOf('festival') >= 0) d.push(FESTIVAL_ZIN);
+  if (typeof dagWeerKeuze !== 'undefined' && dagWeerKeuze) {
+    d.push('Zij heeft zelf aangegeven dat het ' + dagWeerKeuze + ' is — dat gaat vóór het '
+      + 'weerbericht, want zij weet of ze binnen zit of dat het voor morgen is.');
+  }
+  if (typeof nietVandaag !== 'undefined' && nietVandaag.length) {
+    const namen = nietVandaag.map(function(id) {
+      const i = getItemById(id); return i ? i.name : null;
+    }).filter(Boolean);
+    if (namen.length) {
+      d.push('Deze stukken blijven vandaag thuis, gebruik ze niet: ' + namen.join(', ') + '.');
+    }
+  }
   return d.length ? d.join(' ') + '\n\n' : '';
 }
 
@@ -3862,6 +4009,21 @@ async function vraagLooks(ctx, regels, slots, aantal) {
     + dagCyclusZin()
     + 'HAAR KAST:\n' + regels + '\n\n'
     + 'Maak precies ' + aantal + ' looks, verdeeld als volgt:\n' + opdrachten + '\n\n'
+    // De criteria waar zij om vroeg, uit de stylistprompts die ze stuurde. Niet
+    // als losse checklist maar als wat een stylist werkelijk nakijkt — en
+    // steeds met de rem erop: alleen wat uit de gegevens af te leiden is.
+    + 'WAAR JE OP LET, per look:\n'
+    + '- Pasvorm en proporties: waar zit het volume, waar het tegenwicht, is de taille '
+    + 'zichtbaar. Waar vallen de zomen, en deelt er een lijn op een ongelukkige plek.\n'
+    + '- Kleur: welke kleur voert, welke ondersteunt, waar komt het accent terug. Grofweg '
+    + 'zestig procent rust, dertig procent steun, tien procent accent.\n'
+    + '- Materiaal: twee families tegenover elkaar, iets soepels tegen iets stevigs.\n'
+    + '- Gelaagdheid en afwerking: schoenen bewust gekozen, en een tas of accessoire dat de '
+    + 'look afmaakt in plaats van er los bij te hangen.\n'
+    + '- Wat het uitstraalt: verzorgd en moeiteloos tegelijk, en precies één blikvanger.\n'
+    + '- Eigentijds: proporties die nu gedragen worden, niet die van tien jaar terug.\n'
+    + 'Beweer niets over pasvorm dat je niet uit de tags kunt afleiden — een productfoto '
+    + 'laat niet zien hoe iets op haar valt.\n\n'
     + 'Regels:\n'
     + '- Gebruik per look 3 tot 6 stukken, met exacte namen uit de lijst.\n'
     + '- Geen twee looks met dezelfde stukken.\n'
@@ -3871,7 +4033,11 @@ async function vraagLooks(ctx, regels, slots, aantal) {
     + 'Antwoord ALLEEN met JSON:\n'
     + '{"looks":[{"naam":"korte naam","merk":"karakter, kleur of gelegenheid","waarom":"1 zin: '
     + 'waarom dit werkt voor haar","items":["exacte naam"],"rodedraad":"het stuk dat terugkomt, of leeg",'
-    + '"netniet":"wat ontbreekt en waarom het zou werken, of leeg"}]}';
+    + '"netniet":"wat ontbreekt en waarom het zou werken, of leeg",'
+    // Drie korte krabbels in de trant van haar eigen lookbook: losse
+    // opmerkingen naast de look, niet nog een alinea.
+    + '"krabbels":["max 4 woorden","max 4 woorden","max 4 woorden"],'
+    + '"ondertitel":"3 tot 5 woorden die de look typeren"}]}';
 
   // Zonder tijdslimiet blijft een stille verbinding eeuwig hangen, en dan
   // blijft het skelet staan zonder dat er ooit iets gebeurt of gezegd wordt.
@@ -3913,6 +4079,9 @@ function verwerkLooks(looks, gezien, hoogstens) {
     gezien.sleutels.add(sleutel);
     uit.push({ naam: l.naam || 'Look', merk: l.merk || '', waarom: l.waarom || '',
                rodedraad: l.rodedraad || '', netniet: mist.length ? (l.netniet || '') : '',
+               ondertitel: String(l.ondertitel || '').slice(0, 60),
+               krabbels: [].concat(l.krabbels || []).slice(0, 3)
+                 .map(function(k){ return String(k).slice(0, 40); }),
                stukken: stukken });
   });
   return uit;
@@ -3980,6 +4149,9 @@ function lokaleReden(boven, onder, schoen) {
 
 // Het weer van vandaag, of anders een gok op grond van de maand.
 function dagWeer() {
+  // Haar eigen keuze gaat vóór het weerbericht: zij weet of ze binnen zit of
+  // dat het morgen is.
+  if (typeof dagWeerKeuze !== 'undefined' && dagWeerKeuze) return dagWeerKeuze;
   if (typeof weatherTemp !== 'undefined' && weatherTemp) return weatherTemp;
   const m = new Date().getMonth();
   return [11,0,1,2].indexOf(m) >= 0 ? 'koel' : [5,6,7].indexOf(m) >= 0 ? 'warm' : 'mild';
@@ -4020,7 +4192,12 @@ let bijstelTeller = { bekeken:0, geruild:0, redenen:{} };
 
 function lokaleLooks() {
   bijstelTeller = { bekeken:0, geruild:0, redenen:{} };
-  const kast = getAllItems().filter(function(i){ return !deletedItemIds.has(i.id); });
+  // Wat zij vandaag niet wil, doet niet mee. Niet verwijderd — alleen vandaag
+  // even niet, en morgen weer gewoon in beeld.
+  const weg = (typeof nietVandaag !== 'undefined') ? nietVandaag : [];
+  const kast = getAllItems().filter(function(i) {
+    return !deletedItemIds.has(i.id) && weg.indexOf(i.id) < 0;
+  });
   const uit = function(cat) { return kast.filter(function(i){ return i.cat === cat; }); };
   let tops = uit('tops'), onders = uit('bottoms'), schoenen = uit('shoes');
   const lagen = uit('layers'), eendelig = uit('jurken').concat(uit('eendelig'));
@@ -4374,12 +4551,31 @@ function toonDagKaarten() {
     const stippen = dagStippen(k).map(function(c) {
       return '<span class="dk-stip" style="background:' + c + '"></span>';
     }).join('');
-    return '<div class="dagkaart' + (dagBewaard[n] ? ' bewaard' : '')
+    // De opmaak van haar eigen lookbook: een genummerde kop met de naam in twee
+    // regels, "DE LOOK" met de stukken, een kolom kleurvlakjes ernaast, en
+    // losse krabbels in de kantlijn. Eén ding uit dat voorbeeld kan hier niet:
+    // de grote foto van haarzelf in de outfit. Die heeft de app niet, en er
+    // wordt ook niets verzonnen om die plek te vullen.
+    const krabbels = [].concat(k.krabbels || []).filter(Boolean);
+    return '<div class="dagkaart lookkaart' + (dagBewaard[n] ? ' bewaard' : '')
       + (k.netniet ? ' netniet' : '') + (k.eigen ? '' : ' vanstylist')
       + '" id="dagkaart-' + n + '">'
-      + '<div class="dk-rij">' + stukken + '</div>'
-      + (stippen ? '<div class="dk-stippen">' + stippen + '</div>' : '')
-      + '<div class="dk-naam">' + esc2(k.naam) + '</div>'
+      + '<div class="lk-kop">'
+      + '<div class="lk-nr">LOOK ' + (n + 1) + '</div>'
+      + '<div class="lk-naam">' + esc2(k.naam) + '</div>'
+      + (k.ondertitel ? '<div class="lk-onder">' + esc2(k.ondertitel) + '</div>' : '')
+      + '</div>'
+      + '<div class="lk-body">'
+      + '<div class="lk-stukken"><div class="lk-label">De look</div>'
+      + '<div class="dk-rij">' + stukken + '</div></div>'
+      + (stippen ? '<div class="lk-kleuren"><div class="lk-label">Kleuren</div>'
+          + '<div class="dk-stippen">' + stippen + '</div></div>' : '')
+      + '</div>'
+      + (krabbels.length
+          ? '<div class="lk-krabbels">' + krabbels.map(function(x) {
+              return '<span class="lk-krabbel">' + esc2(x) + ' ♡</span>';
+            }).join('') + '</div>'
+          : '')
       + '<span class="dk-merk">' + esc2(k.eigen ? (k.merk || 'uit je kast') : 'door je stylist') + '</span>'
       + (k.waarom ? '<div class="dk-regel"></div><div class="dk-waarom">' + esc2(k.waarom) + '</div>' : '')
       + (k.netniet ? '<div class="dk-tip">Dit had gekund als je dit had: ' + esc2(k.netniet) + '</div>' : '')
@@ -4551,8 +4747,10 @@ function ruilOpen(n, i) {
   const item = huidig.id && getItemById(huidig.id);
   const cat = item ? item.cat : null;
   const alIn = kaart.stukken.map(function(s){ return s.id; });
+  const wegVandaag = (typeof nietVandaag !== 'undefined') ? nietVandaag : [];
   let opties = getAllItems().filter(function(x) {
     return !deletedItemIds.has(x.id) && alIn.indexOf(x.id) < 0
+      && wegVandaag.indexOf(x.id) < 0
       && (!cat || x.cat === cat);
   });
   opties = weerZeef(opties, dagWeer(), cat);
@@ -10230,12 +10428,47 @@ function startDagKaarten() {
   document.querySelectorAll('#dag-mood .dag-ctx').forEach(function(b) {
     b.classList.toggle('actief', aan.indexOf(b.id.replace('dq-', '')) >= 0);
   });
+  ['koel','mild','warm'].forEach(function(x) {
+    const b = document.getElementById('dq-' + x);
+    if (b) b.classList.toggle('actief', dagWeerKeuze === x);
+  });
+  const nietKnop = document.getElementById('dq-niet');
+  if (nietKnop) nietKnop.classList.toggle('actief', nietVandaag.length > 0);
+  toonNietVandaagGekozen();
   toonDagMoodUit();
   if (dagKaarten.length) { toonDagKaarten(); return; }
   if (document.querySelector('#dag-kaarten .dagkaart')) return;   // al bezig
-  toonDagSkelet(10);
-  setTimeout(function(){ maakDagKaarten(dagContext, false); }, 250);
+
+  // Eerder maakte hij de tien meteen bij het openen. Zij wil ze pas als zij
+  // heeft gezegd wat ze wil: koud weer, soort schoeisel, iets dat juist niet
+  // mee hoeft. Anders staat er tien keer iets waar ze niets mee kan.
+  //
+  // Maar niets aantikken moet ook werken — dat zei ze eerder, en dat klopt.
+  // Dus: geen automatische start, wél een knop die het meteen doet. Zij
+  // bepaalt of ze eerst kiest.
+  toonDagStart();
 }
+
+function toonDagStart() {
+  const vak = document.getElementById('dag-kaarten');
+  if (!vak) return;
+  vak.innerHTML = '<div class="dag-start">'
+    + '<div class="dag-start-kop">Tien looks, zo gemaakt</div>'
+    + '<div class="dag-start-uit">Tik hierboven aan wat je vandaag wilt — rok of broek, '
+    + 'welke schoenen, een thema. Of sla dat over; dan kies ik vrij uit je kast.</div>'
+    + '<button type="button" class="dag-start-knop" onclick="maakDagKaartenNu()">'
+    + '✦ Maak mijn tien outfitkaarten</button>'
+    + '</div>';
+}
+
+// Eén plek vanwaar het echt begint: de knop, en elke moodkeuze.
+function maakDagKaartenNu(opnieuw) {
+  const vak = document.getElementById('dag-kaarten');
+  if (!vak) return;
+  toonDagSkelet(10);
+  setTimeout(function(){ maakDagKaarten(dagContext, !!opnieuw); }, 100);
+}
+
 setTimeout(startDagKaarten, 4000);
 laadMijnKaarten();
 
