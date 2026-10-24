@@ -7698,14 +7698,34 @@ Zeg per outfit die je verandert kort waarom het nog steeds klopt qua silhouet
 en kleur. Gaat haar wens niet samen met een werkende outfit, zeg dat dan in
 plaats van iets te forceren.
 
-Antwoord ALLEEN met JSON:
+Noemt zij een kledingstuk dat niet in de lijst hierboven staat — bijvoorbeeld
+iets wat ze net gekocht heeft — dan kun je dat niet gebruiken, want je weet
+niet hoe het eruitziet. Verzin het niet en pak ook niet iets dat erop lijkt.
+Antwoord dan met alleen "kan_niet", waarin je zegt welk stuk je niet kent en
+dat ze het eerst in haar kast kan zetten.
+
+Antwoord ALLEEN met JSON, één van deze twee vormen:
 {"outfits":[{"naam":"...","items":["exacte naam uit de lijst"],"stijl":"...","waarom":"..."}],
- "wat_ik_deed":"één zin","niet_gedaan":"alleen als iets niet kon"}` }],
+ "wat_ik_deed":"één zin","niet_gedaan":"alleen als iets niet kon"}
+{"kan_niet":"wat je niet kunt en waarom"}` }],
       6000, 'medium', 'kies');
 
     const data = extractJson(raw);
+    // Zij typte "mijn sabbi longsleeve paars. is nieuw" en kreeg "het antwoord
+    // was niet te lezen". Dat was ook zo: de stylist mág niets verzinnen, dus
+    // het enige eerlijke antwoord was uitleg — en daar was geen plek voor in
+    // het formaat, dus brak hij eruit. Nu is die plek er, en zegt de app wat
+    // er aan de hand is in plaats van dat het antwoord stuk was.
+    if (data && data.kan_niet && !(Array.isArray(data.outfits) && data.outfits.length)) {
+      if (st) st.innerHTML = esc(String(data.kan_niet))
+        + '<br>Je tas staat nog zoals hij was. Wil je een nieuw stuk meenemen? '
+        + 'Zet het eerst in je kast, dan kan de stylist het zien. '
+        + '<a href="griette.html" style="color:var(--accent)">→ naar je kast</a>';
+      return;
+    }
     if (!data || !Array.isArray(data.outfits) || !data.outfits.length) {
-      throw new Error('het antwoord was niet te lezen');
+      throw new Error('het antwoord was niet te lezen. Noem je een stuk dat nog '
+        + 'niet in je kast staat? Zet het daar eerst bij');
     }
     // Namen terugvertalen naar echte stukken; wat niet bestaat telt niet mee.
     const schoon = data.outfits.map(function(o) {
