@@ -321,6 +321,10 @@ input.field::placeholder,textarea.field::placeholder{color:var(--text-2);}
 .tasruil-knop{display:flex;align-items:center;gap:7px;width:100%;text-align:left;background:none;border:none;padding:5px 3px;cursor:pointer;font-family:'Jost',sans-serif;font-size:11px;color:var(--text);}
 .tasruil-knop img{width:26px;height:32px;object-fit:cover;border-radius:3px;flex-shrink:0;}
 .tasruil-geen{width:26px;height:32px;border-radius:3px;background:var(--cream);flex-shrink:0;}
+.cap-wisseltip{font-size:9.5px;color:var(--text-2);opacity:.75;margin:2px 0 4px;letter-spacing:.02em;}
+.tasvul-cats{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:4px;}
+.tasvul-cat{font-size:10.5px;padding:5px 9px;border-radius:20px;background:var(--ph-bg);border:1px solid var(--border);font-family:'Jost',sans-serif;color:var(--text);cursor:pointer;}
+.tasvul-cat.mist{border-color:var(--accent);color:var(--accent);}
 .tr-beter{border-color:#8aa87a;background:color-mix(in srgb,#8aa87a 8%,var(--white));}
 .tr-minder{border-color:#c9a06a;background:color-mix(in srgb,#c9a06a 9%,var(--white));}
 .tr-kop{font-size:8.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--text-2);margin-bottom:4px;}
@@ -7290,10 +7294,15 @@ function toonCapsule() {
             : `<span class="cap-chip nieuw">${esc(n)}</span>`;
         }).join('')
       + '</div>'
+      // Zij miste dat ze kon wisselen: de ↻ op een stuk zag ze niet. Dus staat
+      // het er nu in woorden bij, en staat "erbij" als eigen knop.
+      + (namen.some(n => !!vindItemOpNaam(n))
+          ? '<div class="cap-wisseltip">Tik op een stuk om het te wisselen</div>' : '')
       + (o.waarom ? `<div class="cap-waarom">${esc(o.waarom)}</div>` : '')
       + `<div id="tasruil-${i}"></div>`
       + '<div class="cap-outfit-knoppen">'
       + `<button class="cap-kaart-btn" onclick="capsuleNaarKaart(${i})">Outfitkaart →</button>`
+      + `<button class="cap-vervang-btn" onclick="tasVulAanOpen(${i})">✚ Erbij</button>`
       + `<button class="cap-vervang-btn" onclick="vervangOutfit(${i})">↻ Andere</button>`
       + '</div>'
       + '</div>';
@@ -7426,10 +7435,15 @@ async function tasRuilDoe(outfitIdx, itemIdx, nieuwId) {
 
 // Opnieuw kijken naar de outfit zoals hij nu is. Niet "past dit stuk" in het
 // algemeen, maar: klopt déze combinatie nog, met dit stuk erin.
+//
+// oudeNaam leeg = er is niets vervangen maar iets toegevoegd. Dan is de vraag
+// een andere ("maakt dit de outfit beter of staat het in de weg") en is de weg
+// terug ook een andere: eruit halen in plaats van omruilen.
 async function beoordeelTasOutfit(outfitIdx, oudeNaam, nieuweNaam) {
   const vak = document.getElementById('tasruil-' + outfitIdx);
   const o = capsuleResultaat && capsuleResultaat.outfits[outfitIdx];
   if (!vak || !o) return;
+  const erbij = !oudeNaam;
   vak.innerHTML = '<div class="tasruil"><div class="field-note">'
     + esc(nieuweNaam) + ' staat erin. Even kijken of de outfit nog klopt…</div></div>';
 
@@ -7441,9 +7455,13 @@ async function beoordeelTasOutfit(outfitIdx, oudeNaam, nieuweNaam) {
   try {
     const raw = await callClaude(
       "Je bent Griette's stylist. " + DNA_KORT + profielBlok()
-      + '\nAntwoord in het Nederlands, kort en eerlijk. Zij heeft net één stuk gewisseld.',
+      + '\nAntwoord in het Nederlands, kort en eerlijk. Zij heeft net één stuk '
+      + (erbij ? 'toegevoegd.' : 'gewisseld.'),
       [{ type:'text', text:
-`In deze outfit uit haar weekendtas heeft ze "${oudeNaam}" vervangen door "${nieuweNaam}".
+(erbij
+  ? `In deze outfit uit haar weekendtas heeft ze "${nieuweNaam}" toegevoegd.`
+  : `In deze outfit uit haar weekendtas heeft ze "${oudeNaam}" vervangen door "${nieuweNaam}".`)
++ `
 
 De outfit is nu:
 ${stukken}
@@ -7453,13 +7471,29 @@ Beoordeel of deze combinatie nog klopt, met dit stuk erin. Kijk naar silhouet
 voert, wat ondersteunt, komt er iets terug) en naar materiaal (staat er iets
 soepels tegenover iets stevigs). Beweer niets over pasvorm dat je niet kunt zien.
 
-Wees eerlijk: is dit een verbetering, gelijkwaardig, of een verslechtering ten
-opzichte van "${oudeNaam}"? Zeg het gewoon als het minder is.
+` + (erbij
+  ? `Wees eerlijk: maakt dit stuk de outfit beter, verandert het niets, of staat
+het in de weg (te veel blikvangers, te veel kleuren, te druk)? Zeg het gewoon
+als het er beter uit zou moeten.`
+  : `Wees eerlijk: is dit een verbetering, gelijkwaardig, of een verslechtering ten
+opzichte van "${oudeNaam}"? Zeg het gewoon als het minder is.`) + `
 
 Antwoord ALLEEN met JSON:
 {"oordeel":"beter|gelijk|minder","kort":"één zin waarom",
  "let_op":"alleen als er nu iets wringt","handeling":"één precieze stylinghandeling"}` }],
       1200, 'low', 'kies');
+
+    // De weg terug: bij toevoegen is dat het stuk eruit halen, bij wisselen
+    // het oude weer erin. Eén plek, zodat de twee niet uit elkaar lopen.
+    const terugKnop = function(label) {
+      return '<button type="button" class="btn-rescan" style="margin-top:6px;" '
+        + (erbij
+            ? 'onclick="tasVulAanTerug(' + outfitIdx + ',\'' + esc(nieuweNaam) + '\')">'
+              + '↩ ' + label + ' ' + esc(nieuweNaam) + ' er weer uit'
+            : 'onclick="tasRuilTerug(' + outfitIdx + ',\'' + esc(oudeNaam) + '\',\''
+              + esc(nieuweNaam) + '\')">↩ ' + label + ' terug naar ' + esc(oudeNaam))
+        + '</button>';
+    };
 
     const d = extractJson(raw);
     if (!d) throw new Error('geen bruikbaar antwoord');
@@ -7471,9 +7505,7 @@ Antwoord ALLEEN met JSON:
       + (d.kort ? '<div class="tr-regel">' + esc(d.kort) + '</div>' : '')
       + (d.let_op ? '<div class="tr-regel"><b>Let op:</b> ' + esc(d.let_op) + '</div>' : '')
       + (d.handeling ? '<div class="tr-regel"><b>Doe dit:</b> ' + esc(d.handeling) + '</div>' : '')
-      + '<button type="button" class="btn-rescan" style="margin-top:6px;" '
-      + 'onclick="tasRuilTerug(' + outfitIdx + ',\'' + esc(oudeNaam) + '\',\''
-      + esc(nieuweNaam) + '\')">↩ Toch terug naar ' + esc(oudeNaam) + '</button>'
+      + terugKnop('Toch')
       + '</div>';
   } catch(e) {
     // Geen oordeel is geen ramp, maar het mag niet lijken alsof het goedgekeurd is.
@@ -7481,9 +7513,129 @@ Antwoord ALLEEN met JSON:
       + esc(nieuweNaam) + ' staat erin. De stylist kon er niet bij ('
       + esc(e && e.message || 'onbekend') + '), dus dit is nog niet nagekeken.'
       + '<br><button type="button" class="btn-rescan" style="margin-top:6px;" '
-      + 'onclick="tasRuilTerug(' + outfitIdx + ',\'' + esc(oudeNaam) + '\',\''
-      + esc(nieuweNaam) + '\')">↩ Toch terug</button></div></div>';
+      + (erbij
+          ? 'onclick="tasVulAanTerug(' + outfitIdx + ',\'' + esc(nieuweNaam) + '\')">'
+            + '↩ Toch er weer uit'
+          : 'onclick="tasRuilTerug(' + outfitIdx + ',\'' + esc(oudeNaam) + '\',\''
+            + esc(nieuweNaam) + '\')">↩ Toch terug')
+      + '</button></div></div>';
   }
+}
+
+// ── EEN STUK ERBIJ IN DE TAS ─────────────────────────────────────────────────
+// "ook mis ik dat ik nog items kan wisselen of toevoegen in de tas"
+//
+// Wisselen kon al; toevoegen niet. Dat is iets anders: bij wisselen weet je
+// welke rol je vervangt, bij toevoegen is de vraag eerst "wat mist er nog".
+// Dus eerst de rollen die ontbreken (die staan vooraan en zijn gemarkeerd),
+// daarna de rest van de kast. En daarna hetzelfde mes: opnieuw beoordelen.
+function tasVulAanOpen(outfitIdx, cat) {
+  const vak = document.getElementById('tasruil-' + outfitIdx);
+  const o = capsuleResultaat && capsuleResultaat.outfits[outfitIdx];
+  if (!vak || !o) return;
+  // Tweede tik op "✚ Erbij" sluit het weer, net als bij wisselen.
+  if (!cat && vak.innerHTML) { vak.innerHTML = ''; return; }
+
+  const namen = Array.isArray(o.items) ? o.items : [];
+  if (namen.length >= MAX_OP_KAART) {
+    vak.innerHTML = '<div class="tasruil"><div class="field-note">Deze outfit heeft al '
+      + MAX_OP_KAART + ' stukken, en zoveel passen er op een outfitkaart. Wissel er '
+      + 'liever een voor iets anders, of haal er eerst een uit.</div></div>';
+    return;
+  }
+
+  const inOutfit = namen.map(function(n){ return vindItemOpNaam(n); }).filter(Boolean);
+  const alIn = inOutfit.map(function(x){ return x.id; });
+  // Alleen uit de gezeefde kast: wat zij heeft uitgesloten of wat niet bij dit
+  // weer past, hoort hier net zo min te staan als bij wisselen.
+  const kast = (capGefilterd.length ? capGefilterd : allItems).filter(function(x) {
+    return alIn.indexOf(x.id) < 0;
+  });
+
+  const mistSleutels = ontbrekendeRollen(inOutfit);
+  // Van rol naar categorie: de rollen zijn gedefinieerd met een test, dus laat
+  // de test zelf zeggen welke categorieën eraan voldoen. Eén waarheid.
+  const mistCats = [];
+  mistSleutels.forEach(function(r) {
+    kast.forEach(function(x) {
+      if (r.test(x) && mistCats.indexOf(x.cat) < 0) mistCats.push(x.cat);
+    });
+  });
+  const andereCats = [];
+  kast.forEach(function(x) {
+    if (mistCats.indexOf(x.cat) < 0 && andereCats.indexOf(x.cat) < 0) andereCats.push(x.cat);
+  });
+  const cats = mistCats.concat(andereCats);
+
+  if (!cats.length) {
+    vak.innerHTML = '<div class="tasruil"><div class="field-note">Er is niets meer in je kast '
+      + 'dat hier nog bij past én bij deze reis hoort.</div></div>';
+    return;
+  }
+
+  const gekozen = cats.indexOf(cat) >= 0 ? cat : cats[0];
+  const opties = kast.filter(function(x){ return x.cat === gekozen; });
+  const mistZin = mistSleutels.length
+    ? 'Nog niet in deze outfit: ' + lijstZin(mistSleutels.map(function(r){ return r.naam; })) + '.'
+    : 'Deze outfit is compleet. Wat je nu toevoegt is een extra.';
+
+  vak.innerHTML = '<div class="tasruil">'
+    + '<div class="field-note" style="margin-bottom:6px;">' + esc(mistZin) + '</div>'
+    + '<div class="tasvul-cats">'
+    + cats.map(function(c) {
+        return '<button type="button" class="tasvul-cat'
+          + (mistCats.indexOf(c) >= 0 ? ' mist' : '') + (c === gekozen ? ' aan' : '') + '" '
+          + 'onclick="tasVulAanOpen(' + outfitIdx + ',\'' + esc(c) + '\')">'
+          + esc(catNaam(c)) + (mistCats.indexOf(c) >= 0 ? ' •' : '') + '</button>';
+      }).join('')
+    + '</div>'
+    + opties.slice(0, 18).map(function(x) {
+        const foto = cloudMap[x.id];
+        return '<button type="button" class="tasruil-knop" '
+          + 'onclick="tasVulAanDoe(' + outfitIdx + ',\'' + esc(x.id) + '\')">'
+          + (foto ? '<img src="' + esc(foto) + '" alt="">' : '<span class="tasruil-geen"></span>')
+          + '<span class="tasruil-naam">' + esc(x.name) + '</span></button>';
+      }).join('')
+    + (opties.length > 18
+        ? '<div class="field-note">en nog ' + (opties.length - 18) + ' in deze soort</div>' : '')
+    + '</div>';
+}
+
+async function tasVulAanDoe(outfitIdx, nieuwId) {
+  const o = capsuleResultaat && capsuleResultaat.outfits[outfitIdx];
+  const nieuw = allItems.find(function(i){ return i.id === nieuwId; });
+  if (!o || !nieuw) return;
+  const namen = Array.isArray(o.items) ? o.items.slice() : [];
+  if (namen.indexOf(nieuw.name) >= 0) return;
+  namen.push(nieuw.name);
+  o.items = namen;
+  o.aangevuld = true;
+  toonCapsule();
+
+  // De kaarten en het moodboard kloppen niet meer bij deze tas.
+  alleKaarten = [];
+  const kv = document.getElementById('cap-kaarten-vak');
+  if (kv) kv.innerHTML = '';
+  const mv = document.getElementById('cap-moodboard-vak');
+  if (mv) mv.innerHTML = '';
+
+  // Hetzelfde als bij wisselen: een stuk erbij kan de hele outfit kantelen,
+  // dus die moet opnieuw langs de stylist.
+  await beoordeelTasOutfit(outfitIdx, '', nieuw.name);
+}
+
+// Een toegevoegd stuk er weer uit. Geen vervanging, dus gewoon weghalen.
+function tasVulAanTerug(outfitIdx, naam) {
+  const o = capsuleResultaat && capsuleResultaat.outfits[outfitIdx];
+  if (!o) return;
+  o.items = (o.items || []).filter(function(n){ return n !== naam; });
+  delete o.ruilOordeel;
+  toonCapsule();
+  alleKaarten = [];
+  const kv = document.getElementById('cap-kaarten-vak');
+  if (kv) kv.innerHTML = '';
+  const mv = document.getElementById('cap-moodboard-vak');
+  if (mv) mv.innerHTML = '';
 }
 
 // Terug kunnen is belangrijker dan het lijkt: zonder dat durf je niet te
