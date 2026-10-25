@@ -1,7 +1,7 @@
 // node tests/engine.test.mjs
 import fs from 'fs';
 import { zetHex, herken } from '../app/kleur.js';
-import { stelVoor, alternatieven, pakTas, meerVan, WENSEN } from '../app/engine.js';
+import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit } from '../app/engine.js';
 const kast = JSON.parse(fs.readFileSync('data/kast.json'));
 const rapport = JSON.parse(fs.readFileSync('data/rapport.json'));
 zetHex(JSON.parse(fs.readFileSync('data/kennis.json')).kleuren);
@@ -74,5 +74,18 @@ meng.forEach(o => console.log('   cosy×street |', naam(o)));
 const tas2 = pakTas(kast, { dagen, rapport, sfeer: ['cosy', 'street'], afwisselen: true });
 ok(tas2.plan.every(p => p.outfit) && new Set(tas2.plan.map(p => p.sfeer)).size === 2, 'afwisselen verdeelt beide sferen');
 tas2.plan.forEach(p => console.log('   ', p.dag, p.moment, p.sfeer, '|', p.outfit && naam(p.outfit)));
+// 10. activiteiten per dagdeel en wat niet mee
+ok(herkenActiviteit('hardloopwedstrijd') === 'sport' && herkenActiviteit('pizzeria') === 'pizzeria' && herkenActiviteit('iets onbekends') === null, 'activiteit uit eigen tekst');
+const rokken = kast.filter(i => i.soort === 'rok').map(i => i.id);
+const dagen3 = [{ naam: 'Za', temp: 14, momenten: ['ochtend', 'dag', 'avond'], doen: { ochtend: 'hardloopwedstrijd', dag: 'strand', avond: 'pizzeria' } },
+                { naam: 'Zo', temp: 15, momenten: ['dag'] }];
+const tas3 = pakTas(kast, { dagen: dagen3, rapport, uitsluiten: rokken });
+tas3.plan.forEach(p => console.log('   ', p.dag, p.moment, p.activiteit || '-', '|', p.outfit && naam(p.outfit)));
+const sportP = tas3.plan.find(p => p.activiteit === 'sport');
+ok(sportP && sportP.outfit && sportP.outfit.slots.schoen && sportP.outfit.slots.schoen.soort === 'sneakers' && ['legging', 'short'].includes(sportP.outfit.slots.onder?.soort) && !sportP.outfit.slots.tas && !sportP.outfit.slots.laag, 'hardloopwedstrijd geeft een sportoutfit zonder breisel');
+const strandP = tas3.plan.find(p => p.activiteit === 'strand');
+ok(strandP && strandP.outfit && strandP.outfit.slots.schoen.soort !== 'hakken', 'strandwandeling: platte schoenen');
+ok(tas3.plan.every(p => !p.outfit || !p.outfit.items.some(i => i.soort === 'rok')), 'geen rokken als die thuisblijven');
+ok(tas3.plan.every(p => p.outfit), 'elk dagdeel een outfit');
 console.log(goed, 'goed,', fout, 'fout,', Date.now() - t0, 'ms');
 process.exit(fout ? 1 : 0);

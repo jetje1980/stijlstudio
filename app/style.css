@@ -194,3 +194,7 @@ label.lab { display: block; font-size: 12px; letter-spacing: .1em; text-transfor
 .bijsturen summary { list-style: none; cursor: pointer; padding: 10px 0 6px; display: flex; justify-content: space-between; gap: 10px; font-weight: 500; }
 .bijsturen summary::-webkit-details-marker { display: none; }
 .bijsturen summary span { font-weight: 400; color: var(--zacht); font-size: 13px; text-align: right; }
+
+.doen { display: grid; grid-template-columns: 64px 1fr; gap: 4px 8px; align-items: center; margin-top: 6px; }
+.doen .veld { padding: 7px 10px; font-size: 14px; }
+.doen input.veld, .doen > .klein:last-child { grid-column: 2; }
