@@ -31,6 +31,10 @@ console.log('cosy+trui',await p.$$eval('#voorstellen .kaart',x=>x.map(k=>[...k.q
 await p.click('#voorstellen .kaart [data-slot="onder"], #voorstellen .kaart [data-slot="heel"]');await p.waitForSelector('.blad .tegel');
 console.log('samenvatting',await p.$eval('.bijsturen summary span',x=>x.textContent));console.log('alternatieven',await p.$$eval('.blad .tegel',x=>x.length));await p.screenshot({path:S+'s-wissel.png'});
 await p.click('.blad .tegel');await p.waitForTimeout(400);
+// andere kleur in de maker
+await p.click('#voorstellen .kaart [data-a="kleur"]');await p.waitForSelector('.blad [data-k]');await p.click('.blad [data-k="geel"]');await p.waitForTimeout(300);
+console.log('maker andere kleur:', await p.$eval('#kl-uit', x => (x.querySelector('.tips') || x).textContent.trim().slice(0, 120)));
+if (await p.$('#kl-ok')) { await p.click('#kl-ok'); await p.waitForTimeout(300); } else { await p.click('.blad-dicht'); await p.waitForTimeout(300); }
 // bewaren + kaart
 await p.click('#voorstellen .kaart [data-a="bewaar"]');await p.waitForTimeout(300);
 const [dl]=await Promise.all([p.waitForEvent('download',{timeout:10000}),p.click('#voorstellen .kaart [data-a="kaart"]')]);
@@ -46,6 +50,9 @@ console.log('herkend:',await p.$eval('.doen input + .klein',x=>x.textContent));
 await p.click('[data-chips="sfeer"] .chip[data-w="cosy"]');await p.click('[data-chips="sfeer"] .chip[data-w="street"]');
 await p.click('[data-afw="1"]');await p.fill('[data-temp="0"]','12');await p.fill('[data-temp="1"]','13');await p.fill('[data-temp="2"]','11');
 await p.click('#pak');await p.waitForSelector('.paklijst li',{timeout:20000});
+await p.click('[data-kleur="0"]');await p.waitForSelector('.blad [data-k]');await p.click('.blad [data-k="rood"]');await p.waitForTimeout(300);
+console.log('tas andere kleur:', await p.$eval('#kl-uit', x => x.querySelector('.tips') ? x.querySelector('.tips').textContent.trim() : x.textContent.trim().slice(0, 80)));
+if (await p.$('#kl-ok')) { await p.click('#kl-ok'); await p.waitForTimeout(300); }
 console.log('rok in tas?',await p.$$eval('.paklijst li span:nth-of-type(1)',x=>x.some(y=>/rok/i.test(y.textContent))));console.log('sferen per moment',await p.$$eval('.moment-kop .klein',x=>x.map(y=>y.textContent)));
 console.log('tas',await p.$eval('#uitkomst h2',x=>x.textContent),await p.$$eval('[data-f]',x=>x.map(y=>y.textContent)));
 await p.screenshot({path:S+'s-tas.png',fullPage:true});

@@ -1,8 +1,8 @@
 // Outfits: je bewaarde looks, en de maker. In de maker kies je niets vooraf
 // als je dat niet wilt: dan krijg je drie voorstellen in drie verschillende
 // kleurmanieren, en stuur je daarna bij.
-import { stelVoor, alternatieven, maakOutfit, slotVan, SFEREN, WENSEN, weerKlasse } from '../engine.js';
-import { METHODEN } from '../kleur.js';
+import { stelVoor, alternatieven, maakOutfit, slotVan, andereKleur, SFEREN, WENSEN, weerKlasse } from '../engine.js';
+import { METHODEN, info } from '../kleur.js';
 import { esc, $, $$, collage, foto, blad, melding, chips, stip, tegel, verklein } from '../ui.js';
 import { tekenKaart, deelOfBewaar } from '../kaart.js';
 import { vertelOver, spiegelcheck } from '../ai.js';
@@ -90,6 +90,7 @@ function toonBewaard(app, id, klaar) {
         <button class="knop licht" data-a="vandaag" type="button">Vandaag aan</button>
       </div>
       <div class="rij" style="margin-top:8px">
+        <button class="knop licht" data-a="kleur" type="button">Andere kleur</button>
         <button class="knop licht" data-a="naam" type="button">Naam wijzigen</button>
         <button class="knop licht" data-a="weg" type="button">Verwijderen</button>
       </div>`;
@@ -105,6 +106,11 @@ function toonBewaard(app, id, klaar) {
     const a = e.target.closest('[data-a]'); if (!a) return;
     if (a.dataset.a === 'kaart') bewaarKaart(o.naam, uit, o.waarom || o.notitie);
     if (a.dataset.a === 'vandaag') vandaag(app, uit);
+    if (a.dataset.a === 'kleur') andereKleurBlad(app, uit, context(app), [], nieuw => {
+      Object.assign(uit, nieuw);
+      app.bij(s => { const x = s.outfits.find(y => y.id === id); x.items = nieuw.items.map(i => i.id); x.afbeelding = null; x.methode = nieuw.kleur.methode; });
+      o.afbeelding = null; teken();
+    });
     if (a.dataset.a === 'naam') {
       const n = prompt('Naam', o.naam);
       if (n) { app.bij(s => { s.outfits.find(y => y.id === id).naam = n; }); o.naam = n; teken(); }
@@ -128,6 +134,38 @@ export function outfitHtml(o, { notitie, waarom, tip } = {}) {
 }
 
 // Een stuk wisselen: eerst wat de kleurmanier heel laat.
+// "Dit outfit, maar met een andere kleur." Zo weinig mogelijk wisselen, liefst
+// met stukken die je al meeneemt (`voorkeur`).
+const KLEUR_OPTIES = ['rood', 'oranje-rood', 'roze', 'felroze', 'paars', 'geel', 'oranje', 'groen', 'kobaltblauw', 'lichtblauw', 'turquoise', 'bruin', 'camel', 'zwart', 'ecru', 'donkerblauw'];
+export function andereKleurBlad(app, o, ctx, voorkeur, klaar) {
+  const kast = app.kast();
+  const heeft = k => kast.some(i => ['boven', 'onder', 'heel', 'laag', 'jas', 'tas', 'schoen', 'accessoire'].includes(i.rol)
+    && (i.kleur[0] === k || (info(i.kleur[0]).fam === info(k).fam && (info(k).neutraal || !info(i.kleur[0]).neutraal))));
+  const opties = KLEUR_OPTIES.filter(heeft);
+  const b = blad(`<h2>Andere kleur</h2>
+    <p class="sub">Welke kleur wil je erin? Ik verander zo weinig mogelijk${voorkeur.length ? ' en pak liefst wat al in je tas zit' : ''}.</p>
+    <div class="chips wrap">${opties.map(k => `<button class="chip" data-k="${esc(k)}" type="button">${stip(k, 12)}${esc(k)}</button>`).join('')}</div>
+    <div id="kl-uit" style="margin-top:12px"></div>`);
+  let gekozen = null;
+  b.addEventListener('click', e => {
+    const c = e.target.closest('[data-k]');
+    if (c) {
+      $$('[data-k]', b).forEach(x => x.classList.toggle('aan', x === c));
+      const r = andereKleur(kast, o, c.dataset.k, ctx, voorkeur);
+      gekozen = r;
+      $('#kl-uit', b).innerHTML = r ? `${outfitHtml(r.outfit)}
+        <ul class="tips">${r.wissels.map(w => `<li>${w.van ? esc(w.van.naam) : 'Erbij'} → ${w.naar ? `<b>${esc(w.naar.naam)}</b>` : 'weggelaten'}${w.naar && voorkeur.length && !voorkeur.includes(w.naar.id) ? ' <span class="klein">(komt erbij in je tas)</span>' : ''}</li>`).join('')}</ul>
+        <button class="knop vol" id="kl-ok" type="button" style="margin-top:10px">Gebruik deze</button>`
+        : `<div class="kaart"><b>Met ${esc(c.dataset.k)} lukt het niet.</b><p class="klein">In je kast zit geen stuk in deze kleur dat bij dit outfit past zonder je rapportregels te breken. Probeer een andere kleur, of wissel eerst een stuk.</p></div>`;
+      return;
+    }
+    if (e.target.id === 'kl-ok' && gekozen) {
+      gekozen.wissels.forEach(w => { if (w.van) app.onthoud(w.van.id, 'weg'); if (w.naar) app.onthoud(w.naar.id, 'gekozen'); });
+      b.sluit(); klaar(gekozen.outfit);
+    }
+  });
+}
+
 export function wissel(app, o, slot, klaar, ctxIn) {
   const ctx = ctxIn || context(app);
   const alt = alternatieven(app.kast(), o, slot, { ...ctx, methode: null, kleur: null, anker: [] }, 18);
@@ -272,6 +310,7 @@ function toonVoorstellen(el, app) {
       <button class="knop licht" data-a="kaart" type="button">Kaart</button>
       <button class="knop licht" data-a="ai" type="button">Waarom?</button>
       <button class="knop licht" data-a="vandaag" type="button">Vandaag aan</button>
+      <button class="knop licht" data-a="kleur" type="button">Andere kleur</button>
     </div></div>`).join('')
     + `<button class="knop licht vol" id="meer" type="button">Andere voorstellen</button>`;
   $('#meer').addEventListener('click', () => { keuze.seed++; toonVoorstellen(el, app); });
@@ -279,13 +318,15 @@ function toonVoorstellen(el, app) {
     let o = lijst[+kaart.dataset.n];
     let ai = null;
     kaart.addEventListener('click', async e => {
-      const st = e.target.closest('[data-slot]');
-      if (st) return wissel(app, o, st.dataset.slot, nieuw => {
+      const vervang = nieuw => {
         o = nieuw; lijst[+kaart.dataset.n] = nieuw; ai = null;
         const knoppen = kaart.querySelector('.rij').outerHTML;
         kaart.innerHTML = outfitHtml(o) + '<p class="waarom" data-waarom></p>' + knoppen;
-      });
+      };
+      const st = e.target.closest('[data-slot]');
+      if (st) return wissel(app, o, st.dataset.slot, vervang);
       const a = e.target.closest('[data-a]'); if (!a) return;
+      if (a.dataset.a === 'kleur') return andereKleurBlad(app, o, { ...context(app), methode: null, kleur: null, anker: [] }, [], vervang);
       const naam = (ai && ai.naam) || standaardNaam(o);
       if (a.dataset.a === 'bewaar') {
         const id = 'o-' + Date.now().toString(36);

@@ -71,6 +71,16 @@ async function start() {
       for (const [d, ids] of Object.entries(outfits.gedragen || {})) s.gedragen[d] = ids;
     });
   }
+  // Eenmalige reparatie: een khaki broek stond als hakken in de kast ("hak" in
+  // kHAKi). Wie dat stuk al had nagekeken, had die fout ook in de eigen labels.
+  opslag.bij(s => {
+    for (const [id, o] of Object.entries(s.items)) {
+      const basis = kast.find(i => i.id === id);
+      if (basis && o.soort === 'hakken' && basis.rol !== 'schoen') {
+        for (const k of ['soort', 'rol', 'formeel', 'comfort', 'print']) delete o[k];
+      }
+    }
+  });
   opslag.luister(() => { const el = $('.sync'); if (el) el.textContent = opslag.syncStatus; });
   window.addEventListener('hashchange', toon);
   toon();
