@@ -14,7 +14,7 @@ const p=await c.newPage();const errs=[];p.on('pageerror',e=>errs.push('PAGE '+e.
 await p.route(/^https?:\/\/(?!127\.0\.0\.1)/,r=>r.abort());
 const S=require('os').tmpdir()+'/';
 await p.goto('http://127.0.0.1:8765/');await p.waitForSelector('.raster .tegel',{timeout:8000});
-console.log('kast tegels',await p.$$eval('.raster .tegel',x=>x.length));
+console.log('url na versiecheck',p.url());console.log('kast tegels',await p.$$eval('.raster .tegel',x=>x.length));
 await p.screenshot({path:S+'s-kast.png'});
 await p.click('.raster .tegel');await p.waitForSelector('.blad');await p.waitForTimeout(400);await p.screenshot({path:S+'s-item.png'});
 await p.click('.blad-dicht');await p.waitForTimeout(300);
@@ -38,7 +38,15 @@ const pad=S+'kaart.jpg';await dl.saveAs(pad);console.log('kaart',dl.suggestedFil
 // tas
 await p.goto('http://127.0.0.1:8765/#tas');await p.waitForSelector('#pak');
 await p.fill('[data-temp="0"]','12');await p.fill('[data-temp="1"]','13');await p.fill('[data-temp="2"]','11');
+await p.fill('[data-temp="0"]','12');await p.fill('[data-temp="1"]','13');await p.fill('[data-temp="2"]','11');
+await p.click('[data-chips="niet"] .chip[data-w="rok"]');
+await p.selectOption('[data-doen="1|avond"]','pizzeria');
+await p.selectOption('[data-doen="1|dag"]','anders');await p.fill('[data-doen-tekst="1|dag"]','hardloopwedstrijd');await p.press('[data-doen-tekst="1|dag"]','Tab');await p.waitForTimeout(200);
+console.log('herkend:',await p.$eval('.doen input + .klein',x=>x.textContent));
+await p.click('[data-chips="sfeer"] .chip[data-w="cosy"]');await p.click('[data-chips="sfeer"] .chip[data-w="street"]');
+await p.click('[data-afw="1"]');await p.fill('[data-temp="0"]','12');await p.fill('[data-temp="1"]','13');await p.fill('[data-temp="2"]','11');
 await p.click('#pak');await p.waitForSelector('.paklijst li',{timeout:20000});
+console.log('rok in tas?',await p.$$eval('.paklijst li span:nth-of-type(1)',x=>x.some(y=>/rok/i.test(y.textContent))));console.log('sferen per moment',await p.$$eval('.moment-kop .klein',x=>x.map(y=>y.textContent)));
 console.log('tas',await p.$eval('#uitkomst h2',x=>x.textContent),await p.$$eval('[data-f]',x=>x.map(y=>y.textContent)));
 await p.screenshot({path:S+'s-tas.png',fullPage:true});
 await p.click('[data-f]');await p.waitForTimeout(300);await p.click('#meer-van');await p.waitForTimeout(3000);console.log('meer-van:',await p.$eval('#ruil-uit',x=>x.textContent));

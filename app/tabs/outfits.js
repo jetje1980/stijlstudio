@@ -11,7 +11,7 @@ import { detail as itemDetail } from './kast.js';
 const MANIEREN = ['tonsurton', 'mono', 'accent', 'analoog', 'split', 'colorblock', 'neutraal'];
 const KLEURKEUZE = ['donkerblauw', 'lichtblauw', 'bruin', 'camel', 'zwart', 'ecru', 'groen', 'olijf/khaki', 'rood', 'roze', 'paars', 'geel', 'oranje', 'turquoise'];
 
-const keuze = { open: false, anker: [], sfeer: null, sjiek: 0.5, schuif: false, methode: null, kleur: null, wensen: [], weer: null, seed: 0 };
+const keuze = { open: false, anker: [], sfeer: [], sjiek: 0.5, schuif: false, methode: null, kleur: null, wensen: [], weer: null, seed: 0 };
 let weerInfo = null;
 
 // Vanuit Stijl: "probeer deze kleurmanier met mijn kast".
@@ -155,7 +155,7 @@ export function standaardNaam(o) {
 export async function bewaarKaart(naam, o, notitie) {
   try {
     melding('Kaart maken…');
-    const sfeer = keuze.sfeer ? SFEREN[keuze.sfeer].naam : '';
+    const sfeer = keuze.sfeer.map(k => SFEREN[k].naam).join(' × ');
     const c = await tekenKaart({ titel: naam, ondertitel: [o.kleur.naam, sfeer].filter(Boolean).join(' · '), items: o.items, notitie });
     const r = await deelOfBewaar(c, naam);
     if (r !== 'geannuleerd') melding(r === 'gedeeld' ? 'Gedeeld' : 'Kaart opgeslagen');
@@ -189,7 +189,7 @@ async function haalWeer() {
 
 // Wat staat er aan, in één regel.
 function samenvatting() {
-  return [keuze.sfeer && SFEREN[keuze.sfeer].naam, keuze.schuif && (keuze.sjiek < 0.4 ? 'comfy' : keuze.sjiek > 0.6 ? 'sjiek' : 'midden'),
+  return [keuze.sfeer.map(k => SFEREN[k].naam).join(' × '), keuze.schuif && (keuze.sjiek < 0.4 ? 'comfy' : keuze.sjiek > 0.6 ? 'sjiek' : 'midden'),
     keuze.methode && METHODEN[keuze.methode].naam, keuze.kleur, ...keuze.wensen.map(w => WENSEN[w].naam.toLowerCase())].filter(Boolean).join(' · ');
 }
 
@@ -212,9 +212,10 @@ function maker(el, app) {
     <details class="bijsturen"${keuze.open ? ' open' : ''}>
       <summary>Bijsturen <span>${esc(samenvatting()) || 'niets gekozen'}</span></summary>
       <label class="lab">Sfeer</label>
-      ${chips('sfeer', [['', 'Geen voorkeur']].concat(Object.entries(SFEREN).map(([k, v]) => [k, v.naam])), keuze.sfeer || '')}
+      ${chips('sfeer', Object.entries(SFEREN).map(([k, v]) => [k, v.naam]), keuze.sfeer, { meer: true })}
+      <p class="klein">Meer dan één? Dan mengt de app ze.</p>
       <div class="schuif"><span>comfy</span><input type="range" min="0" max="1" step="0.25" value="${keuze.sjiek}" id="sjiek" aria-label="Van comfy naar sjiek"><span>sjiek</span></div>
-      ${keuze.sfeer ? `<p class="klein">${esc(SFEREN[keuze.sfeer].uitleg)}</p>` : ''}
+      ${keuze.sfeer.map(k => `<p class="klein"><b>${esc(SFEREN[k].naam)}</b>: ${esc(SFEREN[k].uitleg)}</p>`).join('')}
 
       <label class="lab">Kleurmanier</label>
       ${chips('methode', [['', 'Laat me kiezen']].concat(MANIEREN.map(m => [m, METHODEN[m].naam])), keuze.methode || '')}
@@ -234,13 +235,13 @@ function maker(el, app) {
 
   const kies = (naam, fn) => $$(`[data-chips="${naam}"] .chip`, el).forEach(b => b.addEventListener('click', () => { fn(b.dataset.w); keuze.seed = 0; maker(el, app); }));
   kies('weer', w => { keuze.weer = w; });
-  kies('sfeer', w => { keuze.sfeer = w || null; });
+  kies('sfeer', w => { keuze.sfeer = keuze.sfeer.includes(w) ? keuze.sfeer.filter(x => x !== w) : keuze.sfeer.concat(w); });
   kies('methode', w => { keuze.methode = w || null; });
   kies('kleur', w => { keuze.kleur = w || null; });
   kies('wensen', w => { keuze.wensen = keuze.wensen.includes(w) ? keuze.wensen.filter(x => x !== w) : keuze.wensen.concat(w); });
   $('#sjiek').addEventListener('change', e => { keuze.sjiek = +e.target.value; keuze.schuif = true; keuze.seed = 0; maker(el, app); });
   $('.bijsturen').addEventListener('toggle', e => { keuze.open = e.target.open; });
-  const wis = $('#wis'); if (wis) wis.addEventListener('click', () => { Object.assign(keuze, { sfeer: null, schuif: false, sjiek: 0.5, methode: null, kleur: null, wensen: [], seed: 0 }); maker(el, app); });
+  const wis = $('#wis'); if (wis) wis.addEventListener('click', () => { Object.assign(keuze, { sfeer: [], schuif: false, sjiek: 0.5, methode: null, kleur: null, wensen: [], seed: 0 }); maker(el, app); });
   $$('[data-anker-weg]', el).forEach(b => b.addEventListener('click', () => { keuze.anker = keuze.anker.filter(x => x !== b.dataset.ankerWeg); maker(el, app); }));
   $('#kies-anker').addEventListener('click', () => kiesAnker(app, kast, () => maker(el, app)));
 

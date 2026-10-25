@@ -19,6 +19,10 @@ Taal in code, commentaar en UI: Nederlands, informeel (je/jij).
 - Rekenwerk in de engine, niet in de AI. AI alleen waar je moet kijken of formuleren.
 - Een outfit die een rapportregel breekt (wijd op wijd, twee prints, …) wordt nooit voorgesteld.
 
+## Na elke wijziging
+- `python3 tools/versie.py` — nieuw versienummer en importmap in index.html, anders blijven telefoons oude code draaien.
+
 ## Testen
 - `node tests/engine.test.mjs` — de motor op de echte kast.
 - `node tests/app.test.cjs` — de hele app in Chromium (Playwright), offline.
+- `node tests/tas-onthoud.test.cjs` — de tas blijft staan na opnieuw openen; datum schuift goed mee.

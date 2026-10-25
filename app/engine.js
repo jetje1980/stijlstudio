@@ -32,6 +32,8 @@ export const SFEREN = {
     methode: { analoog: 1, split: 1 } },
 };
 
+export const sfeerLijst = s => (Array.isArray(s) ? s : s ? [s] : []);
+
 // ── WENSEN ───────────────────────────────────────────────────────────────────
 // Een wens is een harde eis. Daarom staat er maar een handvol.
 export const WENSEN = {
@@ -41,6 +43,39 @@ export const WENSEN = {
   broek: { naam: 'Broek', test: o => !!o.slots.onder && ['broek', 'jeans', 'pantalon', 'legging'].includes(o.slots.onder.soort) },
   rok:   { naam: 'Rok of jurk', test: o => (o.slots.onder && o.slots.onder.soort === 'rok') || (o.slots.heel && o.slots.heel.soort === 'jurk') },
 };
+
+// ── ACTIVITEITEN ─────────────────────────────────────────────────────────────
+// Wat je op een dagdeel doet, bepaalt hoe net of sportief de outfit wordt.
+// Optioneel: weet je het nog niet, dan geldt gewoon het moment.
+export const ACTIVITEITEN = {
+  chillen:  { naam: 'Chillen', sjiek: 0.15, wensen: ['plat'] },
+  wandelen: { naam: 'Wandelen', sjiek: 0.2, wensen: ['plat'] },
+  strand:   { naam: 'Strandwandeling', sjiek: 0.2, wensen: ['plat'] },
+  stad:     { naam: 'Stad of shoppen', sjiek: 0.45, wensen: ['plat'] },
+  museum:   { naam: 'Museum', sjiek: 0.55 },
+  terras:   { naam: 'Lunch of terras', sjiek: 0.5 },
+  pizzeria: { naam: 'Pizzeria', sjiek: 0.45 },
+  dinner:   { naam: 'Uit eten', sjiek: 0.8 },
+  feest:    { naam: 'Feest of borrel', sjiek: 0.9 },
+  sport:    { naam: 'Sporten of hardlopen', sport: true },
+};
+// Zelf getypt ("hardloopwedstrijd", "etentje bij vrienden") vertalen naar een
+// van de bekende. Niets herkend? Dan telt alleen het moment.
+export function herkenActiviteit(tekst) {
+  const t = String(tekst || '').toLowerCase();
+  if (!t) return null;
+  if (ACTIVITEITEN[t]) return t;
+  const regels = [
+    [/hardloop|rennen|\brun|sport|fitness|yoga|fiets|zwemmen|tennis|padel|wedstrijd/, 'sport'],
+    [/strand|zee|duin/, 'strand'], [/wandel|hike|bos|natuur/, 'wandelen'],
+    [/chill|relax|luier|thuis|bank|lezen|spa/, 'chillen'], [/museum|expo|galerie|tentoonstelling/, 'museum'],
+    [/pizza|snack|friet|burger/, 'pizzeria'], [/diner|uit eten|restaurant|etentje|eten/, 'dinner'],
+    [/feest|borrel|bruiloft|party|club|verjaardag|concert/, 'feest'], [/stad|shop|winkel|markt/, 'stad'],
+    [/lunch|terras|koffie|brunch|ontbijt/, 'terras'],
+  ];
+  const r = regels.find(([re]) => re.test(t));
+  return r ? r[1] : null;
+}
 
 // ── WEER ─────────────────────────────────────────────────────────────────────
 export function weerKlasse(temp) {
@@ -139,15 +174,18 @@ export function score(o, ctx) {
   const gem = kleding.reduce((t, i) => t + i.formeel, 0) / Math.max(1, kleding.length);
   if (o.slots.schoen) s -= Math.abs(o.slots.schoen.formeel - gem) * 0.4;
 
-  // sfeer
-  const sf = ctx.sfeer && SFEREN[ctx.sfeer];
-  if (sf) {
+  // sfeer: één of meer. Meerdere worden gemengd (het gemiddelde van de
+  // recepten), zodat cosy + streetstyle iets geeft dat van allebei heeft.
+  const sferen = sfeerLijst(ctx.sfeer).map(k => SFEREN[k]).filter(Boolean);
+  for (const sf of sferen) {
+    let t = 0;
     for (const i of o.items) {
-      s += (sf.soort[i.soort] || 0) * 0.6;
-      s += ((sf.textuur || {})[i.textuur] || 0) * 0.5;
-      if (i.print) s += ((sf.print || {})[i.print] || 0) * 0.5;
+      t += (sf.soort[i.soort] || 0) * 0.6;
+      t += ((sf.textuur || {})[i.textuur] || 0) * 0.5;
+      if (i.print) t += ((sf.print || {})[i.print] || 0) * 0.5;
     }
-    s += (sf.methode[o.kleur.methode] || 0);
+    t += (sf.methode[o.kleur.methode] || 0);
+    s += t / sferen.length;
   }
   // comfy ←→ sjiek
   if (ctx.sjiek != null) {
@@ -194,6 +232,14 @@ function pools(kast, ctx) {
   const p = { boven: [], onder: [], heel: [], laag: [], jas: [], schoen: [], tas: [], riem: [], sjaal: [] };
   for (const i of kast) {
     if (!ok(i)) continue;
+    // Sporten: alleen wat ervoor gemaakt is, sneakers eronder, geen tas.
+    if (ctx.sport) {
+      if (['sporttop', 't-shirt', 'longsleeve'].includes(i.soort) && i.rol === 'boven') p.boven.push(i);
+      else if (i.soort === 'legging' || (i.soort === 'short' && /sport|nike|adidas|run/i.test(i.naam))) p.onder.push(i);
+      else if (i.soort === 'sneakers') p.schoen.push(i);
+      else if (i.rol === 'jas') p.jas.push(i);  // geen breisel tijdens het sporten
+      continue;
+    }
     if (i.rol === 'boven') p.boven.push(i);
     else if (i.rol === 'onder') p.onder.push(i);
     else if (i.rol === 'heel' && i.soort !== 'co-ord') p.heel.push(i);
@@ -263,12 +309,15 @@ function kleedAan(basis, p, ctx, gebruikt = new Map()) {
   const lagen = ctx.weer === 'koud' || ctx.weer === 'fris' ? p.laag.filter(i => i.warmte >= 2) : p.laag;
   if (ctx.weer !== 'warm') probeer('laag', lagen, wilLaag && !p.jas.length);
   // onder de 16 graden ga je met een jas de deur uit
-  if (ctx.weer === 'koud' || ctx.weer === 'fris' || (wilLaag && !o.slots.laag)) probeer('jas', p.jas, ctx.weer === 'koud' || ctx.weer === 'fris' || (wilLaag && !o.slots.laag));
-  probeer('tas', p.tas, false);
-  if (o.slots.boven && o.slots.boven.pasvorm === 'wijd' && o.slots.onder && o.slots.onder.pasvorm === 'wijd') probeer('riem', p.riem, false);
+  // bij het sporten pas een jas als het echt koud is
+  const jasNodig = ctx.sport ? ctx.weer === 'koud' : (ctx.weer === 'koud' || ctx.weer === 'fris' || (wilLaag && !o.slots.laag));
+  if (jasNodig) probeer('jas', p.jas, true);
+  if (!ctx.sport) probeer('tas', p.tas, false);
+  if (ctx.sport) { /* geen riem of sjaal bij het sporten */ }
+  else if (o.slots.boven && o.slots.boven.pasvorm === 'wijd' && o.slots.onder && o.slots.onder.pasvorm === 'wijd') probeer('riem', p.riem, false);
   else if (ctx.weer === 'koud' || ctx.weer === 'fris') probeer('sjaal', p.sjaal, false);
   // Geen jas die erbij past terwijl het fris is: dan is dit geen outfit.
-  if ((ctx.weer === 'koud' || ctx.weer === 'fris') && p.jas.length && !o.slots.jas)
+  if (jasNodig && p.jas.length && !o.slots.jas)
     o = { ...o, check: { ...o.check, ok: false, problemen: o.check.problemen.concat({ regel: 'weer', tekst: 'Geen jas die erbij past.' }) } };
   return o;
 }
@@ -363,7 +412,11 @@ export function alternatieven(kast, outfit, rol, ctx, max = 12) {
 export function momenten(dagen) {
   const uit = [];
   dagen.forEach((d, n) => {
-    for (const m of d.momenten) uit.push({ dag: d.naam || `Dag ${n + 1}`, moment: m, weer: weerKlasse(d.temp), reis: m === 'reis' });
+    for (const m of d.momenten) {
+      const act = m === 'actief' ? 'sport' : herkenActiviteit((d.doen || {})[m]);
+      uit.push({ dag: d.naam || `Dag ${n + 1}`, moment: m, weer: weerKlasse(d.temp), reis: m === 'reis',
+                 activiteit: act, doen: (d.doen || {})[m] || null });
+    }
   });
   return uit;
 }
@@ -409,11 +462,11 @@ function rng(seed) {
 }
 
 export function pakTas(kast, opties) {
-  const { dagen, rapport, sfeer = null, sjiek = null, moetMee = [], uitsluiten = [], seed = 1, geheugen = {} } = opties;
+  const { dagen, rapport, sfeer = null, sjiek = null, moetMee = [], uitsluiten = [], seed = 1, geheugen = {}, afwisselen = false } = opties;
   const mom = momenten(dagen);
   const nodig = mom.length;
   const koudste = mom.some(m => m.weer === 'koud') ? 'koud' : mom.some(m => m.weer === 'fris') ? 'fris' : mom.every(m => m.weer === 'warm') ? 'warm' : 'mild';
-  const ctx = { rapport, sfeer, sjiek, weer: koudste, geheugen, uitsluiten };
+  const ctx = { rapport, sfeer, sjiek, weer: koudste, geheugen, uitsluiten, afwisselen };
   const perId = Object.fromEntries(kast.map(i => [i.id, i]));
   const pool = kast.filter(i => !uitsluiten.includes(i.id) && (moetMee.includes(i.id) || pastBijWeer(i, koudste === 'koud' ? 'fris' : koudste)));
   const formule = FORMULE(nodig);
@@ -460,16 +513,38 @@ export function pakTas(kast, opties) {
     }
     if (!beste || w.waarde > beste.w.waarde) beste = { koffer, w };
   }
-  return verdeel(beste.koffer, mom, { ...ctx, moetMee }, nodig, kast);
+  let koffer = beste.koffer;
+  if (mom.some(m => m.activiteit === 'sport')) {
+    // Sportspullen gaan mee als er gesport wordt; de rest van de koffer telt daar niet voor.
+    const sp = pools(pool, { ...ctx, sport: true, weer: 'mild' });
+    const heeft = rol => koffer.some(i => sp[rol].includes(i));
+    for (const rol of ['boven', 'onder', 'schoen']) {
+      if (!heeft(rol) && sp[rol].length) {
+        const keus = sp[rol].slice().sort((a, b) => (b.soort === 'sporttop' || b.soort === 'legging') - (a.soort === 'sporttop' || a.soort === 'legging'))[0];
+        koffer = koffer.concat(keus);
+      }
+    }
+  }
+  return verdeel(koffer, mom, { ...ctx, moetMee }, nodig, kast);
 }
 
 // Outfits uit de koffer aan dagen en momenten koppelen.
 function verdeel(koffer, mom, ctx, nodig, kast) {
   const plan = [];
   const gebruikt = new Set();
-  for (const m of mom) {
-    const mctx = { ...ctx, weer: m.weer, sjiek: m.moment === 'avond' ? Math.max(ctx.sjiek ?? 0.5, 0.75) : m.moment === 'actief' ? 0.1 : ctx.sjiek };
+  // Afwisselen: elk moment krijgt om de beurt één van de gekozen sferen. De
+  // koffer is wel samen gekozen, dus stukken komen in beide terug.
+  const sferen = sfeerLijst(ctx.sfeer);
+  for (const [n, m] of mom.entries()) {
+    if (ctx.afwisselen && sferen.length > 1) m.sfeer = sferen[n % sferen.length];
+    const act = ACTIVITEITEN[m.activiteit];
+    const sjiek = act && act.sjiek != null ? act.sjiek : m.moment === 'avond' ? Math.max(ctx.sjiek ?? 0.5, 0.75) : ctx.sjiek;
+    const wensen = (ctx.wensen || []).concat((act && act.wensen) || []);
+    const mctx = { ...ctx, sfeer: m.sfeer || ctx.sfeer, weer: m.weer, sjiek, wensen, sport: !!(act && act.sport) };
     let os = alleOutfits(koffer, mctx);
+    // wensen van de activiteit (platte schoenen bij een strandwandeling), als het kan
+    const passend = os.filter(o => wensen.every(w => !WENSEN[w] || WENSEN[w].test(o)));
+    if (passend.length) os = passend;
     if (m.reis) {
       // reisoutfit: de zwaarste stukken aan, dan scheelt het in de koffer
       os = os.map(o => ({ o, w: o.score + o.items.reduce((t, i) => t + i.warmte, 0) * 0.8 })).sort((a, b) => b.w - a.w).map(x => x.o);
