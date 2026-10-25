@@ -163,7 +163,8 @@ SOORTEN = [
     (r'jeans|\bjean\b', 'jeans', 'onder'),
     (r'pantalon|pantolon|trouser|trouwer', 'pantalon', 'onder'),
     (r'broek|worker', 'broek', 'onder'),
-    (r'kitten|pump|hak|heel|high geel satin', 'hakken', 'schoen'),
+    # woordbegin: "hak" zit ook in kHAKi
+    (r'kitten|pump|\bhak|\bheels?\b|high geel satin', 'hakken', 'schoen'),
     (r'loafer', 'loafers', 'schoen'),
     (r'laars|laarzen|boot', 'laarzen', 'schoen'),
     (r'sneaker|new balance|9060|samba|adidas sneakers', 'sneakers', 'schoen'),

@@ -4,7 +4,7 @@
 import { pakTas, meerVan, maakOutfit, SFEREN, ACTIVITEITEN, herkenActiviteit } from '../engine.js';
 import { METHODEN } from '../kleur.js';
 import { esc, $, $$, foto, blad, melding, chips, stip, tegel } from '../ui.js';
-import { outfitHtml, wissel, vanIds } from './outfits.js';
+import { outfitHtml, wissel, vanIds, andereKleurBlad } from './outfits.js';
 import { tekenKaart, deelOfBewaar } from '../kaart.js';
 
 // Sporten kies je bij "wat ga je doen"; 'actief' kan nog in oude bewaarde tassen staan.
@@ -286,7 +286,7 @@ function toonUitkomst(el, app) {
     <h3>Per dag</h3>
     ${u.plan.map((p, i) => `<div class="kaart" data-p="${i}">
       <div class="moment-kop"><h4>${esc(p.dag)} · ${esc(MOMENT_LABEL[p.moment] || p.moment)}</h4><span class="klein">${esc([p.doen && p.doen.trim(), p.sfeer && SFEREN[p.sfeer].naam, p.weer].filter(Boolean).join(' · '))}</span></div>
-      ${p.outfit ? outfitHtml(p.outfit) : '<p class="klein">Hier vond ik niets passends.</p>'}</div>`).join('')}
+      ${p.outfit ? outfitHtml(p.outfit) + `<button class="chip" data-kleur="${i}" type="button" style="margin-top:6px">🎨 Andere kleur</button>` : '<p class="klein">Hier vond ik niets passends.</p>'}</div>`).join('')}
 
     <div class="moment-kop"><h3>Paklijst</h3><span class="klein" id="ingepakt">${k.filter(x => tas.afgevinkt.includes(x.item.id)).length} van ${k.length} ingepakt</span></div>
     <p class="klein" style="margin-top:0">Vink af wat in je tas zit. × laat een stuk thuis, ＋ zet er een bij; de outfits worden dan opnieuw uitgerekend.</p>
@@ -323,8 +323,12 @@ function toonUitkomst(el, app) {
     e.preventDefault(); tas.moetMee.push(a.dataset.zet); reken(el, app);
   }));
   $$('[data-p]', plek).forEach(kaart => kaart.addEventListener('click', e => {
-    const st = e.target.closest('[data-slot]'); if (!st) return;
     const p = u.plan[+kaart.dataset.p];
+    if (e.target.closest('[data-kleur]')) {
+      return andereKleurBlad(app, p.outfit, { rapport: app.data.rapport, weer: p.weer, geheugen: app.staat().geheugen, uitsluiten: opties(app).uitsluiten },
+        k.map(x => x.item.id), nieuw => { p.outfit = nieuw; bewaarConcept(app); toonUitkomst(el, app); });
+    }
+    const st = e.target.closest('[data-slot]'); if (!st) return;
     wissel(app, p.outfit, st.dataset.slot, nieuw => { p.outfit = nieuw; bewaarConcept(app); toonUitkomst(el, app); },
       { rapport: app.data.rapport, weer: p.weer, geheugen: app.staat().geheugen });
   }));

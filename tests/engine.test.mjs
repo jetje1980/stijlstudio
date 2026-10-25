@@ -1,7 +1,8 @@
 // node tests/engine.test.mjs
 import fs from 'fs';
 import { zetHex, herken } from '../app/kleur.js';
-import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit } from '../app/engine.js';
+import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur } from '../app/engine.js';
+import { info } from '../app/kleur.js';
 const kast = JSON.parse(fs.readFileSync('data/kast.json'));
 const rapport = JSON.parse(fs.readFileSync('data/rapport.json'));
 zetHex(JSON.parse(fs.readFileSync('data/kennis.json')).kleuren);
@@ -111,5 +112,20 @@ ok(!parijs.plan[0].outfit.items.some(i => i.open), 'bij 18 graden dichte schoene
 const dik = o => { const b = o.slots.boven || o.slots.heel, l = o.slots.laag; return b && l && ((b.soort === 'trui' && ['vest', 'teddy'].includes(l.soort)) || (b.warmte >= 3 && l.warmte >= 3 && !['gilet', 'blazer'].includes(l.soort))); };
 const alleKoud = [koudW, tas, tas2, tas3].flatMap(t => t.plan.map(p => p.outfit).filter(Boolean)).concat(stelVoor(kast, { rapport, weer: 'koud', sfeer: ['cosy'] }, 20));
 ok(!alleKoud.some(dik), 'geen dikke trui met gebreid vest erover (' + alleKoud.length + ' outfits bekeken)');
+// 13. andere kleur
+let kleurGoed = 0, kleurTot = 0;
+const kofferIds2 = tas.koffer.map(k => k.item.id);
+for (const p of tas.plan) for (const k of ['rood', 'kobaltblauw', 'geel', 'groen', 'roze']) {
+  const r = andereKleur(kast, p.outfit, k, { rapport, weer: p.weer }, kofferIds2);
+  kleurTot++;
+  if (!r) continue;
+  const raak = r.outfit.items.some(i => i.kleur[0] === k || (info(i.kleur[0]).fam === info(k).fam && !info(i.kleur[0]).neutraal));
+  if (raak && r.outfit.check.ok && r.wissels.length <= 2 && r.outfit.slots.schoen) kleurGoed++;
+  else console.log('   ✗ kleur', k, r.wissels.map(w => w.naar && w.naar.naam));
+}
+ok(kleurGoed >= kleurTot * 0.8, `andere kleur: ${kleurGoed} van ${kleurTot} lukken, met hooguit 2 wissels en binnen de regels`);
+const kobalt = andereKleur(kast, tas.plan[0].outfit, 'kobaltblauw', { rapport, weer: tas.plan[0].weer }, kofferIds2);
+ok(!kobalt || !kobalt.wissels.some(w => w.naar && ['donkerblauw', 'marine', 'denimblauw'].includes(w.naar.kleur[0]) && w.naar.kleur[0] !== 'kobaltblauw' && !w.van), 'kobalt is geen navy');
+ok(kast.find(i => i.naam.startsWith('Khaki bloemen')).rol === 'onder', 'khaki broek is geen hak meer');
 console.log(goed, 'goed,', fout, 'fout,', Date.now() - t0, 'ms');
 process.exit(fout ? 1 : 0);

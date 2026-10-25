@@ -654,3 +654,64 @@ export function meerVan(kast, koffer, methode, opties) {
   }
   return beste;
 }
+
+// ── ANDERE KLEUR ─────────────────────────────────────────────────────────────
+// "Dit outfit, maar met rood als accent." Zo weinig mogelijk veranderen: één
+// stuk in de nieuwe kleur, en als de oude accentkleur daarmee gaat botsen, die
+// een stap terug naar iets rustigs. Liefst met wat al in de koffer zit.
+export function andereKleur(kast, outfit, kleur, ctx, voorkeur = []) {
+  const fam = info(kleur).fam;
+  const perId = Object.fromEntries(kast.map(i => [i.id, i]));
+  const p = pools(kast, { ...ctx, anker: outfit.items.map(i => i.id), uitsluiten: ctx.uitsluiten || [] });
+  const pool = rol => (p[rol] || []);
+  // De gekozen kleur zelf, of een heldere tint uit dezelfde familie; navy of
+  // denim telt niet als "blauw accent", die zijn rustige basis.
+  const kInfo = info(kleur);
+  const heeftKleur = i => i.kleur[0] === kleur || (info(i.kleur[0]).fam === fam && (kInfo.neutraal || !info(i.kleur[0]).neutraal));
+  const precies = i => i.kleur[0] === kleur;
+  const inKoffer = new Set(voorkeur);
+  const accenten = o => [...new Set(o.items.filter(i => !info(i.kleur[0]).neutraal && info(i.kleur[0]).fam !== 'multi')
+    .map(i => info(i.kleur[0]).fam))];
+  const slotsOm = ['boven', 'laag', 'tas', 'sjaal', 'onder', 'schoen', 'jas', 'heel'];
+  const beoordeel = (n, wissels) => {
+    if (!n.check.ok || !n.items.some(heeftKleur)) return null;
+    const anders = accenten(n).filter(f => f !== fam).length;
+    const nieuw = wissels.filter(w => w.naar && !inKoffer.has(w.naar.id)).length;
+    const raak = n.items.some(precies) ? 2 : 0;
+    return { outfit: n, wissels, w: n.score + raak - anders * 4 - wissels.length * 1.2 - nieuw * 1.5 };
+  };
+  const kandidaten = [];
+  // één stuk in de nieuwe kleur (of erbij: een sjaal of tas)
+  for (const s of slotsOm) {
+    if (s === 'heel' && !outfit.slots.heel) continue;
+    if ((s === 'boven' || s === 'onder') && outfit.slots.heel) continue;
+    for (const k of pool(s).filter(heeftKleur)) {
+      if (outfit.items.some(i => i.id === k.id)) continue;
+      const n = maakOutfit({ ...outfit.slots, [s]: k }, ctx);
+      const r = beoordeel(n, [{ slot: s, van: outfit.slots[s] || null, naar: k }]);
+      if (r) kandidaten.push(r);
+    }
+  }
+  // ...en de oude accentkleur een stap terug, als die nog botst
+  const eerste = kandidaten.sort((a, b) => b.w - a.w).slice(0, 12);
+  for (const k of eerste) {
+    const botst = k.outfit.items.filter(i => !heeftKleur(i) && !info(i.kleur[0]).neutraal && info(i.kleur[0]).fam !== 'multi');
+    for (const oud of botst) {
+      const s = Object.keys(k.outfit.slots).find(x => k.outfit.slots[x] === oud);
+      if (!s || s === 'extra') continue;
+      const rustig = pool(s).filter(i => info(i.kleur[0]).neutraal && !k.outfit.items.some(j => j.id === i.id));
+      if (['laag', 'tas', 'sjaal', 'riem'].includes(s)) rustig.push(null); // of gewoon weglaten
+      for (const r of rustig) {
+        const slots = { ...k.outfit.slots, [s]: r || undefined };
+        if (!r) delete slots[s];
+        const n = maakOutfit(slots, ctx);
+        const b = beoordeel(n, k.wissels.concat({ slot: s, van: oud, naar: r }));
+        if (b) kandidaten.push(b);
+      }
+    }
+  }
+  kandidaten.sort((a, b) => b.w - a.w);
+  const beste = kandidaten[0];
+  if (!beste) return null;
+  return { outfit: beste.outfit, wissels: beste.wissels, nieuw: beste.wissels.filter(w => w.naar && !inKoffer.has(w.naar.id)).map(w => w.naar) };
+}
