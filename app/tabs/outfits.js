@@ -26,17 +26,26 @@ export default function outfitsTab(el, app, [sub, arg]) {
 }
 
 // ── Het overzicht ───────────────────────────────────────────────────────────
+// Bovenaan de vraag waarvoor je de app meestal opent: wat trek ik vandaag aan?
+// Eén voorstel op basis van het weer; "Andere" geeft de volgende.
 let mapFilter = '';
+let vandaagSeed = 0, vandaagOutfit = null, vandaagSleutel = '';
+const vandaagDatum = () => new Date().toISOString().slice(0, 10);
+
 function lijst(el, app) {
   const outfits = app.outfits();
   const mappen = app.mappen().filter(m => outfits.some(o => o.map === m.id));
   const perId = Object.fromEntries(app.kast().map(i => [i.id, i]));
   const zicht = outfits.filter(o => !mapFilter || o.map === mapFilter).slice().reverse();
+  const gedragen = (app.staat().gedragen[vandaagDatum()] || []).map(id => perId[id]).filter(Boolean);
   el.innerHTML = `
-    <div class="tab-kop"><div><h1>Outfits</h1><p class="sub">${outfits.length} bewaard</p></div></div>
+    <div class="tab-kop"><div><h1>Vandaag</h1><p class="sub" id="vandaag-weer">${weerInfo ? `${weerInfo.temp}° · ${esc(weerInfo.klasse)}` : 'Weer ophalen…'}</p></div></div>
+    <div class="kaart" id="vandaag">${gedragen.length ? `<p class="klein">Vandaag bijgehouden: ${esc(gedragen.map(i => i.naam).join(', '))}</p>` : ''}<p class="klein">Ik zoek iets voor vandaag…</p></div>
+    <div class="tab-kop" style="margin-top:22px"><div><h2 style="margin:0">Outfits</h2><p class="sub">${outfits.length} bewaard</p></div></div>
     <div class="rij" style="margin-bottom:12px">
       <a class="knop" href="#outfits/maak">Nieuwe outfit</a>
       <button class="knop licht" id="spiegel" type="button">Spiegelcheck</button>
+      <button class="knop licht" id="opruimen" type="button">Opruimen</button>
     </div>
     ${chips('map', [['', 'Alles']].concat(mappen.map(m => [m.id, `${m.emoji || ''} ${esc(m.naam)}`])), mapFilter)}
     <div class="outfit-lijst">${zicht.map(o => {
@@ -48,6 +57,75 @@ function lijst(el, app) {
   $$('[data-chips="map"] .chip', el).forEach(b => b.addEventListener('click', () => { mapFilter = b.dataset.w; lijst(el, app); }));
   $$('[data-o]', el).forEach(b => b.addEventListener('click', () => toonBewaard(app, b.dataset.o, () => lijst(el, app))));
   $('#spiegel').addEventListener('click', () => spiegel(app));
+  $('#opruimen').addEventListener('click', () => opruimen(app, () => lijst(el, app)));
+  if (!weerInfo) haalWeer().then(() => { const w = $('#vandaag-weer'); if (w) w.textContent = `${weerInfo.temp}° · ${weerInfo.klasse}`; vandaag(el, app, true); })
+    .catch(() => { const w = $('#vandaag-weer'); if (w) w.textContent = 'Geen weer; ik ga uit van mild'; });
+  setTimeout(() => vandaag(el, app), 30);
+}
+
+function vandaagCtx(app) {
+  return { rapport: app.data.rapport, weer: weerInfo ? weerInfo.klasse : 'mild', geheugen: app.staat().geheugen, seed: vandaagSeed };
+}
+
+function vandaag(el, app, opnieuw) {
+  const plek = $('#vandaag', el);
+  if (!plek) return;
+  const sleutel = `${vandaagDatum()}|${vandaagSeed}|${weerInfo ? weerInfo.klasse : 'mild'}`;
+  if (opnieuw || !vandaagOutfit || vandaagSleutel !== sleutel) {
+    // Eén voorstel, maar uit een ruimere top: met "Andere" schuif je door.
+    const lijst = stelVoor(app.kast(), { ...vandaagCtx(app), seed: 0 }, 8);
+    vandaagOutfit = lijst.length ? lijst[vandaagSeed % lijst.length] : null;
+    vandaagSleutel = sleutel;
+  }
+  const o = vandaagOutfit;
+  const bijgehouden = plek.querySelector('p.klein') && /bijgehouden/.test(plek.querySelector('p.klein').textContent) ? plek.querySelector('p.klein').outerHTML : '';
+  if (!o) { plek.innerHTML = bijgehouden + '<p class="klein">Ik vind nu niets passends. Kijk of je kast labels heeft.</p>'; return; }
+  plek.innerHTML = bijgehouden + outfitHtml(o) + `
+    <div class="rij" style="margin-top:10px">
+      <button class="knop" data-v="aan" type="button">Vandaag aan</button>
+      <button class="knop licht" data-v="andere" type="button">Andere</button>
+      <button class="knop licht" data-v="kleur" type="button">Andere kleur</button>
+      <button class="knop licht" data-v="kaart" type="button">Kaart</button>
+      <a class="knop licht" href="#outfits/maak">Bijsturen</a>
+    </div>`;
+  plek.onclick = e => {
+    const zet = nieuw => { vandaagOutfit = nieuw; vandaag(el, app); };
+    const st = e.target.closest('[data-slot]');
+    if (st) return wissel(app, vandaagOutfit, st.dataset.slot, zet, vandaagCtx(app));
+    const a = e.target.closest('[data-v]'); if (!a) return;
+    if (a.dataset.v === 'aan') { vandaagBijhouden(app, vandaagOutfit); lijst(el, app); }
+    if (a.dataset.v === 'andere') { vandaagSeed++; vandaag(el, app, true); }
+    if (a.dataset.v === 'kleur') andereKleurBlad(app, vandaagOutfit, vandaagCtx(app), [], zet);
+    if (a.dataset.v === 'kaart') bewaarKaart(standaardNaam(vandaagOutfit), vandaagOutfit);
+  };
+}
+
+// ── Opruimen: dubbele en onvolledige outfits ──────────────────────────────
+function opruimen(app, klaar) {
+  const kast = new Set(app.kast().map(i => i.id));
+  const perId = Object.fromEntries(app.kast().map(i => [i.id, i]));
+  const gezien = new Map(), dubbel = [], onvolledig = [];
+  for (const o of app.outfits()) {
+    const echt = o.items.filter(id => kast.has(id));
+    const kleding = echt.filter(id => ['boven', 'onder', 'heel', 'laag', 'jas', 'zwem'].includes(perId[id].rol));
+    // een bikini of badpak telt als basis: strandoutfits blijven staan
+    const heeftBasis = echt.some(id => ['heel', 'zwem'].includes(perId[id].rol)) || (echt.some(id => ['boven', 'laag'].includes(perId[id].rol)) && echt.some(id => perId[id].rol === 'onder'));
+    if (!o.afbeelding && (kleding.length < 2 || !heeftBasis)) { onvolledig.push(o); continue; }
+    const sl = echt.slice().sort().join('|');
+    if (gezien.has(sl)) dubbel.push(o); else gezien.set(sl, o);
+  }
+  const b = blad(`<h2>Outfits opruimen</h2>
+    <p class="sub">Je hebt ${app.outfits().length} outfits, veel uit je oude boards.</p>
+    <div class="kaart"><b>${dubbel.length} dubbel</b><p class="klein" style="margin:4px 0 0">Precies dezelfde stukken als een outfit die blijft staan.</p></div>
+    <div class="kaart"><b>${onvolledig.length} onvolledig</b><p class="klein" style="margin:4px 0 0">Geen boven- én onderstuk (of jurk) meer, bijvoorbeeld omdat stukken uit je kast zijn.</p>
+      ${onvolledig.length ? `<div class="outfit-lijst" style="margin-top:8px">${onvolledig.slice(0, 6).map(o => `<div class="outfit-tegel">${collage(o.items.map(id => perId[id]).filter(Boolean))}<b>${esc(o.naam)}</b></div>`).join('')}</div>${onvolledig.length > 6 ? `<p class="klein">en ${onvolledig.length - 6} meer</p>` : ''}` : ''}</div>
+    ${dubbel.length + onvolledig.length ? `<button class="knop vol" id="ruim" type="button">Haal ${dubbel.length + onvolledig.length} outfits weg</button>` : '<p class="leeg-melding">Niets op te ruimen.</p>'}`, { opSluiten: klaar });
+  const ruim = $('#ruim', b);
+  if (ruim) ruim.addEventListener('click', () => {
+    const weg = new Set(dubbel.concat(onvolledig).map(o => o.id));
+    app.bij(s => { s.outfits = s.outfits.filter(o => !weg.has(o.id)); });
+    b.sluit(); melding(`${weg.size} outfits opgeruimd`);
+  });
 }
 
 // Een bewaarde outfit weer tot leven: met wisselen en de kaart.
@@ -105,7 +183,7 @@ function toonBewaard(app, id, klaar) {
     });
     const a = e.target.closest('[data-a]'); if (!a) return;
     if (a.dataset.a === 'kaart') bewaarKaart(o.naam, uit, o.waarom || o.notitie);
-    if (a.dataset.a === 'vandaag') vandaag(app, uit);
+    if (a.dataset.a === 'vandaag') vandaagBijhouden(app, uit);
     if (a.dataset.a === 'kleur') andereKleurBlad(app, uit, context(app), [], nieuw => {
       Object.assign(uit, nieuw);
       app.bij(s => { const x = s.outfits.find(y => y.id === id); x.items = nieuw.items.map(i => i.id); x.afbeelding = null; x.methode = nieuw.kleur.methode; });
@@ -206,7 +284,7 @@ export async function bewaarKaart(naam, o, notitie) {
   } catch (e) { melding('Kaart lukte niet: ' + e.message, 4000); }
 }
 
-function vandaag(app, o) {
+function vandaagBijhouden(app, o) {
   const d = new Date().toISOString().slice(0, 10);
   app.bij(s => { s.gedragen[d] = [...new Set((s.gedragen[d] || []).concat(o.items.map(i => i.id)))]; });
   o.items.forEach(i => app.onthoud(i.id, 'gekozen'));
@@ -339,7 +417,7 @@ function toonVoorstellen(el, app) {
         melding('Bewaard bij je outfits');
       }
       if (a.dataset.a === 'kaart') bewaarKaart(naam, o, ai && ai.waarom);
-      if (a.dataset.a === 'vandaag') vandaag(app, o);
+      if (a.dataset.a === 'vandaag') vandaagBijhouden(app, o);
       if (a.dataset.a === 'ai') {
         const p = kaart.querySelector('[data-waarom]');
         p.textContent = 'De stylist kijkt…';

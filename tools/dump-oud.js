@@ -1,6 +1,8 @@
 // Laadt de oude pagina's (griette.html, outfitkaart.html) met een backup in een
 // testbrowser en schrijft de kast en de kleurkennis weg zoals die pagina's ze
 // zelf zien. Daarna: python3 tools/migreer.py <backup.json> <uitmap>
+// De oude pagina's zijn uit de repo gehaald; haal ze eerst terug met
+//   git checkout 8cc14e0 -- griette.html outfitkaart.html
 // Gebruik: node tools/dump-oud.js <backup.json> <uitmap>
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path');

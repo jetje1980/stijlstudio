@@ -88,10 +88,15 @@ async function start() {
 
 let huidig = null;
 function toon() {
-  const [tab, ...rest] = (location.hash.slice(1) || 'kast').split('/');
-  const t = TABS[tab] ? tab : 'kast';
+  // De app opent bij Outfits, met bovenaan het voorstel voor vandaag.
+  const [tab, ...rest] = (location.hash.slice(1) || 'outfits').split('/');
+  const t = TABS[tab] ? tab : 'outfits';
   $$('.tabs a').forEach(a => a.classList.toggle('aan', a.dataset.tab === t));
   const scherm = $('#scherm');
+  // Een open venster hoort bij het vorige scherm: weg ermee, zonder het
+  // vorige scherm opnieuw te tekenen.
+  $$('.blad-achter').forEach(b => b.remove());
+  document.body.classList.remove('blad-open');
   if (huidig !== t) window.scrollTo(0, 0);
   huidig = t;
   TABS[t](scherm, app, rest.map(decodeURIComponent));
