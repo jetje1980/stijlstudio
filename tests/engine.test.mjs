@@ -75,7 +75,7 @@ const tas2 = pakTas(kast, { dagen, rapport, sfeer: ['cosy', 'street'], afwissele
 ok(tas2.plan.every(p => p.outfit) && new Set(tas2.plan.map(p => p.sfeer)).size === 2, 'afwisselen verdeelt beide sferen');
 tas2.plan.forEach(p => console.log('   ', p.dag, p.moment, p.sfeer, '|', p.outfit && naam(p.outfit)));
 // 10. activiteiten per dagdeel en wat niet mee
-ok(herkenActiviteit('hardloopwedstrijd') === 'sport' && herkenActiviteit('pizzeria') === 'pizzeria' && herkenActiviteit('iets onbekends') === null, 'activiteit uit eigen tekst');
+ok(['hardloopwedstrijd', 'hardlopen', 'joggen', 'naar de gym', 'yoga'].every(t => herkenActiviteit(t) === 'sport') && herkenActiviteit('pizzeria') === 'pizzeria' && herkenActiviteit('iets onbekends') === null, 'activiteit uit eigen tekst');
 const rokken = kast.filter(i => i.soort === 'rok').map(i => i.id);
 const dagen3 = [{ naam: 'Za', temp: 14, momenten: ['ochtend', 'dag', 'avond'], doen: { ochtend: 'hardloopwedstrijd', dag: 'strand', avond: 'pizzeria' } },
                 { naam: 'Zo', temp: 15, momenten: ['dag'] }];
@@ -87,5 +87,25 @@ const strandP = tas3.plan.find(p => p.activiteit === 'strand');
 ok(strandP && strandP.outfit && strandP.outfit.slots.schoen.soort !== 'hakken', 'strandwandeling: platte schoenen');
 ok(tas3.plan.every(p => !p.outfit || !p.outfit.items.some(i => i.soort === 'rok')), 'geen rokken als die thuisblijven');
 ok(tas3.plan.every(p => p.outfit), 'elk dagdeel een outfit');
+// 11. de dingen die een stylist meteen zou zien
+const koudW = pakTas(kast, { rapport, dagen: [
+  { naam: 'Vr', temp: 8, momenten: ['reis', 'avond'], doen: { avond: 'uit eten' } },
+  { naam: 'Za', temp: 7, momenten: ['ochtend', 'dag'], doen: { ochtend: 'hardlopen', dag: 'strandwandeling' } }] });
+const vind = (plan, a) => plan.find(p => p.activiteit === a);
+const diner = vind(koudW.plan, 'dinner');
+ok(diner && diner.outfit.slots.schoen.formeel >= 3, 'uit eten: geen sneakers maar nette schoenen (' + diner?.outfit.slots.schoen.naam + ')');
+const loop = vind(koudW.plan, 'sport');
+ok(loop && (!loop.outfit.slots.jas || /technical|sport|wind|run/i.test(loop.outfit.slots.jas.naam)), 'hardlopen: alleen een sportjack');
+const strandK = vind(koudW.plan, 'strand');
+ok(strandK && !strandK.outfit.items.some(i => ['glans', 'kant'].includes(i.textuur) && i.rol !== 'tas'), 'strandwandeling: geen satijn of kant');
+ok(koudW.plan.filter(p => p.outfit.slots.jas && !p.activiteit).every(p => /wol|kunstbont|fleece|leer|mohair/.test(p.outfit.slots.jas.materiaal || '') || p.outfit.slots.jas.textuur === 'pluizig'), 'bij 7-8 graden een warme jas');
+ok(koudW.plan.filter(p => p.activiteit !== 'sport').every(p => !p.outfit.items.some(i => i.soort === 'sporttop' || i.soort === 'legging')), 'geen sportkleding buiten het sporten');
+const zomer = pakTas(kast, { rapport, dagen: [
+  { naam: 'Ma', temp: 28, momenten: ['reis', 'avond'], doen: { avond: 'feest' } },
+  { naam: 'Di', temp: 29, momenten: ['dag'], doen: { dag: 'strand' } }] });
+ok(zomer.ookMee.some(x => x.item.rol === 'zwem'), 'stranddag bij 28 graden: zwemkleding mee');
+ok(!zomer.plan.some(p => (p.reis || p.moment === 'avond') && p.outfit.slots.schoen && /slipper|flipflop|haivanas/i.test(p.outfit.slots.schoen.naam)), 'niet op teenslippers reizen of uitgaan');
+const parijs = pakTas(kast, { rapport, dagen: [{ naam: 'Za', temp: 18, momenten: ['dag'], doen: { dag: 'museum' } }] });
+ok(!parijs.plan[0].outfit.items.some(i => i.open), 'bij 18 graden dichte schoenen');
 console.log(goed, 'goed,', fout, 'fout,', Date.now() - t0, 'ms');
 process.exit(fout ? 1 : 0);

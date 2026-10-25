@@ -48,9 +48,9 @@ export const WENSEN = {
 // Wat je op een dagdeel doet, bepaalt hoe net of sportief de outfit wordt.
 // Optioneel: weet je het nog niet, dan geldt gewoon het moment.
 export const ACTIVITEITEN = {
-  chillen:  { naam: 'Chillen', sjiek: 0.15, wensen: ['plat'] },
-  wandelen: { naam: 'Wandelen', sjiek: 0.2, wensen: ['plat'] },
-  strand:   { naam: 'Strandwandeling', sjiek: 0.2, wensen: ['plat'] },
+  chillen:  { naam: 'Chillen', sjiek: 0.15, wensen: ['plat'], vermijd: ['glans', 'kant'] },
+  wandelen: { naam: 'Wandelen', sjiek: 0.2, wensen: ['plat', 'broek'], vermijd: ['glans', 'kant'] },
+  strand:   { naam: 'Strandwandeling', sjiek: 0.2, wensen: ['plat'], vermijd: ['glans', 'kant'], strand: true },
   stad:     { naam: 'Stad of shoppen', sjiek: 0.45, wensen: ['plat'] },
   museum:   { naam: 'Museum', sjiek: 0.55 },
   terras:   { naam: 'Lunch of terras', sjiek: 0.5 },
@@ -66,8 +66,8 @@ export function herkenActiviteit(tekst) {
   if (!t) return null;
   if (ACTIVITEITEN[t]) return t;
   const regels = [
-    [/hardloop|rennen|\brun|sport|fitness|yoga|fiets|zwemmen|tennis|padel|wedstrijd/, 'sport'],
-    [/strand|zee|duin/, 'strand'], [/wandel|hike|bos|natuur/, 'wandelen'],
+    [/hardlo+p|rennen|joggen|\brun|sport|fitness|gym|yoga|pilates|fiets|mountainbike|zwemmen|tennis|padel|golf|wedstrijd|marathon|training/, 'sport'],
+    [/strand|zee|duin/, 'strand'], [/wandel|hike|hiken|bos|natuur|berg/, 'wandelen'],
     [/chill|relax|luier|thuis|bank|lezen|spa/, 'chillen'], [/museum|expo|galerie|tentoonstelling/, 'museum'],
     [/pizza|snack|friet|burger/, 'pizzeria'], [/diner|uit eten|restaurant|etentje|eten/, 'dinner'],
     [/feest|borrel|bruiloft|party|club|verjaardag|concert/, 'feest'], [/stad|shop|winkel|markt/, 'stad'],
@@ -87,6 +87,8 @@ export function weerKlasse(temp) {
 }
 
 const open = i => i.open || i.soort === 'sandalen';
+// teenslippers en badslippers: voor het strand en luieren, niet voor de stad
+export const isSlipper = i => i.rol === 'schoen' && /slipper|flipflop|haivanas|teenslipper/i.test(i.naam);
 function pastBijWeer(i, klasse) {
   if (klasse === 'koud') {
     if (open(i) || ['short', 'zwemkleding'].includes(i.soort)) return false;
@@ -95,7 +97,8 @@ function pastBijWeer(i, klasse) {
   }
   if (klasse === 'fris') return !open(i) && i.soort !== 'zwemkleding' && !(i.soort === 'short' && i.warmte < 2);
   if (klasse === 'warm') return i.warmte <= 2 && i.rol !== 'jas' && !['laarzen', 'muts', 'teddy'].includes(i.soort);
-  return i.soort !== 'zwemkleding' && i.soort !== 'muts';
+  // mild (16-22 graden): dichte schoenen
+  return !open(i) && i.soort !== 'zwemkleding' && i.soort !== 'muts';
 }
 
 // ── RAPPORTREGELS ────────────────────────────────────────────────────────────
@@ -189,8 +192,13 @@ export function score(o, ctx) {
   }
   // comfy ←→ sjiek
   if (ctx.sjiek != null) {
+    // De schoen telt mee: sneakers maken een avond uit eten casual,
+    // hakken een strandwandeling onhandig.
     const doel = 1.5 + 3 * ctx.sjiek;
-    s -= Math.abs(gem - doel) * 1.2;
+    const metSchoen = kleding.concat(o.slots.schoen ? [o.slots.schoen] : []);
+    const gemS = metSchoen.reduce((t, i) => t + i.formeel, 0) / Math.max(1, metSchoen.length);
+    s -= Math.abs(gemS - doel) * 1.2;
+    if (o.slots.schoen) s -= Math.max(0, Math.abs(o.slots.schoen.formeel - doel) - 1.5) * 1.5;
     const comfort = o.items.reduce((t, i) => t + i.comfort, 0) / o.items.length;
     s += (1 - ctx.sjiek) * (comfort - 3) * 0.5;
   }
@@ -198,7 +206,12 @@ export function score(o, ctx) {
   // weer: genoeg warmte
   const k = ctx.weer;
   const warmte = kleding.reduce((t, i) => t + i.warmte, 0);
-  if (k === 'koud') s += Math.min(warmte, 9) * 0.3 - (o.slots.jas ? 0 : 3);
+  if (k === 'koud') {
+    s += Math.min(warmte, 9) * 0.3 - (o.slots.jas ? 0 : 3);
+    // een spijker- of linnen jasje is geen winterjas
+    const jas = o.slots.jas;
+    if (jas && !/wol|kunstbont|fleece|leer|mohair/.test(jas.materiaal || '') && jas.textuur !== 'pluizig') s -= 2.5;
+  }
   if (k === 'fris') s += (o.slots.laag || o.slots.jas) ? 1 : -1;
   if (k === 'warm') s -= Math.max(0, warmte - 4) * 0.8;
 
@@ -237,9 +250,14 @@ function pools(kast, ctx) {
       if (['sporttop', 't-shirt', 'longsleeve'].includes(i.soort) && i.rol === 'boven') p.boven.push(i);
       else if (i.soort === 'legging' || (i.soort === 'short' && /sport|nike|adidas|run/i.test(i.naam))) p.onder.push(i);
       else if (i.soort === 'sneakers') p.schoen.push(i);
-      else if (i.rol === 'jas') p.jas.push(i);  // geen breisel tijdens het sporten
+      // geen breisel en geen bontjas tijdens het sporten; alleen een sportief jack
+      else if (i.rol === 'jas' && /technical|sport|wind|run|regen|rain/i.test(i.naam)) p.jas.push(i);
       continue;
     }
+    // een legging is sportkleding, behalve bij cosy of streetstyle
+    if (i.soort === 'legging' && !sfeerLijst(ctx.sfeer).some(f => f === 'cosy' || f === 'street')) continue;
+    if (i.soort === 'sporttop') continue;
+    if (isSlipper(i) && (ctx.weer !== 'warm' || ctx.avond || ctx.reis || (ctx.activiteit && !['strand', 'chillen'].includes(ctx.activiteit)))) continue;
     if (i.rol === 'boven') p.boven.push(i);
     else if (i.rol === 'onder') p.onder.push(i);
     else if (i.rol === 'heel' && i.soort !== 'co-ord') p.heel.push(i);
@@ -310,12 +328,14 @@ function kleedAan(basis, p, ctx, gebruikt = new Map()) {
   if (ctx.weer !== 'warm') probeer('laag', lagen, wilLaag && !p.jas.length);
   // onder de 16 graden ga je met een jas de deur uit
   // bij het sporten pas een jas als het echt koud is
-  const jasNodig = ctx.sport ? ctx.weer === 'koud' : (ctx.weer === 'koud' || ctx.weer === 'fris' || (wilLaag && !o.slots.laag));
+  const jasNodig = ctx.sport ? (ctx.weer === 'koud' || ctx.weer === 'fris') && p.jas.length > 0 : (ctx.weer === 'koud' || ctx.weer === 'fris' || (wilLaag && !o.slots.laag));
   if (jasNodig) probeer('jas', p.jas, true);
   if (!ctx.sport) probeer('tas', p.tas, false);
   if (ctx.sport) { /* geen riem of sjaal bij het sporten */ }
   else if (o.slots.boven && o.slots.boven.pasvorm === 'wijd' && o.slots.onder && o.slots.onder.pasvorm === 'wijd') probeer('riem', p.riem, false);
   else if (ctx.weer === 'koud' || ctx.weer === 'fris') probeer('sjaal', p.sjaal, false);
+  // Bij het sporten gaan kleurregels niet over krachtmetingen.
+  if (ctx.sport) o = { ...o, check: { ...o.check, tips: [], problemen: o.check.problemen.filter(p => !p.zacht) } };
   // Geen jas die erbij past terwijl het fris is: dan is dit geen outfit.
   if (jasNodig && p.jas.length && !o.slots.jas)
     o = { ...o, check: { ...o.check, ok: false, problemen: o.check.problemen.concat({ regel: 'weer', tekst: 'Geen jas die erbij past.' }) } };
@@ -518,14 +538,24 @@ export function pakTas(kast, opties) {
     // Sportspullen gaan mee als er gesport wordt; de rest van de koffer telt daar niet voor.
     const sp = pools(pool, { ...ctx, sport: true, weer: 'mild' });
     const heeft = rol => koffer.some(i => sp[rol].includes(i));
-    for (const rol of ['boven', 'onder', 'schoen']) {
+    const kou = mom.some(m => m.activiteit === 'sport' && (m.weer === 'koud' || m.weer === 'fris'));
+    for (const rol of kou ? ['boven', 'onder', 'schoen', 'jas'] : ['boven', 'onder', 'schoen']) {
       if (!heeft(rol) && sp[rol].length) {
         const keus = sp[rol].slice().sort((a, b) => (b.soort === 'sporttop' || b.soort === 'legging') - (a.soort === 'sporttop' || a.soort === 'legging'))[0];
         koffer = koffer.concat(keus);
       }
     }
   }
-  return verdeel(koffer, mom, { ...ctx, moetMee }, nodig, kast);
+  const uit = verdeel(koffer, mom, { ...ctx, moetMee }, nodig, kast);
+  // Wat niet in een outfit zit maar wel mee moet: zwemkleding bij een warme
+  // stranddag. Liefst iets wat je zelf al "moet mee" had gezet.
+  uit.ookMee = [];
+  if (mom.some(m => m.activiteit === 'strand' && m.weer === 'warm')) {
+    const zwem = kast.filter(i => i.rol === 'zwem' && !uitsluiten.includes(i.id));
+    const keus = zwem.find(i => moetMee.includes(i.id)) || zwem[0];
+    if (keus) uit.ookMee.push({ item: keus, waarom: 'voor het strand' });
+  }
+  return uit;
 }
 
 // Outfits uit de koffer aan dagen en momenten koppelen.
@@ -540,10 +570,14 @@ function verdeel(koffer, mom, ctx, nodig, kast) {
     const act = ACTIVITEITEN[m.activiteit];
     const sjiek = act && act.sjiek != null ? act.sjiek : m.moment === 'avond' ? Math.max(ctx.sjiek ?? 0.5, 0.75) : ctx.sjiek;
     const wensen = (ctx.wensen || []).concat((act && act.wensen) || []);
-    const mctx = { ...ctx, sfeer: m.sfeer || ctx.sfeer, weer: m.weer, sjiek, wensen, sport: !!(act && act.sport) };
+    const mctx = { ...ctx, sfeer: m.sfeer || ctx.sfeer, weer: m.weer, sjiek, wensen, sport: !!(act && act.sport),
+                   activiteit: m.activiteit, avond: m.moment === 'avond', reis: m.reis };
     let os = alleOutfits(koffer, mctx);
-    // wensen van de activiteit (platte schoenen bij een strandwandeling), als het kan
-    const passend = os.filter(o => wensen.every(w => !WENSEN[w] || WENSEN[w].test(o)));
+    // wat de activiteit vraagt (platte schoenen en een broek bij een wandeling,
+    // geen satijn op het strand), als dat met deze koffer kan
+    const vermijd = (act && act.vermijd) || [];
+    const passend = os.filter(o => wensen.every(w => !WENSEN[w] || WENSEN[w].test(o))
+      && !o.items.some(i => ROLLEN_KLEDING.includes(i.rol) && vermijd.includes(i.textuur)));
     if (passend.length) os = passend;
     if (m.reis) {
       // reisoutfit: de zwaarste stukken aan, dan scheelt het in de koffer

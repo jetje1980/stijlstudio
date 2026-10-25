@@ -1,13 +1,15 @@
 // De tas. Jij zegt alleen waar je heen gaat en wat je doet; de app rekent de
 // koffer uit die de meeste goede outfits geeft, met verschillende kleurmanieren
 // erin. Daarna stuur je bij: meer van een manier, of een stuk wisselen.
-import { pakTas, meerVan, SFEREN, ACTIVITEITEN, herkenActiviteit } from '../engine.js';
+import { pakTas, meerVan, maakOutfit, SFEREN, ACTIVITEITEN, herkenActiviteit } from '../engine.js';
 import { METHODEN } from '../kleur.js';
 import { esc, $, $$, foto, blad, melding, chips, stip, tegel } from '../ui.js';
 import { outfitHtml, wissel, vanIds } from './outfits.js';
 import { tekenKaart, deelOfBewaar } from '../kaart.js';
 
-const MOMENTEN = [['reis', 'Reis'], ['ochtend', 'Ochtend'], ['dag', 'Overdag'], ['avond', 'Avond'], ['actief', 'Sport']];
+// Sporten kies je bij "wat ga je doen"; 'actief' kan nog in oude bewaarde tassen staan.
+const MOMENTEN = [['reis', 'Reis'], ['ochtend', 'Ochtend'], ['dag', 'Overdag'], ['avond', 'Avond']];
+const MOMENT_LABEL = { ...Object.fromEntries(MOMENTEN), actief: 'Sport' };
 // Wat sowieso thuisblijft. "open" = sandalen en slippers, ook met hak.
 const NIET = [['rok', 'Rokken'], ['jurk', 'Jurken'], ['short', 'Shorts'], ['hakken', 'Hakken'], ['open', 'Open schoenen'], ['legging', 'Leggings']];
 const DAGNAMEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
@@ -41,19 +43,30 @@ function laadConcept(app) {
   for (const k of BEWAAR) if (c[k] !== undefined) tas[k] = c[k];
   // Een bewaarde reis die al voorbij is, schuift op naar vandaag.
   if (tas.start < vandaag()) { tas.start = vandaag(); tas.dagen = maakDagen(tas.start, tas.dagen.length, tas.dagen); vergeetWeer(); }
-  else if (c.plan) tas.uitkomst = vanPlan(app, c.plan);
+  else if (c.plan) {
+    tas.uitkomst = vanPlan(app, c.plan);
+    tas.uitkomst.ookMee = (c.ookMee || []).map(x => ({ item: app.item(x.id), waarom: x.waarom })).filter(x => x.item);
+  }
 }
 function bewaarConcept(app) {
   const c = Object.fromEntries(BEWAAR.map(k => [k, tas[k]]));
-  if (tas.uitkomst) c.plan = planIds(tas.uitkomst.plan);
+  if (tas.uitkomst) { c.plan = planIds(tas.uitkomst.plan); c.ookMee = (tas.uitkomst.ookMee || []).map(x => ({ id: x.item.id, waarom: x.waarom })); }
   const oud = app.staat().tasConcept;
   if (JSON.stringify(oud) !== JSON.stringify(c)) app.bij(s => { s.tasConcept = c; });
 }
+// Per stuk ook de plek bewaren: een trui uit je laagjes kan het bovenstuk zijn.
 const planIds = plan => plan.map(p => ({ dag: p.dag, moment: p.moment, weer: p.weer, sfeer: p.sfeer || null, doen: p.doen || null,
-  activiteit: p.activiteit || null, items: p.outfit ? p.outfit.items.map(i => i.id) : [] }));
+  activiteit: p.activiteit || null, items: p.outfit ? p.outfit.items.map(i => i.id) : [],
+  slots: p.outfit ? Object.fromEntries(Object.entries(p.outfit.slots).filter(([k, v]) => v && !Array.isArray(v)).map(([k, v]) => [k, v.id])) : null }));
 function vanPlan(app, planLijst) {
   const ctx = { rapport: app.data.rapport, geheugen: app.staat().geheugen };
-  const plan = planLijst.map(p => ({ ...p, outfit: p.items.length ? vanIds(app, p.items, { ...ctx, weer: p.weer }) : null }));
+  const bouw = p => {
+    if (!p.items.length) return null;
+    if (!p.slots) return vanIds(app, p.items, { ...ctx, weer: p.weer });
+    const slots = Object.fromEntries(Object.entries(p.slots).map(([k, id]) => [k, app.item(id)]).filter(([, i]) => i));
+    return maakOutfit(slots, { ...ctx, weer: p.weer });
+  };
+  const plan = planLijst.map(p => ({ ...p, outfit: bouw(p) }));
   const ids = [...new Set(planLijst.flatMap(p => p.items))];
   return { plan, koffer: ids.map(i => ({ item: app.item(i), keer: 0 })).filter(x => x.item), extra: [], perManier: tel(plan), ontbreekt: [] };
 }
@@ -75,8 +88,8 @@ export default function tasTab(el, app) {
     <h1>Tas</h1>
     <p class="sub">Waar ga je heen, en wat ga je doen? De rest reken ik uit.</p>
     <label class="lab">Bestemming</label>
-    <div class="rij"><input class="veld" id="best" placeholder="bijv. Terschelling" value="${esc(tas.bestemming)}" style="flex:1">
-      <button class="knop licht" id="weer" type="button">Weer</button></div>
+    <div class="rij" style="flex-wrap:nowrap"><input class="veld" id="best" placeholder="bijv. Terschelling" value="${esc(tas.bestemming)}" style="flex:1">
+      <button class="knop licht" id="weer" type="button" style="flex:0 0 auto">Weer</button></div>
     <div class="rij" style="margin-top:8px">
       <input class="veld" type="date" id="start" value="${esc(tas.start)}" style="flex:1">
       <select class="veld" id="aantal" style="flex:0 0 120px">${[1, 2, 3, 4, 5, 6, 7].map(n => `<option${n === tas.dagen.length ? ' selected' : ''}>${n}</option>`).join('')}</select>
@@ -86,11 +99,11 @@ export default function tasTab(el, app) {
       <div class="dag-kop"><b style="flex:1">${esc(d.naam)} <span class="klein">${esc(d.datum.slice(8))}-${esc(d.datum.slice(5, 7))}</span></b>
         <span class="klein">${d.temp == null ? '' : d.tempBron === 'zelf' ? 'zelf' : d.tempBron === 'voorspeld' ? 'voorspeld' : ''}</span>
         <input class="veld temp" type="number" inputmode="numeric" placeholder="°C" value="${d.temp ?? ''}" data-temp="${n}" aria-label="Temperatuur ${esc(d.naam)}"></div>
-      ${chips('m' + n, MOMENTEN, d.momenten, { meer: true })}
-      ${d.momenten.filter(m => m !== 'actief').map(m => doenRij(d, n, m)).join('')}</div>`).join('')}</div>
+      ${chips('m' + n, MOMENTEN, d.momenten, { meer: true }).replace('class="chips"', 'class="chips wrap"')}
+      ${d.momenten.filter(m => m !== 'actief' && m !== 'reis').map(m => doenRij(d, n, m)).join('')}</div>`).join('')}</div>
 
     <label class="lab">Wat niet mee</label>
-    ${chips('niet', NIET, tas.niet, { meer: true })}
+    ${chips('niet', NIET, tas.niet, { meer: true }).replace('class="chips"', 'class="chips wrap"')}
     <div class="rij" style="margin-top:4px">${tas.thuis.map(id => app.item(id)).filter(Boolean).map(i => `<button class="chip aan" data-th="${esc(i.id)}" type="button">${esc(i.naam)} ×</button>`).join('')}
       <button class="chip" id="kies-thuis" type="button">＋ stuk blijft thuis</button></div>
 
@@ -98,7 +111,7 @@ export default function tasTab(el, app) {
     <div class="rij">${tas.moetMee.map(id => app.item(id)).filter(Boolean).map(i => `<button class="chip aan" data-mm="${esc(i.id)}" type="button">${esc(i.naam)} ×</button>`).join('')}
       <button class="chip" id="kies-mm" type="button">＋ stuk</button></div>
     <label class="lab">Sfeer (mag leeg, meer mag ook)</label>
-    ${chips('sfeer', Object.entries(SFEREN).map(([k, v]) => [k, v.naam]), tas.sfeer, { meer: true })}
+    ${chips('sfeer', Object.entries(SFEREN).map(([k, v]) => [k, v.naam]), tas.sfeer, { meer: true }).replace('class="chips"', 'class="chips wrap"')}
     ${tas.sfeer.length > 1 ? `<div class="chips"><button class="chip${!tas.afwisselen ? ' aan' : ''}" data-afw="0" type="button">Mengen in elke outfit</button><button class="chip${tas.afwisselen ? ' aan' : ''}" data-afw="1" type="button">Per moment afwisselen</button></div>` : ''}
     <div class="schuif"><span>comfy</span><input type="range" min="0" max="1" step="0.25" value="${tas.sjiek}" id="sjiek"><span>sjiek</span></div>
     <button class="knop vol" id="pak" type="button" style="margin-top:14px">Pak mijn tas</button>
@@ -155,7 +168,7 @@ export default function tasTab(el, app) {
 }
 
 // Activiteit per dagdeel: een keuzelijst, of zelf typen. Mag leeg blijven.
-const MOMENT_NAAM = Object.fromEntries(MOMENTEN);
+const MOMENT_NAAM = MOMENT_LABEL;
 function doenRij(d, n, m) {
   const w = (d.doen || {})[m];
   const eigen = w && !ACTIVITEITEN[w];
@@ -204,7 +217,10 @@ async function haalWeer(el, app, stil) {
         tasTab(el, app);
       });
     }
-  } catch (e) { st.textContent = 'Geen weer gevonden (' + e.message + '). Vul de temperatuur zelf in.'; }
+  } catch (e) {
+    st.textContent = /plaats/.test(e.message) ? `Ik kan "${tas.bestemming}" niet vinden. Probeer de plaatsnaam, of vul de graden zelf in.`
+      : 'Het weer ophalen lukt nu niet. Vul de graden zelf in, of probeer het straks opnieuw.';
+  }
 }
 
 function opties(app) {
@@ -235,6 +251,7 @@ function koffer(u) {
   const tel = new Map();
   for (const p of u.plan) if (p.outfit) for (const i of p.outfit.items) tel.set(i.id, { item: i, keer: (tel.get(i.id)?.keer || 0) + 1 });
   for (const id of tas.moetMee) if (!tel.has(id) && u.koffer.find(k => k.item.id === id)) tel.set(id, { item: u.koffer.find(k => k.item.id === id).item, keer: 0 });
+  for (const x of u.ookMee || []) if (!tel.has(x.item.id)) tel.set(x.item.id, { item: x.item, keer: 0, waarom: x.waarom });
   return [...tel.values()].sort((a, b) => b.keer - a.keer);
 }
 
@@ -261,13 +278,13 @@ function toonUitkomst(el, app) {
 
     <h3>Per dag</h3>
     ${u.plan.map((p, i) => `<div class="kaart" data-p="${i}">
-      <div class="moment-kop"><h4>${esc(p.dag)} · ${esc(MOMENTEN.find(m => m[0] === p.moment)?.[1] || p.moment)}</h4><span class="klein">${esc([p.doen && p.doen.trim(), p.sfeer && SFEREN[p.sfeer].naam, p.weer].filter(Boolean).join(' · '))}</span></div>
+      <div class="moment-kop"><h4>${esc(p.dag)} · ${esc(MOMENT_LABEL[p.moment] || p.moment)}</h4><span class="klein">${esc([p.doen && p.doen.trim(), p.sfeer && SFEREN[p.sfeer].naam, p.weer].filter(Boolean).join(' · '))}</span></div>
       ${p.outfit ? outfitHtml(p.outfit) : '<p class="klein">Hier vond ik niets passends.</p>'}</div>`).join('')}
 
     <h3>Paklijst</h3>
     <ul class="paklijst">${k.map(x => `<li><input type="checkbox" data-v="${esc(x.item.id)}"${tas.afgevinkt.includes(x.item.id) ? ' checked' : ''} aria-label="${esc(x.item.naam)} ingepakt">
       ${x.item.foto ? `<img src="${esc(foto(x.item.foto, 120))}" alt="">` : `<span class="leeg">${stip(x.item.kleur[0], 20)}</span>`}
-      <span>${esc(x.item.naam)}</span><span class="keer">${x.keer}×</span></li>`).join('')}</ul>
+      <span>${esc(x.item.naam)}</span><span class="keer">${x.waarom ? esc(x.waarom) : x.keer + '×'}</span></li>`).join('')}</ul>
     <div class="rij" style="margin-top:14px">
       <button class="knop" id="kaarten" type="button">Alle kaarten opslaan</button>
       <button class="knop licht" id="bewaar" type="button">Tas bewaren</button>
@@ -312,7 +329,7 @@ function toonUitkomst(el, app) {
   $('#kaarten').addEventListener('click', async () => {
     for (const p of u.plan) {
       if (!p.outfit) continue;
-      const titel = `${p.dag} ${MOMENTEN.find(m => m[0] === p.moment)?.[1].toLowerCase() || ''}`;
+      const titel = `${p.dag} ${(MOMENT_LABEL[p.moment] || '').toLowerCase()}`;
       const c = await tekenKaart({ titel, ondertitel: `${tas.bestemming || 'Weekendtas'} · ${p.outfit.kleur.naam}`, items: p.outfit.items });
       const r = await deelOfBewaar(c, titel);
       if (r === 'geannuleerd') break;
