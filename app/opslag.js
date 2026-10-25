@@ -17,7 +17,7 @@ async function poort(actie, extra = {}) {
   const r = await fetch(POORT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-griette-wachtwoord': wachtwoord() },
-    body: JSON.stringify({ actie, tabel: 'data', key: SLEUTEL, ...extra }),
+    body: JSON.stringify({ actie, tabel: 'stijl', key: SLEUTEL, ...extra }),
   });
   const d = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(d.fout || 'opslag gaf ' + r.status);
