@@ -1,0 +1,59 @@
+{
+ "titel": "Stijlrapport Griette",
+ "kern": "Klassiek casual, krachtig, kleurrijk en vrouwelijk. Comfort telt, maar kleding werkt het mooist als er duidelijke vorm in het silhouet zichtbaar blijft. Moeiteloos met impact. Tijdloos met karakter.",
+ "ogen": "Grijsblauw. Kleuren die dat versterken horen dicht bij het gezicht (top, sjaal, accessoire): donkerblauw, rood, roze, paars.",
+ "kleur": {
+  "basis": ["donkerblauw", "bruin", "zwart", "gebroken-wit"],
+  "accent": ["felroze", "paars", "geel", "oranje", "oranje-rood", "rood", "lichtblauw", "groen"],
+  "rustig": ["denimblauw", "gebroken-wit", "ecru", "camel", "zand", "salie", "lichtgrijs", "donkerblauw", "marine", "bruin", "taupe", "beige"],
+  "zwaar": ["zwart", "bordeaux", "aubergine"],
+  "gezicht": ["donkerblauw", "rood", "roze", "felroze", "paars"],
+  "flets": ["champagne", "grijs"],
+  "uitgelicht": [
+   {"kleuren": ["felroze", "paars"], "tekst": "Energie en vrouwelijke kracht, mooi met donkerblauw of bruin."},
+   {"kleuren": ["geel", "oranje-rood"], "tekst": "Zonnig; vooral rood met oranje ondertoon."},
+   {"kleuren": ["groen"], "tekst": "Mooi met donkerblauw, bruin en gebroken wit."},
+   {"kleuren": ["lichtblauw"], "tekst": "Frisse tegenhanger van de donkere basis, sluit aan bij je blauwgrijze ogen."}
+  ],
+  "combinaties": [["donkerblauw", "felroze"], ["bruin", "lichtblauw"], ["rood", "gebroken-wit"]]
+ },
+ "regels": [
+  {"id": "statement", "titel": "Eén heldere kleur is het statement",
+   "tekst": "Heeft een outfit één uitgesproken kleur, dan is dát het statement en gaat al het andere een stap terug: denim, gebroken wit, camel, zand, zacht groen, lichtgrijs, donkerblauw, bruin. Een tweede zware kleur ernaast (zwart, bordeaux, aubergine) maakt er een krachtmeting van."},
+  {"id": "zacht", "titel": "Krachtig met zacht",
+   "tekst": "Krachtige kleuren altijd combineren met zachte, rustige tonen, zodat jij zichtbaar blijft en het niet te veel wordt. Er is geen limiet op het aantal accentkleuren."},
+  {"id": "zwart", "titel": "All-black mag, materiaal beslist",
+   "tekst": "Zwart is een basiskleur en een complete zwarte look draag je graag. Zonder kleurcontrast doet de stof het werk: zet minstens twee texturen tegenover elkaar (wol tegen leer, gebreid tegen satijn, mat tegen glans) en kies stukken waarvan de kwaliteit te zien is."},
+  {"id": "grijs", "titel": "Grijs en champagne: waar wel",
+   "tekst": "Als hoofdkleur en vlak bij het gezicht maken ze je fletser. Wel goed: in zachte, casual stof, ver van het gezicht, of lichtgrijs als rustige steunkleur (paars + lichtgrijs + zand, donkerblauw + ijsblauw + lichtgrijs)."},
+  {"id": "accentlijst", "titel": "De accentlijst is een voorbeeld, geen hek",
+   "tekst": "Turquoise, petrol, smaragd of kobalt zijn niet afgekeurd. Toets aan het principe: één heldere kleur die de leiding neemt, de rest rustig."}
+ ],
+ "secties": [
+  {"id": "silhouet", "titel": "Silhouet", "intro": "Schouders en heupen even breed, van nature een rechte lijn. De taille altijd benadrukken.",
+   "punten": ["Wijd onderstuk + aansluitend bovenstuk, of andersom", "Broeken met hoge taille geven direct meer vorm", "Nooit wijd op wijd: het silhouet verdwijnt en je oogt vierkanter", "Oversized altijd bewust stylen: instoppen, mouwen oprollen, riem, hoge taille"]},
+  {"id": "blazers", "titel": "Blazers", "punten": ["Rond de heup of net korter, niet te lang of te oversized", "Oversized kan alleen met een strak shirt eronder", "Voorkeur voor zachte, soepele jasjes"]},
+  {"id": "hals", "titel": "Halslijnen", "punten": ["Open en zacht: ronde hals, boothals, sweetheart, spaghetti, V-hals, open knoopsluiting", "Hoge of gesloten halslijnen zijn te massief"]},
+  {"id": "mouwen", "titel": "Mouwen", "punten": ["Op de schouder, verlaagde schoudernaad of raglan", "Pofmouw of subtiele schoudervulling werkt", "Soepel vallend, niet strak"]},
+  {"id": "materialen", "titel": "Materialen",
+   "punten": ["Soepel: lyocell/tencel, viscose, modal, rayon, stretchkatoen", "Zacht: katoen, bamboe, jersey, fijn gebreide wol, cashmere", "Glad/licht glanzend: viscose, satijnmix, gladde wolblend; felle kleuren krijgen hier extra diepte", "Structuur: denim, wolmix, ribstof, tweed, stevig katoen", "Beste combinatie is soepel + stevig (viscose top + denim, cashmere + satijn)", "Vermijd grove, stugge, zware stoffen"]},
+  {"id": "prints", "titel": "Prints", "punten": ["Strepen, stippen, dierenprint, grafisch, subtiele bloemen met een modern randje", "Geen grote, drukke of veelkleurige prints", "Maximaal één print per outfit, met een effen stuk in een bijpassende tint"]},
+  {"id": "schoenen", "titel": "Schoenen & accessoires", "punten": ["Kitten heels zijn je signature", "New Balance voor casual", "Riemen zijn essentieel bij oversized", "Sjaaltjes in felroze of lichtblauw", "Gouden sieraden", "Tas in een neutrale basiskleur"]}
+ ],
+ "methoden": [
+  {"id": "split", "naam": "Split-complementair", "rapport": "beste match", "uitleg": "Eén hoofdkleur met twee lichtere aanvullende tinten.",
+   "voorbeelden": [["oranje-rood", "roze", "ijsblauw"], ["roze", "botergeel", "ecru"], ["paars", "lichtgrijs", "zand"]]},
+  {"id": "tonsurton", "naam": "Ton-sur-ton", "rapport": "aanbevolen", "uitleg": "Eén kleurenfamilie van licht naar donker, met verwante tinten ernaast. Oogt rustig en duur.",
+   "voorbeelden": [["donkerblauw", "ijsblauw", "lichtgrijs"], ["oranje-rood", "oudroze", "taupe"], ["groen", "mintgroen", "taupe"]]},
+  {"id": "analoog", "naam": "Analoog", "rapport": "aanbevolen", "uitleg": "Kleuren die naast elkaar liggen op de kleurencirkel. Harmonieus en warm.",
+   "voorbeelden": [["rood", "koraal", "oudroze"], ["lila/paars", "paars", "oudroze"], ["botergeel", "ecru", "zand"]]},
+  {"id": "accent", "naam": "Neutraal + accent", "rapport": "past bij je kern", "uitleg": "Een rustige basis met één kleur die de leiding neemt. Dit is de regel van het statement.",
+   "voorbeelden": [["donkerblauw", "felroze"], ["bruin", "lichtblauw"], ["rood", "gebroken-wit"]]},
+  {"id": "mono", "naam": "Monochroom", "rapport": "aanvulling", "uitleg": "Eén kleur in verschillende lichtheden en texturen. Staat niet als methode in je rapport; werkt bij jou vooral in je basiskleuren, met textuurcontrast.",
+   "voorbeelden": [["donkerblauw", "marine", "lichtblauw"], ["bruin", "cognac", "camel"], ["zwart"]]},
+  {"id": "colorblock", "naam": "Colorblocking", "rapport": "mag, bewuste keuze", "uitleg": "Complementaire kleuren: veel energie. Je rapport zegt: \"dit heb je voorheen veel gedragen en dat kan je nog steeds hebben, maar ik denk dat je nu wat meer op zoek bent naar balans.\"",
+   "voorbeelden": [["oranje", "kobaltblauw"], ["felroze", "groen"], ["geel", "paars"]]}
+ ],
+ "oefentip": "Begin met een gekleurd item dat je al graag draagt, en combineer het met iets zachts.",
+ "zwijgt": "Over schoenkeuze bij een specifiek silhouet, proporties van tassen, laagjes en wat nu gangbaar is staat weinig in je rapport. Daar geeft de app zijn eigen inschatting, en zegt dat erbij."
+}

@@ -1,0 +1,3311 @@
+{
+ "mappen": [
+  {
+   "id": "inspiratie",
+   "naam": "Inspiratie looks",
+   "emoji": "✨"
+  },
+  {
+   "id": "vakantie",
+   "naam": "Vakantie/strand",
+   "emoji": "🌊"
+  },
+  {
+   "id": "portugal",
+   "naam": "Portugal",
+   "emoji": "🇵🇹"
+  },
+  {
+   "id": "werkdag",
+   "naam": "Werkdag",
+   "emoji": "💼"
+  },
+  {
+   "id": "avond",
+   "naam": "Avond uit",
+   "emoji": "✨"
+  },
+  {
+   "id": "bijzonder",
+   "naam": "Bijzondere gelegenheid",
+   "emoji": "🌹"
+  },
+  {
+   "id": "parijs",
+   "naam": "Stedentrip Parijs",
+   "emoji": "🗼"
+  },
+  {
+   "id": "casual",
+   "naam": "Casual weekend",
+   "emoji": "☀️"
+  },
+  {
+   "id": "board-1775844024992",
+   "naam": "Algarve 22 april tm 1 mei",
+   "emoji": "🏖️"
+  },
+  {
+   "id": "board-1775928890504",
+   "naam": "Berenloop November Terschelling",
+   "emoji": "❄️"
+  },
+  {
+   "id": "board-1779042790077",
+   "naam": "Parijs 26 tm.28 juni",
+   "emoji": "☀️"
+  },
+  {
+   "id": "board-1784383500712",
+   "naam": "zomervakantie slovenie en oostenrijk",
+   "emoji": "🌿"
+  },
+  {
+   "id": "kaarten",
+   "naam": "Bewaarde kaarten",
+   "emoji": "🖼"
+  }
+ ],
+ "outfits": [
+  {
+   "id": "outfit-192",
+   "naam": "Red Power Hour",
+   "items": [
+    "custom-1775584623244",
+    "adidas-broek",
+    "custom-1775424360960",
+    "ketting-goud",
+    "oorbellen-goud"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-193",
+   "naam": "Inspo 8 apr",
+   "items": [
+    "custom-1775072581233",
+    "adidas-broek",
+    "zwarte-kitten"
+   ],
+   "map": "inspiratie",
+   "notitie": "NU TRENDING\nDé trend van lente 2026 is boldkleurige color blocking met 'off-kilter' combinaties: oranje + roze, rood + kobaltblauw, geel + bruin — seen at Paris, Milan én Copenhagen Fashion Week S/S 2026 (bron: whowhatwear.com, marieclaire.com, april 2026). Quiet luxury is officieel voorbij; saturated, expressieve kleur is nu de norm.\nJOUW VERSIE\nGriette draagt haar Geel Stieglitz t-shirt gecombineerd met de Bruin satijnen maxi rok — precies de 'butter yellow + chocolate brown' combo die de runways domineren. Ze voegt haar Adidas Firebird broek marineblauw toe als alternatief: dan kiest ze de "
+  },
+  {
+   "id": "outfit-194",
+   "naam": "Butter & Chocolate Runway",
+   "items": [
+    "geel-shirt",
+    "bruin-maxi",
+    "riem-zwart",
+    "zwarte-sandaal"
+   ],
+   "map": "inspiratie",
+   "notitie": "Stop het gele t-shirt losjes in de rok voor een nonchalant silhouet — de zwarte riem markeert je taille én grond de color-blocking combo precies zoals op de SS26 runways.\n\nNU TRENDING\nDé trend van lente 2026 is boldkleurige color blocking met 'off-kilter' combinaties: oranje + roze, rood + kobaltblauw, geel + bruin — seen at Paris, Milan én Copenhagen Fashion Week S/S 2026 (bron: whowhatwear.com, marieclaire.com, april 2026). Quiet luxury is officieel voorbij; saturated, expressieve kleur is nu de norm.\nJOUW VERSIE\nGriette draagt haar Geel Stieglitz t-shirt gecombineerd met de Bruin satijnen m"
+  },
+  {
+   "id": "outfit-196",
+   "naam": "Purple Power Play",
+   "items": [
+    "custom-1775072515985",
+    "custom-1775584623244",
+    "custom-1775418539393",
+    "riem-bruin",
+    "oorbellen-goud",
+    "zwarte-sandaal"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-210",
+   "naam": "Green Power Clash",
+   "items": [
+    "custom-1775670456999",
+    "custom-1775418539393",
+    "riem-bruin",
+    "custom-1775632389199",
+    "ketting-goud",
+    "oorbellen-goud"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-219",
+   "naam": "Colorblock Summer '26",
+   "items": [
+    "custom-1775213378322",
+    "lichtblauwe-shorts",
+    "bruine-sandaal"
+   ],
+   "map": "inspiratie",
+   "notitie": "Draag de gele top in de shorts voor een strakke taille, knoop het blauwe sjaaltje losjes om je tas voor de finishing touch van het seizoen.\n\nNU TRENDING\nColorblocking 2.0 — zomer 2026 draait om het bewust combineren van kleuren in harmonieuze, draagbare pairings. Niet schreeuwerig, maar expressief: denk geel met zand, lichtblauw met warm beige, of oranje-rood met gebroken-wit. Op de catwalks (Prada, Loewe, Chanel) zagen we 'toy-box brights' en 'unlikely combinations' die tegelijk krachtig én vrouwelijk zijn. Daarbij dominant: rokken in alle lengtes als hét vrouwelijke statement van het seizoen"
+  },
+  {
+   "id": "outfit-224",
+   "naam": "Yellow × Blue Colorblock",
+   "items": [
+    "custom-1775213378322",
+    "custom-1775069275202",
+    "bruine-kitten"
+   ],
+   "map": "inspiratie",
+   "notitie": "Stop de gele top losjes in de linnen blauwe broek voor een gepolijste maar relaxte look — bind het felroze of blauwe sjaaltje nonchalant om de tas als finishing touch.\n\nNU TRENDING\nColorblocking 2.0 — zomer 2026 draait om het bewust combineren van kleuren in harmonieuze, draagbare pairings. Niet schreeuwerig, maar expressief: denk geel met zand, lichtblauw met warm beige, of oranje-rood met gebroken-wit. Op de catwalks (Prada, Loewe, Chanel) zagen we 'toy-box brights' en 'unlikely combinations' die tegelijk krachtig én vrouwelijk zijn. Daarbij dominant: rokken in alle lengtes als hét vrouwelij"
+  },
+  {
+   "id": "outfit-226",
+   "naam": "Chocolate Power Play",
+   "items": [
+    "bruin-spaghet",
+    "bruin-maxi",
+    "custom-1775069339465",
+    "bruine-kitten",
+    "riem-bruin",
+    "ketting-goud",
+    "oorbellen-goud"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-231",
+   "naam": "Sunset Stripe",
+   "items": [
+    "bruin-maxi",
+    "bruine-sandaal",
+    "leonie-bag"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-232",
+   "naam": "Yellow Punch Stad",
+   "items": [
+    "geel-shirt",
+    "custom-1775632125331",
+    "new-balance",
+    "gele-bag",
+    "riem-bruin"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-233",
+   "naam": "Gebroken Wit Klassiek",
+   "items": [
+    "witte-cardigan",
+    "bruine-kitten",
+    "leonie-bag",
+    "riem-bruin"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-268",
+   "naam": "Golden Hour Power",
+   "items": [
+    "custom-1775848780392",
+    "custom-1775213378322",
+    "custom-1775419585107",
+    "custom-1775632494104",
+    "gele-bag",
+    "oorbellen-goud",
+    "riem-bruin"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-270",
+   "naam": "Leopard & Denim",
+   "items": [
+    "custom-1775672036462",
+    "custom-1775848780392",
+    "bruine-sandaal"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-271",
+   "naam": "Lace & Power",
+   "items": [
+    "kanten-top",
+    "rood-rok",
+    "custom-1775069339465",
+    "bruine-kitten",
+    "riem-bruin",
+    "ketting-goud",
+    "oorbellen-goud"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-275",
+   "naam": "Blue Power Play",
+   "items": [
+    "custom-1775675622894",
+    "custom-1775584623244",
+    "riem-bruin",
+    "custom-1775632494104",
+    "oorbellen-goud"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-278",
+   "naam": "Golden Hour Stad",
+   "items": [
+    "geel-shirt",
+    "bruin-maxi",
+    "bruine-kitten",
+    "riem-bruin"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-279",
+   "naam": "Rood Contrast Statement",
+   "items": [
+    "custom-1775584623244",
+    "bruin-maxi",
+    "bruine-kitten",
+    "gele-bag"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-280",
+   "naam": "Leopard & Denim Power",
+   "items": [
+    "custom-1775672036462",
+    "custom-1775675622894",
+    "zwarte-sandaal",
+    "riem-zwart"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-281",
+   "naam": "Purple Punch Casual",
+   "items": [
+    "custom-1775072581233",
+    "lichtblauwe-shorts",
+    "custom-1775424360960",
+    "custom-1775072515985"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-282",
+   "naam": "Kanten Zachtheid met Bite",
+   "items": [
+    "kanten-top",
+    "rood-rok",
+    "bruine-kitten",
+    "custom-1775069339465"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-283",
+   "naam": "Spaghetti & Stripes Spel",
+   "items": [
+    "custom-1775213378322",
+    "adidas-broek",
+    "new-balance",
+    "witte-cardigan"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-289",
+   "naam": "Neo-Romance in Full Bloom",
+   "items": [
+    "roze-maxi",
+    "custom-1775072754509",
+    "kanten-top",
+    "bruine-kitten"
+   ],
+   "map": "inspiratie",
+   "notitie": "Draag de kanten top als luchtige laag over de off-white top voor diepte en textuur — knoop hem los op taillehoogte en gebruik het felroze sjaaltje als riem om de taille te accentueren en de kleurexplosie compleet te maken.\n\nNU TRENDING\nNeo-romantiek meets Bold Color — Lente/Zomer 2026 draait om vrouwelijkheid met pit: volumineuze rokken, kant, warme kleurexplosies (geel, oranje, felroze, kobaltblauw) en speelse contrast-combinaties tussen strak en wijd.\nJOUW VERSIE\nDraag de felroze maxi rok met het Massimo Dutti off-white top (strak + volumineus = perfecte balans) en de kanten top als luchtige"
+  },
+  {
+   "id": "outfit-290",
+   "naam": "Golden Hour Denim",
+   "items": [
+    "custom-1775848780392",
+    "custom-1775213378322",
+    "custom-1775069339465",
+    "bruine-kitten",
+    "riem-bruin",
+    "ketting-goud",
+    "oorbellen-goud"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-303",
+   "naam": "Chocolate Leopard Power",
+   "items": [
+    "bruin-jurk",
+    "custom-1775672036462",
+    "riem-bruin",
+    "bruine-kitten",
+    "leonie-bag",
+    "oorbellen-goud"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-308",
+   "naam": "Oranje Vuur",
+   "items": [
+    "custom-1775928527437",
+    "custom-1775418539393",
+    "riem-bruin",
+    "new-balance",
+    "leonie-bag",
+    "oorbellen-goud"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-325",
+   "naam": "Pink & Red Colorblock Moment",
+   "items": [
+    "roze-maxi",
+    "custom-1775072581233",
+    "new-balance"
+   ],
+   "map": "inspiratie",
+   "notitie": "Draag de rode top in de rok voor een strakke taille. Knoop het felroze sjaaltje losjes om je heupen als scarf belt. Laat de kleuren botsen — dit is exact de roze × rood colorblock-move van lente 2026.\n\nNU TRENDING\nColorblocking & Bold Primaries lente/zomer 2026 — felle, krachtige kleuren (rood, blauw, geel) worden bewust naast elkaar gezet tot grafische, energieke looks. Vogue NL, Fashionchick en Refinery29 bevestigen: kleur keerde met volle kracht terug op de catwalks bij o.a. Loewe, Balenciaga en Chloé. De look combineert eenvoudige silhouetten met maximale kleurimpact.\nJOUW VERSIE\nDraag de "
+  },
+  {
+   "id": "outfit-326",
+   "naam": "Inspiratie looks look",
+   "items": [
+    "wit-basic",
+    "custom-1775072446265",
+    "custom-1775632494104"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-327",
+   "naam": "Colorblock Clash",
+   "items": [
+    "custom-1775072581233",
+    "lichtblauwe-shorts",
+    "new-balance"
+   ],
+   "map": "inspiratie",
+   "notitie": "Draag het blauwe sjaaltje als scarf belt door de lussen van de shorts voor een trendy SS26 detail — het oranje-rood × lichtblauw contrast is precies het krachtige colorblock moment van dit seizoen, de beige New Balance houdt het geaard.\n\nNU TRENDING\nColorblocking SS26 — krachtige kleurcombinaties die 'niet zouden moeten werken maar toch kloppen': rood × geel, oranje × blauw, primaire tinten als grafische statements. Vogue NL, Who What Wear en Net-a-Porter benoemen dit als dé dominante trend van lente/zomer 2026.\nJOUW VERSIE\nDraag je Rode top Zara (oranje-rood) als anker. Combineer hem met de L"
+  },
+  {
+   "id": "outfit-328",
+   "naam": "Neo-Romantic Cloud Dancer",
+   "items": [
+    "roze-maxi",
+    "custom-1775418986374",
+    "new-balance"
+   ],
+   "map": "inspiratie",
+   "notitie": "Strooi het felroze sjaaltje nonchalant om de hals voor die typische 2026 detail-trend — het verbindt de roze rok en off-white top tot één coherent verhaal. Tuck de top licht in de rok voor een getailleerde balans.\n\nNU TRENDING\nColorblocking SS26: zachte aardetinten (bruin, botergeel, off-white) gecombineerd met krachtige kleuraccenten (felroze, rood-oranje). Neo-romantische vrouwelijkheid via volumineuze rokken, kanten details en sjaaltjes als accessoire. Pantone Kleur van het Jaar 2026: 'Cloud Dancer' (warme off-white) als ankerpunt.\nJOUW VERSIE\nDraag de felroze maxi rok met het Massimo Dutti"
+  },
+  {
+   "id": "outfit-329",
+   "naam": "Color Clash Power Femme",
+   "items": [
+    "roze-maxi",
+    "custom-1775673469857",
+    "bruine-kitten"
+   ],
+   "map": "inspiratie",
+   "notitie": "Stop de zwarte ballontop strak in de felroze maxi rok voor een krachtig contrast — het felroze-op-zwart is dé SS26 move. Knoop het felroze sjaaltje nonchalant om de hals voor dat directe, vrouwelijke effect. De bruine kitten heels ankeren de look warm zonder af te leiden van de kleurbotsing.\n\nNU TRENDING\nColor Clash Power Dressing — SS26 draait om krachtige kleurencombinaties en vrouwelijke silhouetten. Tomatenrood, felroze (fuchsia), kobaltblauw en warm oranje/geel worden bewust gecombineerd voor grafische, krachtige looks. Rokken in alle lengtes spelen hoofdrol, gedragen met eenvoudige tops."
+  },
+  {
+   "id": "outfit-333",
+   "naam": "Tomato Red Power Clash",
+   "items": [
+    "custom-1775072581233",
+    "roze-maxi",
+    "bruine-kitten"
+   ],
+   "map": "inspiratie",
+   "notitie": "Draag de rode top in de rok voor een getailleerde silhouet en knoop het felroze sjaaltje nonchalant om de hals — de rood x roze power clash is precies de expressieve monochrome dopamine-hit van SS26.\n\nNU TRENDING\nTomato Red Power Dressing – SS26 zet voluit in op 'tomato red' als dé krachtige kleur van het seizoen, gecombineerd met vrouwelijke silhouetten, volumineuze rokken en monochrome statements. Vogue NL bevestigt de overheersende sfeer: expressief, feestelijk en persoonlijk. Mango signaleert dat tomato red 'luminous, almost appetizing' is en een simpele look direct memorabel maakt. Who Wh"
+  },
+  {
+   "id": "outfit-334",
+   "naam": "Vandaag — Inspiratie looks",
+   "items": [
+    "blauw-spaghet",
+    "custom-1775418612723",
+    "new-balance",
+    "gele-bag",
+    "custom-1776676550548"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-365",
+   "naam": "Dopamine Colour Block",
+   "items": [
+    "roze-maxi",
+    "custom-1775928527437",
+    "gele-bag",
+    "bruine-sandaal"
+   ],
+   "map": "inspiratie",
+   "notitie": "Draag de oranje mohair trui losjes over de felroze maxi rok voor een krachtig kleurblok — volume bovenaan, vloeiend silhouet onderaan. De gele stippen bucket bag voegt een speelse derde kleur toe zonder te veel te worden. Laat de trui half van de schouder glijden voor een nonchalante, vrouwelijke finish.\n\nNU TRENDING\nRomanticore meets Bold Colour — zomer 2026 draait om vrouwelijke volumes (ballonrokken, pofmouwen), speelse prints én een bewuste shift naar heldere, expressieve kleuren zoals oranje, geel en rood. Rok + simpele top = hét duo van het seizoen.\nJOUW VERSIE\nDraag de kleurrijke print "
+  },
+  {
+   "id": "outfit-387",
+   "naam": "Colour Block Drama",
+   "items": [
+    "roze-maxi",
+    "custom-1775928527437",
+    "bruine-suede",
+    "gele-bag"
+   ],
+   "map": "inspiratie",
+   "notitie": "Draag de oranje mohair trui losjes over de felroze maxi rok voor een krachtig kleurblok — volume bovenaan, lang silhouet onderaan. De bruine suède sandalen ankeren de look, de gele stippen bucket bag voegt een speelse derde kleur toe die alles samentrekt.\n\nNU TRENDING\nRomanticore meets Bold Colour — zomer 2026 draait om vrouwelijke volumes (ballonrokken, pofmouwen), speelse prints én een bewuste shift naar heldere, expressieve kleuren zoals oranje, geel en rood. Rok + simpele top = hét duo van het seizoen.\nJOUW VERSIE\nDraag de kleurrijke print mini rok met de Massimo Dutti off-white top of het"
+  },
+  {
+   "id": "outfit-393",
+   "naam": "Zwarte top gouden… + mid rise baggy baloon…",
+   "items": [
+    "custom-1775424911796",
+    "custom-1775927974841",
+    "riem-bruin",
+    "bruine-suede",
+    "leonie-bag",
+    "zonnebril",
+    "ketting-goud"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-394",
+   "naam": "Massimo duti top off… + Bruin satijnen maxi…",
+   "items": [
+    "custom-1775072754509",
+    "bruin-maxi",
+    "custom-1775672036462",
+    "riem-bruin",
+    "bruine-sandaal",
+    "leonie-bag",
+    "ketting-goud"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-396",
+   "naam": "Pink & Yellow Power Block",
+   "items": [
+    "roze-maxi",
+    "geel-shirt",
+    "bruine-kitten",
+    "gele-bag"
+   ],
+   "map": "inspiratie",
+   "notitie": "Stop het gele t-shirt strak in de felroze maxi rok voor een clean kleurblok. De gele stippen bucket bag pakt de gele tint op en houdt het speels — minder is meer bij color blocking.\n\nNU TRENDING\nColor Blocking & 'Personality Skirt' – zomer 2026 draait om krachtige kleurblokken (rood × geel × blauw) gecombineerd met een statement rok en een simpele basic top. De rok doet het werk, de top houdt het gebalanceerd.\nJOUW VERSIE\nCombineer je felroze maxi rok met het gele Stieglitz t-shirt (tucked-in) voor een gedurfd kleurblok. Of ga voor je kleurrijke print mini rok met het donkerblauw spaghettitopj"
+  },
+  {
+   "id": "outfit-409",
+   "naam": "Vandaag — Inspiratie looks",
+   "items": [
+    "zwart-peplum",
+    "custom-1787739922392",
+    "zwarte-sandaal",
+    "blauwe-tas"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-410",
+   "naam": "Color Block Kimono",
+   "items": [
+    "custom-1775856345390",
+    "custom-1775928527437",
+    "custom-1775418612723",
+    "custom-1779014779052"
+   ],
+   "map": "inspiratie",
+   "notitie": "Draag de mohair trui open als kimono-jas over de streep longsleeve, zodat de groene boord net zichtbaar blijft onderaan. Knoop de bruine leren riem om de taille voor een krachtig zandloper-silhouet.\n\nNU TRENDING\nColor Blocking & Bold Stripes – Herfst 2026 draait om intentional dressing: krachtige kleuren (rood, oranje, koningsblauw, groen) gecombineerd met aardse tonen als chocoladebruin en terracotta. Brede, contrasterende strepen op knitwear zijn hét statement van het seizoen. Vrouwelijkheid en kracht gaan hand in hand.\nJOUW VERSIE\nDraag je Stieglitz longsleeve bruin-wit streep (met de groen"
+  },
+  {
+   "id": "outfit-411",
+   "naam": "Tomato Layer Stack",
+   "items": [
+    "custom-1775072581233",
+    "bruin-spaghet",
+    "zwart-peplum",
+    "bruine-kitten"
+   ],
+   "map": "inspiratie",
+   "notitie": "Draag het donkerbruin spaghettitopje als zichtbare onderlaag, de rode Zara top daaroverheen, en sluit af met de zwarte peplum top als buitenste laag — de gelaagde kleuren bruin, rood en zwart zijn exact de colorblock-combo van herfst 2026. Bind een bruine riem losjes om de taille voor het 'useless belt'-effect. De bruine kitten heels maken de look vrouwelijk én samenhangend.\n\nNU TRENDING\nColorblocking & tomato red revival — herfst 2026 draait om felle kleurinjecties (tomato red, ochre, bottle green) gecombineerd met klassieke neutrale tinten. Felle kleuren worden bewust naast bruinen, zwarten "
+  },
+  {
+   "id": "outfit-414",
+   "naam": "Cobalt & Chocolade Herfstlook",
+   "items": [
+    "custom-1788604927874",
+    "custom-1775072420968",
+    "riem-bruin",
+    "bruine-suede"
+   ],
+   "map": "inspiratie",
+   "notitie": "Knoop de bruine leren riem strak om je middel over de longsleeve heen om je taille te accentueren en de kobaltblauwe top mooi te laten opbollen boven de bruine broek - dit geeft direct dat vrouwelijke zandloper-silhouet dat nu trending is, terwijl de cobalt-op-chocolade combinatie je kleurrijke DNA perfect showcaset.\n\nNU TRENDING\nCobalt blue is dé kleurentrend van herfst/winter 2026 en wordt door stylisten het liefst gecombineerd met chocoladebruin voor een fris maar warm herfstgevoel. Een cobalt sweater, blouse of jasje ziet er fantastisch uit met je favoriete blue jeans, voor een tonale look"
+  },
+  {
+   "id": "outfit-415",
+   "naam": "Cobalt & Chocolade Layers",
+   "items": [
+    "custom-1775856345390",
+    "only-sons-blauw",
+    "mbym-leopard-top",
+    "leonie-bag",
+    "custom-1776003691206"
+   ],
+   "map": "inspiratie",
+   "notitie": "Start met de Stieglitz longsleeve bruin/wit streep als basislaag en trek daar losjes het Only & Sons koningsblauw t-shirt overheen voor die felle cobalt-x-bruin mix. Knoop de MbyM luipaardprint top om je middel of draag als extra laagje open erover voor de statement animal print. Maak af met de bruine suède Leonie bag en bruine afzaklaarsjes voor een warme, aardse basis die het kobaltblauw laat knallen - pure 'intentional layering' zoals de trend voorschrijft.\n\n❖ TIP VOOR VANDAAG\n{\"trend\":\"Herfst 2026 draait om de mix van chocoladebruin met een fris kobaltblauw of felle 'electric blue', gecomb"
+  },
+  {
+   "id": "outfit-417",
+   "naam": "dark denim… · 2",
+   "items": [
+    "custom-1775584623244",
+    "custom-1788822045084",
+    "zwarte-sandaal"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-418",
+   "naam": "dark denim… · 3",
+   "items": [
+    "mbym-leopard-top",
+    "custom-1788822045084",
+    "custom-1779014779052",
+    "cargo-jasje"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-419",
+   "naam": "dark denim… · 1",
+   "items": [
+    "only-sons-blauw",
+    "custom-1788822045084",
+    "custom-1775632389199"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-420",
+   "naam": "Donkerblauw spaghettitopje voorop",
+   "items": [
+    "blauw-spaghet",
+    "zara-cargo-khaki",
+    "bruine-kitten",
+    "custom-1790427597721",
+    "custom-1789293798551"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-421",
+   "naam": "Parisienne",
+   "items": [
+    "blauwe-blouse",
+    "zara-cargo-khaki",
+    "custom-1790427621964",
+    "gele-bag",
+    "custom-1790428032830"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-422",
+   "naam": "Comfy",
+   "items": [
+    "custom-1788604776745",
+    "custom-1775927420799",
+    "custom-1779014779052",
+    "custom-1775072172172",
+    "custom-1790428122184"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-423",
+   "naam": "Comfy",
+   "items": [
+    "custom-1788604776745",
+    "custom-1775927420799",
+    "custom-1779014779052",
+    "custom-1775072172172",
+    "custom-1790428122184"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-424",
+   "naam": "Zara cargo… · 1",
+   "items": [
+    "only-sons-blauw",
+    "zara-cargo-khaki",
+    "custom-1775632494104",
+    "leonie-bag",
+    "custom-1790428122184"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-425",
+   "naam": "Comfy",
+   "items": [
+    "custom-1788604776745",
+    "custom-1775072446265",
+    "custom-1775424020218",
+    "custom-1790427597721",
+    "custom-1775631826255"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-426",
+   "naam": "Adidas crop… voorop",
+   "items": [
+    "adidas-blauw-crop",
+    "custom-1775072446265",
+    "new-balance",
+    "leonie-bag",
+    "custom-1775418791681"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-427",
+   "naam": "Zara cargo… · 2",
+   "items": [
+    "custom-1775584623244",
+    "zara-cargo-khaki",
+    "custom-1775424360960",
+    "gele-bag"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-428",
+   "naam": "Adidas Firebird… · 1",
+   "items": [
+    "custom-1775928527437",
+    "adidas-broek",
+    "new-balance",
+    "blauwe-tas",
+    "custom-1790428122184"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-429",
+   "naam": "Streetstyle",
+   "items": [
+    "custom-1790427740859",
+    "khaki-bloemenprint",
+    "new-balance",
+    "custom-1790427597721",
+    "custom-1790428032830"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-430",
+   "naam": "Adidas Firebird… · 1",
+   "items": [
+    "custom-1775072754509",
+    "adidas-broek",
+    "custom-1775928203194",
+    "blauwe-tas",
+    "second-female-cardigan"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-431",
+   "naam": "Streetstyle",
+   "items": [
+    "custom-1788604776745",
+    "custom-1775927974841",
+    "custom-1790445805745",
+    "custom-1775632541956",
+    "custom-1789293798551"
+   ],
+   "map": "inspiratie"
+  },
+  {
+   "id": "outfit-15",
+   "naam": "Vandaag — Vakantie / strand",
+   "items": [
+    "blauw-spaghet",
+    "lichtblauwe-shorts",
+    "zwarte-sandaal",
+    "blauwe-tas"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-30",
+   "naam": "Vandaag — Vakantie / strand",
+   "items": [
+    "blauw-spaghet",
+    "adidas-broek",
+    "new-balance",
+    "leonie-bag"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-129",
+   "naam": "Dag 1 – Strand Arrival Glow",
+   "items": [
+    "geel-shirt",
+    "rood-rok",
+    "riem-bruin",
+    "bruine-sandaal",
+    "gele-bag",
+    "zonnebril",
+    "oorbellen-goud",
+    "bikini-1"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-131",
+   "naam": "Dag 3 – Strand Breeze Relaxed",
+   "items": [
+    "witte-shorts",
+    "flipflops",
+    "gele-bag",
+    "zonnebril",
+    "petje",
+    "bikini-1"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-132",
+   "naam": "Dag 5 – Strand Glam",
+   "items": [
+    "custom-1775072754509",
+    "blauwe-blouse",
+    "custom-1775419075492",
+    "strandtas",
+    "zonnebril",
+    "armband",
+    "bikini-1",
+    "lichtblauwe-shorts"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-133",
+   "naam": "Dag 6 – Stad Krachtig & Kleur",
+   "items": [
+    "custom-1775584623244",
+    "custom-1775069275202",
+    "bruine-sandaal",
+    "blauwe-tas",
+    "oorbellen-goud",
+    "zonnebril"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-134",
+   "naam": "Dag 8 – Actief Stad Casual",
+   "items": [
+    "bruin-shorts",
+    "new-balance",
+    "petje",
+    "zonnebril",
+    "oorbellen-goud"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-148",
+   "naam": "Dag 1 – Aankomst Vibes",
+   "items": [
+    "geel-shirt",
+    "bruin-maxi",
+    "bruine-sandaal",
+    "blauwe-tas"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-149",
+   "naam": "Dag 2 – Stranddag met stijl",
+   "items": [
+    "rood-rok",
+    "custom-1775419075492",
+    "custom-1775667011608"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-182",
+   "naam": "Tshirt rood sezane + Broek linnen zara…",
+   "items": [
+    "custom-1775584623244",
+    "custom-1775069275202",
+    "custom-1775072515985",
+    "zwarte-kitten"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-187",
+   "naam": "Strand Goddess",
+   "items": [
+    "badpak-1",
+    "bruine-sandaal"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-188",
+   "naam": "Kleur Clash Stad",
+   "items": [
+    "custom-1775584623244",
+    "new-balance",
+    "roze-maxi"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-1775835858979",
+   "naam": "Golden Power Play",
+   "items": [
+    "custom-1775424911796",
+    "custom-1775419601514",
+    "bruine-kitten",
+    "riem-zwart",
+    "ketting-goud",
+    "oorbellen-goud",
+    "custom-1775632541956"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-1775835865145",
+   "naam": "Citrus Power",
+   "items": [
+    "oranje-shirt",
+    "rood-rok",
+    "bruine-kitten",
+    "riem-bruin",
+    "oorbellen-goud",
+    "ketting-goud"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-1775835880934",
+   "naam": "Outfit 2 – Actief & Cool",
+   "items": [
+    "custom-1775584623244",
+    "new-balance",
+    "cargo-jasje",
+    "custom-1775632125331"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-1775835883916",
+   "naam": "Outfit 3 – Rivièra Vibes",
+   "items": [
+    "blauw-spaghet",
+    "witte-shorts",
+    "zwarte-sandaal"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-1775835901873",
+   "naam": "Outfit 2 – Actief & Cool",
+   "items": [
+    "custom-1775584623244",
+    "new-balance",
+    "cargo-jasje",
+    "custom-1775632125331"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-1775835907216",
+   "naam": "Outfit 3 – Rivièra Vibes",
+   "items": [
+    "blauw-spaghet",
+    "witte-shorts",
+    "zwarte-sandaal"
+   ],
+   "map": "vakantie"
+  },
+  {
+   "id": "outfit-11",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "bruin-spaghet",
+    "custom-1775072420968",
+    "new-balance",
+    "blauwe-tas",
+    "witte-cardigan"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-12",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "zwart-peplum",
+    "custom-1775072420968",
+    "custom-1775069306604",
+    "gele-bag"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-50",
+   "naam": "Werkdag 50",
+   "items": [
+    "bruin-spaghet",
+    "adidas-broek",
+    "bruine-kitten",
+    "gele-bag"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-51",
+   "naam": "Werkdag 51",
+   "items": [
+    "bruin-spaghet",
+    "custom-1775072420968",
+    "new-balance",
+    "gele-bag",
+    "witte-cardigan"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-52",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "wit-oversized",
+    "custom-1775069275202",
+    "custom-1775069306604",
+    "leonie-bag",
+    "cargo-jasje"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-55",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "blauwe-blouse",
+    "custom-1775069275202",
+    "custom-1775069306604",
+    "gele-bag",
+    "cargo-jasje"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-58",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "blauwe-blouse",
+    "custom-1775072420968",
+    "custom-1775069306604",
+    "leonie-bag",
+    "cargo-jasje"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-59",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "wit-oversized",
+    "custom-1775072446265",
+    "custom-1775069306604",
+    "blauwe-tas",
+    "witte-cardigan"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-61",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "bruin-spaghet",
+    "custom-1775072420968",
+    "bruine-sandaal",
+    "gele-bag"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-63",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "bruin-spaghet",
+    "custom-1775072420968",
+    "new-balance",
+    "leonie-bag",
+    "witte-cardigan"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-64",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "custom-1775418986374",
+    "custom-1775418612723",
+    "zwarte-kitten",
+    "leonie-bag",
+    "witte-cardigan"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-65",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "custom-1775418986374",
+    "bruin-maxi",
+    "bruine-kitten",
+    "blauwe-tas"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-81",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "zwart-peplum",
+    "custom-1775419601514",
+    "new-balance",
+    "gele-bag",
+    "custom-1775419585107"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-82",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "custom-1775069248643",
+    "custom-1775069275202",
+    "bruine-kitten",
+    "leonie-bag",
+    "witte-cardigan"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-83",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "blauw-spaghet",
+    "custom-1775418539393",
+    "new-balance",
+    "leonie-bag",
+    "witte-cardigan"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-84",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "custom-1775069248643",
+    "custom-1775418539393",
+    "zwarte-kitten",
+    "blauwe-tas",
+    "witte-cardigan"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-85",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "bruin-spaghet",
+    "adidas-broek",
+    "bruine-kitten",
+    "gele-bag",
+    "witte-cardigan"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-86",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "custom-1775069248643",
+    "custom-1775418612723",
+    "zwarte-kitten",
+    "blauwe-tas",
+    "witte-cardigan"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-87",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "zwart-peplum",
+    "custom-1775418539393",
+    "zwarte-kitten",
+    "leonie-bag",
+    "witte-cardigan"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-88",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "zwart-peplum",
+    "custom-1775418539393",
+    "new-balance",
+    "blauwe-tas",
+    "witte-cardigan"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-99",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "custom-1775069248643",
+    "custom-1775069275202",
+    "new-balance",
+    "blauwe-tas",
+    "custom-1775418791681"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-100",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "zwart-peplum",
+    "custom-1775069275202",
+    "new-balance",
+    "leonie-bag",
+    "custom-1775072496955"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-101",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "custom-1775418646741",
+    "bruin-maxi",
+    "bruine-kitten",
+    "leonie-bag",
+    "custom-1775418873394"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-103",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "kanten-top",
+    "custom-1775584579591",
+    "new-balance",
+    "gele-bag",
+    "cargo-jasje"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-150",
+   "naam": "Dag 1 – Power Blauw",
+   "items": [
+    "custom-1775424911796",
+    "custom-1775069275202",
+    "bruine-kitten",
+    "custom-1775069339465"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-151",
+   "naam": "Dag 3 – Sezane Set Elevated",
+   "items": [
+    "custom-1775584606181",
+    "custom-1775584606181",
+    "zwarte-kitten"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-152",
+   "naam": "Dag 4 – Sportief Verrassing",
+   "items": [
+    "custom-1775584623244",
+    "adidas-broek",
+    "custom-1775424020218",
+    "witte-cardigan"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-153",
+   "naam": "Dag 5 – Bruin Monochroom Luxe",
+   "items": [
+    "bruin-spaghet",
+    "custom-1775072420968",
+    "leonie-bag",
+    "custom-1775418791681"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-154",
+   "naam": "Dag 7 – Off-White Kracht",
+   "items": [
+    "custom-1775418986374",
+    "custom-1775418539393",
+    "new-balance",
+    "custom-1775072496955"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-155",
+   "naam": "Dag 9 – Oud Roze Softpower",
+   "items": [
+    "custom-1775072894005",
+    "custom-1775419568589",
+    "bruine-kitten",
+    "riem-bruin"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-211",
+   "naam": "Rood & Ballon Power",
+   "items": [
+    "custom-1775584623244",
+    "custom-1775072420968",
+    "bruine-kitten",
+    "custom-1775069339465"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-212",
+   "naam": "Leopard & Licht Denim",
+   "items": [
+    "custom-1775672036462",
+    "custom-1775632125331",
+    "custom-1775424020218"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-213",
+   "naam": "Barrel Blues & Zwart Peplum",
+   "items": [
+    "zwart-peplum",
+    "custom-1775072446265",
+    "zwarte-kitten",
+    "blauwe-tas"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-214",
+   "naam": "Rood & Barrel Casual Power",
+   "items": [
+    "custom-1775584623244",
+    "custom-1775072446265",
+    "custom-1775424020218",
+    "blauwe-tas"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-215",
+   "naam": "Petite Jeans & Soft Draped",
+   "items": [
+    "custom-1775418646741",
+    "custom-1775632125331",
+    "zwarte-kitten",
+    "custom-1775632541956"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-220",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "custom-1775584623244",
+    "custom-1775072420968",
+    "custom-1775069306604",
+    "gele-bag",
+    "custom-1775072894005"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-221",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "custom-1775584623244",
+    "custom-1775072420968",
+    "custom-1775424020218",
+    "gele-bag",
+    "custom-1775079411498"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-307",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "blauwe-blouse",
+    "custom-1775928073461",
+    "custom-1775069306604",
+    "gele-bag",
+    "custom-1775069170005"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-1776026474104",
+   "naam": "Inspiratie looks look",
+   "items": [
+    "wit-basic",
+    "custom-1775072446265",
+    "custom-1775632494104"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-1776026665659",
+   "naam": "Oranje Vuur",
+   "items": [
+    "custom-1775928527437",
+    "custom-1775418539393",
+    "riem-bruin",
+    "new-balance",
+    "leonie-bag",
+    "oorbellen-goud"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-1776026698488",
+   "naam": "Leopard & Denim",
+   "items": [
+    "custom-1775672036462",
+    "custom-1775848780392",
+    "bruine-sandaal"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-377",
+   "naam": "Massimo Dutti top… + Broek balloon bruin…",
+   "items": [
+    "custom-1775072766330",
+    "custom-1775072420968",
+    "bruine-suede",
+    "leonie-bag",
+    "riem-bruin",
+    "oorbellen-goud"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-378",
+   "naam": "Shirt with cutwork.emb… + Jean Agolde",
+   "items": [
+    "custom-1775418986374",
+    "custom-1775848780392",
+    "custom-1775072172172",
+    "riem-bruin",
+    "ketting-goud",
+    "zonnebril"
+   ],
+   "map": "werkdag"
+  },
+  {
+   "id": "outfit-4",
+   "naam": "Avond uit 4",
+   "items": [
+    "geel-shirt",
+    "witte-shorts",
+    "zwarte-sandaal",
+    "gele-bag",
+    "witte-cardigan"
+   ],
+   "map": "avond"
+  },
+  {
+   "id": "outfit-28",
+   "naam": "Vandaag — Avond uit",
+   "items": [
+    "wit-basic",
+    "adidas-broek",
+    "new-balance",
+    "gele-bag"
+   ],
+   "map": "avond"
+  },
+  {
+   "id": "outfit-102",
+   "naam": "Vandaag — Avond uit",
+   "items": [
+    "custom-1775584623244",
+    "custom-1775072420968",
+    "bruine-kitten",
+    "gele-bag",
+    "custom-1775069339465"
+   ],
+   "map": "avond"
+  },
+  {
+   "id": "outfit-175",
+   "naam": "Vandaag — Avond uit",
+   "items": [
+    "custom-1775584623244",
+    "custom-1775072420968",
+    "bruine-kitten",
+    "leonie-bag",
+    "custom-1775631826255"
+   ],
+   "map": "avond"
+  },
+  {
+   "id": "outfit-306",
+   "naam": "Vandaag — Avond uit",
+   "items": [
+    "bruin-longsleeve",
+    "custom-1775928073461",
+    "custom-1775069306604",
+    "blauwe-tas",
+    "custom-1775072496955"
+   ],
+   "map": "avond"
+  },
+  {
+   "id": "outfit-355",
+   "naam": "Parijs Rouge",
+   "items": [
+    "wit-basic",
+    "rood-rok",
+    "bruine-kitten",
+    "leonie-bag"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-356",
+   "naam": "Blauw op Blauw",
+   "items": [
+    "custom-1775069248643",
+    "custom-1775418539393",
+    "zwarte-kitten"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-362",
+   "naam": "Blue Hour Stroll",
+   "items": [
+    "kanten-top",
+    "custom-1775418539393",
+    "bruine-kitten",
+    "blauwe-tas"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-363",
+   "naam": "Golden Hour Terras",
+   "items": [
+    "blauw-spaghet",
+    "custom-1779007034987",
+    "zwarte-sandaal",
+    "riem-bruin"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-366",
+   "naam": "Golden Power Play",
+   "items": [
+    "custom-1775424911796",
+    "witte-shorts",
+    "zwarte-kitten"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-367",
+   "naam": "Nacht in Parijs",
+   "items": [
+    "custom-1775424911796",
+    "custom-1779007034987",
+    "zwarte-kitten"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-368",
+   "naam": "Midnight Power Play",
+   "items": [
+    "custom-1779008721864",
+    "zwarte-kitten",
+    "ketting-goud"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-369",
+   "naam": "Zwarte top gouden… + ripped mide rise…",
+   "items": [
+    "custom-1775419518761",
+    "custom-1775424911796",
+    "custom-1775419537039",
+    "custom-1775632494104",
+    "custom-1775632541956",
+    "zonnebril",
+    "riem-zwart"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-370",
+   "naam": "Jurk sezane bruin rib + Bruine kitten heel…",
+   "items": [
+    "custom-1775821736079",
+    "bruine-kitten",
+    "leonie-bag",
+    "zonnebril",
+    "ketting-goud",
+    "oorbellen-goud",
+    "armband"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-371",
+   "naam": "Top linnen blauw zara + bermuda short with…",
+   "items": [
+    "custom-1775418908279",
+    "custom-1775069248643",
+    "custom-1776676550548",
+    "custom-1775926752318",
+    "blauwe-tas",
+    "zwarte-kitten",
+    "oorbellen-goud"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-372",
+   "naam": "Trui sezane zwart + rok zwart sezane",
+   "items": [
+    "custom-1775584606181",
+    "custom-1775584579591",
+    "zwarte-kitten",
+    "custom-1775632541956",
+    "oorbellen-goud",
+    "armband",
+    "zonnebril"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-373",
+   "naam": "Lichtblauwe oversized… + ripped mide rise…",
+   "items": [
+    "blauwe-blouse",
+    "custom-1775419518761",
+    "new-balance",
+    "blauwe-tas",
+    "zonnebril"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-374",
+   "naam": "Massimo duti top off… + Pantolon wide leg…",
+   "items": [
+    "custom-1775072754509",
+    "custom-1775928073461",
+    "custom-1775419537039",
+    "custom-1775632541956",
+    "zwarte-kitten",
+    "riem-zwart",
+    "ketting-goud"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-375",
+   "naam": "Massimo duti top off… + Pantolon wide leg…",
+   "items": [
+    "custom-1775928073461",
+    "custom-1775072754509",
+    "zonnebril",
+    "leonie-bag",
+    "bruine-sandaal",
+    "riem-bruin"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-376",
+   "naam": "Shirt with cutwork.emb… + ripped mide rise…",
+   "items": [
+    "custom-1775418986374",
+    "custom-1775419518761",
+    "blauwe-tas",
+    "new-balance",
+    "zonnebril",
+    "ketting-goud"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-379",
+   "naam": "Shirt with cutwork.emb… + ripped mide rise…",
+   "items": [
+    "custom-1775418986374",
+    "custom-1775419518761",
+    "blauwe-tas",
+    "new-balance",
+    "zonnebril",
+    "ketting-goud"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-380",
+   "naam": "Wit basic t-shirt + short creme hoort bij…",
+   "items": [
+    "custom-1776003744942",
+    "wit-basic",
+    "custom-1775673326077",
+    "custom-1775632494104",
+    "petje",
+    "leonie-bag",
+    "zonnebril",
+    "riem-bruin"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-381",
+   "naam": "Massimo duti top off… + off white broek zara…",
+   "items": [
+    "custom-1775673436765",
+    "custom-1779007034987",
+    "custom-1775072754509",
+    "new-balance",
+    "custom-1775632541956",
+    "oorbellen-goud",
+    "ketting-goud"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-382",
+   "naam": "Donkerblauw… + bermuda short with…",
+   "items": [
+    "custom-1775419537039",
+    "blauw-spaghet",
+    "custom-1775418908279",
+    "zwarte-kitten",
+    "blauwe-tas",
+    "oorbellen-goud",
+    "riem-zwart"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-383",
+   "naam": "Donkerblauw… + off white broek zara…",
+   "items": [
+    "blauw-spaghet",
+    "custom-1779007034987",
+    "zwarte-sandaal"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-386",
+   "naam": "Zwarte top gouden… + ripped mide rise…",
+   "items": [
+    "custom-1775419537039",
+    "custom-1775424911796",
+    "custom-1775419518761",
+    "zwarte-kitten",
+    "custom-1775632541956",
+    "oorbellen-goud",
+    "zonnebril"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-388",
+   "naam": "Broek + top zwart… + Zwarte leren riem",
+   "items": [
+    "custom-1779008721864",
+    "riem-zwart",
+    "zwarte-kitten",
+    "custom-1775632541956",
+    "ketting-goud",
+    "oorbellen-goud",
+    "zonnebril"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-392",
+   "naam": "Massimo duti top off… + off white broek zara…",
+   "items": [
+    "custom-1775673436765",
+    "custom-1779007034987",
+    "custom-1775072754509",
+    "riem-bruin",
+    "new-balance",
+    "custom-1775632541956",
+    "zonnebril",
+    "ketting-goud"
+   ],
+   "map": "parijs"
+  },
+  {
+   "id": "outfit-32",
+   "naam": "Vandaag — Casual weekend",
+   "items": [
+    "wit-basic",
+    "adidas-broek",
+    "bruine-sandaal",
+    "gele-bag"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-33",
+   "naam": "Vandaag — Casual weekend",
+   "items": [
+    "geel-shirt",
+    "custom-1775072446265",
+    "bruine-kitten",
+    "gele-bag",
+    "custom-1775079411498"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-34",
+   "naam": "Vandaag — Casual weekend",
+   "items": [
+    "wit-basic",
+    "custom-1775072420968",
+    "custom-1775069306604",
+    "leonie-bag"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-35",
+   "naam": "Vandaag — Casual weekend",
+   "items": [
+    "blauwe-blouse",
+    "custom-1775072420968",
+    "custom-1775069306604",
+    "leonie-bag",
+    "witte-cardigan"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-36",
+   "naam": "Vandaag — Casual weekend",
+   "items": [
+    "oranje-shirt",
+    "custom-1775072446265",
+    "zwarte-sandaal",
+    "leonie-bag"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-37",
+   "naam": "Vandaag — Casual weekend",
+   "items": [
+    "oranje-shirt",
+    "custom-1775072446265",
+    "zwarte-sandaal",
+    "leonie-bag"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-39",
+   "naam": "Vandaag — Casual weekend",
+   "items": [
+    "bruin-longsleeve",
+    "bruin-maxi",
+    "bruine-kitten",
+    "gele-bag",
+    "cargo-jasje"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-40",
+   "naam": "Vandaag — Casual weekend",
+   "items": [
+    "blauwe-blouse",
+    "custom-1775069275202",
+    "custom-1775069306604",
+    "leonie-bag",
+    "cargo-jasje"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-41",
+   "naam": "Vandaag — Casual weekend",
+   "items": [
+    "blauwe-blouse",
+    "custom-1775069275202",
+    "custom-1775069306604",
+    "leonie-bag",
+    "cargo-jasje"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-42",
+   "naam": "Vandaag — Casual weekend",
+   "items": [
+    "blauwe-blouse",
+    "custom-1775069275202",
+    "custom-1775069306604",
+    "leonie-bag",
+    "cargo-jasje"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-48",
+   "naam": "Vandaag — Casual weekend",
+   "items": [
+    "bruin-longsleeve",
+    "adidas-broek",
+    "custom-1775069306604",
+    "blauwe-tas",
+    "cargo-jasje"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-49",
+   "naam": "Vandaag — Casual weekend",
+   "items": [
+    "wit-oversized",
+    "custom-1775072446265",
+    "custom-1775069306604",
+    "leonie-bag",
+    "cargo-jasje"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-53",
+   "naam": "Vandaag — Casual weekend",
+   "items": [
+    "wit-basic",
+    "custom-1775072420968",
+    "custom-1775069306604",
+    "gele-bag",
+    "cargo-jasje"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-56",
+   "naam": "Vandaag — Casual weekend",
+   "items": [
+    "wit-basic",
+    "adidas-broek",
+    "new-balance",
+    "gele-bag",
+    "witte-cardigan"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-62",
+   "naam": "Vandaag — Casual weekend",
+   "items": [
+    "wit-basic",
+    "adidas-broek",
+    "bruine-kitten",
+    "leonie-bag",
+    "custom-1775072496955"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-227",
+   "naam": "Stripe Power",
+   "items": [
+    "rood-rok",
+    "riem-zwart",
+    "custom-1775069306604",
+    "custom-1775632541956",
+    "oorbellen-goud"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-255",
+   "naam": "Casual weekend look",
+   "items": [
+    "geel-shirt",
+    "bruin-maxi",
+    "bruine-sandaal",
+    "riem-bruin"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-1776026731231",
+   "naam": "Vandaag — Werkdag",
+   "items": [
+    "zwart-peplum",
+    "custom-1775419601514",
+    "new-balance",
+    "gele-bag",
+    "custom-1775419585107"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-389",
+   "naam": "Red Power Bloom",
+   "items": [
+    "custom-1775072581233",
+    "custom-1775072420968",
+    "bruine-kitten",
+    "riem-bruin",
+    "oorbellen-goud",
+    "leonie-bag"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-391",
+   "naam": "Golden Power Hour",
+   "items": [
+    "geel-shirt",
+    "custom-1775419601514",
+    "riem-zwart",
+    "bruine-kitten",
+    "gele-bag",
+    "oorbellen-goud"
+   ],
+   "map": "casual"
+  },
+  {
+   "id": "outfit-243",
+   "naam": "Golden Hour Strand",
+   "items": [
+    "geel-shirt",
+    "bruin-maxi",
+    "zwarte-sandaal"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-1775844169210",
+   "naam": "Outfit 5 – Sporty Surprise",
+   "items": [
+    "wit-basic",
+    "adidas-broek",
+    "riem-bruin",
+    "witte-cardigan",
+    "new-balance"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-1775844173085",
+   "naam": "Outfit 6– Linnen Lucht",
+   "items": [
+    "custom-1775069248643",
+    "custom-1775069275202",
+    "zwarte-sandaal",
+    "gele-bag"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-1775844217917",
+   "naam": "Donkerbruin… + Jean Agolde",
+   "items": [
+    "bruin-spaghet",
+    "gele-bag",
+    "cargo-jasje",
+    "custom-1775848780392"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-1775844245546",
+   "naam": "Donkerbruin… + Witte denim shorts",
+   "items": [
+    "bruin-spaghet",
+    "witte-shorts",
+    "custom-1775419075492",
+    "gele-bag",
+    "custom-1775079411498"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-1775844282544",
+   "naam": "Butter & Chocolate Runway",
+   "items": [
+    "geel-shirt",
+    "bruin-maxi",
+    "riem-zwart",
+    "zwarte-sandaal"
+   ],
+   "map": "board-1775844024992",
+   "notitie": "Stop het gele t-shirt losjes in de rok voor een nonchalant silhouet — de zwarte riem markeert je taille én grond de color-blocking combo precies zoals op de SS26 runways.\n\nNU TRENDING\nDé trend van lente 2026 is boldkleurige color blocking met 'off-kilter' combinaties: oranje + roze, rood + kobaltblauw, geel + bruin — seen at Paris, Milan én Copenhagen Fashion Week S/S 2026 (bron: whowhatwear.com, marieclaire.com, april 2026). Quiet luxury is officieel voorbij; saturated, expressieve kleur is nu de norm.\nJOUW VERSIE\nGriette draagt haar Geel Stieglitz t-shirt gecombineerd met de Bruin satijnen m"
+  },
+  {
+   "id": "outfit-1775844308383",
+   "naam": "Vandaag — Vakantie / strand",
+   "items": [
+    "blauw-spaghet",
+    "lichtblauwe-shorts",
+    "zwarte-sandaal"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-250",
+   "naam": "Karamel Power",
+   "items": [
+    "custom-1775079411498",
+    "rood-rok",
+    "bruin-spaghet",
+    "bruine-kitten",
+    "riem-bruin",
+    "ketting-goud",
+    "oorbellen-goud"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-254",
+   "naam": "Rode top.zara + Rood mini rokje met…",
+   "items": [
+    "custom-1775072581233",
+    "rood-rok",
+    "zwarte-sandaal"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-256",
+   "naam": "Algarve 22 april tm 1 mei look",
+   "items": [
+    "custom-1775072581233",
+    "custom-1775069275202",
+    "bruine-kitten",
+    "riem-bruin"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-258",
+   "naam": "Chocolate Power Hour",
+   "items": [
+    "bruin-jurk",
+    "cargo-jasje",
+    "bruine-kitten",
+    "riem-bruin",
+    "oorbellen-goud"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-259",
+   "naam": "Algarve 22 april tm 1 mei look",
+   "items": [
+    "oranje-shirt",
+    "rood-rok",
+    "new-balance"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-264",
+   "naam": "Algarve 22 april tm 1 mei look",
+   "items": [
+    "custom-1775675622894",
+    "custom-1775072581233",
+    "new-balance"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-1775848255176",
+   "naam": "Inspo 8 apr",
+   "items": [
+    "custom-1775072581233",
+    "adidas-broek",
+    "bruine-kitten"
+   ],
+   "map": "board-1775844024992",
+   "notitie": "NU TRENDING\nDé trend van lente 2026 is boldkleurige color blocking met 'off-kilter' combinaties: oranje + roze, rood + kobaltblauw, geel + bruin — seen at Paris, Milan én Copenhagen Fashion Week S/S 2026 (bron: whowhatwear.com, marieclaire.com, april 2026). Quiet luxury is officieel voorbij; saturated, expressieve kleur is nu de norm.\nJOUW VERSIE\nGriette draagt haar Geel Stieglitz t-shirt gecombineerd met de Bruin satijnen maxi rok — precies de 'butter yellow + chocolate brown' combo die de runways domineren. Ze voegt haar Adidas Firebird broek marineblauw toe als alternatief: dan kiest ze de "
+  },
+  {
+   "id": "outfit-1775848299817",
+   "naam": "Yellow Punch Stad",
+   "items": [
+    "geel-shirt",
+    "custom-1775848780392",
+    "new-balance",
+    "gele-bag",
+    "riem-bruin"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-269",
+   "naam": "Golden Hour Power",
+   "items": [
+    "custom-1775848780392",
+    "custom-1775418986374",
+    "new-balance",
+    "gele-bag",
+    "oorbellen-goud",
+    "riem-bruin"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-1775849523384",
+   "naam": "Purple Power Play",
+   "items": [
+    "custom-1775072515985",
+    "custom-1775584623244",
+    "witte-shorts",
+    "bruine-kitten",
+    "riem-bruin",
+    "oorbellen-goud"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-1775849555701",
+   "naam": "Spelletjesavond Cosy",
+   "items": [
+    "bruin-spaghet",
+    "witte-shorts",
+    "custom-1775419075492",
+    "witte-cardigan"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-1775850056558",
+   "naam": "Vandaag — Casual weekend",
+   "items": [
+    "bruin-longsleeve",
+    "bruin-maxi",
+    "bruine-kitten",
+    "gele-bag",
+    "cargo-jasje"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-1775850122932",
+   "naam": "Dag 1 – Strand Arrival Glow",
+   "items": [
+    "geel-shirt",
+    "rood-rok",
+    "riem-bruin",
+    "zwarte-sandaal",
+    "gele-bag",
+    "zonnebril",
+    "oorbellen-goud",
+    "bikini-1"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-272",
+   "naam": "Citrus Power Hour",
+   "items": [
+    "oranje-shirt",
+    "rood-rok",
+    "bruine-kitten",
+    "riem-bruin",
+    "ketting-goud",
+    "oorbellen-goud"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-285",
+   "naam": "Indigo Evening Edge",
+   "items": [
+    "bruin-jurk",
+    "bruine-kitten",
+    "custom-1775072515985",
+    "gele-bag"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-286",
+   "naam": "Rood Energie Dag",
+   "items": [
+    "custom-1775584623244",
+    "custom-1775848780392",
+    "new-balance",
+    "custom-1775072515985",
+    "riem-bruin"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-287",
+   "naam": "Wild at Heart",
+   "items": [
+    "custom-1775673355346",
+    "custom-1775675622894",
+    "bruine-kitten",
+    "oorbellen-goud"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-288",
+   "naam": "Chocolate Power Hour",
+   "items": [
+    "bruin-longsleeve",
+    "bruin-maxi",
+    "riem-bruin",
+    "bruine-kitten",
+    "oorbellen-goud",
+    "zonnebril"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-292",
+   "naam": "Casual Coast Wander",
+   "items": [
+    "custom-1775418986374",
+    "lichtblauwe-shorts",
+    "new-balance",
+    "cargo-jasje"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-293",
+   "naam": "Sunset Strand Chic",
+   "items": [
+    "oranje-shirt",
+    "witte-shorts",
+    "custom-1775419075492",
+    "gele-bag"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-294",
+   "naam": "Leopard & Denim Dag",
+   "items": [
+    "custom-1775673355346",
+    "custom-1775848780392",
+    "new-balance",
+    "riem-bruin"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-295",
+   "naam": "Monochrome Brown Diner",
+   "items": [
+    "bruin-jurk",
+    "custom-1775419075492",
+    "custom-1775072515985"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-296",
+   "naam": "Jungle Stripe Power",
+   "items": [
+    "custom-1775856345390",
+    "bruin-maxi",
+    "riem-bruin",
+    "bruine-kitten",
+    "oorbellen-goud"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-297",
+   "naam": "Rood Vuur Casual",
+   "items": [
+    "custom-1775584623244",
+    "custom-1775848780392",
+    "new-balance",
+    "cargo-jasje"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-298",
+   "naam": "Zand & Blauw Strand",
+   "items": [
+    "blauw-spaghet",
+    "witte-shorts",
+    "custom-1775419075492",
+    "gele-bag"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-299",
+   "naam": "Cognac Diner Look",
+   "items": [
+    "bruin-jurk",
+    "bruine-kitten",
+    "custom-1775072515985"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-300",
+   "naam": "Oranje Contrast Stad",
+   "items": [
+    "oranje-shirt",
+    "adidas-broek",
+    "new-balance",
+    "custom-1775673355346"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-301",
+   "naam": "Cream Power Hour",
+   "items": [
+    "custom-1775667011608",
+    "rood-rok",
+    "bruine-kitten",
+    "riem-bruin",
+    "oorbellen-goud",
+    "zonnebril"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-302",
+   "naam": "Power Blossom",
+   "items": [
+    "roze-maxi",
+    "custom-1775584623244",
+    "riem-bruin",
+    "bruine-kitten",
+    "oorbellen-goud"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-304",
+   "naam": "Chocolate Power Hour",
+   "items": [
+    "bruin-jurk",
+    "cargo-jasje",
+    "bruine-kitten",
+    "riem-bruin",
+    "ketting-goud",
+    "oorbellen-goud"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-305",
+   "naam": "Green Power Play",
+   "items": [
+    "custom-1775672624997",
+    "rood-rok",
+    "bruine-kitten",
+    "riem-bruin",
+    "oorbellen-goud",
+    "zonnebril"
+   ],
+   "map": "board-1775844024992",
+   "notitie": "kan ook met agode jeans + slippers bruin en gouden oorbellen. Of met roze satin dress en sjaaltje roze en slippers bruinf met short en new balance"
+  },
+  {
+   "id": "outfit-336",
+   "naam": "Golden Hour Power",
+   "items": [
+    "geel-shirt",
+    "bruin-maxi",
+    "bruine-kitten",
+    "riem-bruin",
+    "ketting-goud",
+    "oorbellen-goud",
+    "zonnebril"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-337",
+   "naam": "Gele Energie Shorts",
+   "items": [
+    "geel-shirt",
+    "witte-shorts",
+    "custom-1775419075492",
+    "gele-bag"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-338",
+   "naam": "Blauw Linen Cool",
+   "items": [
+    "custom-1775069248643",
+    "custom-1775848780392",
+    "new-balance",
+    "custom-1775072515985"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-339",
+   "naam": "Bruin Cargo Layer",
+   "items": [
+    "bruin-spaghet",
+    "lichtblauwe-shorts",
+    "new-balance",
+    "cargo-jasje"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-340",
+   "naam": "Roze Power Maxi",
+   "items": [
+    "oranje-shirt",
+    "roze-maxi",
+    "bruine-kitten",
+    "riem-bruin"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-341",
+   "naam": "Wit & Blauw Rivièra",
+   "items": [
+    "custom-1775667011608",
+    "lichtblauwe-shorts",
+    "custom-1775419075492"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-342",
+   "naam": "Bruin Monochroom met Twist",
+   "items": [
+    "blauw-spaghet",
+    "custom-1775848780392",
+    "bruine-kitten",
+    "custom-1775079411498"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-343",
+   "naam": "Gestreepte Kracht",
+   "items": [
+    "custom-1775856345390",
+    "witte-shorts",
+    "new-balance",
+    "cargo-jasje"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-344",
+   "naam": "Red Power Play",
+   "items": [
+    "custom-1775072581233",
+    "custom-1775848780392",
+    "riem-bruin",
+    "bruine-kitten",
+    "oorbellen-goud"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-345",
+   "naam": "Earthy Power Hour",
+   "items": [
+    "bruin-shorts",
+    "oranje-shirt",
+    "riem-bruin",
+    "bruine-kitten",
+    "oorbellen-goud",
+    "zonnebril"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-346",
+   "naam": "White Power Bloom",
+   "items": [
+    "custom-1775821801093",
+    "bruine-kitten",
+    "riem-bruin",
+    "ketting-goud",
+    "oorbellen-goud",
+    "zonnebril"
+   ],
+   "map": "board-1775844024992"
+  },
+  {
+   "id": "outfit-309",
+   "naam": "Terschelling Wandeldag",
+   "items": [
+    "bruin-longsleeve",
+    "custom-1775848780392",
+    "cargo-jasje",
+    "custom-1775632494104"
+   ],
+   "map": "board-1775928890504"
+  },
+  {
+   "id": "outfit-310",
+   "naam": "Berenloop Opener",
+   "items": [
+    "custom-1775670456999",
+    "adidas-broek",
+    "new-balance"
+   ],
+   "map": "board-1775928890504"
+  },
+  {
+   "id": "outfit-311",
+   "naam": "Earthy Power Stripe",
+   "items": [
+    "custom-1775856345390",
+    "adidas-broek",
+    "new-balance"
+   ],
+   "map": "board-1775928890504"
+  },
+  {
+   "id": "outfit-312",
+   "naam": "Cacao Power",
+   "items": [
+    "custom-1775072420968",
+    "bruin-longsleeve",
+    "new-balance"
+   ],
+   "map": "board-1775928890504"
+  },
+  {
+   "id": "outfit-313",
+   "naam": "Purple Power Hour",
+   "items": [
+    "custom-1775848780392",
+    "new-balance"
+   ],
+   "map": "board-1775928890504"
+  },
+  {
+   "id": "outfit-314",
+   "naam": "Gestreept & Sterk",
+   "items": [
+    "custom-1775856345390",
+    "custom-1775848780392",
+    "custom-1775632494104",
+    "cargo-jasje"
+   ],
+   "map": "board-1775928890504"
+  },
+  {
+   "id": "outfit-315",
+   "naam": "Blauw Vuur",
+   "items": [
+    "bruin-longsleeve",
+    "adidas-broek",
+    "new-balance"
+   ],
+   "map": "board-1775928890504"
+  },
+  {
+   "id": "outfit-316",
+   "naam": "Bruine Diepte",
+   "items": [
+    "bruin-longsleeve",
+    "custom-1775072420968",
+    "custom-1775632494104"
+   ],
+   "map": "board-1775928890504"
+  },
+  {
+   "id": "outfit-317",
+   "naam": "Paars Contrast",
+   "items": [
+    "custom-1775670456999",
+    "custom-1775848780392",
+    "new-balance"
+   ],
+   "map": "board-1775928890504"
+  },
+  {
+   "id": "outfit-318",
+   "naam": "Blauw Vuur",
+   "items": [
+    "bruin-longsleeve",
+    "adidas-broek",
+    "new-balance"
+   ],
+   "map": "board-1775928890504"
+  },
+  {
+   "id": "outfit-319",
+   "naam": "Gestreept & Sterk",
+   "items": [
+    "custom-1775856345390",
+    "custom-1775848780392",
+    "custom-1775632494104",
+    "cargo-jasje"
+   ],
+   "map": "board-1775928890504"
+  },
+  {
+   "id": "outfit-320",
+   "naam": "Groene Kracht",
+   "items": [
+    "custom-1775670456999",
+    "custom-1775072420968",
+    "new-balance"
+   ],
+   "map": "board-1775928890504"
+  },
+  {
+   "id": "outfit-321",
+   "naam": "Bruine Diepte",
+   "items": [
+    "bruin-longsleeve",
+    "custom-1775072420968",
+    "custom-1775632494104"
+   ],
+   "map": "board-1775928890504"
+  },
+  {
+   "id": "outfit-322",
+   "naam": "Sporty Stripe",
+   "items": [
+    "custom-1775856345390",
+    "adidas-broek",
+    "custom-1775632494104",
+    "cargo-jasje"
+   ],
+   "map": "board-1775928890504"
+  },
+  {
+   "id": "outfit-323",
+   "naam": "Paars Contrast",
+   "items": [
+    "custom-1775670456999",
+    "custom-1775848780392",
+    "new-balance"
+   ],
+   "map": "board-1775928890504"
+  },
+  {
+   "id": "outfit-413",
+   "naam": "Second Female crop… + Adidas Firebird broek…",
+   "items": [
+    "adidas-broek",
+    "second-female-grijs",
+    "custom-1788827817917",
+    "new-balance",
+    "oorbellen-goud"
+   ],
+   "map": "board-1775928890504"
+  },
+  {
+   "id": "outfit-397",
+   "naam": "Shirt with cutwork.emb… + Jean Agolde",
+   "items": [
+    "custom-1775848780392",
+    "custom-1775418986374",
+    "leonie-bag",
+    "oorbellen-goud",
+    "zonnebril"
+   ],
+   "map": "board-1779042790077"
+  },
+  {
+   "id": "outfit-398",
+   "naam": "Blauw Power Stad",
+   "items": [
+    "blauwe-blouse",
+    "custom-1775419518761",
+    "custom-1775632494104",
+    "ketting-goud"
+   ],
+   "map": "board-1784383500712"
+  },
+  {
+   "id": "outfit-399",
+   "naam": "Peplum Diner Glow",
+   "items": [
+    "zwart-peplum",
+    "custom-1775069275202",
+    "bruine-sandaal",
+    "ketting-goud"
+   ],
+   "map": "board-1784383500712"
+  },
+  {
+   "id": "outfit-400",
+   "naam": "Suppen Adidas Energy",
+   "items": [
+    "blauw-spaghet",
+    "custom-1775675622894",
+    "custom-1775419075492"
+   ],
+   "map": "board-1784383500712"
+  },
+  {
+   "id": "outfit-401",
+   "naam": "Bruine Cargo Wandeling",
+   "items": [
+    "bruin-spaghet",
+    "lichtblauwe-shorts",
+    "new-balance",
+    "cargo-jasje"
+   ],
+   "map": "board-1784383500712"
+  },
+  {
+   "id": "outfit-402",
+   "naam": "Geel Verassing Stad",
+   "items": [
+    "geel-shirt",
+    "witte-shorts",
+    "bruine-sandaal",
+    "blauwe-tas"
+   ],
+   "map": "board-1784383500712"
+  },
+  {
+   "id": "outfit-403",
+   "naam": "Co-ord Nacht Uit",
+   "items": [
+    "custom-1779008721864",
+    "zwarte-sandaal",
+    "ketting-goud"
+   ],
+   "map": "board-1784383500712"
+  },
+  {
+   "id": "outfit-404",
+   "naam": "Oranje Hike Verrassing",
+   "items": [
+    "oranje-shirt",
+    "bruin-shorts",
+    "new-balance"
+   ],
+   "map": "board-1784383500712"
+  },
+  {
+   "id": "outfit-405",
+   "naam": "Wit Kant Diner Soft",
+   "items": [
+    "kanten-top",
+    "lichtblauwe-shorts",
+    "bruine-kitten",
+    "leonie-bag"
+   ],
+   "map": "board-1784383500712"
+  },
+  {
+   "id": "outfit-406",
+   "naam": "American Vintage Stadswandeling",
+   "items": [
+    "custom-1775072496955",
+    "witte-shorts",
+    "custom-1775632494104",
+    "ketting-goud"
+   ],
+   "map": "board-1784383500712"
+  },
+  {
+   "id": "outfit-407",
+   "naam": "Pofmouw Leopard Casual Chic",
+   "items": [
+    "custom-1775672036462",
+    "lichtblauwe-shorts",
+    "zwarte-sandaal"
+   ],
+   "map": "board-1784383500712"
+  },
+  {
+   "id": "outfit-408",
+   "naam": "Strand naar Stad",
+   "items": [
+    "bruin-spaghet",
+    "witte-shorts",
+    "custom-1775419075492",
+    "leonie-bag"
+   ],
+   "map": "board-1784383500712"
+  },
+  {
+   "id": "kk-mvmfdu17cyc",
+   "naam": "Navy Layered Chic",
+   "items": [
+    "custom-1775418791681",
+    "custom-1790427903157",
+    "custom-1790445805745"
+   ],
+   "map": "kaarten",
+   "datum": "2026-10-24",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1792847876/griette-kaarten/griette_kaart_kk-mvmfdu17cyc.jpg"
+  },
+  {
+   "id": "kk-mvmf8vdjnpl",
+   "naam": "Ontspannen Dagje Uit",
+   "items": [],
+   "map": "kaarten",
+   "datum": "2026-10-24",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1792847644/griette-kaarten/griette_kaart_kk-mvmf8vdjnpl.jpg"
+  },
+  {
+   "id": "kk-muif2w7zll7",
+   "naam": "Checked & Layered",
+   "items": [
+    "custom-1790428032830",
+    "custom-1775069306604"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-26",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1790428718/griette-kaarten/griette_kaart_kk-muif2w7zll7.jpg"
+  },
+  {
+   "id": "kk-mu7d1plwd5f",
+   "naam": "Khaki Meets Ice",
+   "items": [],
+   "map": "kaarten",
+   "datum": "2026-09-18",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1789760263/griette-kaarten/griette_kaart_kk-mu7d1plwd5f.jpg"
+  },
+  {
+   "id": "kk-mu03vxso0i7",
+   "naam": "Warm & Effortless",
+   "items": [
+    "custom-1775418539393"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-13",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1789321612/griette-kaarten/griette_kaart_kk-mu03vxso0i7.jpg"
+  },
+  {
+   "id": "kk-mtznj6uiise",
+   "naam": "Roze Tegen Bruin",
+   "items": [
+    "custom-1789293833474",
+    "custom-1775418539393",
+    "custom-1775424020218"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-13",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1789294144/griette-kaarten/griette_kaart_kk-mtznj6uiise.jpg"
+  },
+  {
+   "id": "kk-mtznj2cges9",
+   "naam": "Roze Tegen Bruin",
+   "items": [
+    "custom-1789293833474",
+    "custom-1775418539393",
+    "custom-1775424020218"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-13",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1789294137/griette-kaarten/griette_kaart_kk-mtznj2cges9.jpg"
+  },
+  {
+   "id": "kk-mty85zdjqjh",
+   "naam": "Actief & Grounded",
+   "items": [
+    "custom-1789207304905",
+    "custom-1788827817917"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-12",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1789207867/griette-kaarten/griette_kaart_kk-mty85zdjqjh.jpg"
+  },
+  {
+   "id": "kk-mtwu0gzuxgh",
+   "naam": "Zoet & Zonnig",
+   "items": [
+    "custom-1788704450036",
+    "custom-1788707185856"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-11",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1789123629/griette-kaarten/griette_kaart_kk-mtwu0gzuxgh.jpg"
+  },
+  {
+   "id": "kk-mtwtknz8yaz",
+   "naam": "Festival Warm Glow",
+   "items": [
+    "custom-1789063228201",
+    "custom-1788827817917",
+    "custom-1776003744942",
+    "custom-1775926752318",
+    "custom-1788827850827"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-11",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1789122891/griette-kaarten/griette_kaart_kk-mtwtknz8yaz.jpg"
+  },
+  {
+   "id": "kk-mtwsuxsrq6b",
+   "naam": "Grafisch & Gedurfd",
+   "items": [
+    "custom-1775584623244",
+    "custom-1775928073461",
+    "custom-1775424360960"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-11",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1789121691/griette-kaarten/griette_kaart_kk-mtwsuxsrq6b.jpg"
+  },
+  {
+   "id": "kk-mtwsuvzgw7l",
+   "naam": "Grafisch & Gedurfd",
+   "items": [
+    "custom-1775584623244",
+    "custom-1775928073461",
+    "custom-1775424360960"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-11",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1789121689/griette-kaarten/griette_kaart_kk-mtwsuvzgw7l.jpg"
+  },
+  {
+   "id": "kk-mtw1cvcanns",
+   "naam": "Bruine Warmte, Gouden Glans",
+   "items": [
+    "custom-1775584550083",
+    "custom-1775848780392"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-10",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1789075498/griette-kaarten/griette_kaart_kk-mtw1cvcanns.jpg"
+  },
+  {
+   "id": "kk-mtw1cr2clf9",
+   "naam": "Bruine Warmte, Gouden Glans",
+   "items": [
+    "custom-1775584550083",
+    "custom-1775848780392"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-10",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1789075493/griette-kaarten/griette_kaart_kk-mtw1cr2clf9.jpg"
+  },
+  {
+   "id": "kk-mtvw1stnbt0",
+   "naam": "Khaki Meets Kobalt",
+   "items": [
+    "custom-1789063228201",
+    "custom-1775632364742",
+    "custom-1788827850827"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-10",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1789066584/griette-kaarten/griette_kaart_kk-mtvw1stnbt0.jpg"
+  },
+  {
+   "id": "kk-mtvvxgtsfuk",
+   "naam": "Khaki Meets Petrol",
+   "items": [
+    "custom-1789063228201",
+    "custom-1775673436765",
+    "custom-1775632389199"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-10",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1789066381/griette-kaarten/griette_kaart_kk-mtvvxgtsfuk.jpg"
+  },
+  {
+   "id": "kk-mtvvmxj6sh1",
+   "naam": "Fort & Festival Edge",
+   "items": [
+    "custom-1789065266950",
+    "custom-1788888975901",
+    "custom-1775632389199",
+    "custom-1788827850827"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-10",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1789065890/griette-kaarten/griette_kaart_kk-mtvvmxj6sh1.jpg"
+  },
+  {
+   "id": "kk-mtvvmt80s8c",
+   "naam": "Fort & Festival Edge",
+   "items": [
+    "custom-1789065266950",
+    "custom-1788888975901",
+    "custom-1775632389199",
+    "custom-1788827850827"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-10",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1789065884/griette-kaarten/griette_kaart_kk-mtvvmt80s8c.jpg"
+  },
+  {
+   "id": "kk-mtukvhfbxw3",
+   "naam": "Citroentuin Stadswandeling",
+   "items": [
+    "custom-1775926752318"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788987347/griette-kaarten/griette_kaart_kk-mtukvhfbxw3.jpg"
+  },
+  {
+   "id": "kk-mtukvc2xhx2",
+   "naam": "Citroentuin Stadswandeling",
+   "items": [
+    "custom-1775926752318"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788987340/griette-kaarten/griette_kaart_kk-mtukvc2xhx2.jpg"
+  },
+  {
+   "id": "kk-mtuh3yg832m",
+   "naam": "Stille Elegantie",
+   "items": [
+    "custom-1775418539393"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788981023/griette-kaarten/griette_kaart_kk-mtuh3yg832m.jpg"
+  },
+  {
+   "id": "kk-mtuh3vtwdzi",
+   "naam": "Stille Elegantie",
+   "items": [
+    "custom-1775418539393"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788981020/griette-kaarten/griette_kaart_kk-mtuh3vtwdzi.jpg"
+  },
+  {
+   "id": "kk-mtugw7d0e6r",
+   "naam": "Zeelucht & Terras",
+   "items": [
+    "custom-1788707134909"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788980662/griette-kaarten/griette_kaart_kk-mtugw7d0e6r.jpg"
+  },
+  {
+   "id": "kk-mtugw0zza4l",
+   "naam": "Zeelucht & Terras",
+   "items": [
+    "custom-1788707134909"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788980653/griette-kaarten/griette_kaart_kk-mtugw0zza4l.jpg"
+  },
+  {
+   "id": "kk-mtugsd5tt88",
+   "naam": "Casual Citrus Vibes",
+   "items": [
+    "custom-1775926752318",
+    "custom-1775418539393"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788980483/griette-kaarten/griette_kaart_kk-mtugsd5tt88.jpg"
+  },
+  {
+   "id": "kk-mtugoeg7bdi",
+   "naam": "Winterse Citroenvlaag",
+   "items": [
+    "custom-1776676550548",
+    "custom-1775848780392",
+    "custom-1775926733081",
+    "custom-1788827850827"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788980298/griette-kaarten/griette_kaart_kk-mtugoeg7bdi.jpg"
+  },
+  {
+   "id": "kk-mtufew6ar9c",
+   "naam": "City Weekend Roodzwart",
+   "items": [
+    "custom-1775584623244",
+    "custom-1775928073461",
+    "custom-1788827817917"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788978175/griette-kaarten/griette_kaart_kk-mtufew6ar9c.jpg"
+  },
+  {
+   "id": "kk-mtufer1ndas",
+   "naam": "City Weekend Roodzwart",
+   "items": [
+    "custom-1775584623244",
+    "custom-1775928073461",
+    "custom-1788827817917"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788978168/griette-kaarten/griette_kaart_kk-mtufer1ndas.jpg"
+  },
+  {
+   "id": "kk-mtuejnxgy3l",
+   "naam": "Maritiem Fris Weekend",
+   "items": [
+    "custom-1788707134909"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788976717/griette-kaarten/griette_kaart_kk-mtuejnxgy3l.jpg"
+  },
+  {
+   "id": "kk-mtuejkdl1q1",
+   "naam": "Maritiem Fris Weekend",
+   "items": [
+    "custom-1788707134909"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788976713/griette-kaarten/griette_kaart_kk-mtuejkdl1q1.jpg"
+  },
+  {
+   "id": "kk-mtud6ekpn4x",
+   "naam": "Turquoise Blikvanger Op Denim",
+   "items": [],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788974419/griette-kaarten/griette_kaart_kk-mtud6ekpn4x.jpg"
+  },
+  {
+   "id": "kk-mtud6aakqrn",
+   "naam": "Turquoise Blikvanger Op Denim",
+   "items": [],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788974414/griette-kaarten/griette_kaart_kk-mtud6aakqrn.jpg"
+  },
+  {
+   "id": "kk-mtub5zz6k9f",
+   "naam": "Utility Khaki-Zwart",
+   "items": [
+    "custom-1775632364742"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788971041/griette-kaarten/griette_kaart_kk-mtub5zz6k9f.jpg"
+  },
+  {
+   "id": "kk-mtub2qr3lt2",
+   "naam": "Utility Khaki-Zwart",
+   "items": [
+    "custom-1775632364742"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788970889/griette-kaarten/griette_kaart_kk-mtub2qr3lt2.jpg"
+  },
+  {
+   "id": "kk-mtua9mozxip",
+   "naam": "Casual Chic Essentieel",
+   "items": [
+    "custom-1776003691206"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788969531/griette-kaarten/griette_kaart_kk-mtua9mozxip.jpg"
+  },
+  {
+   "id": "kk-mtu5jvq6hgk",
+   "naam": "Marineblauw Stadswandeling",
+   "items": [
+    "custom-1776676550548",
+    "custom-1775069306604"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788961611/griette-kaarten/griette_kaart_kk-mtu5jvq6hgk.jpg"
+  },
+  {
+   "id": "kk-mtu3rucb4jt",
+   "naam": "Terschelling After Dark",
+   "items": [
+    "custom-1775632364742",
+    "custom-1775926733081"
+   ],
+   "map": "kaarten",
+   "datum": "2026-09-09",
+   "afbeelding": "https://res.cloudinary.com/dhggari0g/image/upload/v1788958624/griette-kaarten/griette_kaart_kk-mtu3rucb4jt.jpg"
+  }
+ ],
+ "gedragen": {
+  "2026-08-26": [
+   "zwart-peplum",
+   "custom-1787739922392",
+   "zwarte-sandaal",
+   "blauwe-tas"
+  ]
+ }
+}

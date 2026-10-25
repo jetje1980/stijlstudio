@@ -1,0 +1,540 @@
+// De stylist die rekent. Geen AI: regels uit het rapport, de kleurmanieren,
+// sfeer, wensen en weer. Alles wat hier gebeurt is na te rekenen, dus elke
+// outfit komt echt uit de kast en houdt zich aan wat je koos.
+import { info, herken, METHODEN, ZWAAR } from './kleur.js';
+
+export const ROLLEN_KLEDING = ['boven', 'onder', 'heel', 'laag', 'jas'];
+
+// ── SFEREN ───────────────────────────────────────────────────────────────────
+// Een sfeer is een recept: welke soorten, texturen en prints erbij horen.
+// De comfy/sjiek-schuif staat daar los van en verschuift het niveau.
+export const SFEREN = {
+  cosy: { naam: 'Cosy', uitleg: 'Breisels, zachte stoffen, ton-sur-ton, platte schoenen',
+    soort: { trui: 3, vest: 3, teddy: 3, gilet: 1, longsleeve: 1, jeans: 1, broek: 1, legging: 1, laarzen: 2, sneakers: 2, muts: 2, sjaal: 1, hakken: -3, topje: -2, blazer: -1 },
+    textuur: { 'grof gebreid': 3, pluizig: 3, 'fijn gebreid': 2, 'suède': 1, glans: -1 },
+    methode: { tonsurton: 1.5, mono: 1, neutraal: 1, colorblock: -1 } },
+  parisienne: { naam: 'Parisienne', uitleg: 'Rechte jeans of pantalon, blouse of fijn breisel, trench of blazer, loafers; neutraal met één accent',
+    soort: { blouse: 3, trenchcoat: 3, loafers: 3, pantalon: 2, jeans: 2, blazer: 2, sjaal: 2, hakken: 1, longsleeve: 1, vest: 1, rok: 1, sandalen: 1, pet: -2, legging: -2, teddy: -1 },
+    textuur: { 'fijn gebreid': 1, linnen: 1, denim: 1, leer: 1 },
+    print: { streep: 3, stip: 1, luipaard: 1 },
+    methode: { accent: 2, neutraal: 1.5, tonsurton: 1, colorblock: -2, mix: -2 } },
+  street: { naam: 'Streetstyle', uitleg: 'Sneakers, cargo, oversized, petje, technische jacks',
+    soort: { sneakers: 3, pet: 3, jas: 2, broek: 2, jeans: 2, 't-shirt': 2, trui: 1, longsleeve: 1, sporttop: 1, hakken: -2, blouse: -1, pantalon: -1 },
+    textuur: { structuur: 1, denim: 1, glad: 0.5 },
+    methode: { colorblock: 1, accent: 1 } },
+  klassiek: { naam: 'Klassiek casual', uitleg: 'Je rapport als basis: blazer, pantalon, blouse, loafers of kitten heels',
+    soort: { blazer: 3, pantalon: 3, blouse: 2, loafers: 3, hakken: 2, trenchcoat: 2, rok: 1, jurk: 1, top: 1, riem: 1, sneakers: -1 },
+    textuur: { glans: 1, 'fijn gebreid': 1 },
+    methode: { split: 1, accent: 1, tonsurton: 1 } },
+  vrouwelijk: { naam: 'Vrouwelijk', uitleg: 'Jurk of rok, kant, satijn, een open hals, kitten heels',
+    soort: { jurk: 3, rok: 3, topje: 2, hakken: 2, sandalen: 1, blouse: 1, sjaal: 1, sneakers: -1, pet: -2 },
+    textuur: { kant: 3, glans: 2, 'fijn gebreid': 1 },
+    methode: { analoog: 1, split: 1 } },
+};
+
+// ── WENSEN ───────────────────────────────────────────────────────────────────
+// Een wens is een harde eis. Daarom staat er maar een handvol.
+export const WENSEN = {
+  trui:  { naam: 'Lekkere trui', test: o => o.items.some(i => ['trui', 'vest', 'teddy'].includes(i.soort) && /gebreid|pluizig/.test(i.textuur)) },
+  laag:  { naam: 'Extra laagje', test: o => !!(o.slots.laag || o.slots.jas) },
+  plat:  { naam: 'Platte schoenen', test: o => !o.slots.schoen || o.slots.schoen.soort !== 'hakken' },
+  broek: { naam: 'Broek', test: o => !!o.slots.onder && ['broek', 'jeans', 'pantalon', 'legging'].includes(o.slots.onder.soort) },
+  rok:   { naam: 'Rok of jurk', test: o => (o.slots.onder && o.slots.onder.soort === 'rok') || (o.slots.heel && o.slots.heel.soort === 'jurk') },
+};
+
+// ── WEER ─────────────────────────────────────────────────────────────────────
+export function weerKlasse(temp) {
+  if (temp == null) return 'mild';
+  if (temp < 10) return 'koud';
+  if (temp < 16) return 'fris';
+  if (temp < 23) return 'mild';
+  return 'warm';
+}
+
+const open = i => i.open || i.soort === 'sandalen';
+function pastBijWeer(i, klasse) {
+  if (klasse === 'koud') {
+    if (open(i) || ['short', 'zwemkleding'].includes(i.soort)) return false;
+    // een zomers bovenstuk kan nog onder een trui of jas; de rest niet
+    return i.seizoen !== 'zomer' || i.rol === 'boven';
+  }
+  if (klasse === 'fris') return !open(i) && i.soort !== 'zwemkleding' && !(i.soort === 'short' && i.warmte < 2);
+  if (klasse === 'warm') return i.warmte <= 2 && i.rol !== 'jas' && !['laarzen', 'muts', 'teddy'].includes(i.soort);
+  return i.soort !== 'zwemkleding' && i.soort !== 'muts';
+}
+
+// ── RAPPORTREGELS ────────────────────────────────────────────────────────────
+const STOPBAAR = new Set(['blouse', 't-shirt', 'top', 'topje', 'longsleeve']);
+
+export function controleer(o, rapport) {
+  const problemen = [], tips = [];
+  const { boven, onder, heel, laag } = o.slots;
+  const kleding = o.items.filter(i => ROLLEN_KLEDING.includes(i.rol));
+
+  // Nooit wijd op wijd. Instoppen met een riem redt een wijde blouse.
+  if (boven && onder && boven.pasvorm === 'wijd' && onder.pasvorm === 'wijd') {
+    if (STOPBAAR.has(boven.soort) && o.items.some(i => i.soort === 'riem')) tips.push('Stop het bovenstuk in en draag de riem: zo blijft je taille zichtbaar.');
+    else problemen.push({ regel: 'silhouet', tekst: 'Wijd op wijd: je silhouet verdwijnt.' });
+  }
+  if (heel && heel.pasvorm === 'wijd' && laag && laag.pasvorm === 'wijd') problemen.push({ regel: 'silhouet', tekst: 'Wijde set met een wijde laag erover.' });
+
+  // Laagjes van dun naar dik: een blouse over een trui werkt niet.
+  const DIKTE = { topje: 1, sporttop: 1, 't-shirt': 1, top: 1.5, longsleeve: 2, blouse: 2, trui: 3, vest: 3.5, gilet: 3.5, blazer: 4, teddy: 5 };
+  if (laag && (boven || heel) && (DIKTE[laag.soort] || 3) <= (DIKTE[(boven || heel).soort] || 1.5))
+    problemen.push({ regel: 'laagjes', tekst: `${laag.soort} over ${(boven || heel).soort} draagt niet.` });
+
+  const prints = o.items.filter(i => i.print);
+  if (prints.length > 1) problemen.push({ regel: 'prints', tekst: 'Meer dan één print (' + prints.map(i => i.print).join(' + ') + ').' });
+
+  const texturen = new Set(kleding.map(i => i.textuur));
+  if ((o.kleur.methode === 'mono' || o.kleur.methode === 'neutraal') && texturen.size < 2 && kleding.length >= 2)
+    problemen.push({ regel: 'textuur', tekst: 'Zonder kleurcontrast moet de stof het werk doen: nu maar één textuur.' });
+
+  // Eén heldere kleur is het statement; geen zwaargewicht ernaast.
+  const helder = kleding.concat(o.items.filter(i => i.rol === 'tas' || i.rol === 'schoen'))
+    .filter(i => { const k = info(i.kleur[0]); return !k.neutraal && !k.zwaar && k.licht > 0.25; });
+  const zwaar = kleding.filter(i => ZWAAR.has(i.kleur[0]));
+  if (helder.length && zwaar.length && o.kleur.methode !== 'mono')
+    problemen.push({ regel: 'statement', zacht: true, tekst: `${zwaar[0].kleur[0]} naast ${helder[0].kleur[0]}: twee kleuren die allebei de aandacht pakken.` });
+
+  const gezicht = boven || heel;
+  if (gezicht && /grijs|antraciet/.test(gezicht.kleur[0] || '') && !/gebreid|pluizig/.test(gezicht.textuur))
+    tips.push('Grijs vlak bij je gezicht maakt je fletser; een sjaaltje in roze of lichtblauw helpt.');
+  if (gezicht && gezicht.hals && /col|hoog|gesloten/i.test(gezicht.hals)) tips.push('Een hoge hals is massief voor jou; open hem met een ketting of sjaal.');
+  if (boven && boven.pasvorm === 'wijd' && onder && onder.pasvorm !== 'wijd' && STOPBAAR.has(boven.soort)) tips.push('Oversized bewust stylen: half instoppen of mouwen oprollen.');
+  if (o.kleur.methode === 'colorblock') tips.push('Colorblocking mag; je rapport zoekt nu vooral balans.');
+  return { ok: !problemen.some(p => !p.zacht), problemen, tips };
+}
+
+// ── SCORE ────────────────────────────────────────────────────────────────────
+const METHODE_WAARDE = { split: 1.5, tonsurton: 1.2, accent: 1.2, analoog: 0.8, mono: 0.6, neutraal: 0.3, colorblock: -0.5, mix: -3 };
+
+export function score(o, ctx) {
+  let s = 10;
+  const kleding = o.items.filter(i => ROLLEN_KLEDING.includes(i.rol));
+  s += METHODE_WAARDE[o.kleur.methode] || 0;
+  if (!o.check.ok) s -= 20;
+  s -= o.check.problemen.filter(p => p.zacht).length * 3;
+
+  // soepel + stevig
+  const tex = new Set(kleding.map(i => i.textuur));
+  if (tex.size >= 2) s += 1;
+  const soepel = kleding.some(i => ['glad', 'glans', 'fijn gebreid', 'kant', 'linnen'].includes(i.textuur));
+  const stevig = kleding.some(i => ['denim', 'structuur', 'leer', 'suède', 'grof gebreid'].includes(i.textuur));
+  if (soepel && stevig) s += 1;
+
+  // kleuren bij je gezicht en uit je palet
+  const gezicht = o.slots.boven || o.slots.heel;
+  if (gezicht && ctx.rapport.kleur.gezicht.includes(gezicht.kleur[0])) s += 0.8;
+  for (const i of kleding) if (ctx.rapport.kleur.accent.includes(i.kleur[0])) s += 0.3;
+  // tas in een neutrale basis als er al kleur is; een statement-tas bij rust
+  const tas = o.slots.tas;
+  if (tas) {
+    const tk = info(tas.kleur[0]);
+    if (o.kleur.methode === 'neutraal' && !tk.neutraal) s += 0.8;
+    else if (tk.neutraal) s += 0.4;
+  }
+
+  // schoen past bij het niveau van de rest
+  const gem = kleding.reduce((t, i) => t + i.formeel, 0) / Math.max(1, kleding.length);
+  if (o.slots.schoen) s -= Math.abs(o.slots.schoen.formeel - gem) * 0.4;
+
+  // sfeer
+  const sf = ctx.sfeer && SFEREN[ctx.sfeer];
+  if (sf) {
+    for (const i of o.items) {
+      s += (sf.soort[i.soort] || 0) * 0.6;
+      s += ((sf.textuur || {})[i.textuur] || 0) * 0.5;
+      if (i.print) s += ((sf.print || {})[i.print] || 0) * 0.5;
+    }
+    s += (sf.methode[o.kleur.methode] || 0);
+  }
+  // comfy ←→ sjiek
+  if (ctx.sjiek != null) {
+    const doel = 1.5 + 3 * ctx.sjiek;
+    s -= Math.abs(gem - doel) * 1.2;
+    const comfort = o.items.reduce((t, i) => t + i.comfort, 0) / o.items.length;
+    s += (1 - ctx.sjiek) * (comfort - 3) * 0.5;
+  }
+
+  // weer: genoeg warmte
+  const k = ctx.weer;
+  const warmte = kleding.reduce((t, i) => t + i.warmte, 0);
+  if (k === 'koud') s += Math.min(warmte, 9) * 0.3 - (o.slots.jas ? 0 : 3);
+  if (k === 'fris') s += (o.slots.laag || o.slots.jas) ? 1 : -1;
+  if (k === 'warm') s -= Math.max(0, warmte - 4) * 0.8;
+
+  // wat zij eerder wegwisselde of juist koos
+  const geheugen = ctx.geheugen || {};
+  for (const i of o.items) {
+    const g = geheugen[i.id];
+    if (g) s += Math.min(g.gekozen || 0, 4) * 0.25 - Math.min(g.weg || 0, 6) * 0.5;
+  }
+  return Math.round(s * 10) / 10;
+}
+
+// ── OUTFIT BOUWEN ────────────────────────────────────────────────────────────
+export function maakOutfit(slots, ctx) {
+  const items = Object.values(slots).flat().filter(Boolean);
+  const kleding = items.filter(i => ROLLEN_KLEDING.includes(i.rol));
+  const extra = items.filter(i => !ROLLEN_KLEDING.includes(i.rol));
+  const o = { slots, items, kleur: herken(kleding, extra) };
+  o.check = controleer(o, ctx.rapport);
+  o.score = score(o, ctx);
+  return o;
+}
+
+const sleutel = o => o.items.map(i => i.id).sort().join('|');
+
+function pools(kast, ctx) {
+  const weer = ctx.weer || 'mild';
+  const uit = new Set(ctx.uitsluiten || []);
+  const anker = new Set(ctx.anker || []);
+  const ok = i => anker.has(i.id) || (!uit.has(i.id) && pastBijWeer(i, weer));
+  const p = { boven: [], onder: [], heel: [], laag: [], jas: [], schoen: [], tas: [], riem: [], sjaal: [] };
+  for (const i of kast) {
+    if (!ok(i)) continue;
+    if (i.rol === 'boven') p.boven.push(i);
+    else if (i.rol === 'onder') p.onder.push(i);
+    else if (i.rol === 'heel' && i.soort !== 'co-ord') p.heel.push(i);
+    else if (i.rol === 'heel') p.heel.push(i);
+    else if (i.rol === 'laag') { p.laag.push(i); if (['trui', 'blouse'].includes(i.soort)) p.boven.push(i); }
+    else if (i.rol === 'jas') p.jas.push(i);
+    else if (i.rol === 'schoen') p.schoen.push(i);
+    else if (i.rol === 'tas') p.tas.push(i);
+    else if (i.soort === 'riem') p.riem.push(i);
+    else if (i.soort === 'sjaal') p.sjaal.push(i);
+  }
+  return p;
+}
+
+// Past een outfit bij wat er gevraagd is (manier, kleur, wensen, anker)?
+function voldoet(o, ctx) {
+  if (ctx.methode && o.kleur.methode !== ctx.methode) return false;
+  if (ctx.kleur) {
+    // de hoofdkleur van een kledingstuk telt, niet de stippen op een blouse
+    const fam = info(ctx.kleur).fam;
+    if (!o.items.some(i => ROLLEN_KLEDING.includes(i.rol) && i.kleur[0] && (i.kleur[0] === ctx.kleur || info(i.kleur[0]).fam === fam))) return false;
+    if (o.kleur.familie && !String(o.kleur.familie).split('+').includes(fam)) return false;
+  }
+  for (const w of ctx.wensen || []) if (WENSEN[w] && !WENSEN[w].test(o)) return false;
+  for (const a of ctx.anker || []) if (!o.items.some(i => i.id === a)) return false;
+  return true;
+}
+
+function besteVan(lijst, maak, max = 1) {
+  return lijst.map(maak).sort((a, b) => b.score - a.score).slice(0, max);
+}
+
+const harde = o => o.check.problemen.filter(p => !p.zacht);
+const nieuweFout = (oud, nieuw) => harde(nieuw).some(p => !harde(oud).some(q => q.regel === p.regel));
+// Een skelet met alleen een textuurprobleem kan nog goed komen met een laag.
+const herstelbaar = o => harde(o).every(p => p.regel === 'textuur');
+
+// Het skelet (boven+onder of één geheel) aankleden met schoen, laag, jas, tas.
+// Een aanvulling mag de gekozen kleurmanier niet breken: een gekleurd vest
+// over een monochrome look maakt er iets anders van. `gebruikt` telt wat al
+// in eerdere voorstellen zit, zodat niet elke outfit dezelfde laarsjes krijgt.
+function kleedAan(basis, p, ctx, gebruikt = new Map()) {
+  const ankerIn = rol => (ctx.anker || []).map(id => ctx.perId[id]).filter(i => i && slotVan(i) === rol);
+  let o = maakOutfit(basis, ctx);
+  const past = n => !ctx.methode || n.kleur.methode === ctx.methode;
+  const probeer = (rol, kandidaten, verplicht) => {
+    const vast = ankerIn(rol);
+    if (vast.length) { o = maakOutfit({ ...o.slots, [rol]: vast[0] }, ctx); return; }
+    let beste = null, besteW = -Infinity, nood = null, noodW = -Infinity;
+    for (const k of kandidaten) {
+      if (o.items.some(i => i.id === k.id)) continue;
+      const n = maakOutfit({ ...o.slots, [rol]: k }, ctx);
+      // Alleen afwijzen als dít stuk een nieuwe fout maakt. Satijn op satijn
+      // heeft nog één textuur; dat lost een gebreid vest straks op, dus de
+      // schoenen daarvoor afkeuren is te vroeg.
+      if (nieuweFout(o, n)) continue;
+      const w = n.score - (gebruikt.get(k.id) || 0) * 1.2;
+      if (past(n) && w > besteW) { beste = n; besteW = w; }
+      if (w > noodW) { nood = n; noodW = w; }
+    }
+    if (verplicht) { o = beste || nood || o; return; }
+    if (beste && (besteW > o.score || !past(o))) o = beste;
+  };
+  probeer('schoen', p.schoen, true);
+  const wilLaag = (ctx.wensen || []).includes('laag');
+  // bij fris of koud weer moet een laag ook echt warmte geven
+  const lagen = ctx.weer === 'koud' || ctx.weer === 'fris' ? p.laag.filter(i => i.warmte >= 2) : p.laag;
+  if (ctx.weer !== 'warm') probeer('laag', lagen, wilLaag && !p.jas.length);
+  // onder de 16 graden ga je met een jas de deur uit
+  if (ctx.weer === 'koud' || ctx.weer === 'fris' || (wilLaag && !o.slots.laag)) probeer('jas', p.jas, ctx.weer === 'koud' || ctx.weer === 'fris' || (wilLaag && !o.slots.laag));
+  probeer('tas', p.tas, false);
+  if (o.slots.boven && o.slots.boven.pasvorm === 'wijd' && o.slots.onder && o.slots.onder.pasvorm === 'wijd') probeer('riem', p.riem, false);
+  else if (ctx.weer === 'koud' || ctx.weer === 'fris') probeer('sjaal', p.sjaal, false);
+  // Geen jas die erbij past terwijl het fris is: dan is dit geen outfit.
+  if ((ctx.weer === 'koud' || ctx.weer === 'fris') && p.jas.length && !o.slots.jas)
+    o = { ...o, check: { ...o.check, ok: false, problemen: o.check.problemen.concat({ regel: 'weer', tekst: 'Geen jas die erbij past.' }) } };
+  return o;
+}
+
+export function slotVan(i) {
+  if (i.rol === 'accessoire') return i.soort === 'riem' ? 'riem' : 'sjaal';
+  return i.rol;
+}
+
+// Drie (of meer) voorstellen. Zonder gekozen manier zo verschillend mogelijk:
+// elk voorstel een andere kleurmanier, zodat je ziet wat er kan.
+export function stelVoor(kast, ctx, aantal = 3) {
+  ctx = { ...ctx, perId: Object.fromEntries(kast.map(i => [i.id, i])) };
+  const p = pools(kast, ctx);
+  const anker = (ctx.anker || []).map(id => ctx.perId[id]).filter(Boolean);
+  const vast = r => anker.find(i => slotVan(i) === r || (r === 'boven' && i.rol === 'laag' && ['trui', 'blouse'].includes(i.soort) && !anker.some(a => a.rol === 'boven')));
+
+  const skeletten = [];
+  const vb = vast('boven'), vo = vast('onder'), vh = vast('heel');
+  if (!vh) {
+    for (const b of vb ? [vb] : p.boven) for (const on of vo ? [vo] : p.onder) skeletten.push({ boven: b, onder: on });
+  }
+  if (!vb && !vo) for (const h of vh ? [vh] : p.heel) skeletten.push({ heel: h });
+
+  // Eerst snel rangschikken op het skelet, dan de beste paar honderd volledig
+  // aankleden. Is er een manier gekozen, dan gaan skeletten die al in die
+  // manier zitten voor.
+  const voorrang = o => o.score + (ctx.methode && o.kleur.methode === ctx.methode ? 6 : 0);
+  const snel = skeletten.map(sk => maakOutfit(sk, ctx)).filter(herstelbaar)
+    .sort((a, b) => voorrang(b) - voorrang(a)).slice(0, 260);
+  const kandidaten = [];
+  for (const o of snel) {
+    const vol = kleedAan(o.slots, p, ctx);
+    if (vol.check.ok && voldoet(vol, ctx)) kandidaten.push(vol);
+  }
+  kandidaten.sort((a, b) => b.score - a.score);
+  const gekozen = kiesDivers(kandidaten, aantal, !ctx.methode, ctx.seed || 0);
+  // Opnieuw aankleden met wat al gebruikt is, voor variatie in schoenen en tassen.
+  const gebruikt = new Map();
+  return gekozen.map(o => {
+    const skelet = o.slots.heel ? { heel: o.slots.heel } : { boven: o.slots.boven, onder: o.slots.onder };
+    const n = kleedAan(skelet, p, ctx, gebruikt);
+    const uit = n.check.ok && voldoet(n, ctx) ? n : o;
+    for (const i of uit.items) if (!['boven', 'onder', 'heel'].includes(i.rol)) gebruikt.set(i.id, (gebruikt.get(i.id) || 0) + 1);
+    return uit;
+  });
+}
+
+function kiesDivers(lijst, aantal, verschillendeManieren, seed) {
+  const gekozen = [], gezien = new Set(), manieren = new Set();
+  const start = seed ? Math.min(seed * 2, Math.max(0, lijst.length - aantal * 3)) : 0;
+  const pool = lijst.slice(start).concat(lijst.slice(0, start));
+  const overlapt = o => gekozen.some(g => o.items.filter(i => ['boven', 'onder', 'heel'].includes(i.rol) && g.items.includes(i)).length >= 2
+    || (o.slots.heel && g.slots.heel === o.slots.heel));
+  for (const ronde of [0, 1, 2]) {
+    for (const o of pool) {
+      if (gekozen.length >= aantal) break;
+      const k = sleutel(o);
+      if (gezien.has(k)) continue;
+      if (ronde === 0 && verschillendeManieren && manieren.has(o.kleur.methode)) continue;
+      if (ronde < 2 && overlapt(o)) continue;
+      gekozen.push(o); gezien.add(k); manieren.add(o.kleur.methode);
+    }
+  }
+  return gekozen;
+}
+
+// Wat kan er op deze plek in plaats van dit stuk, zonder dat de outfit van
+// kleurmanier verandert of een rapportregel breekt?
+export function alternatieven(kast, outfit, rol, ctx, max = 12) {
+  ctx = { ...ctx, perId: Object.fromEntries(kast.map(i => [i.id, i])) };
+  const p = pools(kast, { ...ctx, anker: outfit.items.map(i => i.id) });
+  const lijst = rol === 'riem' || rol === 'sjaal' ? p[rol] : (p[rol] || []);
+  const huidig = outfit.slots[rol];
+  const zelfdeManier = outfit.kleur.methode;
+  const uit = [];
+  for (const k of lijst) {
+    if (huidig && k.id === huidig.id) continue;
+    if (outfit.items.some(i => i.id === k.id)) continue;
+    const n = maakOutfit({ ...outfit.slots, [rol]: k }, ctx);
+    if (!n.check.ok) continue;
+    uit.push({ item: k, outfit: n, zelfde: n.kleur.methode === zelfdeManier });
+  }
+  uit.sort((a, b) => (b.zelfde - a.zelfde) || (b.outfit.score - a.outfit.score));
+  return uit.slice(0, max);
+}
+
+// ── DE TAS ───────────────────────────────────────────────────────────────────
+// Eerst de koffer, dan de outfits eruit. De koffer wordt gekozen op hoeveel
+// goede, verschillende outfits hij oplevert: elk stuk moet zijn plek verdienen.
+
+export function momenten(dagen) {
+  const uit = [];
+  dagen.forEach((d, n) => {
+    for (const m of d.momenten) uit.push({ dag: d.naam || `Dag ${n + 1}`, moment: m, weer: weerKlasse(d.temp), reis: m === 'reis' });
+  });
+  return uit;
+}
+
+const FORMULE = n => ({
+  onder: n <= 3 ? 2 : n <= 6 ? 3 : 4,
+  boven: n <= 3 ? 3 : n <= 6 ? 4 : 6,
+  laag: n <= 3 ? 1 : 2,
+  schoen: n <= 4 ? 2 : 3,
+  tas: 1,
+});
+
+function alleOutfits(koffer, ctx) {
+  const p = pools(koffer, { ...ctx, weer: ctx.weer });
+  const uit = [];
+  const skeletten = [];
+  for (const b of p.boven) for (const on of p.onder) skeletten.push({ boven: b, onder: on });
+  for (const h of p.heel) skeletten.push({ heel: h });
+  for (const sk of skeletten) {
+    if (!herstelbaar(maakOutfit(sk, ctx))) continue;
+    const o = kleedAan(sk, p, { ...ctx, perId: {} });
+    if (o.check.ok) uit.push(o);
+  }
+  return uit.sort((a, b) => b.score - a.score);
+}
+
+// Een koffer beoordelen: aantal goede outfits (tot wat nodig is telt het
+// zwaarst), het aantal kleurmanieren, en de gemiddelde kwaliteit.
+function waardeer(koffer, ctx, nodig) {
+  const os = alleOutfits(koffer, ctx).filter(o => o.score > 8 && voldoet(o, { ...ctx, methode: null, kleur: null, anker: [] }));
+  const uniek = [];
+  for (const o of os) if (!uniek.some(u => u.items.filter(i => o.items.includes(i) && ['boven', 'onder', 'heel'].includes(i.rol)).length >= 2)) uniek.push(o);
+  const manieren = new Set(uniek.map(o => o.kleur.methode));
+  const kwaliteit = uniek.slice(0, nodig).reduce((t, o) => t + o.score, 0) / Math.max(1, Math.min(nodig, uniek.length));
+  const gebruikt = new Set(os.slice(0, nodig * 3).flatMap(o => o.items.map(i => i.id)));
+  const passagiers = koffer.filter(i => !gebruikt.has(i.id)).length;
+  return { waarde: Math.min(uniek.length, nodig) * 10 + Math.min(uniek.length, nodig * 2) + manieren.size * 2 + kwaliteit - passagiers * 3, os: uniek, manieren };
+}
+
+function rng(seed) {
+  let s = seed >>> 0 || 1;
+  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+}
+
+export function pakTas(kast, opties) {
+  const { dagen, rapport, sfeer = null, sjiek = null, moetMee = [], uitsluiten = [], seed = 1, geheugen = {} } = opties;
+  const mom = momenten(dagen);
+  const nodig = mom.length;
+  const koudste = mom.some(m => m.weer === 'koud') ? 'koud' : mom.some(m => m.weer === 'fris') ? 'fris' : mom.every(m => m.weer === 'warm') ? 'warm' : 'mild';
+  const ctx = { rapport, sfeer, sjiek, weer: koudste, geheugen, uitsluiten };
+  const perId = Object.fromEntries(kast.map(i => [i.id, i]));
+  const pool = kast.filter(i => !uitsluiten.includes(i.id) && (moetMee.includes(i.id) || pastBijWeer(i, koudste === 'koud' ? 'fris' : koudste)));
+  const formule = FORMULE(nodig);
+  const per = rol => pool.filter(i => i.rol === rol || (rol === 'boven' && i.rol === 'laag' && i.soort === 'trui'));
+  const vast = moetMee.map(id => perId[id]).filter(Boolean);
+  const r = rng(seed);
+
+  let beste = null;
+  // Een handvol vertrekpunten: elk een andere kleurbasis uit het rapport.
+  const bases = [['blauw', 'wit'], ['bruin', 'wit'], ['zwart', 'wit'], ['bruin', 'blauw'], ['blauw', 'grijs'], ['bruin', 'groen'], ['zwart', 'bruin']];
+  for (let poging = 0; poging < 10; poging++) {
+    const basis = bases[poging % bases.length];
+    let koffer = [...vast];
+    const telRol = rol => koffer.filter(i => i.rol === rol || (rol === 'boven' && i.rol === 'laag' && i.soort === 'trui' && koffer.indexOf(i) < 0)).length;
+    // vul op met stukken in de basis, en een paar accenten
+    const order = ['onder', 'boven', 'schoen', 'laag', 'tas'];
+    for (const rol of order) {
+      const kand = per(rol).filter(i => !koffer.includes(i))
+        .map(i => {
+          const fam = info(i.kleur[0]).fam;
+          const inBasis = basis.includes(fam) || info(i.kleur[0]).neutraal;
+          return { i, w: (inBasis ? 2 : 0.8) + r() * 1.5 + (rol === 'boven' && !info(i.kleur[0]).neutraal ? 0.6 : 0) };
+        })
+        .sort((a, b) => b.w - a.w).map(x => x.i);
+      while (koffer.filter(i => i.rol === rol).length < formule[rol] && kand.length) koffer.push(kand.shift());
+    }
+    if (koudste === 'koud' || koudste === 'fris') {
+      const jas = pool.filter(i => i.rol === 'jas' && !koffer.includes(i)).sort((a, b) => (basis.includes(info(b.kleur[0]).fam) - basis.includes(info(a.kleur[0]).fam)) || r() - 0.5)[0];
+      if (jas && !koffer.some(i => i.rol === 'jas')) koffer.push(jas);
+    }
+    let w = waardeer(koffer, ctx, nodig);
+    // Verbeteren: één stuk ruilen zolang het beter wordt.
+    for (let ronde = 0; ronde < 3; ronde++) {
+      let verbeterd = false;
+      for (const uit of koffer.filter(i => !vast.includes(i))) {
+        const kand = pool.filter(i => i.rol === uit.rol && !koffer.includes(i)).sort(() => r() - 0.5).slice(0, 6);
+        for (const in_ of kand) {
+          const nieuw = koffer.map(i => i === uit ? in_ : i);
+          const nw = waardeer(nieuw, ctx, nodig);
+          if (nw.waarde > w.waarde + 0.5) { koffer = nieuw; w = nw; verbeterd = true; break; }
+        }
+      }
+      if (!verbeterd) break;
+    }
+    if (!beste || w.waarde > beste.w.waarde) beste = { koffer, w };
+  }
+  return verdeel(beste.koffer, mom, { ...ctx, moetMee }, nodig, kast);
+}
+
+// Outfits uit de koffer aan dagen en momenten koppelen.
+function verdeel(koffer, mom, ctx, nodig, kast) {
+  const plan = [];
+  const gebruikt = new Set();
+  for (const m of mom) {
+    const mctx = { ...ctx, weer: m.weer, sjiek: m.moment === 'avond' ? Math.max(ctx.sjiek ?? 0.5, 0.75) : m.moment === 'actief' ? 0.1 : ctx.sjiek };
+    let os = alleOutfits(koffer, mctx);
+    if (m.reis) {
+      // reisoutfit: de zwaarste stukken aan, dan scheelt het in de koffer
+      os = os.map(o => ({ o, w: o.score + o.items.reduce((t, i) => t + i.warmte, 0) * 0.8 })).sort((a, b) => b.w - a.w).map(x => x.o);
+    }
+    // Liefst een kleurmanier die nog niet in de tas zit: zo zie je in één
+    // koffer wat ton-sur-ton, mono of een accent met jouw stukken doet.
+    const manieren = new Set(plan.filter(p => p.outfit).map(p => p.outfit.kleur.methode));
+    const vrij = o => !gebruikt.has(sleutel(o)) && !plan.some(p => p.outfit && p.outfit.items.filter(i => o.items.includes(i) && ['boven', 'onder', 'heel'].includes(i.rol)).length >= 2);
+    const top = os.filter(vrij).slice(0, 12);
+    const beste = top.map(o => ({ o, w: o.score + (manieren.has(o.kleur.methode) ? 0 : 2.5) - (o.kleur.methode === 'mix' ? 3 : 0) }))
+      .sort((a, b) => b.w - a.w)[0];
+    const keuze = (beste && beste.o) || os.find(o => !gebruikt.has(sleutel(o))) || null;
+    if (keuze) gebruikt.add(sleutel(keuze));
+    plan.push({ ...m, outfit: keuze });
+  }
+  const tel = new Map();
+  for (const p of plan) if (p.outfit) for (const i of p.outfit.items) tel.set(i.id, (tel.get(i.id) || 0) + 1);
+  // Wat in geen enkele outfit zit, gaat niet mee. Behalve wat zij zelf wilde.
+  koffer = koffer.filter(i => tel.get(i.id) || (ctx.moetMee || []).includes(i.id));
+  const alle = alleOutfits(koffer, ctx);
+  const perManier = {};
+  for (const o of alle) (perManier[o.kleur.methode] ||= []).push(o);
+  return {
+    koffer: koffer.map(i => ({ item: i, keer: tel.get(i.id) || 0 })).sort((a, b) => b.keer - a.keer),
+    plan,
+    extra: alle.filter(o => !gebruikt.has(sleutel(o))).slice(0, 24),
+    perManier: Object.fromEntries(Object.entries(perManier).map(([k, v]) => [k, v.length])),
+    ontbreekt: watOntbreekt(koffer, kast, ctx, perManier),
+  };
+}
+
+// Waarom lukt een kleurmanier niet met deze koffer, en welk stuk uit je kast
+// zou het wél mogelijk maken?
+function watOntbreekt(koffer, kast, ctx, perManier) {
+  const uit = [];
+  for (const m of ['mono', 'tonsurton', 'accent']) {
+    if (perManier[m] && perManier[m].length) continue;
+    let beste = null;
+    for (const kand of kast) {
+      if (koffer.includes(kand) || !['boven', 'onder', 'laag'].includes(kand.rol)) continue;
+      if (!pastBijWeer(kand, ctx.weer)) continue;
+      const n = alleOutfits(koffer.concat([kand]), ctx).filter(o => o.kleur.methode === m).length;
+      if (n && (!beste || n > beste.n)) beste = { item: kand, n };
+    }
+    uit.push({ methode: m, naam: METHODEN[m].naam, zet: beste });
+  }
+  return uit;
+}
+
+// "Meer hiervan": ruil één stuk zodat er meer outfits in deze manier passen.
+export function meerVan(kast, koffer, methode, opties) {
+  const { rapport, dagen } = opties;
+  const mom = momenten(dagen);
+  const koudste = mom.some(m => m.weer === 'koud') ? 'koud' : mom.some(m => m.weer === 'fris') ? 'fris' : 'mild';
+  const ctx = { rapport, weer: koudste, sfeer: opties.sfeer, sjiek: opties.sjiek };
+  const tel = k => alleOutfits(k, ctx).filter(o => o.kleur.methode === methode).length;
+  const nu = tel(koffer);
+  let beste = null;
+  for (const uit of koffer) {
+    for (const in_ of kast) {
+      if (koffer.includes(in_) || in_.rol !== uit.rol || !pastBijWeer(in_, koudste)) continue;
+      const nieuw = koffer.map(i => i === uit ? in_ : i);
+      const n = tel(nieuw);
+      if (n > nu && (!beste || n > beste.n)) beste = { uit, in: in_, n, nu };
+    }
+  }
+  return beste;
+}
