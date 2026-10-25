@@ -29,8 +29,47 @@ function maakDagen(start, n, oud = []) {
   });
 }
 
+// Wat je invult blijft bewaard (ook na opnieuw openen en op je andere
+// toestel), en de laatst uitgerekende tas ook.
+const BEWAAR = ['bestemming', 'start', 'dagen', 'moetMee', 'niet', 'thuis', 'sfeer', 'afwisselen', 'sjiek', 'schuif', 'afgevinkt', 'seed'];
+let geladen = false;
+function laadConcept(app) {
+  if (geladen) return;
+  geladen = true;
+  const c = app.staat().tasConcept;
+  if (!c) return;
+  for (const k of BEWAAR) if (c[k] !== undefined) tas[k] = c[k];
+  // Een bewaarde reis die al voorbij is, schuift op naar vandaag.
+  if (tas.start < vandaag()) { tas.start = vandaag(); tas.dagen = maakDagen(tas.start, tas.dagen.length, tas.dagen); vergeetWeer(); }
+  else if (c.plan) tas.uitkomst = vanPlan(app, c.plan);
+}
+function bewaarConcept(app) {
+  const c = Object.fromEntries(BEWAAR.map(k => [k, tas[k]]));
+  if (tas.uitkomst) c.plan = planIds(tas.uitkomst.plan);
+  const oud = app.staat().tasConcept;
+  if (JSON.stringify(oud) !== JSON.stringify(c)) app.bij(s => { s.tasConcept = c; });
+}
+const planIds = plan => plan.map(p => ({ dag: p.dag, moment: p.moment, weer: p.weer, sfeer: p.sfeer || null, doen: p.doen || null,
+  activiteit: p.activiteit || null, items: p.outfit ? p.outfit.items.map(i => i.id) : [] }));
+function vanPlan(app, planLijst) {
+  const ctx = { rapport: app.data.rapport, geheugen: app.staat().geheugen };
+  const plan = planLijst.map(p => ({ ...p, outfit: p.items.length ? vanIds(app, p.items, { ...ctx, weer: p.weer }) : null }));
+  const ids = [...new Set(planLijst.flatMap(p => p.items))];
+  return { plan, koffer: ids.map(i => ({ item: app.item(i), keer: 0 })).filter(x => x.item), extra: [], perManier: tel(plan), ontbreekt: [] };
+}
+// Andere dagen of dagdelen: de uitgerekende tas hoort daar niet meer bij.
+let melding_ = '';
+function verouderd() { if (tas.uitkomst) { tas.uitkomst = null; melding_ = 'Je reis is veranderd. Tik opnieuw op "Pak mijn tas".'; } }
+
+// Nieuwe datum: voorspelde graden horen bij de oude dagen. Wat je zelf invulde blijft.
+function vergeetWeer() {
+  for (const d of tas.dagen) if (d.tempBron !== 'zelf') { d.temp = null; d.tempBron = null; }
+}
+
 export default function tasTab(el, app) {
+  laadConcept(app);
   if (!tas.dagen) tas.dagen = maakDagen(tas.start, 3);
+  bewaarConcept(app);
   const opgeslagen = app.staat().tassen || [];
   el.innerHTML = `
     <h1>Tas</h1>
@@ -63,15 +102,19 @@ export default function tasTab(el, app) {
     ${tas.sfeer.length > 1 ? `<div class="chips"><button class="chip${!tas.afwisselen ? ' aan' : ''}" data-afw="0" type="button">Mengen in elke outfit</button><button class="chip${tas.afwisselen ? ' aan' : ''}" data-afw="1" type="button">Per moment afwisselen</button></div>` : ''}
     <div class="schuif"><span>comfy</span><input type="range" min="0" max="1" step="0.25" value="${tas.sjiek}" id="sjiek"><span>sjiek</span></div>
     <button class="knop vol" id="pak" type="button" style="margin-top:14px">Pak mijn tas</button>
-    <div id="uitkomst" style="margin-top:18px"></div>
+    <div id="uitkomst" style="margin-top:18px">${melding_ && !tas.uitkomst ? `<p class="klein">${esc(melding_)}</p>` : ''}</div>
     ${opgeslagen.length ? `<h3>Bewaarde tassen</h3>${opgeslagen.slice().reverse().map(t => `<button class="chip" data-tas="${esc(t.id)}" type="button">${esc(t.naam)} · ${esc(t.datum)}</button>`).join(' ')}` : ''}`;
 
   // Bestemming en datum ingevuld: het weer komt vanzelf.
   let wacht;
   $('#best').addEventListener('input', e => { tas.bestemming = e.target.value; clearTimeout(wacht); wacht = setTimeout(() => haalWeer(el, app, true), 900); });
   $('#best').addEventListener('change', () => { clearTimeout(wacht); haalWeer(el, app, true); });
-  $('#start').addEventListener('change', e => { tas.start = e.target.value; tas.dagen = maakDagen(tas.start, tas.dagen.length, tas.dagen); tasTab(el, app); haalWeer(el, app, true); });
-  $('#aantal').addEventListener('change', e => { tas.dagen = maakDagen(tas.start, +e.target.value, tas.dagen); tasTab(el, app); haalWeer(el, app, true); });
+  $('#start').addEventListener('change', e => {
+    if (!e.target.value) return;
+    tas.start = e.target.value; tas.dagen = maakDagen(tas.start, tas.dagen.length, tas.dagen); vergeetWeer(); verouderd();
+    tasTab(el, app); haalWeer(el, app, true);
+  });
+  $('#aantal').addEventListener('change', e => { tas.dagen = maakDagen(tas.start, +e.target.value, tas.dagen); verouderd(); tasTab(el, app); haalWeer(el, app, true); });
   $$('[data-temp]', el).forEach(i => i.addEventListener('change', () => {
     const d = tas.dagen[+i.dataset.temp];
     d.temp = i.value === '' ? null : +i.value; d.tempBron = i.value === '' ? null : 'zelf';
@@ -79,7 +122,7 @@ export default function tasTab(el, app) {
   tas.dagen.forEach((d, n) => $$(`[data-chips="m${n}"] .chip`, el).forEach(b => b.addEventListener('click', () => {
     d.momenten = d.momenten.includes(b.dataset.w) ? d.momenten.filter(m => m !== b.dataset.w) : d.momenten.concat(b.dataset.w);
     d.momenten.sort((a, c) => MOMENTEN.findIndex(x => x[0] === a) - MOMENTEN.findIndex(x => x[0] === c));
-    tasTab(el, app);
+    verouderd(); tasTab(el, app);
   })));
   $$('[data-doen]', el).forEach(sel => sel.addEventListener('change', () => {
     const [n, m] = sel.dataset.doen.split('|'); const d = tas.dagen[+n];
@@ -181,6 +224,7 @@ function reken(el, app) {
   setTimeout(() => {
     tas.uitkomst = pakTas(app.kast(), opties(app));
     tas.afgevinkt = [];
+    bewaarConcept(app);
     toonUitkomst(el, app);
     plek.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 40);
@@ -233,6 +277,7 @@ function toonUitkomst(el, app) {
   $$('[data-f]', plek).forEach(b => b.addEventListener('click', () => { tas.filter = tas.filter === b.dataset.f ? null : b.dataset.f; toonUitkomst(el, app); }));
   $$('[data-v]', plek).forEach(c => c.addEventListener('change', () => {
     tas.afgevinkt = c.checked ? tas.afgevinkt.concat(c.dataset.v) : tas.afgevinkt.filter(x => x !== c.dataset.v);
+    bewaarConcept(app);
   }));
   $$('[data-zet]', plek).forEach(a => a.addEventListener('click', e => {
     e.preventDefault(); tas.moetMee.push(a.dataset.zet); reken(el, app);
@@ -240,7 +285,7 @@ function toonUitkomst(el, app) {
   $$('[data-p]', plek).forEach(kaart => kaart.addEventListener('click', e => {
     const st = e.target.closest('[data-slot]'); if (!st) return;
     const p = u.plan[+kaart.dataset.p];
-    wissel(app, p.outfit, st.dataset.slot, nieuw => { p.outfit = nieuw; toonUitkomst(el, app); },
+    wissel(app, p.outfit, st.dataset.slot, nieuw => { p.outfit = nieuw; bewaarConcept(app); toonUitkomst(el, app); },
       { rapport: app.data.rapport, weer: p.weer, geheugen: app.staat().geheugen });
   }));
   const mv = $('#meer-van');
@@ -260,7 +305,7 @@ function toonUitkomst(el, app) {
     const naam = tas.bestemming || 'Weekendtas';
     app.bij(s => s.tassen.push({
       id: 't-' + Date.now().toString(36), naam, datum: tas.start, dagen: tas.dagen,
-      plan: u.plan.map(p => ({ dag: p.dag, moment: p.moment, weer: p.weer, sfeer: p.sfeer || null, doen: p.doen || null, items: p.outfit ? p.outfit.items.map(i => i.id) : [] })),
+      plan: planIds(u.plan),
     }));
     melding('Tas bewaard');
   });
@@ -279,11 +324,8 @@ function toonUitkomst(el, app) {
 function openBewaard(el, app, id) {
   const t = app.staat().tassen.find(x => x.id === id);
   if (!t) return;
-  const ctx = { rapport: app.data.rapport, geheugen: app.staat().geheugen };
   tas.bestemming = t.naam; tas.start = t.datum; tas.dagen = t.dagen;
-  const plan = t.plan.map(p => ({ ...p, outfit: p.items.length ? vanIds(app, p.items, { ...ctx, weer: p.weer }) : null }));
-  const ids = [...new Set(t.plan.flatMap(p => p.items))];
-  tas.uitkomst = { plan, koffer: ids.map(i => ({ item: app.item(i), keer: 0 })).filter(x => x.item), extra: [], perManier: tel(plan), ontbreekt: [] };
+  tas.uitkomst = vanPlan(app, t.plan);
   tasTab(el, app);
 }
 const tel = plan => plan.reduce((t, p) => { if (p.outfit) t[p.outfit.kleur.methode] = (t[p.outfit.kleur.methode] || 0) + 1; return t; }, {});

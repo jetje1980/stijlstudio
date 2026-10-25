@@ -1,0 +1,65 @@
+// Blijft de tas staan na opnieuw openen, en beweegt de datum goed mee?
+// node tests/tas-onthoud.test.cjs
+const http = require('http'), fs = require('fs'), path = require('path');
+const root = path.resolve(__dirname, '..');
+const typen = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg' };
+const server = http.createServer((q, r) => {
+  const f = path.join(root, decodeURIComponent(q.url.split('?')[0]).replace(/\/$/, '/index.html'));
+  fs.readFile(f, (e, d) => { if (e) { r.writeHead(404); r.end(); } else { r.writeHead(200, { 'content-type': typen[path.extname(f)] || 'application/octet-stream' }); r.end(d); } });
+}).listen(8767, '127.0.0.1');
+const { chromium } = require('playwright');
+let fout = 0;
+const ok = (c, t) => { console.log((c ? '✓ ' : '✗ ') + t); if (!c) fout++; };
+const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
+
+(async () => {
+  const b = await chromium.launch();
+  const p = await b.newPage();
+  const errs = []; p.on('pageerror', e => errs.push(e.message));
+  await p.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
+  const url = 'http://127.0.0.1:8767/#tas';
+  await p.goto(url); await p.waitForSelector('#pak');
+
+  await p.fill('#best', 'Terschelling');
+  await p.fill('#start', plus(5)); await p.dispatchEvent('#start', 'change'); await p.waitForTimeout(200);
+  await p.selectOption('#aantal', '4'); await p.waitForTimeout(200);
+  await p.fill('[data-temp="0"]', '9'); await p.dispatchEvent('[data-temp="0"]', 'change');
+  await p.selectOption('[data-doen="1|avond"]', 'pizzeria'); await p.waitForTimeout(150);
+  await p.click('[data-chips="niet"] .chip[data-w="rok"]');
+  await p.click('#kies-mm'); await p.click('.blad .tegel'); await p.waitForTimeout(300);
+  await p.click('#kies-thuis'); await p.click('.blad .tegel:nth-child(5)'); await p.waitForTimeout(300);
+  const mm = await p.$$eval('[data-mm]', x => x.map(y => y.textContent));
+  const th = await p.$$eval('[data-th]', x => x.map(y => y.textContent));
+  await p.click('#pak'); await p.waitForSelector('.paklijst li', { timeout: 20000 });
+  const plan1 = await p.$$eval('[data-p] .stuk span', x => x.map(y => y.textContent).join('|'));
+  await p.waitForTimeout(300);
+
+  // opnieuw openen
+  await p.goto('about:blank'); await p.goto(url); await p.waitForSelector('#pak');
+  ok(await p.inputValue('#best') === 'Terschelling', 'bestemming blijft staan');
+  ok(await p.inputValue('#start') === plus(5), 'datum blijft staan');
+  ok(await p.$$eval('.dag', x => x.length) === 4, 'aantal dagen blijft staan');
+  ok(await p.inputValue('[data-temp="0"]') === '9', 'zelf ingevulde graden blijven staan');
+  ok(await p.inputValue('[data-doen="1|avond"]') === 'pizzeria', 'wat je doet blijft staan');
+  ok(await p.$eval('[data-chips="niet"] .chip[data-w="rok"]', x => x.classList.contains('aan')), 'geen rokken blijft aan');
+  ok(JSON.stringify(await p.$$eval('[data-mm]', x => x.map(y => y.textContent))) === JSON.stringify(mm) && mm.length === 1, 'moet mee blijft staan');
+  ok(JSON.stringify(await p.$$eval('[data-th]', x => x.map(y => y.textContent))) === JSON.stringify(th) && th.length === 1, 'blijft thuis blijft staan');
+  ok(await p.$$eval('[data-p] .stuk span', x => x.map(y => y.textContent).join('|')) === plan1, 'uitgerekende tas blijft staan');
+
+  // datum verschuiven: dagnamen en data bewegen mee, voorspelde graden niet
+  const naam1 = await p.$eval('.dag b', x => x.textContent);
+  await p.evaluate(() => { });
+  await p.fill('#start', plus(6)); await p.dispatchEvent('#start', 'change'); await p.waitForTimeout(200);
+  const naam2 = await p.$eval('.dag b', x => x.textContent);
+  ok(naam1 !== naam2, 'dag schuift mee met de datum (' + naam1 + ' → ' + naam2 + ')');
+  ok(await p.inputValue('[data-temp="0"]') === '9', 'zelf ingevuld blijft ook na datumwissel');
+  ok(await p.inputValue('[data-doen="1|avond"]') === 'pizzeria', 'activiteit blijft bij dag 2');
+  ok(!(await p.$('.paklijst')) && /opnieuw/.test(await p.$eval('#uitkomst', x => x.textContent)), 'oude tas verdwijnt na een andere datum');
+
+  // een reis in het verleden schuift op naar vandaag
+  await p.evaluate(() => { const s = JSON.parse(localStorage.getItem('stijlstudio-v2')); s.tasConcept.start = '2020-01-01'; localStorage.setItem('stijlstudio-v2', JSON.stringify(s)); });
+  await p.goto('about:blank'); await p.goto(url); await p.waitForSelector('#pak');
+  ok(await p.inputValue('#start') === plus(0), 'datum in het verleden wordt vandaag');
+  ok(!errs.length, 'geen fouten ' + errs.join(' '));
+  await b.close(); server.close(); process.exit(fout ? 1 : 0);
+})().catch(e => { console.error(e); server.close(); process.exit(1); });

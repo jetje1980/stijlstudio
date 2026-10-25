@@ -25,3 +25,4 @@ Taal in code, commentaar en UI: Nederlands, informeel (je/jij).
 ## Testen
 - `node tests/engine.test.mjs` — de motor op de echte kast.
 - `node tests/app.test.cjs` — de hele app in Chromium (Playwright), offline.
+- `node tests/tas-onthoud.test.cjs` — de tas blijft staan na opnieuw openen; datum schuift goed mee.
