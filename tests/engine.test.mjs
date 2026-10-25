@@ -67,5 +67,12 @@ ok(tas.koffer.filter(k => k.keer === 0).length <= 2, 'weinig passagiers');
 tas.ontbreekt.forEach(o => console.log('   ontbreekt', o.naam, o.zet ? '→ ' + o.zet.item.naam + ' (+' + o.zet.n + ')' : '-'));
 const mv = meerVan(kast, tas.koffer.map(k => k.item), 'tonsurton', { rapport, dagen });
 console.log('   meer tst:', mv ? mv.uit.naam + ' → ' + mv.in.naam + ' (' + mv.nu + '→' + mv.n + ')' : 'geen');
+// 9. meerdere sferen: mengen en afwisselen
+const meng = stelVoor(kast, { rapport, weer: 'fris', sfeer: ['cosy', 'street'] });
+ok(meng.length === 3, 'cosy + street geeft voorstellen');
+meng.forEach(o => console.log('   cosy×street |', naam(o)));
+const tas2 = pakTas(kast, { dagen, rapport, sfeer: ['cosy', 'street'], afwisselen: true });
+ok(tas2.plan.every(p => p.outfit) && new Set(tas2.plan.map(p => p.sfeer)).size === 2, 'afwisselen verdeelt beide sferen');
+tas2.plan.forEach(p => console.log('   ', p.dag, p.moment, p.sfeer, '|', p.outfit && naam(p.outfit)));
 console.log(goed, 'goed,', fout, 'fout,', Date.now() - t0, 'ms');
 process.exit(fout ? 1 : 0);

@@ -39,9 +39,26 @@ export const app = {
   ververs() { toon(); },
 };
 
+// Telefoons houden oude code een tijdje vast. index.html draagt een
+// versienummer (tools/versie.py); staat er online een nieuwere, dan laden we
+// die meteen in plaats van met de oude verder te werken.
+const VERSIE = (document.querySelector('meta[name="versie"]') || {}).content || '0';
+async function nieuwsteVersie() {
+  try {
+    const html = await (await fetch('./?nocache=' + Date.now(), { cache: 'no-store' })).text();
+    const online = (html.match(/<meta name="versie" content="([^"]+)"/) || [])[1];
+    const al = sessionStorage.getItem('versie-herladen');
+    if (online && online !== VERSIE && al !== online) {
+      sessionStorage.setItem('versie-herladen', online);
+      location.replace(location.pathname + '?v=' + online + location.hash);
+    }
+  } catch (e) { /* offline: verder met wat we hebben */ }
+}
+
 async function start() {
+  nieuwsteVersie();
   const [kast, rapport, kennis, outfits, rapportOutfits] = await Promise.all(
-    ['kast', 'rapport', 'kennis', 'outfits', 'rapport-outfits'].map(n => fetch(`data/${n}.json`).then(r => r.json())));
+    ['kast', 'rapport', 'kennis', 'outfits', 'rapport-outfits'].map(n => fetch(`data/${n}.json?v=${VERSIE}`).then(r => r.json())));
   app.data = { kast, rapport, kennis, rapportOutfits, startOutfits: outfits };
   zetHex(kennis.kleuren);
   zetRapport(rapport);

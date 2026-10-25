@@ -32,6 +32,8 @@ export const SFEREN = {
     methode: { analoog: 1, split: 1 } },
 };
 
+export const sfeerLijst = s => (Array.isArray(s) ? s : s ? [s] : []);
+
 // ── WENSEN ───────────────────────────────────────────────────────────────────
 // Een wens is een harde eis. Daarom staat er maar een handvol.
 export const WENSEN = {
@@ -139,15 +141,18 @@ export function score(o, ctx) {
   const gem = kleding.reduce((t, i) => t + i.formeel, 0) / Math.max(1, kleding.length);
   if (o.slots.schoen) s -= Math.abs(o.slots.schoen.formeel - gem) * 0.4;
 
-  // sfeer
-  const sf = ctx.sfeer && SFEREN[ctx.sfeer];
-  if (sf) {
+  // sfeer: één of meer. Meerdere worden gemengd (het gemiddelde van de
+  // recepten), zodat cosy + streetstyle iets geeft dat van allebei heeft.
+  const sferen = sfeerLijst(ctx.sfeer).map(k => SFEREN[k]).filter(Boolean);
+  for (const sf of sferen) {
+    let t = 0;
     for (const i of o.items) {
-      s += (sf.soort[i.soort] || 0) * 0.6;
-      s += ((sf.textuur || {})[i.textuur] || 0) * 0.5;
-      if (i.print) s += ((sf.print || {})[i.print] || 0) * 0.5;
+      t += (sf.soort[i.soort] || 0) * 0.6;
+      t += ((sf.textuur || {})[i.textuur] || 0) * 0.5;
+      if (i.print) t += ((sf.print || {})[i.print] || 0) * 0.5;
     }
-    s += (sf.methode[o.kleur.methode] || 0);
+    t += (sf.methode[o.kleur.methode] || 0);
+    s += t / sferen.length;
   }
   // comfy ←→ sjiek
   if (ctx.sjiek != null) {
@@ -409,11 +414,11 @@ function rng(seed) {
 }
 
 export function pakTas(kast, opties) {
-  const { dagen, rapport, sfeer = null, sjiek = null, moetMee = [], uitsluiten = [], seed = 1, geheugen = {} } = opties;
+  const { dagen, rapport, sfeer = null, sjiek = null, moetMee = [], uitsluiten = [], seed = 1, geheugen = {}, afwisselen = false } = opties;
   const mom = momenten(dagen);
   const nodig = mom.length;
   const koudste = mom.some(m => m.weer === 'koud') ? 'koud' : mom.some(m => m.weer === 'fris') ? 'fris' : mom.every(m => m.weer === 'warm') ? 'warm' : 'mild';
-  const ctx = { rapport, sfeer, sjiek, weer: koudste, geheugen, uitsluiten };
+  const ctx = { rapport, sfeer, sjiek, weer: koudste, geheugen, uitsluiten, afwisselen };
   const perId = Object.fromEntries(kast.map(i => [i.id, i]));
   const pool = kast.filter(i => !uitsluiten.includes(i.id) && (moetMee.includes(i.id) || pastBijWeer(i, koudste === 'koud' ? 'fris' : koudste)));
   const formule = FORMULE(nodig);
@@ -467,8 +472,12 @@ export function pakTas(kast, opties) {
 function verdeel(koffer, mom, ctx, nodig, kast) {
   const plan = [];
   const gebruikt = new Set();
-  for (const m of mom) {
-    const mctx = { ...ctx, weer: m.weer, sjiek: m.moment === 'avond' ? Math.max(ctx.sjiek ?? 0.5, 0.75) : m.moment === 'actief' ? 0.1 : ctx.sjiek };
+  // Afwisselen: elk moment krijgt om de beurt één van de gekozen sferen. De
+  // koffer is wel samen gekozen, dus stukken komen in beide terug.
+  const sferen = sfeerLijst(ctx.sfeer);
+  for (const [n, m] of mom.entries()) {
+    if (ctx.afwisselen && sferen.length > 1) m.sfeer = sferen[n % sferen.length];
+    const mctx = { ...ctx, sfeer: m.sfeer || ctx.sfeer, weer: m.weer, sjiek: m.moment === 'avond' ? Math.max(ctx.sjiek ?? 0.5, 0.75) : m.moment === 'actief' ? 0.1 : ctx.sjiek };
     let os = alleOutfits(koffer, mctx);
     if (m.reis) {
       // reisoutfit: de zwaarste stukken aan, dan scheelt het in de koffer

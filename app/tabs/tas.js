@@ -12,7 +12,7 @@ const DAGNAMEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrij
 
 const vandaag = () => new Date().toISOString().slice(0, 10);
 const tas = {
-  bestemming: '', start: vandaag(), dagen: null, moetMee: [], sfeer: null, sjiek: 0.5, schuif: false,
+  bestemming: '', start: vandaag(), dagen: null, moetMee: [], sfeer: [], afwisselen: false, sjiek: 0.5, schuif: false,
   seed: 1, uitkomst: null, filter: null, afgevinkt: [], ruil: null,
 };
 
@@ -49,8 +49,9 @@ export default function tasTab(el, app) {
     <label class="lab">Moet mee</label>
     <div class="rij">${tas.moetMee.map(id => app.item(id)).filter(Boolean).map(i => `<button class="chip aan" data-mm="${esc(i.id)}" type="button">${esc(i.naam)} ×</button>`).join('')}
       <button class="chip" id="kies-mm" type="button">＋ stuk</button></div>
-    <label class="lab">Sfeer (mag leeg)</label>
-    ${chips('sfeer', [['', 'Geen voorkeur']].concat(Object.entries(SFEREN).map(([k, v]) => [k, v.naam])), tas.sfeer || '')}
+    <label class="lab">Sfeer (mag leeg, meer mag ook)</label>
+    ${chips('sfeer', Object.entries(SFEREN).map(([k, v]) => [k, v.naam]), tas.sfeer, { meer: true })}
+    ${tas.sfeer.length > 1 ? `<div class="chips"><button class="chip${!tas.afwisselen ? ' aan' : ''}" data-afw="0" type="button">Mengen in elke outfit</button><button class="chip${tas.afwisselen ? ' aan' : ''}" data-afw="1" type="button">Per moment afwisselen</button></div>` : ''}
     <div class="schuif"><span>comfy</span><input type="range" min="0" max="1" step="0.25" value="${tas.sjiek}" id="sjiek"><span>sjiek</span></div>
     <button class="knop vol" id="pak" type="button" style="margin-top:14px">Pak mijn tas</button>
     <div id="uitkomst" style="margin-top:18px"></div>
@@ -64,7 +65,10 @@ export default function tasTab(el, app) {
     d.momenten = d.momenten.includes(b.dataset.w) ? d.momenten.filter(m => m !== b.dataset.w) : d.momenten.concat(b.dataset.w);
     b.classList.toggle('aan');
   })));
-  $$('[data-chips="sfeer"] .chip', el).forEach(b => b.addEventListener('click', () => { tas.sfeer = b.dataset.w || null; tasTab(el, app); }));
+  $$('[data-chips="sfeer"] .chip', el).forEach(b => b.addEventListener('click', () => {
+    const w = b.dataset.w; tas.sfeer = tas.sfeer.includes(w) ? tas.sfeer.filter(x => x !== w) : tas.sfeer.concat(w); tasTab(el, app);
+  }));
+  $$('[data-afw]', el).forEach(b => b.addEventListener('click', () => { tas.afwisselen = b.dataset.afw === '1'; tasTab(el, app); }));
   $('#sjiek').addEventListener('change', e => { tas.sjiek = +e.target.value; tas.schuif = true; });
   $$('[data-mm]', el).forEach(b => b.addEventListener('click', () => { tas.moetMee = tas.moetMee.filter(x => x !== b.dataset.mm); tasTab(el, app); }));
   $('#kies-mm').addEventListener('click', () => kiesStuk(app, id => { if (!tas.moetMee.includes(id)) tas.moetMee.push(id); tasTab(el, app); }));
@@ -94,7 +98,7 @@ async function haalWeer(el, app) {
 function opties(app) {
   return {
     dagen: tas.dagen.filter(d => d.momenten.length).map(d => ({ ...d, temp: d.temp ?? 15 })),
-    rapport: app.data.rapport, sfeer: tas.sfeer, sjiek: tas.schuif ? tas.sjiek : null,
+    rapport: app.data.rapport, sfeer: tas.sfeer, afwisselen: tas.afwisselen, sjiek: tas.schuif ? tas.sjiek : null,
     moetMee: tas.moetMee, seed: tas.seed, geheugen: app.staat().geheugen,
   };
 }
@@ -142,7 +146,7 @@ function toonUitkomst(el, app) {
 
     <h3>Per dag</h3>
     ${u.plan.map((p, i) => `<div class="kaart" data-p="${i}">
-      <div class="moment-kop"><h4>${esc(p.dag)} · ${esc(MOMENTEN.find(m => m[0] === p.moment)?.[1] || p.moment)}</h4><span class="klein">${esc(p.weer)}</span></div>
+      <div class="moment-kop"><h4>${esc(p.dag)} · ${esc(MOMENTEN.find(m => m[0] === p.moment)?.[1] || p.moment)}</h4><span class="klein">${esc([p.sfeer && SFEREN[p.sfeer].naam, p.weer].filter(Boolean).join(' · '))}</span></div>
       ${p.outfit ? outfitHtml(p.outfit) : '<p class="klein">Hier vond ik niets passends.</p>'}</div>`).join('')}
 
     <h3>Paklijst</h3>
@@ -185,7 +189,7 @@ function toonUitkomst(el, app) {
     const naam = tas.bestemming || 'Weekendtas';
     app.bij(s => s.tassen.push({
       id: 't-' + Date.now().toString(36), naam, datum: tas.start, dagen: tas.dagen,
-      plan: u.plan.map(p => ({ dag: p.dag, moment: p.moment, weer: p.weer, items: p.outfit ? p.outfit.items.map(i => i.id) : [] })),
+      plan: u.plan.map(p => ({ dag: p.dag, moment: p.moment, weer: p.weer, sfeer: p.sfeer || null, items: p.outfit ? p.outfit.items.map(i => i.id) : [] })),
     }));
     melding('Tas bewaard');
   });
