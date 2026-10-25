@@ -198,3 +198,6 @@ label.lab { display: block; font-size: 12px; letter-spacing: .1em; text-transfor
 .doen { display: grid; grid-template-columns: 64px 1fr; gap: 4px 8px; align-items: center; margin-top: 6px; }
 .doen .veld { padding: 7px 10px; font-size: 14px; }
 .doen input.veld, .doen > .klein:last-child { grid-column: 2; }
+
+.pak-weg { border: 0; background: none; color: var(--zacht); font-size: 20px; line-height: 1; padding: 4px 6px; margin-left: 2px; }
+.paklijst input:checked ~ span { text-decoration: line-through; color: var(--zacht); }

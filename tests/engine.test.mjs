@@ -107,5 +107,9 @@ ok(zomer.ookMee.some(x => x.item.rol === 'zwem'), 'stranddag bij 28 graden: zwem
 ok(!zomer.plan.some(p => (p.reis || p.moment === 'avond') && p.outfit.slots.schoen && /slipper|flipflop|haivanas/i.test(p.outfit.slots.schoen.naam)), 'niet op teenslippers reizen of uitgaan');
 const parijs = pakTas(kast, { rapport, dagen: [{ naam: 'Za', temp: 18, momenten: ['dag'], doen: { dag: 'museum' } }] });
 ok(!parijs.plan[0].outfit.items.some(i => i.open), 'bij 18 graden dichte schoenen');
+// 12. geen twee dikke lagen
+const dik = o => { const b = o.slots.boven || o.slots.heel, l = o.slots.laag; return b && l && ((b.soort === 'trui' && ['vest', 'teddy'].includes(l.soort)) || (b.warmte >= 3 && l.warmte >= 3 && !['gilet', 'blazer'].includes(l.soort))); };
+const alleKoud = [koudW, tas, tas2, tas3].flatMap(t => t.plan.map(p => p.outfit).filter(Boolean)).concat(stelVoor(kast, { rapport, weer: 'koud', sfeer: ['cosy'] }, 20));
+ok(!alleKoud.some(dik), 'geen dikke trui met gebreid vest erover (' + alleKoud.length + ' outfits bekeken)');
 console.log(goed, 'goed,', fout, 'fout,', Date.now() - t0, 'ms');
 process.exit(fout ? 1 : 0);

@@ -120,6 +120,13 @@ export function controleer(o, rapport) {
   const DIKTE = { topje: 1, sporttop: 1, 't-shirt': 1, top: 1.5, longsleeve: 2, blouse: 2, trui: 3, vest: 3.5, gilet: 3.5, blazer: 4, teddy: 5 };
   if (laag && (boven || heel) && (DIKTE[laag.soort] || 3) <= (DIKTE[(boven || heel).soort] || 1.5))
     problemen.push({ regel: 'laagjes', tekst: `${laag.soort} over ${(boven || heel).soort} draagt niet.` });
+  // Twee dikke lagen op elkaar wordt te veel: over een trui alleen een gilet,
+  // blazer of jas, geen gebreid vest of teddy.
+  const onder_ = boven || heel;
+  if (laag && onder_ && (
+      (onder_.soort === 'trui' && ['vest', 'teddy'].includes(laag.soort)) ||
+      (onder_.warmte >= 3 && laag.warmte >= 3 && !['gilet', 'blazer'].includes(laag.soort))))
+    problemen.push({ regel: 'laagjes', tekst: `Twee dikke lagen (${onder_.soort} en ${laag.soort}) wordt te veel.` });
 
   const prints = o.items.filter(i => i.print);
   if (prints.length > 1) problemen.push({ regel: 'prints', tekst: 'Meer dan één print (' + prints.map(i => i.print).join(' + ') + ').' });

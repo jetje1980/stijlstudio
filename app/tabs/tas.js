@@ -233,7 +233,13 @@ function opties(app) {
   };
 }
 
-function reken(el, app) {
+function herreken(el, app, bericht) {
+  const ingepakt = tas.afgevinkt.slice();
+  tasTab(el, app);
+  reken(el, app, () => { tas.afgevinkt = ingepakt; bewaarConcept(app); toonUitkomst(el, app); melding(bericht); });
+}
+
+function reken(el, app, daarna) {
   const plek = $('#uitkomst');
   if (!opties(app).dagen.length) { plek.innerHTML = '<p class="klein">Kies per dag minstens één moment.</p>'; return; }
   plek.innerHTML = '<p class="klein">Ik pak je tas… dit duurt een paar tellen.</p>';
@@ -242,6 +248,7 @@ function reken(el, app) {
     tas.afgevinkt = [];
     bewaarConcept(app);
     toonUitkomst(el, app);
+    if (daarna) daarna();
     plek.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 40);
 }
@@ -281,10 +288,13 @@ function toonUitkomst(el, app) {
       <div class="moment-kop"><h4>${esc(p.dag)} · ${esc(MOMENT_LABEL[p.moment] || p.moment)}</h4><span class="klein">${esc([p.doen && p.doen.trim(), p.sfeer && SFEREN[p.sfeer].naam, p.weer].filter(Boolean).join(' · '))}</span></div>
       ${p.outfit ? outfitHtml(p.outfit) : '<p class="klein">Hier vond ik niets passends.</p>'}</div>`).join('')}
 
-    <h3>Paklijst</h3>
+    <div class="moment-kop"><h3>Paklijst</h3><span class="klein" id="ingepakt">${k.filter(x => tas.afgevinkt.includes(x.item.id)).length} van ${k.length} ingepakt</span></div>
+    <p class="klein" style="margin-top:0">Vink af wat in je tas zit. × laat een stuk thuis, ＋ zet er een bij; de outfits worden dan opnieuw uitgerekend.</p>
     <ul class="paklijst">${k.map(x => `<li><input type="checkbox" data-v="${esc(x.item.id)}"${tas.afgevinkt.includes(x.item.id) ? ' checked' : ''} aria-label="${esc(x.item.naam)} ingepakt">
       ${x.item.foto ? `<img src="${esc(foto(x.item.foto, 120))}" alt="">` : `<span class="leeg">${stip(x.item.kleur[0], 20)}</span>`}
-      <span>${esc(x.item.naam)}</span><span class="keer">${x.waarom ? esc(x.waarom) : x.keer + '×'}</span></li>`).join('')}</ul>
+      <span>${esc(x.item.naam)}</span><span class="keer">${x.waarom ? esc(x.waarom) : x.keer + '×'}</span>
+      <button class="pak-weg" data-weg="${esc(x.item.id)}" type="button" aria-label="${esc(x.item.naam)} thuislaten">×</button></li>`).join('')}</ul>
+    <button class="knop licht vol" id="pak-erbij" type="button" style="margin-top:8px">＋ Stuk toevoegen</button>
     <div class="rij" style="margin-top:14px">
       <button class="knop" id="kaarten" type="button">Alle kaarten opslaan</button>
       <button class="knop licht" id="bewaar" type="button">Tas bewaren</button>
@@ -295,6 +305,19 @@ function toonUitkomst(el, app) {
   $$('[data-v]', plek).forEach(c => c.addEventListener('change', () => {
     tas.afgevinkt = c.checked ? tas.afgevinkt.concat(c.dataset.v) : tas.afgevinkt.filter(x => x !== c.dataset.v);
     bewaarConcept(app);
+    const n = $('#ingepakt'); if (n) n.textContent = `${k.filter(x => tas.afgevinkt.includes(x.item.id)).length} van ${k.length} ingepakt`;
+  }));
+  // Thuislaten of erbij: de outfits rekenen opnieuw, wat al ingepakt is blijft afgevinkt.
+  $$('[data-weg]', plek).forEach(b => b.addEventListener('click', () => {
+    const id = b.dataset.weg;
+    tas.moetMee = tas.moetMee.filter(x => x !== id);
+    if (!tas.thuis.includes(id)) tas.thuis.push(id);
+    herreken(el, app, `${app.item(id)?.naam || 'Dat stuk'} blijft thuis.`);
+  }));
+  $('#pak-erbij').addEventListener('click', () => kiesStuk(app, id => {
+    tas.thuis = tas.thuis.filter(x => x !== id);
+    if (!tas.moetMee.includes(id)) tas.moetMee.push(id);
+    herreken(el, app, `${app.item(id)?.naam || 'Het stuk'} gaat mee.`);
   }));
   $$('[data-zet]', plek).forEach(a => a.addEventListener('click', e => {
     e.preventDefault(); tas.moetMee.push(a.dataset.zet); reken(el, app);

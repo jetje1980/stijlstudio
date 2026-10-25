@@ -46,6 +46,16 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   ok(JSON.stringify(await p.$$eval('[data-th]', x => x.map(y => y.textContent))) === JSON.stringify(th) && th.length === 1, 'blijft thuis blijft staan');
   ok(await p.$$eval('[data-p] .stuk span', x => x.map(y => y.textContent).join('|')) === plan1, 'uitgerekende tas blijft staan');
 
+  // paklijst: afvinken telt, × laat thuis, ＋ zet erbij
+  await p.click('.paklijst li:first-child input'); await p.waitForTimeout(100);
+  ok(/^1 van \d+ ingepakt$/.test(await p.$eval('#ingepakt', x => x.textContent)), 'teller ingepakt loopt mee');
+  const wegNaam = await p.$eval('.paklijst li:nth-child(2) span', x => x.textContent);
+  await p.click('.paklijst li:nth-child(2) .pak-weg'); await p.waitForSelector('.paklijst li', { timeout: 20000 }); await p.waitForTimeout(300);
+  ok(!(await p.$$eval('.paklijst li span', x => x.map(y => y.textContent))).includes(wegNaam), 'thuisgelaten stuk is van de paklijst');
+  ok(/^1 van/.test(await p.$eval('#ingepakt', x => x.textContent)), 'afgevinkt blijft na opnieuw rekenen');
+  await p.click('#pak-erbij'); await p.fill('#zz', 'Gouden ketting'); await p.click('.blad .tegel'); await p.waitForSelector('.paklijst li', { timeout: 20000 }); await p.waitForTimeout(300);
+  ok((await p.$$eval('.paklijst li span', x => x.map(y => y.textContent))).includes('Gouden ketting'), 'toegevoegd stuk staat op de paklijst');
+
   // datum verschuiven: dagnamen en data bewegen mee, voorspelde graden niet
   const naam1 = await p.$eval('.dag b', x => x.textContent);
   await p.evaluate(() => { });
