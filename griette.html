@@ -1510,13 +1510,6 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 <footer>Digitale Stylist · Iconic Wardrobe<br><span style="opacity:.5;font-size:9px;">versie 27 sep · tien kaarten op Home</span></footer>
 
 <script>
-// Alleen toegankelijk met Griette's persoonlijke code
-(function() {
-  var code = '';
-  try { code = localStorage.getItem('ss-code') || ''; } catch(e) {}
-  if (code !== 'SS-GRIET') { window.location.replace('stijlstudio.html'); }
-})();
-
 // ============ AI-AANROEPEN: MODEL EN TERUGVAL ============
 // Deze pagina draaide op claude-sonnet-4-6. Sonnet 5 is een generatie nieuwer
 // en een derde goedkoper: $2 in / $10 uit per miljoen tokens, tegen $3 / $15.
