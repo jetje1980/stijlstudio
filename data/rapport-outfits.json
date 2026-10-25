@@ -1,0 +1,1161 @@
+[
+ {
+  "nr": 1,
+  "naam": "Antraciet & zwart, getailleerd",
+  "kleuren": [
+   "antraciet",
+   "zwart",
+   "gebroken-wit"
+  ],
+  "stukken": [
+   {
+    "naam": "Antraciet gebreide trui",
+    "id": null,
+    "zoek": [
+     "antraciet",
+     "trui"
+    ],
+    "cat": "tops"
+   },
+   {
+    "naam": "Zwarte oversized blazer",
+    "id": null,
+    "zoek": [
+     "blazer"
+    ],
+    "kleur": "zwart",
+    "cat": "layers"
+   },
+   {
+    "naam": "Gestreepte wijde broek zwart-wit",
+    "id": null,
+    "zoek": [
+     "streep",
+     "broek"
+    ],
+    "cat": "bottoms"
+   },
+   {
+    "naam": "Zwarte loafers met gouden gesp",
+    "id": null,
+    "zoek": [
+     "loafer"
+    ],
+    "cat": "shoes"
+   }
+  ]
+ },
+ {
+  "nr": 2,
+  "naam": "Streep op denim",
+  "kleuren": [
+   "bruin",
+   "ecru",
+   "lichtblauw"
+  ],
+  "stukken": [
+   {
+    "naam": "gestreept",
+    "id": null
+   },
+   {
+    "naam": "Pull&Bear ballonpijpen jeans blauw",
+    "id": "pullbear-balloon-jeans"
+   },
+   {
+    "naam": "Bruine suède enkellaarsjes, kitten heel",
+    "id": null,
+    "zoek": [
+     "laars",
+     "laarsje",
+     "boot"
+    ],
+    "kleur": "bruin",
+    "cat": "shoes"
+   }
+  ]
+ },
+ {
+  "nr": 3,
+  "naam": "Olijf op zwart",
+  "kleuren": [
+   "olijf/khaki",
+   "zwart"
+  ],
+  "stukken": [
+   {
+    "naam": "Olijfgroen T-shirt (Stieglitz)",
+    "id": null,
+    "zoek": [
+     "olijf",
+     "groen"
+    ],
+    "cat": "tops"
+   },
+   {
+    "naam": "Zwarte flared broek",
+    "id": null,
+    "zoek": [
+     "flared",
+     "flare"
+    ],
+    "cat": "bottoms"
+   }
+  ]
+ },
+ {
+  "nr": 4,
+  "naam": "Framboos op zwart",
+  "kleuren": [
+   "felroze",
+   "zwart"
+  ],
+  "stukken": [
+   {
+    "naam": "Framboosroze T-shirt (Stieglitz)",
+    "id": null,
+    "zoek": [
+     "roze",
+     "framboos"
+    ],
+    "cat": "tops"
+   },
+   {
+    "naam": "Zwarte flared broek",
+    "id": null,
+    "zoek": [
+     "flared",
+     "flare"
+    ],
+    "cat": "bottoms"
+   }
+  ]
+ },
+ {
+  "nr": 5,
+  "naam": "Bruin overhemd op denim",
+  "kleuren": [
+   "chocolade",
+   "lichtblauw",
+   "bruin"
+  ],
+  "stukken": [
+   {
+    "naam": "Donkerbruin cropped overhemd",
+    "id": null,
+    "zoek": [
+     "overhemd",
+     "blouse"
+    ],
+    "kleur": "bruin",
+    "cat": "tops"
+   },
+   {
+    "naam": "Pull&Bear ballonpijpen jeans blauw",
+    "id": "pullbear-balloon-jeans"
+   },
+   {
+    "naam": "choco-kitten",
+    "id": null
+   }
+  ]
+ },
+ {
+  "nr": 6,
+  "naam": "Bruin leer met ruit",
+  "kleuren": [
+   "chocolade",
+   "taupe",
+   "bruin"
+  ],
+  "stukken": [
+   {
+    "naam": "Bruine asymmetrische top",
+    "id": null,
+    "zoek": [
+     "top"
+    ],
+    "kleur": "bruin",
+    "cat": "tops"
+   },
+   {
+    "naam": "Bruine leren jas met ceintuur",
+    "id": null,
+    "zoek": [
+     "leer",
+     "leren"
+    ],
+    "cat": "layers"
+   },
+   {
+    "naam": "Geruite broek grijsbruin",
+    "id": null,
+    "zoek": [
+     "ruit",
+     "geruit",
+     "check",
+     "pied"
+    ],
+    "cat": "bottoms"
+   },
+   {
+    "naam": "choco-kitten",
+    "id": null
+   }
+  ]
+ },
+ {
+  "nr": 7,
+  "naam": "Olijf met patchwork",
+  "kleuren": [
+   "olijf/khaki",
+   "ecru",
+   "bruin"
+  ],
+  "stukken": [
+   {
+    "naam": "Olijfgroene sweater met zon-patch",
+    "id": null,
+    "zoek": [
+     "sweater",
+     "trui"
+    ],
+    "kleur": "groen",
+    "cat": "tops"
+   },
+   {
+    "naam": "print-mini",
+    "id": null
+   },
+   {
+    "naam": "Crème linnen short",
+    "id": null,
+    "zoek": [
+     "short"
+    ],
+    "cat": "bottoms"
+   },
+   {
+    "naam": "choco-kitten",
+    "id": null
+   }
+  ]
+ },
+ {
+  "nr": 8,
+  "naam": "Olijf op luipaard",
+  "kleuren": [
+   "olijf/khaki",
+   "camel",
+   "bruin"
+  ],
+  "stukken": [
+   {
+    "naam": "Olijfgroene sweater met zon-patch",
+    "id": null,
+    "zoek": [
+     "sweater",
+     "trui"
+    ],
+    "kleur": "groen",
+    "cat": "tops"
+   },
+   {
+    "naam": "Luipaardprint broek",
+    "id": null,
+    "zoek": [
+     "luipaard",
+     "leopard",
+     "panter"
+    ],
+    "cat": "bottoms"
+   },
+   {
+    "naam": "choco-kitten",
+    "id": null
+   }
+  ]
+ },
+ {
+  "nr": 9,
+  "naam": "Botergeel op bruin",
+  "kleuren": [
+   "botergeel",
+   "bruin",
+   "chocolade"
+  ],
+  "stukken": [
+   {
+    "naam": "Botergele mohair trui",
+    "id": null,
+    "zoek": [
+     "geel",
+     "mohair"
+    ],
+    "cat": "tops"
+   },
+   {
+    "naam": "Bruine wijde pantalon met plooien",
+    "id": null,
+    "zoek": [
+     "pantalon",
+     "wide"
+    ],
+    "kleur": "bruin",
+    "cat": "bottoms"
+   }
+  ]
+ },
+ {
+  "nr": 10,
+  "naam": "Sportief met blazer",
+  "kleuren": [
+   "ecru",
+   "zwart",
+   "lichtblauw"
+  ],
+  "stukken": [
+   {
+    "naam": "Crème sweater \"70\"",
+    "id": null,
+    "zoek": [
+     "sweater",
+     "70"
+    ],
+    "cat": "tops"
+   },
+   {
+    "naam": "Zwarte oversized blazer",
+    "id": null,
+    "zoek": [
+     "blazer"
+    ],
+    "kleur": "zwart",
+    "cat": "layers"
+   },
+   {
+    "naam": "Pull&Bear ballonpijpen jeans blauw",
+    "id": "pullbear-balloon-jeans"
+   },
+   {
+    "naam": "Zwarte wijde pantalon",
+    "id": null,
+    "zoek": [
+     "pantalon",
+     "wide"
+    ],
+    "kleur": "zwart",
+    "cat": "bottoms"
+   }
+  ]
+ },
+ {
+  "nr": 11,
+  "naam": "Ruches op denim",
+  "kleuren": [
+   "bruin",
+   "oudroze",
+   "lichtblauw"
+  ],
+  "stukken": [
+   {
+    "naam": "Bruin-roze geprinte blouse met ruches",
+    "id": null,
+    "zoek": [
+     "blouse",
+     "ruche"
+    ],
+    "cat": "tops"
+   },
+   {
+    "naam": "Pull&Bear ballonpijpen jeans blauw",
+    "id": "pullbear-balloon-jeans"
+   },
+   {
+    "naam": "Bruine suède enkellaarsjes, kitten heel",
+    "id": null,
+    "zoek": [
+     "laars",
+     "laarsje",
+     "boot"
+    ],
+    "kleur": "bruin",
+    "cat": "shoes"
+   }
+  ]
+ },
+ {
+  "nr": 12,
+  "naam": "Zacht op felroze",
+  "kleuren": [
+   "ecru",
+   "felroze",
+   "bruin"
+  ],
+  "stukken": [
+   {
+    "naam": "Gebroken witte cardigan",
+    "id": "witte-cardigan"
+   },
+   {
+    "naam": "Felroze maxi rok",
+    "id": "roze-maxi"
+   },
+   {
+    "naam": "choco-kitten",
+    "id": null
+   }
+  ]
+ },
+ {
+  "nr": 13,
+  "naam": "Rood-zwarte streep",
+  "kleuren": [
+   "rood",
+   "zwart"
+  ],
+  "stukken": [
+   {
+    "naam": "Rood-zwart gestreepte coltrui",
+    "id": null,
+    "zoek": [
+     "col",
+     "streep"
+    ],
+    "kleur": "rood",
+    "cat": "tops"
+   },
+   {
+    "naam": "Zwarte wijde pantalon",
+    "id": null,
+    "zoek": [
+     "pantalon",
+     "wide"
+    ],
+    "kleur": "zwart",
+    "cat": "bottoms"
+   },
+   {
+    "naam": "Zwarte enkellaarsjes",
+    "id": null,
+    "zoek": [
+     "laars",
+     "laarsje",
+     "boot"
+    ],
+    "kleur": "zwart",
+    "cat": "shoes"
+   }
+  ]
+ },
+ {
+  "nr": 14,
+  "naam": "Rood op zand",
+  "kleuren": [
+   "rood",
+   "zand",
+   "camel"
+  ],
+  "stukken": [
+   {
+    "naam": "Rode geribde top",
+    "id": null,
+    "zoek": [
+     "rood",
+     "rib"
+    ],
+    "cat": "tops"
+   },
+   {
+    "naam": "Camel jeans",
+    "id": null,
+    "zoek": [
+     "jeans",
+     "broek"
+    ],
+    "kleur": "camel",
+    "cat": "bottoms"
+   }
+  ]
+ },
+ {
+  "nr": 15,
+  "naam": "Denim met oranje",
+  "kleuren": [
+   "lichtblauw",
+   "oranje",
+   "ecru"
+  ],
+  "stukken": [
+   {
+    "naam": "Denim jacket",
+    "id": null,
+    "zoek": [
+     "denim",
+     "spijker"
+    ],
+    "cat": "layers"
+   },
+   {
+    "naam": "Gebroken witte cardigan",
+    "id": "witte-cardigan"
+   },
+   {
+    "naam": "Oranje gebreide mini rok",
+    "id": null,
+    "zoek": [
+     "rok"
+    ],
+    "kleur": "oranje",
+    "cat": "bottoms"
+   },
+   {
+    "naam": "Zwarte enkellaarsjes",
+    "id": null,
+    "zoek": [
+     "laars",
+     "laarsje",
+     "boot"
+    ],
+    "kleur": "zwart",
+    "cat": "shoes"
+   }
+  ]
+ },
+ {
+  "nr": 16,
+  "naam": "Geel met ruit of luipaard",
+  "kleuren": [
+   "geel",
+   "taupe",
+   "camel"
+  ],
+  "stukken": [
+   {
+    "naam": "Gele cropped blouse",
+    "id": null,
+    "zoek": [
+     "blouse",
+     "overhemd"
+    ],
+    "kleur": "geel",
+    "cat": "tops"
+   },
+   {
+    "naam": "Geruite broek grijsbruin",
+    "id": null,
+    "zoek": [
+     "ruit",
+     "geruit",
+     "check",
+     "pied"
+    ],
+    "cat": "bottoms"
+   },
+   {
+    "naam": "Luipaardprint broek",
+    "id": null,
+    "zoek": [
+     "luipaard",
+     "leopard",
+     "panter"
+    ],
+    "cat": "bottoms"
+   }
+  ]
+ },
+ {
+  "nr": 17,
+  "naam": "Stippen op zwart",
+  "kleuren": [
+   "ecru",
+   "zwart"
+  ],
+  "stukken": [
+   {
+    "naam": "Crème blouse met zwarte stippen",
+    "id": null,
+    "zoek": [
+     "stip",
+     "blouse"
+    ],
+    "cat": "tops"
+   },
+   {
+    "naam": "Zwarte flared broek",
+    "id": null,
+    "zoek": [
+     "flared",
+     "flare"
+    ],
+    "cat": "bottoms"
+   },
+   {
+    "naam": "Zwarte enkellaarsjes",
+    "id": null,
+    "zoek": [
+     "laars",
+     "laarsje",
+     "boot"
+    ],
+    "kleur": "zwart",
+    "cat": "shoes"
+   }
+  ]
+ },
+ {
+  "nr": 18,
+  "naam": "Botergeel op roze",
+  "kleuren": [
+   "botergeel",
+   "felroze"
+  ],
+  "stukken": [
+   {
+    "naam": "Botergele cardigan",
+    "id": null,
+    "zoek": [
+     "cardigan",
+     "vest"
+    ],
+    "kleur": "geel",
+    "cat": "layers"
+   },
+   {
+    "naam": "Felroze maxi rok",
+    "id": "roze-maxi"
+   },
+   {
+    "naam": "print-mini",
+    "id": null
+   }
+  ]
+ },
+ {
+  "nr": 19,
+  "naam": "Luipaard op bruin",
+  "kleuren": [
+   "camel",
+   "bruin",
+   "chocolade"
+  ],
+  "stukken": [
+   {
+    "naam": "MbyM Rihne top luipaardprint",
+    "id": "mbym-leopard-top"
+   },
+   {
+    "naam": "Bruine wijde pantalon",
+    "id": null,
+    "cat": "bottoms"
+   },
+   {
+    "naam": "choco-kitten",
+    "id": null
+   }
+  ]
+ },
+ {
+  "nr": 20,
+  "naam": "Marine onder camel",
+  "kleuren": [
+   "marine",
+   "camel",
+   "lichtblauw"
+  ],
+  "stukken": [
+   {
+    "naam": "Donkerblauw spaghettitopje",
+    "id": "blauw-spaghet"
+   },
+   {
+    "naam": "Camel trenchcoat",
+    "id": null,
+    "zoek": [
+     "trench",
+     "jas"
+    ],
+    "kleur": "camel",
+    "cat": "layers"
+   },
+   {
+    "naam": "Pull&Bear ballonpijpen jeans blauw",
+    "id": "pullbear-balloon-jeans"
+   }
+  ]
+ },
+ {
+  "nr": 21,
+  "naam": "Baseball op zwart",
+  "kleuren": [
+   "ecru",
+   "zwart"
+  ],
+  "stukken": [
+   {
+    "naam": "Baseball shirt crème-zwart",
+    "id": null,
+    "zoek": [
+     "baseball",
+     "shirt"
+    ],
+    "cat": "tops"
+   },
+   {
+    "naam": "Zwarte flared broek",
+    "id": null,
+    "zoek": [
+     "flared",
+     "flare"
+    ],
+    "cat": "bottoms"
+   },
+   {
+    "naam": "Zwarte enkellaarsjes",
+    "id": null,
+    "zoek": [
+     "laars",
+     "laarsje",
+     "boot"
+    ],
+    "kleur": "zwart",
+    "cat": "shoes"
+   }
+  ]
+ },
+ {
+  "nr": 22,
+  "naam": "Print op denim",
+  "kleuren": [
+   "grijs",
+   "lichtblauw",
+   "zwart"
+  ],
+  "stukken": [
+   {
+    "naam": "Grijsblauw geprint cropped overhemd",
+    "id": null,
+    "zoek": [
+     "overhemd",
+     "blouse"
+    ],
+    "cat": "tops"
+   },
+   {
+    "naam": "Pull&Bear ballonpijpen jeans blauw",
+    "id": "pullbear-balloon-jeans"
+   },
+   {
+    "naam": "Zwarte enkellaarsjes",
+    "id": null,
+    "zoek": [
+     "laars",
+     "laarsje",
+     "boot"
+    ],
+    "kleur": "zwart",
+    "cat": "shoes"
+   }
+  ]
+ },
+ {
+  "nr": 23,
+  "naam": "Denim jack, drie bodems",
+  "kleuren": [
+   "lichtblauw",
+   "zwart"
+  ],
+  "stukken": [
+   {
+    "naam": "Denim jacket",
+    "id": null,
+    "zoek": [
+     "denim",
+     "spijker"
+    ],
+    "cat": "layers"
+   },
+   {
+    "naam": "Zwarte wijde pantalon",
+    "id": null,
+    "zoek": [
+     "pantalon",
+     "wide"
+    ],
+    "kleur": "zwart",
+    "cat": "bottoms"
+   },
+   {
+    "naam": "Denim mini rok",
+    "id": null,
+    "zoek": [
+     "denim",
+     "rok"
+    ],
+    "cat": "bottoms"
+   },
+   {
+    "naam": "Pull&Bear ballonpijpen jeans blauw",
+    "id": "pullbear-balloon-jeans"
+   }
+  ]
+ },
+ {
+  "nr": 24,
+  "naam": "Oranje op zwart",
+  "kleuren": [
+   "oranje",
+   "zwart"
+  ],
+  "stukken": [
+   {
+    "naam": "Oranje/zalm Stieglitz t-shirt",
+    "id": "oranje-shirt"
+   },
+   {
+    "naam": "Zwarte flared broek",
+    "id": null,
+    "zoek": [
+     "flared",
+     "flare"
+    ],
+    "cat": "bottoms"
+   }
+  ]
+ },
+ {
+  "nr": 25,
+  "naam": "Zwart glanzend, avond",
+  "kleuren": [
+   "zwart"
+  ],
+  "stukken": [
+   {
+    "naam": "Zwarte kanten top met glans",
+    "id": null,
+    "zoek": [
+     "kant",
+     "glans"
+    ],
+    "kleur": "zwart",
+    "cat": "tops"
+   },
+   {
+    "naam": "Zwarte oversized blazer",
+    "id": null,
+    "zoek": [
+     "blazer"
+    ],
+    "kleur": "zwart",
+    "cat": "layers"
+   },
+   {
+    "naam": "Zwarte wijde pantalon",
+    "id": null,
+    "zoek": [
+     "pantalon",
+     "wide"
+    ],
+    "kleur": "zwart",
+    "cat": "bottoms"
+   },
+   {
+    "naam": "Zwarte laarzen",
+    "id": null,
+    "zoek": [
+     "laars",
+     "laarzen",
+     "boot"
+    ],
+    "kleur": "zwart",
+    "cat": "shoes"
+   }
+  ]
+ },
+ {
+  "nr": 26,
+  "naam": "Bruin met luipaard of oranje",
+  "kleuren": [
+   "chocolade",
+   "camel",
+   "oranje"
+  ],
+  "stukken": [
+   {
+    "naam": "Bruin cropped overhemd",
+    "id": null,
+    "zoek": [
+     "overhemd",
+     "blouse"
+    ],
+    "kleur": "bruin",
+    "cat": "tops"
+   },
+   {
+    "naam": "Luipaardprint broek",
+    "id": null,
+    "zoek": [
+     "luipaard",
+     "leopard",
+     "panter"
+    ],
+    "cat": "bottoms"
+   },
+   {
+    "naam": "Oranje gebreide mini rok",
+    "id": null,
+    "zoek": [
+     "rok"
+    ],
+    "kleur": "oranje",
+    "cat": "bottoms"
+   },
+   {
+    "naam": "Bruine wijde pantalon",
+    "id": null,
+    "cat": "bottoms"
+   }
+  ]
+ },
+ {
+  "nr": 27,
+  "naam": "Kant onder leer",
+  "kleuren": [
+   "ecru",
+   "chocolade",
+   "zwart"
+  ],
+  "stukken": [
+   {
+    "naam": "Witte kanten top",
+    "id": "kanten-top"
+   },
+   {
+    "naam": "Bruine leren jas met ceintuur",
+    "id": null,
+    "zoek": [
+     "leer",
+     "leren"
+    ],
+    "cat": "layers"
+   },
+   {
+    "naam": "Zwarte flared broek",
+    "id": null,
+    "zoek": [
+     "flared",
+     "flare"
+    ],
+    "cat": "bottoms"
+   }
+  ]
+ },
+ {
+  "nr": 28,
+  "naam": "Kleurpop op patchwork",
+  "kleuren": [
+   "rood",
+   "ecru"
+  ],
+  "stukken": [
+   {
+    "naam": "Rood T-shirt",
+    "id": null,
+    "zoek": [
+     "shirt"
+    ],
+    "kleur": "rood",
+    "cat": "tops"
+   },
+   {
+    "naam": "Limoengroen T-shirt",
+    "id": null,
+    "zoek": [
+     "shirt"
+    ],
+    "kleur": "groen",
+    "cat": "tops"
+   },
+   {
+    "naam": "print-mini",
+    "id": null
+   }
+  ]
+ },
+ {
+  "nr": 29,
+  "naam": "Denim met linnen",
+  "kleuren": [
+   "lichtblauw",
+   "ecru",
+   "zand"
+  ],
+  "stukken": [
+   {
+    "naam": "Denim jacket",
+    "id": null,
+    "zoek": [
+     "denim",
+     "spijker"
+    ],
+    "cat": "layers"
+   },
+   {
+    "naam": "Crème linnen short",
+    "id": null,
+    "zoek": [
+     "short"
+    ],
+    "cat": "bottoms"
+   }
+  ]
+ },
+ {
+  "nr": 30,
+  "naam": "Lichtblauw met ruit",
+  "kleuren": [
+   "lichtblauw",
+   "zwart",
+   "camel"
+  ],
+  "stukken": [
+   {
+    "naam": "Lichtblauwe oversized blouse",
+    "id": "blauwe-blouse"
+   },
+   {
+    "naam": "Zwarte wijde pantalon",
+    "id": null,
+    "zoek": [
+     "pantalon",
+     "wide"
+    ],
+    "kleur": "zwart",
+    "cat": "bottoms"
+   },
+   {
+    "naam": "Luipaardprint broek",
+    "id": null,
+    "zoek": [
+     "luipaard",
+     "leopard",
+     "panter"
+    ],
+    "cat": "bottoms"
+   }
+  ]
+ },
+ {
+  "nr": 31,
+  "naam": "Ecru met teddy",
+  "kleuren": [
+   "ecru",
+   "chocolade",
+   "taupe"
+  ],
+  "stukken": [
+   {
+    "naam": "Ecru overhemd",
+    "id": null,
+    "zoek": [
+     "overhemd",
+     "blouse"
+    ],
+    "cat": "tops"
+   },
+   {
+    "naam": "Bruine teddy jas",
+    "id": null,
+    "zoek": [
+     "teddy",
+     "jas"
+    ],
+    "kleur": "bruin",
+    "cat": "layers"
+   },
+   {
+    "naam": "Geruite broek grijsbruin",
+    "id": null,
+    "zoek": [
+     "ruit",
+     "geruit",
+     "check",
+     "pied"
+    ],
+    "cat": "bottoms"
+   }
+  ]
+ },
+ {
+  "nr": 32,
+  "naam": "Zacht met print",
+  "kleuren": [
+   "ecru",
+   "oudroze",
+   "bruin"
+  ],
+  "stukken": [
+   {
+    "naam": "Gebroken witte cardigan",
+    "id": "witte-cardigan"
+   },
+   {
+    "naam": "Roze geprinte broek",
+    "id": null,
+    "zoek": [
+     "broek",
+     "pantalon"
+    ],
+    "kleur": "roze",
+    "cat": "bottoms"
+   },
+   {
+    "naam": "choco-kitten",
+    "id": null
+   }
+  ]
+ },
+ {
+  "nr": 33,
+  "naam": "Sweater onder leer",
+  "kleuren": [
+   "ecru",
+   "chocolade",
+   "camel"
+  ],
+  "stukken": [
+   {
+    "naam": "Crème sweater \"70\"",
+    "id": null,
+    "zoek": [
+     "sweater",
+     "70"
+    ],
+    "cat": "tops"
+   },
+   {
+    "naam": "Bruine leren jas met ceintuur",
+    "id": null,
+    "zoek": [
+     "leer",
+     "leren"
+    ],
+    "cat": "layers"
+   },
+   {
+    "naam": "Luipaardprint broek",
+    "id": null,
+    "zoek": [
+     "luipaard",
+     "leopard",
+     "panter"
+    ],
+    "cat": "bottoms"
+   },
+   {
+    "naam": "Pull&Bear ballonpijpen jeans blauw",
+    "id": "pullbear-balloon-jeans"
+   }
+  ]
+ }
+]

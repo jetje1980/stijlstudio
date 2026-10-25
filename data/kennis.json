@@ -1,0 +1,1581 @@
+{
+ "kleuren": [
+  {
+   "naam": "zwart",
+   "hex": "#111"
+  },
+  {
+   "naam": "antraciet",
+   "hex": "#3a3d42"
+  },
+  {
+   "naam": "grijs",
+   "hex": "#888"
+  },
+  {
+   "naam": "lichtgrijs",
+   "hex": "#c4c4c8"
+  },
+  {
+   "naam": "donkerblauw",
+   "hex": "#162038"
+  },
+  {
+   "naam": "marine",
+   "hex": "#1a2a4a"
+  },
+  {
+   "naam": "bruin",
+   "hex": "#5c3317"
+  },
+  {
+   "naam": "chocolade",
+   "hex": "#3d2314"
+  },
+  {
+   "naam": "cognac",
+   "hex": "#8B4513"
+  },
+  {
+   "naam": "camel",
+   "hex": "#c19a6b"
+  },
+  {
+   "naam": "taupe",
+   "hex": "#8b7d6b"
+  },
+  {
+   "naam": "beige",
+   "hex": "#d4b896"
+  },
+  {
+   "naam": "zand",
+   "hex": "#e0d5bf"
+  },
+  {
+   "naam": "ecru",
+   "hex": "#f5f0e1"
+  },
+  {
+   "naam": "gebroken-wit",
+   "hex": "#f0e8d8"
+  },
+  {
+   "naam": "wit",
+   "hex": "#f8f4ef"
+  },
+  {
+   "naam": "felroze",
+   "hex": "#e8407a"
+  },
+  {
+   "naam": "fuchsia",
+   "hex": "#d6006e"
+  },
+  {
+   "naam": "roze",
+   "hex": "#e8a0b4"
+  },
+  {
+   "naam": "oudroze",
+   "hex": "#d4a5a5"
+  },
+  {
+   "naam": "zalm",
+   "hex": "#f0928a"
+  },
+  {
+   "naam": "koraal",
+   "hex": "#f4715e"
+  },
+  {
+   "naam": "perzik",
+   "hex": "#f0a07a"
+  },
+  {
+   "naam": "nude/huid",
+   "hex": "#d4a882"
+  },
+  {
+   "naam": "rood",
+   "hex": "#cc2211"
+  },
+  {
+   "naam": "oranje-rood",
+   "hex": "#b5232a"
+  },
+  {
+   "naam": "bordeaux",
+   "hex": "#6e1020"
+  },
+  {
+   "naam": "terra cotta",
+   "hex": "#c1654a"
+  },
+  {
+   "naam": "roest",
+   "hex": "#a8522a"
+  },
+  {
+   "naam": "oranje",
+   "hex": "#d4703a"
+  },
+  {
+   "naam": "geel",
+   "hex": "#d4b84a"
+  },
+  {
+   "naam": "botergeel",
+   "hex": "#f5e6a8"
+  },
+  {
+   "naam": "mosterd",
+   "hex": "#b8860b"
+  },
+  {
+   "naam": "goud",
+   "hex": "#c9a84c"
+  },
+  {
+   "naam": "lila/paars",
+   "hex": "#b088c8"
+  },
+  {
+   "naam": "lavendel",
+   "hex": "#c3b1e1"
+  },
+  {
+   "naam": "paars",
+   "hex": "#7b3fa0"
+  },
+  {
+   "naam": "aubergine",
+   "hex": "#4a2545"
+  },
+  {
+   "naam": "ijsblauw",
+   "hex": "#d4e4f0"
+  },
+  {
+   "naam": "lichtblauw",
+   "hex": "#a8c4e0"
+  },
+  {
+   "naam": "hemelsblauw",
+   "hex": "#4aa8d8"
+  },
+  {
+   "naam": "denimblauw",
+   "hex": "#4a6d94"
+  },
+  {
+   "naam": "kobaltblauw",
+   "hex": "#0047AB"
+  },
+  {
+   "naam": "petrol",
+   "hex": "#1a4d5c"
+  },
+  {
+   "naam": "turquoise",
+   "hex": "#2ab0a8"
+  },
+  {
+   "naam": "smaragdgroen",
+   "hex": "#0f7361"
+  },
+  {
+   "naam": "mintgroen",
+   "hex": "#88c8b0"
+  },
+  {
+   "naam": "salie",
+   "hex": "#9caa8c"
+  },
+  {
+   "naam": "groen",
+   "hex": "#4a8a5c"
+  },
+  {
+   "naam": "olijf/khaki",
+   "hex": "#6b7c45"
+  },
+  {
+   "naam": "chartreuse",
+   "hex": "#c4d21e"
+  },
+  {
+   "naam": "zilver",
+   "hex": "#bbb"
+  }
+ ],
+ "eigenKleuren": [
+  "turquoise",
+  "kobaltblauw",
+  "botergeel",
+  "mintgroen",
+  "groen",
+  "olijf/khaki",
+  "zilver",
+  "lichtgrijs",
+  "donkerblauw",
+  "marine",
+  "roze",
+  "rood",
+  "oranje-rood",
+  "koraal",
+  "goud",
+  "salie",
+  "smaragdgroen",
+  "denimblauw",
+  "hemelsblauw",
+  "lichtblauw",
+  "ijsblauw"
+ ],
+ "kleurbronnen": [
+  {
+   "naam": "Chartreuse",
+   "soort": "palet",
+   "paren": {
+    "chartreuse": [
+     "bordeaux",
+     "hemelsblauw",
+     "rood",
+     "roze"
+    ]
+   },
+   "notities": {
+    "chartreuse": "Zit tussen geel en groen in, fel, vrolijk en onmogelijk te negeren. De naam komt van een Franse kruidenlikeur gemaakt door Carthuizer monniken sinds de 17e eeuw."
+   },
+   "zegt": ""
+  },
+  {
+   "naam": "Berry Pink",
+   "soort": "palet",
+   "paren": {
+    "fuchsia": [
+     "mosterd",
+     "smaragdgroen",
+     "perzik",
+     "bordeaux"
+    ]
+   },
+   "notities": {
+    "fuchsia": "Pink, but with more richness and depth. Think ripe berries rather than bubblegum. It brengt een romantische kwaliteit in de herfst zonder te zoet te voelen."
+   },
+   "zegt": ""
+  },
+  {
+   "naam": "Turquoise",
+   "soort": "palet",
+   "paren": {
+    "turquoise": [
+     "chartreuse",
+     "oranje",
+     "paars",
+     "rood"
+    ]
+   },
+   "notities": {
+    "turquoise": "Een beetje onverwacht voor de herfst, en dat is precies het punt. Turquoise en petrol brengen frisheid in een seizoen dat meestal door aardetinten wordt gedomineerd. Combineer met neutrale kleuren om de helderheid te temperen."
+   },
+   "zegt": "Pair with neutrals to tone down the brightness."
+  },
+  {
+   "naam": "Herfstcombinaties",
+   "soort": "matrix",
+   "paren": {
+    "bordeaux": [
+     "grijs",
+     "roze",
+     "lichtblauw",
+     "bruin"
+    ],
+    "olijf/khaki": [
+     "camel",
+     "marine",
+     "bordeaux",
+     "grijs"
+    ],
+    "zwart": [
+     "wit",
+     "beige",
+     "camel",
+     "lichtblauw"
+    ],
+    "bruin": [
+     "bordeaux",
+     "lichtblauw",
+     "marine",
+     "olijf/khaki"
+    ],
+    "lichtblauw": [
+     "beige",
+     "bruin",
+     "grijs",
+     "bordeaux"
+    ],
+    "roze": [
+     "bruin",
+     "grijs",
+     "marine",
+     "olijf/khaki"
+    ],
+    "grijs": [
+     "roze",
+     "bordeaux",
+     "olijf/khaki",
+     "wit"
+    ],
+    "marine": [
+     "camel",
+     "wit",
+     "beige",
+     "bordeaux"
+    ],
+    "camel": [
+     "olijf/khaki",
+     "bordeaux",
+     "bruin",
+     "wit"
+    ]
+   },
+   "notities": {},
+   "zegt": "Fall dressing gets easier when the colors already work together."
+  }
+ ],
+ "combos": [
+  {
+   "id": "stijlrapport",
+   "label": "Uit je stijlrapport",
+   "uitleg": "De combinaties die je rapport zelf aanbeveelt",
+   "bron": "rapport",
+   "voorbeelden": [
+    {
+     "naam": "Oranje-rood + lichtroze + ijsblauw",
+     "sfeer": "split-complementair — beste match",
+     "kleuren": [
+      "oranje-rood",
+      "roze",
+      "ijsblauw",
+      "gebroken-wit"
+     ],
+     "hex": [
+      "#b5232a",
+      "#e8a0b4",
+      "#d4e4f0",
+      "#f0e8d8"
+     ]
+    },
+    {
+     "naam": "Roze + botergeel + warm wit",
+     "sfeer": "split-complementair, zacht",
+     "kleuren": [
+      "roze",
+      "botergeel",
+      "ecru",
+      "taupe"
+     ],
+     "hex": [
+      "#e8a0b4",
+      "#f5e6a8",
+      "#f5f0e1",
+      "#8b7d6b"
+     ]
+    },
+    {
+     "naam": "Paars + lichtgrijs + zand",
+     "sfeer": "split-complementair — grijs als steunkleur",
+     "kleuren": [
+      "paars",
+      "lichtgrijs",
+      "zand",
+      "ecru"
+     ],
+     "hex": [
+      "#7b3fa0",
+      "#c4c4c8",
+      "#e0d5bf",
+      "#f5f0e1"
+     ]
+    },
+    {
+     "naam": "Donkerblauw + ijsblauw + lichtgrijs",
+     "sfeer": "ton-sur-ton, rustig",
+     "kleuren": [
+      "donkerblauw",
+      "ijsblauw",
+      "lichtgrijs",
+      "wit"
+     ],
+     "hex": [
+      "#162038",
+      "#d4e4f0",
+      "#c4c4c8",
+      "#f8f4ef"
+     ]
+    },
+    {
+     "naam": "Oranje-rood + zachtroze + taupe",
+     "sfeer": "ton-sur-ton, warm",
+     "kleuren": [
+      "oranje-rood",
+      "oudroze",
+      "taupe",
+      "ecru"
+     ],
+     "hex": [
+      "#b5232a",
+      "#d4a5a5",
+      "#8b7d6b",
+      "#f5f0e1"
+     ]
+    },
+    {
+     "naam": "Groen + mintgroen + taupe",
+     "sfeer": "ton-sur-ton, natuurlijk",
+     "kleuren": [
+      "groen",
+      "mintgroen",
+      "taupe",
+      "ecru"
+     ],
+     "hex": [
+      "#4a8a5c",
+      "#88c8b0",
+      "#8b7d6b",
+      "#f5f0e1"
+     ]
+    },
+    {
+     "naam": "Rood + koraal + zachtroze",
+     "sfeer": "analoog, vloeiend",
+     "kleuren": [
+      "rood",
+      "koraal",
+      "oudroze",
+      "ecru"
+     ],
+     "hex": [
+      "#cc2211",
+      "#f4715e",
+      "#d4a5a5",
+      "#f5f0e1"
+     ]
+    },
+    {
+     "naam": "Lila + paars + oudroze",
+     "sfeer": "analoog, verfijnd",
+     "kleuren": [
+      "lila/paars",
+      "paars",
+      "oudroze",
+      "wit"
+     ],
+     "hex": [
+      "#b088c8",
+      "#7b3fa0",
+      "#d4a5a5",
+      "#f8f4ef"
+     ]
+    },
+    {
+     "naam": "Botergeel + creme + zand",
+     "sfeer": "analoog, licht",
+     "kleuren": [
+      "botergeel",
+      "ecru",
+      "zand",
+      "taupe"
+     ],
+     "hex": [
+      "#f5e6a8",
+      "#f5f0e1",
+      "#e0d5bf",
+      "#8b7d6b"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ton-sur-ton",
+   "label": "Ton-sur-ton",
+   "uitleg": "Één kleurenfamilie van licht naar donker",
+   "bron": "rapport",
+   "voorbeelden": [
+    {
+     "naam": "Chocolade tonal",
+     "sfeer": "warm & elegant",
+     "kleuren": [
+      "bruin",
+      "cognac",
+      "camel",
+      "gebroken-wit"
+     ],
+     "hex": [
+      "#5c3317",
+      "#8B4513",
+      "#c19a6b",
+      "#f0e8d8"
+     ]
+    },
+    {
+     "naam": "Navy tonal",
+     "sfeer": "krachtig & helder",
+     "kleuren": [
+      "zwart",
+      "donkerblauw",
+      "marine",
+      "lichtblauw"
+     ],
+     "hex": [
+      "#111827",
+      "#162038",
+      "#1a2a4a",
+      "#a8c4e0"
+     ]
+    },
+    {
+     "naam": "Roze tonal",
+     "sfeer": "romantisch & modern",
+     "kleuren": [
+      "paars",
+      "lila/paars",
+      "roze",
+      "wit"
+     ],
+     "hex": [
+      "#7b3fa0",
+      "#b088c8",
+      "#e8a0b4",
+      "#f8f4ef"
+     ]
+    },
+    {
+     "naam": "Aards tonal",
+     "sfeer": "robuust & authentiek",
+     "kleuren": [
+      "bruin",
+      "olijf/khaki",
+      "camel",
+      "beige"
+     ],
+     "hex": [
+      "#5c3317",
+      "#6b7c45",
+      "#c19a6b",
+      "#d4b896"
+     ]
+    },
+    {
+     "naam": "Nacht tonal",
+     "sfeer": "dramatisch & sterk",
+     "kleuren": [
+      "zwart",
+      "donkerblauw",
+      "bordeaux",
+      "turquoise"
+     ],
+     "hex": [
+      "#111",
+      "#162038",
+      "#6e1020",
+      "#2ab0a8"
+     ]
+    },
+    {
+     "naam": "Groen tonal",
+     "sfeer": "gelaagd en rustig",
+     "kleuren": [
+      "salie",
+      "olijf/khaki",
+      "smaragdgroen",
+      "ecru"
+     ],
+     "hex": [
+      "#9caa8c",
+      "#6b7c45",
+      "#0f7361",
+      "#f5f0e1"
+     ]
+    },
+    {
+     "naam": "Roze tonal warm",
+     "sfeer": "zacht met diepte",
+     "kleuren": [
+      "perzik",
+      "oudroze",
+      "roest",
+      "chocolade"
+     ],
+     "hex": [
+      "#f0a07a",
+      "#d4a5a5",
+      "#a8522a",
+      "#3d2314"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "monochromatisch",
+   "label": "Monochromatisch",
+   "uitleg": "Één kleur in alle tinten en texturen",
+   "bron": "trend",
+   "voorbeelden": [
+    {
+     "naam": "All-navy",
+     "sfeer": "strak & doordacht",
+     "kleuren": [
+      "donkerblauw",
+      "marine",
+      "donkerblauw",
+      "lichtblauw"
+     ],
+     "hex": [
+      "#0a1228",
+      "#162038",
+      "#1a3560",
+      "#a8c4e0"
+     ]
+    },
+    {
+     "naam": "All-bruin",
+     "sfeer": "aards & rijkgeschakeerd",
+     "kleuren": [
+      "bruin",
+      "bruin",
+      "cognac",
+      "camel"
+     ],
+     "hex": [
+      "#3a1f0c",
+      "#5c3317",
+      "#8B4513",
+      "#c19a6b"
+     ]
+    },
+    {
+     "naam": "All-zwart",
+     "sfeer": "onverslaanbaar & krachtig",
+     "kleuren": [
+      "zwart",
+      "zwart",
+      "zwart",
+      "grijs"
+     ],
+     "hex": [
+      "#000",
+      "#222",
+      "#444",
+      "#888"
+     ]
+    },
+    {
+     "naam": "All-roze",
+     "sfeer": "bold & maximalist",
+     "kleuren": [
+      "paars",
+      "felroze",
+      "roze",
+      "wit"
+     ],
+     "hex": [
+      "#7b3fa0",
+      "#e8407a",
+      "#e8a0b4",
+      "#f8eef3"
+     ]
+    },
+    {
+     "naam": "All-denim",
+     "sfeer": "één blauw, alle wassingen",
+     "kleuren": [
+      "donkerblauw",
+      "denimblauw",
+      "lichtblauw",
+      "ijsblauw"
+     ],
+     "hex": [
+      "#162038",
+      "#4a6d94",
+      "#a8c4e0",
+      "#d4e4f0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "analoog",
+   "label": "Analoog",
+   "uitleg": "Naast elkaar op de kleurencirkel — harmonieus & warm",
+   "bron": "rapport",
+   "voorbeelden": [
+    {
+     "naam": "Bruin-oranje-mosterd",
+     "sfeer": "warm & rijp",
+     "kleuren": [
+      "bruin",
+      "oranje",
+      "mosterd",
+      "gebroken-wit"
+     ],
+     "hex": [
+      "#5c3317",
+      "#d4703a",
+      "#b8860b",
+      "#f0e8d8"
+     ]
+    },
+    {
+     "naam": "Navy-turquoise-groen",
+     "sfeer": "maritiem & fris",
+     "kleuren": [
+      "donkerblauw",
+      "turquoise",
+      "groen",
+      "gebroken-wit"
+     ],
+     "hex": [
+      "#162038",
+      "#2ab0a8",
+      "#4a8a5c",
+      "#f0e8d8"
+     ]
+    },
+    {
+     "naam": "Felroze-paars-blauw",
+     "sfeer": "vibrant & onverwacht",
+     "kleuren": [
+      "felroze",
+      "paars",
+      "kobaltblauw",
+      "wit"
+     ],
+     "hex": [
+      "#e8407a",
+      "#7b3fa0",
+      "#0047AB",
+      "#f8f4ef"
+     ]
+    },
+    {
+     "naam": "Rood-oranje-rood-geel",
+     "sfeer": "vurig & energiek",
+     "kleuren": [
+      "rood",
+      "oranje-rood",
+      "oranje",
+      "geel"
+     ],
+     "hex": [
+      "#cc2211",
+      "#b5232a",
+      "#d4703a",
+      "#d4b84a"
+     ]
+    },
+    {
+     "naam": "Perzik-koraal-terracotta",
+     "sfeer": "zonnig en warm",
+     "kleuren": [
+      "perzik",
+      "koraal",
+      "terra cotta",
+      "ecru"
+     ],
+     "hex": [
+      "#f0a07a",
+      "#f4715e",
+      "#c1654a",
+      "#f5f0e1"
+     ]
+    },
+    {
+     "naam": "Petrol-turquoise-smaragd",
+     "sfeer": "diep en helder",
+     "kleuren": [
+      "petrol",
+      "turquoise",
+      "smaragdgroen",
+      "gebroken-wit"
+     ],
+     "hex": [
+      "#1a4d5c",
+      "#2ab0a8",
+      "#0f7361",
+      "#f0e8d8"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "complementair",
+   "label": "Complementair",
+   "uitleg": "Colorblocking — mag, maar je rapport zegt dat je nu meer balans zoekt",
+   "bron": "kan",
+   "voorbeelden": [
+    {
+     "naam": "Turquoise × bruin",
+     "sfeer": "elegant maar verrassend",
+     "kleuren": [
+      "turquoise",
+      "bruin",
+      "camel",
+      "gebroken-wit"
+     ],
+     "hex": [
+      "#2ab0a8",
+      "#5c3317",
+      "#c19a6b",
+      "#f0e8d8"
+     ]
+    },
+    {
+     "naam": "Kobaltblauw × cognac",
+     "sfeer": "grafisch & warm",
+     "kleuren": [
+      "kobaltblauw",
+      "cognac",
+      "camel",
+      "wit"
+     ],
+     "hex": [
+      "#0047AB",
+      "#8B4513",
+      "#c19a6b",
+      "#f8f4ef"
+     ]
+    },
+    {
+     "naam": "Marine × mosterd",
+     "sfeer": "klassiek & sterk",
+     "kleuren": [
+      "marine",
+      "mosterd",
+      "camel",
+      "wit"
+     ],
+     "hex": [
+      "#1a2a4a",
+      "#b8860b",
+      "#c19a6b",
+      "#f8f4ef"
+     ]
+    },
+    {
+     "naam": "Felroze × olijf",
+     "sfeer": "speels & onverwacht",
+     "kleuren": [
+      "felroze",
+      "olijf/khaki",
+      "gebroken-wit",
+      "grijs"
+     ],
+     "hex": [
+      "#e8407a",
+      "#6b7c45",
+      "#f0e8d8",
+      "#888"
+     ]
+    },
+    {
+     "naam": "Bordeaux × turquoise",
+     "sfeer": "dramatisch & fris",
+     "kleuren": [
+      "bordeaux",
+      "turquoise",
+      "gebroken-wit",
+      "zwart"
+     ],
+     "hex": [
+      "#6e1020",
+      "#2ab0a8",
+      "#f0e8d8",
+      "#111"
+     ]
+    },
+    {
+     "naam": "Koraal × petrol",
+     "sfeer": "warm tegen koel",
+     "kleuren": [
+      "koraal",
+      "petrol",
+      "ecru",
+      "taupe"
+     ],
+     "hex": [
+      "#f4715e",
+      "#1a4d5c",
+      "#f5f0e1",
+      "#8b7d6b"
+     ]
+    },
+    {
+     "naam": "Botergeel × lavendel",
+     "sfeer": "zacht maar eigenzinnig",
+     "kleuren": [
+      "botergeel",
+      "lavendel",
+      "wit",
+      "antraciet"
+     ],
+     "hex": [
+      "#f5e6a8",
+      "#c3b1e1",
+      "#f8f4ef",
+      "#3a3d42"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "split-complementair",
+   "label": "Split-complementair",
+   "uitleg": "Beste match volgens je rapport — 1 hoofdkleur + 2 lichtere tinten",
+   "bron": "rapport",
+   "voorbeelden": [
+    {
+     "naam": "Turquoise + roze + grijs",
+     "sfeer": "energiek & chic",
+     "kleuren": [
+      "turquoise",
+      "felroze",
+      "grijs",
+      "gebroken-wit"
+     ],
+     "hex": [
+      "#2ab0a8",
+      "#e8407a",
+      "#888",
+      "#f0e8d8"
+     ]
+    },
+    {
+     "naam": "Oranje-rood + roze + blauw",
+     "sfeer": "warm & speels",
+     "kleuren": [
+      "oranje-rood",
+      "roze",
+      "lichtblauw",
+      "wit"
+     ],
+     "hex": [
+      "#b5232a",
+      "#e8a0b4",
+      "#a8c4e0",
+      "#f8f4ef"
+     ]
+    },
+    {
+     "naam": "Navy + turquoise + roze",
+     "sfeer": "grafisch & fris",
+     "kleuren": [
+      "donkerblauw",
+      "turquoise",
+      "felroze",
+      "gebroken-wit"
+     ],
+     "hex": [
+      "#162038",
+      "#2ab0a8",
+      "#e8407a",
+      "#f0e8d8"
+     ]
+    },
+    {
+     "naam": "Bruin + geel + lichtblauw",
+     "sfeer": "zonnig & warm",
+     "kleuren": [
+      "bruin",
+      "geel",
+      "lichtblauw",
+      "gebroken-wit"
+     ],
+     "hex": [
+      "#5c3317",
+      "#d4b84a",
+      "#a8c4e0",
+      "#f0e8d8"
+     ]
+    },
+    {
+     "naam": "Zwart + felroze + groen",
+     "sfeer": "bold streetstyle",
+     "kleuren": [
+      "zwart",
+      "felroze",
+      "groen",
+      "wit"
+     ],
+     "hex": [
+      "#111",
+      "#e8407a",
+      "#4a8a5c",
+      "#f8f4ef"
+     ]
+    },
+    {
+     "naam": "Chocolade + roze + hemelsblauw",
+     "sfeer": "warm met een frisse knal",
+     "kleuren": [
+      "chocolade",
+      "roze",
+      "hemelsblauw",
+      "gebroken-wit"
+     ],
+     "hex": [
+      "#3d2314",
+      "#e8a0b4",
+      "#4aa8d8",
+      "#f0e8d8"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "neutraal-accent",
+   "label": "Neutraal + accent",
+   "uitleg": "Strakke basis met één krachtige kleurpop",
+   "bron": "rapport",
+   "voorbeelden": [
+    {
+     "naam": "Grijs + felroze",
+     "sfeer": "zachte basis, harde knal — de sweater-en-rok-look",
+     "kleuren": [
+      "lichtgrijs",
+      "felroze",
+      "kobaltblauw",
+      "gebroken-wit"
+     ],
+     "hex": [
+      "#c4c4c8",
+      "#e8407a",
+      "#0047AB",
+      "#f0e8d8"
+     ]
+    },
+    {
+     "naam": "Grijs + roze + kobalt",
+     "sfeer": "grijs draagt, roze voert, blauw verrast",
+     "kleuren": [
+      "grijs",
+      "roze",
+      "kobaltblauw",
+      "ecru"
+     ],
+     "hex": [
+      "#888",
+      "#e8a0b4",
+      "#0047AB",
+      "#f5f0e1"
+     ]
+    },
+    {
+     "naam": "Lichtgrijs + paars + zand",
+     "sfeer": "uit je rapport, rustig en verfijnd",
+     "kleuren": [
+      "lichtgrijs",
+      "paars",
+      "zand",
+      "ecru"
+     ],
+     "hex": [
+      "#c4c4c8",
+      "#7b3fa0",
+      "#e0d5bf",
+      "#f5f0e1"
+     ]
+    },
+    {
+     "naam": "Zwart × felroze",
+     "sfeer": "krachtig & verleidelijk",
+     "kleuren": [
+      "zwart",
+      "zwart",
+      "felroze",
+      "wit"
+     ],
+     "hex": [
+      "#111",
+      "#333",
+      "#e8407a",
+      "#f8f4ef"
+     ]
+    },
+    {
+     "naam": "Bruin × turquoise",
+     "sfeer": "aards & verrassend",
+     "kleuren": [
+      "bruin",
+      "camel",
+      "turquoise",
+      "gebroken-wit"
+     ],
+     "hex": [
+      "#5c3317",
+      "#c19a6b",
+      "#2ab0a8",
+      "#f0e8d8"
+     ]
+    },
+    {
+     "naam": "Navy × geel",
+     "sfeer": "klassiek & vrolijk",
+     "kleuren": [
+      "donkerblauw",
+      "marine",
+      "geel",
+      "wit"
+     ],
+     "hex": [
+      "#162038",
+      "#1a2a4a",
+      "#d4b84a",
+      "#f8f4ef"
+     ]
+    },
+    {
+     "naam": "Grijs × rood",
+     "sfeer": "grafisch & sterk",
+     "kleuren": [
+      "grijs",
+      "grijs",
+      "rood",
+      "wit"
+     ],
+     "hex": [
+      "#888",
+      "#555",
+      "#cc2211",
+      "#f8f4ef"
+     ]
+    },
+    {
+     "naam": "Bruin × kobaltblauw",
+     "sfeer": "onverwacht & krachtig",
+     "kleuren": [
+      "bruin",
+      "camel",
+      "kobaltblauw",
+      "gebroken-wit"
+     ],
+     "hex": [
+      "#5c3317",
+      "#c19a6b",
+      "#0047AB",
+      "#f0e8d8"
+     ]
+    },
+    {
+     "naam": "Chocolade × roze",
+     "sfeer": "de combo van je inspiratie",
+     "kleuren": [
+      "chocolade",
+      "bruin",
+      "roze",
+      "ecru"
+     ],
+     "hex": [
+      "#3d2314",
+      "#5c3317",
+      "#e8a0b4",
+      "#f5f0e1"
+     ]
+    },
+    {
+     "naam": "Antraciet × botergeel",
+     "sfeer": "stoer met een zachte pop",
+     "kleuren": [
+      "antraciet",
+      "zwart",
+      "botergeel",
+      "gebroken-wit"
+     ],
+     "hex": [
+      "#3a3d42",
+      "#111",
+      "#f5e6a8",
+      "#f0e8d8"
+     ]
+    },
+    {
+     "naam": "Taupe × koraal",
+     "sfeer": "ingetogen met warmte",
+     "kleuren": [
+      "taupe",
+      "zand",
+      "koraal",
+      "ecru"
+     ],
+     "hex": [
+      "#8b7d6b",
+      "#e0d5bf",
+      "#f4715e",
+      "#f5f0e1"
+     ]
+    },
+    {
+     "naam": "Ecru × smaragdgroen",
+     "sfeer": "rustig en rijk",
+     "kleuren": [
+      "ecru",
+      "zand",
+      "smaragdgroen",
+      "chocolade"
+     ],
+     "hex": [
+      "#f5f0e1",
+      "#e0d5bf",
+      "#0f7361",
+      "#3d2314"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "grafisch",
+   "label": "Grafisch",
+   "uitleg": "Hoog contrast — eigen toevoeging, staat niet in je rapport",
+   "bron": "trend",
+   "voorbeelden": [
+    {
+     "naam": "Zwart-wit + goud",
+     "sfeer": "tijdloos & luxe",
+     "kleuren": [
+      "zwart",
+      "wit",
+      "geel",
+      "grijs"
+     ],
+     "hex": [
+      "#111",
+      "#f8f4ef",
+      "#c9a84c",
+      "#888"
+     ]
+    },
+    {
+     "naam": "Marine + crème + zwart",
+     "sfeer": "strak & doordacht",
+     "kleuren": [
+      "marine",
+      "gebroken-wit",
+      "zwart",
+      "camel"
+     ],
+     "hex": [
+      "#162038",
+      "#f0e8d8",
+      "#111",
+      "#c19a6b"
+     ]
+    },
+    {
+     "naam": "Bordeaux + zwart + goud",
+     "sfeer": "dramatisch & elegant",
+     "kleuren": [
+      "bordeaux",
+      "zwart",
+      "geel",
+      "gebroken-wit"
+     ],
+     "hex": [
+      "#6e1020",
+      "#111",
+      "#c9a84c",
+      "#f0e8d8"
+     ]
+    },
+    {
+     "naam": "Kobaltblauw + wit + rood",
+     "sfeer": "power dressing",
+     "kleuren": [
+      "kobaltblauw",
+      "wit",
+      "rood",
+      "zwart"
+     ],
+     "hex": [
+      "#0047AB",
+      "#f8f4ef",
+      "#cc2211",
+      "#111"
+     ]
+    },
+    {
+     "naam": "Marine + wit + rood",
+     "sfeer": "maritiem, tijdloos",
+     "kleuren": [
+      "marine",
+      "wit",
+      "rood",
+      "goud"
+     ],
+     "hex": [
+      "#1a2a4a",
+      "#f8f4ef",
+      "#cc2211",
+      "#c9a84c"
+     ]
+    },
+    {
+     "naam": "Zwart + ecru + cognac",
+     "sfeer": "strak met warmte",
+     "kleuren": [
+      "zwart",
+      "ecru",
+      "cognac",
+      "taupe"
+     ],
+     "hex": [
+      "#111",
+      "#f5f0e1",
+      "#8B4513",
+      "#8b7d6b"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "inspiratie",
+   "label": "Van je inspiratieplaat",
+   "uitleg": "Looks die je zelf bewaarde — actueel streetstyle",
+   "bron": "trend",
+   "voorbeelden": [
+    {
+     "naam": "Chocolade × zacht roze",
+     "sfeer": "de raglan-combo — warm & modern",
+     "kleuren": [
+      "chocolade",
+      "roze",
+      "gebroken-wit",
+      "camel"
+     ],
+     "hex": [
+      "#3d2314",
+      "#e8a0b4",
+      "#f0e8d8",
+      "#c19a6b"
+     ]
+    },
+    {
+     "naam": "Hemelsblauw × denim × cognac",
+     "sfeer": "frisse lucht op warme grond",
+     "kleuren": [
+      "hemelsblauw",
+      "lichtblauw",
+      "cognac",
+      "gebroken-wit"
+     ],
+     "hex": [
+      "#4aa8d8",
+      "#a8c4e0",
+      "#8B4513",
+      "#f0e8d8"
+     ]
+    },
+    {
+     "naam": "Denim tonal",
+     "sfeer": "blauw op blauw, zonder ruis",
+     "kleuren": [
+      "marine",
+      "denimblauw",
+      "lichtblauw",
+      "ijsblauw"
+     ],
+     "hex": [
+      "#1a2a4a",
+      "#4a6d94",
+      "#a8c4e0",
+      "#d4e4f0"
+     ]
+    },
+    {
+     "naam": "Khaki × wit × zwart",
+     "sfeer": "utility, strak afgewerkt",
+     "kleuren": [
+      "olijf/khaki",
+      "wit",
+      "zwart",
+      "camel"
+     ],
+     "hex": [
+      "#6b7c45",
+      "#f8f4ef",
+      "#111",
+      "#c19a6b"
+     ]
+    },
+    {
+     "naam": "Bordeaux × lichtblauw",
+     "sfeer": "onverwacht en rijk",
+     "kleuren": [
+      "bordeaux",
+      "lichtblauw",
+      "gebroken-wit",
+      "zwart"
+     ],
+     "hex": [
+      "#6e1020",
+      "#a8c4e0",
+      "#f0e8d8",
+      "#111"
+     ]
+    },
+    {
+     "naam": "Botergeel × zwart",
+     "sfeer": "zacht geel met harde rand",
+     "kleuren": [
+      "botergeel",
+      "zwart",
+      "gebroken-wit",
+      "taupe"
+     ],
+     "hex": [
+      "#f5e6a8",
+      "#111",
+      "#f0e8d8",
+      "#8b7d6b"
+     ]
+    },
+    {
+     "naam": "Marine × wit × licht denim",
+     "sfeer": "nonchalant klassiek",
+     "kleuren": [
+      "marine",
+      "wit",
+      "lichtblauw",
+      "goud"
+     ],
+     "hex": [
+      "#1a2a4a",
+      "#f8f4ef",
+      "#a8c4e0",
+      "#c9a84c"
+     ]
+    }
+   ]
+  }
+ ],
+ "trends": "AANVULLENDE TRENDINFORMATIE (najaar/winter 2026) — SECUNDAIR.\nGebruik dit pas nadat je het stijlrapport hebt toegepast, en alleen waar het\nGriette's DNA versterkt. Noem het expliciet als trend, niet als rapportadvies.\n\nKleuren: bruin, bordeaux en pruimpaars vervangen het zware zwart in\nnajaarscollecties (diepbruin +50% zoekvolume, paars +60%, bordeaux +46%).\nElektrisch turquoise als onverwacht accent. Zachtere blush-tinten naast rijkere\nbessentinten; kersenrood als frissere update van rood.\nSleutelstukken: funnel-neck jas met hoge kraag, suède laarzen (van slank\nknie-hoog tot slouchy western), donkere denimwassing, trenchcoat in marine of\nchocoladebruin, leer- en suèdedetails.\nMaterialen: zachte, romantische stoffen tegenover zware buitenlagen — kant en\nzijde naast bouclé wol en gestructureerd nepbont.\nRichting: van quiet luxury naar meer maximalisme; runways kleurrijker dan\nvoorheen.\n\nLet op de aansluiting met Griette: bruin, bordeaux, paars, suède en\nchocoladebruine trenchcoat sluiten naadloos aan op haar palet. Kersenrood past\nbij haar warme oranje-rood. Elektrisch turquoise is een trendkleur buiten haar\nrapport — bied dat aan als bewuste keuze.",
+ "smaak": {
+  "kern": "Zij wil er ontspannen en moeiteloos uitzien, casual maar met een vrouwelijk en kleurrijk accent. Ze wil opvallen door kleur en een blikvanger-accessoire, niet door aandacht te trekken met vorm.",
+  "silhouet": "Steeds een los, oversized bovenstuk boven een wijde broek of rok, zonder duidelijke taillebenadrukking.",
+  "kleuren": "Rustige basis (denimblauw, wit, beige, zwart) met telkens één of twee heldere accentkleuren zoals roze, groen, geel of blauw.",
+  "texturen": "Soepele, casual stoffen zoals jersey, denim en katoen, af en toe met kant of gebreide structuur voor wat contrast.",
+  "accessoires": "Eén opvallende tas (rieten, gekleurd of logo) trekt de aandacht, schoenen blijven functioneel en rustig (sneakers, sandalen, boots).",
+  "terugkerend": [
+   "Oversized bovenstuk boven wijde broek/rok",
+   "Eén helder kleuraccent op neutrale basis",
+   "Denim als terugkerende basisstof",
+   "Statement tas als blikvanger",
+   "Platte of functionele schoenen",
+   "Losse, ongedwongen houding in de pose"
+  ],
+  "spanning": "Haar eigen smaak kiest bewust voor los-op-los en weinig taillebenadrukking, terwijl het stijlrapport juist taille en vorm centraal stelt — dit is een directe botsing. Ook zoekt zij vaker een zachte, open hals via oversized truien, wat overeenkomt met het rapport, maar de algehele silhouetkeuze wijkt af; bij twijfel volgt de stylist het rapport en brengt taille of een riem terug als breekpunt.",
+  "regels": [
+   "Combineer oversized boven met taillerende broek of riem als breekpunt",
+   "Gebruik één helder accent op rustige basis",
+   "Kies zachte, open halslijn ondanks casual voorkeur",
+   "Eén statement-accessoire per look, rest neutraal",
+   "Houd materialen soepel maar met structuur",
+   "Sneakers of boots blijven functioneel, niet dominant"
+  ],
+  "bron": "beide",
+  "aantal": 10,
+  "gemaakt": "2026-09-09T13:42:28.118Z"
+ },
+ "inspiratieplaat": [
+  {
+   "bestand": "data/inspo/plaat-01.jpg"
+  },
+  {
+   "bestand": "data/inspo/plaat-02.jpg"
+  },
+  {
+   "bestand": "data/inspo/plaat-03.jpg"
+  },
+  {
+   "bestand": "data/inspo/plaat-04.jpg"
+  },
+  {
+   "bestand": "data/inspo/plaat-05.jpg"
+  },
+  {
+   "bestand": "data/inspo/plaat-06.jpg"
+  },
+  {
+   "bestand": "data/inspo/plaat-07.jpg"
+  },
+  {
+   "bestand": "data/inspo/plaat-08.jpg"
+  },
+  {
+   "bestand": "data/inspo/plaat-09.jpg"
+  },
+  {
+   "bestand": "data/inspo/plaat-10.jpg"
+  },
+  {
+   "bestand": "https://res.cloudinary.com/dhggari0g/image/upload/v1788961821/griette-inspiratie/griette_inspo_ip-mtu5odqgri48.jpg"
+  },
+  {
+   "bestand": "https://res.cloudinary.com/dhggari0g/image/upload/v1788961822/griette-inspiratie/griette_inspo_ip-mtu5oer5bqht.jpg"
+  }
+ ],
+ "gekocht": [
+  {
+   "naam": "crème fluffy vest met kraagje",
+   "datum": "2026-09-16"
+  },
+  {
+   "naam": "bruin faux fur cropped jasje",
+   "datum": "2026-09-16"
+  },
+  {
+   "naam": "mouwloos gebreid gilet paars",
+   "datum": "2026-09-16"
+  },
+  {
+   "naam": "bruin cropped vest",
+   "datum": "2026-09-16"
+  },
+  {
+   "naam": "rood t-shirt",
+   "datum": "2026-09-16"
+  },
+  {
+   "naam": "limegeel t-shirt met print",
+   "datum": "2026-09-16"
+  },
+  {
+   "naam": "bruine fijngebreide longsleeve",
+   "datum": "2026-09-16"
+  },
+  {
+   "naam": "marineblauw cropped jasje met gouden knopen",
+   "datum": "2026-09-16"
+  },
+  {
+   "naam": "bruin lakleren jack met ceintuur",
+   "datum": "2026-09-26"
+  },
+  {
+   "naam": "bruine croco teenslippers",
+   "datum": "2026-09-26"
+  },
+  {
+   "naam": "bruine suède enkellaarsjes met kitten heel",
+   "datum": ""
+  },
+  {
+   "naam": "zwarte croco laarsjes met kitten heel",
+   "datum": "2026-09-26"
+  },
+  {
+   "naam": "zwarte loafers met gouden gesp",
+   "datum": "2026-09-26"
+  }
+ ]
+}

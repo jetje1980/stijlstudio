@@ -1,0 +1,24 @@
+# Stijl Studio
+
+Persoonlijke stijlapp van Griette op stijlstudio.app (GitHub Pages, geen build-stap).
+Taal in code, commentaar en UI: Nederlands, informeel (je/jij).
+
+## Opbouw
+- `index.html` + `app/` — de app. ES-modules, geen framework.
+  - `app/kleur.js` — kleurfamilies en het herkennen van de kleurmanier (mono, ton-sur-ton, accent, analoog, split, colorblock).
+  - `app/engine.js` — de stylist die rekent: rapportregels, sferen, wensen, weer, voorstellen, wisselen en de tas. Geen AI.
+  - `app/ai.js` — de enige AI-aanroepen (labels uit een foto, "waarom", spiegelcheck) via de Supabase-functie `claude`.
+  - `app/opslag.js` — jouw staat in localStorage, en sync via de functie `griette-prive` (alleen met wachtwoord).
+  - `app/kaart.js` — outfitkaart rechtstreeks op canvas (geen html2canvas).
+  - `app/tabs/` — Kast, Outfits, Tas, Stijl.
+- `data/` — kast, rapport, kennis en de startoutfits. `kast.json` is gemaakt door `tools/migreer.py` uit een backup van de oude app.
+- `griette.html`, `outfitkaart.html`, `snel-toevoegen.html`, `rapport/` — de oude app, nog bereikbaar tot de nieuwe is goedgekeurd.
+
+## Regels
+- Rangorde: stijlrapport > stylingtheorie > trends/tips (die altijd met label).
+- Rekenwerk in de engine, niet in de AI. AI alleen waar je moet kijken of formuleren.
+- Een outfit die een rapportregel breekt (wijd op wijd, twee prints, …) wordt nooit voorgesteld.
+
+## Testen
+- `node tests/engine.test.mjs` — de motor op de echte kast.
+- `node tests/app.test.cjs` — de hele app in Chromium (Playwright), offline.
