@@ -612,6 +612,11 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
   <button type="button" data-meer-action="outfitcal" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
     <span style="font-size:18px;flex-shrink:0;">🗓</span><span style="flex:1;">Wat je droeg <span style="color:var(--muted);font-size:10px;">— je outfitgeschiedenis</span></span><span style="color:var(--muted);">›</span>
   </button>
+  <!-- Je eigen items, labels, outfits en draaglog staan alleen in deze browser.
+       Met dit bestand neemt de nieuwe app ze over. -->
+  <button type="button" onclick="closeMeerSheet();exporteerAlles();" class="meer-nav-btn" style="width:100%;padding:13px 16px;background:var(--white);border:1.5px solid var(--cream-dark);border-radius:12px;font-size:12px;font-family:Jost,sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;color:var(--brown);text-align:left;-webkit-tap-highlight-color:rgba(0,0,0,0.08);touch-action:manipulation;">
+    <span style="font-size:18px;flex-shrink:0;">💾</span><span style="flex:1;">Alles bewaren <span style="color:var(--muted);font-size:10px;">— één bestand voor de nieuwe app</span></span><span style="color:var(--muted);">›</span>
+  </button>
 
 
   <!-- Beheer collapsible -->
@@ -1510,13 +1515,6 @@ footer{text-align:center;padding:16px;font-size:9px;color:var(--muted);letter-sp
 <footer>Digitale Stylist · Iconic Wardrobe<br><span style="opacity:.5;font-size:9px;">versie 27 sep · tien kaarten op Home</span></footer>
 
 <script>
-// Alleen toegankelijk met Griette's persoonlijke code
-(function() {
-  var code = '';
-  try { code = localStorage.getItem('ss-code') || ''; } catch(e) {}
-  if (code !== 'SS-GRIET') { window.location.replace('stijlstudio.html'); }
-})();
-
 // ============ AI-AANROEPEN: MODEL EN TERUGVAL ============
 // Deze pagina draaide op claude-sonnet-4-6. Sonnet 5 is een generatie nieuwer
 // en een derde goedkoper: $2 in / $10 uit per miljoen tokens, tegen $3 / $15.
@@ -7082,7 +7080,7 @@ const manifestData = {
   name: "Griette Stylist",
   short_name: "Griette",
   description: "Persoonlijke digitale stylist van Griette",
-  start_url: "./griette_stylist_FIXED.html",
+  start_url: "./griette.html",
   display: "standalone",
   orientation: "portrait",
   background_color: "#f7f1e8",
@@ -15076,6 +15074,31 @@ function toggleMeerBeheer() {
   var open = sec.style.display !== 'none';
   sec.style.display = open ? 'none' : 'block';
   if (chev) chev.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+// Alles wat deze app (en de outfitkaart, zelfde adres) in de browser bewaart,
+// in één bestand. Ruw overgenomen: liever te veel mee dan iets kwijt.
+async function exporteerAlles() {
+  var data = {};
+  try {
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      data[k] = localStorage.getItem(k);
+    }
+  } catch(e) { alert('Kon de opgeslagen gegevens niet lezen: ' + e.message); return; }
+  var dump = JSON.stringify({ gemaakt: new Date().toISOString(), bron: location.href, data: data });
+  var naam = 'stijlstudio-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  var bestand = new File([dump], naam, { type: 'application/json' });
+  // Op de iPhone is delen de weg naar "Bewaar in Bestanden"
+  if (navigator.canShare && navigator.canShare({ files: [bestand] })) {
+    try { await navigator.share({ files: [bestand], title: naam }); return; }
+    catch(e) { if (e.name === 'AbortError') return; }
+  }
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(bestand);
+  a.download = naam;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
 }
 
 function updateHomeGreeting() {
