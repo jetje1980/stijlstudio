@@ -12,23 +12,28 @@ export const SFEREN = {
   cosy: { naam: 'Cosy', uitleg: 'Breisels, zachte stoffen, ton-sur-ton, platte schoenen',
     soort: { trui: 3, vest: 3, teddy: 3, gilet: 1, longsleeve: 1, jeans: 1, broek: 1, legging: 1, laarzen: 2, sneakers: 2, muts: 2, sjaal: 1, hakken: -3, topje: -2, blazer: -1 },
     textuur: { 'grof gebreid': 3, pluizig: 3, 'fijn gebreid': 2, 'suède': 1, glans: -1 },
+    snit: { ballon: 1, 'wide leg': 1, legging: 1 },
     methode: { tonsurton: 1.5, mono: 1, neutraal: 1, colorblock: -1 } },
   parisienne: { naam: 'Parisienne', uitleg: 'Rechte jeans of pantalon, blouse of fijn breisel, trench of blazer, loafers; neutraal met één accent',
     soort: { blouse: 3, trenchcoat: 3, loafers: 3, pantalon: 2, jeans: 2, blazer: 2, sjaal: 2, hakken: 1, longsleeve: 1, vest: 1, rok: 1, sandalen: 1, pet: -2, legging: -2, teddy: -1 },
     textuur: { 'fijn gebreid': 1, linnen: 1, denim: 1, leer: 1 },
     print: { streep: 3, stip: 1, luipaard: 1 },
+    snit: { recht: 2, flared: 2, 'wide leg': 1, slim: 1, ballon: -1, cargo: -2, barrel: -1 },
     methode: { accent: 2, neutraal: 1.5, tonsurton: 1, colorblock: -2, mix: -2 } },
   street: { naam: 'Streetstyle', uitleg: 'Sneakers, cargo, oversized, petje, technische jacks',
     soort: { sneakers: 3, pet: 3, jas: 2, broek: 2, jeans: 2, 't-shirt': 2, trui: 1, longsleeve: 1, sporttop: 1, hakken: -2, blouse: -1, pantalon: -1 },
     textuur: { structuur: 1, denim: 1, glad: 0.5 },
+    snit: { barrel: 2, ballon: 2, cargo: 2, 'wide leg': 1, flared: -1 },
     methode: { colorblock: 1, accent: 1 } },
   klassiek: { naam: 'Klassiek casual', uitleg: 'Je rapport als basis: blazer, pantalon, blouse, loafers of kitten heels',
     soort: { blazer: 3, pantalon: 3, blouse: 2, loafers: 3, hakken: 2, trenchcoat: 2, rok: 1, jurk: 1, top: 1, riem: 1, sneakers: -1 },
     textuur: { glans: 1, 'fijn gebreid': 1 },
+    snit: { 'wide leg': 2, recht: 1, flared: 1, potlood: 1, cargo: -2, ballon: -1 },
     methode: { split: 1, accent: 1, tonsurton: 1 } },
   vrouwelijk: { naam: 'Vrouwelijk', uitleg: 'Jurk of rok, kant, satijn, een open hals, kitten heels',
     soort: { jurk: 3, rok: 3, topje: 2, hakken: 2, sandalen: 1, blouse: 1, sjaal: 1, sneakers: -1, pet: -2 },
     textuur: { kant: 3, glans: 2, 'fijn gebreid': 1 },
+    snit: { 'A-lijn': 2, plissé: 2, wikkel: 2, flared: 1, cargo: -2 },
     methode: { analoog: 1, split: 1 } },
 };
 
@@ -168,6 +173,12 @@ export function score(o, ctx) {
   const stevig = kleding.some(i => ['denim', 'structuur', 'leer', 'suède', 'grof gebreid'].includes(i.textuur));
   if (soepel && stevig) s += 1;
 
+  // Taille: een hoge taille geeft je direct meer vorm (rapport). Een kort
+  // bovenstuk op een lage taille laat precies zien wat je niet wilt laten zien.
+  const ond = o.slots.onder;
+  if (ond && ond.taille === 'hoog') s += 0.8;
+  if (ond && ond.taille === 'laag' && o.slots.boven && o.slots.boven.pasvorm === 'kort') s -= 1.5;
+
   // kleuren bij je gezicht en uit je palet
   const gezicht = o.slots.boven || o.slots.heel;
   if (gezicht && ctx.rapport.kleur.gezicht.includes(gezicht.kleur[0])) s += 0.8;
@@ -193,6 +204,7 @@ export function score(o, ctx) {
       t += (sf.soort[i.soort] || 0) * 0.6;
       t += ((sf.textuur || {})[i.textuur] || 0) * 0.5;
       if (i.print) t += ((sf.print || {})[i.print] || 0) * 0.5;
+      if (i.snit) t += ((sf.snit || {})[i.snit] || 0) * 0.6;
     }
     t += (sf.methode[o.kleur.methode] || 0);
     s += t / sferen.length;

@@ -1023,12 +1023,14 @@
   "print": null,
   "textuur": "glad",
   "materiaal": "katoen",
-  "pasvorm": "aansluitend",
+  "pasvorm": "recht",
   "warmte": 2,
   "formeel": 3,
   "comfort": 3,
   "seizoen": "zomer",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_roze-maxi",
+  "snit": "recht",
+  "lengte": "maxi",
   "beschrijving": "felblauwroze, recht, licht fluiterend, glad woven katoen, onversierde zoom",
   "nagekeken": false
  },
@@ -1049,6 +1051,8 @@
   "comfort": 3,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_bruin-maxi",
+  "snit": "A-lijn",
+  "lengte": "maxi",
   "beschrijving": "diepbruin, wijd uitlopend vanaf taille, glad satijn, zacht glanzend",
   "nagekeken": false
  },
@@ -1063,12 +1067,14 @@
   "print": null,
   "textuur": "grof gebreid",
   "materiaal": null,
-  "pasvorm": "kort",
+  "pasvorm": "recht",
   "warmte": 3,
   "formeel": 3,
   "comfort": 4,
   "seizoen": "zomer",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_rood-rok",
+  "snit": "recht",
+  "lengte": "mini",
   "beschrijving": "diepwijnrood, recht, korte snit, grof gebreid, goudkleurige gesp",
   "nagekeken": false
  },
@@ -1129,6 +1135,7 @@
   "comfort": 4,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_adidas-broek",
+  "snit": "wide leg",
   "beschrijving": "marineblauw, wijd uitlopend vanaf heup, glad jersey, elastische taille, zijstreep",
   "nagekeken": false
  },
@@ -1170,6 +1177,7 @@
   "comfort": 4,
   "seizoen": "winter",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_khaki-bloemenprint",
+  "snit": "wide leg",
   "beschrijving": "olijfgroen khaki, wijd uitlopend vanaf heup, ruwe katoen, bloemenprint zwart, rechte pijpen",
   "nagekeken": false
  },
@@ -1190,6 +1198,7 @@
   "comfort": 4,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_bordeaux-stripe-broek",
+  "snit": "wide leg",
   "beschrijving": "diep bordeauxrood, wijd recht silhouet, zacht katoen, witte zijstreep, elastische taille",
   "nagekeken": false
  },
@@ -1210,6 +1219,8 @@
   "comfort": 4,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_pullbear-balloon-jeans",
+  "snit": "ballon",
+  "taille": "hoog",
   "beschrijving": "medium blauw, ballonmouw onderaan, ruwe denim, gescheurd knie, hoge taille",
   "nagekeken": false
  },
@@ -1231,6 +1242,7 @@
   "comfort": 4,
   "seizoen": "winter",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_zara-cargo-khaki",
+  "snit": "cargo",
   "beschrijving": "olijfgroen khaki, wijd recht cargo-fit, ruwe katoen ribstof, grote zakken zijkant, knopen",
   "nagekeken": false
  },
@@ -1251,6 +1263,8 @@
   "comfort": 4,
   "seizoen": "zomer",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775069275202",
+  "snit": "ballon",
+  "taille": "hoog",
   "beschrijving": "donkerblauw, wijde ballonbroek, linnen met natuurlijke nubs, hoge taille, rechte pijpen",
   "nagekeken": false
  },
@@ -1271,6 +1285,7 @@
   "comfort": 4,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775072420968",
+  "snit": "ballon",
   "beschrijving": "donkerbruin met zwart geruite print, wijde ballonbroek, wol blend met textuur, knopen, uitlopende pijpen",
   "nagekeken": false
  },
@@ -1291,6 +1306,9 @@
   "comfort": 4,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775072446265",
+  "snit": "barrel",
+  "lengte": "cropped",
+  "taille": "laag",
   "beschrijving": "lichtblauw verwassen, wijde getaperde ballonbroek, denim, ruw geweven, lage taille, getaperde enkels",
   "nagekeken": false
  },
@@ -1311,6 +1329,9 @@
   "comfort": 4,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775418539393",
+  "snit": "recht",
+  "lengte": "cropped",
+  "taille": "midden",
   "beschrijving": "lichtblauw verwassen, straight crop, denim, ruw, middelhoge taille, afgeknipt",
   "nagekeken": false
  },
@@ -1331,6 +1352,8 @@
   "comfort": 4,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775418612723",
+  "snit": "wide leg",
+  "taille": "laag",
   "beschrijving": "zeer licht blauw verwassen, laag uitgesneden wijd, denim, ruw, lage taille, wijde pijpen",
   "nagekeken": false
  },
@@ -1351,6 +1374,7 @@
   "comfort": 4,
   "seizoen": "winter",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775418688519",
+  "snit": "wide leg",
   "beschrijving": "donkergrijs, wijd en recht, oversized silhouet, grof gebreid wollen, wrap-over design, knoop",
   "nagekeken": false
  },
@@ -1391,6 +1415,7 @@
   "comfort": 4,
   "seizoen": "zomer",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775419518761",
+  "taille": "midden",
   "beschrijving": "lichtblauw verwassen, recht, mid-rise, ruwe denim, meerdere scheurmotieven voorkant en achterkant",
   "nagekeken": false
  },
@@ -1411,6 +1436,7 @@
   "comfort": 4,
   "seizoen": "zomer",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775419568589",
+  "snit": "wide leg",
   "beschrijving": "oud roze, wijd recht, elastische taille, fijn geribde katoenen stof, trekkoord in taille, volle lengte",
   "nagekeken": false
  },
@@ -1431,6 +1457,7 @@
   "comfort": 4,
   "seizoen": "zomer",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775419601514",
+  "snit": "wide leg",
   "beschrijving": "zwart, wijd recht, volle lengte, fijn geribde katoenen stof, trekkoord in taille, elastische tailleband",
   "nagekeken": false
  },
@@ -1451,6 +1478,8 @@
   "comfort": 4,
   "seizoen": "winter",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775584579591",
+  "snit": "A-lijn",
+  "lengte": "midi",
   "beschrijving": "zwart, getailleerde A-lijn, kniehoogte, fijn geribde tricot, elastische tailleband, strak zittend",
   "nagekeken": false
  },
@@ -1471,6 +1500,8 @@
   "comfort": 4,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775632125331",
+  "snit": "flared",
+  "taille": "hoog",
   "beschrijving": "lichtblauw, recht, wijd silhouet, ruwe denim, hoge taille, uitgeflaarde pijpen",
   "nagekeken": false
  },
@@ -1492,6 +1523,7 @@
   "comfort": 5,
   "seizoen": "zomer",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775672554323",
+  "snit": "wide leg",
   "beschrijving": "zwart met wit, wijd uitlopend, grof gebreid, chevron-zigzagpatroon",
   "nagekeken": false
  },
@@ -1534,6 +1566,7 @@
   "comfort": 4,
   "seizoen": "zomer",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775675622894",
+  "snit": "recht",
   "beschrijving": "donkerblauw met wit, recht met gebogen zoom, glad geweefde stof, drie witte strepen, logo",
   "nagekeken": false
  },
@@ -1554,6 +1587,8 @@
   "comfort": 4,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775848780392",
+  "snit": "wide leg",
+  "taille": "hoog",
   "beschrijving": "zeer lichtblauw, recht, wijde pasvorm, ruwe denim, hoge taille, klassiek snit",
   "nagekeken": false
  },
@@ -1575,6 +1610,7 @@
   "comfort": 4,
   "seizoen": "zomer",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775927420799",
+  "snit": "A-lijn",
   "beschrijving": "crème met oranje, getailleerd, A-lijn, grof gebreid, bloemen gehaakt patroon, scalloped zoom",
   "nagekeken": false
  },
@@ -1595,6 +1631,8 @@
   "comfort": 4,
   "seizoen": "winter",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775927974841",
+  "snit": "ballon",
+  "taille": "midden",
   "beschrijving": "Zwart met vervaagde tint, Wijd uitlopend ballon, mid-rise, Ruwe denim, Gouden knopen, rafelige zoom",
   "nagekeken": false
  },
@@ -1616,6 +1654,7 @@
   "comfort": 3,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775928073461",
+  "snit": "wide leg",
   "beschrijving": "Donkergrijs, Wijd uitlopend, getailleerd, Glad wollen mélange, Plooien bij taille",
   "nagekeken": false
  },
@@ -1636,6 +1675,8 @@
   "comfort": 4,
   "seizoen": "zomer",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775928354764",
+  "snit": "A-lijn",
+  "lengte": "mini",
   "beschrijving": "Helder oranje, Recht A-lijn mini, Zacht gebreid, Elastische rand bovenaan",
   "nagekeken": false
  },
@@ -1656,6 +1697,8 @@
   "comfort": 4,
   "seizoen": "zomer",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1775928664096",
+  "snit": "wide leg",
+  "taille": "hoog",
   "beschrijving": "Bleekgeel, Wijd uitlopend, hoge taille, Glad denim, Donkere zoom",
   "nagekeken": false
  },
@@ -1676,6 +1719,8 @@
   "comfort": 5,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1776676963025",
+  "snit": "legging",
+  "taille": "hoog",
   "beschrijving": "Zwart, Slim aansluitend, hoge taille, Glad nylon/elastaan, Nike logo",
   "nagekeken": false
  },
@@ -1697,6 +1742,8 @@
   "comfort": 4,
   "seizoen": "zomer",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1779007034987",
+  "snit": "wide leg",
+  "taille": "hoog",
   "beschrijving": "off-white, recht, wijde pijpen met plooien, glad geweven katoen, frontplooien, hoge taille",
   "nagekeken": false
  },
@@ -1717,6 +1764,7 @@
   "comfort": 4,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1787739922392",
+  "snit": "cargo",
   "beschrijving": "khaki groen, wijd uitlopend vanaf heup, ruwe katoenen twill, grote zakken, werkbroekstijl",
   "nagekeken": false
  },
@@ -1762,6 +1810,7 @@
   "comfort": 3,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/v1788635243/griette-wardrobe/griette-wardrobe/griette_custom-1788635241932.jpg",
+  "snit": "recht",
   "beschrijving": "donkerblauw navy, recht, volle lengte, fijne wollen stof, gespleten zoom, plooien",
   "nagekeken": false
  },
@@ -1782,6 +1831,7 @@
   "comfort": 3,
   "seizoen": "zomer",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1788707011154",
+  "snit": "wide leg",
   "beschrijving": "taupe beige, wijd uitlopend met plooien, zacht geweven linnen, frontplooien, volumineus",
   "nagekeken": false
  },
@@ -1802,6 +1852,9 @@
   "comfort": 4,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1788707134909",
+  "snit": "flared",
+  "lengte": "cropped",
+  "taille": "hoog",
   "beschrijving": "blauwgrijs denim, gecropt, wijd uitlopend, ruwe denim, high-waist, gespleten zoom",
   "nagekeken": false
  },
@@ -1822,6 +1875,9 @@
   "comfort": 4,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_custom-1788707185856",
+  "snit": "recht",
+  "lengte": "cropped",
+  "taille": "midden",
   "beschrijving": "verwassen middenblauw, recht, cropped tot knie, ruwe denim, klassieke vijfzakken, contrast stiksel",
   "nagekeken": false
  },
@@ -1842,6 +1898,8 @@
   "comfort": 4,
   "seizoen": "winter",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/v1788822048/griette-wardrobe/griette-wardrobe/griette_custom-1788822045084.jpg",
+  "snit": "barrel",
+  "taille": "hoog",
   "beschrijving": "donker indigoblauw, wijd uitlopend, barrel-fit, stevige ruwe denim, contraststiksel, hoge taille",
   "nagekeken": false
  },
@@ -1863,6 +1921,7 @@
   "comfort": 3,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/v1789207309/griette-wardrobe/griette-wardrobe/griette_custom-1789207304905.jpg",
+  "snit": "wide leg",
   "beschrijving": "beige met dunne donkere streepjes, wijd uitlopend, rechte pijp, geribbelde stof, plooien, riemlussen",
   "nagekeken": false
  },
@@ -1883,6 +1942,8 @@
   "comfort": 5,
   "seizoen": "altijd",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/v1789293725/griette-wardrobe/griette-wardrobe/griette_custom-1789293721872.jpg",
+  "snit": "legging",
+  "taille": "hoog",
   "beschrijving": "kobaltblauw, getailleerd, hoge taille, glad stretch sportmateriaal, hoge taille",
   "nagekeken": false
  },

@@ -7,6 +7,7 @@ import { labelsVoorFoto } from '../ai.js';
 import { syncStatus } from '../opslag.js';
 
 const ROLLEN = [['', 'Alles'], ['boven', 'Boven'], ['onder', 'Onder'], ['heel', 'Jurk & set'], ['laag', 'Laagjes'], ['jas', 'Jassen'], ['schoen', 'Schoenen'], ['tas', 'Tassen'], ['accessoire', 'Accessoires']];
+const TAILLE = { hoog: 'hoge taille', midden: 'middelhoge taille', laag: 'lage taille' };
 const FAMILIES = ['zwart', 'wit', 'grijs', 'bruin', 'blauw', 'groen', 'geel', 'oranje', 'rood', 'roze', 'paars', 'turquoise'];
 const FAM_STIP = { zwart: 'zwart', wit: 'ecru', grijs: 'lichtgrijs', bruin: 'bruin', blauw: 'donkerblauw', groen: 'groen', geel: 'geel', oranje: 'oranje', rood: 'rood', roze: 'roze', paars: 'paars', turquoise: 'turquoise' };
 
@@ -40,7 +41,7 @@ export default function kastTab(el, app, [sub]) {
       (!filter.rol || i.rol === filter.rol) &&
       (!filter.fam || i.kleur.some(k => info(k).fam === filter.fam)) &&
       (!filter.nooit || !log[i.id]) &&
-      (!z || (i.naam + ' ' + i.kleur.join(' ') + ' ' + i.soort).toLowerCase().includes(z)));
+      (!z || (i.naam + ' ' + i.kleur.join(' ') + ' ' + i.soort + ' ' + (i.snit || '')).toLowerCase().includes(z)));
     $('#raster').innerHTML = lijst.length
       ? lijst.map(i => tegel(i, log[i.id] ? '' : '')).join('')
       : `<p class="leeg-melding" style="grid-column:1/-1">Niets gevonden.</p>`;
@@ -71,6 +72,8 @@ export function detail(app, id, klaar) {
     /grijs|antraciet/.test(k) && ['boven', 'heel'].includes(i.rol) && 'Grijs bij je gezicht maakt je fletser: draag het in zachte stof of met een kleur erbij.',
     i.pasvorm === 'wijd' && i.rol === 'boven' && 'Wijd bovenstuk: altijd met een aansluitend of hoog onderstuk, of instoppen met riem.',
     i.pasvorm === 'wijd' && i.rol === 'onder' && 'Wijd onderstuk: combineer met iets aansluitends of korts erboven.',
+    i.taille === 'hoog' && 'Hoge taille: geeft je direct meer vorm.',
+    i.taille === 'laag' && 'Lage taille: liever met een langer bovenstuk of een laag, niet met een crop.',
     i.print && 'Print: dit is de enige in je outfit.',
   ].filter(Boolean);
 
@@ -79,7 +82,7 @@ export function detail(app, id, klaar) {
     <h2>${esc(i.naam)}</h2>
     <dl class="labels">
       <dt>Kleur</dt><dd>${i.kleur.map(k => stip(k) + ' ' + esc(k)).join(' &nbsp; ') || '—'}</dd>
-      <dt>Soort</dt><dd>${esc(i.soort)} · ${esc(i.pasvorm)}</dd>
+      <dt>Soort</dt><dd>${esc([i.soort, i.snit, i.snit ? '' : i.pasvorm, TAILLE[i.taille], i.lengte].filter(Boolean).join(' · '))}</dd>
       <dt>Stof</dt><dd>${esc(i.textuur)}${i.materiaal ? ' · ' + esc(i.materiaal) : ''}${i.print ? ' · ' + esc(i.print) : ''}</dd>
       <dt>Gedragen</dt><dd>${log.length ? `${log.length}× · laatst ${datum(log[0])}` : 'nog niet bijgehouden'}</dd>
       <dt>In outfits</dt><dd>${inOutfits.length}</dd>
