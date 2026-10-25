@@ -58,6 +58,12 @@ export function vanIds(app, ids, ctx) {
     const s = slotVan(i);
     if (slots[s]) slots.extra.push(i); else slots[s] = i;
   }
+  // Geen bovenstuk, wel een trui of blouse uit je laagjes: dan was dat het bovenstuk.
+  if (!slots.boven && !slots.heel && slots.laag && ['trui', 'blouse'].includes(slots.laag.soort)) {
+    slots.boven = slots.laag;
+    slots.laag = slots.extra.find(i => slotVan(i) === 'laag') || null;
+    if (slots.laag) slots.extra = slots.extra.filter(i => i !== slots.laag);
+  }
   return maakOutfit(slots, ctx);
 }
 
