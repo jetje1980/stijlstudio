@@ -1,7 +1,7 @@
 // node tests/engine.test.mjs
 import fs from 'fs';
 import { zetHex, herken } from '../app/kleur.js';
-import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur, uitSelectie, contrast, printMix, smaakVan, naMaken } from '../app/engine.js';
+import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur, uitSelectie, contrast, printMix, smaakVan, naMaken, mouwen } from '../app/engine.js';
 import { info } from '../app/kleur.js';
 const kast = JSON.parse(fs.readFileSync('data/kast.json'));
 const rapport = JSON.parse(fs.readFileSync('data/rapport.json'));
@@ -201,6 +201,16 @@ ok(telSnit(street, ['barrel', 'ballon', 'cargo']) >= telSnit(paris, ['barrel', '
     const u = pakTas(kast, { rapport, dagen: [{ naam: 'Za', temp: t, momenten: ['dag', 'avond'], doen: { dag: 'borrel en eten', avond: 'dansen in de kroeg' } }] });
     const o = u.plan[1].outfit;
     ok(o && ['topje', 'top'].includes(o.slots.boven?.soort) && o.slots.laag && o.slots.schoen?.soort !== 'hakken', `kroeg bij ${t}°: topje + laag, plat (${o && naam(o)})`);
+  }
+}
+// 21. mouwloos: altijd een laag met mouwen erover; bij kou een trui of vest én een jas
+{
+  for (const weer of ['koud', 'fris', 'mild', 'warm']) {
+    const os = stelVoor(kast, { rapport, weer }, 12).concat(stelVoor(kast, { rapport, weer, anker: [kast.find(i => /Donkerblauw spaghettitopje/.test(i.naam)).id] }, 3));
+    const topjes = os.filter(o => o.slots.boven && mouwen(o.slots.boven) === 'geen');
+    ok(topjes.length && topjes.every(o => o.slots.laag && mouwen(o.slots.laag) !== 'geen'), `${weer}: mouwloos altijd met een laag met mouwen (${topjes.length} keer)`);
+    if (weer === 'koud') ok(topjes.every(o => ['trui', 'vest', 'teddy', 'blazer'].includes(o.slots.laag.soort) && o.slots.jas), 'koud: over een topje een trui of vest, en een jas');
+    if (weer === 'koud') ok(os.filter(o => o.slots.boven && mouwen(o.slots.boven) === 'kort').every(o => o.slots.laag && mouwen(o.slots.laag) !== 'geen'), 'koud: ook over een t-shirt een laag met mouwen');
   }
 }
 console.log(goed, 'goed,', fout, 'fout,', Date.now() - t0, 'ms');

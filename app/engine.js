@@ -119,6 +119,24 @@ function pastBijWeer(i, klasse) {
   return !open(i) && i.soort !== 'zwemkleding' && i.soort !== 'muts';
 }
 
+// ── MOUWEN ───────────────────────────────────────────────────────────────────
+// 'geen' (spaghetti, topje, gilet), 'kort' of 'lang'. Uit soort en naam.
+export function mouwen(i) {
+  const t = `${i.naam} ${i.beschrijving || ''}`.toLowerCase();
+  if (i.soort === 'topje' || i.soort === 'gilet' || /spaghetti|mouwloos|\btank|hemdje|singlet|strapless|halter/.test(t)) return 'geen';
+  if (/short sleeve|korte mouw|t-?shirt/.test(t)) return 'kort';
+  if (['trui', 'longsleeve', 'blouse', 'vest', 'blazer', 'teddy', 'jas', 'trenchcoat'].includes(i.soort) || /longsleeve|long sleeve|lange mouw|sleeve|mouw/.test(t)) return 'lang';
+  return 'kort';
+}
+// Wat er over de armen moet: een mouwloos topje nooit zonder laag met
+// mouwen (een gilet telt niet), en bij kou ook een t-shirt niet.
+function armenTeKoud(o, weer) {
+  const b = o.slots.boven;
+  if (!b || weer === 'warm') return false;
+  const nodig = mouwen(b) === 'geen' || (weer === 'koud' && mouwen(b) === 'kort');
+  return nodig && !(o.slots.laag && mouwen(o.slots.laag) !== 'geen');
+}
+
 // ── RAPPORTREGELS ────────────────────────────────────────────────────────────
 const STOPBAAR = new Set(['blouse', 't-shirt', 'top', 'topje', 'longsleeve']);
 
@@ -155,6 +173,9 @@ export function controleer(o, rapport, ctx = {}) {
     problemen.push({ regel: 'laagjes', tekst: 'Een blazer onder een oversized jas wordt te veel.' });
 
   // een zijstreep op een trainingsbroek is een detail, geen print
+  if (!ctx.sport && armenTeKoud(o, ctx.weer))
+    problemen.push({ regel: 'armen', tekst: mouwen(boven) === 'geen' ? 'Een mouwloos topje zonder laag met mouwen erover is te koud.' : 'Bij deze kou een trui of vest over je shirt.' });
+
   const prints = o.items.filter(i => i.print && !(i.print === 'streep' && /zijstreep|firebird|track/i.test(`${i.naam} ${i.beschrijving || ''}`)));
   if (prints.length > 1) {
     // Print op print, zoals stylisten het doen: alleen als je het aanzet, en
@@ -383,7 +404,7 @@ export function score(o, ctx) {
   }
   if (k === 'fris') s += (o.slots.laag || o.slots.jas) ? 1 : -1;
   // een warme jas is bij fris weer genoeg; nog een vest eronder wordt stapelen
-  if (k !== 'koud' && o.slots.jas && o.slots.jas.warmte >= 3 && o.slots.laag) s -= o.slots.jas.pasvorm === 'wijd' ? 2.5 : 1.2;
+  if (k !== 'koud' && o.slots.jas && o.slots.jas.warmte >= 3 && o.slots.laag && o.slots.boven && mouwen(o.slots.boven) === 'lang') s -= o.slots.jas.pasvorm === 'wijd' ? 2.5 : 1.2;
   if (k === 'warm') s -= Math.max(0, warmte - 4) * 0.8;
 
   // wat zij eerder wegwisselde of juist koos
@@ -478,7 +499,7 @@ const nieuweFout = (oud, nieuw) => harde(nieuw).some(p => !harde(oud).some(q => 
 // Een skelet met alleen een textuurprobleem kan nog goed komen met een laag.
 // Wijd op wijd met een instopbaar bovenstuk redt een riem nog.
 const metRiem = o => o.slots.boven && o.slots.onder && o.slots.boven.pasvorm === 'wijd' && o.slots.onder.pasvorm === 'wijd' && STOPBAAR.has(o.slots.boven.soort);
-const herstelbaar = o => harde(o).every(p => p.regel === 'textuur' || (p.regel === 'silhouet' && metRiem(o)));
+const herstelbaar = o => harde(o).every(p => p.regel === 'textuur' || p.regel === 'armen' || (p.regel === 'silhouet' && metRiem(o)));
 
 // Het skelet (boven+onder of één geheel) aankleden met schoen, laag, jas, tas.
 // Een aanvulling mag de gekozen kleurmanier niet breken: een gekleurd vest
@@ -509,8 +530,13 @@ function kleedAan(basis, p, ctx, gebruikt = new Map()) {
   probeer('schoen', p.schoen, true);
   const wilLaag = (ctx.wensen || []).includes('laag');
   // bij fris of koud weer moet een laag ook echt warmte geven
-  const lagen = ctx.weer === 'koud' || ctx.weer === 'fris' ? p.laag.filter(i => i.warmte >= 2) : p.laag;
-  if (ctx.weer !== 'warm' || ctx.laagjes) probeer('laag', lagen, (wilLaag && !p.jas.length) || (ctx.laagjes && o.slots.boven && ['topje', 'top'].includes(o.slots.boven.soort)));
+  let lagen = ctx.weer === 'koud' || ctx.weer === 'fris' ? p.laag.filter(i => i.warmte >= 2) : p.laag;
+  // Mouwloos topje: altijd een laag erover, met mouwen (ook bij warm weer,
+  // dan een lichte). Bij kou geldt dat ook voor een t-shirt. De jas telt niet.
+  const b0 = o.slots.boven;
+  const armen = !ctx.sport && b0 && (mouwen(b0) === 'geen' || (ctx.weer === 'koud' && mouwen(b0) === 'kort'));
+  if (armen) lagen = lagen.filter(i => mouwen(i) !== 'geen' && (ctx.weer !== 'koud' || ['trui', 'vest', 'teddy', 'blazer'].includes(i.soort)));
+  if (ctx.weer !== 'warm' || ctx.laagjes || armen) probeer('laag', lagen, (wilLaag && !p.jas.length) || armen || (ctx.laagjes && b0 && ['topje', 'top'].includes(b0.soort)));
   // onder de 16 graden ga je met een jas de deur uit
   // bij het sporten pas een jas als het echt koud is
   const jasNodig = ctx.sport ? (ctx.weer === 'koud' || ctx.weer === 'fris') && p.jas.length > 0 : (ctx.weer === 'koud' || ctx.weer === 'fris' || (wilLaag && !o.slots.laag));
@@ -520,7 +546,7 @@ function kleedAan(basis, p, ctx, gebruikt = new Map()) {
   else if (metRiem(o)) probeer('riem', p.riem, true);
   else if (ctx.weer === 'koud' || ctx.weer === 'fris') probeer('sjaal', p.sjaal, false);
   // De laag werd gekozen vóór de jas. Is hij met de jas erover overbodig, dan weg.
-  if (o.slots.laag && o.slots.jas && !wilLaag && !ctx.laagjes && !ankerIn('laag').length) {
+  if (o.slots.laag && o.slots.jas && !wilLaag && !ctx.laagjes && !armen && !ankerIn('laag').length) {
     const { laag, ...zonder } = o.slots;
     const n = maakOutfit(zonder, ctx);
     if (n.check.ok && n.score > o.score && past(n)) o = n;
@@ -559,7 +585,7 @@ export function stelVoor(kast, ctx, aantal = 3) {
   // aankleden. Is er een manier gekozen, dan gaan skeletten die al in die
   // manier zitten voor.
   // een wijd-op-wijd-skelet telt nog als fout tot de riem erbij is; niet te vroeg wegzetten
-  const voorrang = o => o.score + (ctx.methode && o.kleur.methode === ctx.methode ? 6 : 0) + (!o.check.ok && metRiem(o) ? 20 : 0);
+  const voorrang = o => o.score + (ctx.methode && o.kleur.methode === ctx.methode ? 6 : 0) + (!o.check.ok && herstelbaar(o) ? 20 : 0);
   const snel = skeletten.map(sk => maakOutfit(sk, ctx)).filter(herstelbaar)
     .sort((a, b) => voorrang(b) - voorrang(a)).slice(0, 260);
   const kandidaten = [];

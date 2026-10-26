@@ -81,7 +81,9 @@ function vandaag(el, app, opnieuw) {
   const o = vandaagOutfit;
   const bijgehouden = plek.querySelector('p.klein') && /bijgehouden/.test(plek.querySelector('p.klein').textContent) ? plek.querySelector('p.klein').outerHTML : '';
   if (!o) { plek.innerHTML = bijgehouden + '<p class="klein">Ik vind nu niets passends. Kijk of je kast labels heeft.</p>'; return; }
+  // de jas kies je zelf: welke, en of hij echt nodig is
   plek.innerHTML = bijgehouden + outfitHtml(o) + `
+    <div class="chips"><button class="chip" data-slot="jas" type="button">${o.slots.jas ? 'Andere jas, of zonder' : 'Jas erbij?'}</button></div>
     <div class="rij" style="margin-top:10px">
       <button class="knop" data-v="aan" type="button">Vandaag aan</button>
       <button class="knop licht" data-v="andere" type="button">Andere</button>
