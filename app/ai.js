@@ -3,9 +3,15 @@
 // systeemtekst, zodat je dat niet bij elke vraag opnieuw betaalt.
 
 const EIND = 'https://osuqtfsxmquwqsbgzlqn.supabase.co/functions/v1/claude';
-// Wat de proxy toestaat (supabase/functions/claude/index.ts)
+// Wat de proxy toestaat (supabase/functions/claude/index.ts). Kijken (labels,
+// inspiratie) doet Haiku 5.5: ruim twintig keer goedkoper dan Sonnet, en jij
+// checkt het resultaat toch. Formuleren en de spiegelcheck doet Sonnet.
 const OORDEEL = 'claude-sonnet-5';
-const LICHT = 'claude-haiku-4-5';
+const LICHT = 'claude-haiku-5-5';
+
+// Beelden niet groter sturen dan nodig: de kosten gaan per pixel. 1200 px aan
+// de lange kant is genoeg om kleding te herkennen.
+const klein = url => /res\.cloudinary\.com/.test(url) ? url.replace('/image/upload/', '/image/upload/c_limit,w_1200,h_1200,q_auto/') : url;
 
 let rapportKort = '';
 export function zetRapport(r) {
@@ -35,7 +41,7 @@ export async function vraag({ taak = 'oordeel', vraag, beelden = [], max = 3000 
   const model = taak === 'licht' ? LICHT : OORDEEL;
   const content = [
     ...beelden.map(b => b.startsWith('http')
-      ? { type: 'image', source: { type: 'url', url: b } }
+      ? { type: 'image', source: { type: 'url', url: klein(b) } }
       : { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b.replace(/^data:[^,]+,/, '') } }),
     { type: 'text', text: vraag },
   ];
@@ -44,7 +50,8 @@ export async function vraag({ taak = 'oordeel', vraag, beelden = [], max = 3000 
     system: [{ type: 'text', text: rapportKort, cache_control: { type: 'ephemeral' } }],
     messages: [{ role: 'user', content }],
   };
-  if (model !== LICHT) body.output_config = { effort: 'low' };
+  // weinig nadenken: herkennen en kort formuleren vraagt geen diep redeneren
+  body.output_config = { effort: 'low' };
   let r;
   try {
     r = await fetch(EIND, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
@@ -101,7 +108,7 @@ Antwoord als JSON: {"werkt":"wat al goed is, 1 zin","verbeter":[{"wat":"de veran
 // Een inspiratiebeeld één keer lezen: wat zit erin, en welke vibe. Jij
 // bevestigt daarna wat klopt; alleen dat telt mee.
 export async function inspoAnalyse(beeld) {
-  const t = await vraag({ beelden: [beeld], max: 2500, vraag:
+  const t = await vraag({ taak: 'licht', beelden: [beeld], max: 2500, vraag:
 `Dit is een inspiratiebeeld dat Griette mooi vindt (screenshot van Pinterest of Instagram). Analyseer de look(s) als stylist. Antwoord als JSON, niets anders:
 {"samenvatting":"één zin: wat is de look",
  "stukken":[{"wat":"korte omschrijving in het Nederlands","soort":"t-shirt|top|topje|longsleeve|blouse|trui|vest|gilet|blazer|teddy|jas|trenchcoat|jeans|broek|pantalon|rok|short|legging|jurk|sneakers|loafers|hakken|laarzen|sandalen|tas|riem|sjaal|pet|muts|sieraad|zonnebril",
