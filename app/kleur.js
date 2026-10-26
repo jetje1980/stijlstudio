@@ -122,6 +122,10 @@ export function herken(kleding, extra = []) {
   if (accentFams.length <= 3 && accentFams.every((a, i) => accentFams.every(b => a === b || buren(a, b) || CIRKEL[a] === undefined)))
     return r('analoog', { families: accentFams });
   if (accentFams.length === 2 && tegenover(accentFams[0], accentFams[1])) return r('colorblock', { families: accentFams });
+  // Twee kleuren die geen buren en geen tegenpolen zijn (rood met paars), op
+  // een rustige basis: dat is gewoon neutraal met accenten. "Er is geen limiet
+  // op het aantal accentkleuren", zolang de rest rustig blijft (rapport).
+  if (accentFams.length === 2 && hoofd.some(k => k.neutraal)) return r('accent', { accent: accentFams });
   if (accentFams.length === 3) {
     // één sterke kleur met twee lichte tinten erbij
     const acc = alles.filter(k => !k.neutraal && k.fam !== 'multi');

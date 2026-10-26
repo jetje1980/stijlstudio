@@ -32,6 +32,7 @@ function rapport(el, app) {
     <h2>Regels</h2>
     ${r.regels.map(x => `<div class="kaart"><b>${esc(x.titel)}</b><p class="klein" style="margin:4px 0 0">${esc(x.tekst)}</p></div>`).join('')}
     ${r.secties.map(s => `<h3>${esc(s.titel)}</h3>${s.intro ? `<p>${esc(s.intro)}</p>` : ''}<ul class="tips">${s.punten.map(p => `<li>${esc(p)}</li>`).join('')}</ul>`).join('')}
+    ${basisHtml(app)}
     <div class="kaart" style="margin-top:16px"><b>Oefentip</b><p class="waarom">${esc(r.oefentip)}</p>
       <a class="knop licht" href="#outfits/maak">Kies een gekleurd stuk →</a></div>
     <p class="klein">${esc(r.zwijgt)}</p>
@@ -40,7 +41,27 @@ function rapport(el, app) {
     ${app.data.rapportOutfits.map(o => `<div class="kaart"><div class="moment-kop"><b>${o.nr}. ${esc(o.naam)}</b>
       <span>${o.kleuren.map(k => stip(k, 13)).join('')}</span></div>
       <ul class="tips">${o.stukken.map(s => `<li>${s.id ? `<a href="#" data-item="${esc(s.id)}">${esc(s.naam)}</a> · in je kast` : esc(s.naam)}</li>`).join('')}</ul></div>`).join('')}`;
-  el.addEventListener('click', e => { const t = e.target.closest('[data-item]'); if (t) { e.preventDefault(); itemDetail(app, t.dataset.item); } });
+  el.addEventListener('click', e => {
+    const p = e.target.closest('[data-probeer-stuk]');
+    if (p) { zetKeuze({ anker: [p.dataset.probeerStuk] }); location.hash = '#outfits/maak'; return; }
+    const t = e.target.closest('[data-item]'); if (t) { e.preventDefault(); itemDetail(app, t.dataset.item); }
+  });
+}
+
+// Robins basisgarderobe: haar voorbeeldfoto, wat je ervan hebt, en "probeer".
+function basisHtml(app) {
+  const r = app.data.rapport;
+  if (!(r.basis || []).length) return '';
+  return `<h2>Jouw basisgarderobe</h2><p class="sub">${esc(r.basisIntro || '')}</p>
+    ${r.basis.map(g => `<h3>${esc(g.groep)}</h3><div class="outfit-lijst">${g.items.map(b => {
+      const heb = (b.kast || []).map(id => app.item(id)).filter(Boolean);
+      return `<div class="outfit-tegel"><img src="rapport/${esc(b.foto)}.jpg" alt="" loading="lazy" style="width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:10px">
+        <b>${esc(b.naam)}</b>${b.merk ? `<span class="klein">${esc(b.merk)}</span>` : ''}
+        ${b.tip ? `<p class="klein" style="margin:4px 0">${esc(b.tip)}</p>` : ''}
+        ${heb.length ? `<p class="klein" style="margin:4px 0">In je kast: ${heb.map(i => `<a href="#" data-item="${esc(i.id)}">${esc(i.naam)}</a>`).join(', ')}</p>
+          <button class="chip" data-probeer-stuk="${esc(heb[0].id)}" type="button">Outfits hiermee</button>`
+        : '<p class="klein" style="margin:4px 0">Nog niet in je kast (zie Shop)</p>'}</div>`;
+    }).join('')}</div>`).join('')}`;
 }
 
 function kleur(el, app) {

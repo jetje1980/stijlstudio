@@ -1,7 +1,7 @@
 // node tests/engine.test.mjs
 import fs from 'fs';
 import { zetHex, herken } from '../app/kleur.js';
-import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur, uitSelectie, contrast, printMix, smaakVan, naMaken, mouwen } from '../app/engine.js';
+import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur, uitSelectie, contrast, printMix, smaakVan, naMaken, mouwen, basisIds, maakOutfit } from '../app/engine.js';
 import { info } from '../app/kleur.js';
 const kast = JSON.parse(fs.readFileSync('data/kast.json'));
 const rapport = JSON.parse(fs.readFileSync('data/rapport.json'));
@@ -212,6 +212,19 @@ ok(telSnit(street, ['barrel', 'ballon', 'cargo']) >= telSnit(paris, ['barrel', '
     if (weer === 'koud') ok(topjes.every(o => ['trui', 'vest', 'teddy', 'blazer'].includes(o.slots.laag.soort) && o.slots.jas), 'koud: over een topje een trui of vest, en een jas');
     if (weer === 'koud') ok(os.filter(o => o.slots.boven && mouwen(o.slots.boven) === 'kort').every(o => o.slots.laag && mouwen(o.slots.laag) !== 'geen'), 'koud: ook over een t-shirt een laag met mouwen');
   }
+}
+// 22. Robins basisgarderobe: werkpaarden, en het paarse gilet als laagje
+{
+  const g = kast.find(i => /gilet paars/i.test(i.naam));
+  ok(basisIds(rapport).has(g.id), 'paarse gilet staat in Robins basis');
+  let n = 0, met = 0;
+  for (const weer of ['fris', 'mild']) for (const sf of [[], ['cosy'], ['street'], ['klassiek']]) for (const o of stelVoor(kast, { rapport, weer, sfeer: sf }, 6)) { n++; if (o.items.includes(g)) met++; }
+  ok(met / n >= 0.1, `paarse gilet komt regelmatig voorbij (${met} van ${n})`);
+  const rood = kast.find(i => i.naam === 'tshirt rood sezane'), jeans = kast.find(i => /Pull&Bear ballon/.test(i.naam));
+  const o = maakOutfit({ boven: rood, onder: jeans, laag: g }, { rapport, weer: 'mild' });
+  ok(o.check.ok && o.kleur.methode === 'accent', 'rood T-shirt met paars gilet op denim: neutraal met accenten, geen colorblock (' + o.kleur.methode + ')');
+  const a = stelVoor(kast, { rapport, weer: 'mild', anker: [g.id] }, 6);
+  ok(new Set(a.map(x => x.slots.boven && x.slots.boven.id)).size >= 5, 'met het gilet vast: steeds een ander bovenstuk');
 }
 console.log(goed, 'goed,', fout, 'fout,', Date.now() - t0, 'ms');
 process.exit(fout ? 1 : 0);

@@ -326,6 +326,16 @@ export function contrast(o) {
   return null;
 }
 
+// Robins basisgarderobe (rapport p. 25-29): stukken die met veel andere
+// kunnen. Wat je daarvan hebt, krijgt voorrang als werkpaard; een laagje uit
+// die lijst (zoals het paarse gilet) nog iets meer.
+const BASIS = new WeakMap();
+export function basisIds(rapport) {
+  if (!rapport) return new Set();
+  if (!BASIS.has(rapport)) BASIS.set(rapport, new Set((rapport.basis || []).flatMap(g => g.items.flatMap(i => i.kast || []))));
+  return BASIS.get(rapport);
+}
+
 const METHODE_WAARDE = { split: 1.5, tonsurton: 1.2, accent: 1.2, analoog: 0.8, mono: 0.6, neutraal: 0.3, colorblock: -0.5, mix: -3 };
 
 export function score(o, ctx) {
@@ -372,15 +382,21 @@ export function score(o, ctx) {
   const tegen = contrast(o);
   if (o.slots.schoen && !(tegen && tegen.pop === o.slots.schoen)) s -= Math.abs(o.slots.schoen.formeel - gem) * 0.4;
   // de schuif puur ←→ stoer × lief; zonder schuif een klein beetje
-  if (tegen) s += (ctx.contrast ?? 0.25) * 2.5;
+  if (tegen) s += (ctx.contrast ?? 0.25) * 3.5;
 
   // sfeer: één of meer. Meerdere worden gemengd (het gemiddelde van de
   // recepten), zodat cosy + streetstyle iets geeft dat van allebei heeft.
   const sferen = sfeerLijst(ctx.sfeer).map(k => SFEREN[k]).filter(Boolean);
   for (const sf of sferen) s += sfeerPunten(o, sf) / sferen.length;
+  // werkpaarden uit Robins basisgarderobe
+  const basis = basisIds(ctx.rapport);
+  if (basis.size) {
+    const w = o.items.filter(i => basis.has(i.id) && (ROLLEN_KLEDING.includes(i.rol) || i.rol === 'schoen')).length;
+    s += Math.min(w, 3) * 0.5 + (o.slots.laag && basis.has(o.slots.laag.id) ? 0.7 : 0);
+  }
   // jouw smaak van nu, uit je inspiratie (na rapport en theorie: een plusje)
   if (ctx.smaak) s += smaakPunten(o, ctx.smaak);
-  if (ctx.printMix && o.printMix) s += 1.2;
+  if (ctx.printMix && o.printMix) s += 2.5;
   // comfy ←→ sjiek
   if (ctx.sjiek != null) {
     // Te nette schoenen bij comfy (hakken op een strandwandeling) kosten
@@ -610,15 +626,23 @@ function kiesDivers(lijst, aantal, verschillendeManieren, seed) {
   const gekozen = [], gezien = new Set(), manieren = new Set();
   const start = seed ? Math.min(seed * 2, Math.max(0, lijst.length - aantal * 3)) : 0;
   const pool = lijst.slice(start).concat(lijst.slice(0, start));
-  const overlapt = o => gekozen.some(g => o.items.filter(i => ['boven', 'onder', 'heel'].includes(i.rol) && g.items.includes(i)).length >= 2
+  // op plek vergelijken, niet op rol: een blouse uit je laagjes kan het bovenstuk zijn
+  const overlapt = o => gekozen.some(g => ['boven', 'onder', 'heel'].filter(r => o.slots[r] && g.slots[r] === o.slots[r]).length >= 2
     || (o.slots.heel && g.slots.heel === o.slots.heel));
-  for (const ronde of [0, 1, 2]) {
+  const vloer = Math.max(...lijst.map(o => o.score), -Infinity) - 4;
+  const zelfdeBoven = o => o.slots.boven && gekozen.some(g => g.slots.boven === o.slots.boven);
+  // ronde 0: andere manier én ander bovenstuk; 1: ander bovenstuk; 2: niet
+  // twee kernstukken gelijk; 3: wat er nog over is
+  for (const ronde of [0, 1, 2, 3]) {
     for (const o of pool) {
       if (gekozen.length >= aantal) break;
       const k = sleutel(o);
       if (gezien.has(k)) continue;
       if (ronde === 0 && verschillendeManieren && manieren.has(o.kleur.methode)) continue;
-      if (ronde < 2 && overlapt(o)) continue;
+      if (ronde < 3 && overlapt(o)) continue;
+      if (ronde < 2 && zelfdeBoven(o)) continue;
+      // variatie, maar niet ten koste van alles: geen zwakke look om de variatie
+      if (ronde < 3 && o.score < vloer) continue;
       gekozen.push(o); gezien.add(k); manieren.add(o.kleur.methode);
     }
   }

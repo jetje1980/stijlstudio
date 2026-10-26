@@ -201,6 +201,8 @@ const WINKELS = [
 ];
 export const winkelLinks = term => WINKELS.map(([n, f]) => `<a class="chip" target="_blank" rel="noopener" href="${esc(f(encodeURIComponent(term)))}">${n}</a>`).join('');
 
+const basisMist = app => (app.data.rapport.basis || []).flatMap(g => g.items).filter(b => !(b.kast || []).some(id => app.item(id)));
+
 function shop(el, app) {
   const kast = app.kast();
   const log = app.draaglog();
@@ -218,6 +220,10 @@ function shop(el, app) {
     <h1>Shop</h1>
     <p class="sub">Eerst kijken wat je hebt, dan pas wat je mist.</p>
     <div class="balk"><span>${nooit} kledingstukken heb je in deze app nog nooit als gedragen bijgehouden.</span><a class="knop licht" href="#kast">Bekijk</a></div>
+    ${basisMist(app).length ? `<h3>Robins basisgarderobe, nog niet in je kast</h3>
+      ${basisMist(app).map(b => `<div class="kaart rij" style="flex-wrap:nowrap;align-items:flex-start">
+        <img src="rapport/${esc(b.foto)}.jpg" alt="" style="width:64px;height:80px;object-fit:cover;border-radius:8px;flex:none">
+        <div><b>${esc(b.naam)}</b>${b.merk ? ` <span class="klein">${esc(b.merk)}</span>` : ''}<div class="chips" style="margin-top:6px">${winkelLinks(b.naam)}</div></div></div>`).join('')}` : ''}
     <h3>Uit je rapport, nog niet in je kast</h3>
     ${lijst.map(m => `<div class="kaart"><b>${esc(m.naam)}</b><p class="klein">Komt terug in: ${esc(m.outfits.slice(0, 3).join(', '))}${m.outfits.length > 3 ? ' +' + (m.outfits.length - 3) : ''}</p>
       <div class="chips">${winkelLinks(m.naam)}</div></div>`).join('')}
