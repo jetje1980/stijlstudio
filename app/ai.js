@@ -50,7 +50,13 @@ export async function vraag({ taak = 'oordeel', vraag, beelden = [], max = 3000 
     r = await fetch(EIND, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
   } catch (e) { throw new Error('Geen verbinding met de stylist.'); }
   const d = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error((d.error && d.error.message) || 'De stylist gaf een fout (' + r.status + ').');
+  const melding = (d.error && d.error.message) || '';
+  // de limiet die je zelf bij Anthropic instelde is bereikt
+  if (/usage limits?/i.test(melding)) {
+    const tot = (melding.match(/on (\d{4}-\d{2}-\d{2})/) || [])[1];
+    throw new Error(`Je AI-limiet bij Anthropic is bereikt${tot ? ` (weer beschikbaar op ${tot.split('-').reverse().join('-')})` : ''}. Verhoog hem in console.anthropic.com bij Limits, of wacht tot dan.`);
+  }
+  if (!r.ok) throw new Error(melding || 'De stylist gaf een fout (' + r.status + ').');
   return tekstUit(d);
 }
 

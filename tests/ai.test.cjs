@@ -112,6 +112,16 @@ const JPG = Buffer.from('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP/////////////////////
   await p.click('#bord-ok'); await p.waitForTimeout(300);
   ok(JSON.parse(await p.evaluate(() => localStorage.getItem('stijlstudio-v2'))).tasConcept.bord.length === 2, 'tasbord: beide beelden in de tas');
 
+  // limiet bij Anthropic bereikt: duidelijke melding, beeld blijft, later opnieuw
+  await p.unroute(/functions\/v1\/claude/);
+  await p.route(/functions\/v1\/claude/, r => r.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ type: 'error', error: { type: 'invalid_request_error', message: 'You have reached your specified API usage limits. You will regain access on 2026-11-01 at 00:00 UTC.' } }) }));
+  await p.goto('http://127.0.0.1:8769/#stijl'); await p.waitForSelector('[data-chips="deel"]');
+  await p.click('[data-chips="deel"] .chip[data-w="inspiratie"]'); await p.waitForSelector('#inspo-in', { state: 'attached' });
+  await p.setInputFiles('#inspo-in', [{ name: 'c.jpg', mimeType: 'image/jpeg', buffer: JPG }, { name: 'd.jpg', mimeType: 'image/jpeg', buffer: JPG }]);
+  await p.waitForSelector('#alles-opnieuw', { timeout: 10000 });
+  ok(/AI-limiet bij Anthropic is bereikt \(weer beschikbaar op 01-11-2026\)/.test(await p.textContent('#inspo-st')), 'limiet bereikt: duidelijke melding met datum');
+  ok(/2 mislukte/.test(await p.textContent('#alles-opnieuw')), 'mislukte beelden blijven staan, met knop om alles opnieuw te lezen');
+
   // 5. Een fout van de stylist geeft een nette melding
   await p.unroute(/functions\/v1\/claude/);
   await p.route(/functions\/v1\/claude/, r => r.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: { message: 'tijdelijk niet beschikbaar' } }) }));
