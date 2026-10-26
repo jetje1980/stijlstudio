@@ -194,5 +194,14 @@ ok(telSnit(street, ['barrel', 'ballon', 'cargo']) >= telSnit(paris, ['barrel', '
   ok(na.gevonden[0].item && /Sabbi/.test(na.gevonden[0].item.naam), 'maak na: de camo-jas uit je kast');
   ok(na.outfits.length && na.outfits.every(o => o.check.ok), 'maak na: outfits binnen je rapport');
 }
+// 20. kroeg of dansen: topje met een laag die uit kan, platte schoenen
+{
+  ok(herkenActiviteit('dansen in de kroeg') === 'kroeg' && herkenActiviteit('borrelen') === 'feest', 'kroeg en dansen herkend');
+  for (const t of [8, 12, 19, 25]) {
+    const u = pakTas(kast, { rapport, dagen: [{ naam: 'Za', temp: t, momenten: ['dag', 'avond'], doen: { dag: 'borrel en eten', avond: 'dansen in de kroeg' } }] });
+    const o = u.plan[1].outfit;
+    ok(o && ['topje', 'top'].includes(o.slots.boven?.soort) && o.slots.laag && o.slots.schoen?.soort !== 'hakken', `kroeg bij ${t}°: topje + laag, plat (${o && naam(o)})`);
+  }
+}
 console.log(goed, 'goed,', fout, 'fout,', Date.now() - t0, 'ms');
 process.exit(fout ? 1 : 0);

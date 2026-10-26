@@ -73,6 +73,8 @@ export const ACTIVITEITEN = {
   pizzeria: { naam: 'Pizzeria', sjiek: 0.45 },
   dinner:   { naam: 'Uit eten', sjiek: 0.8 },
   feest:    { naam: 'Feest of borrel', sjiek: 0.9 },
+  // informeel: een topje met een laag erover die uit kan als het warm wordt
+  kroeg:    { naam: 'Kroeg of dansen', sjiek: 0.4, laagjes: true, wensen: ['plat'] },
   sport:    { naam: 'Sporten of hardlopen', sport: true },
 };
 // Zelf getypt ("hardloopwedstrijd", "etentje bij vrienden") vertalen naar een
@@ -86,7 +88,7 @@ export function herkenActiviteit(tekst) {
     [/strand|zee|duin/, 'strand'], [/wandel|hike|hiken|bos|natuur|berg/, 'wandelen'],
     [/chill|relax|luier|thuis|bank|lezen|spa/, 'chillen'], [/museum|expo|galerie|tentoonstelling/, 'museum'],
     [/pizza|snack|friet|burger/, 'pizzeria'], [/diner|uit eten|restaurant|etentje|eten/, 'dinner'],
-    [/feest|borrel|bruiloft|party|club|verjaardag|concert/, 'feest'], [/stad|shop|winkel|markt/, 'stad'],
+    [/kroeg|dansen|uitgaan|club|stappen|\bbar\b|cafe|café/, 'kroeg'], [/feest|borrel|bruiloft|party|verjaardag|concert/, 'feest'], [/stad|shop|winkel|markt/, 'stad'],
     [/lunch|terras|koffie|brunch|ontbijt/, 'terras'],
   ];
   const r = regels.find(([re]) => re.test(t));
@@ -133,7 +135,7 @@ export function controleer(o, rapport, ctx = {}) {
   if (heel && heel.pasvorm === 'wijd' && laag && laag.pasvorm === 'wijd') problemen.push({ regel: 'silhouet', tekst: 'Wijde set met een wijde laag erover.' });
 
   // Laagjes van dun naar dik: een blouse over een trui werkt niet.
-  const DIKTE = { topje: 1, sporttop: 1, 't-shirt': 1, top: 1.5, longsleeve: 2, blouse: 2, trui: 3, vest: 3.5, gilet: 3.5, blazer: 4, teddy: 5 };
+  const DIKTE = { topje: 0.5, sporttop: 0.5, 't-shirt': 1, top: 1.5, longsleeve: 2, blouse: 2, trui: 3, vest: 3.5, gilet: 3.5, blazer: 4, teddy: 5 };
   if (laag && (boven || heel) && (DIKTE[laag.soort] || 3) <= (DIKTE[(boven || heel).soort] || 1.5))
     problemen.push({ regel: 'laagjes', tekst: `${laag.soort} over ${(boven || heel).soort} draagt niet.` });
   // Twee dikke lagen op elkaar wordt te veel: over een trui alleen een gilet,
@@ -441,6 +443,15 @@ function pools(kast, ctx) {
     else if (i.soort === 'riem') p.riem.push(i);
     else if (i.soort === 'sjaal') p.sjaal.push(i);
   }
+  // Laagjes (kroeg, dansen): een topje als basis, en een trui of shirt erover
+  // die uit kan. Geen topje in de kast? Dan gewoon zoals altijd.
+  if (ctx.laagjes) {
+    const basis = p.boven.filter(i => i.soort === 'topje' || (i.soort === 'top' && i.warmte <= 1));
+    if (basis.length) {
+      for (const i of p.boven) if (['trui', 't-shirt', 'longsleeve'].includes(i.soort) && !p.laag.includes(i)) p.laag.push(i);
+      p.boven = basis;
+    }
+  }
   return p;
 }
 
@@ -499,7 +510,7 @@ function kleedAan(basis, p, ctx, gebruikt = new Map()) {
   const wilLaag = (ctx.wensen || []).includes('laag');
   // bij fris of koud weer moet een laag ook echt warmte geven
   const lagen = ctx.weer === 'koud' || ctx.weer === 'fris' ? p.laag.filter(i => i.warmte >= 2) : p.laag;
-  if (ctx.weer !== 'warm') probeer('laag', lagen, wilLaag && !p.jas.length);
+  if (ctx.weer !== 'warm' || ctx.laagjes) probeer('laag', lagen, (wilLaag && !p.jas.length) || (ctx.laagjes && o.slots.boven && ['topje', 'top'].includes(o.slots.boven.soort)));
   // onder de 16 graden ga je met een jas de deur uit
   // bij het sporten pas een jas als het echt koud is
   const jasNodig = ctx.sport ? (ctx.weer === 'koud' || ctx.weer === 'fris') && p.jas.length > 0 : (ctx.weer === 'koud' || ctx.weer === 'fris' || (wilLaag && !o.slots.laag));
@@ -509,11 +520,13 @@ function kleedAan(basis, p, ctx, gebruikt = new Map()) {
   else if (metRiem(o)) probeer('riem', p.riem, true);
   else if (ctx.weer === 'koud' || ctx.weer === 'fris') probeer('sjaal', p.sjaal, false);
   // De laag werd gekozen vóór de jas. Is hij met de jas erover overbodig, dan weg.
-  if (o.slots.laag && o.slots.jas && !wilLaag && !ankerIn('laag').length) {
+  if (o.slots.laag && o.slots.jas && !wilLaag && !ctx.laagjes && !ankerIn('laag').length) {
     const { laag, ...zonder } = o.slots;
     const n = maakOutfit(zonder, ctx);
     if (n.check.ok && n.score > o.score && past(n)) o = n;
   }
+  if (ctx.laagjes && o.slots.laag && o.slots.boven && ['topje', 'top'].includes(o.slots.boven.soort))
+    o = { ...o, check: { ...o.check, tips: o.check.tips.concat(`Dansen: wordt het warm, dan gaat ${o.slots.laag.naam.toLowerCase()} uit en dans je in je ${o.slots.boven.soort}.`) } };
   // Bij het sporten gaan kleurregels niet over krachtmetingen.
   if (ctx.sport) o = { ...o, check: { ...o.check, tips: [], problemen: o.check.problemen.filter(p => !p.zacht) } };
   // Geen jas die erbij past terwijl het fris is: dan is dit geen outfit.
@@ -715,6 +728,13 @@ export function pakTas(kast, opties) {
     if (!beste || w.waarde > beste.w.waarde) beste = { koffer, w };
   }
   let koffer = beste.koffer;
+  // Kroeg of dansen: een topje voor eronder, als dat er nog niet in zit.
+  if (mom.some(m => (ACTIVITEITEN[m.activiteit] || {}).laagjes) && !koffer.some(i => i.soort === 'topje')) {
+    const topjes = pool.filter(i => i.soort === 'topje' && !koffer.includes(i));
+    let top = null;
+    for (const t of topjes) { const w = waardeer(koffer.concat(t), ctx, nodig).waarde; if (!top || w > top.w) top = { t, w }; }
+    if (top) koffer = koffer.concat(top.t);
+  }
   if (mom.some(m => m.activiteit === 'sport')) {
     // Sportspullen gaan mee als er gesport wordt; de rest van de koffer telt daar niet voor.
     const sp = pools(pool, { ...ctx, sport: true, weer: 'mild' });
@@ -748,7 +768,7 @@ function momentCtx(m, n, ctx, sferen) {
   const sjiek = act && act.sjiek != null ? act.sjiek : m.moment === 'avond' ? Math.max(ctx.sjiek ?? 0.5, 0.75) : ctx.sjiek;
   const wensen = (ctx.wensen || []).concat((act && act.wensen) || []);
   return { act, mctx: { ...ctx, sfeer: m.sfeer || ctx.sfeer, weer: m.weer, sjiek, wensen, sport: !!(act && act.sport),
-    activiteit: m.activiteit, avond: m.moment === 'avond', reis: m.reis } };
+    activiteit: m.activiteit, avond: m.moment === 'avond', reis: m.reis, laagjes: !!(act && act.laagjes) } };
 }
 
 // Alle outfits voor één moment uit deze stukken, de best passende eerst.
@@ -819,6 +839,16 @@ function verdeel(koffer, mom, ctx, nodig, kast) {
     if (!os.length && kast) {
       erbij = aanvullen(koffer, kast, m, mctx, act);
       if (erbij.length) { koffer = koffer.concat(erbij); os = voorMoment(koffer, m, mctx, act); }
+    }
+    // Platte schoenen gevraagd (wandelen, dansen) maar alleen hakken in de
+    // koffer? Dan één paar platte uit de kast erbij.
+    if (os.length && kast && mctx.wensen.includes('plat') && !os.some(o => WENSEN.plat.test(o))) {
+      let top = null;
+      for (const k of pools(kast.filter(i => !koffer.includes(i)), mctx).schoen.filter(i => i.soort !== 'hakken').slice(0, 25)) {
+        const o = voorMoment(koffer.concat(k), m, mctx, act).find(x => WENSEN.plat.test(x));
+        if (o && (!top || o.score > top.o.score)) top = { k, o };
+      }
+      if (top) { koffer = koffer.concat(top.k); erbij = erbij.concat(top.k); os = voorMoment(koffer, m, mctx, act); }
     }
     // Liefst een kleurmanier die nog niet in de tas zit: zo zie je in één
     // koffer wat ton-sur-ton, mono of een accent met jouw stukken doet.
