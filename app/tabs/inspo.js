@@ -32,6 +32,7 @@ export function inspiratie(el, app) {
     <label class="knop vol" style="text-align:center">＋ Screenshots toevoegen<input type="file" accept="image/*" multiple id="inspo-in" hidden></label>
     <p class="klein" id="inspo-st">${esc(melding_)}</p>
     ${sm ? smaakHtml(sm) : ''}
+    ${checken.filter(x => x.status === 'fout').length > 1 ? `<button class="knop licht vol" id="alles-opnieuw" type="button" style="margin-top:10px">Alle ${checken.filter(x => x.status === 'fout').length} mislukte opnieuw lezen</button>` : ''}
     ${checken.length ? `<h3>Nog even checken</h3>${checken.map(x => `<div class="kaart rij" style="flex-wrap:nowrap;align-items:center">
       <img src="${esc(foto(x.beeld, 160))}" alt="" style="width:64px;height:80px;object-fit:cover;border-radius:8px;flex:none">
       <span class="klein" style="flex:1">${x.status === 'fout' ? 'Lezen lukte niet.' : x.status === 'lezen' ? 'Bezig met lezen…' : esc(x.analyse?.samenvatting || '')}</span>
@@ -47,6 +48,19 @@ export function inspiratie(el, app) {
     if (x.status === 'fout') return analyseer(app, x.id, $('#inspo-st')).then(() => checkBlad(app, x.id, () => inspiratie(el, app)));
     checkBlad(app, x.id, () => inspiratie(el, app));
   }));
+  const ao = $('#alles-opnieuw');
+  if (ao) ao.addEventListener('click', async () => {
+    const fout = lijst(app).filter(x => x.status === 'fout').map(x => x.id);
+    ao.disabled = true;
+    for (const [n, id] of fout.entries()) {
+      voortgang.textContent = `Beeld ${n + 1} van ${fout.length} lezen…`;
+      app.bij(s => { s.inspo.find(z => z.id === id).status = 'lezen'; });
+      await analyseer(app, id, voortgang);
+      if (lijst(app).find(z => z.id === id).status === 'fout') break; // limiet of storing: niet alles laten mislukken
+    }
+    if (!/lukte niet/.test(melding_)) voortgang.textContent = '';
+    inspiratie(el, app);
+  });
   $$('[data-na]', el).forEach(b => b.addEventListener('click', () => naMakenBlad(app, b.dataset.na)));
   $$('[data-arch]', el).forEach(b => b.addEventListener('click', () => {
     app.bij(s => { const x = s.inspo.find(y => y.id === b.dataset.arch); x.status = x.status === 'archief' ? 'bevestigd' : 'archief'; });
@@ -83,6 +97,7 @@ function smaakHtml(sm) {
 export async function voegToe(app, files, klaar, status, extra = {}, bijElk = null) {
   if (!files.length) return;
   const ids = [];
+  let mislukt = false;
   for (const [n, f] of files.entries()) {
     const id = 'i-' + Date.now().toString(36) + n;
     if (status) status.textContent = `Beeld ${n + 1} van ${files.length} uploaden…`;
@@ -93,10 +108,10 @@ export async function voegToe(app, files, klaar, status, extra = {}, bijElk = nu
     ids.push(id);
     if (bijElk) bijElk(id);
     if (status) status.textContent = `Beeld ${n + 1} van ${files.length} lezen… dit kan een halve minuut duren.`;
-    await analyseer(app, id, status);
+    if (!await analyseer(app, id, status)) mislukt = true;
     if (bijElk) bijElk(id);
   }
-  if (status) status.textContent = '';
+  if (status && !mislukt) status.textContent = '';
   // de beelden één voor één langs
   const volgende = () => {
     const id = ids.shift();
@@ -120,11 +135,14 @@ async function analyseer(app, id, status) {
   try {
     const a = await inspoAnalyse(x.beeld);
     app.bij(s => { const y = s.inspo.find(z => z.id === id); y.analyse = a; y.status = 'te checken'; });
+    bezig.delete(id);
+    return true;
   } catch (e) {
     app.bij(s => { s.inspo.find(z => z.id === id).status = 'fout'; });
-    if (status) status.textContent = 'Lezen lukte niet: ' + e.message + ' Tik op het beeld om het opnieuw te proberen.';
+    if (status) status.textContent = 'Lezen lukte niet: ' + e.message + ' Je beelden blijven bewaard; probeer het later opnieuw.';
   }
   bezig.delete(id);
+  return false;
 }
 
 // "Klopt het dat je dit bedoelt?" Per punt aan of uit; alleen wat aan staat telt.
