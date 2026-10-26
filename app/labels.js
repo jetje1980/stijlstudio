@@ -33,6 +33,7 @@ export function formulier(item, kleuren) {
     <label class="lab">Kleur ${stip(item.kleur?.[0] || 'multi', 12)}</label>
     <div class="rij">${select('kleur1', kl, item.kleur?.[0])}${select('kleur2', [''].concat(kl), item.kleur?.[1] || '')}</div>
     <label class="lab">Print</label>${select('print', PRINTS, item.print || '')}
+    <label class="lab">Grootte van de print</label>${knoppen('printGroot', [['klein', 'klein / fijn'], ['groot', 'groot']], item.printGroot)}
     <label class="lab">Textuur</label>${select('textuur', TEXTUREN, item.textuur)}
     <label class="lab">Materiaal</label><input class="veld" name="materiaal" value="${esc(item.materiaal || '')}" placeholder="weet ik niet mag ook">
     <label class="lab">Pasvorm</label>${knoppen('pasvorm', PASVORMEN.map(p => [p, p]), item.pasvorm)}
@@ -70,6 +71,7 @@ export function leesFormulier(root) {
     pasvorm: knop('pasvorm') || 'recht', warmte: +knop('warmte') || 2,
     formeel: +knop('formeel') || 3, comfort: +knop('comfort') || 3, seizoen: knop('seizoen') || 'altijd',
   };
+  if (uit.print && knop('printGroot')) uit.printGroot = knop('printGroot');
   // een sandaal met hak blijft een open schoen; die vlag niet wissen
   if (soort === 'sandalen') uit.open = true;
   if (uit.rol === 'onder') {

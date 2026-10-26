@@ -6,12 +6,13 @@ import { METHODEN, info } from '../kleur.js';
 import { esc, $, $$, collage, foto, blad, melding, chips, stip, tegel, verklein } from '../ui.js';
 import { tekenKaart, deelOfBewaar } from '../kaart.js';
 import { vertelOver, spiegelcheck } from '../ai.js';
+import { huidigeSmaak } from './inspo.js';
 import { detail as itemDetail } from './kast.js';
 
 const MANIEREN = ['tonsurton', 'mono', 'accent', 'analoog', 'split', 'colorblock', 'neutraal'];
 const KLEURKEUZE = ['donkerblauw', 'lichtblauw', 'bruin', 'camel', 'zwart', 'ecru', 'groen', 'olijf/khaki', 'rood', 'roze', 'paars', 'geel', 'oranje', 'turquoise'];
 
-const keuze = { open: false, anker: [], sfeer: [], sjiek: 0.5, schuif: false, contrast: null, methode: null, kleur: null, wensen: [], weer: null, seed: 0 };
+const keuze = { open: false, anker: [], sfeer: [], sjiek: 0.5, schuif: false, contrast: null, printMix: false, methode: null, kleur: null, wensen: [], weer: null, seed: 0 };
 let weerInfo = null;
 
 // Vanuit Stijl: "probeer deze kleurmanier met mijn kast".
@@ -64,7 +65,7 @@ function lijst(el, app) {
 }
 
 function vandaagCtx(app) {
-  return { rapport: app.data.rapport, weer: weerInfo ? weerInfo.klasse : 'mild', geheugen: app.staat().geheugen, seed: vandaagSeed };
+  return { rapport: app.data.rapport, weer: weerInfo ? weerInfo.klasse : 'mild', geheugen: app.staat().geheugen, seed: vandaagSeed, smaak: huidigeSmaak(app) };
 }
 
 function vandaag(el, app, opnieuw) {
@@ -148,7 +149,7 @@ export function vanIds(app, ids, ctx) {
 function context(app) {
   return {
     rapport: app.data.rapport, weer: keuze.weer || (weerInfo ? weerInfo.klasse : 'mild'),
-    sfeer: keuze.sfeer, sjiek: keuze.schuif ? keuze.sjiek : null, contrast: keuze.contrast, methode: keuze.methode, kleur: keuze.kleur,
+    sfeer: keuze.sfeer, sjiek: keuze.schuif ? keuze.sjiek : null, contrast: keuze.contrast, printMix: keuze.printMix, smaak: huidigeSmaak(app), methode: keuze.methode, kleur: keuze.kleur,
     wensen: keuze.wensen, anker: keuze.anker, geheugen: app.staat().geheugen, seed: keuze.seed,
   };
 }
@@ -315,7 +316,7 @@ export const contrastSchuif = w => `<div class="schuif"><span>puur</span><input 
 // Wat staat er aan, in één regel.
 function samenvatting() {
   return [keuze.sfeer.map(k => SFEREN[k].naam).join(' × '), keuze.schuif && (keuze.sjiek < 0.4 ? 'comfy' : keuze.sjiek > 0.6 ? 'sjiek' : 'midden'),
-    keuze.contrast != null && (keuze.contrast === 0 ? 'puur' : keuze.contrast >= 0.5 ? 'stoer × lief' : null),
+    keuze.contrast != null && (keuze.contrast === 0 ? 'puur' : keuze.contrast >= 0.5 ? 'stoer × lief' : null), keuze.printMix && 'print op print',
     keuze.methode && METHODEN[keuze.methode].naam, keuze.kleur, ...keuze.wensen.map(w => WENSEN[w].naam.toLowerCase())].filter(Boolean).join(' · ');
 }
 
@@ -342,6 +343,7 @@ function maker(el, app) {
       <p class="klein">Meer dan één? Dan mengt de app ze.</p>
       <div class="schuif"><span>comfy</span><input type="range" min="0" max="1" step="0.25" value="${keuze.sjiek}" id="sjiek" aria-label="Van comfy naar sjiek"><span>sjiek</span></div>
       ${contrastSchuif(keuze.contrast)}
+      <div class="chips"><button class="chip${keuze.printMix ? ' aan' : ''}" id="printmix" type="button">Print op print</button></div>
       ${keuze.sfeer.map(k => `<p class="klein"><b>${esc(SFEREN[k].naam)}</b>: ${esc(SFEREN[k].uitleg)}</p>`).join('')}
 
       <label class="lab">Kleurmanier</label>
@@ -368,8 +370,9 @@ function maker(el, app) {
   kies('wensen', w => { keuze.wensen = keuze.wensen.includes(w) ? keuze.wensen.filter(x => x !== w) : keuze.wensen.concat(w); });
   $('#sjiek').addEventListener('change', e => { keuze.sjiek = +e.target.value; keuze.schuif = true; keuze.seed = 0; maker(el, app); });
   $('#contrast').addEventListener('change', e => { keuze.contrast = +e.target.value; keuze.seed = 0; maker(el, app); });
+  $('#printmix').addEventListener('click', () => { keuze.printMix = !keuze.printMix; keuze.seed = 0; maker(el, app); });
   $('.bijsturen').addEventListener('toggle', e => { keuze.open = e.target.open; });
-  const wis = $('#wis'); if (wis) wis.addEventListener('click', () => { Object.assign(keuze, { sfeer: [], schuif: false, sjiek: 0.5, contrast: null, methode: null, kleur: null, wensen: [], seed: 0 }); maker(el, app); });
+  const wis = $('#wis'); if (wis) wis.addEventListener('click', () => { Object.assign(keuze, { sfeer: [], schuif: false, sjiek: 0.5, contrast: null, printMix: false, methode: null, kleur: null, wensen: [], seed: 0 }); maker(el, app); });
   $$('[data-anker-weg]', el).forEach(b => b.addEventListener('click', () => { keuze.anker = keuze.anker.filter(x => x !== b.dataset.ankerWeg); maker(el, app); }));
   $('#kies-anker').addEventListener('click', () => kiesAnker(app, kast, () => maker(el, app)));
 

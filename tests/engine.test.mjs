@@ -1,7 +1,7 @@
 // node tests/engine.test.mjs
 import fs from 'fs';
 import { zetHex, herken } from '../app/kleur.js';
-import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur, uitSelectie, contrast } from '../app/engine.js';
+import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur, uitSelectie, contrast, printMix, smaakVan, naMaken } from '../app/engine.js';
 import { info } from '../app/kleur.js';
 const kast = JSON.parse(fs.readFileSync('data/kast.json'));
 const rapport = JSON.parse(fs.readFileSync('data/rapport.json'));
@@ -167,6 +167,32 @@ ok(telSnit(street, ['barrel', 'ballon', 'cargo']) >= telSnit(paris, ['barrel', '
   const alle = [[], ['street'], ['parisienne'], ['klassiek']].flatMap(sf => stelVoor(kast, { rapport, weer: 'mild', sfeer: sf }, 12));
   const ww = alle.filter(o => o.slots.boven && o.slots.onder && o.slots.boven.pasvorm === 'wijd' && o.slots.onder.pasvorm === 'wijd');
   ok(ww.length && ww.every(o => o.slots.riem), `wijd op wijd alleen met riem (${ww.length} keer)`);
+}
+// 18. print op print: alleen als je het aanzet, en dan zoals stylisten het doen
+{
+  const twee = o => o.items.filter(i => i.print && !/zijstreep|firebird|track/i.test(i.naam + ' ' + (i.beschrijving || ''))).length >= 2;
+  const uit = stelVoor(kast, { rapport, weer: 'mild' }, 12), aan = stelVoor(kast, { rapport, weer: 'mild', printMix: true }, 12);
+  ok(!uit.some(twee), 'zonder print op print: nooit twee prints (rapport)');
+  const mixen = aan.filter(twee);
+  ok(mixen.length >= 1 && mixen.every(o => o.printMix && o.check.ok), `met print op print: ${mixen.length} mix(en), allemaal binnen de mix-regels`);
+  const p = (print, kleur, printGroot) => ({ naam: print, print, kleur: [kleur], printGroot });
+  ok(printMix(p('streep', 'donkerblauw'), p('luipaard', 'camel')).ok, 'streep met luipaard mag');
+  ok(!printMix(p('bloem', 'rood', 'groot'), p('ruit', 'groen', 'groot')).ok, 'twee grote prints zonder gedeelde kleur niet');
+  ok(!printMix(p('stip', 'rood'), p('stip', 'rood')).ok, 'twee keer dezelfde print niet');
+}
+// 19. jouw smaak uit inspiratie stuurt bij, en "maak na" vindt je eigen stukken
+{
+  const camo = { stukken: [{ soort: 'jas', rol: 'jas', kleur: ['olijf/khaki'], print: 'camouflage', pasvorm: 'wijd' }, { soort: 't-shirt', rol: 'boven', kleur: ['paars'] },
+    { soort: 'jeans', rol: 'onder', kleur: ['lichtblauw'], snit: 'wide leg', textuur: 'denim' }, { soort: 'sneakers', rol: 'schoen', kleur: ['bruin'] }], methode: 'accent', sferen: ['street'], stoerLief: 'stoer' };
+  const sm = smaakVan([{ analyse: camo, status: 'bevestigd', datum: '2026-10-20' }, { analyse: camo, status: 'archief', datum: '2026-10-20' }], '2026-10-26');
+  ok(sm.n === 1 && sm.soort.sneakers > 0.9, 'smaak: alleen bevestigde beelden tellen');
+  const oud = smaakVan([{ analyse: camo, status: 'bevestigd', datum: '2026-01-01' }, { analyse: { ...camo, stukken: [{ soort: 'blouse', rol: 'boven', kleur: ['wit'] }] }, status: 'bevestigd', datum: '2026-10-25' }], '2026-10-26');
+  ok(oud.soort.blouse > oud.soort.sneakers * 3, 'smaak: recent telt zwaarder dan oud');
+  const sneak = l => l.filter(o => o.slots.schoen && o.slots.schoen.soort === 'sneakers').length;
+  ok(sneak(stelVoor(kast, { rapport, weer: 'fris', smaak: sm }, 8)) >= sneak(stelVoor(kast, { rapport, weer: 'fris' }, 8)), 'smaak: meer sneakers als je inspiratie sneakers heeft');
+  const na = naMaken(kast, camo, { rapport, weer: 'fris' });
+  ok(na.gevonden[0].item && /Sabbi/.test(na.gevonden[0].item.naam), 'maak na: de camo-jas uit je kast');
+  ok(na.outfits.length && na.outfits.every(o => o.check.ok), 'maak na: outfits binnen je rapport');
 }
 console.log(goed, 'goed,', fout, 'fout,', Date.now() - t0, 'ms');
 process.exit(fout ? 1 : 0);

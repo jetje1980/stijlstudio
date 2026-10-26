@@ -60,7 +60,7 @@ export async function labelsVoorFoto(fotoUrl, naam) {
   const t = await vraag({ taak: 'licht', beelden: [fotoUrl], max: 600, vraag:
 `Beschrijf dit kledingstuk${naam ? ` ("${naam}")` : ''} als JSON, niets anders:
 {"naam":"korte naam","soort":"t-shirt|top|topje|longsleeve|blouse|trui|vest|gilet|blazer|teddy|jas|trenchcoat|jeans|broek|pantalon|rok|short|legging|jurk|co-ord|sneakers|loafers|hakken|laarzen|sandalen|tas|riem|sjaal|pet|muts|sieraad",
- "kleur":["hoofdkleur","eventueel tweede"],"print":null|"streep"|"stip"|"ruit"|"luipaard"|"bloem",
+ "kleur":["hoofdkleur","eventueel tweede"],"print":null|"streep"|"stip"|"ruit"|"luipaard"|"bloem"|"camouflage","printGroot":null|"klein"|"groot",
  "textuur":"glad|glans|fijn gebreid|grof gebreid|pluizig|denim|linnen|leer|suède|kant|structuur",
  "materiaal":"katoen|wol|denim|linnen|satijn|leer|suède|mohair|synthetisch|viscose|onbekend",
  "pasvorm":"aansluitend|recht|wijd|kort","warmte":1|2|3,
@@ -90,4 +90,27 @@ Haar kast:
 ${lijst}
 Antwoord als JSON: {"werkt":"wat al goed is, 1 zin","verbeter":[{"wat":"de verandering","waarom":"kort","uitKast":["id"],"nieuw":null|{"wat":"omschrijving","budget":"laag|midden|premium"}}],"foto":"één tip voor houding of hoek"}` });
   return jsonUit(t);
+}
+
+// Een inspiratiebeeld één keer lezen: wat zit erin, en welke vibe. Jij
+// bevestigt daarna wat klopt; alleen dat telt mee.
+export async function inspoAnalyse(beeld) {
+  const t = await vraag({ beelden: [beeld], max: 2500, vraag:
+`Dit is een inspiratiebeeld dat Griette mooi vindt (screenshot van Pinterest of Instagram). Analyseer de look(s) als stylist. Antwoord als JSON, niets anders:
+{"samenvatting":"één zin: wat is de look",
+ "stukken":[{"wat":"korte omschrijving in het Nederlands","soort":"t-shirt|top|topje|longsleeve|blouse|trui|vest|gilet|blazer|teddy|jas|trenchcoat|jeans|broek|pantalon|rok|short|legging|jurk|sneakers|loafers|hakken|laarzen|sandalen|tas|riem|sjaal|pet|muts|sieraad|zonnebril",
+   "kleur":["hoofdkleur","eventueel tweede"],"print":null|"streep"|"stip"|"ruit"|"luipaard"|"bloem"|"camouflage","printGroot":null|"klein"|"groot",
+   "snit":null|"recht"|"wide leg"|"flared"|"barrel"|"ballon"|"cargo"|"A-lijn"|"plissé","textuur":"glad|glans|fijn gebreid|grof gebreid|pluizig|denim|leer|suède|kant|structuur","pasvorm":"aansluitend|recht|wijd|kort","detail":null|"zijstreep"}],
+ "methode":"mono|tonsurton|analoog|accent|split|colorblock|neutraal",
+ "sferen":["cosy|parisienne|street|klassiek|vrouwelijk"],
+ "stoerLief":null|"stoer"|"lief"|"contrast",
+ "printMix":true|false,
+ "ideeen":["max 4 korte stylingideeën die je eruit haalt, bv. 'gouden kettingen gelaagd over een shirt'"]}
+Zie je meerdere looks met hetzelfde stuk, neem dan de stukken van alle looks één keer op.
+Kleuren uit: zwart, antraciet, lichtgrijs, wit, ecru, beige, zand, taupe, camel, bruin, chocolade, cognac, donkerblauw, marine, denimblauw, lichtblauw, ijsblauw, kobaltblauw, turquoise, groen, olijf/khaki, salie, mintgroen, geel, botergeel, mosterd, oranje, koraal, rood, oranje-rood, bordeaux, roze, felroze, oudroze, paars, lila/paars, goud, zilver.` });
+  const a = jsonUit(t);
+  a.stukken = Array.isArray(a.stukken) ? a.stukken : [];
+  a.sferen = Array.isArray(a.sferen) ? a.sferen : [];
+  a.ideeen = Array.isArray(a.ideeen) ? a.ideeen : [];
+  return a;
 }

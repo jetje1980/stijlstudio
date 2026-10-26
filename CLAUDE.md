@@ -10,7 +10,7 @@ Taal in code, commentaar en UI: Nederlands, informeel (je/jij).
   - `app/ai.js` — de enige AI-aanroepen (labels uit een foto, "waarom", spiegelcheck) via de Supabase-functie `claude`.
   - `app/opslag.js` — jouw staat in localStorage, en sync via de functie `griette-prive` (alleen met wachtwoord).
   - `app/kaart.js` — outfitkaart rechtstreeks op canvas (geen html2canvas).
-  - `app/tabs/` — Kast, Outfits, Tas, Stijl.
+  - `app/tabs/` — Kast, Outfits, Tas, Stijl. `inspo.js`: inspiratiebeelden, de check "klopt dit?", je smaak van nu en "maak na".
 - `data/` — kast, rapport, kennis en de startoutfits. `kast.json` is gemaakt door `tools/migreer.py` uit een backup van de oude app.
 - De oude app (`griette.html`, `outfitkaart.html`, …) is weg; terug te halen uit commit `8cc14e0`. `tools/dump-oud.js` heeft hem nodig.
 
