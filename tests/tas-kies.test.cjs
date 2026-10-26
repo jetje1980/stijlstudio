@@ -71,6 +71,30 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   // andere kiezen
   await p.click('[data-los="0"]'); await p.waitForTimeout(150);
   ok(await p.$('[data-p="0"] [data-kies]'), '"Andere kiezen" laat de opties weer zien');
+  await p.click('#compact'); await p.waitForTimeout(200);
+
+  // extra outfits met wat over is
+  await p.click('#extra-aan'); await p.waitForSelector('[data-extra]', { timeout: 10000 });
+  const voorPak = await p.$$eval('.paklijst li', x => x.length);
+  await p.click('[data-extra="0"]'); await p.waitForTimeout(300);
+  ok(await p.$$eval('#uitkomst [data-extraweg]', x => x.length) === 1, 'extra outfit staat erbij in je plan');
+  ok(await p.$$eval('.paklijst li', x => x.length) >= voorPak, 'paklijst groeit mee (of blijft gelijk)');
+  // tas en muts bij koud weer
+  const tassen = await p.$$eval('#uitkomst [data-p]', ks => ks.filter(k => k.querySelector('.stukken') && !/sport/i.test(k.querySelector('.moment-kop').textContent)).map(k => !!k.querySelector('[data-slot="tas"]')));
+  ok(tassen.length && tassen.every(Boolean), `elke outfit heeft een tas, behalve bij het sporten (${tassen.length})`);
+
+  // vastzetten
+  await p.click('#zet-vast'); await p.waitForSelector('[data-anders]');
+  ok(/staat vast/.test(await p.textContent('.sub')) && !(await p.$('#pak')), 'tas staat vast: geen invulscherm meer');
+  const was = await p.$eval('[data-p="0"] .stukken', x => x.textContent);
+  await p.click('[data-anders="0"]'); await p.waitForSelector('.blad [data-o]');
+  await p.click('.blad [data-o="0"]'); await p.waitForTimeout(300);
+  ok(/Anders dan je plan/.test(await p.textContent('[data-p="0"]')) && await p.$eval('[data-p="0"] .stukken', x => x.textContent) !== was, 'per dagdeel iets anders gekozen uit je tas');
+  await p.waitForTimeout(300);
+  await p.goto('about:blank'); await p.goto(url); await p.waitForSelector('[data-anders]');
+  ok(/Anders dan je plan|staat vast/.test(await p.textContent('#scherm')), 'na opnieuw openen staat de tas nog vast');
+  await p.click('#losmaken'); await p.waitForSelector('#pak');
+  ok(true, 'losmaken geeft het invulscherm terug');
   await p.screenshot({ path: path.join(require('os').tmpdir(), 'tas-kies.png'), fullPage: true });
   ok(!errs.length, 'geen fouten ' + errs.join(' '));
   await b.close(); server.close(); process.exit(fout ? 1 : 0);

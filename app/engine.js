@@ -443,6 +443,7 @@ export function score(o, ctx) {
     if (jas && !/wol|kunstbont|fleece|leer|mohair/.test(jas.materiaal || '') && jas.textuur !== 'pluizig') s -= 2.5;
   }
   if (k === 'fris') s += (o.slots.laag || o.slots.jas) ? 1 : -1;
+  if ((k === 'fris' || k === 'koud') && o.slots.muts) s += 0.4;
   // een warme jas is bij fris weer genoeg; nog een vest eronder wordt stapelen
   if (k !== 'koud' && o.slots.jas && o.slots.jas.warmte >= 3 && o.slots.laag && o.slots.boven && mouwen(o.slots.boven) === 'lang') s -= o.slots.jas.pasvorm === 'wijd' ? 2.5 : 1.2;
   if (k === 'warm') s -= Math.max(0, warmte - 4) * 0.8;
@@ -477,7 +478,7 @@ function pools(kast, ctx) {
   const uit = new Set(ctx.uitsluiten || []);
   const anker = new Set(ctx.anker || []);
   const ok = i => anker.has(i.id) || (!uit.has(i.id) && pastBijWeer(i, weer));
-  const p = { boven: [], onder: [], heel: [], laag: [], jas: [], schoen: [], tas: [], riem: [], sjaal: [] };
+  const p = { boven: [], onder: [], heel: [], laag: [], jas: [], schoen: [], tas: [], riem: [], sjaal: [], muts: [] };
   for (const i of kast) {
     if (!ok(i)) continue;
     // Sporten: alleen wat ervoor gemaakt is, sneakers eronder, geen tas.
@@ -503,6 +504,7 @@ function pools(kast, ctx) {
     else if (i.rol === 'tas') p.tas.push(i);
     else if (i.soort === 'riem') p.riem.push(i);
     else if (i.soort === 'sjaal') p.sjaal.push(i);
+    else if (i.soort === 'muts') p.muts.push(i);
   }
   // Laagjes (kroeg, dansen): een topje als basis, en een trui of shirt erover
   // die uit kan. Geen topje in de kast? Dan gewoon zoals altijd.
@@ -581,7 +583,9 @@ function kleedAan(basis, p, ctx, gebruikt = new Map()) {
   // bij het sporten pas een jas als het echt koud is
   const jasNodig = ctx.sport ? (ctx.weer === 'koud' || ctx.weer === 'fris') && p.jas.length > 0 : (ctx.weer === 'koud' || ctx.weer === 'fris' || (wilLaag && !o.slots.laag));
   if (jasNodig) probeer('jas', p.jas, true);
-  if (!ctx.sport) probeer('tas', p.tas, false);
+  // een tas hoort bij elke outfit (behalve bij het sporten); bij kou een muts
+  if (!ctx.sport) probeer('tas', p.tas, true);
+  if (!ctx.sport && (ctx.weer === 'koud' || ctx.weer === 'fris') && o.slots.jas) probeer('muts', p.muts, ctx.weer === 'koud');
   if (ctx.sport) { /* geen riem of sjaal bij het sporten */ }
   else if (metRiem(o)) probeer('riem', p.riem, true);
   else if (ctx.weer === 'koud' || ctx.weer === 'fris') probeer('sjaal', p.sjaal, false);
@@ -602,7 +606,7 @@ function kleedAan(basis, p, ctx, gebruikt = new Map()) {
 }
 
 export function slotVan(i) {
-  if (i.rol === 'accessoire') return i.soort === 'riem' ? 'riem' : 'sjaal';
+  if (i.rol === 'accessoire') return i.soort === 'riem' ? 'riem' : i.soort === 'muts' ? 'muts' : 'sjaal';
   return i.rol;
 }
 
@@ -788,6 +792,8 @@ export function pakTas(kast, opties) {
     if (koudste === 'koud' || koudste === 'fris') {
       const jas = pool.filter(i => i.rol === 'jas' && !koffer.includes(i)).sort((a, b) => (basis.includes(info(b.kleur[0]).fam) - basis.includes(info(a.kleur[0]).fam)) || r() - 0.5)[0];
       if (jas && !koffer.some(i => i.rol === 'jas')) koffer.push(jas);
+      const muts = pool.filter(i => i.soort === 'muts' && !koffer.includes(i)).sort((a, b) => basis.includes(info(b.kleur[0]).fam) - basis.includes(info(a.kleur[0]).fam))[0];
+      if (muts && !koffer.some(i => i.soort === 'muts')) koffer.push(muts);
     }
     let w = waardeer(koffer, ctx, nodig);
     // Verbeteren: één stuk ruilen zolang het beter wordt.
@@ -889,6 +895,8 @@ function aanvullen(basis, kast, m, mctx, act) {
   if (!p.schoen.length) mist.push('schoen');
   const koud = mctx.weer === 'koud' || mctx.weer === 'fris';
   if (koud && !p.jas.length && pk.jas.length) mist.push('jas');
+  if (!mctx.sport && !p.tas.length && pk.tas.length) mist.push('tas');
+  if (mctx.weer === 'koud' && !p.muts.length && pk.muts.length) mist.push('muts');
   if (!mist.length && voorMoment(basis, m, mctx, act).length) return [];
   for (const rol of mist) {
     // zolang er nog meer ontbreekt, geeft geen enkel stuk al een outfit; kies dan rustig
@@ -1072,6 +1080,34 @@ function waaromNiet(i, ctx) {
   if (i.rol === 'jas' && ctx.weer === 'warm') return 'Te warm voor een jas.';
   if (isSlipper(i)) return 'Slippers alleen bij warm weer op het strand of om te chillen.';
   return 'Past niet bij dit weer.';
+}
+
+// ── NA HET KIEZEN ───────────────────────────────────────────────────────────
+// Extra outfits: uit wat meegaat plus wat er over is (stukken die je klaarlegde
+// maar in geen gekozen outfit zitten). Elke extra gebruikt iets wat over is,
+// of is een nieuwe combinatie van wat al meegaat.
+export function extraOutfits(mee, over, opties, bestaand = [], max = 8) {
+  const mom = momenten(opties.dagen);
+  const tel = {};
+  for (const m of mom) tel[m.weer] = (tel[m.weer] || 0) + 1;
+  const weer = Object.entries(tel).sort((a, b) => b[1] - a[1])[0]?.[0] || 'mild';
+  const ctx = { rapport: opties.rapport, sfeer: opties.sfeer, sjiek: opties.sjiek ?? null, contrast: opties.contrast ?? null,
+    smaak: opties.smaak || null, printMix: !!opties.printMix, geheugen: opties.geheugen || {}, uitsluiten: [] };
+  const m = { dag: 'Extra', moment: 'extra', weer, activiteit: null, reis: false };
+  const { mctx, act } = momentCtx(m, 0, ctx, []);
+  const al = new Set(bestaand.map(sleutel));
+  const metOver = o => !over.length || o.items.some(i => over.includes(i));
+  const os = voorMoment(mee.concat(over), m, mctx, act).filter(o => !al.has(sleutel(o)) && metOver(o));
+  return { weer, outfits: divers(os, max) };
+}
+
+// Tijdens je weekend: voor één dagdeel alles wat kan met wat je bij je hebt.
+export function uitJeTas(items, moment, opties, max = 8) {
+  const ctx = { rapport: opties.rapport, sfeer: opties.sfeer, sjiek: opties.sjiek ?? null, contrast: opties.contrast ?? null,
+    smaak: opties.smaak || null, printMix: !!opties.printMix, geheugen: opties.geheugen || {}, uitsluiten: [] };
+  const m = { ...moment };
+  const { mctx, act } = momentCtx(m, 0, ctx, []);
+  return divers(voorMoment(items, m, mctx, act), max);
 }
 
 // "Maak compact": per moment een outfit, met zo min mogelijk stukken in totaal.

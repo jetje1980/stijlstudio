@@ -202,7 +202,7 @@ function toonBewaard(app, id, klaar) {
 
 export const SLOT_NAAM = { boven: 'boven', onder: 'onder', heel: 'jurk/set', laag: 'laag', jas: 'jas', schoen: 'schoenen', tas: 'tas', riem: 'riem', sjaal: 'accessoire' };
 export function outfitHtml(o, { notitie, waarom, tip } = {}) {
-  const volgorde = ['boven', 'onder', 'heel', 'laag', 'jas', 'schoen', 'tas', 'riem', 'sjaal'];
+  const volgorde = ['boven', 'onder', 'heel', 'laag', 'jas', 'schoen', 'tas', 'muts', 'riem', 'sjaal'];
   const stukken = volgorde.filter(s => o.slots[s]).map(s => [s, o.slots[s]]).concat((o.slots.extra || []).map(i => ['extra', i]));
   const fam = o.kleur.familie || (o.kleur.accent && o.kleur.accent[0]) || (o.kleur.families || []).join(' + ');
   return `<span class="label-manier">${esc(o.kleur.naam)}${fam ? ' · ' + esc(fam) : ''}</span>
