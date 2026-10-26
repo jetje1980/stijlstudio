@@ -4,7 +4,7 @@
 import { pakTas, uitSelectie, compact, meerVan, maakOutfit, extraOutfits, uitJeTas, slotVan, SFEREN, WENSEN, ACTIVITEITEN, herkenActiviteit } from '../engine.js';
 import { METHODEN } from '../kleur.js';
 import { esc, $, $$, foto, blad, melding, chips, stip, tegel, collage } from '../ui.js';
-import { outfitHtml, wissel, vanIds, andereKleurBlad, contrastSchuif } from './outfits.js';
+import { outfitHtml, wissel, vanIds, andereKleurBlad, contrastSchuif, stukErbij } from './outfits.js';
 import { tekenKaart, deelOfBewaar } from '../kaart.js';
 import { huidigeSmaak, kiesBord } from './inspo.js';
 
@@ -344,7 +344,7 @@ function toonUitkomst(el, app) {
     <h3>Per dag</h3>
     ${u.plan.map((p, i) => `<div class="kaart" data-p="${i}">
       <div class="moment-kop"><h4>${esc(p.dag)} · ${esc(MOMENT_LABEL[p.moment] || p.moment)}</h4><span class="klein">${esc([p.doen && p.doen.trim(), p.sfeer && SFEREN[p.sfeer].naam, p.weer].filter(Boolean).join(' · '))}</span></div>
-      ${p.outfit ? outfitHtml(p.outfit) + erbijNoot(app, p) + `<div class="rij" style="margin-top:6px"><button class="chip" data-kleur="${i}" type="button">🎨 Andere kleur</button>${p.extra ? `<button class="chip" data-extraweg="${i}" type="button">Haal weg</button>` : ''}</div>` : '<p class="klein">Hier lukt niets, ook niet met iets uit je kast erbij. Kijk bij "Wat niet mee" of je niet te veel hebt uitgesloten.</p>'}</div>`).join('')}
+      ${p.outfit ? outfitHtml(p.outfit) + erbijNoot(app, p) + `<div class="rij" style="margin-top:6px"><button class="chip" data-kleur="${i}" type="button">🎨 Andere kleur</button><button class="chip" data-stukerbij="${i}" type="button">＋ Stuk erbij</button>${p.extra ? `<button class="chip" data-extraweg="${i}" type="button">Haal weg</button>` : ''}</div>` : '<p class="klein">Hier lukt niets, ook niet met iets uit je kast erbij. Kijk bij "Wat niet mee" of je niet te veel hebt uitgesloten.</p>'}</div>`).join('')}
     ${extraHtml(app, u, k)}
 
     <div class="moment-kop"><h3>Paklijst</h3><span class="klein" id="ingepakt">${k.filter(x => tas.afgevinkt.includes(x.item.id)).length} van ${k.length} ingepakt</span></div>
@@ -388,6 +388,10 @@ function toonUitkomst(el, app) {
     const p = u.plan[+kaart.dataset.p];
     if (e.target.closest('[data-kleur]')) {
       return andereKleurBlad(app, p.outfit, { rapport: app.data.rapport, weer: p.weer, geheugen: app.staat().geheugen, uitsluiten: opties(app).uitsluiten },
+        k.map(x => x.item.id), nieuw => { p.outfit = nieuw; bewaarConcept(app); toonUitkomst(el, app); });
+    }
+    if (e.target.closest('[data-stukerbij]')) {
+      return stukErbij(app, p.outfit, { rapport: app.data.rapport, weer: p.weer, geheugen: app.staat().geheugen },
         k.map(x => x.item.id), nieuw => { p.outfit = nieuw; bewaarConcept(app); toonUitkomst(el, app); });
     }
     const st = e.target.closest('[data-slot]'); if (!st) return;
@@ -461,7 +465,7 @@ function toonVast(el, app) {
       <div class="moment-kop"><h4>${esc(p.extra ? 'Extra outfit' : p.dag + ' · ' + (MOMENT_LABEL[p.moment] || p.moment))}</h4><span class="klein">${esc([p.doen && p.doen.trim(), p.weer].filter(Boolean).join(' · '))}</span></div>
       ${outfitHtml(p.outfit)}${p.gewisseld ? '<p class="klein">Anders dan je plan.</p>' : ''}
       <div class="rij" style="margin-top:6px"><button class="chip" data-anders="${i}" type="button">Iets anders uit mijn tas</button>
-        <button class="chip" data-erbij="${i}" type="button">＋ Uit mijn tas erbij</button></div></div>` : '').join('')}
+        <button class="chip" data-erbij="${i}" type="button">＋ Stuk erbij</button></div></div>` : '').join('')}
     <div class="moment-kop"><h3>Paklijst</h3><span class="klein" id="ingepakt">${k.filter(x => tas.afgevinkt.includes(x.item.id)).length} van ${k.length} ingepakt</span></div>
     <ul class="paklijst">${k.map(x => `<li><input type="checkbox" data-v="${esc(x.item.id)}"${tas.afgevinkt.includes(x.item.id) ? ' checked' : ''} aria-label="${esc(x.item.naam)} ingepakt">
       ${x.item.foto ? `<img src="${esc(foto(x.item.foto, 120))}" alt="">` : `<span class="leeg">${stip(x.item.kleur[0], 20)}</span>`}
@@ -498,19 +502,10 @@ function toonVast(el, app) {
     const p = u.plan[+kaart.dataset.p];
     wissel(app, p.outfit, st.dataset.slot, klaar(p), ctxVan(p), bij);
   }));
-  // een stuk uit je tas erbij (of in plaats van wat er op die plek zit)
+  // een stuk erbij: uit je tas of je hele kast
   $$('[data-erbij]', el).forEach(b => b.addEventListener('click', () => {
     const p = u.plan[+b.dataset.erbij];
-    const kan = bij.filter(i => !p.outfit.items.includes(i));
-    const bl = blad(`<h2>Uit je tas erbij</h2><p class="sub">Komt erbij, of in de plaats van wat er op die plek zit.</p>
-      <div class="raster">${kan.map(i => tegel(i)).join('')}</div>`);
-    bl.addEventListener('click', e => {
-      const t = e.target.closest('[data-item]'); if (!t) return;
-      const item = bij.find(i => i.id === t.dataset.item);
-      const n = maakOutfit({ ...p.outfit.slots, [slotVan(item)]: item }, ctxVan(p));
-      bl.sluit(); klaar(p)(n);
-      if (!n.check.ok) melding('Let op: ' + n.check.problemen[0].tekst, 4000);
-    });
+    stukErbij(app, p.outfit, ctxVan(p), bij.map(i => i.id), klaar(p));
   }));
   $('#nieuwe-look').addEventListener('click', () => nieuweLook(el, app, u, bij));
   $('#kaarten').addEventListener('click', () => bewaarKaarten(u));
@@ -612,7 +607,7 @@ function toonKeuze(el, app) {
       const toon = tas.meer.includes(i) ? p.opties : p.opties.slice(0, 4);
       return `<div class="kaart" data-p="${i}">
       <div class="moment-kop"><h4>${esc(p.dag)} · ${esc(MOMENT_LABEL[p.moment] || p.moment)}</h4><span class="klein">${esc([p.doen && p.doen.trim(), p.sfeer && SFEREN[p.sfeer].naam, p.weer].filter(Boolean).join(' · '))}</span></div>
-      ${p.outfit ? outfitHtml(p.outfit) + `<div class="rij" style="margin-top:6px"><button class="chip" data-kleur="${i}" type="button">🎨 Andere kleur</button>${p.extra ? `<button class="chip" data-extraweg="${i}" type="button">Haal weg</button>` : `<button class="chip" data-los="${i}" type="button">Andere kiezen</button>`}</div>`
+      ${p.outfit ? outfitHtml(p.outfit) + `<div class="rij" style="margin-top:6px"><button class="chip" data-kleur="${i}" type="button">🎨 Andere kleur</button><button class="chip" data-stukerbij="${i}" type="button">＋ Stuk erbij</button>${p.extra ? `<button class="chip" data-extraweg="${i}" type="button">Haal weg</button>` : `<button class="chip" data-los="${i}" type="button">Andere kiezen</button>`}</div>`
         : p.opties.length ? `<div class="outfit-lijst" style="margin-top:8px">${toon.map((o, n) => tegelVan(o, i, n)).join('')}</div>
           ${p.opties.length > toon.length ? `<button class="chip" data-meer="${i}" type="button" style="margin-top:8px">Nog ${p.opties.length - toon.length} opties</button>` : ''}`
         : '<p class="klein">Hier lukt niets, ook niet met iets uit je kast erbij. Kijk bij "Wat niet mee" of je niet te veel hebt uitgesloten.</p>'}
@@ -663,6 +658,10 @@ function toonKeuze(el, app) {
     if (!p.outfit) return;
     if (e.target.closest('[data-kleur]')) {
       return andereKleurBlad(app, p.outfit, { rapport: app.data.rapport, weer: p.weer, geheugen: app.staat().geheugen, uitsluiten: opties(app).uitsluiten },
+        k.map(x => x.item.id).concat(tas.moetMee), nieuw => { p.outfit = nieuw; opnieuw(); });
+    }
+    if (e.target.closest('[data-stukerbij]')) {
+      return stukErbij(app, p.outfit, { rapport: app.data.rapport, weer: p.weer, geheugen: app.staat().geheugen },
         k.map(x => x.item.id).concat(tas.moetMee), nieuw => { p.outfit = nieuw; opnieuw(); });
     }
     const st = e.target.closest('[data-slot]'); if (!st) return;

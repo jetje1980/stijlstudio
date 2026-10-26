@@ -94,14 +94,15 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   const voorW = await p.$eval('[data-p="1"] .stukken', x => x.textContent);
   await p.click('[data-p="1"] [data-slot="onder"], [data-p="1"] [data-slot="schoen"]');
   await p.waitForSelector('.blad');
-  ok(/Uit wat je bij je hebt/.test(await p.textContent('.blad')) && await p.$('#hele-kast'), 'stuk wisselen: eerst uit je tas, knop voor je hele kast');
+  ok(/Uit je tas/.test(await p.textContent('.blad')) && /Uit je kast/.test(await p.textContent('.blad')), 'stuk wisselen: uit je tas én uit je hele kast');
   if (await p.$('.blad [data-item]')) { await p.click('.blad [data-item]'); await p.waitForTimeout(300);
     ok(await p.$eval('[data-p="1"] .stukken', x => x.textContent) !== voorW, 'stuk gewisseld'); }
   else { await p.click('.blad-dicht'); await p.waitForTimeout(300); }
   // een stuk uit je tas erbij
   const voorN = await p.$$eval('[data-p="2"] .stuk', x => x.length);
-  await p.click('[data-erbij="2"]'); await p.waitForSelector('.blad [data-item]');
-  await p.click('.blad [data-item]'); await p.waitForTimeout(300);
+  await p.click('[data-erbij="2"]'); await p.waitForSelector('#se-z');
+  await p.fill('#se-z', 'wit'); await p.waitForTimeout(100);
+  await p.click('#se-r [data-item]'); await p.waitForTimeout(300);
   ok(await p.$$eval('[data-p="2"] .stuk', x => x.length) >= voorN && /Anders dan je plan/.test(await p.textContent('[data-p="2"]')), 'stuk uit je tas erbij gezet');
   // nieuwe look op basis van wensen
   await p.click('#nieuwe-look'); await p.waitForSelector('#nl-zoek');

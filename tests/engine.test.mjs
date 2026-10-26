@@ -1,7 +1,7 @@
 // node tests/engine.test.mjs
 import fs from 'fs';
 import { zetHex, herken } from '../app/kleur.js';
-import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur, uitSelectie, contrast, printMix, smaakVan, naMaken, mouwen, basisIds, maakOutfit, laagProbleem } from '../app/engine.js';
+import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur, uitSelectie, contrast, printMix, smaakVan, naMaken, mouwen, basisIds, maakOutfit, laagProbleem, voegStukToe } from '../app/engine.js';
 import { info } from '../app/kleur.js';
 const kast = JSON.parse(fs.readFileSync('data/kast.json'));
 const rapport = JSON.parse(fs.readFileSync('data/rapport.json'));
@@ -244,6 +244,17 @@ ok(telSnit(street, ['barrel', 'ballon', 'cargo']) >= telSnit(paris, ['barrel', '
   ok(alle.filter(o => o.slots.laag && o.slots.laag.soort === 'gilet' && o.slots.boven && o.slots.boven.soort === 'trui').length <= 2, 'trui onder gilet is de uitzondering');
   ok(stelVoor(kast, { rapport, weer: 'mild', sfeer: ['street'] }, 6).some(o => o.slots.muts && o.slots.muts.soort === 'pet'), 'streetstyle: soms een pet');
   ok(stelVoor(kast, { rapport, weer: 'mild', sfeer: ['klassiek'] }, 6).every(o => !o.slots.muts), 'klassiek bij mild weer: geen pet');
+}
+// 24. een stuk erbij, en andere kleur met opties uit je hele kast
+{
+  const vind = n => kast.find(i => i.naam.startsWith(n));
+  const o = maakOutfit({ boven: vind('Bershka raglan trui'), onder: vind('Pull&Bear ballon'), schoen: vind('laarsjes zwart') }, { rapport, weer: 'fris' });
+  const n = voegStukToe(o, vind('Wit basic t-shirt'), { rapport, weer: 'fris' });
+  ok(n.slots.boven.naam.startsWith('Wit basic') && n.slots.laag && n.slots.laag.naam.startsWith('Bershka'), 'wit T-shirt erbij: gaat onder je trui, de trui wordt de laag');
+  const n2 = voegStukToe(o, vind('Zara cargo broek'), { rapport, weer: 'fris' });
+  ok(n2.slots.onder.naam.startsWith('Zara cargo'), 'andere broek erbij: in de plaats van de oude');
+  const r = andereKleur(kast, stelVoor(kast, { rapport, weer: 'mild' }, 1)[0], 'rood', { rapport, weer: 'mild' });
+  ok(r && r.opties.length >= 2, 'andere kleur: meerdere varianten uit je kast (' + (r ? r.opties.length : 0) + ')');
 }
 console.log(goed, 'goed,', fout, 'fout,', Date.now() - t0, 'ms');
 process.exit(fout ? 1 : 0);

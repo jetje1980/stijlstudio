@@ -1,7 +1,7 @@
 // Outfits: je bewaarde looks, en de maker. In de maker kies je niets vooraf
 // als je dat niet wilt: dan krijg je drie voorstellen in drie verschillende
 // kleurmanieren, en stuur je daarna bij.
-import { stelVoor, alternatieven, maakOutfit, slotVan, andereKleur, SFEREN, WENSEN, weerKlasse } from '../engine.js';
+import { stelVoor, alternatieven, maakOutfit, slotVan, andereKleur, voegStukToe, SFEREN, WENSEN, weerKlasse } from '../engine.js';
 import { METHODEN, info } from '../kleur.js';
 import { esc, $, $$, collage, foto, blad, melding, chips, stip, tegel, verklein } from '../ui.js';
 import { tekenKaart, deelOfBewaar } from '../kaart.js';
@@ -83,7 +83,7 @@ function vandaag(el, app, opnieuw) {
   if (!o) { plek.innerHTML = bijgehouden + '<p class="klein">Ik vind nu niets passends. Kijk of je kast labels heeft.</p>'; return; }
   // de jas kies je zelf: welke, en of hij echt nodig is
   plek.innerHTML = bijgehouden + outfitHtml(o) + `
-    <div class="chips"><button class="chip" data-slot="jas" type="button">${o.slots.jas ? 'Andere jas, of zonder' : 'Jas erbij?'}</button></div>
+    <div class="chips"><button class="chip" data-slot="jas" type="button">${o.slots.jas ? 'Andere jas, of zonder' : 'Jas erbij?'}</button><button class="chip" data-v="erbij" type="button">＋ Stuk erbij</button></div>
     <div class="rij" style="margin-top:10px">
       <button class="knop" data-v="aan" type="button">Vandaag aan</button>
       <button class="knop licht" data-v="andere" type="button">Andere</button>
@@ -99,6 +99,7 @@ function vandaag(el, app, opnieuw) {
     if (a.dataset.v === 'aan') { vandaagBijhouden(app, vandaagOutfit); lijst(el, app); }
     if (a.dataset.v === 'andere') { vandaagSeed++; vandaag(el, app, true); }
     if (a.dataset.v === 'kleur') andereKleurBlad(app, vandaagOutfit, vandaagCtx(app), [], zet);
+    if (a.dataset.v === 'erbij') stukErbij(app, vandaagOutfit, vandaagCtx(app), [], zet);
     if (a.dataset.v === 'kaart') bewaarKaart(standaardNaam(vandaagOutfit), vandaagOutfit);
   };
 }
@@ -224,25 +225,34 @@ export function andereKleurBlad(app, o, ctx, voorkeur, klaar) {
     && (i.kleur[0] === k || (info(i.kleur[0]).fam === info(k).fam && (info(k).neutraal || !info(i.kleur[0]).neutraal))));
   const opties = KLEUR_OPTIES.filter(heeft);
   const b = blad(`<h2>Andere kleur</h2>
-    <p class="sub">Welke kleur wil je erin? Ik verander zo weinig mogelijk${voorkeur.length ? ' en pak liefst wat al in je tas zit' : ''}.</p>
+    <p class="sub">Welke kleur wil je erin? Ik verander zo weinig mogelijk en laat ook opties uit je hele kast zien.</p>
     <div class="chips wrap">${opties.map(k => `<button class="chip" data-k="${esc(k)}" type="button">${stip(k, 12)}${esc(k)}</button>`).join('')}</div>
     <div id="kl-uit" style="margin-top:12px"></div>`);
-  let gekozen = null;
+  let gekozen = [];
   b.addEventListener('click', e => {
     const c = e.target.closest('[data-k]');
     if (c) {
       $$('[data-k]', b).forEach(x => x.classList.toggle('aan', x === c));
-      const r = andereKleur(kast, o, c.dataset.k, ctx, voorkeur);
-      gekozen = r;
-      $('#kl-uit', b).innerHTML = r ? `${outfitHtml(r.outfit)}
+      // eerst met wat je meeneemt (als dat er is), dan uit je hele kast
+      const metTas = voorkeur.length ? andereKleur(kast, o, c.dataset.k, ctx, voorkeur) : null;
+      const vrij = andereKleur(kast, o, c.dataset.k, ctx, []);
+      const sl = r => r.outfit.items.map(i => i.id).sort().join('|');
+      gekozen = [];
+      for (const r of [metTas, ...((vrij && vrij.opties) || [])]) if (r && !gekozen.some(g => sl(g) === sl(r))) gekozen.push(r);
+      gekozen = gekozen.slice(0, 4);
+      $('#kl-uit', b).innerHTML = gekozen.length ? gekozen.map((r, n) => `<div class="kaart">
+        <span class="label-manier">${voorkeur.length && r.wissels.every(w => !w.naar || voorkeur.includes(w.naar.id)) ? 'met wat je meeneemt' : 'uit je kast'}</span>
+        ${outfitHtml(r.outfit)}
         <ul class="tips">${r.wissels.map(w => `<li>${w.van ? esc(w.van.naam) : 'Erbij'} → ${w.naar ? `<b>${esc(w.naar.naam)}</b>` : 'weggelaten'}${w.naar && voorkeur.length && !voorkeur.includes(w.naar.id) ? ' <span class="klein">(komt erbij in je tas)</span>' : ''}</li>`).join('')}</ul>
-        <button class="knop vol" id="kl-ok" type="button" style="margin-top:10px">Gebruik deze</button>`
+        <button class="knop vol" data-kl-ok="${n}" type="button">Gebruik deze</button></div>`).join('')
         : `<div class="kaart"><b>Met ${esc(c.dataset.k)} lukt het niet.</b><p class="klein">In je kast zit geen stuk in deze kleur dat bij dit outfit past zonder je rapportregels te breken. Probeer een andere kleur, of wissel eerst een stuk.</p></div>`;
       return;
     }
-    if (e.target.id === 'kl-ok' && gekozen) {
-      gekozen.wissels.forEach(w => { if (w.van) app.onthoud(w.van.id, 'weg'); if (w.naar) app.onthoud(w.naar.id, 'gekozen'); });
-      b.sluit(); klaar(gekozen.outfit);
+    const ok = e.target.closest('[data-kl-ok]');
+    if (ok) {
+      const r = gekozen[+ok.dataset.klOk];
+      r.wissels.forEach(w => { if (w.van) app.onthoud(w.van.id, 'weg'); if (w.naar) app.onthoud(w.naar.id, 'gekozen'); });
+      b.sluit(); klaar(r.outfit);
     }
   });
 }
@@ -250,16 +260,21 @@ export function andereKleurBlad(app, o, ctx, voorkeur, klaar) {
 // `bron`: alleen uit deze stukken (je tas), met een knop om toch je hele kast te zien.
 export function wissel(app, o, slot, klaar, ctxIn, bron = null) {
   const ctx = ctxIn || context(app);
-  const alt = alternatieven(bron || app.kast(), o, slot, { ...ctx, methode: null, kleur: null, anker: [] }, 18);
-  const zelfde = alt.filter(a => a.zelfde), anders = alt.filter(a => !a.zelfde);
+  const actx = { ...ctx, methode: null, kleur: null, anker: [] };
+  // uit je tas eerst, en daaronder uit je hele kast: anders zie je alleen wat je zelf al bedacht
+  const uitTas = bron ? alternatieven(bron, o, slot, actx, 18) : [];
+  const tasIds = new Set((bron || []).map(i => i.id));
+  const alt = uitTas.concat(alternatieven(app.kast(), o, slot, actx, 18).filter(a => !tasIds.has(a.item.id)));
+  const kastAlt = alt.filter(a => !tasIds.has(a.item.id));
+  const zelfde = kastAlt.filter(a => a.zelfde), anders = kastAlt.filter(a => !a.zelfde);
   const huidig = o.slots[slot];
   const b = blad(`<h2>Ander${slot === 'schoen' ? 'e schoenen' : ' stuk'} (${esc(SLOT_NAAM[slot] || slot)})</h2>
-    ${bron ? '<p class="sub">Uit wat je bij je hebt.</p>' : ''}
+    ${bron ? `<h3>Uit je tas</h3>${uitTas.length ? `<div class="raster">${uitTas.map(a => tegel(a.item)).join('')}</div>` : '<p class="klein">Niets anders in je tas dat hierbij past.</p>'}<h2 style="margin-top:14px">Uit je kast</h2>` : ''}
     ${zelfde.length ? `<h3>Blijft ${esc(o.kleur.naam.toLowerCase())}</h3><div class="raster">${zelfde.map(a => tegel(a.item)).join('')}</div>` : ''}
     ${anders.length ? `<h3>Wordt een andere manier</h3><div class="raster">${anders.map(a => tegel(a.item, `<span class="label">${esc(a.outfit.kleur.kort)}</span>`)).join('')}</div>` : ''}
-    ${!alt.length ? '<p class="leeg-melding">Niets anders dat met deze outfit werkt.</p>' : ''}
+    ${!kastAlt.length && !uitTas.length ? '<p class="leeg-melding">Niets anders dat met deze outfit werkt.</p>' : ''}
     ${huidig && !['boven', 'onder', 'heel', 'schoen'].includes(slot) ? '<button class="knop licht vol" id="zonder" type="button" style="margin-top:12px">Zonder</button>' : ''}
-    ${bron ? '<button class="knop licht vol" id="hele-kast" type="button" style="margin-top:8px">Ook uit mijn hele kast</button>' : ''}`);
+`);
   b.addEventListener('click', e => {
     const t = e.target.closest('[data-item]');
     if (t) {
@@ -268,11 +283,30 @@ export function wissel(app, o, slot, klaar, ctxIn, bron = null) {
       app.onthoud(a.item.id, 'gekozen');
       b.sluit(); klaar(a.outfit);
     }
-    if (e.target.id === 'hele-kast') { b.sluit(); return wissel(app, o, slot, klaar, ctxIn); }
     if (e.target.id === 'zonder') {
       const slots = { ...o.slots }; delete slots[slot];
       b.sluit(); klaar(maakOutfit(slots, ctx));
     }
+  });
+}
+
+// Een stuk erbij, bijvoorbeeld een wit T-shirt onder je trui: uit je tas
+// (als je die meegeeft) of uit je hele kast, met zoeken.
+export function stukErbij(app, o, ctx, voorkeur, klaar) {
+  const kast = app.kast();
+  const tas = (voorkeur || []).map(id => app.item(id)).filter(i => i && !o.items.includes(i));
+  const b = blad(`<h2>Stuk erbij</h2><p class="sub">Komt erbij (een T-shirt gaat onder wat je aanhad), of in de plaats van wat er op die plek zit.</p>
+    ${tas.length ? `<h3>Uit je tas</h3><div class="raster">${tas.map(i => tegel(i)).join('')}</div>` : ''}
+    <h3>Uit je kast</h3><input class="veld" id="se-z" placeholder="Zoek, bijv. wit t-shirt">
+    <div class="raster" id="se-r" style="margin-top:10px"></div>`);
+  const teken = z => { $('#se-r', b).innerHTML = kast.filter(i => !o.items.includes(i) && !tas.includes(i) && (!z || [i.naam, i.soort, ...i.kleur].join(' ').toLowerCase().includes(z))).slice(0, 60).map(i => tegel(i)).join(''); };
+  teken('');
+  $('#se-z', b).addEventListener('input', e => teken(e.target.value.toLowerCase().trim()));
+  b.addEventListener('click', e => {
+    const t = e.target.closest('[data-item]'); if (!t) return;
+    const n = voegStukToe(o, app.item(t.dataset.item), ctx);
+    b.sluit(); klaar(n);
+    if (!n.check.ok) melding('Let op: ' + n.check.problemen.find(p => !p.zacht)?.tekst, 4000);
   });
 }
 

@@ -42,7 +42,7 @@ await p.click('.blad .tegel');await p.waitForTimeout(400);
 // andere kleur in de maker
 await p.click('#voorstellen .kaart [data-a="kleur"]');await p.waitForSelector('.blad [data-k]');await p.click('.blad [data-k="geel"]');await p.waitForTimeout(300);
 console.log('maker andere kleur:', await p.$eval('#kl-uit', x => (x.querySelector('.tips') || x).textContent.trim().slice(0, 120)));
-if (await p.$('#kl-ok')) { await p.click('#kl-ok'); await p.waitForTimeout(300); } else { await p.click('.blad-dicht'); await p.waitForTimeout(300); }
+if (await p.$('[data-kl-ok]')) { await p.click('[data-kl-ok]'); await p.waitForTimeout(300); } else { await p.click('.blad-dicht'); await p.waitForTimeout(300); }
 // bewaren + kaart
 await p.click('#voorstellen .kaart [data-a="bewaar"]');await p.waitForTimeout(300);
 const [dl]=await Promise.all([p.waitForEvent('download',{timeout:10000}),p.click('#voorstellen .kaart [data-a="kaart"]')]);
@@ -60,7 +60,7 @@ await p.click('[data-afw="1"]');await p.fill('[data-temp="0"]','12');await p.fil
 await p.click('#pak');await p.waitForSelector('.paklijst li',{timeout:20000});
 await p.click('[data-kleur="0"]');await p.waitForSelector('.blad [data-k]');await p.click('.blad [data-k="rood"]');await p.waitForTimeout(300);
 console.log('tas andere kleur:', await p.$eval('#kl-uit', x => x.querySelector('.tips') ? x.querySelector('.tips').textContent.trim() : x.textContent.trim().slice(0, 80)));
-if (await p.$('#kl-ok')) { await p.click('#kl-ok'); await p.waitForTimeout(300); }
+if (await p.$('[data-kl-ok]')) { await p.click('[data-kl-ok]'); await p.waitForTimeout(300); } else if (await p.$('.blad-dicht')) { await p.click('.blad-dicht'); await p.waitForTimeout(300); }
 console.log('rok in tas?',await p.$$eval('.paklijst li span:nth-of-type(1)',x=>x.some(y=>/rok/i.test(y.textContent))));console.log('sferen per moment',await p.$$eval('.moment-kop .klein',x=>x.map(y=>y.textContent)));
 console.log('tas',await p.$eval('#uitkomst h2',x=>x.textContent),await p.$$eval('[data-f]',x=>x.map(y=>y.textContent)));
 await p.screenshot({path:S+'s-tas.png',fullPage:true});

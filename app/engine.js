@@ -1268,5 +1268,21 @@ export function andereKleur(kast, outfit, kleur, ctx, voorkeur = []) {
   kandidaten.sort((a, b) => b.w - a.w);
   const beste = kandidaten[0];
   if (!beste) return null;
-  return { outfit: beste.outfit, wissels: beste.wissels, nieuw: beste.wissels.filter(w => w.naar && !inKoffer.has(w.naar.id)).map(w => w.naar) };
+  const vorm = k => ({ outfit: k.outfit, wissels: k.wissels, nieuw: k.wissels.filter(w => w.naar && !inKoffer.has(w.naar.id)).map(w => w.naar) });
+  // een paar verschillende varianten, zodat je ook iets ziet wat je zelf niet had bedacht
+  const gezien = new Set(), opties = [];
+  for (const k of kandidaten) { const s = sleutel(k.outfit); if (!gezien.has(s)) { gezien.add(s); opties.push(vorm(k)); } if (opties.length >= 4) break; }
+  return { ...vorm(beste), opties };
+}
+
+// Een stuk erbij: een T-shirt onder wat je al aanhad (dat wordt de laag),
+// of in de plaats van wat er op die plek zit. Wat het beste uitpakt, wint.
+export function voegStukToe(o, item, ctx) {
+  const plek = slotVan(item);
+  const varianten = [maakOutfit({ ...o.slots, [plek]: item }, ctx)];
+  if (plek === 'boven' && o.slots.boven && o.slots.boven !== item)
+    varianten.unshift(maakOutfit({ ...o.slots, boven: item, laag: o.slots.boven }, ctx));
+  if (plek === 'laag' && o.slots.laag && !o.slots.boven && o.slots.heel)
+    varianten.push(maakOutfit({ ...o.slots, laag: item }, ctx));
+  return varianten.find(v => v.check.ok) || varianten[varianten.length - 1];
 }
