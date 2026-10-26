@@ -1,7 +1,7 @@
 // node tests/engine.test.mjs
 import fs from 'fs';
 import { zetHex, herken } from '../app/kleur.js';
-import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur, uitSelectie, contrast, printMix, smaakVan, naMaken, mouwen, basisIds, maakOutfit } from '../app/engine.js';
+import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur, uitSelectie, contrast, printMix, smaakVan, naMaken, mouwen, basisIds, maakOutfit, laagProbleem } from '../app/engine.js';
 import { info } from '../app/kleur.js';
 const kast = JSON.parse(fs.readFileSync('data/kast.json'));
 const rapport = JSON.parse(fs.readFileSync('data/rapport.json'));
@@ -219,7 +219,7 @@ ok(telSnit(street, ['barrel', 'ballon', 'cargo']) >= telSnit(paris, ['barrel', '
   ok(basisIds(rapport).has(g.id), 'paarse gilet staat in Robins basis');
   let n = 0, met = 0;
   for (const weer of ['fris', 'mild']) for (const sf of [[], ['cosy'], ['street'], ['klassiek']]) for (const o of stelVoor(kast, { rapport, weer, sfeer: sf }, 6)) { n++; if (o.items.includes(g)) met++; }
-  ok(met / n >= 0.1, `paarse gilet komt regelmatig voorbij (${met} van ${n})`);
+  ok(met / n >= 0.05 && met / n <= 0.3, `paarse gilet komt voorbij, maar niet overal (${met} van ${n})`);
   const rood = kast.find(i => i.naam === 'tshirt rood sezane'), jeans = kast.find(i => /Pull&Bear ballon/.test(i.naam));
   const o = maakOutfit({ boven: rood, onder: jeans, laag: g }, { rapport, weer: 'mild' });
   ok(o.kleur.methode === 'accent', 'rood met paars op denim: neutraal met accenten, geen colorblock (' + o.kleur.methode + ')');
@@ -230,6 +230,20 @@ ok(telSnit(street, ['barrel', 'ballon', 'cargo']) >= telSnit(paris, ['barrel', '
   ok(metG.length && metG.every(x => mouwen(x.slots.boven || x.slots.heel) === 'lang' && (x.slots.boven || x.slots.heel).pasvorm !== 'wijd'), `gilet alleen over lange mouwen die aansluiten (${metG.length} keer)`);
   const a = stelVoor(kast, { rapport, weer: 'mild', anker: [g.id] }, 6);
   ok(new Set(a.map(x => x.slots.boven && x.slots.boven.id)).size >= 5, 'met het gilet vast: steeds een ander bovenstuk');
+}
+// 23. laagjes per soort: gilet, vest, blazer; en pet of muts
+{
+  const vind = n => kast.find(i => i.naam.startsWith(n));
+  const g = vind('american vintage gilet paars');
+  ok(!laagProbleem(g, vind('Donkerbruin longsleeve')) && laagProbleem(g, vind('Wit basic t-shirt')) && laagProbleem(g, vind('Lichtblauwe oversized blouse')), 'gilet: wel over longsleeve, niet over T-shirt of wijde blouse');
+  ok(!laagProbleem(g, vind('Second Female crop sweater grijs')) && laagProbleem(g, vind('mohair trui off white')), 'gilet: grijze katoenen sweater mag (andere stof), mohair onder mohair niet');
+  ok(laagProbleem(vind('oversized blazer zwart zara'), vind('Lichtblauwe oversized blouse')) && !laagProbleem(vind('oversized blazer zwart zara'), vind('Wit basic t-shirt')), 'oversized blazer alleen met iets strakkers eronder');
+  ok(laagProbleem(vind('mohair vest lichtblauw'), vind('Trui Amiel')), 'geen dik vest over een dikke trui');
+  const alle = ['koud', 'fris', 'mild'].flatMap(weer => [[], ['street'], ['cosy']].flatMap(sf => stelVoor(kast, { rapport, weer, sfeer: sf }, 6)));
+  ok(alle.every(o => !o.slots.laag || !laagProbleem(o.slots.laag, o.slots.boven || o.slots.heel)), 'geen voorstel breekt een laagjesregel');
+  ok(alle.filter(o => o.slots.laag && o.slots.laag.soort === 'gilet' && o.slots.boven && o.slots.boven.soort === 'trui').length <= 2, 'trui onder gilet is de uitzondering');
+  ok(stelVoor(kast, { rapport, weer: 'mild', sfeer: ['street'] }, 6).some(o => o.slots.muts && o.slots.muts.soort === 'pet'), 'streetstyle: soms een pet');
+  ok(stelVoor(kast, { rapport, weer: 'mild', sfeer: ['klassiek'] }, 6).every(o => !o.slots.muts), 'klassiek bij mild weer: geen pet');
 }
 console.log(goed, 'goed,', fout, 'fout,', Date.now() - t0, 'ms');
 process.exit(fout ? 1 : 0);

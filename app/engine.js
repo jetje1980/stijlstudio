@@ -137,6 +137,35 @@ function armenTeKoud(o, weer) {
   return nodig && !(o.slots.laag && mouwen(o.slots.laag) !== 'geen');
 }
 
+// ── LAAGJES ──────────────────────────────────────────────────────────────────
+// Wat mag over wat. Per soort laag, en op materiaal: twee dikke breisels op
+// elkaar nooit; een trui onder een gilet alleen als het materiaal verschilt
+// (een katoenen sweater onder een gebreid gilet).
+const BREI = i => /gebreid|pluizig/.test(i.textuur || '');
+const DIKBREI = i => /grof|pluizig/.test(i.textuur || '');
+export function laagProbleem(laag, b) {
+  if (!laag || !b) return null;
+  const s = laag.soort;
+  if (s === 'gilet') {
+    if (mouwen(b) !== 'lang') return 'Een gilet hoort over lange mouwen, niet over een T-shirt of topje.';
+    if (b.pasvorm === 'wijd') return 'Een gilet over een wijd shirt wordt een blok.';
+    // in principe geen trui eronder; wel als de stof echt anders is (grof
+    // gebreide wol onder pluizig mohair, of een sweater onder breisel)
+    if (b.soort === 'trui') return b.textuur === laag.textuur || (b.materiaal && b.materiaal === laag.materiaal) ? 'Een trui onder een gilet alleen als de stof echt anders is.' : null;
+    if (b.warmte >= 3 || DIKBREI(b)) return 'Onder een gilet iets dunners.';
+    return null;
+  }
+  if (DIKBREI(laag) && DIKBREI(b)) return `Twee dikke breisels op elkaar (${b.naam} en ${laag.naam}).`;
+  if (s === 'vest' || s === 'teddy') {
+    if (b.pasvorm === 'wijd' && laag.pasvorm !== 'kort' && (laag.warmte >= 3 || DIKBREI(laag))) return `Een dik ${s} over een wijd shirt wordt een blok.`;
+  }
+  if (s === 'blazer') {
+    if (laag.pasvorm === 'wijd' && b.pasvorm === 'wijd') return 'Een oversized blazer alleen met iets strakkers eronder.';
+    if (DIKBREI(b)) return 'Een blazer over een dikke, pluizige trui trekt scheef.';
+  }
+  return null;
+}
+
 // ── RAPPORTREGELS ────────────────────────────────────────────────────────────
 const STOPBAAR = new Set(['blouse', 't-shirt', 'top', 'topje', 'longsleeve']);
 
@@ -156,12 +185,8 @@ export function controleer(o, rapport, ctx = {}) {
   const DIKTE = { topje: 0.5, sporttop: 0.5, 't-shirt': 1, top: 1.5, longsleeve: 2, blouse: 2, trui: 3, vest: 3.5, gilet: 3.5, blazer: 4, teddy: 5 };
   if (laag && (boven || heel) && (DIKTE[laag.soort] || 3) <= (DIKTE[(boven || heel).soort] || 1.5))
     problemen.push({ regel: 'laagjes', tekst: `${laag.soort} over ${(boven || heel).soort} draagt niet.` });
-  // Een (mouwloos) gilet hoort over iets met lange mouwen dat aansluit en
-  // dun is: een longsleeve, fijn breisel of getailleerde blouse. Niet over
-  // een T-shirt, een wijd shirt of een dikke trui.
-  const basisG = boven || heel;
-  if (laag && laag.soort === 'gilet' && basisG && (mouwen(basisG) !== 'lang' || basisG.pasvorm === 'wijd' || basisG.warmte >= 3 || /grof|pluizig/.test(basisG.textuur)))
-    problemen.push({ regel: 'laagjes', tekst: 'Een gilet hoort over een dunne, aansluitende longsleeve of blouse.' });
+  const lp = laagProbleem(laag, boven || heel);
+  if (lp) problemen.push({ regel: 'laagjes', tekst: lp });
   // Twee dikke lagen op elkaar wordt te veel: over een trui alleen een gilet,
   // blazer of jas, geen gebreid vest of teddy.
   const onder_ = boven || heel;
@@ -170,8 +195,8 @@ export function controleer(o, rapport, ctx = {}) {
       (onder_.warmte >= 3 && laag.warmte >= 3 && !['gilet', 'blazer'].includes(laag.soort))))
     problemen.push({ regel: 'laagjes', tekst: `Twee dikke lagen (${onder_.soort} en ${laag.soort}) wordt te veel.` });
 
-  // Oversized laag alleen met iets strakkers eronder (rapport, blazers)
-  if (laag && boven && laag.pasvorm === 'wijd' && boven.pasvorm === 'wijd' && ['blazer', 'vest', 'gilet'].includes(laag.soort))
+  // Oversized laag alleen met iets strakkers eronder (rapport, blazers: zie laagProbleem)
+  if (laag && boven && laag.pasvorm === 'wijd' && boven.pasvorm === 'wijd' && ['vest', 'gilet'].includes(laag.soort))
     problemen.push({ regel: 'silhouet', zacht: true, tekst: `Oversized ${laag.soort} over een wijd bovenstuk: neem er iets strakkers onder.` });
 
   // Een blazer onder een oversized jas wordt een stapel schouders.
@@ -444,6 +469,8 @@ export function score(o, ctx) {
   }
   if (k === 'fris') s += (o.slots.laag || o.slots.jas) ? 1 : -1;
   if ((k === 'fris' || k === 'koud') && o.slots.muts) s += 0.4;
+  // een trui onder een gilet mag, maar is de uitzondering
+  if (o.slots.laag && o.slots.laag.soort === 'gilet' && o.slots.boven && o.slots.boven.soort === 'trui') s -= 3;
   // een warme jas is bij fris weer genoeg; nog een vest eronder wordt stapelen
   if (k !== 'koud' && o.slots.jas && o.slots.jas.warmte >= 3 && o.slots.laag && o.slots.boven && mouwen(o.slots.boven) === 'lang') s -= o.slots.jas.pasvorm === 'wijd' ? 2.5 : 1.2;
   if (k === 'warm') s -= Math.max(0, warmte - 4) * 0.8;
@@ -504,7 +531,7 @@ function pools(kast, ctx) {
     else if (i.rol === 'tas') p.tas.push(i);
     else if (i.soort === 'riem') p.riem.push(i);
     else if (i.soort === 'sjaal') p.sjaal.push(i);
-    else if (i.soort === 'muts') p.muts.push(i);
+    else if (i.soort === 'muts' || i.soort === 'pet') p.muts.push(i);
   }
   // Laagjes (kroeg, dansen): een topje als basis, en een trui of shirt erover
   // die uit kan. Geen topje in de kast? Dan gewoon zoals altijd.
@@ -585,7 +612,11 @@ function kleedAan(basis, p, ctx, gebruikt = new Map()) {
   if (jasNodig) probeer('jas', p.jas, true);
   // een tas hoort bij elke outfit (behalve bij het sporten); bij kou een muts
   if (!ctx.sport) probeer('tas', p.tas, true);
-  if (!ctx.sport && (ctx.weer === 'koud' || ctx.weer === 'fris') && o.slots.jas) probeer('muts', p.muts, ctx.weer === 'koud');
+  // hoofd: bij kou een muts (verplicht); anders een muts of pet als hij iets toevoegt
+  // (een pet hoort bij streetstyle of een sportieve dag, niet bij een blouse en pantalon)
+  const petOk = sfeerLijst(ctx.sfeer).includes('street') || ['wandelen', 'strand', 'chillen'].includes(ctx.activiteit);
+  const hoofd = p.muts.filter(i => i.soort === 'muts' ? ctx.weer === 'koud' || ctx.weer === 'fris' : petOk && !ctx.avond);
+  if (!ctx.sport) probeer('muts', ctx.weer === 'koud' && hoofd.some(i => i.soort === 'muts') ? hoofd.filter(i => i.soort === 'muts') : hoofd, ctx.weer === 'koud');
   if (ctx.sport) { /* geen riem of sjaal bij het sporten */ }
   else if (metRiem(o)) probeer('riem', p.riem, true);
   else if (ctx.weer === 'koud' || ctx.weer === 'fris') probeer('sjaal', p.sjaal, false);
@@ -606,7 +637,7 @@ function kleedAan(basis, p, ctx, gebruikt = new Map()) {
 }
 
 export function slotVan(i) {
-  if (i.rol === 'accessoire') return i.soort === 'riem' ? 'riem' : i.soort === 'muts' ? 'muts' : 'sjaal';
+  if (i.rol === 'accessoire') return i.soort === 'riem' ? 'riem' : ['muts', 'pet'].includes(i.soort) ? 'muts' : 'sjaal';
   return i.rol;
 }
 
