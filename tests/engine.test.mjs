@@ -1,7 +1,7 @@
 // node tests/engine.test.mjs
 import fs from 'fs';
 import { zetHex, herken } from '../app/kleur.js';
-import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur } from '../app/engine.js';
+import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur, uitSelectie, contrast } from '../app/engine.js';
 import { info } from '../app/kleur.js';
 const kast = JSON.parse(fs.readFileSync('data/kast.json'));
 const rapport = JSON.parse(fs.readFileSync('data/rapport.json'));
@@ -136,5 +136,28 @@ const street = stelVoor(kast, { rapport, weer: 'mild', sfeer: 'street' }, 6);
 const paris = stelVoor(kast, { rapport, weer: 'mild', sfeer: 'parisienne' }, 6);
 const telSnit = (l, s) => l.filter(o => o.slots.onder && s.includes(o.slots.onder.snit)).length;
 ok(telSnit(street, ['barrel', 'ballon', 'cargo']) >= telSnit(paris, ['barrel', 'ballon', 'cargo']), 'streetstyle kiest vaker barrel/ballon/cargo dan parisienne');
+// 15. kiezen uit je stukken: elke jas en elk paar schoenen in de eerste vier, of een reden
+{
+  let z = 7; const r = () => (z = (z * 1664525 + 1013904223) >>> 0) / 4294967296;
+  const neem = (rol, n, f = () => true) => kast.filter(i => i.rol === rol && f(i)).sort(() => r() - 0.5).slice(0, n).map(i => i.id);
+  let mis = 0, tot = 0;
+  for (let t = 0; t < 12; t++) {
+    const moetMee = [...neem('boven', 6), ...neem('onder', 4, i => i.soort !== 'short'), ...neem('jas', 2, i => i.warmte >= 2), ...neem('schoen', 2, i => !i.open), ...neem('laag', 2)];
+    const dagen = [{ naam: 'Vr', temp: 12, momenten: ['dag', 'avond'], doen: { avond: 'pizzeria' } }, { naam: 'Za', temp: 9, momenten: ['dag'], doen: { dag: 'hardlopen' } }];
+    const u = uitSelectie(kast, { dagen, rapport, moetMee, sfeer: [['street'], ['cosy'], ['parisienne']][t % 3] });
+    for (const p of u.plan) for (const id of moetMee.filter(id => ['jas', 'schoen'].includes(kast.find(i => i.id === id).rol))) {
+      tot++;
+      if (!p.opties.slice(0, 4).some(o => o.items.some(i => i.id === id)) && !p.niet.some(x => x.item.id === id)) mis++;
+    }
+    if (t === 0) ok(u.plan.every(p => p.opties.every(o => o.check.ok)), 'kiezen: alle opties binnen de regels');
+  }
+  ok(!mis, `kiezen: elke jas en schoen in de eerste vier of met reden (${tot - mis}/${tot})`);
+}
+// 16. stoer met een zachte pop
+{
+  const sv = stelVoor(kast, { rapport, weer: 'mild', sfeer: ['street', 'vrouwelijk'] }, 12);
+  ok(sv.filter(contrast).length >= 3 && sv.some(o => o.slots.schoen && o.slots.schoen.soort === 'hakken'), 'street + vrouwelijk: contrast en soms een hak');
+  ok(stelVoor(kast, { rapport, weer: 'mild', sfeer: ['cosy'] }, 12).filter(contrast).length <= 3, 'cosy blijft vooral cosy');
+}
 console.log(goed, 'goed,', fout, 'fout,', Date.now() - t0, 'ms');
 process.exit(fout ? 1 : 0);
