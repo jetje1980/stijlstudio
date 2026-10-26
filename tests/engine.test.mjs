@@ -158,6 +158,15 @@ ok(telSnit(street, ['barrel', 'ballon', 'cargo']) >= telSnit(paris, ['barrel', '
   const sv = stelVoor(kast, { rapport, weer: 'mild', sfeer: ['street', 'vrouwelijk'] }, 12);
   ok(sv.filter(contrast).length >= 3 && sv.some(o => o.slots.schoen && o.slots.schoen.soort === 'hakken'), 'street + vrouwelijk: contrast en soms een hak');
   ok(stelVoor(kast, { rapport, weer: 'mild', sfeer: ['cosy'] }, 12).filter(contrast).length <= 3, 'cosy blijft vooral cosy');
+  const telC = c => stelVoor(kast, { rapport, weer: 'mild', sfeer: ['street'], contrast: c }, 12).filter(contrast).length;
+  const [c0, c1] = [telC(0), telC(1)];
+  ok(c1 > c0 + 3, `schuif stoer × lief werkt (puur ${c0}, vol ${c1} van 12)`);
+}
+// 17. wijd op wijd kan alleen ingestopt met een riem, en dat komt nu ook echt voorbij
+{
+  const alle = [[], ['street'], ['parisienne'], ['klassiek']].flatMap(sf => stelVoor(kast, { rapport, weer: 'mild', sfeer: sf }, 12));
+  const ww = alle.filter(o => o.slots.boven && o.slots.onder && o.slots.boven.pasvorm === 'wijd' && o.slots.onder.pasvorm === 'wijd');
+  ok(ww.length && ww.every(o => o.slots.riem), `wijd op wijd alleen met riem (${ww.length} keer)`);
 }
 console.log(goed, 'goed,', fout, 'fout,', Date.now() - t0, 'ms');
 process.exit(fout ? 1 : 0);
