@@ -101,6 +101,17 @@ const JPG = Buffer.from('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP/////////////////////
   await p.click('#bord-r [data-b]'); await p.click('#bord-ok'); await p.waitForTimeout(300);
   ok(await p.$$eval('#bord ~ img, .rij img', x => x.length) >= 1 && JSON.parse(await p.evaluate(() => localStorage.getItem('stijlstudio-v2'))).tasConcept.bord.length === 1, 'tas: inspiratiebord gekozen en bewaard');
 
+  // nieuwe screenshots in het tasbord staan er meteen, ook als je de check wegklikt
+  await p.click('#bord'); await p.waitForSelector('#bord-in', { state: 'attached' });
+  const voorB = await p.$$eval('#bord-r [data-b]', x => x.length);
+  await p.setInputFiles('#bord-in', [{ name: 'b.jpg', mimeType: 'image/jpeg', buffer: JPG }]);
+  await p.waitForSelector('#ck-ok', { timeout: 10000 });
+  ok(await p.$$eval('#bord-r [data-b]', x => x.length) === voorB + 1, 'tasbord: nieuw beeld staat er meteen');
+  await p.click('.blad-achter:last-of-type .blad-dicht'); await p.waitForTimeout(400);
+  ok(/tik om te checken/.test(await p.textContent('#bord-r')) && await p.$$eval('#bord-r .gekozen', x => x.length) === 2, 'tasbord: check weggeklikt, beeld blijft (gekozen, nog te checken)');
+  await p.click('#bord-ok'); await p.waitForTimeout(300);
+  ok(JSON.parse(await p.evaluate(() => localStorage.getItem('stijlstudio-v2'))).tasConcept.bord.length === 2, 'tasbord: beide beelden in de tas');
+
   // 5. Een fout van de stylist geeft een nette melding
   await p.unroute(/functions\/v1\/claude/);
   await p.route(/functions\/v1\/claude/, r => r.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: { message: 'tijdelijk niet beschikbaar' } }) }));

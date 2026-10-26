@@ -209,8 +209,8 @@ export function printMix(a, b) {
 // Uit je bevestigde inspiratie: wat steeds terugkomt. Recent telt zwaarder,
 // zodat het meebeweegt met waar je nu zit. Elk gewicht is 0..1: in hoeveel
 // van je inspiratie het voorkomt.
-export function smaakVan(inspo, vandaag = new Date().toISOString().slice(0, 10), sterkte = 1) {
-  const lijst = inspo.filter(x => x.analyse && x.status === 'bevestigd');
+export function smaakVan(inspo, vandaag = new Date().toISOString().slice(0, 10), sterkte = 1, ookOngecheckt = false) {
+  const lijst = inspo.filter(x => x.analyse && (x.status === 'bevestigd' || (ookOngecheckt && x.status === 'te checken')));
   if (!lijst.length) return null;
   const p = { soort: {}, snit: {}, fam: {}, print: {}, textuur: {}, methode: {}, sfeer: {}, contrast: 0, n: lijst.length };
   let totaal = 0;
