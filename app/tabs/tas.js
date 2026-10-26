@@ -1,7 +1,7 @@
 // De tas. Jij zegt alleen waar je heen gaat en wat je doet; de app rekent de
 // koffer uit die de meeste goede outfits geeft, met verschillende kleurmanieren
 // erin. Daarna stuur je bij: meer van een manier, of een stuk wisselen.
-import { pakTas, uitSelectie, compact, meerVan, maakOutfit, extraOutfits, uitJeTas, SFEREN, ACTIVITEITEN, herkenActiviteit } from '../engine.js';
+import { pakTas, uitSelectie, compact, meerVan, maakOutfit, extraOutfits, uitJeTas, slotVan, SFEREN, WENSEN, ACTIVITEITEN, herkenActiviteit } from '../engine.js';
 import { METHODEN } from '../kleur.js';
 import { esc, $, $$, foto, blad, melding, chips, stip, tegel, collage } from '../ui.js';
 import { outfitHtml, wissel, vanIds, andereKleurBlad, contrastSchuif } from './outfits.js';
@@ -455,11 +455,13 @@ function toonVast(el, app) {
   const k = koffer(u);
   const bij = k.map(x => x.item);
   el.innerHTML = `<h1>Tas</h1>
-    <p class="sub">Je tas${tas.bestemming ? ' voor ' + esc(tas.bestemming) : ''} staat vast. Per dagdeel kun je nog iets anders kiezen uit wat je bij je hebt.</p>
+    <p class="sub">Je tas${tas.bestemming ? ' voor ' + esc(tas.bestemming) : ''} staat vast. Per dagdeel kun je nog iets anders kiezen uit wat je bij je hebt. Tik op een stuk om alleen dat te wisselen.</p>
+    <button class="knop vol" id="nieuwe-look" type="button">Nieuwe look samenstellen</button>
     ${u.plan.map((p, i) => p.outfit ? `<div class="kaart" data-p="${i}">
       <div class="moment-kop"><h4>${esc(p.extra ? 'Extra outfit' : p.dag + ' · ' + (MOMENT_LABEL[p.moment] || p.moment))}</h4><span class="klein">${esc([p.doen && p.doen.trim(), p.weer].filter(Boolean).join(' · '))}</span></div>
       ${outfitHtml(p.outfit)}${p.gewisseld ? '<p class="klein">Anders dan je plan.</p>' : ''}
-      <button class="chip" data-anders="${i}" type="button" style="margin-top:6px">Iets anders uit mijn tas</button></div>` : '').join('')}
+      <div class="rij" style="margin-top:6px"><button class="chip" data-anders="${i}" type="button">Iets anders uit mijn tas</button>
+        <button class="chip" data-erbij="${i}" type="button">＋ Uit mijn tas erbij</button></div></div>` : '').join('')}
     <div class="moment-kop"><h3>Paklijst</h3><span class="klein" id="ingepakt">${k.filter(x => tas.afgevinkt.includes(x.item.id)).length} van ${k.length} ingepakt</span></div>
     <ul class="paklijst">${k.map(x => `<li><input type="checkbox" data-v="${esc(x.item.id)}"${tas.afgevinkt.includes(x.item.id) ? ' checked' : ''} aria-label="${esc(x.item.naam)} ingepakt">
       ${x.item.foto ? `<img src="${esc(foto(x.item.foto, 120))}" alt="">` : `<span class="leeg">${stip(x.item.kleur[0], 20)}</span>`}
@@ -488,8 +490,74 @@ function toonVast(el, app) {
       bl.sluit(); bewaarConcept(app); toonVast(el, app);
     });
   }));
+  const klaar = p => nieuw => { p.outfit = nieuw; p.gewisseld = true; bewaarConcept(app); toonVast(el, app); };
+  const ctxVan = p => ({ rapport: app.data.rapport, weer: p.weer, geheugen: app.staat().geheugen });
+  // één stuk wisselen: eerst uit je tas, met een knop voor je hele kast
+  $$('[data-p]', el).forEach(kaart => kaart.addEventListener('click', e => {
+    const st = e.target.closest('[data-slot]'); if (!st) return;
+    const p = u.plan[+kaart.dataset.p];
+    wissel(app, p.outfit, st.dataset.slot, klaar(p), ctxVan(p), bij);
+  }));
+  // een stuk uit je tas erbij (of in plaats van wat er op die plek zit)
+  $$('[data-erbij]', el).forEach(b => b.addEventListener('click', () => {
+    const p = u.plan[+b.dataset.erbij];
+    const kan = bij.filter(i => !p.outfit.items.includes(i));
+    const bl = blad(`<h2>Uit je tas erbij</h2><p class="sub">Komt erbij, of in de plaats van wat er op die plek zit.</p>
+      <div class="raster">${kan.map(i => tegel(i)).join('')}</div>`);
+    bl.addEventListener('click', e => {
+      const t = e.target.closest('[data-item]'); if (!t) return;
+      const item = bij.find(i => i.id === t.dataset.item);
+      const n = maakOutfit({ ...p.outfit.slots, [slotVan(item)]: item }, ctxVan(p));
+      bl.sluit(); klaar(p)(n);
+      if (!n.check.ok) melding('Let op: ' + n.check.problemen[0].tekst, 4000);
+    });
+  }));
+  $('#nieuwe-look').addEventListener('click', () => nieuweLook(el, app, u, bij));
   $('#kaarten').addEventListener('click', () => bewaarKaarten(u));
   $('#losmaken').addEventListener('click', () => { tas.vast = false; bewaarConcept(app); tasTab(el, app); });
+}
+
+// Een heel nieuwe look uit alles wat je bij je hebt, op basis van je wensen.
+function nieuweLook(el, app, u, bij) {
+  const momenten = u.plan.map((p, i) => [String(i), p.extra ? 'Extra outfit' : `${p.dag} ${(MOMENT_LABEL[p.moment] || '').toLowerCase()}`]);
+  const w = { voor: momenten[0] ? momenten[0][0] : 'extra', sfeer: [], sjiek: null, wensen: [], methode: null };
+  const b = blad(`<h2>Nieuwe look</h2><p class="sub">Uit alles wat je bij je hebt. Zeg wat je wilt; alles mag leeg.</p>
+    <label class="lab">Voor</label><select class="veld" id="nl-voor">${momenten.map(([v, l]) => `<option value="${v}">${esc(l)}</option>`).join('')}<option value="extra">Als extra outfit</option></select>
+    <label class="lab">Sfeer</label>${chips('nl-sf', Object.entries(SFEREN).map(([k, v]) => [k, v.naam]), [], { meer: true }).replace('class="chips"', 'class="chips wrap"')}
+    <div class="schuif"><span>comfy</span><input type="range" min="0" max="1" step="0.25" value="0.5" id="nl-sjiek"><span>sjiek</span></div>
+    <label class="lab">Wensen</label>${chips('nl-w', Object.entries(WENSEN).map(([k, v]) => [k, v.naam]), [], { meer: true }).replace('class="chips"', 'class="chips wrap"')}
+    <label class="lab">Kleurmanier</label>${chips('nl-m', ['mono', 'tonsurton', 'accent', 'analoog', 'split'].map(k => [k, METHODEN[k].naam]), null).replace('class="chips"', 'class="chips wrap"')}
+    <button class="knop vol" id="nl-zoek" type="button" style="margin-top:12px">Laat looks zien</button>
+    <div id="nl-uit" style="margin-top:12px"></div>`);
+  const meer = (naam, veld) => $$(`[data-chips="${naam}"] .chip`, b).forEach(c => c.addEventListener('click', () => {
+    w[veld] = w[veld].includes(c.dataset.w) ? w[veld].filter(x => x !== c.dataset.w) : w[veld].concat(c.dataset.w); c.classList.toggle('aan');
+  }));
+  meer('nl-sf', 'sfeer'); meer('nl-w', 'wensen');
+  $$('[data-chips="nl-m"] .chip', b).forEach(c => c.addEventListener('click', () => {
+    w.methode = w.methode === c.dataset.w ? null : c.dataset.w;
+    $$('[data-chips="nl-m"] .chip', b).forEach(d => d.classList.toggle('aan', d.dataset.w === w.methode));
+  }));
+  $('#nl-voor', b).addEventListener('change', e => { w.voor = e.target.value; });
+  $('#nl-sjiek', b).addEventListener('change', e => { w.sjiek = +e.target.value; });
+  let looks = [];
+  $('#nl-zoek', b).addEventListener('click', () => {
+    const p = u.plan[+w.voor];
+    const weer = p ? p.weer : (u.plan[0] && u.plan[0].weer) || 'mild';
+    const moment = p && !p.extra ? { dag: p.dag, moment: p.moment, weer, activiteit: p.activiteit || null, reis: p.moment === 'reis', doen: p.doen }
+      : { dag: 'Extra', moment: 'dag', weer, activiteit: null, reis: false };
+    looks = uitJeTas(bij, moment, { ...opties(app), sfeer: w.sfeer.length ? w.sfeer : opties(app).sfeer, sjiek: w.sjiek, wensen: w.wensen, methode: w.methode }, 10);
+    $('#nl-uit', b).innerHTML = looks.length ? `<div class="outfit-lijst">${looks.map((o, n) => `<button class="outfit-tegel" data-look="${n}" type="button">${collage(o.items)}<b>${esc(o.kleur.naam)}</b></button>`).join('')}</div>`
+      : '<p class="klein">Met wat je bij je hebt lukt dat niet. Laat een wens weg.</p>';
+  });
+  $('#nl-uit', b).addEventListener('click', e => {
+    const t = e.target.closest('[data-look]'); if (!t) return;
+    const o = looks[+t.dataset.look];
+    if (w.voor === 'extra') {
+      const n = u.plan.filter(p => p.extra).length + 1;
+      u.plan.push({ dag: `Extra ${n}`, moment: 'extra', weer: o && u.plan[0] ? u.plan[0].weer : 'mild', outfit: o, extra: true, gewisseld: true });
+    } else { const p = u.plan[+w.voor]; p.outfit = o; p.gewisseld = true; }
+    b.sluit(); bewaarConcept(app); toonVast(el, app); melding('Nieuwe look staat erin');
+  });
 }
 
 function bewaarTas(app, u) {

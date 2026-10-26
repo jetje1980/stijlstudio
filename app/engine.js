@@ -1135,10 +1135,15 @@ export function extraOutfits(mee, over, opties, bestaand = [], max = 8) {
 // Tijdens je weekend: voor één dagdeel alles wat kan met wat je bij je hebt.
 export function uitJeTas(items, moment, opties, max = 8) {
   const ctx = { rapport: opties.rapport, sfeer: opties.sfeer, sjiek: opties.sjiek ?? null, contrast: opties.contrast ?? null,
-    smaak: opties.smaak || null, printMix: !!opties.printMix, geheugen: opties.geheugen || {}, uitsluiten: [] };
+    smaak: opties.smaak || null, printMix: !!opties.printMix, geheugen: opties.geheugen || {}, uitsluiten: [], wensen: opties.wensen || [] };
   const m = { ...moment };
   const { mctx, act } = momentCtx(m, 0, ctx, []);
-  return divers(voorMoment(items, m, mctx, act), max);
+  // jouw wensen gaan voor wat het dagdeel vraagt: "sjiek" wint van "chillen"
+  if (opties.sjiek != null) mctx.sjiek = opties.sjiek;
+  let os = voorMoment(items, m, mctx, act);
+  const wil = os.filter(o => (opties.wensen || []).every(w => !WENSEN[w] || WENSEN[w].test(o)) && (!opties.methode || o.kleur.methode === opties.methode));
+  if (wil.length) os = wil;
+  return divers(os, max);
 }
 
 // "Maak compact": per moment een outfit, met zo min mogelijk stukken in totaal.
