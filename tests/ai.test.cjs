@@ -51,7 +51,7 @@ const JPG = Buffer.from('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP/////////////////////
   const waarom = await p.$eval('#voorstellen .kaart [data-waarom]', x => x.textContent);
   ok(/Zondag in de stad/.test(waarom) && /taille|accent/.test(waarom), 'Waarom? toont naam en uitleg');
   const v1 = vragen[vragen.length - 1];
-  ok(['claude-sonnet-5', 'claude-haiku-4-5', 'claude-opus-5'].includes(v1.model), 'model staat op de lijst van de proxy (' + v1.model + ')');
+  ok(['claude-sonnet-5', 'claude-sonnet-5-5', 'claude-haiku-4-5', 'claude-haiku-5-5', 'claude-opus-5'].includes(v1.model), 'model staat op de lijst van de proxy (' + v1.model + ')');
   ok(v1.system && v1.system[0].cache_control && /stijlrapport/i.test(v1.system[0].text), 'rapport gaat mee als gecachte systeemtekst');
   ok(JSON.stringify(v1).length < 12000, 'de vraag blijft klein (' + JSON.stringify(v1).length + ' tekens)');
 
@@ -64,7 +64,7 @@ const JPG = Buffer.from('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP/////////////////////
   ok(await p.inputValue('.labelform [name="naam"]') === 'Rode wollen trui', 'AI vult de naam in');
   ok(await p.inputValue('.labelform [name="soort"]') === 'trui' && await p.inputValue('.labelform [name="kleur1"]') === 'rood', 'AI vult soort en kleur in');
   const vl = vragen[vragen.length - 1];
-  ok(vl.model === 'claude-haiku-4-5' && vl.messages[0].content.some(c => c.type === 'image' && c.source.type === 'url'), 'labels via het goedkope model, met de foto als url');
+  ok(vl.model === 'claude-haiku-5-5' && vl.output_config?.effort === 'low' && vl.messages[0].content.some(c => c.type === 'image' && c.source.type === 'url' && /c_limit,w_1200,h_1200/.test(c.source.url)), 'labels via Haiku 5.5, weinig nadenken, foto verkleind');
   await p.click('#bewaar'); await p.waitForTimeout(300);
   ok(await p.$$eval('.raster .tegel', x => x.length) === voor + 1, 'het nieuwe stuk staat in de kast');
 
@@ -87,7 +87,7 @@ const JPG = Buffer.from('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP/////////////////////
   ok(await p.$eval('#ck-sf .chip[data-w="street"]', x => x.classList.contains('aan')), 'check: sfeer staat voorgeselecteerd');
   await p.click('#ck-st .chip[data-n="3"]');
   const vi = vragen[vragen.length - 1];
-  ok(vi.model === 'claude-sonnet-5' && vi.messages[0].content.some(c => c.type === 'image'), 'inspiratie: het beeld gaat mee naar de stylist');
+  ok(vi.model === 'claude-haiku-5-5' && vi.messages[0].content.some(c => c.type === 'image' && /c_limit,w_1200/.test(c.source.url)), 'inspiratie: via Haiku 5.5, beeld verkleind');
   await p.click('#ck-ok'); await p.waitForTimeout(400);
   const st = await p.evaluate(() => JSON.parse(localStorage.getItem('stijlstudio-v2')).inspo);
   ok(st.length === 1 && st[0].status === 'bevestigd' && st[0].analyse.stukken.length === 3 && st[0].analyse.stukken[0].rol === 'jas', 'wat je wegtikt telt niet mee; de rest is bevestigd');

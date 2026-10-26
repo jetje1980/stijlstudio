@@ -17,7 +17,9 @@ const ALLOWED_ORIGINS = [
 const ALLOWED_MODELS = [
   "claude-opus-5",
   "claude-sonnet-5",
+  "claude-sonnet-5-5",
   "claude-haiku-4-5",
+  "claude-haiku-5-5",
 ];
 
 const MAX_TOKENS_CAP = 32000;   // denk-tokens tellen mee; te krap levert lege antwoorden
@@ -104,7 +106,7 @@ Deno.serve(async (req: Request) => {
 
   // Haiku 4.5 kent de effort-parameter niet en geeft dan een 400 terug.
   // Weghalen in plaats van de aanroep laten mislukken.
-  if (/haiku/i.test(String(body.model)) && body.output_config) {
+  if (/haiku-4/i.test(String(body.model)) && body.output_config) {
     const oc = body.output_config as Record<string, unknown>;
     delete oc.effort;
     if (Object.keys(oc).length === 0) delete body.output_config;
