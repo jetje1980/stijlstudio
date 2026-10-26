@@ -137,7 +137,12 @@ export function controleer(o, rapport) {
   if (laag && boven && laag.pasvorm === 'wijd' && boven.pasvorm === 'wijd' && ['blazer', 'vest', 'gilet'].includes(laag.soort))
     problemen.push({ regel: 'silhouet', zacht: true, tekst: `Oversized ${laag.soort} over een wijd bovenstuk: neem er iets strakkers onder.` });
 
-  const prints = o.items.filter(i => i.print);
+  // Een blazer onder een oversized jas wordt een stapel schouders.
+  if (laag && o.slots.jas && laag.soort === 'blazer' && o.slots.jas.pasvorm === 'wijd')
+    problemen.push({ regel: 'laagjes', tekst: 'Een blazer onder een oversized jas wordt te veel.' });
+
+  // een zijstreep op een trainingsbroek is een detail, geen print
+  const prints = o.items.filter(i => i.print && !(i.print === 'streep' && /zijstreep|firebird|track/i.test(`${i.naam} ${i.beschrijving || ''}`)));
   if (prints.length > 1) problemen.push({ regel: 'prints', tekst: 'Meer dan één print (' + prints.map(i => i.print).join(' + ') + ').' });
 
   const texturen = new Set(kleding.map(i => i.textuur));
@@ -172,7 +177,7 @@ export function karakter(i) {
   // bij schoenen telt de vorm, niet de glans van het leer
   if (i.rol === 'schoen') return ['hakken', 'loafers'].includes(i.soort) ? 'lief' : ['sneakers', 'laarzen'].includes(i.soort) ? 'stoer' : null;
   if (LIEF_SOORT.has(i.soort) || LIEF_SNIT.has(i.snit) || ['kant', 'glans'].includes(i.textuur)) return 'lief';
-  if (STOER_SOORT.has(i.soort) || STOER_SNIT.has(i.snit) || ['leer', 'denim'].includes(i.textuur) || (i.rol === 'jas' && /technical|cargo|bomber|biker/i.test(i.naam))) return 'stoer';
+  if (STOER_SOORT.has(i.soort) || STOER_SNIT.has(i.snit) || ['leer', 'denim'].includes(i.textuur) || i.print === 'camouflage' || i.detail === 'zijstreep' || (i.rol === 'jas' && /technical|cargo|bomber|biker/i.test(i.naam))) return 'stoer';
   return null;
 }
 export function contrast(o) {
@@ -268,6 +273,8 @@ export function score(o, ctx) {
     if (jas && !/wol|kunstbont|fleece|leer|mohair/.test(jas.materiaal || '') && jas.textuur !== 'pluizig') s -= 2.5;
   }
   if (k === 'fris') s += (o.slots.laag || o.slots.jas) ? 1 : -1;
+  // een warme jas is bij fris weer genoeg; nog een vest eronder wordt stapelen
+  if (k !== 'koud' && o.slots.jas && o.slots.jas.warmte >= 3 && o.slots.laag) s -= o.slots.jas.pasvorm === 'wijd' ? 2.5 : 1.2;
   if (k === 'warm') s -= Math.max(0, warmte - 4) * 0.8;
 
   // wat zij eerder wegwisselde of juist koos
@@ -390,6 +397,12 @@ function kleedAan(basis, p, ctx, gebruikt = new Map()) {
   // bij het sporten pas een jas als het echt koud is
   const jasNodig = ctx.sport ? (ctx.weer === 'koud' || ctx.weer === 'fris') && p.jas.length > 0 : (ctx.weer === 'koud' || ctx.weer === 'fris' || (wilLaag && !o.slots.laag));
   if (jasNodig) probeer('jas', p.jas, true);
+  // De laag werd gekozen vóór de jas. Is hij met de jas erover overbodig, dan weg.
+  if (o.slots.laag && o.slots.jas && !wilLaag && !ankerIn('laag').length) {
+    const { laag, ...zonder } = o.slots;
+    const n = maakOutfit(zonder, ctx);
+    if (n.check.ok && n.score > o.score && past(n)) o = n;
+  }
   if (!ctx.sport) probeer('tas', p.tas, false);
   if (ctx.sport) { /* geen riem of sjaal bij het sporten */ }
   else if (metRiem(o)) probeer('riem', p.riem, true);

@@ -1126,7 +1126,7 @@
   "kleur": [
    "marine"
   ],
-  "print": "streep",
+  "print": null,
   "textuur": "glad",
   "materiaal": "katoen",
   "pasvorm": "wijd",
@@ -1137,7 +1137,8 @@
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/griette-wardrobe/griette_adidas-broek",
   "snit": "wide leg",
   "beschrijving": "marineblauw, wijd uitlopend vanaf heup, glad jersey, elastische taille, zijstreep",
-  "nagekeken": false
+  "nagekeken": false,
+  "detail": "zijstreep"
  },
  {
   "id": "bruin-shorts",
@@ -2547,16 +2548,17 @@
   "print": "camouflage",
   "textuur": "glad",
   "materiaal": null,
-  "pasvorm": "recht",
+  "pasvorm": "wijd",
   "warmte": 3,
-  "formeel": 3,
-  "comfort": 3,
+  "formeel": 2,
+  "comfort": 4,
   "seizoen": "winter",
   "foto": "https://res.cloudinary.com/dhggari0g/image/upload/v1792535809/griette-wardrobe/griette-wardrobe/griette_custom-1792535891892.jpg",
   "gedragenFotos": [
    "https://res.cloudinary.com/dhggari0g/image/upload/v1792535810/griette-wardrobe/griette_custom-1792535891892-extra-0.jpg"
   ],
-  "nagekeken": false
+  "nagekeken": false,
+  "beschrijving": "oversized bomber in camouflage, olijf/khaki met bruin, roze Honda-logo en patches, warm gevoerd"
  },
  {
   "id": "bruin-jurk",
