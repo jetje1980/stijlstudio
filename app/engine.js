@@ -175,7 +175,9 @@ export function controleer(o, rapport, ctx = {}) {
   const kleding = o.items.filter(i => ROLLEN_KLEDING.includes(i.rol));
 
   // Nooit wijd op wijd. Instoppen met een riem redt een wijde blouse.
-  if (boven && onder && boven.pasvorm === 'wijd' && onder.pasvorm === 'wijd') {
+  const isSet = boven && onder && boven.set && boven.set === onder.set;
+  if (isSet) tips.push('Een set: draag hem als geheel, en geef hem vorm met je schoenen, een tas of een laagje.');
+  if (boven && onder && boven.pasvorm === 'wijd' && onder.pasvorm === 'wijd' && !isSet) {
     if (STOPBAAR.has(boven.soort) && o.items.some(i => i.soort === 'riem')) tips.push('Stop het bovenstuk in en draag de riem: zo blijft je taille zichtbaar.');
     else problemen.push({ regel: 'silhouet', tekst: 'Wijd op wijd: je silhouet verdwijnt.' });
   }
@@ -217,7 +219,8 @@ export function controleer(o, rapport, ctx = {}) {
   }
 
   const texturen = new Set(kleding.map(i => i.textuur));
-  if ((o.kleur.methode === 'mono' || o.kleur.methode === 'neutraal') && texturen.size < 2 && kleding.length >= 2)
+  // (een set is één stof; dan maakt een jas, tas of schoen het contrast)
+  if ((o.kleur.methode === 'mono' || o.kleur.methode === 'neutraal') && texturen.size < 2 && kleding.length >= 2 && !isSet)
     problemen.push({ regel: 'textuur', tekst: 'Zonder kleurcontrast moet de stof het werk doen: nu maar één textuur.' });
 
   // Eén heldere kleur is het statement; geen zwaargewicht ernaast.
@@ -437,6 +440,8 @@ export function score(o, ctx) {
   // recepten), zodat cosy + streetstyle iets geeft dat van allebei heeft.
   const sferen = sfeerLijst(ctx.sfeer).map(k => SFEREN[k]).filter(Boolean);
   for (const sf of sferen) s += sfeerPunten(o, sf) / sferen.length;
+  // een set die je zelf maakte (joggingpak, co-ord) hoort bij elkaar
+  if (o.slots.boven && o.slots.onder && o.slots.boven.set && o.slots.boven.set === o.slots.onder.set) s += 4;
   // werkpaarden uit Robins basisgarderobe
   const basis = basisIds(ctx.rapport);
   if (basis.size) {
@@ -764,7 +769,7 @@ function alleOutfits(koffer, ctx) {
   for (const h of p.heel) skeletten.push({ heel: h });
   for (const sk of skeletten) {
     if (!herstelbaar(maakOutfit(sk, ctx))) continue;
-    const o = kleedAan(sk, p, { ...ctx, perId: {} });
+    const o = kleedAan(sk, p, { ...ctx, perId: ctx.perId || {} });
     if (o.check.ok) uit.push(o);
   }
   return uit.sort((a, b) => b.score - a.score);
@@ -1140,7 +1145,10 @@ export function uitJeTas(items, moment, opties, max = 8) {
   const { mctx, act } = momentCtx(m, 0, ctx, []);
   // jouw wensen gaan voor wat het dagdeel vraagt: "sjiek" wint van "chillen"
   if (opties.sjiek != null) mctx.sjiek = opties.sjiek;
+  // "met dit stuk erin"
+  if (opties.anker) { mctx.anker = [opties.anker]; mctx.perId = Object.fromEntries(items.map(i => [i.id, i])); }
   let os = voorMoment(items, m, mctx, act);
+  if (opties.anker) os = os.filter(o => o.items.some(i => i.id === opties.anker));
   const wil = os.filter(o => (opties.wensen || []).every(w => !WENSEN[w] || WENSEN[w].test(o)) && (!opties.methode || o.kleur.methode === opties.methode));
   if (wil.length) os = wil;
   return divers(os, max);

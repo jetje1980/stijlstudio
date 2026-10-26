@@ -1,7 +1,7 @@
 // node tests/engine.test.mjs
 import fs from 'fs';
 import { zetHex, herken } from '../app/kleur.js';
-import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur, uitSelectie, contrast, printMix, smaakVan, naMaken, mouwen, basisIds, maakOutfit, laagProbleem, voegStukToe } from '../app/engine.js';
+import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur, uitSelectie, contrast, printMix, smaakVan, naMaken, mouwen, basisIds, maakOutfit, laagProbleem, voegStukToe, uitJeTas } from '../app/engine.js';
 import { info } from '../app/kleur.js';
 const kast = JSON.parse(fs.readFileSync('data/kast.json'));
 const rapport = JSON.parse(fs.readFileSync('data/rapport.json'));
@@ -255,6 +255,19 @@ ok(telSnit(street, ['barrel', 'ballon', 'cargo']) >= telSnit(paris, ['barrel', '
   ok(n2.slots.onder.naam.startsWith('Zara cargo'), 'andere broek erbij: in de plaats van de oude');
   const r = andereKleur(kast, stelVoor(kast, { rapport, weer: 'mild' }, 1)[0], 'rood', { rapport, weer: 'mild' });
   ok(r && r.opties.length >= 2, 'andere kleur: meerdere varianten uit je kast (' + (r ? r.opties.length : 0) + ')');
+}
+// 25. sets, en looks uit je tas met een vast stuk
+{
+  const sweater = { id: 't-sweat', naam: 'Sweater lichtgrijs', soort: 'trui', rol: 'boven', kleur: ['lichtgrijs'], textuur: 'structuur', pasvorm: 'wijd', warmte: 2, formeel: 1, comfort: 5, seizoen: 'altijd', set: 'joggen' };
+  const pants = { id: 't-pants', naam: 'Sweatpants lichtgrijs', soort: 'broek', rol: 'onder', kleur: ['lichtgrijs'], textuur: 'structuur', pasvorm: 'wijd', warmte: 2, formeel: 1, comfort: 5, seizoen: 'altijd', set: 'joggen' };
+  const o = maakOutfit({ boven: sweater, onder: pants }, { rapport, weer: 'mild' });
+  ok(o.check.ok, 'set (joggingpak): wijd op wijd mag als het een set is');
+  const k2 = kast.concat(sweater, pants);
+  ok(stelVoor(k2, { rapport, weer: 'mild', anker: ['t-sweat'], sfeer: ['cosy'] }, 3).some(x => x.items.includes(pants)), 'met de sweater vast komt de broek van de set voorbij');
+  const tasje = kast.filter(i => /Amiel|ballon|Agolde|barrel|laarsjes zwart|New Balance|Leonie|gilet paars|Donkerbruin longsleeve/i.test(i.naam));
+  const amiel = kast.find(i => /Amiel/.test(i.naam));
+  const looks = uitJeTas(tasje, { dag: 'Za', moment: 'dag', weer: 'fris' }, { rapport, anker: amiel.id }, 12);
+  ok(looks.length >= 2 && looks.every(l => l.items.includes(amiel)), `uit je tas met de Amiel-trui erin: ${looks.length} looks`);
 }
 console.log(goed, 'goed,', fout, 'fout,', Date.now() - t0, 'ms');
 process.exit(fout ? 1 : 0);
