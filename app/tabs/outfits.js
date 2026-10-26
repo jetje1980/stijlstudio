@@ -421,9 +421,17 @@ function maker(el, app) {
   setTimeout(() => toonVoorstellen(el, app), 30);
 }
 
+// Eén keer ruim zoeken, daarna bladeren: met een vast stuk zes per keer,
+// zonder drie. "Andere voorstellen" laat de volgende zien, niet bijna dezelfde.
+let voorraad = { sleutel: null, lijst: [], pagina: 0 };
 function toonVoorstellen(el, app) {
   const ctx = context(app);
-  const lijst = stelVoor(app.kast(), ctx, 3);
+  const per = keuze.anker.length ? 6 : 3;
+  const sl = JSON.stringify({ ...ctx, geheugen: null, seed: null, smaak: null, perId: null });
+  if (voorraad.sleutel !== sl) voorraad = { sleutel: sl, lijst: stelVoor(app.kast(), ctx, 30), pagina: 0 };
+  const paginas = Math.max(1, Math.ceil(voorraad.lijst.length / per));
+  const begin = (voorraad.pagina % paginas) * per;
+  const lijst = voorraad.lijst.slice(begin, begin + per);
   const plek = $('#voorstellen');
   if (!plek) return;
   if (!lijst.length) {
@@ -439,8 +447,9 @@ function toonVoorstellen(el, app) {
       <button class="knop licht" data-a="vandaag" type="button">Vandaag aan</button>
       <button class="knop licht" data-a="kleur" type="button">Andere kleur</button>
     </div></div>`).join('')
-    + `<button class="knop licht vol" id="meer" type="button">Andere voorstellen</button>`;
-  $('#meer').addEventListener('click', () => { keuze.seed++; toonVoorstellen(el, app); });
+    + `<p class="klein" style="text-align:center">${begin + 1}–${begin + lijst.length} van ${voorraad.lijst.length} looks</p>
+      <button class="knop licht vol" id="meer" type="button">${begin + per >= voorraad.lijst.length ? 'Weer vooraan beginnen' : 'Andere voorstellen'}</button>`;
+  $('#meer').addEventListener('click', () => { voorraad.pagina++; toonVoorstellen(el, app); plek.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   plek.querySelectorAll('[data-n]').forEach(kaart => {
     let o = lijst[+kaart.dataset.n];
     let ai = null;
