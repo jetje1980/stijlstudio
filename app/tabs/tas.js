@@ -435,7 +435,8 @@ function toonKeuze(el, app) {
       ${p.outfit ? outfitHtml(p.outfit) + `<div class="rij" style="margin-top:6px"><button class="chip" data-kleur="${i}" type="button">🎨 Andere kleur</button><button class="chip" data-los="${i}" type="button">Andere kiezen</button></div>`
         : p.opties.length ? `<div class="outfit-lijst" style="margin-top:8px">${toon.map((o, n) => tegelVan(o, i, n)).join('')}</div>
           ${p.opties.length > toon.length ? `<button class="chip" data-meer="${i}" type="button" style="margin-top:8px">Nog ${p.opties.length - toon.length} opties</button>` : ''}`
-        : '<p class="klein">Hier lukt niets, ook niet met iets uit je kast erbij. Kijk bij "Wat niet mee" of je niet te veel hebt uitgesloten.</p>'}</div>`;
+        : '<p class="klein">Hier lukt niets, ook niet met iets uit je kast erbij. Kijk bij "Wat niet mee" of je niet te veel hebt uitgesloten.</p>'}
+      ${!p.outfit && (p.niet || []).length ? `<ul class="tips">${p.niet.map(x => `<li>${esc(x.item.naam)}: ${esc(x.waarom)}</li>`).join('')}</ul>` : ''}</div>`;
     }).join('')}
 
     <h3>Wat je klaarlegde</h3>

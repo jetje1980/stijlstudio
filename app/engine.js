@@ -21,7 +21,7 @@ export const SFEREN = {
     snit: { recht: 2, flared: 2, 'wide leg': 1, slim: 1, ballon: -1, cargo: -2, barrel: -1 },
     methode: { accent: 2, neutraal: 1.5, tonsurton: 1, colorblock: -2, mix: -2 } },
   street: { naam: 'Streetstyle', uitleg: 'Sneakers, cargo, oversized, petje, technische jacks',
-    soort: { sneakers: 3, pet: 3, jas: 2, broek: 2, jeans: 2, 't-shirt': 2, trui: 1, longsleeve: 1, sporttop: 1, hakken: -2, blouse: -1, pantalon: -1 },
+    soort: { sneakers: 3, pet: 3, jas: 2, broek: 2, jeans: 2, 't-shirt': 2, trui: 1, longsleeve: 1, sporttop: 1, hakken: -0.5, blouse: -0.5, pantalon: -1 },
     textuur: { structuur: 1, denim: 1, glad: 0.5 },
     snit: { barrel: 2, ballon: 2, cargo: 2, 'wide leg': 1, flared: -1 },
     methode: { colorblock: 1, accent: 1 } },
@@ -31,7 +31,7 @@ export const SFEREN = {
     snit: { 'wide leg': 2, recht: 1, flared: 1, potlood: 1, cargo: -2, ballon: -1 },
     methode: { split: 1, accent: 1, tonsurton: 1 } },
   vrouwelijk: { naam: 'Vrouwelijk', uitleg: 'Jurk of rok, kant, satijn, een open hals, kitten heels',
-    soort: { jurk: 3, rok: 3, topje: 2, hakken: 2, sandalen: 1, blouse: 1, sjaal: 1, sneakers: -1, pet: -2 },
+    soort: { jurk: 3, rok: 3, topje: 2, hakken: 2, sandalen: 1, blouse: 1, sjaal: 1, laarzen: 1, sneakers: 0, pet: -1 },
     textuur: { kant: 3, glans: 2, 'fijn gebreid': 1 },
     snit: { 'A-lijn': 2, plissé: 2, wikkel: 2, flared: 1, cargo: -2 },
     methode: { analoog: 1, split: 1 } },
@@ -157,6 +157,28 @@ export function controleer(o, rapport) {
 }
 
 // ── SCORE ────────────────────────────────────────────────────────────────────
+// Stoer met een zachte pop (stylingkennis): een stoere basis met één lief of
+// net stuk, of andersom. Precies één tegenpool; meer wordt rommelig.
+const STOER_SOORT = new Set(['jeans', 'pet', 'teddy', 'sporttop']);
+const STOER_SNIT = new Set(['barrel', 'ballon', 'cargo', 'mom']);
+const LIEF_SOORT = new Set(['topje', 'jurk']);
+const LIEF_SNIT = new Set(['A-lijn', 'plissé', 'wikkel', 'potlood']);
+export function karakter(i) {
+  if (['tas', 'riem', 'sjaal'].includes(i.soort) || i.rol === 'tas') return null;
+  // bij schoenen telt de vorm, niet de glans van het leer
+  if (i.rol === 'schoen') return ['hakken', 'loafers'].includes(i.soort) ? 'lief' : ['sneakers', 'laarzen'].includes(i.soort) ? 'stoer' : null;
+  if (LIEF_SOORT.has(i.soort) || LIEF_SNIT.has(i.snit) || ['kant', 'glans'].includes(i.textuur)) return 'lief';
+  if (STOER_SOORT.has(i.soort) || STOER_SNIT.has(i.snit) || ['leer', 'denim'].includes(i.textuur) || (i.rol === 'jas' && /technical|cargo|bomber|biker/i.test(i.naam))) return 'stoer';
+  return null;
+}
+export function contrast(o) {
+  const k = o.items.map(i => [i, karakter(i)]).filter(([, c]) => c);
+  const stoer = k.filter(([, c]) => c === 'stoer'), lief = k.filter(([, c]) => c === 'lief');
+  if (stoer.length >= 2 && lief.length === 1) return { pop: lief[0][0], basis: 'stoer' };
+  if (lief.length >= 2 && stoer.length === 1) return { pop: stoer[0][0], basis: 'lief' };
+  return null;
+}
+
 const METHODE_WAARDE = { split: 1.5, tonsurton: 1.2, accent: 1.2, analoog: 0.8, mono: 0.6, neutraal: 0.3, colorblock: -0.5, mix: -3 };
 
 export function score(o, ctx) {
@@ -191,9 +213,11 @@ export function score(o, ctx) {
     else if (tk.neutraal) s += 0.4;
   }
 
-  // schoen past bij het niveau van de rest
+  // schoen past bij het niveau van de rest, tenzij hij juist het contrast is
   const gem = kleding.reduce((t, i) => t + i.formeel, 0) / Math.max(1, kleding.length);
-  if (o.slots.schoen) s -= Math.abs(o.slots.schoen.formeel - gem) * 0.4;
+  const tegen = contrast(o);
+  if (o.slots.schoen && !(tegen && tegen.pop === o.slots.schoen)) s -= Math.abs(o.slots.schoen.formeel - gem) * 0.4;
+  if (tegen) s += 0.5;
 
   // sfeer: één of meer. Meerdere worden gemengd (het gemiddelde van de
   // recepten), zodat cosy + streetstyle iets geeft dat van allebei heeft.
@@ -250,6 +274,9 @@ export function maakOutfit(slots, ctx) {
   const extra = items.filter(i => !ROLLEN_KLEDING.includes(i.rol));
   const o = { slots, items, kleur: herken(kleding, extra) };
   o.check = controleer(o, ctx.rapport);
+  const tegen = contrast(o);
+  if (tegen) o.check = { ...o.check, tips: o.check.tips.concat(tegen.basis === 'stoer'
+    ? `Stoer met een zachte pop: ${tegen.pop.naam} maakt het spannend.` : `Lief met een stoere twist: ${tegen.pop.naam}.`) };
   o.score = score(o, ctx);
   return o;
 }
@@ -745,7 +772,9 @@ export function uitSelectie(kast, opties) {
     for (const v of varianten) if (!gezien.has(sleutel(v))) { gezien.add(sleutel(v)); os.push(v); }
     // jouw eigen stukken eerst; iets uit de kast alleen als het echt beter is
     const eigen = new Set(selectie);
-    return { ...m, outfit: null, opties: divers(os, max, o => o.items.filter(i => !eigen.has(i) && i.rol !== 'tas').length * 2) };
+    const straf = o => o.items.filter(i => !eigen.has(i) && i.rol !== 'tas').length * 2;
+    const { opties, niet } = elkStuk(divers(os, max, straf), os, selectie, stukken, mctx, straf);
+    return { ...m, outfit: null, opties, niet };
   });
   erbij = erbij.concat(sportErbij.filter(i => !erbij.includes(i)));
   // Per stuk: in hoeveel verschillende outfits kan het? Wat in weinig zit,
@@ -758,6 +787,48 @@ export function uitSelectie(kast, opties) {
     keuze: true, plan, erbij: erbij.map(i => i.id), ookMee: ookMee(kast, mom, moetMee, uitsluiten),
     stukken: selectie.concat(erbij).map(i => ({ item: i, kan: tel.get(i.id) || 0, erbij: erbij.includes(i) })).sort((a, b) => b.kan - a.kan),
   };
+}
+
+// Elke jas en elk paar schoenen dat je klaarlegde, komt in de eerste vier
+// opties, met de beste outfit die ermee kan. Lukt dat niet, dan zeggen we waarom.
+function elkStuk(opties, os, selectie, stukken, mctx, straf) {
+  const niet = [];
+  const voor = [];
+  const wensOk = o => (mctx.wensen || []).every(w => !WENSEN[w] || WENSEN[w].test(o));
+  for (const g of selectie.filter(i => i.rol === 'jas' || i.rol === 'schoen')) {
+    const rol = g.rol;
+    if (!stukken[rol].includes(g)) { niet.push({ item: g, waarom: waaromNiet(g, mctx) }); continue; }
+    if (rol === 'jas' && !os.some(o => o.slots.jas)) { niet.push({ item: g, waarom: 'Bij dit weer is geen jas nodig.' }); continue; }
+    let beste = os.filter(o => o.slots[rol] === g).sort((a, b) => (b.score - straf(b)) - (a.score - straf(a)))[0] || null;
+    let fout = null;
+    if (!beste) for (const o of os.slice(0, 40)) {
+      if (!o.slots[rol]) continue;
+      const v = maakOutfit({ ...o.slots, [rol]: g }, mctx);
+      if (v.check.ok && wensOk(v)) { if (!beste || v.score > beste.score) beste = v; }
+      else if (!fout) fout = !v.check.ok ? harde(v)[0] : { tekst: 'Hier vraagt wat je gaat doen om iets anders (bijv. platte schoenen).' };
+    }
+    if (beste) voor.push({ g, o: beste });
+    else niet.push({ item: g, waarom: fout ? fout.tekst : 'Past bij geen van de combinaties.' });
+  }
+  const eerst = opties.slice(0, 4);
+  const beschermd = new Set([eerst[0]]);
+  for (const { g, o } of voor) {
+    const al = eerst.find(x => x.items.includes(g));
+    if (al) { beschermd.add(al); continue; }
+    const plek = eerst.map((x, n) => n).reverse().find(n => !beschermd.has(eerst[n]));
+    if (plek == null || eerst.length < 4) eerst.push(o); else eerst[plek] = o;
+    beschermd.add(o);
+  }
+  const rest = opties.filter(x => !eerst.includes(x) && !eerst.some(e => sleutel(e) === sleutel(x)));
+  return { opties: eerst.concat(rest), niet };
+}
+
+function waaromNiet(i, ctx) {
+  if (ctx.sport) return i.rol === 'jas' ? 'Bij het sporten alleen een sportjack.' : 'Bij het sporten alleen sneakers.';
+  if (open(i) && ctx.weer !== 'warm') return 'Open schoen; daarvoor is het te fris.';
+  if (i.rol === 'jas' && ctx.weer === 'warm') return 'Te warm voor een jas.';
+  if (isSlipper(i)) return 'Slippers alleen bij warm weer op het strand of om te chillen.';
+  return 'Past niet bij dit weer.';
 }
 
 // "Maak compact": per moment een outfit, met zo min mogelijk stukken in totaal.
