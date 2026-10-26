@@ -26,8 +26,8 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   await p.fill('[data-temp="0"]', '9'); await p.dispatchEvent('[data-temp="0"]', 'change');
   await p.selectOption('[data-doen="1|avond"]', 'pizzeria'); await p.waitForTimeout(150);
   await p.click('[data-chips="niet"] .chip[data-w="rok"]');
-  await p.click('#kies-mm'); await p.click('.blad .tegel'); await p.waitForTimeout(300);
-  await p.click('#kies-thuis'); await p.click('.blad .tegel:nth-child(5)'); await p.waitForTimeout(300);
+  await p.click('#kies-mm'); await p.click('.blad .tegel'); await p.click('#zk'); await p.waitForTimeout(300);
+  await p.click('#kies-thuis'); await p.click('.blad .tegel:nth-child(5)'); await p.click('#zk'); await p.waitForTimeout(300);
   const mm = await p.$$eval('[data-mm]', x => x.map(y => y.textContent));
   const th = await p.$$eval('[data-th]', x => x.map(y => y.textContent));
   await p.click('#pak'); await p.waitForSelector('.paklijst li', { timeout: 20000 });
@@ -53,7 +53,7 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   await p.click('.paklijst li:nth-child(2) .pak-weg'); await p.waitForSelector('.paklijst li', { timeout: 20000 }); await p.waitForTimeout(300);
   ok(!(await p.$$eval('.paklijst li span', x => x.map(y => y.textContent))).includes(wegNaam), 'thuisgelaten stuk is van de paklijst');
   ok(/^1 van/.test(await p.$eval('#ingepakt', x => x.textContent)), 'afgevinkt blijft na opnieuw rekenen');
-  await p.click('#pak-erbij'); await p.fill('#zz', 'Gouden ketting'); await p.click('.blad .tegel'); await p.waitForSelector('.paklijst li', { timeout: 20000 }); await p.waitForTimeout(300);
+  await p.click('#pak-erbij'); await p.fill('#zz', 'Gouden ketting'); await p.click('.blad .tegel'); await p.click('#zk'); await p.waitForSelector('.paklijst li', { timeout: 20000 }); await p.waitForTimeout(300);
   ok((await p.$$eval('.paklijst li span', x => x.map(y => y.textContent))).includes('Gouden ketting'), 'toegevoegd stuk staat op de paklijst');
 
   // datum verschuiven: dagnamen en data bewegen mee, voorspelde graden niet

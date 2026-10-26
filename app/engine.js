@@ -566,15 +566,80 @@ export function pakTas(kast, opties) {
     }
   }
   const uit = verdeel(koffer, mom, { ...ctx, moetMee }, nodig, kast);
-  // Wat niet in een outfit zit maar wel mee moet: zwemkleding bij een warme
-  // stranddag. Liefst iets wat je zelf al "moet mee" had gezet.
-  uit.ookMee = [];
-  if (mom.some(m => m.activiteit === 'strand' && m.weer === 'warm')) {
-    const zwem = kast.filter(i => i.rol === 'zwem' && !uitsluiten.includes(i.id));
-    const keus = zwem.find(i => moetMee.includes(i.id)) || zwem[0];
-    if (keus) uit.ookMee.push({ item: keus, waarom: 'voor het strand' });
-  }
+  uit.ookMee = ookMee(kast, mom, moetMee, uitsluiten);
   return uit;
+}
+
+// Wat niet in een outfit zit maar wel mee moet: zwemkleding bij een warme
+// stranddag. Liefst iets wat je zelf al "moet mee" had gezet.
+function ookMee(kast, mom, moetMee, uitsluiten) {
+  if (!mom.some(m => m.activiteit === 'strand' && m.weer === 'warm')) return [];
+  const zwem = kast.filter(i => i.rol === 'zwem' && !uitsluiten.includes(i.id));
+  const keus = zwem.find(i => moetMee.includes(i.id)) || zwem[0];
+  return keus ? [{ item: keus, waarom: 'voor het strand' }] : [];
+}
+
+// Wat een moment vraagt: sfeer (om de beurt bij afwisselen), hoe net, wensen.
+function momentCtx(m, n, ctx, sferen) {
+  if (ctx.afwisselen && sferen.length > 1) m.sfeer = sferen[n % sferen.length];
+  const act = ACTIVITEITEN[m.activiteit];
+  const sjiek = act && act.sjiek != null ? act.sjiek : m.moment === 'avond' ? Math.max(ctx.sjiek ?? 0.5, 0.75) : ctx.sjiek;
+  const wensen = (ctx.wensen || []).concat((act && act.wensen) || []);
+  return { act, mctx: { ...ctx, sfeer: m.sfeer || ctx.sfeer, weer: m.weer, sjiek, wensen, sport: !!(act && act.sport),
+    activiteit: m.activiteit, avond: m.moment === 'avond', reis: m.reis } };
+}
+
+// Alle outfits voor één moment uit deze stukken, de best passende eerst.
+function voorMoment(koffer, m, mctx, act) {
+  let os = alleOutfits(koffer, mctx);
+  // wat de activiteit vraagt (platte schoenen en een broek bij een wandeling,
+  // geen satijn op het strand), als dat met deze koffer kan
+  const vermijd = (act && act.vermijd) || [];
+  const passend = os.filter(o => mctx.wensen.every(w => !WENSEN[w] || WENSEN[w].test(o))
+    && !o.items.some(i => ROLLEN_KLEDING.includes(i.rol) && vermijd.includes(i.textuur)));
+  if (passend.length) os = passend;
+  if (m.reis) {
+    // reisoutfit: de zwaarste stukken aan, dan scheelt het in de koffer
+    os = os.map(o => ({ o, w: o.score + o.items.reduce((t, i) => t + i.warmte, 0) * 0.8 })).sort((a, b) => b.w - a.w).map(x => x.o);
+  }
+  return os;
+}
+
+// Mist er iets voor dit moment, of lukt het niet met deze stukken? Dan zo
+// weinig mogelijk uit de kast erbij: eerst wat echt ontbreekt (schoenen, een
+// broek, een jas bij kou), en anders het ene stuk dat er de beste outfit van maakt.
+function aanvullen(basis, kast, m, mctx, act) {
+  const uit = new Set(mctx.uitsluiten || []);
+  const rest = kast.filter(i => !basis.includes(i) && !uit.has(i.id));
+  const pk = pools(rest, mctx);
+  const erbij = [];
+  const waarde = stukken => { const os = voorMoment(stukken, m, mctx, act); return os.length ? os[0].score + Math.min(os.length, 5) : -Infinity; };
+  const kies = kand => {
+    let beste = null, w = -Infinity;
+    for (const k of kand.slice(0, 40)) {
+      const n = waarde(basis.concat(erbij, [k]));
+      if (n > w) { beste = k; w = n; }
+    }
+    return beste;
+  };
+  const p = pools(basis, mctx);
+  const mist = [];
+  if (!p.heel.length && !p.onder.length) mist.push('onder');
+  if (!p.heel.length && !p.boven.length) mist.push('boven');
+  if (!p.schoen.length) mist.push('schoen');
+  const koud = mctx.weer === 'koud' || mctx.weer === 'fris';
+  if (koud && !p.jas.length && pk.jas.length) mist.push('jas');
+  if (!mist.length && voorMoment(basis, m, mctx, act).length) return [];
+  for (const rol of mist) {
+    // zolang er nog meer ontbreekt, geeft geen enkel stuk al een outfit; kies dan rustig
+    const kand = pk[rol].slice().sort((a, b) => info(b.kleur[0]).neutraal - info(a.kleur[0]).neutraal);
+    const k = kies(kand) || kand[0];
+    if (k) erbij.push(k);
+  }
+  if (voorMoment(basis.concat(erbij), m, mctx, act).length) return erbij;
+  const k = kies(['boven', 'onder', 'heel', 'schoen', 'laag', 'jas'].flatMap(r => pk[r]).filter(i => !erbij.includes(i)));
+  if (k && voorMoment(basis.concat(erbij, [k]), m, mctx, act).length) return erbij.concat(k);
+  return voorMoment(basis.concat(erbij), m, mctx, act).length ? erbij : [];
 }
 
 // Outfits uit de koffer aan dagen en momenten koppelen.
@@ -585,22 +650,13 @@ function verdeel(koffer, mom, ctx, nodig, kast) {
   // koffer is wel samen gekozen, dus stukken komen in beide terug.
   const sferen = sfeerLijst(ctx.sfeer);
   for (const [n, m] of mom.entries()) {
-    if (ctx.afwisselen && sferen.length > 1) m.sfeer = sferen[n % sferen.length];
-    const act = ACTIVITEITEN[m.activiteit];
-    const sjiek = act && act.sjiek != null ? act.sjiek : m.moment === 'avond' ? Math.max(ctx.sjiek ?? 0.5, 0.75) : ctx.sjiek;
-    const wensen = (ctx.wensen || []).concat((act && act.wensen) || []);
-    const mctx = { ...ctx, sfeer: m.sfeer || ctx.sfeer, weer: m.weer, sjiek, wensen, sport: !!(act && act.sport),
-                   activiteit: m.activiteit, avond: m.moment === 'avond', reis: m.reis };
-    let os = alleOutfits(koffer, mctx);
-    // wat de activiteit vraagt (platte schoenen en een broek bij een wandeling,
-    // geen satijn op het strand), als dat met deze koffer kan
-    const vermijd = (act && act.vermijd) || [];
-    const passend = os.filter(o => wensen.every(w => !WENSEN[w] || WENSEN[w].test(o))
-      && !o.items.some(i => ROLLEN_KLEDING.includes(i.rol) && vermijd.includes(i.textuur)));
-    if (passend.length) os = passend;
-    if (m.reis) {
-      // reisoutfit: de zwaarste stukken aan, dan scheelt het in de koffer
-      os = os.map(o => ({ o, w: o.score + o.items.reduce((t, i) => t + i.warmte, 0) * 0.8 })).sort((a, b) => b.w - a.w).map(x => x.o);
+    const { mctx, act } = momentCtx(m, n, ctx, sferen);
+    let os = voorMoment(koffer, m, mctx, act);
+    // Niets met deze koffer: één of twee stukken uit je kast erbij.
+    let erbij = [];
+    if (!os.length && kast) {
+      erbij = aanvullen(koffer, kast, m, mctx, act);
+      if (erbij.length) { koffer = koffer.concat(erbij); os = voorMoment(koffer, m, mctx, act); }
     }
     // Liefst een kleurmanier die nog niet in de tas zit: zo zie je in één
     // koffer wat ton-sur-ton, mono of een accent met jouw stukken doet.
@@ -609,9 +665,10 @@ function verdeel(koffer, mom, ctx, nodig, kast) {
     const top = os.filter(vrij).slice(0, 12);
     const beste = top.map(o => ({ o, w: o.score + (manieren.has(o.kleur.methode) ? 0 : 2.5) - (o.kleur.methode === 'mix' ? 3 : 0) }))
       .sort((a, b) => b.w - a.w)[0];
-    const keuze = (beste && beste.o) || os.find(o => !gebruikt.has(sleutel(o))) || null;
+    // alles al gedragen: dan liever een outfit herhalen dan niets
+    const keuze = (beste && beste.o) || os.find(o => !gebruikt.has(sleutel(o))) || os[0] || null;
     if (keuze) gebruikt.add(sleutel(keuze));
-    plan.push({ ...m, outfit: keuze });
+    plan.push({ ...m, outfit: keuze, erbij: erbij.filter(i => keuze && keuze.items.includes(i)).map(i => i.id) });
   }
   const tel = new Map();
   for (const p of plan) if (p.outfit) for (const i of p.outfit.items) tel.set(i.id, (tel.get(i.id) || 0) + 1);
@@ -627,6 +684,91 @@ function verdeel(koffer, mom, ctx, nodig, kast) {
     perManier: Object.fromEntries(Object.entries(perManier).map(([k, v]) => [k, v.length])),
     ontbreekt: watOntbreekt(koffer, kast, ctx, perManier),
   };
+}
+
+// ── KIEZEN UIT JE EIGEN SELECTIE ────────────────────────────────────────────
+// Je hebt meer klaargelegd dan je nodig hebt. Per moment alle goede outfits
+// uit die stukken; alleen waar echt iets ontbreekt komt er iets uit je kast
+// bij (`erbij`). Jij kiest, de paklijst volgt uit wat je kiest.
+const KERN = ['boven', 'onder', 'heel'];
+const overlap = (a, b) => a.items.filter(i => b.items.includes(i) && KERN.includes(i.rol)).length;
+
+function divers(os, max, straf = () => 0) {
+  const uit = [];
+  const rest = os.map(o => ({ ...o, score: o.score })).sort((a, b) => (b.score - straf(b)) - (a.score - straf(a))).slice(0, 60);
+  while (uit.length < max && rest.length) {
+    const manieren = new Set(uit.map(o => o.kleur.methode));
+    let bi = 0, bw = -Infinity;
+    rest.forEach((o, n) => {
+      const w = o.score - straf(o) + (manieren.has(o.kleur.methode) ? 0 : 2) - uit.reduce((t, u) => t + (overlap(o, u) >= 2 ? 3 : 0), 0) - (o.kleur.methode === 'mix' ? 3 : 0);
+      if (w > bw) { bw = w; bi = n; }
+    });
+    uit.push(rest.splice(bi, 1)[0]);
+  }
+  return uit;
+}
+
+export function uitSelectie(kast, opties) {
+  const { dagen, rapport, sfeer = null, sjiek = null, moetMee = [], uitsluiten = [], geheugen = {}, afwisselen = false, max = 12 } = opties;
+  const mom = momenten(dagen);
+  const perId = Object.fromEntries(kast.map(i => [i.id, i]));
+  const selectie = moetMee.map(id => perId[id]).filter(Boolean);
+  const ctx = { rapport, sfeer, sjiek, geheugen, uitsluiten, afwisselen };
+  const sferen = sfeerLijst(sfeer);
+  // Sportspullen apart: een hardloopjack hoort niet bij het diner.
+  let erbij = [], sportErbij = [];
+  const plan = mom.map((m, n) => {
+    const { mctx, act } = momentCtx(m, n, ctx, sferen);
+    // wat eerder al uit de kast kwam, mag hier ook weer
+    const eerder = mctx.sport ? sportErbij.concat(erbij) : erbij;
+    // ook als er wel outfits zijn: zonder schoenen of jas (bij fris) ga je niet
+    const nieuw = aanvullen(selectie.concat(eerder), kast, m, mctx, act);
+    let os = voorMoment(selectie.concat(eerder), m, mctx, act);
+    if (nieuw.length) {
+      if (mctx.sport) sportErbij = sportErbij.concat(nieuw); else erbij = erbij.concat(nieuw);
+      os = voorMoment(selectie.concat(eerder, nieuw), m, mctx, act);
+    }
+    // jouw eigen stukken eerst; iets uit de kast alleen als het echt beter is
+    const eigen = new Set(selectie);
+    return { ...m, outfit: null, opties: divers(os, max, o => o.items.filter(i => !eigen.has(i) && i.rol !== 'tas').length * 2) };
+  });
+  erbij = erbij.concat(sportErbij.filter(i => !erbij.includes(i)));
+  // Per stuk: in hoeveel verschillende outfits kan het? Wat in weinig zit,
+  // is de eerste kandidaat om thuis te laten.
+  const uniek = new Map();
+  for (const p of plan) for (const o of p.opties) uniek.set(sleutel(o), o);
+  const tel = new Map(selectie.map(i => [i.id, 0]));
+  for (const o of uniek.values()) for (const i of o.items) tel.set(i.id, (tel.get(i.id) || 0) + 1);
+  return {
+    keuze: true, plan, erbij: erbij.map(i => i.id), ookMee: ookMee(kast, mom, moetMee, uitsluiten),
+    stukken: selectie.concat(erbij).map(i => ({ item: i, kan: tel.get(i.id) || 0, erbij: erbij.includes(i) })).sort((a, b) => b.kan - a.kan),
+  };
+}
+
+// "Maak compact": per moment een outfit, met zo min mogelijk stukken in totaal.
+// Een paar volgordes proberen; de kleinste koffer wint, bij gelijkspel de mooiste.
+export function compact(plan) {
+  const volgordes = [plan.map((_, n) => n), plan.map((_, n) => n).reverse(),
+    plan.map((_, n) => n).sort((a, b) => plan[a].opties.length - plan[b].opties.length)];
+  let beste = null;
+  for (const v of volgordes) {
+    const keus = new Array(plan.length).fill(null);
+    const mee = new Set();
+    const gehad = new Set();
+    for (const n of v) {
+      let bo = null, bw = -Infinity;
+      for (const o of plan[n].opties) {
+        const nieuw = o.items.filter(i => ROLLEN_KLEDING.includes(i.rol) || i.rol === 'schoen').filter(i => !mee.has(i.id)).length;
+        const w = o.score - nieuw * 4 - (gehad.has(sleutel(o)) ? 6 : 0);
+        if (w > bw) { bw = w; bo = o; }
+      }
+      keus[n] = bo;
+      if (bo) { gehad.add(sleutel(bo)); bo.items.forEach(i => mee.add(i.id)); }
+    }
+    const w = { keus, n: mee.size, s: keus.reduce((t, o) => t + (o ? o.score : 0), 0) };
+    if (!beste || w.n < beste.n || (w.n === beste.n && w.s > beste.s)) beste = w;
+  }
+  return beste.keus;
 }
 
 // Waarom lukt een kleurmanier niet met deze koffer, en welk stuk uit je kast
