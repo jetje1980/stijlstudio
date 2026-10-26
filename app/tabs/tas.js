@@ -245,23 +245,25 @@ async function haalWeer(el, app, stil) {
   }
 }
 
-function opties(app) {
+// `ingepakt`: bij opnieuw rekenen blijft wat al in je tas zit gewoon mee.
+function opties(app, ingepakt = []) {
+  const mee = [...new Set(tas.moetMee.concat(ingepakt.filter(id => !tas.thuis.includes(id))))];
   return {
     dagen: tas.dagen.filter(d => d.momenten.length).map(d => ({ ...d, temp: d.temp ?? 15 })),
     rapport: app.data.rapport, sfeer: tas.sfeer, afwisselen: tas.afwisselen, sjiek: tas.schuif ? tas.sjiek : null, contrast: tas.contrast,
-    moetMee: tas.moetMee, seed: tas.seed, geheugen: app.staat().geheugen,
+    moetMee: mee, seed: tas.seed, geheugen: app.staat().geheugen,
     uitsluiten: app.kast().filter(i => tas.thuis.includes(i.id) || tas.niet.includes(i.soort) || (tas.niet.includes('open') && i.open)).map(i => i.id)
-      .filter(id => !tas.moetMee.includes(id)),
+      .filter(id => !mee.includes(id)),
   };
 }
 
 function herreken(el, app, bericht) {
   const ingepakt = tas.afgevinkt.slice();
   tasTab(el, app);
-  reken(el, app, () => { tas.afgevinkt = ingepakt; bewaarConcept(app); toonUitkomst(el, app); melding(bericht); });
+  reken(el, app, () => { tas.afgevinkt = ingepakt; bewaarConcept(app); toonUitkomst(el, app); melding(bericht); }, ingepakt);
 }
 
-function reken(el, app, daarna) {
+function reken(el, app, daarna, ingepakt = []) {
   const plek = $('#uitkomst');
   if (!opties(app).dagen.length) { plek.innerHTML = '<p class="klein">Kies per dag minstens één moment.</p>'; return; }
   const kies = tas.modus === 'kies';
@@ -269,7 +271,7 @@ function reken(el, app, daarna) {
   plek.innerHTML = `<p class="klein">${kies ? 'Ik zoek alle outfits uit je stukken…' : 'Ik pak je tas… dit duurt een paar tellen.'}</p>`;
   const oud = tas.uitkomst;
   setTimeout(() => {
-    tas.uitkomst = kies ? uitSelectie(app.kast(), opties(app)) : pakTas(app.kast(), opties(app));
+    tas.uitkomst = kies ? uitSelectie(app.kast(), opties(app)) : pakTas(app.kast(), opties(app, ingepakt));
     // al gekozen outfits blijven staan zolang ze nog kunnen
     if (kies && oud && oud.keuze) tas.uitkomst.plan.forEach((p, n) => {
       const was = oud.plan[n] && oud.plan[n].outfit;
