@@ -7,6 +7,7 @@ import { labelsVoorFoto } from '../ai.js';
 import { syncStatus } from '../opslag.js';
 
 const ROLLEN = [['', 'Alles'], ['boven', 'Boven'], ['onder', 'Onder'], ['heel', 'Jurk & set'], ['laag', 'Laagjes'], ['jas', 'Jassen'], ['schoen', 'Schoenen'], ['tas', 'Tassen'], ['accessoire', 'Accessoires']];
+const TAILLE = { hoog: 'hoge taille', midden: 'middelhoge taille', laag: 'lage taille' };
 const FAMILIES = ['zwart', 'wit', 'grijs', 'bruin', 'blauw', 'groen', 'geel', 'oranje', 'rood', 'roze', 'paars', 'turquoise'];
 const FAM_STIP = { zwart: 'zwart', wit: 'ecru', grijs: 'lichtgrijs', bruin: 'bruin', blauw: 'donkerblauw', groen: 'groen', geel: 'geel', oranje: 'oranje', rood: 'rood', roze: 'roze', paars: 'paars', turquoise: 'turquoise' };
 
@@ -14,6 +15,7 @@ const filter = { rol: '', fam: '', zoek: '', nooit: false };
 
 export default function kastTab(el, app, [sub]) {
   if (sub === 'shop') return shop(el, app);
+  if (sub === 'inzicht') return inzicht(el, app);
   const kast = app.kast();
   const log = app.draaglog();
   const teCheck = kast.filter(i => !i.nagekeken).length;
@@ -31,7 +33,7 @@ export default function kastTab(el, app, [sub]) {
       </div>
     </div>
     <div class="raster" id="raster"></div>
-    <p class="klein" style="margin-top:18px"><a href="#kast/shop">Wat mist er in je kast? Naar de shop →</a></p>`;
+    <div class="rij" style="margin-top:18px"><a class="knop licht" href="#kast/inzicht">Wat draag ik?</a><a class="knop licht" href="#kast/shop">Wat mist er?</a></div>`;
 
   const teken = () => {
     const z = filter.zoek.toLowerCase();
@@ -39,7 +41,7 @@ export default function kastTab(el, app, [sub]) {
       (!filter.rol || i.rol === filter.rol) &&
       (!filter.fam || i.kleur.some(k => info(k).fam === filter.fam)) &&
       (!filter.nooit || !log[i.id]) &&
-      (!z || (i.naam + ' ' + i.kleur.join(' ') + ' ' + i.soort).toLowerCase().includes(z)));
+      (!z || (i.naam + ' ' + i.kleur.join(' ') + ' ' + i.soort + ' ' + (i.snit || '')).toLowerCase().includes(z)));
     $('#raster').innerHTML = lijst.length
       ? lijst.map(i => tegel(i, log[i.id] ? '' : '')).join('')
       : `<p class="leeg-melding" style="grid-column:1/-1">Niets gevonden.</p>`;
@@ -70,6 +72,8 @@ export function detail(app, id, klaar) {
     /grijs|antraciet/.test(k) && ['boven', 'heel'].includes(i.rol) && 'Grijs bij je gezicht maakt je fletser: draag het in zachte stof of met een kleur erbij.',
     i.pasvorm === 'wijd' && i.rol === 'boven' && 'Wijd bovenstuk: altijd met een aansluitend of hoog onderstuk, of instoppen met riem.',
     i.pasvorm === 'wijd' && i.rol === 'onder' && 'Wijd onderstuk: combineer met iets aansluitends of korts erboven.',
+    i.taille === 'hoog' && 'Hoge taille: geeft je direct meer vorm.',
+    i.taille === 'laag' && 'Lage taille: liever met een langer bovenstuk of een laag, niet met een crop.',
     i.print && 'Print: dit is de enige in je outfit.',
   ].filter(Boolean);
 
@@ -78,7 +82,7 @@ export function detail(app, id, klaar) {
     <h2>${esc(i.naam)}</h2>
     <dl class="labels">
       <dt>Kleur</dt><dd>${i.kleur.map(k => stip(k) + ' ' + esc(k)).join(' &nbsp; ') || '—'}</dd>
-      <dt>Soort</dt><dd>${esc(i.soort)} · ${esc(i.pasvorm)}</dd>
+      <dt>Soort</dt><dd>${esc([i.soort, i.snit, i.snit ? '' : i.pasvorm, TAILLE[i.taille], i.lengte].filter(Boolean).join(' · '))}</dd>
       <dt>Stof</dt><dd>${esc(i.textuur)}${i.materiaal ? ' · ' + esc(i.materiaal) : ''}${i.print ? ' · ' + esc(i.print) : ''}</dd>
       <dt>Gedragen</dt><dd>${log.length ? `${log.length}× · laatst ${datum(log[0])}` : 'nog niet bijgehouden'}</dd>
       <dt>In outfits</dt><dd>${inOutfits.length}</dd>
@@ -123,7 +127,10 @@ function bewerk(app, id, klaar) {
 
 // ── Labelcheck: één voor één, "klopt" is één tik ───────────────────────────
 function labelcheck(app, klaar) {
-  const lijst = app.kast().filter(i => !i.nagekeken);
+  // Eerst wat de outfits het meest bepaalt: kleding, dan schoenen en tassen,
+  // accessoires als laatste.
+  const VOLGORDE = { boven: 0, onder: 0, heel: 0, laag: 1, jas: 1, schoen: 2, tas: 3, accessoire: 4, zwem: 5 };
+  const lijst = app.kast().filter(i => !i.nagekeken).sort((a, b) => (VOLGORDE[a.rol] ?? 6) - (VOLGORDE[b.rol] ?? 6));
   let n = 0;
   const b = blad('<div id="check-in"></div>', { opSluiten: klaar });
   const toonStuk = () => {
@@ -218,4 +225,38 @@ function shop(el, app) {
     <input class="veld" id="zoekterm" placeholder="bijv. camel trenchcoat"><div class="chips" id="zelf" style="margin-top:8px"></div>
     ${gekocht.length ? `<h3>Gekocht</h3><ul class="tips">${gekocht.map(g => `<li>${esc(g.naam)} <span class="klein">${esc(g.datum || '')}</span></li>`).join('')}</ul>` : ''}`;
   $('#zoekterm').addEventListener('input', e => { $('#zelf').innerHTML = e.target.value.trim() ? winkelLinks(e.target.value.trim()) : ''; });
+}
+
+// ── Inzicht: wat je draagt, en wat niet ────────────────────────────────────
+// Gebaseerd op "vandaag aan". Hoe vaker je dat tikt, hoe eerlijker dit wordt.
+function inzicht(el, app) {
+  const kast = app.kast();
+  const log = app.draaglog();
+  const kleding = kast.filter(i => ['boven', 'onder', 'heel', 'laag', 'jas', 'schoen', 'tas'].includes(i.rol));
+  const vandaag = new Date().toISOString().slice(0, 10);
+  const dagen = d => Math.round((new Date(vandaag) - new Date(d)) / 864e5);
+  const vaak = kleding.filter(i => log[i.id]).sort((a, b) => log[b.id].length - log[a.id].length).slice(0, 8);
+  const lang = kleding.filter(i => log[i.id] && dagen(log[i.id][0]) > 60).sort((a, b) => log[a.id][0].localeCompare(log[b.id][0])).slice(0, 8);
+  const nooit = kleding.filter(i => !log[i.id] && ['boven', 'onder', 'heel', 'laag'].includes(i.rol));
+  const keren = Object.values(app.staat().gedragen).filter(l => l.length).length;
+  const perRol = ['boven', 'onder', 'heel', 'laag', 'jas', 'schoen'].map(r => {
+    const alle = kleding.filter(i => i.rol === r), gedr = alle.filter(i => log[i.id]);
+    return { r, n: alle.length, g: gedr.length };
+  }).filter(x => x.n);
+  const NAAM = { boven: 'Bovenstukken', onder: 'Broeken & rokken', heel: 'Jurken & sets', laag: 'Laagjes', jas: 'Jassen', schoen: 'Schoenen' };
+  const rij = (i, extra) => `<button class="stuk-rij" data-item="${esc(i.id)}" type="button">
+    ${i.foto ? `<img src="${esc(foto(i.foto, 120))}" alt="">` : `<span class="leeg">${stip(i.kleur[0], 20)}</span>`}
+    <span>${esc(i.naam)}</span><span class="keer">${extra}</span></button>`;
+  el.innerHTML = `
+    <p class="klein"><a href="#kast">← Kast</a></p>
+    <h1>Wat draag ik?</h1>
+    <p class="sub">${keren ? `Gebaseerd op ${keren} dag${keren === 1 ? '' : 'en'} die je hebt bijgehouden met "Vandaag aan".` : 'Nog niets bijgehouden. Tik bij een outfit op "Vandaag aan", dan vult dit zich vanzelf.'}</p>
+    <h3>Hoeveel van je kast draag je</h3>
+    ${perRol.map(x => `<div class="balkje"><span>${NAAM[x.r]}</span><span class="balk-vak"><i style="width:${Math.round(100 * x.g / x.n)}%"></i></span><span class="klein">${x.g}/${x.n}</span></div>`).join('')}
+    ${vaak.length ? `<h3>Je favorieten</h3>${vaak.map(i => rij(i, log[i.id].length + '×')).join('')}` : ''}
+    ${lang.length ? `<h3>Al even niet gedragen</h3>${lang.map(i => rij(i, dagen(log[i.id][0]) + ' dagen')).join('')}` : ''}
+    <h3>Nog nooit bijgehouden (${nooit.length})</h3>
+    <p class="klein" style="margin-top:0">Tik er een aan voor een outfit eromheen. Wat je echt nooit draagt, kun je daar ook weghalen.</p>
+    ${nooit.slice(0, 40).map(i => rij(i, '')).join('')}`;
+  el.onclick = e => { const t = e.target.closest('[data-item]'); if (t) detail(app, t.dataset.item, () => inzicht(el, app)); };
 }

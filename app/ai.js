@@ -63,7 +63,10 @@ export async function labelsVoorFoto(fotoUrl, naam) {
  "kleur":["hoofdkleur","eventueel tweede"],"print":null|"streep"|"stip"|"ruit"|"luipaard"|"bloem",
  "textuur":"glad|glans|fijn gebreid|grof gebreid|pluizig|denim|linnen|leer|suède|kant|structuur",
  "materiaal":"katoen|wol|denim|linnen|satijn|leer|suède|mohair|synthetisch|viscose|onbekend",
- "pasvorm":"aansluitend|recht|wijd|kort","warmte":1|2|3}
+ "pasvorm":"aansluitend|recht|wijd|kort","warmte":1|2|3,
+ "snit":null|"recht"|"slim"|"wide leg"|"flared"|"bootcut"|"barrel"|"ballon"|"cargo"|"culotte"|"mom"|"A-lijn"|"plissé"|"wikkel"|"potlood",
+ "taille":null|"hoog"|"midden"|"laag","lengte":null|"cropped"|"mini"|"midi"|"maxi"}
+Snit, taille en lengte alleen voor broeken, shorts en rokken; anders null.
 Kleuren uit: zwart, antraciet, lichtgrijs, wit, ecru, beige, zand, taupe, camel, bruin, chocolade, cognac, donkerblauw, marine, denimblauw, lichtblauw, ijsblauw, kobaltblauw, turquoise, groen, olijf/khaki, salie, mintgroen, geel, botergeel, mosterd, oranje, koraal, rood, oranje-rood, bordeaux, roze, felroze, oudroze, paars, lila/paars, goud, zilver.
 Materiaal alleen als het te zien is, anders "onbekend".` });
   return jsonUit(t);

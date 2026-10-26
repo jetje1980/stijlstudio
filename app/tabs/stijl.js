@@ -79,7 +79,7 @@ function kennis(el, app) {
       <p class="klein" style="margin:4px 0 8px">Status: ${esc(syncStatus)}. Met het wachtwoord van je afgeschermde opslag zien telefoon en laptop hetzelfde. Zonder wachtwoord blijft alles op dit toestel.</p>
       <div class="rij"><input class="veld" type="password" id="ww" placeholder="wachtwoord" value="${wachtwoord() ? '••••••••' : ''}" style="flex:1" autocomplete="current-password">
         <button class="knop" id="ww-ok" type="button">Koppel</button></div><p class="klein" id="ww-st"></p></div>
-    <div class="rij"><button class="knop licht" id="backup" type="button">Backup bewaren</button><a class="knop licht" href="griette.html">Oude app</a></div>`;
+    <div class="rij"><button class="knop licht" id="backup" type="button">Backup bewaren</button></div>`;
   $('#nieuw').addEventListener('click', () => nieuweKennis(app, () => kennis(el, app)));
   $$('[data-weg]', el).forEach(b => b.addEventListener('click', () => {
     if (confirm('Verwijderen?')) { app.bij(s => { s.kennis = s.kennis.filter(n => n.id !== b.dataset.weg); }); kennis(el, app); }

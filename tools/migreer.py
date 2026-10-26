@@ -264,6 +264,39 @@ def pasvorm_van(it, soort):
         return 'wijd'
     return 'recht'
 
+# ── SNIT, TAILLE, LENGTE (onderstukken) ─────────────────────────────────────
+# De grove pasvorm (wijd/recht/aansluitend) is genoeg voor "nooit wijd op wijd";
+# de snit maakt het verschil tussen een barrel en een flared zichtbaar.
+BROEK_SNIT = [
+    (r'legging', 'legging'), (r'barrel', 'barrel'), (r'ballon|balloon|baloon|baggy', 'ballon'),
+    (r'bootcut', 'bootcut'), (r'flare|uitgeflaard|uitlopend onder', 'flared'), (r'cargo|worker', 'cargo'),
+    (r'culotte', 'culotte'), (r'palazzo', 'palazzo'), (r'\bmom\b', 'mom'), (r'skinny|slim', 'slim'),
+    (r'wide|wijd', 'wide leg'), (r'straight|recht', 'recht'),
+]
+ROK_SNIT = [(r'a-lijn|a-line', 'A-lijn'), (r'plissé|plisse|pleat', 'plissé'), (r'wikkel|wrap', 'wikkel'),
+            (r'potlood|pencil', 'potlood'), (r'uitlopend|klok', 'A-lijn')]
+SNIT_PASVORM = {'barrel': 'wijd', 'ballon': 'wijd', 'flared': 'wijd', 'cargo': 'wijd', 'culotte': 'wijd',
+                'palazzo': 'wijd', 'wide leg': 'wijd', 'recht': 'recht', 'mom': 'recht', 'bootcut': 'recht',
+                'slim': 'aansluitend', 'legging': 'aansluitend'}
+
+def snit_van(it, soort):
+    t = (it['name'] + ' ' + ', '.join(str(v) for v in (it.get('vis') or {}).values())).lower()
+    uit = {}
+    if soort == 'rok':
+        uit['snit'] = next((n for pat, n in ROK_SNIT if re.search(pat, t)), 'recht')
+        uit['lengte'] = 'mini' if re.search(r'mini|kort', t) else 'maxi' if 'maxi' in t else 'midi' if re.search(r'midi|knie', t) else None
+    elif soort in ('broek', 'jeans', 'pantalon', 'legging', 'short'):
+        if soort != 'short':
+            uit['snit'] = next((n for pat, n in BROEK_SNIT if re.search(pat, t)), None)
+        if re.search(r'crop|enkel', t) and soort != 'short':
+            uit['lengte'] = 'cropped'
+    if soort in ('rok', 'broek', 'jeans', 'pantalon', 'legging', 'short'):
+        # eerst midden en laag: "middelhoge taille" bevat ook "hoge taille"
+        uit['taille'] = ('midden' if re.search(r'mid[ -]?(rise|waist)|middelhoge|mide rise', t)
+                         else 'laag' if re.search(r'low[ -]?rise|lage taille|laag uitgesneden|\blow\b', t)
+                         else 'hoog' if re.search(r'high[ -]?(waist|rise)|hoge taille|hoog sluitend', t) else None)
+    return {k: v for k, v in uit.items() if v}
+
 # ── WARMTE, FORMEEL, COMFORT ─────────────────────────────────────────────────
 BASIS = {  # soort: (formeel, comfort)
     't-shirt': (1, 5), 'longsleeve': (2, 5), 'topje': (3, 3), 'top': (3, 3), 'sporttop': (1, 5),
@@ -319,6 +352,10 @@ for it in kast_rt:
     }
     if rol == 'schoen' and re.search(r'sandaal|sandalen|slipper|flipflop|haivanas|thong', (it['name'] + ' ' + json.dumps(it.get('vis') or {})).lower()):
         item['open'] = True  # open schoen: niet bij fris of koud weer
+    if rol == 'onder':
+        item.update(snit_van(it, soort))
+        if item.get('snit') in SNIT_PASVORM:
+            item['pasvorm'] = SNIT_PASVORM[item['snit']]
     hals = (it.get('tags') or {}).get('hals')
     if hals:
         item['hals'] = hals

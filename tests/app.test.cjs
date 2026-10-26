@@ -13,7 +13,15 @@ const {chromium}=require('playwright');
 const p=await c.newPage();const errs=[];p.on('pageerror',e=>errs.push('PAGE '+e.message));p.on('console',m=>{if(m.type()==='error')errs.push('CONSOLE '+m.text().slice(0,150))});
 await p.route(/^https?:\/\/(?!127\.0\.0\.1)/,r=>r.abort());
 const S=require('os').tmpdir()+'/';
-await p.goto('http://127.0.0.1:8765/');await p.waitForSelector('.raster .tegel',{timeout:8000});
+await p.goto('http://127.0.0.1:8765/');await p.waitForSelector('#vandaag .stuk',{timeout:15000});
+console.log('vandaag start:', await p.$eval('h1', x => x.textContent), '|', await p.$$eval('#vandaag .stuk span', x => x.map(y => y.textContent.slice(0, 16)).join(' + ')));
+const v1 = await p.$$eval('#vandaag .stuk span', x => x.map(y => y.textContent).join());
+await p.click('#vandaag [data-v="andere"]'); await p.waitForTimeout(300);
+console.log('vandaag andere wisselt:', v1 !== await p.$$eval('#vandaag .stuk span', x => x.map(y => y.textContent).join()));
+await p.click('#opruimen'); await p.waitForSelector('.blad h2'); console.log('opruimen:', await p.$$eval('.blad .kaart b', x => x.map(y => y.textContent).join(' · ')));
+if (await p.$('#ruim')) { await p.click('#ruim'); await p.waitForTimeout(300); }
+console.log('outfits na opruimen:', await p.$eval('.tab-kop .sub', x => x.textContent), await p.$$eval('.tab-kop', x => x[1].textContent.trim().slice(0, 30)));
+await p.goto('http://127.0.0.1:8765/#kast');await p.waitForSelector('.raster .tegel',{timeout:8000});
 console.log('url na versiecheck',p.url());console.log('kast tegels',await p.$$eval('.raster .tegel',x=>x.length));
 await p.screenshot({path:S+'s-kast.png'});
 await p.click('.raster .tegel');await p.waitForSelector('.blad');await p.waitForTimeout(400);await p.screenshot({path:S+'s-item.png'});
@@ -61,9 +69,12 @@ await p.click('[data-f]');await p.waitForTimeout(300);await p.click('#meer-van')
 for (const d of ['rapport','kleur','kennis','smaak']) { await p.goto('http://127.0.0.1:8765/#stijl');await p.click(`[data-chips="deel"] .chip[data-w="${d}"]`);await p.waitForTimeout(300);await p.screenshot({path:S+'s-stijl-'+d+'.png',fullPage:true}); }
 await p.click('[data-chips="deel"] .chip[data-w="kleur"]');await p.click('[data-probeer="mono"]');await p.waitForSelector('#voorstellen .kaart',{timeout:15000});
 console.log('probeer mono',await p.$$eval('#voorstellen .label-manier',x=>x.map(y=>y.textContent)));
+// inzicht
+await p.goto('http://127.0.0.1:8765/#kast/inzicht');await p.waitForSelector('.balkje');console.log('inzicht:', await p.$$eval('.balkje', x => x.length), 'balkjes,', await p.$$eval('.stuk-rij', x => x.length), 'rijen');
 // shop + labelcheck
 await p.goto('http://127.0.0.1:8765/#kast/shop');await p.waitForTimeout(300);await p.screenshot({path:S+'s-shop.png'});
 await p.goto('http://127.0.0.1:8765/#kast');await p.waitForSelector('#check');await p.click('#check');await p.waitForSelector('.labelform');await p.screenshot({path:S+'s-check.png'});
+console.log('labelcheck eerst kleding:', await p.$eval('.labelform [name="soort"]', x => x.value));
 await p.click('[data-c="ok"]');await p.waitForTimeout(200);
 console.log('nagekeken opgeslagen',await p.evaluate(()=>Object.values(JSON.parse(localStorage.getItem('stijlstudio-v2')).items).filter(i=>i.nagekeken).length));
 const echt=errs.filter(e=>!/ERR_FAILED|net::|Failed to load resource/.test(e));console.log('FOUTEN',echt);

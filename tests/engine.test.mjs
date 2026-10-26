@@ -47,7 +47,7 @@ ok(alle.every(o => !(o.slots.boven && o.slots.onder && o.slots.boven.pasvorm ===
 ok(alle.every(o => o.items.filter(i => i.print).length <= 1), 'max één print');
 // 7. wisselen houdt de manier
 const alt = alternatieven(kast, v[0], v[0].slots.onder ? 'onder' : 'heel', { rapport, weer: 'fris' });
-ok(alt.length > 0 && alt.findIndex(a => !a.zelfde) >= alt.filter(a => a.zelfde).length, 'alternatieven, zelfde manier eerst (' + alt.length + ', ' + alt.filter(a => a.zelfde).length + ' zelfde)');
+ok(alt.length > 0 && [-1, alt.filter(a => a.zelfde).length].includes(alt.findIndex(a => !a.zelfde)), 'alternatieven, zelfde manier eerst (' + alt.length + ', ' + alt.filter(a => a.zelfde).length + ' zelfde)');
 // 8. tas
 const dagen = [{ naam: 'Vrijdag', temp: 12, momenten: ['reis', 'avond'] }, { naam: 'Zaterdag', temp: 13, momenten: ['dag', 'avond'] }, { naam: 'Zondag', temp: 11, momenten: ['dag'] }];
 const t1 = Date.now();
@@ -127,5 +127,14 @@ ok(kleurGoed >= kleurTot * 0.8, `andere kleur: ${kleurGoed} van ${kleurTot} lukk
 const kobalt = andereKleur(kast, tas.plan[0].outfit, 'kobaltblauw', { rapport, weer: tas.plan[0].weer }, kofferIds2);
 ok(!kobalt || !kobalt.wissels.some(w => w.naar && ['donkerblauw', 'marine', 'denimblauw'].includes(w.naar.kleur[0]) && w.naar.kleur[0] !== 'kobaltblauw' && !w.van), 'kobalt is geen navy');
 ok(kast.find(i => i.naam.startsWith('Khaki bloemen')).rol === 'onder', 'khaki broek is geen hak meer');
+// 14. snit en taille
+const snitVan = n => kast.find(i => i.naam.startsWith(n));
+ok(snitVan('dark denim barrel').snit === 'barrel' && snitVan('Pull&Bear ballonpijpen').snit === 'ballon' && snitVan('High waist cropped flared').snit === 'flared', 'snit herkend: barrel, ballon, flared');
+ok(snitVan('cropped mid waist jeans zara').taille === 'midden' && snitVan('Jean Agolde').taille === 'hoog', 'taille: middelhoog is geen hoog');
+ok(kast.filter(i => ['barrel', 'ballon', 'flared', 'wide leg', 'cargo'].includes(i.snit)).every(i => i.pasvorm === 'wijd'), 'wijde snitten tellen als wijd (wijd op wijd blijft verboden)');
+const street = stelVoor(kast, { rapport, weer: 'mild', sfeer: 'street' }, 6);
+const paris = stelVoor(kast, { rapport, weer: 'mild', sfeer: 'parisienne' }, 6);
+const telSnit = (l, s) => l.filter(o => o.slots.onder && s.includes(o.slots.onder.snit)).length;
+ok(telSnit(street, ['barrel', 'ballon', 'cargo']) >= telSnit(paris, ['barrel', 'ballon', 'cargo']), 'streetstyle kiest vaker barrel/ballon/cargo dan parisienne');
 console.log(goed, 'goed,', fout, 'fout,', Date.now() - t0, 'ms');
 process.exit(fout ? 1 : 0);
