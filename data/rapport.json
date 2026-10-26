@@ -55,7 +55,11 @@
      "felroze",
      "paars"
     ],
-    "tekst": "Energie en vrouwelijke kracht, mooi met donkerblauw of bruin."
+    "tekst": "Energie en vrouwelijke kracht, mooi met donkerblauw of bruin.",
+    "met": [
+     "donkerblauw",
+     "bruin"
+    ]
    },
    {
     "kleuren": [
@@ -68,13 +72,23 @@
     "kleuren": [
      "groen"
     ],
-    "tekst": "Mooi met donkerblauw, bruin en gebroken wit."
+    "tekst": "Mooi met donkerblauw, bruin en gebroken wit.",
+    "met": [
+     "donkerblauw",
+     "bruin",
+     "gebroken-wit"
+    ]
    },
    {
     "kleuren": [
      "lichtblauw"
     ],
-    "tekst": "Frisse tegenhanger van de donkere basis, sluit aan bij je blauwgrijze ogen."
+    "tekst": "Frisse tegenhanger van de donkere basis, sluit aan bij je blauwgrijze ogen.",
+    "met": [
+     "donkerblauw",
+     "bruin",
+     "zwart"
+    ]
    }
   ],
   "combinaties": [
@@ -89,6 +103,18 @@
    [
     "rood",
     "gebroken-wit"
+   ]
+  ],
+  "steun": [
+   [
+    "paars",
+    "lichtgrijs",
+    "zand"
+   ],
+   [
+    "donkerblauw",
+    "ijsblauw",
+    "lichtgrijs"
    ]
   ]
  },

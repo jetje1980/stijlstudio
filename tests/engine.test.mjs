@@ -222,7 +222,12 @@ ok(telSnit(street, ['barrel', 'ballon', 'cargo']) >= telSnit(paris, ['barrel', '
   ok(met / n >= 0.1, `paarse gilet komt regelmatig voorbij (${met} van ${n})`);
   const rood = kast.find(i => i.naam === 'tshirt rood sezane'), jeans = kast.find(i => /Pull&Bear ballon/.test(i.naam));
   const o = maakOutfit({ boven: rood, onder: jeans, laag: g }, { rapport, weer: 'mild' });
-  ok(o.check.ok && o.kleur.methode === 'accent', 'rood T-shirt met paars gilet op denim: neutraal met accenten, geen colorblock (' + o.kleur.methode + ')');
+  ok(o.kleur.methode === 'accent', 'rood met paars op denim: neutraal met accenten, geen colorblock (' + o.kleur.methode + ')');
+  ok(!o.check.ok, 'maar een gilet niet over een T-shirt');
+  const bl = kast.find(i => i.id === 'bruin-longsleeve'), worker = kast.find(i => i.naam === 'kaki worker');
+  ok(maakOutfit({ boven: bl, onder: worker, laag: g }, { rapport, weer: 'mild' }).check.ok, 'gilet over bruine longsleeve met khaki worker mag');
+  const metG = ['koud', 'fris', 'mild'].flatMap(weer => stelVoor(kast, { rapport, weer }, 8).concat(stelVoor(kast, { rapport, weer, anker: [g.id] }, 6))).filter(x => x.slots.laag && x.slots.laag.soort === 'gilet');
+  ok(metG.length && metG.every(x => mouwen(x.slots.boven || x.slots.heel) === 'lang' && (x.slots.boven || x.slots.heel).pasvorm !== 'wijd'), `gilet alleen over lange mouwen die aansluiten (${metG.length} keer)`);
   const a = stelVoor(kast, { rapport, weer: 'mild', anker: [g.id] }, 6);
   ok(new Set(a.map(x => x.slots.boven && x.slots.boven.id)).size >= 5, 'met het gilet vast: steeds een ander bovenstuk');
 }
