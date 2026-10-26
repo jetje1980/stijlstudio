@@ -446,6 +446,7 @@ function toonVoorstellen(el, app) {
       <button class="knop licht" data-a="ai" type="button">Waarom?</button>
       <button class="knop licht" data-a="vandaag" type="button">Vandaag aan</button>
       <button class="knop licht" data-a="kleur" type="button">Andere kleur</button>
+      <button class="knop licht" data-a="erbij" type="button">＋ Stuk erbij</button>
     </div></div>`).join('')
     + `<p class="klein" style="text-align:center">${begin + 1}–${begin + lijst.length} van ${voorraad.lijst.length} looks</p>
       <button class="knop licht vol" id="meer" type="button">${begin + per >= voorraad.lijst.length ? 'Weer vooraan beginnen' : 'Andere voorstellen'}</button>`;
@@ -463,6 +464,7 @@ function toonVoorstellen(el, app) {
       if (st) return wissel(app, o, st.dataset.slot, vervang);
       const a = e.target.closest('[data-a]'); if (!a) return;
       if (a.dataset.a === 'kleur') return andereKleurBlad(app, o, { ...context(app), methode: null, kleur: null, anker: [] }, [], vervang);
+      if (a.dataset.a === 'erbij') return stukErbij(app, o, { ...context(app), methode: null, kleur: null, anker: [] }, [], vervang);
       const naam = (ai && ai.naam) || standaardNaam(o);
       if (a.dataset.a === 'bewaar') {
         const id = 'o-' + Date.now().toString(36);

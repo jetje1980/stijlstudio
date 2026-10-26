@@ -359,8 +359,10 @@ function toonUitkomst(el, app) {
       <button class="knop licht" id="bewaar" type="button">Tas bewaren</button>
       <button class="knop licht" id="opnieuw" type="button">Andere tas</button>
     </div>
+    <button class="knop licht vol" id="nieuwe-look" type="button" style="margin-top:10px">Nieuwe look uit mijn tas</button>
     <button class="knop vol" id="zet-vast" type="button" style="margin-top:10px">Klaar: zet mijn tas vast</button>`;
   koppelExtra(el, app, u, k, () => { bewaarConcept(app); toonUitkomst(el, app); });
+  $('#nieuwe-look').addEventListener('click', () => nieuweLook(el, app, u, k.map(x => x.item), () => toonUitkomst(el, app)));
 
   $$('[data-f]', plek).forEach(b => b.addEventListener('click', () => { tas.filter = tas.filter === b.dataset.f ? null : b.dataset.f; toonUitkomst(el, app); }));
   $$('[data-v]', plek).forEach(c => c.addEventListener('change', () => {
@@ -507,17 +509,19 @@ function toonVast(el, app) {
     const p = u.plan[+b.dataset.erbij];
     stukErbij(app, p.outfit, ctxVan(p), bij.map(i => i.id), klaar(p));
   }));
-  $('#nieuwe-look').addEventListener('click', () => nieuweLook(el, app, u, bij));
+  $('#nieuwe-look').addEventListener('click', () => nieuweLook(el, app, u, bij, () => toonVast(el, app)));
   $('#kaarten').addEventListener('click', () => bewaarKaarten(u));
   $('#losmaken').addEventListener('click', () => { tas.vast = false; bewaarConcept(app); tasTab(el, app); });
 }
 
 // Een heel nieuwe look uit alles wat je bij je hebt, op basis van je wensen.
-function nieuweLook(el, app, u, bij) {
+function nieuweLook(el, app, u, bij, opnieuw) {
   const momenten = u.plan.map((p, i) => [String(i), p.extra ? 'Extra outfit' : `${p.dag} ${(MOMENT_LABEL[p.moment] || '').toLowerCase()}`]);
-  const w = { voor: momenten[0] ? momenten[0][0] : 'extra', sfeer: [], sjiek: null, wensen: [], methode: null };
+  const w = { voor: momenten[0] ? momenten[0][0] : 'extra', sfeer: [], sjiek: null, wensen: [], methode: null, anker: null };
+  const kleding = bij.filter(i => ['boven', 'onder', 'heel', 'laag', 'jas', 'schoen'].includes(i.rol)).sort((a, b) => a.naam.localeCompare(b.naam));
   const b = blad(`<h2>Nieuwe look</h2><p class="sub">Uit alles wat je bij je hebt. Zeg wat je wilt; alles mag leeg.</p>
     <label class="lab">Voor</label><select class="veld" id="nl-voor">${momenten.map(([v, l]) => `<option value="${v}">${esc(l)}</option>`).join('')}<option value="extra">Als extra outfit</option></select>
+    <label class="lab">Met dit stuk erin (mag leeg)</label><select class="veld" id="nl-anker"><option value="">Maakt niet uit</option>${kleding.map(i => `<option value="${esc(i.id)}">${esc(i.naam)}</option>`).join('')}</select>
     <label class="lab">Sfeer</label>${chips('nl-sf', Object.entries(SFEREN).map(([k, v]) => [k, v.naam]), [], { meer: true }).replace('class="chips"', 'class="chips wrap"')}
     <div class="schuif"><span>comfy</span><input type="range" min="0" max="1" step="0.25" value="0.5" id="nl-sjiek"><span>sjiek</span></div>
     <label class="lab">Wensen</label>${chips('nl-w', Object.entries(WENSEN).map(([k, v]) => [k, v.naam]), [], { meer: true }).replace('class="chips"', 'class="chips wrap"')}
@@ -533,6 +537,7 @@ function nieuweLook(el, app, u, bij) {
     $$('[data-chips="nl-m"] .chip', b).forEach(d => d.classList.toggle('aan', d.dataset.w === w.methode));
   }));
   $('#nl-voor', b).addEventListener('change', e => { w.voor = e.target.value; });
+  $('#nl-anker', b).addEventListener('change', e => { w.anker = e.target.value || null; });
   $('#nl-sjiek', b).addEventListener('change', e => { w.sjiek = +e.target.value; });
   let looks = [];
   $('#nl-zoek', b).addEventListener('click', () => {
@@ -540,7 +545,7 @@ function nieuweLook(el, app, u, bij) {
     const weer = p ? p.weer : (u.plan[0] && u.plan[0].weer) || 'mild';
     const moment = p && !p.extra ? { dag: p.dag, moment: p.moment, weer, activiteit: p.activiteit || null, reis: p.moment === 'reis', doen: p.doen }
       : { dag: 'Extra', moment: 'dag', weer, activiteit: null, reis: false };
-    looks = uitJeTas(bij, moment, { ...opties(app), sfeer: w.sfeer.length ? w.sfeer : opties(app).sfeer, sjiek: w.sjiek, wensen: w.wensen, methode: w.methode }, 10);
+    looks = uitJeTas(bij, moment, { ...opties(app), sfeer: w.sfeer.length ? w.sfeer : opties(app).sfeer, sjiek: w.sjiek, wensen: w.wensen, methode: w.methode, anker: w.anker }, 12);
     $('#nl-uit', b).innerHTML = looks.length ? `<div class="outfit-lijst">${looks.map((o, n) => `<button class="outfit-tegel" data-look="${n}" type="button">${collage(o.items)}<b>${esc(o.kleur.naam)}</b></button>`).join('')}</div>`
       : '<p class="klein">Met wat je bij je hebt lukt dat niet. Laat een wens weg.</p>';
   });
@@ -551,7 +556,7 @@ function nieuweLook(el, app, u, bij) {
       const n = u.plan.filter(p => p.extra).length + 1;
       u.plan.push({ dag: `Extra ${n}`, moment: 'extra', weer: o && u.plan[0] ? u.plan[0].weer : 'mild', outfit: o, extra: true, gewisseld: true });
     } else { const p = u.plan[+w.voor]; p.outfit = o; p.gewisseld = true; }
-    b.sluit(); bewaarConcept(app); toonVast(el, app); melding('Nieuwe look staat erin');
+    b.sluit(); bewaarConcept(app); opnieuw(); melding('Nieuwe look staat erin');
   });
 }
 
@@ -632,6 +637,7 @@ function toonKeuze(el, app) {
       <button class="knop" id="kaarten" type="button">Alle kaarten opslaan</button>
       <button class="knop licht" id="bewaar" type="button">Tas bewaren</button>
     </div>
+    <button class="knop licht vol" id="nieuwe-look" type="button" style="margin-top:10px">Nieuwe look uit mijn tas</button>
     <button class="knop vol" id="zet-vast" type="button" style="margin-top:10px">Klaar: zet mijn tas vast</button>` : ''}`;
 
   const opnieuw = () => { bewaarConcept(app); toonKeuze(el, app); };
@@ -642,6 +648,8 @@ function toonKeuze(el, app) {
   });
   const wis = $('#wis'); if (wis) wis.addEventListener('click', () => { u.plan = u.plan.filter(p => !p.extra); u.plan.forEach(p => { p.outfit = null; }); opnieuw(); });
   koppelExtra(el, app, u, k, opnieuw, thuis.map(x => x.item));
+  // in de keuzemodus mag de nieuwe look ook uit wat je klaarlegde (niet alleen wat al gekozen is)
+  const nl = $('#nieuwe-look'); if (nl) nl.addEventListener('click', () => nieuweLook(el, app, u, [...new Set(k.map(x => x.item).concat(u.stukken.map(x => x.item)))], opnieuw));
   $$('[data-kies]', plek).forEach(b => b.addEventListener('click', () => {
     const [i, n] = b.dataset.kies.split('|').map(Number);
     u.plan[i].outfit = u.plan[i].opties[n]; opnieuw();

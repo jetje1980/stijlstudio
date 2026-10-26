@@ -77,6 +77,8 @@ export function detail(app, id, klaar) {
     i.print && 'Print: dit is de enige in je outfit.',
   ].filter(Boolean);
 
+  // een set (joggingpak, co-ord): twee stukken die bij elkaar horen
+  const maatje = i.set ? app.kast().find(x => x.set === i.set && x.id !== id) : null;
   const b = blad(`
     ${i.foto ? `<img class="groot-foto" src="${esc(foto(i.foto, 900))}" alt="">` : ''}
     <h2>${esc(i.naam)}</h2>
@@ -86,6 +88,7 @@ export function detail(app, id, klaar) {
       <dt>Stof</dt><dd>${esc(i.textuur)}${i.materiaal ? ' · ' + esc(i.materiaal) : ''}${i.print ? ' · ' + esc(i.print) : ''}</dd>
       <dt>Gedragen</dt><dd>${log.length ? `${log.length}× · laatst ${datum(log[0])}` : 'nog niet bijgehouden'}</dd>
       <dt>In outfits</dt><dd>${inOutfits.length}</dd>
+      ${maatje ? `<dt>Set</dt><dd>met ${esc(maatje.naam)}</dd>` : ''}
     </dl>
     ${rapportZegt.length ? `<h3>Je rapport zegt</h3><ul class="tips">${rapportZegt.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
     <div class="rij" style="margin-top:16px">
@@ -95,7 +98,10 @@ export function detail(app, id, klaar) {
     <div class="rij" style="margin-top:8px">
       <button class="knop licht" data-a="labels" type="button">Labels aanpassen</button>
       <button class="knop licht" data-a="weg" type="button">Verwijderen</button>
-    </div>`, { opSluiten: klaar });
+    </div>
+    ${['boven', 'onder', 'laag'].includes(i.rol) ? `<div class="rij" style="margin-top:8px">${maatje
+      ? '<button class="knop licht" data-a="set-los" type="button">Set losmaken</button>'
+      : '<button class="knop licht" data-a="set" type="button">Maak een set met…</button>'}</div>` : ''}`, { opSluiten: klaar });
 
   b.addEventListener('click', e => {
     const a = e.target.closest('[data-a]'); if (!a) return;
@@ -106,6 +112,25 @@ export function detail(app, id, klaar) {
       melding('Bijgehouden: vandaag gedragen');
     }
     if (a.dataset.a === 'labels') { b.sluit(); bewerk(app, id, klaar); }
+    if (a.dataset.a === 'set') {
+      // het andere deel: een onderstuk bij een bovenstuk, of andersom
+      const anders = app.kast().filter(x => x.id !== id && (i.rol === 'onder' ? ['boven', 'laag'].includes(x.rol) : x.rol === 'onder'));
+      const kb = blad(`<h2>Set met ${esc(i.naam)}</h2><p class="sub">Kies het andere deel, bijvoorbeeld de broek bij je sweater.</p>
+        <input class="veld" id="set-z" placeholder="Zoek"><div class="raster" id="set-r" style="margin-top:10px"></div>`);
+      const teken = z => { $('#set-r', kb).innerHTML = anders.filter(x => !z || [x.naam, x.soort, ...x.kleur].join(' ').toLowerCase().includes(z)).map(x => tegel(x)).join(''); };
+      teken('');
+      $('#set-z', kb).addEventListener('input', ev => teken(ev.target.value.toLowerCase().trim()));
+      $('#set-r', kb).addEventListener('click', ev => {
+        const t = ev.target.closest('[data-item]'); if (!t) return;
+        const sid = 'set-' + Date.now().toString(36);
+        app.bij(s => { for (const x of [id, t.dataset.item]) s.items[x] = { ...(s.items[x] || {}), set: sid }; });
+        kb.sluit(); b.sluit(); melding('Set gemaakt: ze komen nu samen voorbij');
+      });
+    }
+    if (a.dataset.a === 'set-los') {
+      app.bij(s => { for (const x of [id, maatje.id]) s.items[x] = { ...(s.items[x] || {}), set: null }; });
+      b.sluit(); melding('Set losgemaakt');
+    }
     if (a.dataset.a === 'weg' && confirm(`${i.naam} uit je kast halen?`)) {
       app.bij(s => { s.weg.push(id); });
       b.sluit(); melding('Verwijderd');
