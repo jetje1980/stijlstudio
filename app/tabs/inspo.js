@@ -9,34 +9,39 @@ import { esc, $, $$, stip, foto, blad, melding, verklein, upload } from '../ui.j
 import { outfitHtml } from './outfits.js';
 
 const vandaag = () => new Date().toISOString().slice(0, 10);
+let melding_ = '';
 const lijst = app => app.staat().inspo || [];
 
 // Je smaak van nu. Met `ids` (een tasbord) alleen die beelden, en sterker.
 export function huidigeSmaak(app, ids = null) {
   const alle = lijst(app);
-  if (ids && ids.length) return smaakVan(alle.filter(x => ids.includes(x.id)), vandaag(), 1.6);
+  // op een tasbord telt ook wat je nog niet checkte: je koos het zelf
+  if (ids && ids.length) return smaakVan(alle.filter(x => ids.includes(x.id)), vandaag(), 1.6, true);
   return smaakVan(alle, vandaag());
 }
 
 export function inspiratie(el, app) {
+  bezigTeLang(app);
   const alle = lijst(app);
-  const checken = alle.filter(x => x.status === 'te checken' || x.status === 'fout');
+  const checken = alle.filter(x => ['te checken', 'fout', 'lezen'].includes(x.status));
   const bevestigd = alle.filter(x => x.status === 'bevestigd').reverse();
   const archief = alle.filter(x => x.status === 'archief').reverse();
   const sm = huidigeSmaak(app);
   el.innerHTML = `
     <p class="sub">Screenshots die je mooi vindt. Ik lees wat erin zit, jij zegt of het klopt. Wat je bevestigt, telt mee in je voorstellen, na je rapport en de stylingtheorie.</p>
     <label class="knop vol" style="text-align:center">＋ Screenshots toevoegen<input type="file" accept="image/*" multiple id="inspo-in" hidden></label>
-    <p class="klein" id="inspo-st"></p>
+    <p class="klein" id="inspo-st">${esc(melding_)}</p>
     ${sm ? smaakHtml(sm) : ''}
     ${checken.length ? `<h3>Nog even checken</h3>${checken.map(x => `<div class="kaart rij" style="flex-wrap:nowrap;align-items:center">
       <img src="${esc(foto(x.beeld, 160))}" alt="" style="width:64px;height:80px;object-fit:cover;border-radius:8px;flex:none">
-      <span class="klein" style="flex:1">${x.status === 'fout' ? 'Lezen lukte niet.' : esc(x.analyse?.samenvatting || '')}</span>
-      <button class="knop licht" data-check="${esc(x.id)}" type="button">${x.status === 'fout' ? 'Opnieuw' : 'Check'}</button></div>`).join('')}` : ''}
+      <span class="klein" style="flex:1">${x.status === 'fout' ? 'Lezen lukte niet.' : x.status === 'lezen' ? 'Bezig met lezen…' : esc(x.analyse?.samenvatting || '')}</span>
+      ${x.status === 'lezen' ? '' : `<button class="knop licht" data-check="${esc(x.id)}" type="button">${x.status === 'fout' ? 'Opnieuw' : 'Check'}</button>`}</div>`).join('')}` : ''}
     ${bevestigd.length ? `<h3>Telt mee</h3><div class="outfit-lijst">${bevestigd.map(x => kaartje(x)).join('')}</div>` : ''}
     ${archief.length ? `<details style="margin-top:14px"><summary class="klein">Archief (${archief.length}): telt niet meer mee</summary>
       <div class="outfit-lijst" style="margin-top:8px">${archief.map(x => kaartje(x)).join('')}</div></details>` : ''}`;
-  $('#inspo-in').addEventListener('change', e => voegToe(app, [...e.target.files], () => inspiratie(el, app), $('#inspo-st')));
+  // de lijst tekent opnieuw per beeld; de voortgang blijft staan
+  const voortgang = { set textContent(t) { melding_ = t; const x = $('#inspo-st'); if (x) x.textContent = t; } };
+  $('#inspo-in').addEventListener('change', e => voegToe(app, [...e.target.files], () => inspiratie(el, app), voortgang, {}, () => inspiratie(el, app)));
   $$('[data-check]', el).forEach(b => b.addEventListener('click', () => {
     const x = lijst(app).find(y => y.id === b.dataset.check);
     if (x.status === 'fout') return analyseer(app, x.id, $('#inspo-st')).then(() => checkBlad(app, x.id, () => inspiratie(el, app)));
@@ -75,7 +80,7 @@ function smaakHtml(sm) {
 }
 
 // Eén of meer screenshots: uploaden, laten lezen, en dan één voor één checken.
-export async function voegToe(app, files, klaar, status, extra = {}) {
+export async function voegToe(app, files, klaar, status, extra = {}, bijElk = null) {
   if (!files.length) return;
   const ids = [];
   for (const [n, f] of files.entries()) {
@@ -84,10 +89,12 @@ export async function voegToe(app, files, klaar, status, extra = {}) {
     let beeld;
     try { beeld = await upload(await verklein(f, 1400), 'griette-inspo', id); }
     catch (e) { if (status) status.textContent = 'Uploaden lukte niet: ' + e.message; continue; }
-    app.bij(s => { (s.inspo ||= []).push({ id, beeld, datum: vandaag(), status: 'te checken', ...extra }); });
+    app.bij(s => { (s.inspo ||= []).push({ id, beeld, datum: vandaag(), status: 'lezen', ...extra }); });
     ids.push(id);
-    if (status) status.textContent = `Beeld ${n + 1} van ${files.length} lezen…`;
+    if (bijElk) bijElk(id);
+    if (status) status.textContent = `Beeld ${n + 1} van ${files.length} lezen… dit kan een halve minuut duren.`;
     await analyseer(app, id, status);
+    if (bijElk) bijElk(id);
   }
   if (status) status.textContent = '';
   // de beelden één voor één langs
@@ -100,15 +107,24 @@ export async function voegToe(app, files, klaar, status, extra = {}) {
   volgende();
 }
 
+// Een beeld dat bij het sluiten van de app nog 'lezen' was, kan opnieuw.
+const bezig = new Set();
+function bezigTeLang(app) {
+  if (lijst(app).some(x => x.status === 'lezen' && !bezig.has(x.id)))
+    app.bij(s => { for (const x of s.inspo) if (x.status === 'lezen' && !bezig.has(x.id)) x.status = 'fout'; });
+}
+
 async function analyseer(app, id, status) {
+  bezig.add(id);
   const x = lijst(app).find(y => y.id === id);
   try {
     const a = await inspoAnalyse(x.beeld);
     app.bij(s => { const y = s.inspo.find(z => z.id === id); y.analyse = a; y.status = 'te checken'; });
   } catch (e) {
     app.bij(s => { s.inspo.find(z => z.id === id).status = 'fout'; });
-    if (status) status.textContent = 'Lezen lukte niet: ' + e.message + ' Je kunt het later opnieuw proberen.';
+    if (status) status.textContent = 'Lezen lukte niet: ' + e.message + ' Tik op het beeld om het opnieuw te proberen.';
   }
+  bezig.delete(id);
 }
 
 // "Klopt het dat je dit bedoelt?" Per punt aan of uit; alleen wat aan staat telt.
@@ -178,6 +194,7 @@ export function naMakenBlad(app, id, weer) {
 
 // Een inspiratiebord voor één tas: kiezen uit wat je hebt, of nieuwe erbij.
 export function kiesBord(app, gekozen, klaar) {
+  bezigTeLang(app);
   const sel = new Set(gekozen);
   const b = blad(`<h2>Inspiratie voor deze reis</h2>
     <p class="sub">Kies de beelden met de vibe die je mee wilt. Die sturen dan deze tas, in plaats van je algemene smaak.</p>
@@ -185,24 +202,26 @@ export function kiesBord(app, gekozen, klaar) {
     <p class="klein" id="bord-st"></p>
     <div class="raster" id="bord-r" style="margin-top:10px"></div>
     <button class="knop vol" id="bord-ok" type="button" style="position:sticky;bottom:0;margin-top:12px"></button>`);
+  const LABEL = { lezen: 'bezig met lezen…', 'te checken': 'tik om te checken', fout: 'lezen mislukt, tik voor opnieuw' };
   const teken = () => {
-    const alle = lijst(app).filter(x => x.status === 'bevestigd').reverse();
-    $('#bord-r', b).innerHTML = alle.map(x => `<button class="tegel${sel.has(x.id) ? ' gekozen' : ''}" data-b="${esc(x.id)}" type="button"><img src="${esc(foto(x.beeld, 300))}" alt="" loading="lazy"></button>`).join('')
-      || '<p class="klein">Nog geen bevestigde inspiratie. Voeg hierboven screenshots toe.</p>';
+    const alle = lijst(app).filter(x => x.status !== 'archief').reverse();
+    $('#bord-r', b).innerHTML = alle.map(x => `<button class="tegel${sel.has(x.id) ? ' gekozen' : ''}" data-b="${esc(x.id)}" type="button">
+      <img src="${esc(foto(x.beeld, 300))}" alt="" loading="lazy">${LABEL[x.status] ? `<span class="label">${LABEL[x.status]}</span>` : ''}</button>`).join('')
+      || '<p class="klein">Nog geen inspiratie. Voeg hierboven screenshots toe.</p>';
     $('#bord-ok', b).textContent = `Klaar${sel.size ? ` (${sel.size})` : ''}`;
   };
   teken();
   $('#bord-r', b).addEventListener('click', e => {
     const t = e.target.closest('[data-b]'); if (!t) return;
-    if (sel.has(t.dataset.b)) sel.delete(t.dataset.b); else sel.add(t.dataset.b);
+    const x = lijst(app).find(y => y.id === t.dataset.b);
+    if (x.status === 'te checken') return checkBlad(app, x.id, teken);
+    if (x.status === 'fout') return analyseer(app, x.id, $('#bord-st', b)).then(() => { teken(); checkBlad(app, x.id, teken); });
+    if (sel.has(x.id)) sel.delete(x.id); else sel.add(x.id);
     teken();
   });
+  // nieuwe beelden staan er meteen (en gekozen); lezen en checken gaat erachteraan
   $('#bord-in', b).addEventListener('change', e => {
-    const voor = new Set(lijst(app).map(x => x.id));
-    voegToe(app, [...e.target.files], () => {
-      for (const x of lijst(app)) if (!voor.has(x.id) && x.status === 'bevestigd') sel.add(x.id);
-      teken();
-    }, $('#bord-st', b));
+    voegToe(app, [...e.target.files], teken, $('#bord-st', b), {}, id => { sel.add(id); teken(); });
   });
-  $('#bord-ok', b).addEventListener('click', () => { b.sluit(); klaar([...sel].filter(id => lijst(app).some(x => x.id === id))); });
+  $('#bord-ok', b).addEventListener('click', () => { b.sluit(); klaar([...sel].filter(id => lijst(app).some(x => x.id === id && x.status !== 'fout'))); });
 }
