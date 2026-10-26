@@ -37,6 +37,17 @@ export const SFEREN = {
     methode: { analoog: 1, split: 1 } },
 };
 
+function sfeerPunten(o, sf) {
+  let t = 0;
+  for (const i of o.items) {
+    t += (sf.soort[i.soort] || 0) * 0.6;
+    t += ((sf.textuur || {})[i.textuur] || 0) * 0.5;
+    if (i.print) t += ((sf.print || {})[i.print] || 0) * 0.5;
+    if (i.snit) t += ((sf.snit || {})[i.snit] || 0) * 0.6;
+  }
+  return t + (sf.methode[o.kleur.methode] || 0);
+}
+
 export const sfeerLijst = s => (Array.isArray(s) ? s : s ? [s] : []);
 
 // ── WENSEN ───────────────────────────────────────────────────────────────────
@@ -109,7 +120,7 @@ function pastBijWeer(i, klasse) {
 // ── RAPPORTREGELS ────────────────────────────────────────────────────────────
 const STOPBAAR = new Set(['blouse', 't-shirt', 'top', 'topje', 'longsleeve']);
 
-export function controleer(o, rapport) {
+export function controleer(o, rapport, ctx = {}) {
   const problemen = [], tips = [];
   const { boven, onder, heel, laag } = o.slots;
   const kleding = o.items.filter(i => ROLLEN_KLEDING.includes(i.rol));
@@ -143,7 +154,13 @@ export function controleer(o, rapport) {
 
   // een zijstreep op een trainingsbroek is een detail, geen print
   const prints = o.items.filter(i => i.print && !(i.print === 'streep' && /zijstreep|firebird|track/i.test(`${i.naam} ${i.beschrijving || ''}`)));
-  if (prints.length > 1) problemen.push({ regel: 'prints', tekst: 'Meer dan één print (' + prints.map(i => i.print).join(' + ') + ').' });
+  if (prints.length > 1) {
+    // Print op print, zoals stylisten het doen: alleen als je het aanzet, en
+    // alleen als het klopt. Je rapport zegt maximaal één print.
+    const mix = ctx.printMix && prints.length === 2 ? printMix(prints[0], prints[1]) : null;
+    if (mix && mix.ok) { o.printMix = true; tips.push(`Print op print (trend, buiten je rapport): ${mix.waarom}`); }
+    else problemen.push({ regel: 'prints', tekst: 'Meer dan één print (' + prints.map(i => i.print).join(' + ') + ').' + (mix ? ' ' + mix.waarom : '') });
+  }
 
   const texturen = new Set(kleding.map(i => i.textuur));
   if ((o.kleur.methode === 'mono' || o.kleur.methode === 'neutraal') && texturen.size < 2 && kleding.length >= 2)
@@ -163,6 +180,104 @@ export function controleer(o, rapport) {
   if (boven && boven.pasvorm === 'wijd' && onder && onder.pasvorm !== 'wijd' && STOPBAAR.has(boven.soort)) tips.push('Oversized bewust stylen: half instoppen of mouwen oprollen.');
   if (o.kleur.methode === 'colorblock') tips.push('Colorblocking mag; je rapport zoekt nu vooral balans.');
   return { ok: !problemen.some(p => !p.zacht), problemen, tips };
+}
+
+// ── PRINT OP PRINT ──────────────────────────────────────────────────────────
+// Hoe stylisten en influencers het doen: twee prints, nooit drie. Eén is een
+// "neutrale" print (streep, luipaard, camo) of ze delen een kleur. En ze
+// verschillen in grootte: een fijne streep met een grote luipaard, niet twee
+// grote naast elkaar. Twee keer dezelfde print is geen mix.
+const NEUTRALE_PRINT = new Set(['streep', 'luipaard', 'camouflage']);
+const STANDAARD_GROOT = { streep: 'klein', stip: 'klein', ruit: 'groot', luipaard: 'groot', camouflage: 'groot', bloem: 'groot', patchwork: 'groot' };
+const KLASSIEK = [['streep', 'luipaard'], ['streep', 'bloem'], ['luipaard', 'camouflage'], ['streep', 'stip'], ['streep', 'camouflage'], ['luipaard', 'stip']];
+export const printGrootte = i => i.printGroot || STANDAARD_GROOT[i.print] || 'groot';
+export function printMix(a, b) {
+  if (a.print === b.print) return { ok: false, waarom: 'Twee keer dezelfde print is geen mix.' };
+  const famA = new Set(a.kleur.map(k => info(k).fam)), deelt = b.kleur.some(k => famA.has(info(k).fam));
+  const neutraal = NEUTRALE_PRINT.has(a.print) || NEUTRALE_PRINT.has(b.print);
+  if (!deelt && !neutraal) return { ok: false, waarom: 'De prints delen geen kleur.' };
+  const ga = printGrootte(a), gb = printGrootte(b);
+  if (ga === gb && !(a.print === 'streep' || b.print === 'streep')) return { ok: false, waarom: 'Twee prints even groot vechten om aandacht.' };
+  const klassiek = KLASSIEK.some(([x, y]) => (a.print === x && b.print === y) || (a.print === y && b.print === x));
+  const groot = ga === 'groot' ? a : b;
+  return { ok: true, klassiek, waarom: `${a.print} met ${b.print}${klassiek ? ', een klassieker' : ''}${deelt ? ', ze delen een kleur' : ''}; ${groot.naam} is de baas, de rest effen.` };
+}
+
+// ── JOUW SMAAK ───────────────────────────────────────────────────────────────
+// Uit je bevestigde inspiratie: wat steeds terugkomt. Recent telt zwaarder,
+// zodat het meebeweegt met waar je nu zit. Elk gewicht is 0..1: in hoeveel
+// van je inspiratie het voorkomt.
+export function smaakVan(inspo, vandaag = new Date().toISOString().slice(0, 10), sterkte = 1) {
+  const lijst = inspo.filter(x => x.analyse && x.status === 'bevestigd');
+  if (!lijst.length) return null;
+  const p = { soort: {}, snit: {}, fam: {}, print: {}, textuur: {}, methode: {}, sfeer: {}, contrast: 0, n: lijst.length };
+  let totaal = 0;
+  for (const x of lijst) {
+    const dagen = Math.max(0, (new Date(vandaag) - new Date(x.datum || vandaag)) / 864e5);
+    const w = Math.exp(-dagen / 75);
+    totaal += w;
+    const a = x.analyse;
+    const tel = (veld, waarden) => { for (const v of new Set(waarden.filter(Boolean))) p[veld][v] = (p[veld][v] || 0) + w; };
+    tel('soort', a.stukken.map(i => i.soort));
+    tel('snit', a.stukken.map(i => i.snit));
+    tel('fam', a.stukken.flatMap(i => (i.kleur || []).map(k => info(k).fam)).filter(f => f !== 'multi'));
+    tel('print', a.stukken.map(i => i.print));
+    tel('textuur', a.stukken.map(i => i.textuur));
+    tel('methode', [a.methode]);
+    tel('sfeer', a.sferen || []);
+    if (a.stoerLief === 'contrast') p.contrast += w;
+  }
+  for (const veld of ['soort', 'snit', 'fam', 'print', 'textuur', 'methode', 'sfeer'])
+    for (const k in p[veld]) p[veld][k] = Math.min(1, p[veld][k] / totaal * sterkte);
+  p.contrast = Math.min(1, p.contrast / totaal * sterkte);
+  return p;
+}
+
+function smaakPunten(o, sm) {
+  let t = 0;
+  for (const i of o.items) {
+    t += (sm.soort[i.soort] || 0) * 0.6 + (sm.snit[i.snit] || 0) * 0.6 + (i.print ? (sm.print[i.print] || 0) * 0.6 : 0) + (sm.textuur[i.textuur] || 0) * 0.2;
+    if (ROLLEN_KLEDING.includes(i.rol)) t += (sm.fam[info(i.kleur[0]).fam] || 0) * 0.3;
+  }
+  t = Math.min(t, 3) + (sm.methode[o.kleur.methode] || 0) * 1.2;
+  for (const [k, w] of Object.entries(sm.sfeer)) if (SFEREN[k] && w > 0.2) t += sfeerPunten(o, SFEREN[k]) * w * 0.3;
+  if (sm.contrast && contrast(o)) t += sm.contrast * 1.5;
+  return t;
+}
+
+// "Maak dit na uit mijn kast": per stuk op de foto het beste uit jouw kast.
+// Te ver weg? Dan staat het bij "mist".
+export function zoekNa(kast, stukken) {
+  return stukken.map(s => {
+    let beste = null, w = 0;
+    for (const i of kast) {
+      if (i.rol !== s.rol) continue;
+      let t = 1;
+      if (i.soort === s.soort) t += 3;
+      const fams = (s.kleur || []).map(k => info(k).fam);
+      if (fams.includes(info(i.kleur[0]).fam)) t += 2;
+      if (s.snit && i.snit === s.snit) t += 1.5;
+      if (s.print && i.print === s.print) t += 1.5;
+      if (s.textuur && i.textuur === s.textuur) t += 0.5;
+      if (t > w) { w = t; beste = i; }
+    }
+    return { stuk: s, item: w >= 4 ? beste : null, bijna: w >= 4 ? null : beste, score: w };
+  });
+}
+
+export function naMaken(kast, analyse, ctx) {
+  const gevonden = zoekNa(kast, analyse.stukken);
+  const smaak = smaakVan([{ analyse, status: 'bevestigd', datum: null }], undefined, 1.5);
+  const sctx = { ...ctx, smaak, sfeer: (analyse.sferen || []).filter(k => SFEREN[k]), printMix: ctx.printMix || !!analyse.printMix };
+  // Eerst met zoveel mogelijk gevonden kernstukken vast; lukt dat niet, één minder.
+  let anker = gevonden.filter(g => g.item && ['boven', 'onder', 'heel', 'jas', 'laag'].includes(g.item.rol)).sort((a, b) => b.score - a.score).map(g => g.item.id).slice(0, 3);
+  let outfits = [];
+  while (true) {
+    outfits = stelVoor(kast, { ...sctx, anker }, 3);
+    if (outfits.length || !anker.length) break;
+    anker = anker.slice(0, -1);
+  }
+  return { gevonden, outfits, mist: gevonden.filter(g => !g.item) };
 }
 
 // ── SCORE ────────────────────────────────────────────────────────────────────
@@ -239,17 +354,10 @@ export function score(o, ctx) {
   // sfeer: één of meer. Meerdere worden gemengd (het gemiddelde van de
   // recepten), zodat cosy + streetstyle iets geeft dat van allebei heeft.
   const sferen = sfeerLijst(ctx.sfeer).map(k => SFEREN[k]).filter(Boolean);
-  for (const sf of sferen) {
-    let t = 0;
-    for (const i of o.items) {
-      t += (sf.soort[i.soort] || 0) * 0.6;
-      t += ((sf.textuur || {})[i.textuur] || 0) * 0.5;
-      if (i.print) t += ((sf.print || {})[i.print] || 0) * 0.5;
-      if (i.snit) t += ((sf.snit || {})[i.snit] || 0) * 0.6;
-    }
-    t += (sf.methode[o.kleur.methode] || 0);
-    s += t / sferen.length;
-  }
+  for (const sf of sferen) s += sfeerPunten(o, sf) / sferen.length;
+  // jouw smaak van nu, uit je inspiratie (na rapport en theorie: een plusje)
+  if (ctx.smaak) s += smaakPunten(o, ctx.smaak);
+  if (ctx.printMix && o.printMix) s += 1.2;
   // comfy ←→ sjiek
   if (ctx.sjiek != null) {
     // Te nette schoenen bij comfy (hakken op een strandwandeling) kosten
@@ -291,7 +399,7 @@ export function maakOutfit(slots, ctx) {
   const kleding = items.filter(i => ROLLEN_KLEDING.includes(i.rol));
   const extra = items.filter(i => !ROLLEN_KLEDING.includes(i.rol));
   const o = { slots, items, kleur: herken(kleding, extra) };
-  o.check = controleer(o, ctx.rapport);
+  o.check = controleer(o, ctx.rapport, ctx);
   const tegen = contrast(o);
   if (tegen) o.check = { ...o.check, tips: o.check.tips.concat(tegen.basis === 'stoer'
     ? `Stoer met een zachte pop: ${tegen.pop.naam} maakt het spannend.` : `Lief met een stoere twist: ${tegen.pop.naam}.`) };
@@ -396,16 +504,16 @@ function kleedAan(basis, p, ctx, gebruikt = new Map()) {
   // bij het sporten pas een jas als het echt koud is
   const jasNodig = ctx.sport ? (ctx.weer === 'koud' || ctx.weer === 'fris') && p.jas.length > 0 : (ctx.weer === 'koud' || ctx.weer === 'fris' || (wilLaag && !o.slots.laag));
   if (jasNodig) probeer('jas', p.jas, true);
+  if (!ctx.sport) probeer('tas', p.tas, false);
+  if (ctx.sport) { /* geen riem of sjaal bij het sporten */ }
+  else if (metRiem(o)) probeer('riem', p.riem, true);
+  else if (ctx.weer === 'koud' || ctx.weer === 'fris') probeer('sjaal', p.sjaal, false);
   // De laag werd gekozen vóór de jas. Is hij met de jas erover overbodig, dan weg.
   if (o.slots.laag && o.slots.jas && !wilLaag && !ankerIn('laag').length) {
     const { laag, ...zonder } = o.slots;
     const n = maakOutfit(zonder, ctx);
     if (n.check.ok && n.score > o.score && past(n)) o = n;
   }
-  if (!ctx.sport) probeer('tas', p.tas, false);
-  if (ctx.sport) { /* geen riem of sjaal bij het sporten */ }
-  else if (metRiem(o)) probeer('riem', p.riem, true);
-  else if (ctx.weer === 'koud' || ctx.weer === 'fris') probeer('sjaal', p.sjaal, false);
   // Bij het sporten gaan kleurregels niet over krachtmetingen.
   if (ctx.sport) o = { ...o, check: { ...o.check, tips: [], problemen: o.check.problemen.filter(p => !p.zacht) } };
   // Geen jas die erbij past terwijl het fris is: dan is dit geen outfit.
@@ -555,11 +663,11 @@ function rng(seed) {
 }
 
 export function pakTas(kast, opties) {
-  const { dagen, rapport, sfeer = null, sjiek = null, contrast = null, moetMee = [], uitsluiten = [], seed = 1, geheugen = {}, afwisselen = false } = opties;
+  const { dagen, rapport, sfeer = null, sjiek = null, contrast = null, smaak = null, printMix = false, moetMee = [], uitsluiten = [], seed = 1, geheugen = {}, afwisselen = false } = opties;
   const mom = momenten(dagen);
   const nodig = mom.length;
   const koudste = mom.some(m => m.weer === 'koud') ? 'koud' : mom.some(m => m.weer === 'fris') ? 'fris' : mom.every(m => m.weer === 'warm') ? 'warm' : 'mild';
-  const ctx = { rapport, sfeer, sjiek, contrast, weer: koudste, geheugen, uitsluiten, afwisselen };
+  const ctx = { rapport, sfeer, sjiek, contrast, smaak, printMix, weer: koudste, geheugen, uitsluiten, afwisselen };
   const perId = Object.fromEntries(kast.map(i => [i.id, i]));
   const pool = kast.filter(i => !uitsluiten.includes(i.id) && (moetMee.includes(i.id) || pastBijWeer(i, koudste === 'koud' ? 'fris' : koudste)));
   const formule = FORMULE(nodig);
@@ -764,11 +872,11 @@ function divers(os, max, straf = () => 0) {
 }
 
 export function uitSelectie(kast, opties) {
-  const { dagen, rapport, sfeer = null, sjiek = null, contrast = null, moetMee = [], uitsluiten = [], geheugen = {}, afwisselen = false, max = 12 } = opties;
+  const { dagen, rapport, sfeer = null, sjiek = null, contrast = null, smaak = null, printMix = false, moetMee = [], uitsluiten = [], geheugen = {}, afwisselen = false, max = 12 } = opties;
   const mom = momenten(dagen);
   const perId = Object.fromEntries(kast.map(i => [i.id, i]));
   const selectie = moetMee.map(id => perId[id]).filter(Boolean);
-  const ctx = { rapport, sfeer, sjiek, contrast, geheugen, uitsluiten, afwisselen };
+  const ctx = { rapport, sfeer, sjiek, contrast, smaak, printMix, geheugen, uitsluiten, afwisselen };
   const sferen = sfeerLijst(sfeer);
   // Sportspullen apart: een hardloopjack hoort niet bij het diner.
   let erbij = [], sportErbij = [];

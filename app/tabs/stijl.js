@@ -3,17 +3,18 @@
 import { METHODEN } from '../kleur.js';
 import { esc, $, $$, stip, foto, blad, melding, chips, verklein, upload, tegel } from '../ui.js';
 import { zetKeuze } from './outfits.js';
+import { inspiratie } from './inspo.js';
 import { detail as itemDetail } from './kast.js';
 import { exporteer, wachtwoord, zetWachtwoord, probeerSync, syncStatus } from '../opslag.js';
 
 let deel = 'rapport';
-const DELEN = [['rapport', 'Rapport'], ['kleur', 'Kleur'], ['kennis', 'Kennis'], ['smaak', 'Jouw smaak']];
+const DELEN = [['rapport', 'Rapport'], ['kleur', 'Kleur'], ['inspiratie', 'Inspiratie'], ['kennis', 'Kennis'], ['smaak', 'Jouw smaak']];
 
 export default function stijlTab(el, app) {
   el.innerHTML = `<h1>Stijl</h1><p class="sub">Je rapport is leidend. De rest werkt daarbinnen.</p>
     ${chips('deel', DELEN, deel)}<div id="deel"></div>`;
   $$('[data-chips="deel"] .chip', el).forEach(b => b.addEventListener('click', () => { deel = b.dataset.w; stijlTab(el, app); }));
-  ({ rapport, kleur, kennis, smaak })[deel]($('#deel'), app);
+  ({ rapport, kleur, inspiratie, kennis, smaak })[deel]($('#deel'), app);
 }
 
 const palet = lijst => `<div class="palet">${lijst.map(k => `<span>${stip(k, 18)}${esc(k)}</span>`).join('')}</div>`;

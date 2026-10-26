@@ -35,6 +35,7 @@ export const leeg = () => ({
   geheugen: {},       // id → {weg, gekozen}: wat je wegwisselt of kiest
   tassen: [],
   kennis: [],         // jouw screenshots en notities
+  inspo: [],          // inspiratiebeelden met bevestigde analyse
   gekocht: [],
 });
 

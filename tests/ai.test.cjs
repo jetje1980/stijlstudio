@@ -32,6 +32,11 @@ const JPG = Buffer.from('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP/////////////////////
     let t = '{}';
     if (/Beschrijf dit kledingstuk/.test(v)) t = '{"naam":"Rode wollen trui","soort":"trui","kleur":["rood"],"print":null,"textuur":"fijn gebreid","materiaal":"wol","pasvorm":"recht","warmte":3}';
     else if (/Geef als JSON: \{"naam"/.test(v)) t = 'Hier is het: {"naam":"Zondag in de stad","waarom":"De rustige basis laat het accent spreken.","tip":"Stop de trui half in."}';
+    else if (/inspiratiebeeld/.test(v)) t = JSON.stringify({ samenvatting: 'Oversized camo-jas met paars shirt en wijde lichte jeans.',
+      stukken: [{ wat: 'camo bomber', soort: 'jas', kleur: ['olijf/khaki'], print: 'camouflage', printGroot: 'groot', pasvorm: 'wijd' },
+        { wat: 'paars grafisch shirt', soort: 't-shirt', kleur: ['paars'] }, { wat: 'lichte wide-leg jeans', soort: 'jeans', kleur: ['lichtblauw'], snit: 'wide leg', textuur: 'denim' },
+        { wat: 'zonnebril', soort: 'zonnebril', kleur: ['bruin'] }],
+      methode: 'accent', sferen: ['street'], stoerLief: 'stoer', printMix: false, ideeen: ['gouden kettingen gelaagd', 'shirt los over de jeans'] });
     else if (/Dit is Griette in haar outfit/.test(v)) {
       const id = (v.match(/\n([\w-]+): /) || [])[1];
       t = JSON.stringify({ werkt: 'De kleuren zijn rustig en mooi samen.', verbeter: [{ wat: 'Draag een riem', waarom: 'Dan zie je je taille', uitKast: [id], nieuw: null }], foto: 'Draai je schouders iets.' });
@@ -73,7 +78,30 @@ const JPG = Buffer.from('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP/////////////////////
   const vs = vragen[vragen.length - 1];
   ok(vs.messages[0].content.some(c => c.type === 'image' && c.source.type === 'base64'), 'je foto gaat mee, verkleind');
 
-  // 4. Een fout van de stylist geeft een nette melding
+  // 4. Inspiratie: screenshot → analyse → jij checkt → telt mee → maak na
+  await p.goto('http://127.0.0.1:8769/#stijl'); await p.waitForSelector('[data-chips="deel"]');
+  await p.click('[data-chips="deel"] .chip[data-w="inspiratie"]'); await p.waitForSelector('#inspo-in', { state: 'attached' });
+  await p.setInputFiles('#inspo-in', [{ name: 'a.jpg', mimeType: 'image/jpeg', buffer: JPG }]);
+  await p.waitForSelector('#ck-ok', { timeout: 10000 });
+  ok(/camo/i.test(await p.textContent('.blad')) && await p.$$eval('#ck-st .chip.aan', x => x.length) === 4, 'check: de app laat zien wat hij ziet');
+  ok(await p.$eval('#ck-sf .chip[data-w="street"]', x => x.classList.contains('aan')), 'check: sfeer staat voorgeselecteerd');
+  await p.click('#ck-st .chip[data-n="3"]');
+  const vi = vragen[vragen.length - 1];
+  ok(vi.model === 'claude-sonnet-5' && vi.messages[0].content.some(c => c.type === 'image'), 'inspiratie: het beeld gaat mee naar de stylist');
+  await p.click('#ck-ok'); await p.waitForTimeout(400);
+  const st = await p.evaluate(() => JSON.parse(localStorage.getItem('stijlstudio-v2')).inspo);
+  ok(st.length === 1 && st[0].status === 'bevestigd' && st[0].analyse.stukken.length === 3 && st[0].analyse.stukken[0].rol === 'jas', 'wat je wegtikt telt niet mee; de rest is bevestigd');
+  ok(/jouw smaak nu/i.test(await p.textContent('#deel')) && /jas/.test(await p.textContent('#deel')), 'je smaak van nu staat erbij');
+  await p.click('[data-na]'); await p.waitForTimeout(500);
+  ok(/Sabbi/.test(await p.textContent('.blad')) && await p.$$eval('.blad .kaart .stukken', x => x.length) >= 1, 'maak na: je eigen camo-jas en outfits');
+
+  // tas met een eigen inspiratiebord
+  await p.goto('http://127.0.0.1:8769/#tas'); await p.waitForSelector('#bord');
+  await p.click('#bord'); await p.waitForSelector('#bord-r [data-b]');
+  await p.click('#bord-r [data-b]'); await p.click('#bord-ok'); await p.waitForTimeout(300);
+  ok(await p.$$eval('#bord ~ img, .rij img', x => x.length) >= 1 && JSON.parse(await p.evaluate(() => localStorage.getItem('stijlstudio-v2'))).tasConcept.bord.length === 1, 'tas: inspiratiebord gekozen en bewaard');
+
+  // 5. Een fout van de stylist geeft een nette melding
   await p.unroute(/functions\/v1\/claude/);
   await p.route(/functions\/v1\/claude/, r => r.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: { message: 'tijdelijk niet beschikbaar' } }) }));
   await p.goto('http://127.0.0.1:8769/#outfits/maak'); await p.waitForSelector('#voorstellen .kaart', { timeout: 15000 });
