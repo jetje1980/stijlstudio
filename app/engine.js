@@ -252,13 +252,12 @@ export function score(o, ctx) {
   }
   // comfy ←→ sjiek
   if (ctx.sjiek != null) {
-    // De schoen telt mee: sneakers maken een avond uit eten casual,
-    // hakken een strandwandeling onhandig.
+    // Te nette schoenen bij comfy (hakken op een strandwandeling) kosten
+    // punten; sneakers bij iets sjieks niet: die mogen overal.
     const doel = 1.5 + 3 * ctx.sjiek;
-    const metSchoen = kleding.concat(o.slots.schoen ? [o.slots.schoen] : []);
-    const gemS = metSchoen.reduce((t, i) => t + i.formeel, 0) / Math.max(1, metSchoen.length);
+    const gemS = kleding.reduce((t, i) => t + i.formeel, 0) / Math.max(1, kleding.length);
     s -= Math.abs(gemS - doel) * 1.2;
-    if (o.slots.schoen) s -= Math.max(0, Math.abs(o.slots.schoen.formeel - doel) - 1.5) * 1.5;
+    if (o.slots.schoen) s -= Math.max(0, o.slots.schoen.formeel - doel - 1.5) * 1.5;
     const comfort = o.items.reduce((t, i) => t + i.comfort, 0) / o.items.length;
     s += (1 - ctx.sjiek) * (comfort - 3) * 0.5;
   }
@@ -608,20 +607,6 @@ export function pakTas(kast, opties) {
     if (!beste || w.waarde > beste.w.waarde) beste = { koffer, w };
   }
   let koffer = beste.koffer;
-  // Uit eten, een feest of een avond: dan gaat er minstens één paar nette
-  // schoenen mee. De koffer wordt op het geheel gekozen en ziet dat anders niet.
-  const net = mom.some(m => m.moment === 'avond' || (ACTIVITEITEN[m.activiteit] || {}).sjiek >= 0.7);
-  if (net && !koffer.some(i => i.rol === 'schoen' && i.formeel >= 3)) {
-    const nette = pool.filter(i => i.rol === 'schoen' && i.formeel >= 3 && !koffer.includes(i));
-    const schoenen = koffer.filter(i => i.rol === 'schoen' && !vast.includes(i));
-    let top = null;
-    for (const n of nette) for (const uit of schoenen.length > 1 ? schoenen : [null]) {
-      const k = uit ? koffer.map(i => i === uit ? n : i) : koffer.concat(n);
-      const w = waardeer(k, ctx, nodig).waarde;
-      if (!top || w > top.w) top = { k, w };
-    }
-    if (top) koffer = top.k;
-  }
   if (mom.some(m => m.activiteit === 'sport')) {
     // Sportspullen gaan mee als er gesport wordt; de rest van de koffer telt daar niet voor.
     const sp = pools(pool, { ...ctx, sport: true, weer: 'mild' });
