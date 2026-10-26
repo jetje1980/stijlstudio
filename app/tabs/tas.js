@@ -4,7 +4,7 @@
 import { pakTas, uitSelectie, compact, meerVan, maakOutfit, SFEREN, ACTIVITEITEN, herkenActiviteit } from '../engine.js';
 import { METHODEN } from '../kleur.js';
 import { esc, $, $$, foto, blad, melding, chips, stip, tegel, collage } from '../ui.js';
-import { outfitHtml, wissel, vanIds, andereKleurBlad } from './outfits.js';
+import { outfitHtml, wissel, vanIds, andereKleurBlad, contrastSchuif } from './outfits.js';
 import { tekenKaart, deelOfBewaar } from '../kaart.js';
 
 // Sporten kies je bij "wat ga je doen"; 'actief' kan nog in oude bewaarde tassen staan.
@@ -20,7 +20,7 @@ const tas = {
   seed: 1, uitkomst: null, filter: null, afgevinkt: [], ruil: null,
   // 'tas': de app vult je moet-mee aan tot een koffer. 'kies': jij legt (te)
   // veel klaar, ziet alle outfits daaruit en kiest zelf.
-  modus: 'tas', herstel: null, meer: [],
+  modus: 'tas', herstel: null, meer: [], contrast: null,
 };
 
 function maakDagen(start, n, oud = []) {
@@ -36,7 +36,7 @@ function maakDagen(start, n, oud = []) {
 
 // Wat je invult blijft bewaard (ook na opnieuw openen en op je andere
 // toestel), en de laatst uitgerekende tas ook.
-const BEWAAR = ['bestemming', 'start', 'dagen', 'moetMee', 'niet', 'thuis', 'sfeer', 'afwisselen', 'sjiek', 'schuif', 'afgevinkt', 'seed', 'modus'];
+const BEWAAR = ['bestemming', 'start', 'dagen', 'moetMee', 'niet', 'thuis', 'sfeer', 'afwisselen', 'sjiek', 'schuif', 'afgevinkt', 'seed', 'modus', 'contrast'];
 let geladen = false;
 function laadConcept(app) {
   if (geladen) return;
@@ -122,6 +122,7 @@ export default function tasTab(el, app) {
     ${chips('sfeer', Object.entries(SFEREN).map(([k, v]) => [k, v.naam]), tas.sfeer, { meer: true }).replace('class="chips"', 'class="chips wrap"')}
     ${tas.sfeer.length > 1 ? `<div class="chips"><button class="chip${!tas.afwisselen ? ' aan' : ''}" data-afw="0" type="button">Mengen in elke outfit</button><button class="chip${tas.afwisselen ? ' aan' : ''}" data-afw="1" type="button">Per moment afwisselen</button></div>` : ''}
     <div class="schuif"><span>comfy</span><input type="range" min="0" max="1" step="0.25" value="${tas.sjiek}" id="sjiek"><span>sjiek</span></div>
+    ${contrastSchuif(tas.contrast)}
     <button class="knop vol" id="pak" type="button" style="margin-top:14px">${kies ? 'Laat alle outfits zien' : 'Pak mijn tas'}</button>
     <div id="uitkomst" style="margin-top:18px">${melding_ && !tas.uitkomst ? `<p class="klein">${esc(melding_)}</p>` : ''}</div>
     ${opgeslagen.length ? `<h3>Bewaarde tassen</h3>${opgeslagen.slice().reverse().map(t => `<button class="chip" data-tas="${esc(t.id)}" type="button">${esc(t.naam)} · ${esc(t.datum)}</button>`).join(' ')}` : ''}`;
@@ -167,6 +168,7 @@ export default function tasTab(el, app) {
   }));
   $$('[data-afw]', el).forEach(b => b.addEventListener('click', () => { tas.afwisselen = b.dataset.afw === '1'; tasTab(el, app); }));
   $('#sjiek').addEventListener('change', e => { tas.sjiek = +e.target.value; tas.schuif = true; });
+  $('#contrast').addEventListener('change', e => { tas.contrast = +e.target.value; });
   $$('[data-mm]', el).forEach(b => b.addEventListener('click', () => { tas.moetMee = tas.moetMee.filter(x => x !== b.dataset.mm); tasTab(el, app); }));
   $('#kies-mm').addEventListener('click', () => kiesStukken(app, kies ? 'Wat leg je klaar?' : 'Wat moet mee?', tas.moetMee, ids => {
     tas.moetMee = ids; tas.thuis = tas.thuis.filter(x => !ids.includes(x));
@@ -246,7 +248,7 @@ async function haalWeer(el, app, stil) {
 function opties(app) {
   return {
     dagen: tas.dagen.filter(d => d.momenten.length).map(d => ({ ...d, temp: d.temp ?? 15 })),
-    rapport: app.data.rapport, sfeer: tas.sfeer, afwisselen: tas.afwisselen, sjiek: tas.schuif ? tas.sjiek : null,
+    rapport: app.data.rapport, sfeer: tas.sfeer, afwisselen: tas.afwisselen, sjiek: tas.schuif ? tas.sjiek : null, contrast: tas.contrast,
     moetMee: tas.moetMee, seed: tas.seed, geheugen: app.staat().geheugen,
     uitsluiten: app.kast().filter(i => tas.thuis.includes(i.id) || tas.niet.includes(i.soort) || (tas.niet.includes('open') && i.open)).map(i => i.id)
       .filter(id => !tas.moetMee.includes(id)),
