@@ -695,12 +695,13 @@ const overlap = (a, b) => a.items.filter(i => b.items.includes(i) && KERN.includ
 
 function divers(os, max, straf = () => 0) {
   const uit = [];
-  const rest = os.map(o => ({ ...o, score: o.score })).sort((a, b) => (b.score - straf(b)) - (a.score - straf(a))).slice(0, 60);
+  const rest = os.slice().sort((a, b) => (b.score - straf(b)) - (a.score - straf(a))).slice(0, 60);
   while (uit.length < max && rest.length) {
     const manieren = new Set(uit.map(o => o.kleur.methode));
     let bi = 0, bw = -Infinity;
     rest.forEach((o, n) => {
-      const w = o.score - straf(o) + (manieren.has(o.kleur.methode) ? 0 : 2) - uit.reduce((t, u) => t + (overlap(o, u) >= 2 ? 3 : 0), 0) - (o.kleur.methode === 'mix' ? 3 : 0);
+      const nieuwStuk = ['jas', 'schoen'].filter(r => o.slots[r] && !uit.some(u => u.slots[r] === o.slots[r])).length;
+      const w = o.score - straf(o) + nieuwStuk * 1.5 + (manieren.has(o.kleur.methode) ? 0 : 2) - uit.reduce((t, u) => t + (overlap(o, u) >= 2 ? 3 : 0), 0) - (o.kleur.methode === 'mix' ? 3 : 0);
       if (w > bw) { bw = w; bi = n; }
     });
     uit.push(rest.splice(bi, 1)[0]);
@@ -728,6 +729,20 @@ export function uitSelectie(kast, opties) {
       if (mctx.sport) sportErbij = sportErbij.concat(nieuw); else erbij = erbij.concat(nieuw);
       os = voorMoment(selectie.concat(eerder, nieuw), m, mctx, act);
     }
+    // Elke outfit krijgt dezelfde 'beste' jas en schoenen; laat ook zien hoe
+    // het met je andere jas of schoenen staat.
+    const stukken = pools(selectie.concat(eerder, nieuw), mctx);
+    const varianten = [];
+    for (const o of os.slice(0, 15)) for (const rol of ['jas', 'schoen', 'laag']) {
+      if (!o.slots[rol]) continue;
+      for (const k of stukken[rol]) {
+        if (k === o.slots[rol] || o.items.includes(k)) continue;
+        const v = maakOutfit({ ...o.slots, [rol]: k }, mctx);
+        if (v.check.ok && v.score > o.score - 3) varianten.push(v);
+      }
+    }
+    const gezien = new Set(os.map(sleutel));
+    for (const v of varianten) if (!gezien.has(sleutel(v))) { gezien.add(sleutel(v)); os.push(v); }
     // jouw eigen stukken eerst; iets uit de kast alleen als het echt beter is
     const eigen = new Set(selectie);
     return { ...m, outfit: null, opties: divers(os, max, o => o.items.filter(i => !eigen.has(i) && i.rol !== 'tas').length * 2) };

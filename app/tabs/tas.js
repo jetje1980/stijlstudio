@@ -414,8 +414,12 @@ function toonKeuze(el, app) {
   const thuis = u.stukken.filter(x => !x.erbij && !inGekozen.has(x.item.id));
   const tegelVan = (o, i, n) => {
     const uitKast = o.items.filter(x => !eigen.has(x.id) && x.rol !== 'tas');
-    return `<button class="outfit-tegel" data-kies="${i}|${n}" type="button">${collage(o.items)}
-      <b>${esc(o.kleur.naam)}</b><span class="klein">${uitKast.length ? '＋ ' + uitKast.map(x => esc(x.naam)).join(', ') : 'alleen jouw stukken'}</span></button>`;
+    // de stukken die het verschil maken eerst; een riem of sjaal mag wegvallen
+    const volg = ['heel', 'boven', 'onder', 'laag', 'jas', 'schoen', 'tas', 'riem', 'sjaal'];
+    const its = volg.map(r => o.slots[r]).filter(Boolean);
+    const jas = o.slots.jas;
+    return `<button class="outfit-tegel" data-kies="${i}|${n}" type="button">${collage(its)}
+      <b>${esc(o.kleur.naam)}</b>${jas ? `<span class="klein">met ${esc(jas.naam)}</span><br>` : ''}<span class="klein">${uitKast.length ? '＋ uit je kast: ' + uitKast.map(x => esc(x.naam)).join(', ') : 'alleen jouw stukken'}</span></button>`;
   };
   plek.innerHTML = `
     <h2>${gekozen.length} van ${u.plan.length} gekozen</h2>
