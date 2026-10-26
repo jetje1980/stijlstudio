@@ -43,17 +43,26 @@ export const app = {
 // versienummer (tools/versie.py); staat er online een nieuwere, dan laden we
 // die meteen in plaats van met de oude verder te werken.
 const VERSIE = (document.querySelector('meta[name="versie"]') || {}).content || '0';
+// Een nieuwe versie online? Dan herladen. Lukt dat niet meteen (de server
+// geeft vlak na een update soms nog even de oude pagina), dan nog één keer,
+// en anders een balk om zelf te tikken. Ook als je de app weer opent.
 async function nieuwsteVersie() {
   try {
     const html = await (await fetch('./?nocache=' + Date.now(), { cache: 'no-store' })).text();
     const online = (html.match(/<meta name="versie" content="([^"]+)"/) || [])[1];
-    const al = sessionStorage.getItem('versie-herladen');
-    if (online && online !== VERSIE && al !== online) {
-      sessionStorage.setItem('versie-herladen', online);
-      location.replace(location.pathname + '?v=' + online + location.hash);
-    }
+    if (!online || online <= VERSIE) return;
+    const keer = +(sessionStorage.getItem('herladen-' + online) || 0);
+    const laad = () => location.replace(location.pathname + '?v=' + online + '&t=' + Date.now() + location.hash);
+    if (keer < 2) { sessionStorage.setItem('herladen-' + online, keer + 1); return setTimeout(laad, keer * 3000); }
+    if (document.querySelector('.nieuwe-versie')) return;
+    const b = document.createElement('button');
+    b.className = 'nieuwe-versie'; b.type = 'button';
+    b.textContent = 'Er is een nieuwe versie. Tik om te laden.';
+    b.addEventListener('click', laad);
+    document.body.appendChild(b);
   } catch (e) { /* offline: verder met wat we hebben */ }
 }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') nieuwsteVersie(); });
 
 async function start() {
   nieuwsteVersie();
