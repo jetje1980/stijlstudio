@@ -423,12 +423,6 @@ function toonKeuze(el, app) {
     <div class="rij"><button class="knop" id="compact" type="button">Kies voor mij, zo compact mogelijk</button>
       ${gekozen.length ? '<button class="knop licht" id="wis" type="button">Opnieuw kiezen</button>' : ''}</div>
 
-    <h3>Wat je klaarlegde</h3>
-    <p class="klein" style="margin-top:0">Hoeveel outfits er met elk stuk kunnen. Weinig? Dan is het een kandidaat om thuis te laten.</p>
-    <div>${u.stukken.map(x => `<div class="stuk-rij">${x.item.foto ? `<img src="${esc(foto(x.item.foto, 120))}" alt="">` : `<span class="leeg">${stip(x.item.kleur[0], 20)}</span>`}
-      <span>${esc(x.item.naam)}${x.erbij ? ' <span class="klein">· uit je kast erbij</span>' : ''}</span>
-      <span class="keer">${x.kan ? `in ${x.kan} outfit${x.kan > 1 ? 's' : ''}` : 'past nergens bij'}</span></div>`).join('')}</div>
-
     <h3>Per moment</h3>
     ${u.plan.map((p, i) => {
       const toon = tas.meer.includes(i) ? p.opties : p.opties.slice(0, 4);
@@ -439,6 +433,12 @@ function toonKeuze(el, app) {
           ${p.opties.length > toon.length ? `<button class="chip" data-meer="${i}" type="button" style="margin-top:8px">Nog ${p.opties.length - toon.length} opties</button>` : ''}`
         : '<p class="klein">Hier lukt niets, ook niet met iets uit je kast erbij. Kijk bij "Wat niet mee" of je niet te veel hebt uitgesloten.</p>'}</div>`;
     }).join('')}
+
+    <h3>Wat je klaarlegde</h3>
+    <p class="klein" style="margin-top:0">Hoeveel outfits er met elk stuk kunnen. Weinig? Dan is het een kandidaat om thuis te laten.</p>
+    <div>${u.stukken.map(x => `<div class="stuk-rij">${x.item.foto ? `<img src="${esc(foto(x.item.foto, 120))}" alt="">` : `<span class="leeg">${stip(x.item.kleur[0], 20)}</span>`}
+      <span>${esc(x.item.naam)}${x.erbij ? ' <span class="klein">· uit je kast erbij</span>' : ''}</span>
+      <span class="keer">${x.kan ? `in ${x.kan} outfit${x.kan > 1 ? 's' : ''}` : 'past nergens bij'}</span></div>`).join('')}</div>
 
     ${gekozen.length ? `<div class="moment-kop"><h3>Paklijst</h3><span class="klein" id="ingepakt">${k.filter(x => tas.afgevinkt.includes(x.item.id)).length} van ${k.length} ingepakt</span></div>
     <ul class="paklijst">${k.map(x => `<li><input type="checkbox" data-v="${esc(x.item.id)}"${tas.afgevinkt.includes(x.item.id) ? ' checked' : ''} aria-label="${esc(x.item.naam)} ingepakt">
