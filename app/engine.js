@@ -156,6 +156,12 @@ export function controleer(o, rapport, ctx = {}) {
   const DIKTE = { topje: 0.5, sporttop: 0.5, 't-shirt': 1, top: 1.5, longsleeve: 2, blouse: 2, trui: 3, vest: 3.5, gilet: 3.5, blazer: 4, teddy: 5 };
   if (laag && (boven || heel) && (DIKTE[laag.soort] || 3) <= (DIKTE[(boven || heel).soort] || 1.5))
     problemen.push({ regel: 'laagjes', tekst: `${laag.soort} over ${(boven || heel).soort} draagt niet.` });
+  // Een (mouwloos) gilet hoort over iets met lange mouwen dat aansluit en
+  // dun is: een longsleeve, fijn breisel of getailleerde blouse. Niet over
+  // een T-shirt, een wijd shirt of een dikke trui.
+  const basisG = boven || heel;
+  if (laag && laag.soort === 'gilet' && basisG && (mouwen(basisG) !== 'lang' || basisG.pasvorm === 'wijd' || basisG.warmte >= 3 || /grof|pluizig/.test(basisG.textuur)))
+    problemen.push({ regel: 'laagjes', tekst: 'Een gilet hoort over een dunne, aansluitende longsleeve of blouse.' });
   // Twee dikke lagen op elkaar wordt te veel: over een trui alleen een gilet,
   // blazer of jas, geen gebreid vest of teddy.
   const onder_ = boven || heel;
@@ -336,6 +342,20 @@ export function basisIds(rapport) {
   return BASIS.get(rapport);
 }
 
+// Kleurnamen uit je kast terug naar de namen in het rapport.
+const RAPPORTNAAM = { marine: 'donkerblauw', chocolade: 'bruin', cognac: 'bruin', ecru: 'gebroken-wit', wit: 'gebroken-wit', 'lila/paars': 'paars', fuchsia: 'felroze', grijs: 'lichtgrijs' };
+const rnaam = k => RAPPORTNAAM[k] || k;
+function rapportParen(kleding, rapport) {
+  const k = rapport && rapport.kleur;
+  if (!k) return 0;
+  const namen = new Set(kleding.map(i => rnaam(i.kleur[0])));
+  let t = 0;
+  for (const u of k.uitgelicht || []) if (u.met && u.kleuren.some(x => namen.has(x)) && u.met.some(x => namen.has(x))) t += 0.8;
+  for (const [a, b] of k.combinaties || []) if (namen.has(a) && namen.has(b)) t += 0.8;
+  for (const rij of k.steun || []) if (rij.filter(x => namen.has(x)).length >= 2 && namen.has(rij[0])) t += 0.4;
+  return Math.min(t, 1.6);
+}
+
 const METHODE_WAARDE = { split: 1.5, tonsurton: 1.2, accent: 1.2, analoog: 0.8, mono: 0.6, neutraal: 0.3, colorblock: -0.5, mix: -3 };
 
 export function score(o, ctx) {
@@ -361,6 +381,10 @@ export function score(o, ctx) {
   // Silhouet (rapport): wijd onder met aansluitend boven, of andersom
   const bv = o.slots.boven;
   if (bv && ond && ((ond.pasvorm === 'wijd' && ['aansluitend', 'kort'].includes(bv.pasvorm)) || (bv.pasvorm === 'wijd' && ond.pasvorm === 'aansluitend'))) s += 0.5;
+
+  // kleurparen die Robin noemt: paars of felroze met donkerblauw of bruin,
+  // groen met donkerblauw, bruin of gebroken wit; en haar steunkleuren
+  s += rapportParen(kleding, ctx.rapport);
 
   // kleuren bij je gezicht en uit je palet; grijs en champagne maken je fletser
   const gezicht = o.slots.boven || o.slots.heel;
@@ -392,7 +416,7 @@ export function score(o, ctx) {
   const basis = basisIds(ctx.rapport);
   if (basis.size) {
     const w = o.items.filter(i => basis.has(i.id) && (ROLLEN_KLEDING.includes(i.rol) || i.rol === 'schoen')).length;
-    s += Math.min(w, 3) * 0.5 + (o.slots.laag && basis.has(o.slots.laag.id) ? 0.7 : 0);
+    s += Math.min(w, 3) * 0.5;
   }
   // jouw smaak van nu, uit je inspiratie (na rapport en theorie: een plusje)
   if (ctx.smaak) s += smaakPunten(o, ctx.smaak);
@@ -631,18 +655,22 @@ function kiesDivers(lijst, aantal, verschillendeManieren, seed) {
     || (o.slots.heel && g.slots.heel === o.slots.heel));
   const vloer = Math.max(...lijst.map(o => o.score), -Infinity) - 4;
   const zelfdeBoven = o => o.slots.boven && gekozen.some(g => g.slots.boven === o.slots.boven);
-  // ronde 0: andere manier én ander bovenstuk; 1: ander bovenstuk; 2: niet
-  // twee kernstukken gelijk; 3: wat er nog over is
-  for (const ronde of [0, 1, 2, 3]) {
+  const zelfdeOnder = o => o.slots.onder && gekozen.some(g => g.slots.onder === o.slots.onder);
+  // ronde 0: andere manier, ander boven- én onderstuk; 1: ander boven- en
+  // onderstuk; 2: ander bovenstuk; 3: niet twee kernstukken gelijk; 4: de rest
+  for (const ronde of [0, 1, 2, 3, 4]) {
     for (const o of pool) {
       if (gekozen.length >= aantal) break;
       const k = sleutel(o);
       if (gezien.has(k)) continue;
       if (ronde === 0 && verschillendeManieren && manieren.has(o.kleur.methode)) continue;
-      if (ronde < 3 && overlapt(o)) continue;
-      if (ronde < 2 && zelfdeBoven(o)) continue;
+      // je rapport zoekt balans: colorblock en een vrije mix niet vooraan om de variatie
+      if (ronde === 0 && ['colorblock', 'mix'].includes(o.kleur.methode)) continue;
+      if (ronde < 4 && overlapt(o)) continue;
+      if (ronde < 3 && zelfdeBoven(o)) continue;
+      if (ronde < 2 && zelfdeOnder(o)) continue;
       // variatie, maar niet ten koste van alles: geen zwakke look om de variatie
-      if (ronde < 3 && o.score < vloer) continue;
+      if (ronde < 4 && o.score < vloer) continue;
       gekozen.push(o); gezien.add(k); manieren.add(o.kleur.methode);
     }
   }
