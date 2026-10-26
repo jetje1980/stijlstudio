@@ -200,7 +200,7 @@ function toonBewaard(app, id, klaar) {
   });
 }
 
-export const SLOT_NAAM = { boven: 'boven', onder: 'onder', heel: 'jurk/set', laag: 'laag', jas: 'jas', schoen: 'schoenen', tas: 'tas', riem: 'riem', sjaal: 'accessoire' };
+export const SLOT_NAAM = { boven: 'boven', onder: 'onder', heel: 'jurk/set', laag: 'laag', jas: 'jas', schoen: 'schoenen', tas: 'tas', riem: 'riem', sjaal: 'accessoire', muts: 'muts of pet' };
 export function outfitHtml(o, { notitie, waarom, tip } = {}) {
   const volgorde = ['boven', 'onder', 'heel', 'laag', 'jas', 'schoen', 'tas', 'muts', 'riem', 'sjaal'];
   const stukken = volgorde.filter(s => o.slots[s]).map(s => [s, o.slots[s]]).concat((o.slots.extra || []).map(i => ['extra', i]));
@@ -247,16 +247,19 @@ export function andereKleurBlad(app, o, ctx, voorkeur, klaar) {
   });
 }
 
-export function wissel(app, o, slot, klaar, ctxIn) {
+// `bron`: alleen uit deze stukken (je tas), met een knop om toch je hele kast te zien.
+export function wissel(app, o, slot, klaar, ctxIn, bron = null) {
   const ctx = ctxIn || context(app);
-  const alt = alternatieven(app.kast(), o, slot, { ...ctx, methode: null, kleur: null, anker: [] }, 18);
+  const alt = alternatieven(bron || app.kast(), o, slot, { ...ctx, methode: null, kleur: null, anker: [] }, 18);
   const zelfde = alt.filter(a => a.zelfde), anders = alt.filter(a => !a.zelfde);
   const huidig = o.slots[slot];
   const b = blad(`<h2>Ander${slot === 'schoen' ? 'e schoenen' : ' stuk'} (${esc(SLOT_NAAM[slot] || slot)})</h2>
+    ${bron ? '<p class="sub">Uit wat je bij je hebt.</p>' : ''}
     ${zelfde.length ? `<h3>Blijft ${esc(o.kleur.naam.toLowerCase())}</h3><div class="raster">${zelfde.map(a => tegel(a.item)).join('')}</div>` : ''}
     ${anders.length ? `<h3>Wordt een andere manier</h3><div class="raster">${anders.map(a => tegel(a.item, `<span class="label">${esc(a.outfit.kleur.kort)}</span>`)).join('')}</div>` : ''}
     ${!alt.length ? '<p class="leeg-melding">Niets anders dat met deze outfit werkt.</p>' : ''}
-    ${huidig && !['boven', 'onder', 'heel', 'schoen'].includes(slot) ? '<button class="knop licht vol" id="zonder" type="button" style="margin-top:12px">Zonder</button>' : ''}`);
+    ${huidig && !['boven', 'onder', 'heel', 'schoen'].includes(slot) ? '<button class="knop licht vol" id="zonder" type="button" style="margin-top:12px">Zonder</button>' : ''}
+    ${bron ? '<button class="knop licht vol" id="hele-kast" type="button" style="margin-top:8px">Ook uit mijn hele kast</button>' : ''}`);
   b.addEventListener('click', e => {
     const t = e.target.closest('[data-item]');
     if (t) {
@@ -265,6 +268,7 @@ export function wissel(app, o, slot, klaar, ctxIn) {
       app.onthoud(a.item.id, 'gekozen');
       b.sluit(); klaar(a.outfit);
     }
+    if (e.target.id === 'hele-kast') { b.sluit(); return wissel(app, o, slot, klaar, ctxIn); }
     if (e.target.id === 'zonder') {
       const slots = { ...o.slots }; delete slots[slot];
       b.sluit(); klaar(maakOutfit(slots, ctx));

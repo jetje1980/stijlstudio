@@ -90,6 +90,26 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   await p.click('[data-anders="0"]'); await p.waitForSelector('.blad [data-o]');
   await p.click('.blad [data-o="0"]'); await p.waitForTimeout(300);
   ok(/Anders dan je plan/.test(await p.textContent('[data-p="0"]')) && await p.$eval('[data-p="0"] .stukken', x => x.textContent) !== was, 'per dagdeel iets anders gekozen uit je tas');
+  // één stuk wisselen, uit je tas
+  const voorW = await p.$eval('[data-p="1"] .stukken', x => x.textContent);
+  await p.click('[data-p="1"] [data-slot="onder"], [data-p="1"] [data-slot="schoen"]');
+  await p.waitForSelector('.blad');
+  ok(/Uit wat je bij je hebt/.test(await p.textContent('.blad')) && await p.$('#hele-kast'), 'stuk wisselen: eerst uit je tas, knop voor je hele kast');
+  if (await p.$('.blad [data-item]')) { await p.click('.blad [data-item]'); await p.waitForTimeout(300);
+    ok(await p.$eval('[data-p="1"] .stukken', x => x.textContent) !== voorW, 'stuk gewisseld'); }
+  else { await p.click('.blad-dicht'); await p.waitForTimeout(300); }
+  // een stuk uit je tas erbij
+  const voorN = await p.$$eval('[data-p="2"] .stuk', x => x.length);
+  await p.click('[data-erbij="2"]'); await p.waitForSelector('.blad [data-item]');
+  await p.click('.blad [data-item]'); await p.waitForTimeout(300);
+  ok(await p.$$eval('[data-p="2"] .stuk', x => x.length) >= voorN && /Anders dan je plan/.test(await p.textContent('[data-p="2"]')), 'stuk uit je tas erbij gezet');
+  // nieuwe look op basis van wensen
+  await p.click('#nieuwe-look'); await p.waitForSelector('#nl-zoek');
+  await p.click('[data-chips="nl-w"] .chip[data-w="broek"]'); await p.click('#nl-zoek'); await p.waitForTimeout(500);
+  const looks = await p.$$eval('[data-look]', x => x.length);
+  ok(looks > 0, 'nieuwe look: opties uit je tas (' + looks + ')');
+  await p.selectOption('#nl-voor', 'extra'); await p.click('[data-look="0"]'); await p.waitForTimeout(300);
+  ok(/Extra outfit/.test(await p.textContent('#scherm')), 'nieuwe look als extra outfit erbij');
   await p.waitForTimeout(300);
   await p.goto('about:blank'); await p.goto(url); await p.waitForSelector('[data-anders]');
   ok(/Anders dan je plan|staat vast/.test(await p.textContent('#scherm')), 'na opnieuw openen staat de tas nog vast');
