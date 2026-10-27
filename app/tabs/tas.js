@@ -39,6 +39,8 @@ function maakDagen(start, n, oud = []) {
 
 // Wat je invult blijft bewaard (ook na opnieuw openen en op je andere
 // toestel), en de laatst uitgerekende tas ook.
+// Wat een bewaarde tas van je keuzes onthoudt.
+const INSTELLINGEN = ['moetMee', 'niet', 'thuis', 'sfeer', 'afwisselen', 'sjiek', 'schuif', 'modus', 'contrast', 'printMix', 'bord', 'seed'];
 const BEWAAR = ['bestemming', 'start', 'dagen', 'moetMee', 'niet', 'thuis', 'sfeer', 'afwisselen', 'sjiek', 'schuif', 'afgevinkt', 'seed', 'modus', 'contrast', 'printMix', 'bord', 'vast'];
 let geladen = false;
 function laadConcept(app) {
@@ -394,7 +396,14 @@ function toonUitkomst(el, app) {
     const id = b.dataset.weg;
     tas.moetMee = tas.moetMee.filter(x => x !== id);
     if (!tas.thuis.includes(id)) tas.thuis.push(id);
-    herreken(el, app, `${app.item(id)?.naam || 'Dat stuk'} blijft thuis.`);
+    // liefst alleen de outfits met dat stuk aanpassen; de rest blijft staan
+    const item = k.find(x => x.item.id === id)?.item;
+    const r = item && laatThuis(u.plan, [item], ctxVoor(app));
+    if (r && r.gelukt.length) {
+      u.plan.forEach((p, n) => { p.outfit = r.outfits[n]; });
+      u.ookMee = (u.ookMee || []).filter(x => x.item.id !== id);
+      bewaarConcept(app); toonUitkomst(el, app); melding(`${item.naam} blijft thuis.`);
+    } else herreken(el, app, `${app.item(id)?.naam || 'Dat stuk'} blijft thuis.`);
   }));
   $('#pak-erbij').addEventListener('click', () => kiesStukken(app, 'Wat moet erbij?', [], ids => {
     if (!ids.length) return;
@@ -706,7 +715,8 @@ function bewaarTas(app, u) {
   if (!naam) return;
   app.bij(s => s.tassen.push({
     id: 't-' + Date.now().toString(36), naam, bestemming: tas.bestemming || '', datum: tas.start, dagen: tas.dagen,
-    plan: planIds(u.plan),
+    plan: planIds(u.plan), instellingen: Object.fromEntries(INSTELLINGEN.map(k => [k, tas[k]])),
+    ookMee: (u.ookMee || []).map(x => ({ id: x.item.id, waarom: x.waarom })),
   }));
   melding('Tas bewaard');
 }
@@ -834,7 +844,18 @@ function openBewaard(el, app, id) {
   const t = app.staat().tassen.find(x => x.id === id);
   if (!t) return;
   tas.bestemming = t.bestemming ?? t.naam; tas.start = t.datum; tas.dagen = t.dagen;
-  tas.uitkomst = vanPlan(app, t.plan);
+  // ook je keuzes van toen terug, anders rekent een stuk erbij of eraf de
+  // tas helemaal opnieuw uit, alsof alleen dat ene stuk mee moest
+  for (const k of INSTELLINGEN) if (t.instellingen && t.instellingen[k] !== undefined) tas[k] = t.instellingen[k];
+  const inPlan = [...new Set(t.plan.flatMap(p => p.items))].filter(id => app.item(id));
+  tas.moetMee = [...new Set(((t.instellingen && t.instellingen.moetMee) || []).concat(inPlan))];
+  tas.thuis = tas.thuis.filter(id => !tas.moetMee.includes(id));
+  tas.afgevinkt = []; tas.vast = false; tas.filter = null;
+  if (tas.modus === 'kies') { tas.uitkomst = null; tas.herstel = t.plan; }
+  else {
+    tas.uitkomst = vanPlan(app, t.plan);
+    tas.uitkomst.ookMee = (t.ookMee || []).map(x => ({ item: app.item(x.id), waarom: x.waarom })).filter(x => x.item);
+  }
   tasTab(el, app);
 }
 const tel = plan => plan.reduce((t, p) => { if (p.outfit) t[p.outfit.kleur.methode] = (t[p.outfit.kleur.methode] || 0) + 1; return t; }, {});
