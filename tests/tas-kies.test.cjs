@@ -153,6 +153,13 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   p.once('dialog', d => d.accept());
   await p.click('[data-tasweg]'); await p.waitForTimeout(300);
   ok(await p.$$eval('[data-tasweg]', x => x.length) === tassenVoor - 1, 'bewaarde tas verwijderd');
+  // nieuwe tas: één stuk weg, dan alles in één klik weg
+  const mmVoor = await p.$$eval('[data-mm]', x => x.length);
+  await p.click('[data-mm]'); await p.waitForTimeout(200);
+  ok(await p.$$eval('[data-mm]', x => x.length) === mmVoor - 1, 'één stuk weggehaald');
+  p.once('dialog', d => d.accept());
+  await p.click('#wis-mm'); await p.waitForTimeout(200);
+  ok(await p.$$eval('[data-mm]', x => x.length) === 0, 'alle stukken in één klik weg');
   await p.screenshot({ path: path.join(require('os').tmpdir(), 'tas-kies.png'), fullPage: true });
   ok(!errs.length, 'geen fouten ' + errs.join(' '));
   await b.close(); server.close(); process.exit(fout ? 1 : 0);

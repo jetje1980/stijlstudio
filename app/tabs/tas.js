@@ -120,13 +120,14 @@ export default function tasTab(el, app) {
     <label class="lab">Wat niet mee</label>
     ${chips('niet', NIET, tas.niet, { meer: true }).replace('class="chips"', 'class="chips wrap"')}
     <div class="rij" style="margin-top:4px">${tas.thuis.map(id => app.item(id)).filter(Boolean).map(i => `<button class="chip aan" data-th="${esc(i.id)}" type="button">${esc(i.naam)} ×</button>`).join('')}
-      <button class="chip" id="kies-thuis" type="button">＋ stuk blijft thuis</button></div>
+      <button class="chip" id="kies-thuis" type="button">＋ stuk blijft thuis</button>${tas.thuis.length > 1 ? '<button class="chip" id="wis-thuis" type="button">Alles weg</button>' : ''}</div>
 
     <label class="lab">${kies ? 'Mijn stukken' : 'Moet mee'}</label>
     <div class="chips"><button class="chip${!kies ? ' aan' : ''}" data-modus="tas" type="button">Maak een tas voor me</button><button class="chip${kies ? ' aan' : ''}" data-modus="kies" type="button">Ik kies uit mijn stukken</button></div>
     ${kies ? '<p class="klein" style="margin-top:0">Leg gerust meer klaar dan nodig. Je ziet alle outfits die ermee kunnen, en wat ontbreekt komt uit je kast.</p>' : ''}
     <div class="rij">${tas.moetMee.map(id => app.item(id)).filter(Boolean).map(i => `<button class="chip aan" data-mm="${esc(i.id)}" type="button">${esc(i.naam)} ×</button>`).join('')}
-      <button class="chip" id="kies-mm" type="button">＋ ${kies ? 'stukken kiezen' : 'stuk'}</button></div>
+      <button class="chip" id="kies-mm" type="button">＋ ${kies ? 'stukken kiezen' : 'stuk'}</button>${tas.moetMee.length > 1 ? '<button class="chip" id="wis-mm" type="button">Alles weg</button>' : ''}</div>
+    ${tas.moetMee.length ? '<p class="klein" style="margin-top:0">Tik op een stuk om het weg te halen.</p>' : ''}
     <label class="lab">Sfeer (mag leeg, meer mag ook)</label>
     ${chips('sfeer', Object.entries(SFEREN).map(([k, v]) => [k, v.naam]), tas.sfeer, { meer: true }).replace('class="chips"', 'class="chips wrap"')}
     ${tas.sfeer.length > 1 ? `<div class="chips"><button class="chip${!tas.afwisselen ? ' aan' : ''}" data-afw="0" type="button">Mengen in elke outfit</button><button class="chip${tas.afwisselen ? ' aan' : ''}" data-afw="1" type="button">Per moment afwisselen</button></div>` : ''}
@@ -184,6 +185,8 @@ export default function tasTab(el, app) {
   $('#printmix').addEventListener('click', e => { tas.printMix = !tas.printMix; e.target.classList.toggle('aan'); });
   $('#bord').addEventListener('click', () => kiesBord(app, tas.bord, ids => { tas.bord = ids; tasTab(el, app); }));
   $$('[data-mm]', el).forEach(b => b.addEventListener('click', () => { tas.moetMee = tas.moetMee.filter(x => x !== b.dataset.mm); tasTab(el, app); }));
+  const wm = $('#wis-mm'); if (wm) wm.addEventListener('click', () => { if (confirm(`Alle ${tas.moetMee.length} stukken weghalen?`)) { tas.moetMee = []; verouderd(); bewaarConcept(app); tasTab(el, app); } });
+  const wt = $('#wis-thuis'); if (wt) wt.addEventListener('click', () => { tas.thuis = []; verouderd(); bewaarConcept(app); tasTab(el, app); });
   $('#kies-mm').addEventListener('click', () => kiesStukken(app, kies ? 'Wat leg je klaar?' : 'Wat moet mee?', tas.moetMee, ids => {
     tas.moetMee = ids; tas.thuis = tas.thuis.filter(x => !ids.includes(x));
     // al aan het kiezen: opnieuw uitrekenen, je keuzes blijven waar ze nog kunnen
@@ -842,7 +845,7 @@ function kiesStukken(app, titel, begin, klaar) {
   const gekozen = new Set(begin);
   const b = blad(`<h2>${esc(titel)}</h2><input class="veld" id="zz" placeholder="Zoek, bijv. trui of blauw">
     <div class="raster" id="zr" style="margin-top:10px"></div>
-    <button class="knop vol" id="zk" type="button" style="position:sticky;bottom:0;margin-top:12px"></button>`);
+    <div class="rij" style="position:sticky;bottom:0;margin-top:12px"><button class="knop licht" id="zw" type="button">Alles uit</button><button class="knop" id="zk" type="button" style="flex:1"></button></div>`);
   const knop = () => { $('#zk', b).textContent = `Klaar${gekozen.size ? ` (${gekozen.size})` : ''}`; };
   const teken = z => {
     $('#zr', b).innerHTML = kast.filter(i => !z || [i.naam, i.soort, ...i.kleur].join(' ').toLowerCase().includes(z))
@@ -857,4 +860,5 @@ function kiesStukken(app, titel, begin, klaar) {
     t.classList.toggle('gekozen', gekozen.has(id)); knop();
   });
   $('#zk', b).addEventListener('click', () => { b.sluit(); klaar([...gekozen]); });
+  $('#zw', b).addEventListener('click', () => { gekozen.clear(); $$('#zr .gekozen', b).forEach(t => t.classList.remove('gekozen')); knop(); });
 }
