@@ -137,7 +137,7 @@ export default function tasTab(el, app) {
     <div class="rij">${bordHtml(app)}<button class="chip" id="bord" type="button">${tas.bord.length ? 'Aanpassen' : '＋ Kies beelden'}</button></div>
     <button class="knop vol" id="pak" type="button" style="margin-top:14px">${kies ? 'Laat alle outfits zien' : 'Pak mijn tas'}</button>
     <div id="uitkomst" style="margin-top:18px">${melding_ && !tas.uitkomst ? `<p class="klein">${esc(melding_)}</p>` : ''}</div>
-    ${opgeslagen.length ? `<h3>Bewaarde tassen</h3>${opgeslagen.slice().reverse().map(t => `<button class="chip" data-tas="${esc(t.id)}" type="button">${esc(t.naam)} · ${esc(t.datum)}</button>`).join(' ')}` : ''}`;
+    ${opgeslagen.length ? `<h3>Bewaarde tassen</h3><div class="chips wrap">${opgeslagen.slice().reverse().map(t => `<span class="rij" style="gap:2px;flex-wrap:nowrap"><button class="chip" data-tas="${esc(t.id)}" type="button">${esc(t.naam)} · ${esc(t.datum)}</button><button class="chip" data-tasweg="${esc(t.id)}" type="button" aria-label="${esc(t.naam)} verwijderen">×</button></span>`).join('')}</div>` : ''}`;
 
   // Bestemming en datum ingevuld: het weer komt vanzelf.
   let wacht;
@@ -193,6 +193,12 @@ export default function tasTab(el, app) {
   $('#weer').addEventListener('click', () => haalWeer(el, app, false));
   $('#pak').addEventListener('click', () => { tas.seed = 1; tas.filter = null; tas.ruil = null; reken(el, app); });
   $$('[data-tas]', el).forEach(b => b.addEventListener('click', () => openBewaard(el, app, b.dataset.tas)));
+  $$('[data-tasweg]', el).forEach(b => b.addEventListener('click', () => {
+    const t = opgeslagen.find(x => x.id === b.dataset.tasweg);
+    if (!t || !confirm(`Bewaarde tas "${t.naam}" verwijderen?`)) return;
+    app.bij(s => { s.tassen = s.tassen.filter(x => x.id !== t.id); });
+    tasTab(el, app); melding('Tas verwijderd');
+  }));
   // Een bewaarde keuze: de opties opnieuw uitrekenen, je keuzes terugzetten.
   if (tas.herstel && !tas.uitkomst) {
     const oud = tas.herstel; tas.herstel = null;

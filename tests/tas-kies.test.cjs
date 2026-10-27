@@ -140,6 +140,13 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   ok(/Anders dan je plan|staat vast/.test(await p.textContent('#scherm')), 'na opnieuw openen staat de tas nog vast');
   await p.click('#losmaken'); await p.waitForSelector('#pak');
   ok(true, 'losmaken geeft het invulscherm terug');
+  // bewaarde tas verwijderen
+  await p.waitForSelector('#bewaar'); await p.click('#bewaar'); await p.waitForTimeout(300);
+  await p.goto('about:blank'); await p.goto(url); await p.waitForSelector('[data-tasweg]');
+  const tassenVoor = await p.$$eval('[data-tasweg]', x => x.length);
+  p.once('dialog', d => d.accept());
+  await p.click('[data-tasweg]'); await p.waitForTimeout(300);
+  ok(await p.$$eval('[data-tasweg]', x => x.length) === tassenVoor - 1, 'bewaarde tas verwijderd');
   await p.screenshot({ path: path.join(require('os').tmpdir(), 'tas-kies.png'), fullPage: true });
   ok(!errs.length, 'geen fouten ' + errs.join(' '));
   await b.close(); server.close(); process.exit(fout ? 1 : 0);
