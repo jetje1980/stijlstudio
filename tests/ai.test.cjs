@@ -39,7 +39,8 @@ const JPG = Buffer.from('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP/////////////////////
       methode: 'accent', sferen: ['street'], stoerLief: 'stoer', printMix: false, ideeen: ['gouden kettingen gelaagd', 'shirt los over de jeans'] });
     else if (/Dit is Griette in haar outfit/.test(v)) {
       const id = (v.match(/\n([\w-]+): /) || [])[1];
-      t = JSON.stringify({ werkt: 'De kleuren zijn rustig en mooi samen.', verbeter: [{ wat: 'Draag een riem', waarom: 'Dan zie je je taille', uitKast: [id], nieuw: null }], foto: 'Draai je schouders iets.' });
+      t = JSON.stringify({ oordeel: 'bijna', analyse: { silhouet: 'Getailleerd boven, wijd onder.', kleur: 'Kobalt met bruin.', stof: 'Scuba met tricot.', vibe: 'sportief' },
+        werkt: ['De kleuren zijn rustig en mooi samen.'], afstyling: [{ wat: 'Draag een riem', waarom: 'Dan zie je je taille', uitKast: [id], nieuw: null }], wissel: [], foto: 'Draai je schouders iets.' });
     }
     await r.fulfill({ status: 200, contentType: 'application/json', body: antwoord(t) });
   });
@@ -73,7 +74,9 @@ const JPG = Buffer.from('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP/////////////////////
   await p.click('#spiegel');
   await p.setInputFiles('#sf', { name: 'ik.jpg', mimeType: 'image/jpeg', buffer: JPG });
   await p.waitForSelector('#sr .kaart', { timeout: 10000 });
-  ok(/riem/i.test(await p.$eval('#sr', x => x.textContent)), 'spiegelcheck toont de verbetering');
+  ok(/riem/i.test(await p.$eval('#sr', x => x.textContent)) && /Afstyling/.test(await p.$eval('#sr', x => x.textContent)), 'spiegelcheck toont afstyling');
+  ok(/Bijna/.test(await p.$eval('#sr', x => x.textContent)) && /Silhouet/.test(await p.$eval('#sr', x => x.textContent)) && !/Wat ik zou wisselen/.test(await p.$eval('#sr', x => x.textContent)), 'spiegelcheck: eerst oordeel en analyse, geen wissel als het al (bijna) klopt');
+  ok(/draagt ze volgens haar kast/.test(JSON.stringify(vragen[vragen.length - 1])), 'wat je aanhebt gaat mee naar de stylist');
   ok(await p.$$eval('#sr .tegel', x => x.length) === 1, 'spiegelcheck toont het stuk uit je kast');
   const vs = vragen[vragen.length - 1];
   ok(vs.messages[0].content.some(c => c.type === 'image' && c.source.type === 'base64'), 'je foto gaat mee, verkleind');

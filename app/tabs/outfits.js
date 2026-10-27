@@ -525,9 +525,26 @@ function kiesAnker(app, kast, klaar) {
 
 // ── Spiegelcheck: een foto van jou in je outfit ─────────────────────────────
 function spiegel(app) {
+  // wat je aanhebt (optioneel): dan weet de stylist de echte kleuren en stoffen
+  let aan = vandaagOutfit ? vandaagOutfit.items.map(i => i.id) : [];
   const b = blad(`<h2>Spiegelcheck</h2>
-    <p class="sub">Een foto van jezelf in je outfit. Ik kijk naar pasvorm, kleur, laagjes en hoe je op de foto staat, en zoek verbeteringen eerst in je eigen kast.</p>
-    <input type="file" accept="image/*" class="veld" id="sf"><div id="sr" style="margin-top:12px"></div>`);
+    <p class="sub">Een foto van jezelf in je outfit. Ik analyseer eerst (silhouet, kleur, stof, vibe) en zeg of het al klopt. Klopt het, dan krijg je afstyling in plaats van een ander stuk.</p>
+    <label class="lab">Wat heb je aan? (mag leeg, helpt wel)</label>
+    <div class="rij" id="sp-aan"></div>
+    <label class="lab">Foto</label><input type="file" accept="image/*" class="veld" id="sf"><div id="sr" style="margin-top:12px"></div>`);
+  const tekenAan = () => {
+    $('#sp-aan', b).innerHTML = aan.map(id => app.item(id)).filter(Boolean).map(i => `<button class="chip aan" data-aan="${esc(i.id)}" type="button">${esc(i.naam)} ×</button>`).join('')
+      + '<button class="chip" id="sp-kies" type="button">＋ stuk</button>';
+    $('#sp-kies', b).addEventListener('click', () => {
+      const kb = blad(`<h2>Wat heb je aan?</h2><input class="veld" id="sp-z" placeholder="Zoek, bijv. adidas"><div class="raster" id="sp-r" style="margin-top:10px"></div>`);
+      const teken = z => { $('#sp-r', kb).innerHTML = app.kast().filter(i => !aan.includes(i.id) && (!z || [i.naam, i.soort, ...i.kleur].join(' ').toLowerCase().includes(z))).slice(0, 60).map(i => tegel(i)).join(''); };
+      teken('');
+      $('#sp-z', kb).addEventListener('input', ev => teken(ev.target.value.toLowerCase().trim()));
+      $('#sp-r', kb).addEventListener('click', ev => { const t = ev.target.closest('[data-item]'); if (t) { aan.push(t.dataset.item); kb.sluit(); tekenAan(); } });
+    });
+  };
+  $('#sp-aan', b).addEventListener('click', e => { const t = e.target.closest('[data-aan]'); if (t) { aan = aan.filter(x => x !== t.dataset.aan); tekenAan(); } });
+  tekenAan();
   $('#sf', b).addEventListener('change', async e => {
     const f = e.target.files[0]; if (!f) return;
     const uit = $('#sr', b);
@@ -535,12 +552,19 @@ function spiegel(app) {
     try {
       const beeld = await verklein(f, 1200);
       const kast = app.kast().filter(i => ['boven', 'onder', 'heel', 'laag', 'jas', 'schoen', 'tas', 'accessoire'].includes(i.rol));
-      const r = await spiegelcheck(beeld, kast);
-      uit.innerHTML = `<img class="groot-foto" style="max-height:32vh" src="${beeld}" alt="">
-        <p class="waarom">${esc(r.werkt || '')}</p>
-        ${(r.verbeter || []).map(v => `<div class="kaart"><b>${esc(v.wat)}</b><p class="klein">${esc(v.waarom || '')}</p>
+      const r = await spiegelcheck(beeld, kast, aan.map(id => app.item(id)).filter(Boolean));
+      const a = r.analyse || {};
+      const OORDEEL = { klopt: 'Dit klopt', bijna: 'Bijna: het mist vooral afstyling', botst: 'Er botst iets' };
+      const kaartje = v => `<div class="kaart"><b>${esc(v.wat)}</b><p class="klein">${esc(v.waarom || '')}</p>
           ${(v.uitKast || []).map(id => app.item(id)).filter(Boolean).length ? `<div class="raster">${(v.uitKast || []).map(id => app.item(id)).filter(Boolean).map(i => tegel(i)).join('')}</div>` : ''}
-          ${v.nieuw ? `<p class="klein">Nieuw (${esc(v.nieuw.budget || '')}): ${esc(v.nieuw.wat)}</p>` : ''}</div>`).join('')}
+          ${v.nieuw ? `<p class="klein">Nieuw (${esc(v.nieuw.budget || '')}): ${esc(v.nieuw.wat)}</p>` : ''}</div>`;
+      const werkt = Array.isArray(r.werkt) ? r.werkt : r.werkt ? [r.werkt] : [];
+      uit.innerHTML = `<img class="groot-foto" style="max-height:32vh" src="${beeld}" alt="">
+        ${r.oordeel ? `<h3>${esc(OORDEEL[r.oordeel] || r.oordeel)}</h3>` : ''}
+        ${a.silhouet || a.kleur ? `<dl class="labels"><dt>Silhouet</dt><dd>${esc(a.silhouet || '')}</dd><dt>Kleur</dt><dd>${esc(a.kleur || '')}</dd><dt>Stof</dt><dd>${esc(a.stof || '')}</dd><dt>Vibe</dt><dd>${esc(a.vibe || '')}</dd></dl>` : ''}
+        ${werkt.length ? `<h3>Wat werkt</h3><ul class="tips">${werkt.map(w => `<li>${esc(w)}</li>`).join('')}</ul>` : ''}
+        ${(r.afstyling || []).length ? `<h3>Afstyling</h3>${r.afstyling.map(kaartje).join('')}` : ''}
+        ${(r.wissel || []).length ? `<h3>Wat ik zou wisselen</h3>${r.wissel.map(kaartje).join('')}` : ''}
         ${r.foto ? `<p class="klein">Foto-tip: ${esc(r.foto)}</p>` : ''}`;
       uit.addEventListener('click', ev => { const t = ev.target.closest('[data-item]'); if (t) itemDetail(app, t.dataset.item); });
     } catch (err) { uit.innerHTML = `<p class="klein">Dat lukte niet: ${esc(err.message)}</p>`; }
