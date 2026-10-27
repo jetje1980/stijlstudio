@@ -1,7 +1,7 @@
 // De tas. Jij zegt alleen waar je heen gaat en wat je doet; de app rekent de
 // koffer uit die de meeste goede outfits geeft, met verschillende kleurmanieren
 // erin. Daarna stuur je bij: meer van een manier, of een stuk wisselen.
-import { pakTas, uitSelectie, compact, meerVan, maakOutfit, extraOutfits, uitJeTas, slotVan, stelSamen, lichter, laatThuis, verrasMe, SFEREN, WENSEN, ACTIVITEITEN, herkenActiviteit } from '../engine.js';
+import { pakTas, uitSelectie, compact, meerVan, maakOutfit, voegStukToe, extraOutfits, uitJeTas, slotVan, stelSamen, lichter, laatThuis, verrasMe, SFEREN, WENSEN, ACTIVITEITEN, herkenActiviteit } from '../engine.js';
 import { METHODEN } from '../kleur.js';
 import { esc, $, $$, foto, blad, melding, chips, stip, tegel, collage } from '../ui.js';
 import { outfitHtml, wissel, vanIds, andereKleurBlad, contrastSchuif, stukErbij, oordeelBlad } from './outfits.js';
@@ -409,12 +409,6 @@ function toonUitkomst(el, app) {
       bewaarConcept(app); toonUitkomst(el, app); melding(`${item.naam} blijft thuis.`);
     } else herreken(el, app, `${app.item(id)?.naam || 'Dat stuk'} blijft thuis.`);
   }));
-  $('#pak-erbij').addEventListener('click', () => kiesStukken(app, 'Wat moet erbij?', [], ids => {
-    if (!ids.length) return;
-    tas.thuis = tas.thuis.filter(x => !ids.includes(x));
-    tas.moetMee = [...new Set(tas.moetMee.concat(ids))];
-    herreken(el, app, ids.length > 1 ? `${ids.length} stukken gaan mee.` : `${app.item(ids[0])?.naam || 'Het stuk'} gaat mee.`);
-  }));
   $$('[data-zet]', plek).forEach(a => a.addEventListener('click', e => {
     e.preventDefault(); tas.moetMee.push(a.dataset.zet); reken(el, app);
   }));
@@ -509,6 +503,7 @@ function toonVast(el, app) {
     <ul class="paklijst klikbaar">${k.map(x => `<li><input type="checkbox" data-v="${esc(x.item.id)}"${tas.afgevinkt.includes(x.item.id) ? ' checked' : ''} aria-label="${esc(x.item.naam)} ingepakt">
       ${x.item.foto ? `<img src="${esc(foto(x.item.foto, 120))}" alt="">` : `<span class="leeg">${stip(x.item.kleur[0], 20)}</span>`}
       <span>${esc(x.item.naam)}</span><span class="keer">${x.waarom ? esc(x.waarom) : x.keer + '×'}</span></li>`).join('')}</ul>
+    <button class="knop licht vol" id="pak-erbij" type="button" style="margin-top:8px">＋ Stuk toevoegen</button>
     <div class="rij" style="margin-top:14px">
       <button class="knop" id="kaarten" type="button">Alle kaarten opslaan</button>
       <button class="knop licht" id="losmaken" type="button">Tas weer aanpassen</button>
@@ -643,9 +638,47 @@ function zelfSamenstellen(el, app, u, bij, opnieuw) {
   teken();
 }
 
+// Een stuk bij je tas: het gaat mee, en je kiest zelf in welke outfits je het
+// draagt. De rest van je tas blijft zoals hij is.
+function stukInTas(app, u, opnieuw) {
+  kiesStukken(app, 'Wat moet erbij?', [], ids => voegInTas(app, u, ids, opnieuw));
+}
+function voegInTas(app, u, ids, opnieuw) {
+  {
+    const nieuw = ids.map(id => app.item(id)).filter(i => i && !koffer(u).some(x => x.item === i));
+    if (!nieuw.length) return;
+    tas.thuis = tas.thuis.filter(x => !ids.includes(x));
+    tas.moetMee = [...new Set(tas.moetMee.concat(ids))];
+    u.ookMee = (u.ookMee || []).concat(nieuw.map(item => ({ item, waarom: 'zelf erbij' })));
+    opnieuw();
+    melding(nieuw.length > 1 ? `${nieuw.length} stukken gaan mee` : `${nieuw[0].naam} gaat mee`);
+    // waar past het?
+    const ctxVan = ctxVoor(app);
+    const kan = [];
+    for (const item of nieuw) u.plan.forEach((p, n) => {
+      if (!p.outfit) return;
+      const o = voegStukToe(p.outfit, item, ctxVan(p));
+      if (o.check.ok && o.items.includes(item)) kan.push({ item, n, o });
+    });
+    if (!kan.length) return;
+    const b = blad(`<h2>Waar draag je ${nieuw.length > 1 ? 'ze' : 'het'}?</h2>
+      <p class="sub">${nieuw.length > 1 ? 'Ze staan' : 'Het staat'} op je paklijst. Zet ${nieuw.length > 1 ? 'ze' : 'het'} in de outfits die je wilt; de rest blijft zoals hij is.</p>
+      <div>${kan.map((x, k) => { const p = u.plan[x.n]; return `<div class="stuk-rij">${collage(x.o.items, 4)}
+        <span>${esc(p.extra ? 'Extra outfit' : `${p.dag} ${(MOMENT_LABEL[p.moment] || '').toLowerCase()}`)}<br><span class="klein">${nieuw.length > 1 ? esc(x.item.naam) + ' · ' : ''}${esc(x.o.kleur.naam)}</span></span>
+        <button class="chip" data-in="${k}" type="button">Zet erin</button></div>`; }).join('')}</div>
+      <button class="knop vol" id="in-klaar" type="button" style="margin-top:12px">Klaar</button>`, { opSluiten: opnieuw });
+    b.addEventListener('click', e => {
+      const t = e.target.closest('[data-in]');
+      if (t) { const x = kan[+t.dataset.in]; u.plan[x.n].outfit = x.o; u.plan[x.n].gewisseld = true; t.textContent = '✓ Erin'; t.disabled = true; t.classList.add('aan'); }
+      if (e.target.closest('#in-klaar')) b.sluit();
+    });
+  }
+}
+
 // Tik op een stuk in de paklijst: wat het doet in je tas, en eruit halen.
 // De outfits met dat stuk redden zich met wat er al meegaat.
 function koppelPaklijst(el, app, u, opnieuw) {
+  const pe = $('#pak-erbij', el); if (pe) pe.addEventListener('click', () => stukInTas(app, u, opnieuw));
   const lijst = $('.paklijst', el); if (!lijst) return;
   lijst.addEventListener('click', e => {
     if (e.target.closest('input, .pak-weg')) return;
@@ -840,8 +873,10 @@ function toonKeuze(el, app) {
     <ul class="paklijst klikbaar">${k.map(x => `<li><input type="checkbox" data-v="${esc(x.item.id)}"${tas.afgevinkt.includes(x.item.id) ? ' checked' : ''} aria-label="${esc(x.item.naam)} ingepakt">
       ${x.item.foto ? `<img src="${esc(foto(x.item.foto, 120))}" alt="">` : `<span class="leeg">${stip(x.item.kleur[0], 20)}</span>`}
       <span>${esc(x.item.naam)}</span><span class="keer">${x.waarom ? esc(x.waarom) : x.keer + '×'}</span></li>`).join('')}</ul>
+    <button class="knop licht vol" id="pak-erbij" type="button" style="margin-top:8px">＋ Stuk toevoegen</button>
     ${thuis.length ? `<h3>Kan thuisblijven</h3><p class="klein" style="margin-top:0">Zit in geen van je gekozen outfits.</p>
-      <div class="rij">${thuis.map(x => `<span class="chip">${esc(x.item.naam)}</span>`).join('')}</div>` : ''}
+      <p class="klein" style="margin-top:0">Tik om het toch mee te nemen, × haalt het uit je stukken.</p>
+      <div class="rij">${thuis.map(x => `<span class="rij" style="gap:2px;flex-wrap:nowrap"><button class="chip" data-toch="${esc(x.item.id)}" type="button">＋ ${esc(x.item.naam)}</button><button class="chip" data-uitstuk="${esc(x.item.id)}" type="button" aria-label="${esc(x.item.naam)} uit je stukken">×</button></span>`).join('')}</div>` : ''}
     <button class="knop vol" id="zet-vast" type="button" style="margin-top:16px">Klaar: zet mijn tas vast</button>
     <div class="rij" style="margin-top:10px">
       <button class="knop licht" id="bewaar" type="button">Tas bewaren</button>
@@ -862,6 +897,13 @@ function toonKeuze(el, app) {
   const zs = $('#zelf'); if (zs) zs.addEventListener('click', () => zelfSamenstellen(el, app, u, alles, opnieuw));
   if (gekozen.length) koppelLichtVerras(app, u, opnieuw);
   koppelPaklijst(el, app, u, opnieuw);
+  $$('[data-toch]', plek).forEach(b => b.addEventListener('click', () => voegInTas(app, u, [b.dataset.toch], opnieuw)));
+  $$('[data-uitstuk]', plek).forEach(b => b.addEventListener('click', () => {
+    const id = b.dataset.uitstuk;
+    tas.moetMee = tas.moetMee.filter(x => x !== id);
+    u.stukken = u.stukken.filter(x => x.item.id !== id);
+    opnieuw(); melding(`${app.item(id)?.naam || 'Het stuk'} is uit je stukken`);
+  }));
   $$('[data-kies]', plek).forEach(b => b.addEventListener('click', () => {
     const [i, n] = b.dataset.kies.split('|').map(Number);
     u.plan[i].outfit = u.plan[i].opties[n]; opnieuw();
