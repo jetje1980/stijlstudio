@@ -104,7 +104,8 @@ export function weerKlasse(temp) {
   return 'warm';
 }
 
-const open = i => i.open || i.soort === 'sandalen';
+// ook als alleen de naam het zegt ("kitten heel sandalen" staat als hakken)
+const open = i => i.open || i.soort === 'sandalen' || (i.rol === 'schoen' && /sandal|slipper|mule|slingback/i.test(i.naam));
 // teenslippers en badslippers: voor het strand en luieren, niet voor de stad
 export const isSlipper = i => i.rol === 'schoen' && /slipper|flipflop|haivanas|teenslipper/i.test(i.naam);
 function pastBijWeer(i, klasse) {
@@ -354,6 +355,8 @@ const LIEF_SNIT = new Set(['A-lijn', 'plissé', 'wikkel', 'potlood']);
 export function karakter(i) {
   if (['tas', 'riem', 'sjaal'].includes(i.soort) || i.rol === 'tas') return null;
   // bij schoenen telt de vorm, niet de glans van het leer
+  // chunky loafers (dik platform) zijn juist stoer
+  if (i.rol === 'schoen' && i.soort === 'loafers' && /chun?c?ky|chuncky|platform|grof|lug/i.test(`${i.naam} ${i.beschrijving || ''}`)) return 'stoer';
   if (i.rol === 'schoen') return ['hakken', 'loafers'].includes(i.soort) ? 'lief' : ['sneakers', 'laarzen'].includes(i.soort) ? 'stoer' : null;
   if (LIEF_SOORT.has(i.soort) || LIEF_SNIT.has(i.snit) || ['kant', 'glans'].includes(i.textuur)) return 'lief';
   if (STOER_SOORT.has(i.soort) || STOER_SNIT.has(i.snit) || ['leer', 'denim'].includes(i.textuur) || i.print === 'camouflage' || i.detail === 'zijstreep' || (i.rol === 'jas' && /technical|cargo|bomber|biker/i.test(i.naam))) return 'stoer';
@@ -1336,15 +1339,16 @@ export function verrasMe(plan, kast, ctxVan, rapport) {
   if (plan.some(p => p.moment === 'avond') && !heeft(i => ['glans', 'kant'].includes(i.textuur))) mist.push({ wat: 'Voor de avond zit er niets met glans of kant in.', soort: 'glans' });
   if (!outfits.some(o => contrast(o))) mist.push({ wat: 'Nergens stoer met een zachte pop: alles is van één karakter.', soort: 'contrast' });
 
-  // uit je kast: het accessoire dat de meeste outfits optilt. Een sjaal, riem
-  // of tas eerst; een schoen alleen als hij kleur of spanning brengt.
-  const kandidaten = kast.filter(i => !items.includes(i) && ['accessoire', 'tas', 'schoen'].includes(i.rol));
+  // uit je kast: het accessoire dat de meeste outfits optilt. Een sjaal of
+  // riem eerst; een schoen alleen als hij kleur of spanning brengt. Een tweede
+  // tas is geen kleine tweak: die staat bij ruilen.
+  const kandidaten = kast.filter(i => !items.includes(i) && ['accessoire', 'schoen'].includes(i.rol) && !/tas|bag/i.test(`${i.soort} ${i.naam}`));
   const kastTips = [];
   for (const k of kandidaten) {
     const beter = [];
     const fx = new Set();
     plan.forEach((p, n) => {
-      if (!p.outfit) return;
+      if (!p.outfit || !pastBijWeer(k, p.weer) || (k.soort === 'pet' && p.moment === 'avond')) return;
       const nieuw = voegStukToe(p.outfit, k, ctxVan(p));
       if (!nieuw.check.ok) return;
       const e = effecten(p.outfit, nieuw);
@@ -1358,13 +1362,14 @@ export function verrasMe(plan, kast, ctxVan, rapport) {
 
   // ruilen: één stuk uit je tas voor een uit je kast, en wat dat oplevert
   const ruilTips = [];
-  for (const uit of items.filter(i => ['boven', 'laag', 'onder', 'heel', 'jas', 'schoen'].includes(i.rol))) {
+  for (const uit of items.filter(i => ['boven', 'laag', 'onder', 'heel', 'jas', 'schoen', 'tas'].includes(i.rol))) {
     const waar = plan.map((p, n) => [p, n]).filter(([p]) => p.outfit && p.outfit.items.includes(uit));
     let best = null;
     for (const nu of kast.filter(k => !items.includes(k) && slotVan(k) === slotVan(uit))) {
       const outs = [], fx = new Set();
       let winst = 0, ok = true;
       for (const [p, n] of waar) {
+        if (!pastBijWeer(nu, p.weer)) { ok = false; break; }
         const plek = Object.keys(p.outfit.slots).find(k => p.outfit.slots[k] === uit);
         const o = maakOutfit({ ...p.outfit.slots, [plek]: nu }, ctxVan(p));
         if (!o.check.ok) { ok = false; break; }
@@ -1400,7 +1405,11 @@ export function verrasMe(plan, kast, ctxVan, rapport) {
     : !heeft(i => i.soort === 'sjaal') ? `een sjaaltje in ${koopKleur}`
     : !heeft(i => i.soort === 'riem') && outfits.some(o => o.slots.boven && o.slots.boven.pasvorm === 'wijd') ? 'een riem om je wijde bovenstukken in te snoeren'
     : `een tasje of sjaal in ${koopKleur}`;
-  const koop = { wat: koopWat, kleur: koopKleur, waarom: waarom || `${koopKleur} is een accent uit je rapport dat nog niet in je tas zit` };
+  // de reden hoort bij wat je koopt: goud om het goud, een kleur om de kleur
+  const koopWaarom = /goud/.test(koopWat) ? 'gouden sieraden staan in je rapport en er zit nog geen goud in je tas'
+    : /riem/.test(koopWat) ? 'met een riem maak je je taille zichtbaar in je wijde stukken'
+    : waarom || `${koopKleur} is een accent uit je rapport dat nog niet in je tas zit`;
+  const koop = { wat: koopWat, kleur: koopKleur, waarom: koopWaarom };
   return { samenvatting, mist, kast: kastTips.slice(0, 3), ruil: ruilTips.slice(0, 3), draag, koop };
 }
 

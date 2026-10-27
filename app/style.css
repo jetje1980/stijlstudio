@@ -181,7 +181,7 @@ label.lab { display: block; font-size: 12px; letter-spacing: .1em; text-transfor
 .paklijst { list-style: none; padding: 0; margin: 0; }
 .paklijst li { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--lijn); }
 .paklijst img, .paklijst .leeg { width: 38px; height: 48px; object-fit: cover; border-radius: 6px; flex: none; }
-.paklijst input { width: 20px; height: 20px; accent-color: var(--tekst); }
+.paklijst input { width: 20px; height: 20px; flex: none; accent-color: var(--tekst); }
 .paklijst.klikbaar li { cursor: pointer; }
 .paklijst .keer { margin-left: auto; color: var(--zacht); font-size: 13px; }
 .moment-kop { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
