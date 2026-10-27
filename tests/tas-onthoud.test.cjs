@@ -53,16 +53,20 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   await p.click('.paklijst li:nth-child(2) .pak-weg'); await p.waitForSelector('.paklijst li', { timeout: 20000 }); await p.waitForTimeout(300);
   ok(!(await p.$$eval('.paklijst li span', x => x.map(y => y.textContent))).includes(wegNaam), 'thuisgelaten stuk is van de paklijst');
   ok(/^1 van/.test(await p.$eval('#ingepakt', x => x.textContent)), 'afgevinkt blijft na opnieuw rekenen');
-  await p.click('#pak-erbij'); await p.fill('#zz', 'Gouden ketting'); await p.click('.blad .tegel'); await p.click('#zk'); await p.waitForSelector('.paklijst li', { timeout: 20000 }); await p.waitForTimeout(300);
+  await p.click('#pak-erbij'); await p.fill('#zz', 'Gouden ketting'); await p.click('.blad .tegel'); await p.click('#zk'); await p.waitForSelector('.paklijst li', { timeout: 20000 }); await p.waitForTimeout(400);
+  if (await p.$('#in-klaar')) { await p.$eval('#in-klaar', x => x.click()); await p.waitForTimeout(300); }
   ok((await p.$$eval('.paklijst li span', x => x.map(y => y.textContent))).includes('Gouden ketting'), 'toegevoegd stuk staat op de paklijst');
 
   // bewaarde tas openen en dan iets erbij of eraf: de rest van de tas blijft
   p.once('dialog', d => d.accept('Testtas')); await p.click('#bewaar'); await p.waitForTimeout(300);
-  const bewaard = await p.$$eval('.paklijst li span:not(.keer)', x => x.map(y => y.textContent));
-  p.once('dialog', d => d.accept()); await p.click('#wis-mm'); await p.waitForTimeout(200);
+  const bewaard = await p.$$eval('.paklijst li', x => x.map(li => li.querySelector('span:not(.keer):not(.leeg)').textContent));
+  if (await p.$('#wis-mm')) { p.once('dialog', d => d.accept()); await p.click('#wis-mm'); }
+  else while (await p.$('[data-mm]')) { await p.click('[data-mm]'); await p.waitForTimeout(100); }
+  await p.waitForTimeout(200);
   await p.click('[data-tas]'); await p.waitForSelector('.paklijst li'); await p.waitForTimeout(200);
-  await p.click('#pak-erbij'); await p.fill('#zz', 'Wit basic'); await p.click('.blad .tegel'); await p.click('#zk'); await p.waitForSelector('.paklijst li', { timeout: 20000 }); await p.waitForTimeout(300);
-  const na = await p.$$eval('.paklijst li span:not(.keer)', x => x.map(y => y.textContent));
+  await p.click('#pak-erbij'); await p.fill('#zz', 'Wit basic'); await p.click('.blad .tegel'); await p.click('#zk'); await p.waitForSelector('.paklijst li', { timeout: 20000 }); await p.waitForTimeout(400);
+  if (await p.$('#in-klaar')) { await p.$eval('#in-klaar', x => x.click()); await p.waitForTimeout(300); }
+  const na = await p.$$eval('.paklijst li', x => x.map(li => li.querySelector('span:not(.keer):not(.leeg)').textContent));
   const kleding = bewaard.filter(n => !/ketting|tas|bag/i.test(n));
   ok(kleding.filter(n => na.includes(n)).length >= kleding.length - 1 && na.length >= bewaard.length, `bewaarde tas + stuk erbij: de rest blijft (${bewaard.length} → ${na.length})`);
   const plan2 = await p.$$eval('[data-p] .stuk span', x => x.map(y => y.textContent).join('|'));
@@ -70,7 +74,7 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   const nr = na.findIndex(n => /t-shirt|top|trui/i.test(n)) + 1;
   const weg2 = na[nr - 1];
   await p.click(`.paklijst li:nth-child(${nr}) .pak-weg`); await p.waitForTimeout(600);
-  const na2 = await p.$$eval('.paklijst li span:not(.keer)', x => x.map(y => y.textContent));
+  const na2 = await p.$$eval('.paklijst li', x => x.map(li => li.querySelector('span:not(.keer):not(.leeg)').textContent));
   ok(!na2.includes(weg2) && na2.length === na.length - 1 && na.filter(n => n !== weg2).every(n => na2.includes(n)), `bewaarde tas + stuk eraf: alleen dat stuk weg (${na.length} → ${na2.length})`);
 
   // datum verschuiven: dagnamen en data bewegen mee, voorspelde graden niet

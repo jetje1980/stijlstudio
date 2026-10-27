@@ -73,6 +73,23 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   ok(await p.$('[data-p="0"] [data-kies]'), '"Andere kiezen" laat de opties weer zien');
   await p.click('#compact'); await p.waitForTimeout(200);
 
+  // "kan thuisblijven": toch meenemen, of uit je stukken halen
+  const toch = await p.$('[data-toch]');
+  if (toch) {
+    const naam = (await toch.textContent()).replace('＋', '').trim();
+    await toch.click(); await p.waitForTimeout(400);
+    if (await p.$('#in-klaar')) { await p.click('[data-in="0"]'); await p.$eval('#in-klaar', x => x.click()); await p.waitForTimeout(400); }
+    ok((await p.$$eval('.paklijst li span', x => x.map(y => y.textContent))).includes(naam), `kan thuisblijven → toch mee: ${naam} op de paklijst`);
+  }
+  const uit = await p.$('[data-uitstuk]');
+  if (uit) {
+    const voor = await p.$$eval('[data-uitstuk]', x => x.length);
+    await uit.click(); await p.waitForTimeout(300);
+    ok(await p.$$eval('[data-uitstuk]', x => x.length) === voor - 1, 'kan thuisblijven → × haalt het uit je stukken');
+  }
+  // ＋ stuk toevoegen onder de paklijst
+  ok(await p.$('#pak-erbij'), 'ook bij kiezen uit je stukken: ＋ Stuk toevoegen');
+
   // extra outfits met wat over is
   await p.click('#extra-aan'); await p.waitForSelector('[data-extra]', { timeout: 10000 });
   const voorPak = await p.$$eval('.paklijst li', x => x.length);
@@ -136,11 +153,11 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   await p.selectOption('#zs-voor', 'extra'); await p.click('#zs-ok'); await p.waitForTimeout(300);
   ok((await p.$$eval('[data-oordeel]', x => x.length)) > 0, 'zelf samengestelde look staat erin, met "Wat vind je ervan?" per outfit');
   // vaste tas: tik op een stuk in de paklijst en haal het eruit
-  const lijst = await p.$$eval('.paklijst li span:not(.keer)', x => x.map(y => y.textContent));
+  const lijst = await p.$$eval('.paklijst li', x => x.map(li => li.querySelector('span:not(.keer):not(.leeg)').textContent));
   const nr = lijst.findIndex(n => /t-shirt|top|blouse|trui|vest|gilet/i.test(n)) + 1;
   await p.click(`.paklijst li:nth-child(${nr}) span:not(.keer)`); await p.waitForSelector('#st-weg');
   await p.click('#st-weg'); await p.waitForTimeout(400);
-  const lijst2 = await p.$$eval('.paklijst li span:not(.keer)', x => x.map(y => y.textContent));
+  const lijst2 = await p.$$eval('.paklijst li', x => x.map(li => li.querySelector('span:not(.keer):not(.leeg)').textContent));
   ok(!lijst2.includes(lijst[nr - 1]) && lijst2.length === lijst.length - 1, `stuk uit de paklijst gehaald (${lijst[nr - 1]})`);
   if (await p.$('.blad-achter.open')) { await p.click('.blad-achter.open .blad-dicht'); await p.waitForTimeout(300); }
   await p.waitForTimeout(300);
