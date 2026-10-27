@@ -1,7 +1,7 @@
 // node tests/engine.test.mjs
 import fs from 'fs';
 import { zetHex, herken } from '../app/kleur.js';
-import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur, uitSelectie, contrast, printMix, smaakVan, naMaken, mouwen, basisIds, maakOutfit, laagProbleem, voegStukToe, uitJeTas } from '../app/engine.js';
+import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur, uitSelectie, contrast, printMix, smaakVan, naMaken, mouwen, basisIds, maakOutfit, laagProbleem, voegStukToe, uitJeTas, stelSamen, beoordeel } from '../app/engine.js';
 import { info } from '../app/kleur.js';
 const kast = JSON.parse(fs.readFileSync('data/kast.json'));
 const rapport = JSON.parse(fs.readFileSync('data/rapport.json'));
@@ -162,11 +162,16 @@ ok(telSnit(street, ['barrel', 'ballon', 'cargo']) >= telSnit(paris, ['barrel', '
   const [c0, c1] = [telC(0), telC(1)];
   ok(c1 > c0 + 3, `schuif stoer × lief werkt (puur ${c0}, vol ${c1} van 12)`);
 }
-// 17. wijd op wijd kan alleen ingestopt met een riem, en dat komt nu ook echt voorbij
+// 17. wijd op wijd alleen bewust gestyled: instopbaar bovenstuk, met riem of niet op een lage taille
 {
   const alle = [[], ['street'], ['parisienne'], ['klassiek']].flatMap(sf => stelVoor(kast, { rapport, weer: 'mild', sfeer: sf }, 12));
   const ww = alle.filter(o => o.slots.boven && o.slots.onder && o.slots.boven.pasvorm === 'wijd' && o.slots.onder.pasvorm === 'wijd');
-  ok(ww.length && ww.every(o => o.slots.riem), `wijd op wijd alleen met riem (${ww.length} keer)`);
+  ok(ww.every(o => !/grof|pluizig/.test(o.slots.boven.textuur) && (o.slots.riem || o.slots.onder.taille !== 'laag') && o.check.tips.some(t => /instop|riem/i.test(t))), `wijd op wijd alleen ingestopt, met tip (${ww.length} keer)`);
+  const v = n => kast.find(i => i.naam.startsWith(n));
+  const amiel = { ...v('Trui Amiel'), pasvorm: 'wijd', textuur: 'fijn gebreid' };
+  ok(maakOutfit({ boven: amiel, onder: v('Zara cargo broek khaki') }, { rapport, weer: 'fris' }).check.ok, 'fijn gebreide oversized trui op een wijde broek: half instoppen mag');
+  ok(!maakOutfit({ boven: amiel, onder: { ...v('Jeans barrel licht'), taille: 'laag' } }, { rapport, weer: 'fris' }).check.ok, 'maar niet op een lage taille');
+  ok(!maakOutfit({ boven: v('oversized trui mohair'), onder: v('Zara cargo broek khaki') }, { rapport, weer: 'fris' }).check.ok, 'een pluizige oversized trui op een wijde broek niet');
 }
 // 18. print op print: alleen als je het aanzet, en dan zoals stylisten het doen
 {
@@ -268,6 +273,18 @@ ok(telSnit(street, ['barrel', 'ballon', 'cargo']) >= telSnit(paris, ['barrel', '
   const amiel = kast.find(i => /Amiel/.test(i.naam));
   const looks = uitJeTas(tasje, { dag: 'Za', moment: 'dag', weer: 'fris' }, { rapport, anker: amiel.id }, 12);
   ok(looks.length >= 2 && looks.every(l => l.items.includes(amiel)), `uit je tas met de Amiel-trui erin: ${looks.length} looks`);
+}
+// 26. zelf samenstellen en "wat vind je ervan?"
+{
+  const v = n => kast.find(i => i.naam.startsWith(n));
+  const o = stelSamen([v('Trui Amiel'), v('Pull&Bear ballon'), v('laarsjes zwart'), v('Wit basic t-shirt')], { rapport, weer: 'fris' });
+  ok(o.slots.boven === v('Wit basic t-shirt') && o.slots.laag === v('Trui Amiel') && o.slots.onder && o.slots.schoen, 'zelf samenstellen: T-shirt onder de trui, alles op zijn plek');
+  const b = beoordeel(o, { rapport, weer: 'fris' }, kast);
+  ok(b.ok && /accent/i.test(b.kleur) && /Amiel/.test(b.kleur), 'oordeel: klopt, en noemt de trui als accent');
+  ok(b.vibe.length >= 1 && b.niveau, 'oordeel: vibe en niveau (' + b.vibe.join(' × ') + ', ' + b.niveau + ')');
+  ok(b.richting.some(r => /streetstyle/i.test(r.doel)) && b.richting.every(r => r.outfit.check.ok), 'oordeel: een wissel per richting, allemaal binnen de regels');
+  const fout = beoordeel(maakOutfit({ boven: v('oversized trui mohair'), onder: v('Pull&Bear ballon') }, { rapport, weer: 'mild' }), { rapport, weer: 'mild' }, kast);
+  ok(!fout.ok && fout.harde.length, 'oordeel: wijd op wijd botst, met de reden');
 }
 console.log(goed, 'goed,', fout, 'fout,', Date.now() - t0, 'ms');
 process.exit(fout ? 1 : 0);
