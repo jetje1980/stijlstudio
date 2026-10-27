@@ -141,8 +141,14 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   await p.click('#losmaken'); await p.waitForSelector('#pak');
   ok(true, 'losmaken geeft het invulscherm terug');
   // bewaarde tas verwijderen
-  await p.waitForSelector('#bewaar'); await p.click('#bewaar'); await p.waitForTimeout(300);
+  await p.waitForSelector('#bewaar');
+  p.once('dialog', d => d.accept('Testtas veel outfits'));
+  await p.click('#bewaar'); await p.waitForTimeout(300);
   await p.goto('about:blank'); await p.goto(url); await p.waitForSelector('[data-tasweg]');
+  ok(/Testtas veel outfits/.test(await p.textContent('#scherm')), 'tas bewaard met je eigen naam');
+  p.once('dialog', d => d.accept('Andere naam'));
+  await p.click('[data-tasnaam]'); await p.waitForTimeout(300);
+  ok(/Andere naam/.test(await p.textContent('#scherm')), 'naam van een bewaarde tas aangepast');
   const tassenVoor = await p.$$eval('[data-tasweg]', x => x.length);
   p.once('dialog', d => d.accept());
   await p.click('[data-tasweg]'); await p.waitForTimeout(300);
