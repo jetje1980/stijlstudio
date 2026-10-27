@@ -56,6 +56,23 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   await p.click('#pak-erbij'); await p.fill('#zz', 'Gouden ketting'); await p.click('.blad .tegel'); await p.click('#zk'); await p.waitForSelector('.paklijst li', { timeout: 20000 }); await p.waitForTimeout(300);
   ok((await p.$$eval('.paklijst li span', x => x.map(y => y.textContent))).includes('Gouden ketting'), 'toegevoegd stuk staat op de paklijst');
 
+  // bewaarde tas openen en dan iets erbij of eraf: de rest van de tas blijft
+  p.once('dialog', d => d.accept('Testtas')); await p.click('#bewaar'); await p.waitForTimeout(300);
+  const bewaard = await p.$$eval('.paklijst li span:not(.keer)', x => x.map(y => y.textContent));
+  p.once('dialog', d => d.accept()); await p.click('#wis-mm'); await p.waitForTimeout(200);
+  await p.click('[data-tas]'); await p.waitForSelector('.paklijst li'); await p.waitForTimeout(200);
+  await p.click('#pak-erbij'); await p.fill('#zz', 'Wit basic'); await p.click('.blad .tegel'); await p.click('#zk'); await p.waitForSelector('.paklijst li', { timeout: 20000 }); await p.waitForTimeout(300);
+  const na = await p.$$eval('.paklijst li span:not(.keer)', x => x.map(y => y.textContent));
+  const kleding = bewaard.filter(n => !/ketting|tas|bag/i.test(n));
+  ok(kleding.filter(n => na.includes(n)).length >= kleding.length - 1 && na.length >= bewaard.length, `bewaarde tas + stuk erbij: de rest blijft (${bewaard.length} → ${na.length})`);
+  const plan2 = await p.$$eval('[data-p] .stuk span', x => x.map(y => y.textContent).join('|'));
+  // een kledingstuk (een muts of tas zonder vervanger rekent wel opnieuw)
+  const nr = na.findIndex(n => /t-shirt|top|trui/i.test(n)) + 1;
+  const weg2 = na[nr - 1];
+  await p.click(`.paklijst li:nth-child(${nr}) .pak-weg`); await p.waitForTimeout(600);
+  const na2 = await p.$$eval('.paklijst li span:not(.keer)', x => x.map(y => y.textContent));
+  ok(!na2.includes(weg2) && na2.length === na.length - 1 && na.filter(n => n !== weg2).every(n => na2.includes(n)), `bewaarde tas + stuk eraf: alleen dat stuk weg (${na.length} → ${na2.length})`);
+
   // datum verschuiven: dagnamen en data bewegen mee, voorspelde graden niet
   const naam1 = await p.$eval('.dag b', x => x.textContent);
   await p.evaluate(() => { });
