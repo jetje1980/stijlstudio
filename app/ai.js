@@ -94,15 +94,31 @@ Geef als JSON: {"naam":"korte, sfeervolle naam (max 4 woorden)","waarom":"1-2 zi
   return jsonUit(t);
 }
 
-export async function spiegelcheck(foto, kast) {
+// Eerst kijken en benoemen, dan pas iets voorstellen. Klopt de outfit al, dan
+// gaat het om afstyling (sieraden, tas, hoe je iets draagt), niet om een
+// ander hoofdstuk. `aan`: wat ze zegt dat ze draagt, met de echte kleuren uit
+// haar kast; dat gaat voor wat de camera denkt te zien.
+export async function spiegelcheck(foto, kast, aan = []) {
   const lijst = kast.map(i => `${i.id}: ${i.naam} (${i.kleur.join('/')})`).join('\n');
+  const draagt = aan.map(i => `- ${i.naam}: ${i.kleur.join('/')}, ${i.soort}, ${i.pasvorm}, ${i.textuur}`).join('\n');
   const t = await vraag({ beelden: [foto], max: 5000, vraag:
-`Dit is Griette in haar outfit van vandaag. Bekijk pasvorm, proporties, kleurcombinatie, laagjes, materiaal, schoenen en accessoires, en hoe de foto haar presenteert.
-Geef 3 tot 5 verbeteringen met de grootste impact, zonder dat alles anders moet. Eerst met stukken uit haar eigen kast (gebruik de id's), pas daarna iets nieuws.
+`Dit is Griette in haar outfit van vandaag (spiegelfoto).
+${draagt ? `Dit draagt ze volgens haar kast; deze kleuren en stoffen kloppen, ook als het licht op de foto anders doet:\n${draagt}\n` : ''}
+Werk in deze volgorde:
+1. Analyseer eerst: silhouet en verhoudingen (taille, wijd/aansluitend), kleur (kleurmanier, welk stuk is het accent, past het bij haar rapport), stof en textuur, en de vibe.
+2. Oordeel eerlijk: klopt de outfit al, bijna, of botst er iets met haar rapport?
+3. Klopt hij al of bijna: stel GEEN ander hoofdstuk voor (andere broek, ander bovenstuk). Geef afstyling: sieraden, tas, schoenen, sjaal, hoe ze iets draagt (kraag open, mouwen, instoppen), haar. Eerst uit haar kast (id's), dan pas iets nieuws.
+4. Alleen als er echt iets botst met haar rapport: noem wat je zou wisselen en waarom.
 Haar kast:
 ${lijst}
-Antwoord als JSON: {"werkt":"wat al goed is, 1 zin","verbeter":[{"wat":"de verandering","waarom":"kort","uitKast":["id"],"nieuw":null|{"wat":"omschrijving","budget":"laag|midden|premium"}}],"foto":"één tip voor houding of hoek"}` });
-  return jsonUit(t);
+Antwoord als JSON:
+{"oordeel":"klopt|bijna|botst","analyse":{"silhouet":"1 zin","kleur":"1 zin","stof":"1 zin","vibe":"paar woorden"},"werkt":["wat goed is, kort"],
+ "afstyling":[{"wat":"concreet","waarom":"kort","uitKast":["id"],"nieuw":null|{"wat":"omschrijving","budget":"laag|midden|premium"}}],
+ "wissel":[{"wat":"alleen als het botst","waarom":"kort","uitKast":["id"]}],"foto":"één tip voor houding of hoek"}` });
+  const r = jsonUit(t);
+  // oudere vorm (alleen "verbeter") nog begrijpen
+  if (!r.afstyling && r.verbeter) r.afstyling = r.verbeter;
+  return r;
 }
 
 // Een inspiratiebeeld één keer lezen: wat zit erin, en welke vibe. Jij
