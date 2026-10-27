@@ -1235,6 +1235,175 @@ export function beoordeel(o, ctx, bron = []) {
   };
 }
 
+// ── LICHTER EN SPANNENDER ────────────────────────────────────────────────────
+// Mag zonder vervanger weg. Tas en muts niet: die horen bij elke outfit, dus
+// die gaan alleen thuis als er een andere meegaat.
+const VRIJ = new Set(['laag', 'riem', 'sjaal']);
+// Een outfit zonder dit stuk: liefst met iets anders wat al meegaat op die
+// plek, of (bij een laag of accessoire) gewoon zonder. null als het niet kan.
+function herstel(o, weg, bron, ctx) {
+  const plek = Object.keys(o.slots).find(k => o.slots[k] === weg);
+  if (!plek) return o;
+  const opties = [];
+  if (VRIJ.has(plek)) { const slots = { ...o.slots }; delete slots[plek]; opties.push(maakOutfit(slots, ctx)); }
+  for (const k of bron) if (k !== weg && !o.items.includes(k) && slotVan(k) === plek) opties.push(maakOutfit({ ...o.slots, [plek]: k }, ctx));
+  return opties.filter(n => n.check.ok).sort((a, b) => b.score - a.score)[0] || null;
+}
+
+// "Maak mijn tas lichter": stap voor stap het stuk dat het minst kost. Elke
+// stap zegt wat er thuisblijft, wat het kost en hoe de outfits zich redden.
+export function lichter(plan, ctxVan, max = 10) {
+  let nu = plan.map(p => p.outfit);
+  const stappen = [];
+  while (stappen.length < max) {
+    const items = [...new Set(nu.filter(Boolean).flatMap(o => o.items))];
+    let beste = null;
+    for (const c of items) {
+      const bron = items.filter(i => i !== c);
+      let verlies = 0, geraakt = 0, kan = true;
+      const nieuw = nu.map((o, n) => {
+        if (!kan || !o || !o.items.includes(c)) return o;
+        const h = herstel(o, c, bron, ctxVan(plan[n]));
+        if (!h) { kan = false; return o; }
+        geraakt++; verlies += Math.max(0, o.score - h.score);
+        return h;
+      });
+      if (!kan) continue;
+      // niet lichter door twee dagen hetzelfde te dragen
+      const anders = l => new Set(l.filter(Boolean).map(sleutel)).size;
+      if (anders(nieuw) < anders(nu)) continue;
+      // liever een stuk dat in weinig outfits zit en weinig kost
+      const w = verlies + geraakt * 0.3;
+      if (!beste || w < beste.w) beste = { item: c, w, verlies, geraakt, nieuw };
+    }
+    if (!beste || beste.verlies > 4) break;
+    stappen.push({ item: beste.item, verlies: Math.round(beste.verlies * 10) / 10, geraakt: beste.geraakt, outfits: beste.nieuw });
+    nu = beste.nieuw;
+  }
+  return stappen;
+}
+// Alleen de stukken die jij aantikte: in volgorde weghalen en herstellen.
+export function laatThuis(plan, weg, ctxVan) {
+  let nu = plan.map(p => p.outfit);
+  const gelukt = [], niet = [];
+  for (const c of weg) {
+    const bron = [...new Set(nu.filter(Boolean).flatMap(o => o.items))].filter(i => i !== c);
+    let kan = true;
+    const nieuw = nu.map((o, n) => { if (!kan || !o || !o.items.includes(c)) return o; const h = herstel(o, c, bron, ctxVan(plan[n])); if (!h) kan = false; return h || o; });
+    if (kan) { nu = nieuw; gelukt.push(c); } else niet.push(c);
+  }
+  return { outfits: nu, gelukt, niet };
+}
+
+// Wat een ander stuk met een outfit doet, in woorden.
+function effecten(oud, nieuw) {
+  const fx = [];
+  // kleur = een accent uit je rapport; denim of camel tellen niet
+  const acc = new Set(RAPPORT_ACCENT.map(k => info(k).fam));
+  const kleurig = o => o.items.filter(i => !/jeans|denim/i.test(i.naam + ' ' + (i.materiaal || '')) && i.kleur.some(k => !info(k).neutraal && acc.has(info(k).fam))).length;
+  if (kleurig(nieuw) > kleurig(oud)) fx.push('meer kleur');
+  if (contrast(nieuw) && !contrast(oud)) fx.push('meer spanning');
+  const tex = o => new Set(o.items.filter(i => ROLLEN_KLEDING.includes(i.rol)).map(i => i.textuur)).size;
+  if (tex(nieuw) > tex(oud)) fx.push('meer textuur');
+  if (nieuw.score - oud.score >= 1.5) fx.push('beter volgens je rapport');
+  return fx;
+}
+
+// "Verras me": wat zit er in je tas, wat mist er net, en drie kleine dingen
+// met veel effect: uit je kast, in hoe je iets draagt, en één ding om te kopen.
+const RAPPORT_ACCENT = ['felroze', 'paars', 'geel', 'oranje', 'oranje-rood', 'rood', 'lichtblauw', 'groen'];
+export function verrasMe(plan, kast, ctxVan, rapport) {
+  const outfits = plan.map(p => p.outfit).filter(Boolean);
+  const items = [...new Set(outfits.flatMap(o => o.items))];
+  const kleding = items.filter(i => ROLLEN_KLEDING.includes(i.rol));
+  const fam = {};
+  for (const i of kleding) { const k = info(i.kleur[0]); fam[k.neutraal ? 'rustig' : k.fam] = (fam[k.neutraal ? 'rustig' : k.fam] || 0) + 1; }
+  const accenten = Object.entries(fam).filter(([k]) => k !== 'rustig').sort((a, b) => b[1] - a[1]).map(([k]) => k);
+  const basisKleuren = [...new Set(kleding.filter(i => info(i.kleur[0]).neutraal).map(i => rnaam(i.kleur[0])))];
+  const tex = {};
+  for (const i of kleding) tex[i.textuur] = (tex[i.textuur] || 0) + 1;
+  const vibe = Object.entries(SFEREN).map(([k, sf]) => [sf.naam, outfits.reduce((t, o) => t + sfeerPunten(o, sf), 0)]).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([n]) => n);
+  const samenvatting = `Je tas is ${accenten.length ? `${basisKleuren.slice(0, 3).join(', ') || 'rustig'} met ${accenten.slice(0, 2).join(' en ')} als accent` : 'helemaal rustig, zonder kleuraccent'}. `
+    + `Veel ${Object.entries(tex).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([t]) => t).join(' en ')}. De vibe is ${vibe.join(' × ').toLowerCase()}.`;
+
+  // wat er net ontbreekt
+  const mist = [];
+  const heeft = f => items.some(f);
+  if (!accenten.length || (fam.rustig || 0) / kleding.length > 0.85) mist.push({ wat: 'Weinig kleur: bijna alles is rustig.', soort: 'kleur' });
+  if (!heeft(i => i.soort === 'sieraad' || i.kleur.includes('goud'))) mist.push({ wat: 'Er zit geen goud in, terwijl gouden sieraden in je rapport staan.', soort: 'goud' });
+  const accentPlek = new Set(items.filter(i => !info(i.kleur[0]).neutraal).map(i => i.rol));
+  if (accentPlek.size && [...accentPlek].every(r => ['boven', 'laag'].includes(r))) mist.push({ wat: 'Al je kleur zit bovenin; tas, schoen en accessoires zijn rustig.', soort: 'plek' });
+  if (plan.some(p => p.moment === 'avond') && !heeft(i => ['glans', 'kant'].includes(i.textuur))) mist.push({ wat: 'Voor de avond zit er niets met glans of kant in.', soort: 'glans' });
+  if (!outfits.some(o => contrast(o))) mist.push({ wat: 'Nergens stoer met een zachte pop: alles is van één karakter.', soort: 'contrast' });
+
+  // uit je kast: het accessoire dat de meeste outfits optilt. Een sjaal, riem
+  // of tas eerst; een schoen alleen als hij kleur of spanning brengt.
+  const kandidaten = kast.filter(i => !items.includes(i) && ['accessoire', 'tas', 'schoen'].includes(i.rol));
+  const kastTips = [];
+  for (const k of kandidaten) {
+    const beter = [];
+    const fx = new Set();
+    plan.forEach((p, n) => {
+      if (!p.outfit) return;
+      const nieuw = voegStukToe(p.outfit, k, ctxVan(p));
+      if (!nieuw.check.ok) return;
+      const e = effecten(p.outfit, nieuw);
+      const winst = nieuw.score - p.outfit.score + e.length;
+      if (winst >= 0.5) { beter.push({ n, outfit: nieuw, winst }); e.forEach(x => fx.add(x)); }
+    });
+    if (!beter.length || (k.rol === 'schoen' && !fx.has('meer kleur') && !fx.has('meer spanning'))) continue;
+    kastTips.push({ item: k, outfits: beter, effect: [...fx], w: beter.reduce((t, b) => t + b.winst, 0) * (k.rol === 'schoen' ? 0.5 : 1) });
+  }
+  kastTips.sort((a, b) => b.w - a.w);
+
+  // ruilen: één stuk uit je tas voor een uit je kast, en wat dat oplevert
+  const ruilTips = [];
+  for (const uit of items.filter(i => ['boven', 'laag', 'onder', 'heel', 'jas', 'schoen'].includes(i.rol))) {
+    const waar = plan.map((p, n) => [p, n]).filter(([p]) => p.outfit && p.outfit.items.includes(uit));
+    let best = null;
+    for (const nu of kast.filter(k => !items.includes(k) && slotVan(k) === slotVan(uit))) {
+      const outs = [], fx = new Set();
+      let winst = 0, ok = true;
+      for (const [p, n] of waar) {
+        const plek = Object.keys(p.outfit.slots).find(k => p.outfit.slots[k] === uit);
+        const o = maakOutfit({ ...p.outfit.slots, [plek]: nu }, ctxVan(p));
+        if (!o.check.ok) { ok = false; break; }
+        winst += o.score - p.outfit.score;
+        effecten(p.outfit, o).forEach(x => fx.add(x));
+        outs.push({ n, outfit: o });
+      }
+      if (!ok || !fx.size || winst < -1.5 * waar.length) continue;
+      const w = fx.size * 2 + winst / waar.length;
+      if (!best || w > best.w) best = { uit, in: nu, outfits: outs, effect: [...fx], w };
+    }
+    if (best) ruilTips.push(best);
+  }
+  ruilTips.sort((a, b) => b.w - a.w);
+
+  // hoe je het draagt: de stylingtips uit je eigen outfits, de meest voorkomende
+  const tel = {};
+  for (const o of outfits) for (const t of o.check.tips) tel[t] = (tel[t] || 0) + 1;
+  const draag = Object.entries(tel).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([t]) => t);
+
+  // om te kopen: een accentkleur uit je rapport die nog niet in je tas zit en
+  // die je rapport zelf bij je basis zet; als sjaal, ketting of riem
+  const paren = [...(rapport.kleur.combinaties || []).map(([a, b]) => [a, [b]]), ...(rapport.kleur.uitgelicht || []).flatMap(u => (u.met ? u.kleuren.map(k => [k, u.met]) : []))];
+  const inTas = new Set(items.map(i => info(i.kleur[0]).fam));
+  let koopKleur = null, waarom = '';
+  for (const k of RAPPORT_ACCENT) {
+    if (inTas.has(info(k).fam)) continue;
+    const met = [...new Set(paren.flatMap(([a, m]) => a === k ? m : m.includes(k) ? [a] : []).filter(x => basisKleuren.includes(x)))];
+    if (met.length) { koopKleur = k; waarom = `je rapport zet ${k} bij ${met.join(' en ')}, en dat neem je mee`; break; }
+  }
+  if (!koopKleur) koopKleur = RAPPORT_ACCENT.find(k => !inTas.has(info(k).fam)) || 'lichtblauw';
+  const koopWat = !heeft(i => i.soort === 'sieraad' || i.kleur.includes('goud')) ? 'een gouden ketting of oorringen'
+    : !heeft(i => i.soort === 'sjaal') ? `een sjaaltje in ${koopKleur}`
+    : !heeft(i => i.soort === 'riem') && outfits.some(o => o.slots.boven && o.slots.boven.pasvorm === 'wijd') ? 'een riem om je wijde bovenstukken in te snoeren'
+    : `een tasje of sjaal in ${koopKleur}`;
+  const koop = { wat: koopWat, kleur: koopKleur, waarom: waarom || `${koopKleur} is een accent uit je rapport dat nog niet in je tas zit` };
+  return { samenvatting, mist, kast: kastTips.slice(0, 3), ruil: ruilTips.slice(0, 3), draag, koop };
+}
+
 // "Maak compact": per moment een outfit, met zo min mogelijk stukken in totaal.
 // Een paar volgordes proberen; de kleinste koffer wint, bij gelijkspel de mooiste.
 export function compact(plan) {

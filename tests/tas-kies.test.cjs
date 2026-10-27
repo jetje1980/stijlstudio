@@ -83,6 +83,22 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   const tassen = await p.$$eval('#uitkomst [data-p]', ks => ks.filter(k => k.querySelector('.stukken') && !/sport/i.test(k.querySelector('.moment-kop').textContent)).map(k => !!k.querySelector('[data-slot="tas"]')));
   ok(tassen.length && tassen.every(Boolean), `elke outfit heeft een tas, behalve bij het sporten (${tassen.length})`);
 
+  // verras me: analyse en tips
+  await p.click('#verras'); await p.waitForSelector('.blad h2');
+  const vt = await p.textContent('.blad');
+  ok(/Je tas is/.test(vt) && /Tip om te kopen/.test(vt), 'verras me: analyse en een koop-tip');
+  const neem = await p.$('.blad [data-vk], .blad [data-vr]');
+  if (neem) { await neem.click(); await p.waitForTimeout(300); ok(!(await p.$('.blad-achter.open')) && await p.$('#uitkomst [data-p] .stukken'), 'verras-tip toegepast'); }
+  else { await p.click('.blad-dicht'); await p.waitForTimeout(300); ok(true, 'geen verras-tip uit de kast bij deze tas'); }
+  // lichter: voorstel, ja zeggen, minder stukken
+  const voorL = await p.$$eval('.paklijst li', x => x.length);
+  await p.click('#lichter'); await p.waitForSelector('.blad h2');
+  if (await p.$('#lt-ok')) {
+    ok(/→/.test(await p.textContent('#lt-tel')), 'lichter: teller van nu naar straks');
+    await p.click('#lt-ok'); await p.waitForTimeout(300);
+    ok(await p.$$eval('.paklijst li', x => x.length) < voorL, `lichter: paklijst kleiner (${voorL} → ${await p.$$eval('.paklijst li', x => x.length)})`);
+  } else { ok(/al compact/.test(await p.textContent('.blad')), 'lichter: tas is al compact'); await p.click('.blad-dicht'); await p.waitForTimeout(300); }
+
   // vastzetten
   await p.click('#zet-vast'); await p.waitForSelector('[data-anders]');
   ok(/staat vast/.test(await p.textContent('.sub')) && !(await p.$('#pak')), 'tas staat vast: geen invulscherm meer');

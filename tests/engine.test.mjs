@@ -1,7 +1,7 @@
 // node tests/engine.test.mjs
 import fs from 'fs';
 import { zetHex, herken } from '../app/kleur.js';
-import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur, uitSelectie, contrast, printMix, smaakVan, naMaken, mouwen, basisIds, maakOutfit, laagProbleem, voegStukToe, uitJeTas, stelSamen, beoordeel } from '../app/engine.js';
+import { stelVoor, alternatieven, pakTas, meerVan, WENSEN, herkenActiviteit, andereKleur, uitSelectie, contrast, printMix, smaakVan, naMaken, mouwen, basisIds, maakOutfit, laagProbleem, voegStukToe, uitJeTas, stelSamen, beoordeel, lichter, laatThuis, verrasMe, slotVan } from '../app/engine.js';
 import { info } from '../app/kleur.js';
 const kast = JSON.parse(fs.readFileSync('data/kast.json'));
 const rapport = JSON.parse(fs.readFileSync('data/rapport.json'));
@@ -285,6 +285,24 @@ ok(telSnit(street, ['barrel', 'ballon', 'cargo']) >= telSnit(paris, ['barrel', '
   ok(b.richting.some(r => /streetstyle/i.test(r.doel)) && b.richting.every(r => r.outfit.check.ok), 'oordeel: een wissel per richting, allemaal binnen de regels');
   const fout = beoordeel(maakOutfit({ boven: v('oversized trui mohair'), onder: v('Pull&Bear ballon') }, { rapport, weer: 'mild' }), { rapport, weer: 'mild' }, kast);
   ok(!fout.ok && fout.harde.length, 'oordeel: wijd op wijd botst, met de reden');
+}
+// 27. tas lichter maken en "verras me"
+{
+  const tasje = kast.filter(i => /Amiel|ballon|Agolde|barrel|laarsjes zwart|New Balance|Leonie|gilet paars|Donkerbruin longsleeve|Wit basic/i.test(i.naam));
+  const plan = ['dag', 'avond', 'dag', 'avond'].map((m, n) => ({ dag: 'D' + n, moment: m, weer: 'fris' }));
+  plan.forEach(p => { p.outfit = uitJeTas(tasje, { ...p }, { rapport, weer: 'fris' }, 1)[0] || null; });
+  const ctxVan = p => ({ rapport, weer: p.weer });
+  const st = lichter(plan, ctxVan);
+  ok(st.every(s => s.outfits.every((o, n) => !plan[n].outfit || (o && o.check.ok && !o.items.includes(s.item)))), `lichter: ${st.length} stappen, elke outfit blijft geldig`);
+  ok(st.every(s => slotVan(s.item) !== 'tas' || s.outfits.every(o => !o || o.slots.tas)), 'lichter: een tas gaat alleen weg als er een andere is');
+  if (st.length) {
+    const r = laatThuis(plan, [st[0].item], ctxVan);
+    ok(r.gelukt.length === 1 && r.outfits.every(o => !o || !o.items.includes(st[0].item)), 'laat thuis: het stuk zit nergens meer in');
+  }
+  const v = verrasMe(plan, kast, ctxVan, rapport);
+  ok(/Je tas is/.test(v.samenvatting) && v.koop.wat, 'verras me: samenvatting en koop-tip (' + v.koop.wat + ')');
+  ok(v.kast.every(t => t.outfits.every(x => x.outfit.check.ok && x.outfit.items.includes(t.item))), 'verras me: kast-tips binnen de regels (' + v.kast.map(t => t.item.naam).join(', ') + ')');
+  ok(v.ruil.every(t => t.effect.length && t.outfits.every(x => x.outfit.check.ok && x.outfit.items.includes(t.in) && !x.outfit.items.includes(t.uit))), 'verras me: ruiltips met effect (' + v.ruil.map(t => t.uit.naam + ' → ' + t.in.naam + ': ' + t.effect.join(', ')).join('; ') + ')');
 }
 console.log(goed, 'goed,', fout, 'fout,', Date.now() - t0, 'ms');
 process.exit(fout ? 1 : 0);
