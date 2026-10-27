@@ -135,6 +135,14 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   await p.click('.blad-achter:last-of-type .blad-dicht'); await p.waitForTimeout(300);
   await p.selectOption('#zs-voor', 'extra'); await p.click('#zs-ok'); await p.waitForTimeout(300);
   ok((await p.$$eval('[data-oordeel]', x => x.length)) > 0, 'zelf samengestelde look staat erin, met "Wat vind je ervan?" per outfit');
+  // vaste tas: tik op een stuk in de paklijst en haal het eruit
+  const lijst = await p.$$eval('.paklijst li span:not(.keer)', x => x.map(y => y.textContent));
+  const nr = lijst.findIndex(n => /t-shirt|top|blouse|trui|vest|gilet/i.test(n)) + 1;
+  await p.click(`.paklijst li:nth-child(${nr}) span:not(.keer)`); await p.waitForSelector('#st-weg');
+  await p.click('#st-weg'); await p.waitForTimeout(400);
+  const lijst2 = await p.$$eval('.paklijst li span:not(.keer)', x => x.map(y => y.textContent));
+  ok(!lijst2.includes(lijst[nr - 1]) && lijst2.length === lijst.length - 1, `stuk uit de paklijst gehaald (${lijst[nr - 1]})`);
+  if (await p.$('.blad-achter.open')) { await p.click('.blad-achter.open .blad-dicht'); await p.waitForTimeout(300); }
   await p.waitForTimeout(300);
   await p.goto('about:blank'); await p.goto(url); await p.waitForSelector('[data-anders]');
   ok(/Anders dan je plan|staat vast/.test(await p.textContent('#scherm')), 'na opnieuw openen staat de tas nog vast');
