@@ -1,7 +1,7 @@
 // Outfits: je bewaarde looks, en de maker. In de maker kies je niets vooraf
 // als je dat niet wilt: dan krijg je drie voorstellen in drie verschillende
 // kleurmanieren, en stuur je daarna bij.
-import { stelVoor, alternatieven, maakOutfit, slotVan, andereKleur, voegStukToe, SFEREN, WENSEN, weerKlasse } from '../engine.js';
+import { stelVoor, alternatieven, maakOutfit, slotVan, andereKleur, voegStukToe, beoordeel, SFEREN, WENSEN, weerKlasse } from '../engine.js';
 import { METHODEN, info } from '../kleur.js';
 import { esc, $, $$, collage, foto, blad, melding, chips, stip, tegel, verklein } from '../ui.js';
 import { tekenKaart, deelOfBewaar } from '../kaart.js';
@@ -83,7 +83,7 @@ function vandaag(el, app, opnieuw) {
   if (!o) { plek.innerHTML = bijgehouden + '<p class="klein">Ik vind nu niets passends. Kijk of je kast labels heeft.</p>'; return; }
   // de jas kies je zelf: welke, en of hij echt nodig is
   plek.innerHTML = bijgehouden + outfitHtml(o) + `
-    <div class="chips"><button class="chip" data-slot="jas" type="button">${o.slots.jas ? 'Andere jas, of zonder' : 'Jas erbij?'}</button><button class="chip" data-v="erbij" type="button">＋ Stuk erbij</button></div>
+    <div class="chips"><button class="chip" data-slot="jas" type="button">${o.slots.jas ? 'Andere jas, of zonder' : 'Jas erbij?'}</button><button class="chip" data-v="erbij" type="button">＋ Stuk erbij</button><button class="chip" data-v="oordeel" type="button">Wat vind je ervan?</button></div>
     <div class="rij" style="margin-top:10px">
       <button class="knop" data-v="aan" type="button">Vandaag aan</button>
       <button class="knop licht" data-v="andere" type="button">Andere</button>
@@ -100,6 +100,7 @@ function vandaag(el, app, opnieuw) {
     if (a.dataset.v === 'andere') { vandaagSeed++; vandaag(el, app, true); }
     if (a.dataset.v === 'kleur') andereKleurBlad(app, vandaagOutfit, vandaagCtx(app), [], zet);
     if (a.dataset.v === 'erbij') stukErbij(app, vandaagOutfit, vandaagCtx(app), [], zet);
+    if (a.dataset.v === 'oordeel') oordeelBlad(app, vandaagOutfit, vandaagCtx(app), null, zet);
     if (a.dataset.v === 'kaart') bewaarKaart(standaardNaam(vandaagOutfit), vandaagOutfit);
   };
 }
@@ -310,6 +311,26 @@ export function stukErbij(app, o, ctx, voorkeur, klaar) {
   });
 }
 
+// "Wat vind je ervan?": klopt het, welke kleurmanier en welk stuk is het
+// accent, welke vibe, en met één wissel meer streetstyle, ton-sur-ton enz.
+// `bron`: waaruit de wissels komen (je tas); zonder bron je hele kast.
+export function oordeelBlad(app, o, ctx, bron, klaar) {
+  const r = beoordeel(o, ctx, bron || app.kast());
+  const b = blad(`<h2>Wat vind ik ervan?</h2>
+    ${outfitHtml(o)}
+    <div class="kaart"><b>${r.ok ? (r.zachte.length ? 'Kan, met een kanttekening' : 'Dit klopt') : 'Dit botst'}</b>
+      ${r.harde.concat(r.zachte).length ? `<ul class="tips">${r.harde.concat(r.zachte).map(t => `<li>⚠︎ ${esc(t)}</li>`).join('')}</ul>` : '<p class="klein" style="margin:4px 0 0">Binnen je rapport en de stylingregels.</p>'}</div>
+    <h3>Kleur</h3><p class="klein">${esc(r.kleur)}</p>
+    <h3>Vibe</h3><p class="klein">${esc([r.vibe.length ? r.vibe.join(' × ') : 'Geen uitgesproken sfeer', r.niveau, r.contrast].filter(Boolean).join(' · '))}</p>
+    ${r.tips.length ? `<h3>Tips</h3><ul class="tips">${r.tips.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
+    ${r.richting.length ? `<h3>Wil je een andere kant op?</h3>${r.richting.map((w, n) => `<div class="stuk-rij"><span><b>${esc(w.doel)}</b><br><span class="klein">${esc(w.van.naam)} → ${esc(w.naar.naam)}</span></span>
+      ${klaar ? `<button class="chip" data-richting="${n}" type="button">Doe dit</button>` : ''}</div>`).join('')}` : ''}`);
+  b.addEventListener('click', e => {
+    const t = e.target.closest('[data-richting]'); if (!t) return;
+    b.sluit(); klaar(r.richting[+t.dataset.richting].outfit);
+  });
+}
+
 export function standaardNaam(o) {
   const fam = o.kleur.familie || (o.kleur.accent || [])[0] || (o.kleur.families || []).join(' en ');
   return fam ? `${o.kleur.naam} in ${fam}` : o.kleur.naam;
@@ -447,6 +468,7 @@ function toonVoorstellen(el, app) {
       <button class="knop licht" data-a="vandaag" type="button">Vandaag aan</button>
       <button class="knop licht" data-a="kleur" type="button">Andere kleur</button>
       <button class="knop licht" data-a="erbij" type="button">＋ Stuk erbij</button>
+      <button class="knop licht" data-a="oordeel" type="button">Wat vind je ervan?</button>
     </div></div>`).join('')
     + `<p class="klein" style="text-align:center">${begin + 1}–${begin + lijst.length} van ${voorraad.lijst.length} looks</p>
       <button class="knop licht vol" id="meer" type="button">${begin + per >= voorraad.lijst.length ? 'Weer vooraan beginnen' : 'Andere voorstellen'}</button>`;
@@ -465,6 +487,7 @@ function toonVoorstellen(el, app) {
       const a = e.target.closest('[data-a]'); if (!a) return;
       if (a.dataset.a === 'kleur') return andereKleurBlad(app, o, { ...context(app), methode: null, kleur: null, anker: [] }, [], vervang);
       if (a.dataset.a === 'erbij') return stukErbij(app, o, { ...context(app), methode: null, kleur: null, anker: [] }, [], vervang);
+      if (a.dataset.a === 'oordeel') return oordeelBlad(app, o, { ...context(app), methode: null, kleur: null, anker: [] }, null, vervang);
       const naam = (ai && ai.naam) || standaardNaam(o);
       if (a.dataset.a === 'bewaar') {
         const id = 'o-' + Date.now().toString(36);

@@ -111,6 +111,14 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   ok(looks > 0, 'nieuwe look: opties uit je tas (' + looks + ')');
   await p.selectOption('#nl-voor', 'extra'); await p.click('[data-look="0"]'); await p.waitForTimeout(300);
   ok(/Extra outfit/.test(await p.textContent('#scherm')), 'nieuwe look als extra outfit erbij');
+  // zelf samenstellen, met oordeel
+  await p.click('#zelf'); await p.waitForSelector('#zs-uit');
+  for (const n of [1, 2, 3]) { const t = await p.$(`.blad h3:nth-of-type(${n}) + .raster [data-item]`); if (t) await t.click(); }
+  await p.waitForSelector('#zs-oordeel'); await p.click('#zs-oordeel'); await p.waitForTimeout(300);
+  ok(/Kleur/.test(await p.textContent('.blad-achter:last-of-type')) && /Vibe/.test(await p.textContent('.blad-achter:last-of-type')), 'zelf samenstellen: oordeel met kleur en vibe');
+  await p.click('.blad-achter:last-of-type .blad-dicht'); await p.waitForTimeout(300);
+  await p.selectOption('#zs-voor', 'extra'); await p.click('#zs-ok'); await p.waitForTimeout(300);
+  ok((await p.$$eval('[data-oordeel]', x => x.length)) > 0, 'zelf samengestelde look staat erin, met "Wat vind je ervan?" per outfit');
   await p.waitForTimeout(300);
   await p.goto('about:blank'); await p.goto(url); await p.waitForSelector('[data-anders]');
   ok(/Anders dan je plan|staat vast/.test(await p.textContent('#scherm')), 'na opnieuw openen staat de tas nog vast');
