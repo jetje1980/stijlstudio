@@ -89,6 +89,7 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   }
   // ＋ stuk toevoegen onder de paklijst
   ok(await p.$('#pak-erbij'), 'ook bij kiezen uit je stukken: ＋ Stuk toevoegen');
+  ok(await p.$('#lichter') && await p.$('#verras'), 'ook bij kiezen uit je stukken: lichter en verras me');
 
   // extra outfits met wat over is
   await p.click('#extra-aan'); await p.waitForSelector('[data-extra]', { timeout: 10000 });
@@ -119,6 +120,7 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.t
   // vastzetten
   await p.click('#zet-vast'); await p.waitForSelector('[data-anders]');
   ok(/staat vast/.test(await p.textContent('.sub')) && !(await p.$('#pak')), 'tas staat vast: geen invulscherm meer');
+  ok(await p.$('#lichter') && await p.$('#verras'), 'vaste tas: lichter en verras me');
   const was = await p.$eval('[data-p="0"] .stukken', x => x.textContent);
   await p.click('[data-anders="0"]'); await p.waitForSelector('.blad [data-o]');
   await p.click('.blad [data-o="0"]'); await p.waitForTimeout(300);
