@@ -365,10 +365,6 @@ function toonUitkomst(el, app) {
       ${p.outfit ? outfitHtml(p.outfit) + erbijNoot(app, p) + `<div class="rij" style="margin-top:6px"><button class="chip" data-kleur="${i}" type="button">🎨 Andere kleur</button><button class="chip" data-stukerbij="${i}" type="button">＋ Stuk erbij</button><button class="chip" data-oordeel="${i}" type="button">Wat vind je ervan?</button>${p.extra ? `<button class="chip" data-extraweg="${i}" type="button">Haal weg</button>` : ''}</div>` : '<p class="klein">Hier lukt niets, ook niet met iets uit je kast erbij. Kijk bij "Wat niet mee" of je niet te veel hebt uitgesloten.</p>'}</div>`).join('')}
     ${extraHtml(app, u, k)}
 
-    <h3>Afmaken</h3>
-    <p class="klein" style="margin-top:0">Kleine tweaks voor je inpakt.</p>
-    <div class="rij"><button class="knop licht" id="verras" type="button">Verras me</button><button class="knop licht" id="lichter" type="button">Maak mijn tas lichter</button></div>
-    <div class="rij" style="margin-top:10px"><button class="knop licht" id="nieuwe-look" type="button">Nieuwe look uit mijn tas</button><button class="knop licht" id="zelf" type="button">Zelf samenstellen</button></div>
 
     <div class="moment-kop"><h3>Paklijst</h3><span class="klein" id="ingepakt">${k.filter(x => tas.afgevinkt.includes(x.item.id)).length} van ${k.length} ingepakt</span></div>
     <p class="klein" style="margin-top:0">Vink af wat in je tas zit. Tik op een stuk of op × om het thuis te laten; alleen de outfits met dat stuk veranderen.</p>
@@ -377,6 +373,10 @@ function toonUitkomst(el, app) {
       <span>${esc(x.item.naam)}</span><span class="keer">${x.waarom ? esc(x.waarom) : x.keer + '×'}</span>
       <button class="pak-weg" data-weg="${esc(x.item.id)}" type="button" aria-label="${esc(x.item.naam)} thuislaten">×</button></li>`).join('')}</ul>
     <button class="knop licht vol" id="pak-erbij" type="button" style="margin-top:8px">＋ Stuk toevoegen</button>
+    <h3>Afmaken</h3>
+    <p class="klein" style="margin-top:0">Kleine tweaks voor je inpakt.</p>
+    <div class="rij"><button class="knop licht" id="verras" type="button">Verras me</button><button class="knop licht" id="lichter" type="button">Maak mijn tas lichter</button></div>
+    <div class="rij" style="margin-top:10px"><button class="knop licht" id="nieuwe-look" type="button">Nieuwe look uit mijn tas</button><button class="knop licht" id="zelf" type="button">Zelf samenstellen</button></div>
     <button class="knop vol" id="zet-vast" type="button" style="margin-top:16px">Klaar: zet mijn tas vast</button>
     <div class="rij" style="margin-top:10px">
       <button class="knop licht" id="bewaar" type="button">Tas bewaren</button>
@@ -492,7 +492,8 @@ function toonVast(el, app) {
   const bij = k.map(x => x.item);
   el.innerHTML = `<h1>Tas</h1>
     <p class="sub">Je tas${tas.bestemming ? ' voor ' + esc(tas.bestemming) : ''} staat vast. Per dagdeel kun je nog iets anders kiezen uit wat je bij je hebt. Tik op een stuk om alleen dat te wisselen.</p>
-    <div class="rij"><button class="knop" id="nieuwe-look" type="button">Nieuwe look samenstellen</button><button class="knop licht" id="zelf" type="button">Zelf samenstellen</button><button class="knop licht" id="verras" type="button">Verras me</button></div>
+    <div class="rij"><button class="knop" id="nieuwe-look" type="button">Nieuwe look samenstellen</button><button class="knop licht" id="zelf" type="button">Zelf samenstellen</button></div>
+    <div class="rij" style="margin-top:10px"><button class="knop licht" id="verras" type="button">Verras me</button><button class="knop licht" id="lichter" type="button">Maak mijn tas lichter</button></div>
     ${u.plan.map((p, i) => p.outfit ? `<div class="kaart" data-p="${i}">
       <div class="moment-kop"><h4>${esc(p.extra ? 'Extra outfit' : p.dag + ' · ' + (MOMENT_LABEL[p.moment] || p.moment))}</h4><span class="klein">${esc([p.doen && p.doen.trim(), p.weer].filter(Boolean).join(' · '))}</span></div>
       ${outfitHtml(p.outfit)}${p.gewisseld ? '<p class="klein">Anders dan je plan.</p>' : ''}
@@ -856,12 +857,6 @@ function toonKeuze(el, app) {
     }).join('')}
 
     ${gekozen.length ? extraHtml(app, u, k, thuis.map(x => x.item)) : ''}
-    ${gekozen.length ? `
-    <h3>Afmaken</h3>
-    <p class="klein" style="margin-top:0">Kleine tweaks voor je inpakt.</p>
-    <div class="rij"><button class="knop licht" id="verras" type="button">Verras me</button><button class="knop licht" id="lichter" type="button">Maak mijn tas lichter</button></div>
-    <div class="rij" style="margin-top:10px"><button class="knop licht" id="nieuwe-look" type="button">Nieuwe look uit mijn tas</button><button class="knop licht" id="zelf" type="button">Zelf samenstellen</button></div>
-    ` : ''}
 
     <h3>Wat je klaarlegde</h3>
     <p class="klein" style="margin-top:0">Hoeveel outfits er met elk stuk kunnen. Weinig? Dan is het een kandidaat om thuis te laten.</p>
@@ -877,6 +872,10 @@ function toonKeuze(el, app) {
     ${thuis.length ? `<h3>Kan thuisblijven</h3><p class="klein" style="margin-top:0">Zit in geen van je gekozen outfits.</p>
       <p class="klein" style="margin-top:0">Tik om het toch mee te nemen, × haalt het uit je stukken.</p>
       <div class="rij">${thuis.map(x => `<span class="rij" style="gap:2px;flex-wrap:nowrap"><button class="chip" data-toch="${esc(x.item.id)}" type="button">＋ ${esc(x.item.naam)}</button><button class="chip" data-uitstuk="${esc(x.item.id)}" type="button" aria-label="${esc(x.item.naam)} uit je stukken">×</button></span>`).join('')}</div>` : ''}
+    <h3>Afmaken</h3>
+    <p class="klein" style="margin-top:0">Kleine tweaks voor je inpakt.</p>
+    <div class="rij"><button class="knop licht" id="verras" type="button">Verras me</button><button class="knop licht" id="lichter" type="button">Maak mijn tas lichter</button></div>
+    <div class="rij" style="margin-top:10px"><button class="knop licht" id="nieuwe-look" type="button">Nieuwe look uit mijn tas</button><button class="knop licht" id="zelf" type="button">Zelf samenstellen</button></div>
     <button class="knop vol" id="zet-vast" type="button" style="margin-top:16px">Klaar: zet mijn tas vast</button>
     <div class="rij" style="margin-top:10px">
       <button class="knop licht" id="bewaar" type="button">Tas bewaren</button>
