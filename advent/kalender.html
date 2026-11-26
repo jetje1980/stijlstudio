@@ -277,6 +277,66 @@ textarea{min-height:90px;font-family:var(--f-hand);font-size:24px;line-height:1.
 .knop.klein{padding:5px 10px;font-size:11px}
 .diner{display:grid;gap:4px;font-family:var(--f-hand);font-size:22px}
 
+/* ---------- kamertjes achter de raampjes ---------- */
+.raam.open .glas{background-size:cover;background-position:center}
+.raam.open .glas::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(255,196,110,.35),transparent 65%),linear-gradient(rgba(28,39,66,.12),rgba(28,39,66,.12))}
+.raam.open .mini{inset:auto 3px 3px auto!important;width:42%;height:auto!important;z-index:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.7))}
+.raam.open .nr{z-index:1;color:#fff8e6!important;text-shadow:0 1px 3px rgba(0,0,0,.8)!important}
+.dakraam{position:absolute;bottom:8%;width:11%;z-index:2}
+.dakraam.links{left:20%}.dakraam.rechts{right:20%}
+.dakraam .raam .nr,.kapel .raam.open .nr{font-size:clamp(15px,4.4vw,24px)}
+.kamer{position:relative;aspect-ratio:4/3;overflow:hidden;border-radius:2px;background:#3b2a26}
+.kamer img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:inzoom 14s ease-in-out infinite alternate}
+@keyframes inzoom{from{transform:scale(1.02)}to{transform:scale(1.12) translate(-1.5%,1%)}}
+.kamer .gloed{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 30% 20%,rgba(255,214,150,.28),transparent 60%),linear-gradient(transparent 55%,rgba(40,20,10,.35));animation:flakker 3.2s ease-in-out infinite}
+@keyframes flakker{40%{opacity:.75}60%{opacity:1}75%{opacity:.85}}
+.kamer .vlok{position:absolute;top:-10px;width:6px;height:6px;border-radius:50%;background:#fff;opacity:.9;animation:val linear infinite}
+@keyframes val{to{transform:translate(24px,380px)}}
+.kamer .ster{z-index:2}
+.labelkaart{position:absolute;left:50%;top:0;width:58%;transform:translateX(-50%);display:grid;justify-items:center;z-index:3;animation:hangin 1.1s .5s cubic-bezier(.3,1.5,.5,1) both;transform-origin:50% 0}
+.labelkaart .lint{width:3px;height:26px;background:#5e141c}
+.labelkaart .strik{margin-top:-8px;width:34px}
+.labelkaart .kaart{margin-top:-6px;background:#fffdf6;padding:14px 16px;text-align:center;font-family:var(--f-hand);font-size:22px;line-height:1.08;color:var(--inkt);
+  border-radius:16px;box-shadow:0 0 0 3px #fffdf6,0 0 0 4.5px var(--goud),0 10px 18px -6px rgba(0,0,0,.45);position:relative}
+.labelkaart .kaart::before{content:"";position:absolute;inset:5px;border:1px dashed rgba(184,146,74,.6);border-radius:12px;pointer-events:none}
+@keyframes hangin{from{transform:translate(-50%,-120%) rotate(-8deg)}70%{transform:translate(-50%,0) rotate(3deg)}to{transform:translate(-50%,0) rotate(-1.5deg)}}
+.kamerkeuze{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.kamerkeuze button{border:2px solid transparent;padding:0;aspect-ratio:4/3;background-size:cover;background-position:center;border-radius:2px}
+.kamerkeuze button[aria-pressed="true"]{border-color:var(--bordeaux);box-shadow:0 0 0 2px var(--goud-licht)}
+.kamerkeuze button.auto{background:var(--papier);font-size:11px;color:var(--zacht)}
+
+/* ---------- uitjes, lootjes, ideeën, games ---------- */
+.tabs{flex-wrap:wrap}
+.kop2{font-family:var(--f-titel);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--den)}
+.uitje{background:#e6ece4;border:1.5px solid var(--den);padding:14px 16px;display:grid;gap:8px}
+.uitje .titel2{font-family:var(--f-hand);font-size:28px;line-height:1.05}
+.uitje .wanneer{font-size:14px;color:var(--zacht)}
+.keuzes{display:flex;flex-wrap:wrap;gap:8px}
+.keuze{border:1.5px solid var(--den);background:#fff;border-radius:99px;padding:6px 14px;display:flex;gap:6px;align-items:center}
+.keuze[aria-pressed="true"]{background:var(--den);color:#fff}
+.keuze .n{font-weight:600}
+.wie-rij{display:flex;flex-wrap:wrap;gap:6px;align-items:end;min-height:20px}
+.lootje{border:0;background:none;padding:0;width:100%;perspective:800px}
+.lootje .papier{background:#fffdf7;box-shadow:0 6px 14px rgba(0,0,0,.18);padding:18px;display:grid;justify-items:center;gap:8px;transition:transform .8s;transform-origin:50% 0}
+.lootje.dicht .papier{transform:rotateX(55deg);background:repeating-linear-gradient(45deg,#fffdf7 0 10px,#f3ecdf 10px 20px)}
+.lootje .naam2{font-family:var(--f-hand);font-size:34px;color:var(--bordeaux);line-height:1}
+.wens,.idee{display:flex;gap:10px;align-items:center;justify-content:space-between;background:#fff;padding:8px 10px;border-left:3px solid var(--rood);min-width:0;overflow-wrap:anywhere}
+.wens.doe,.idee{border-color:var(--den)}
+.wens .hand,.idee .hand{font-size:22px;line-height:1.1}
+.mini-weg{border:0;background:none;color:var(--rood);font-size:13px;flex:none}
+.hartje{border:1.5px solid var(--rood);background:#fff;color:var(--rood);border-radius:99px;padding:3px 10px;font-size:13px;flex:none}
+.hartje[aria-pressed="true"]{background:var(--rood);color:#fff}
+.games{display:grid;gap:12px}
+.spellijst{display:grid;gap:4px;font-family:var(--f-hand);font-size:24px;line-height:1.15}
+.spellijst label{display:flex;gap:8px;align-items:center;color:var(--inkt);font-size:24px}
+.scorebord{display:grid;gap:6px}
+.score{display:grid;gap:10px;align-items:center;background:#fff;padding:6px 10px}
+.score .punten{font-family:var(--f-hand);font-weight:700;font-size:30px;color:var(--bordeaux);min-width:2ch;text-align:right;font-variant-numeric:tabular-nums}
+.score.koploper{box-shadow:inset 0 0 0 2px var(--goud)}
+.plus{border:1px solid var(--goud);background:var(--creme);border-radius:50%;width:34px;height:34px;font-size:18px;line-height:1;padding:0}
+.formrij{display:flex;gap:8px;flex-wrap:wrap}
+.formrij input{flex:1;min-width:140px}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -303,6 +363,10 @@ const SVG = {
   deurtje:`<svg viewBox="0 0 60 44"><path d="M18 42V14a12 12 0 0124 0v28z" fill="#6e2f22" stroke="${G}" stroke-width="1.4"/><path d="M30 12l-3-3a2 2 0 013-2 2 2 0 013 2z" fill="${C}"/><circle cx="37" cy="29" r="1.6" fill="${G}"/></svg>`,
   kastje:`<svg viewBox="0 0 60 44"><path d="M17 4h26v38H17z" fill="#f7f4ee" stroke="#cfc6b8" stroke-width="1.4"/><path d="M19 7h22v8H19z" fill="#ece6dc" stroke="#cfc6b8"/><rect x="19" y="18" width="22" height="10" fill="none" stroke="#cfc6b8"/><rect x="19" y="30" width="22" height="10" fill="none" stroke="#cfc6b8"/><circle cx="30" cy="23" r="1.5" fill="#cfc6b8"/><circle cx="30" cy="35" r="1.5" fill="#cfc6b8"/><rect x="24" y="2" width="9" height="7" fill="${R}"/></svg>`,
   bezem:`<svg viewBox="0 0 60 44"><path d="M40 3L26 26" stroke="#e2cfa8" stroke-width="2.4"/><path d="M26 24l-10 16 14 2 2-14z" fill="#c9a24d"/><path d="M24 27l6 3" stroke="${R}" stroke-width="2"/></svg>`,
+  oliebol:`<svg viewBox="0 0 60 44"><ellipse cx="30" cy="38" rx="20" ry="4" fill="#fff" stroke="${G}"/><circle cx="30" cy="24" r="13" fill="#b8743a"/><circle cx="25" cy="22" r="2" fill="#5a3015"/><circle cx="35" cy="27" r="1.8" fill="#5a3015"/><path d="M19 18q11-9 22 0" stroke="#fff" stroke-width="3.4" stroke-linecap="round" opacity=".95"/><circle cx="24" cy="15" r="1" fill="#fff"/><circle cx="37" cy="15" r="1" fill="#fff"/></svg>`,
+  kaartje:`<svg viewBox="0 0 60 44"><path d="M6 12h48v7a3 3 0 000 6v7H6v-7a3 3 0 000-6z" fill="#e6ece4" stroke="${D}" stroke-width="1.4"/><path d="M40 12v20" stroke="${D}" stroke-dasharray="2 2"/><path d="M12 19h22M12 25h16" stroke="${D}" stroke-width="2"/></svg>`,
+  reuzenrad:`<svg viewBox="0 0 60 44"><path d="M30 20l-10 23M30 20l10 23" stroke="${G}" stroke-width="2"/><circle cx="30" cy="20" r="15" fill="none" stroke="${G}" stroke-width="1.6"/>${Array.from({length:8},(_,i)=>{const a=i*Math.PI/4,x=30+15*Math.cos(a),y=20+15*Math.sin(a);return `<path d="M30 20L${x.toFixed(1)} ${y.toFixed(1)}" stroke="${G}" stroke-width=".8"/><rect x="${(x-2.6).toFixed(1)}" y="${(y-1).toFixed(1)}" width="5.2" height="4.4" fill="${i%2?R:D}"/>`}).join("")}<circle cx="30" cy="20" r="2" fill="${G}"/></svg>`,
+  lootje:`<svg viewBox="0 0 60 44"><path d="M14 10h32v26H14z" fill="#fffdf7" stroke="${G}" stroke-width="1.4"/><path d="M14 18h32" stroke="${G}" stroke-dasharray="2 2"/><text x="30" y="31" text-anchor="middle" font-family="Caveat,cursive" font-weight="700" font-size="11" fill="#7c1d26">?</text></svg>`,
   groot_cadeau:`<svg viewBox="0 0 120 110"><rect x="18" y="40" width="84" height="64" fill="#7c1d26" stroke="${G}" stroke-width="2.5"/><g fill="#fff" opacity=".8"><circle cx="34" cy="56" r="1.6"/><circle cx="80" cy="70" r="1.6"/><circle cx="50" cy="90" r="1.4"/><circle cx="90" cy="92" r="1.4"/><circle cx="36" cy="80" r="1.2"/></g><rect x="12" y="26" width="96" height="16" fill="#7c1d26" stroke="${G}" stroke-width="2.5"/><path d="M60 26v78" stroke="${G}" stroke-width="7"/><path d="M60 26q-30-28-28 0M60 26q30-28 28 0" fill="none" stroke="${G}" stroke-width="4"/><path d="M60 26l-12 16M60 26l12 16" stroke="${G}" stroke-width="3"/></svg>`
 };
 const KLEREN = {
@@ -316,47 +380,61 @@ const SLINGER = `<svg class="slinger" viewBox="0 0 400 30" preserveAspectRatio="
 const LANTAARN = aan => `<svg class="lantaarn ${aan?'aan':''}" viewBox="0 0 40 110" aria-label="${aan?'Lantaarn brandt':'Lantaarn uit'}"><path d="M20 2l-11 11h22z" fill="#222"/><rect x="11" y="13" width="18" height="20" class="licht" stroke="#222" stroke-width="2.5"/><path d="M20 13v20" stroke="#222" stroke-width="1.4"/><path d="M8 33h24v4H8z" fill="#222"/><rect x="17" y="37" width="6" height="62" fill="#222"/><circle cx="20" cy="52" r="8" fill="none" stroke="#2f5a47" stroke-width="4"/><path d="M15 47l5 5 5-5" stroke="#c22a33" stroke-width="2" fill="none"/><path d="M10 99h20v9H10z" fill="#222"/></svg>`;
 const BUS = `<svg viewBox="0 0 60 80"><rect x="27" y="42" width="6" height="36" fill="#8a5a36"/><path d="M6 10h40v34H6z" fill="#7c1d26" stroke="#b8924a" stroke-width="2"/><path d="M6 10q20-12 40 0" fill="#5e141c" stroke="#b8924a" stroke-width="2"/><rect x="14" y="20" width="24" height="4" rx="2" fill="#2b1013" stroke="#b8924a"/><text x="26" y="37" text-anchor="middle" font-family="Fraunces,serif" font-size="8" letter-spacing="1.5" fill="#d8bd7e">POST</text><g class="vlag"><rect x="46" y="20" width="3" height="22" fill="#b8924a"/><rect x="46" y="20" width="10" height="7" fill="#c22a33"/></g></svg>`;
 
-const SOORTEN = {briefje:"Lief briefje", liedje:"Liedje", aanwijzing:"Aanwijzing", foto:"Foto", video:"Filmpje", cadeau:"Verrassing", bon:"Bon om in te wisselen", stopmotion:"Stopmotion-filmpje"};
+const SOORTEN = {uitje:"Uitje samen", games:"Crazy Christmas Games", lootje:"Lootjes en wensen", briefje:"Lief briefje", liedje:"Liedje", aanwijzing:"Aanwijzing", foto:"Foto", video:"Filmpje", cadeau:"Verrassing", bon:"Bon om in te wisselen", stopmotion:"Stopmotion-filmpje"};
 const SPELLEN = {kras:"Goudpapier krassen", lintje:"Lintje lostrekken", waslijn:"Was ophangen aan de waslijn", wasmand:"Graven in de wasmand", sneeuw:"Sneeuw wegvegen, voetstapjes volgen", deurtje:"Aankloppen bij het deurtje", laatjes:"Laatjes van het kastje"};
-const MINIS = {"":"Hoort bij de soort", waslijn:"Waslijntje", fles:"Flesje wasmiddel", slee:"Sleetje", lantaarn:"Lantaarntje", deurtje:"Deurtje", kastje:"Kastje", bezem:"Bezempje", cadeau:"Cadeautje", briefje:"Envelopje"};
+const MINIS = {"":"Hoort bij de soort", oliebol:"Oliebol", kaartje:"Kaartje voor een uitje", reuzenrad:"Reuzenrad", lootje:"Lootje", waslijn:"Waslijntje", fles:"Flesje wasmiddel", slee:"Sleetje", lantaarn:"Lantaarntje", deurtje:"Deurtje", kastje:"Kastje", bezem:"Bezempje", cadeau:"Cadeautje", briefje:"Envelopje"};
 const POSTSOORT = {briefje:"Briefje aan iemand", vraag:"Vraag of wens aan Griette", foto:"Foto voor het jaaroverzicht", diner:"Ik neem mee naar het kerstdiner"};
+const CLIPS = {slee:["Sleetje door de sneeuw",22], waslijn:["De was aan de lijn, met wasbon",22], welkom:["Welkom bij het deurtje",22], voetstapjes:["Voetstapjes in het meel",22], kerstkamer:["Chocomel in de kerstkamer",20]};
+const KAMERS = {huisje:"Wit huisje met lampjes", elfendeur:"Groen deurtje met postbus", trapje:"Touwladdertje en lantaarn", kerstkamer:"Kerstkamer", kastjeskamer:"Sterrenbehang", houtkamer:"Houten kamertje", kachelkamer:"Bij de kachel", cadeaus:"Cadeaus op de vloer", belletje:"Cadeauzakje met belletje", inpakken:"Inpaktafel", bankje:"Bankje in de sneeuw", picknick:"Chocomel in de sneeuw", dorp:"Dorpje in de sneeuw"};
+const KAMERLIJST = Object.keys(KAMERS), BUITEN = ["bankje","picknick","dorp"];
 const LABELKLEUR = ["#fbf8f1","#d3b48a","#e9d9c4","#d7e0d6","#f0dcd8","#d3b48a"];
-const GEVEL = [20,16,17,2, 21,3,15,10, 14,18,9,22, 8,13,1,7, 19,5,12,4, 11,6,23];
-const vorm = (i,d) => d===6 ? "deur" : [9,10].includes(d)? "rond" : (Math.floor(i/4)%2===0 ? "boog" : "recht");
+const GEVEL = [20,16,17,2, 21,3,15,10, 14,18,9,22, 8,13,1,7, 19,5,12,4, 11,25,6];  /* 23 en 26 zitten als dakraampjes in het dak, 24 in de dakkapel, 25 is de voordeur */
+const vorm = (i,d) => d===25 ? "deur" : [9,10].includes(d)? "rond" : (Math.floor(i/4)%2===0 ? "boog" : "recht");
 
 /* ===== Opslag (demo: alleen op dit apparaat) ===== */
-const SLEUTEL = "kersthuisje-v2";
+const SLEUTEL = "kersthuisje-v3";
 const uid = () => Math.random().toString(36).slice(2,9);
 function voorbeeld(){
   return {
     leden:[
       {id:"g", naam:"Griette", pin:"0000", beheer:true},
+      {id:"p", naam:"Papa", pin:"9999", spelleider:true},
       {id:"z", naam:"Zoon", pin:"1111"},
       {id:"d", naam:"Dochter", pin:"2222"},
-      {id:"c", naam:"Lid 4", pin:"3333"},
       {id:"e", naam:"Lid 5", pin:"4444"},
       {id:"f", naam:"Lid 6", pin:"5555"}
     ],
     inhoud:[
-      {id:uid(), dag:1, voor:"alle", soort:"briefje", spel:"kras", tekst:"Welkom in ons kersthuisje!\nElke ochtend gaat er één lichtje aan. Als iedereen geweest is, brandt de lantaarn."},
-      {id:uid(), dag:2, voor:"z", soort:"bon", spel:"waslijn", mini:"waslijn", tekst:"Wasbon: deze week draai ik jouw was. Gratis!", waarde:"€ 5"},
-      {id:uid(), dag:2, voor:"d", soort:"cadeau", spel:"wasmand", mini:"fles", tekst:"Kijk vandaag in je wasmand: daar staat een fles wasmiddel voor je klaar. Pak 'm eruit!"},
-      {id:uid(), dag:2, voor:"alle", soort:"aanwijzing", spel:"lintje", tekst:"Vanavond eten we pannenkoeken."},
-      {id:uid(), dag:3, voor:"alle", soort:"stopmotion", spel:"deurtje", mini:"slee", tekst:"Het sleetje is onderweg…", frames:"demo"},
-      {id:uid(), dag:4, voor:"alle", soort:"aanwijzing", spel:"sneeuw", mini:"bezem", tekst:"Volg de voetstapjes: kijk achter de kerstboom."},
-      {id:uid(), dag:5, voor:"alle", soort:"cadeau", spel:"laatjes", mini:"kastje", tekst:"Vanavond warme chocomel met slagroom, voor iedereen."},
-      {id:uid(), dag:6, voor:"alle", soort:"briefje", spel:"lintje", tekst:"Sinterklaas is langs geweest. Kijk bij de voordeur!"}
+      {id:uid(), dag:1, voor:"alle", soort:"briefje", spel:"kras", kamer:"huisje", tekst:"Welkom in ons kersthuisje!\nElke ochtend gaat er één lichtje aan. Als iedereen geweest is, brandt de lantaarn."},
+      {id:uid(), dag:2, voor:"z", soort:"stopmotion", clip:"waslijn", spel:"waslijn", mini:"waslijn", tekst:"Er hangt iets aan de lijn voor jou…"},
+      {id:uid(), dag:2, voor:"z", soort:"bon", tekst:"Wasbon: deze week draai ik jouw was. Gratis!", waarde:"€ 5"},
+      {id:uid(), dag:2, voor:"d", soort:"cadeau", spel:"wasmand", mini:"fles", kamer:"kachelkamer", tekst:"Kijk vandaag in je wasmand: daar staat een fles wasmiddel voor je klaar. Pak 'm eruit!"},
+      {id:uid(), dag:2, voor:"alle", soort:"aanwijzing", kamer:"elfendeur", tekst:"Vanavond eten we pannenkoeken."},
+      {id:uid(), dag:3, voor:"alle", soort:"stopmotion", clip:"welkom", spel:"deurtje", mini:"deurtje", tekst:"Vanaf vandaag kun je zelf post doen in de brievenbus, onder het huisje."},
+      {id:uid(), dag:4, voor:"alle", soort:"stopmotion", clip:"voetstapjes", spel:"sneeuw", mini:"bezem", tekst:"Volg de voetstapjes: kijk achter de kerstboom."},
+      {id:uid(), dag:5, voor:"alle", soort:"stopmotion", clip:"kerstkamer", spel:"laatjes", mini:"kastje", tekst:"Vanavond warme chocomel met slagroom, voor iedereen."},
+      {id:uid(), dag:6, voor:"alle", soort:"briefje", spel:"lintje", kamer:"kastjeskamer", tekst:"Pepernoten bij de koffie!\nSinterklaas vieren we op 26 december: zet je wensen alvast in de brievenbus, bij Lootjes."},
+      {id:uid(), dag:7, voor:"alle", soort:"uitje", spel:"kras", mini:"oliebol", kamer:"picknick", tekst:"Oliebollen eten met z'n allen", wanneer:"Zaterdagmiddag", waar:"Thuis aan de keukentafel"},
+      {id:uid(), dag:8, voor:"alle", soort:"stopmotion", clip:"slee", spel:"lintje", mini:"slee", tekst:"Het sleetje is onderweg met iets lekkers."},
+      {id:uid(), dag:13, voor:"alle", soort:"uitje", spel:"kras", mini:"kaartje", kamer:"dorp", tekst:"Samen op pad! Waar gaan we heen?", keuzes:["Kerstmarkt","Kringloop"], wanneer:"Zondag"},
+      {id:uid(), dag:20, voor:"alle", soort:"uitje", spel:"deurtje", mini:"reuzenrad", kamer:"bankje", tekst:"Kerstkermis in Groningen", wanneer:"Datum volgt", waar:"Groningen"},
+      {id:uid(), dag:25, voor:"alle", soort:"games", spel:"deurtje", mini:"cadeau", kamer:"cadeaus", tekst:"Cadeau-estafette\nKerst-pictionary\nWie ben ik?\nSokken-sneeuwballen gooien\nDe grote kerstquiz"},
+      {id:uid(), dag:26, voor:"alle", soort:"lootje", spel:"lintje", mini:"lootje", kamer:"belletje", tekst:"Sinterklaas! Vouw je lootje open."}
     ],
-    geopend:{}, post:[], diner:[{wie:"Griette", wat:"Kalkoen en jus"}], ingewisseld:{}
+    geopend:{}, post:[], diner:[{wie:"Griette", wat:"Kalkoen en jus"}], ingewisseld:{},
+    reacties:{}, wensen:[{id:uid(), van:"z", soort:"cadeau", tekst:"Nieuwe koptelefoon"},{id:uid(), van:"d", soort:"doe", tekst:"Samen naar de film"}],
+    lootjes:null, lootjeOpen:{}, ideeen:[{id:uid(), van:"d", tekst:"Samen kerstkoekjes bakken", stemmen:["g","z"]},{id:uid(), van:"z", tekst:"Filmavond met chips", stemmen:["d"]}],
+    scores:{}, gespeeld:{}
   };
 }
 let S;
 try{ S = JSON.parse(localStorage.getItem(SLEUTEL)) || voorbeeld(); }catch(e){ S = voorbeeld(); }
+S = Object.assign({geopend:{},post:[],diner:[],ingewisseld:{},reacties:{},wensen:[],lootjes:null,lootjeOpen:{},ideeen:[],scores:{},gespeeld:{}}, S);
 function bewaar(){ try{ localStorage.setItem(SLEUTEL, JSON.stringify(S)); }catch(e){ melding("Het geheugen van deze demo is vol. Gebruik kleinere of minder foto's."); } }
 
 let ik=null, kiesLid=null, scherm="login", beheerDag=1, filmTimer=null;
-function vandaagDag(){ const nu=new Date(); return nu.getMonth()===11 ? Math.min(nu.getDate(),24) : 0; }
-let demoDag = vandaagDag() || 6;
+function vandaagDag(){ const nu=new Date(); return nu.getMonth()===11 ? Math.min(nu.getDate(),26) : 0; }
+let demoDag = vandaagDag() || 8;
 
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
@@ -368,6 +446,8 @@ const geopendDoor = (id,dag) => (S.geopend[id]||[]).includes(dag);
 const geopend = dag => geopendDoor(ik.id,dag);
 const hoofd = dag => { const l=voorMij(dag); return l.find(x=>x.voor!=="alle") || l[0] || null; };
 const miniVan = dag => { const h=hoofd(dag); return h ? (h.mini || h.soort) : "cadeau"; };
+const kamerVan = dag => { const h=hoofd(dag); return (h && h.kamer) || KAMERLIJST[(dag*3)%KAMERLIJST.length]; };
+const spelleider = () => !!(ik && (ik.beheer || ik.spelleider));
 const spelVan = dag => { const h=hoofd(dag); return (h && h.spel) || (dag%2 ? "kras" : "lintje"); };
 const kort = t => t.length<=44 ? t : t.slice(0,44).replace(/\s+\S*$/,"")+"…";
 const pop = (l,m) => `<span class="pop" style="--m:${m||40}px" title="${esc(l.naam)}"><span class="hoofd">${l.foto?`<img src="${l.foto}" alt="">`:esc((l.naam||"?")[0])}</span><span class="stokje"></span></span>`;
@@ -416,10 +496,10 @@ function tekenLogin(){
 
 /* ===== Het huisje ===== */
 function raam(d,i){
-  const open=geopend(d), mag=d<=demoDag, heeft=voorMij(d).length>0, v=i===-1?"boog":vorm(i,d);
+  const open=geopend(d), mag=d<=demoDag, heeft=voorMij(d).length>0, v=i===-1?"boog":i===-2?"rond":vorm(i,d);
   return `<button class="raam ${v} ${open?'open':''} ${d===demoDag&&!open?'vandaag':''}" data-dag="${d}" ${(!mag&&!open)?'disabled':''}
      aria-label="${d} december${open?', geopend':mag?'':', nog op slot'}">
-     <span class="glas">${open?`<span class="mini">${SVG[miniVan(d)]||SVG.cadeau}</span>`:'<span class="roede"></span>'}</span>
+     <span class="glas" ${open?`style="background-image:url(kamers/${kamerVan(d)}.jpg)"`:''}>${open?`<span class="mini">${SVG[miniVan(d)]||SVG.cadeau}</span>`:'<span class="roede"></span>'}</span>
      <span class="nr">${d}</span>${mag&&!open&&heeft?'<span class="stip" title="Er zit iets in"></span>':''}
      <span class="vensterbank"></span></button>`;
 }
@@ -434,15 +514,16 @@ function tekenKalender(){
     <div><div class="wie">voor ${esc(ik.naam)}</div><h1>Crazy Christmas</h1></div>
     <div class="balk">
       ${bonnen.length?`<button class="knop licht" id="bonnen">Mijn bonnen (${bonnen.length})</button>`:""}
+      ${spelleider()?`<button class="knop licht" id="games">Games</button>`:""}
       ${ik.beheer?`<button class="knop" id="naarBeheer">Beheer${S.post.filter(p=>p.status==="nieuw").length?` · ${S.post.filter(p=>p.status==="nieuw").length} post`:""}</button>`:''}
       <button class="knop licht" id="uit">Uitloggen</button></div>
   </header>
   <div class="tijd"><span class="demo">Tijdreis</span>
     <label for="tijd" style="display:contents"><span>Doe alsof het <b>${demoDag} december</b> is</span></label>
-    <input type="range" id="tijd" min="1" max="24" value="${demoDag}">
+    <input type="range" id="tijd" min="1" max="26" value="${demoDag}">
   </div>
   <div class="huis">
-    <div class="dakvak"><div class="dak"></div><div class="kapel">${raam(24,-1)}</div></div>
+    <div class="dakvak"><div class="dak"></div><div class="dakraam links">${raam(23,-2)}</div><div class="kapel">${raam(24,-1)}</div><div class="dakraam rechts">${raam(26,-2)}</div></div>
     <div class="gevel">${SLINGER}
       <div class="ramen">${GEVEL.map((d,i)=>raam(d,i)).join("")}</div>
       <div class="sneeuw"></div>
@@ -458,6 +539,7 @@ function tekenKalender(){
   $("#uit").onclick=()=>{ ik=null; scherm="login"; teken(); };
   if($("#naarBeheer")) $("#naarBeheer").onclick=()=>{ scherm="beheer"; teken(); };
   if($("#bonnen")) $("#bonnen").onclick=toonBonnen;
+  if($("#games")) $("#games").onclick=()=>{ const v=venster("Crazy Christmas Games", gamesHtml(gamesItem())); gamesKnoppen(v.podium); };
   $("#bus").onclick=()=>brievenbus("posten");
   $("#tijd").oninput=e=>{ demoDag=+e.target.value; tekenKalender(); $("#tijd").focus(); };
   $$(".raam").forEach(b=>b.onclick=()=>openDag(+b.dataset.dag));
@@ -599,34 +681,12 @@ function laatjes(dag){
 }
 
 /* ===== Stopmotion ===== */
-let demoFrames=null;
-function maakDemoFilm(){
-  if(demoFrames) return demoFrames;
-  const c=document.createElement("canvas"); c.width=320; c.height=240; const x=c.getContext("2d");
-  const vlokken=Array.from({length:26},()=>[Math.random()*320,Math.random()*240,Math.random()*2+1]);
-  demoFrames=Array.from({length:16},(_,f)=>{
-    const jx=Math.random()*2-1, jy=Math.random()*2-1; x.save(); x.translate(jx,jy);
-    for(let i=0;i<8;i++){ x.fillStyle=["#7d4f2e","#8a5a36","#74472a","#93633e"][i%4]; x.fillRect(i*42-4,-4,44,250); }
-    x.fillStyle="rgba(255,255,255,.85)"; x.fillRect(-4,150,330,95);
-    for(let i=0;i<40;i++){ x.fillStyle="rgba(200,215,230,.6)"; x.beginPath(); x.arc((i*53)%320,160+(i*29)%80,2,0,7); x.fill(); }
-    const sx=-60+f*24, sy=150+Math.sin(f*1.3)*2;
-    x.fillStyle="#2f5a47"; x.fillRect(sx+22,sy-34,22,20); x.fillStyle="#c22a33"; x.fillRect(sx+31,sy-34,4,20);
-    x.fillStyle="#e9d9c4"; x.fillRect(sx+46,sy-26,16,12);
-    x.fillStyle="#c22a33"; x.beginPath(); x.moveTo(sx,sy-14); x.lineTo(sx+78,sy-14); x.lineTo(sx+88,sy-26); x.lineTo(sx+88,sy-10); x.lineTo(sx+76,sy+2); x.lineTo(sx+8,sy+2); x.closePath(); x.fill();
-    x.strokeStyle="#c22a33"; x.lineWidth=4; x.lineCap="round"; x.beginPath(); x.moveTo(sx-2,sy+12); x.lineTo(sx+82,sy+12); x.quadraticCurveTo(sx+94,sy+12,sx+94,sy); x.stroke();
-    x.beginPath(); x.moveTo(sx+14,sy+2); x.lineTo(sx+14,sy+12); x.moveTo(sx+66,sy+2); x.lineTo(sx+66,sy+12); x.stroke();
-    x.fillStyle="#fff"; vlokken.forEach(v=>{ x.beginPath(); x.arc(v[0]+f*2,(v[1]+f*9)%240,v[2],0,7); x.fill(); });
-    x.restore();
-    x.fillStyle=`rgba(255,220,160,${.06+Math.random()*.06})`; x.fillRect(0,0,320,240);
-    return c.toDataURL("image/jpeg",.75);
-  });
-  return demoFrames;
-}
-const framesVan = it => it.frames==="demo" ? maakDemoFilm() : (it.frames||[]);
+const framesVan = it => it.clip && CLIPS[it.clip] ? Array.from({length:CLIPS[it.clip][1]},(_,i)=>`clips/${it.clip}/${String(i+1).padStart(2,"0")}.jpg`) : (it.frames||[]);
 function startFilms(root){
   clearInterval(filmTimer);
   const films=[...root.querySelectorAll(".film")]; if(!films.length) return;
   const st=films.map(f=>({f, fr:framesVan(S.inhoud.find(x=>x.id===f.dataset.id)||{}), i:0, aan:true}));
+  st.forEach(s=>s.fr.forEach(src=>{ const im=new Image(); im.src=src; }));
   st.forEach(s=>s.f.querySelector(".speel").onclick=()=>{ s.aan=!s.aan; s.f.querySelector(".speel").textContent=s.aan?"Pauze":"Speel"; });
   filmTimer=setInterval(()=>st.forEach(s=>{ if(!s.aan||!s.fr.length) return; s.i=(s.i+1)%s.fr.length; const img=s.f.querySelector("img"); img.src=s.fr[s.i];
     img.style.transform=`translate(${(Math.random()-.5)*1.5}px,${(Math.random()-.5)*1.5}px)`; }),125);
@@ -657,18 +717,17 @@ function onthul(dag,nieuw){
   const film=l.find(x=>x.soort==="stopmotion");
   const kop = eerste ? kort((eerste.tekst||SOORTEN[eerste.soort]).split("\n")[0]) : "Nog even geduld…";
   const sterren = nieuw ? Array.from({length:16},(_,i)=>`<svg class="ster" viewBox="0 0 10 10" style="left:${Math.random()*100}%;animation-delay:${Math.random()*2.5}s"><path d="M5 0v10M0 5h10M1.5 1.5l7 7M8.5 1.5l-7 7" stroke="${["#fff","#d8bd7e","#fff"][i%3]}" stroke-width="1.2"/></svg>`).join("") : "";
-  const scene = film ? "" : `<div class="scene">${sterren}
-      <span class="takje2">${TAKJE}</span>
-      <svg class="tag" viewBox="0 0 50 80"><path d="M10 0h30l10 12v68H0V12z" fill="#d3b48a"/><circle cx="25" cy="12" r="4" fill="#7d4f2e" stroke="#fbf8f1" stroke-width="2"/><text x="25" y="52" text-anchor="middle" font-family="Caveat,cursive" font-size="22" fill="#7c1d26">${dag}</text></svg>
-      <svg class="env" viewBox="0 0 120 80"><path d="M2 4l4 1 4-2 5 2 4-1 5 1 4-2 5 2 5-1 4 1 5-2 4 2 5-1 4 1 5-2 5 2 4-1 4 1 5-2 4 2 5-1 4 1 5-2 4 2 5-1 3 1v72H2z" fill="#f4eee2"/>
-        <path d="M2 78l46-34h24l46 34" fill="none" stroke="#d9ceba" stroke-width="1.2"/>
-        <path d="M2 4l58 42 58-42" fill="#ece4d4" stroke="#d9ceba" stroke-width="1.2"/>
-        <g class="zegel"><circle cx="60" cy="46" r="10" fill="#c22a33"/><circle cx="60" cy="46" r="6.5" fill="none" stroke="#9c1c25" stroke-width="1.2"/><path d="M60 41v10M55 46h10M56.5 42.5l7 7M63.5 42.5l-7 7" stroke="#9c1c25" stroke-width="1"/></g></svg>
-      <div class="briefje">${esc(kop)}</div>
+  const kamer = kamerVan(dag);
+  const vlokken = BUITEN.includes(kamer) ? Array.from({length:22},()=>`<span class="vlok" style="left:${Math.random()*100}%;width:${3+Math.random()*4}px;height:${3+Math.random()*4}px;animation-duration:${5+Math.random()*6}s;animation-delay:${-Math.random()*10}s"></span>`).join("") : "";
+  const scene = film ? "" : `<div class="kamer"><img src="kamers/${kamer}.jpg" alt="${esc(KAMERS[kamer])}"><span class="gloed"></span>${vlokken}${sterren}
+      <div class="labelkaart"><span class="lint"></span><svg class="strik" viewBox="0 0 40 20"><path d="M20 8q-14-12-16 0t16 0q14-12 16 0t-16 0" fill="#7c1d26"/><circle cx="20" cy="8" r="3" fill="#5e141c"/></svg><div class="kaart">${esc(kop)}</div></div>
     </div>`;
   p.innerHTML=`${scene}
     <div class="items">${l.length? l.map(it=>{
       if(it.soort==="bon") return bonHtml(it);
+      if(it.soort==="uitje") return uitjeHtml(it);
+      if(it.soort==="games") return gamesHtml(it);
+      if(it.soort==="lootje") return `<div class="item"><div class="tekst">${esc(it.tekst)}</div></div>${lootjeHtml()}`;
       return `<div class="item">
         <div class="soort">${SOORTEN[it.soort]}${it.voor==="alle"?'<span class="voorIedereen">voor iedereen</span>':''}</div>
         ${it.soort==="stopmotion"?`<div class="film" data-id="${it.id}"><div class="beeld"><img src="${framesVan(it)[0]||""}" alt="Stopmotion-filmpje"><span class="korrel"></span></div><button class="speel">Pauze</button></div>`:""}
@@ -677,7 +736,93 @@ function onthul(dag,nieuw){
         ${it.beeld?`<img src="${esc(it.beeld)}" alt="">`:""}
       </div>`;}).join("") : `<p class="uitleg">Dit raampje is nog leeg. De beheerder kan er tot die dag nog iets in stoppen.</p>`}
     </div>`;
-  startFilms(p); bonKnoppen(p);
+  startFilms(p); bonKnoppen(p); uitjeKnoppen(p); gamesKnoppen(p); lootjeKnoppen(p, ()=>onthul(dag,false));
+}
+
+/* ===== Uitjes: ik ben erbij, en stemmen ===== */
+function uitjeHtml(it){
+  const r=S.reacties[it.id]||{}, mij=r[ik.id]||{}, erbij=S.leden.filter(l=>(r[l.id]||{}).erbij), keuzes=it.keuzes||[];
+  return `<div class="uitje" data-uitje="${it.id}"><span class="kop2">Samen op pad · ${it.dag} december</span>
+    <span class="titel2">${esc(it.tekst)}</span>
+    ${it.wanneer||it.waar?`<span class="wanneer">${[it.wanneer,it.waar].filter(Boolean).map(esc).join(" · ")}</span>`:""}
+    ${keuzes.length?`<span class="uitleg">Stem mee:</span><div class="keuzes">${keuzes.map(k=>`<button class="keuze" data-keuze="${esc(k)}" aria-pressed="${mij.keuze===k}">${esc(k)} <span class="n">${S.leden.filter(l=>(r[l.id]||{}).keuze===k).length}</span></button>`).join("")}</div>`:""}
+    <div class="knoppen"><button class="knop ${mij.erbij?'':'licht'}" data-erbij>${mij.erbij?"Ik ben erbij ✓":"Ik ben erbij"}</button></div>
+    <div class="wie-rij">${erbij.map(l=>pop(l,24)).join("")||'<span class="uitleg">Nog niemand aangemeld.</span>'}</div></div>`;
+}
+function uitjeKnoppen(root){
+  root.querySelectorAll("[data-uitje]").forEach(el=>{ const id=el.dataset.uitje, it=S.inhoud.find(x=>x.id===id);
+    const zet=(k,v)=>{ (S.reacties[id] ||= {}); S.reacties[id][ik.id]={...(S.reacties[id][ik.id]||{}),[k]:v}; bewaar(); el.outerHTML=uitjeHtml(it); uitjeKnoppen(root); };
+    el.querySelectorAll("[data-keuze]").forEach(b=>b.onclick=()=>zet("keuze",b.dataset.keuze));
+    el.querySelector("[data-erbij]").onclick=()=>zet("erbij",!((S.reacties[id]||{})[ik.id]||{}).erbij);
+  });
+}
+
+/* ===== Crazy Christmas Games (25 december) ===== */
+function gamesItem(){
+  let it=S.inhoud.find(x=>x.soort==="games");
+  if(!it){ it={id:uid(), dag:25, voor:"alle", soort:"games", spel:"deurtje", mini:"cadeau", kamer:"cadeaus", tekst:""}; S.inhoud.push(it); bewaar(); }
+  return it;
+}
+function gamesHtml(it){
+  const lijst=(it.tekst||"").split("\n").map(x=>x.trim()).filter(Boolean), gs=S.gespeeld[it.id]||[], leider=spelleider();
+  const max=Math.max(0,...S.leden.map(l=>S.scores[l.id]||0));
+  const leiders=S.leden.filter(l=>l.spelleider).map(l=>l.naam).join(" en ")||"Griette";
+  return `<div class="games" data-games="${it.id}">
+    <span class="kop2">Spelleider: ${esc(leiders)}</span>
+    <div class="spellijst">${lijst.map((g,i)=>leider?`<label><input type="checkbox" data-gespeeld="${i}" ${gs.includes(i)?"checked":""}>${esc(g)}</label>`:`<div>${gs.includes(i)?"✓ ":"· "}${esc(g)}</div>`).join("")||'<p class="uitleg">De spelleider zet de spellen er nog in.</p>'}</div>
+    <h3 class="kapitaal">Scorebord</h3>
+    <div class="scorebord">${[...S.leden].sort((a,b)=>(S.scores[b.id]||0)-(S.scores[a.id]||0)).map(l=>{ const pt=S.scores[l.id]||0, kop=pt&&pt===max;
+      return `<div class="score ${kop?'koploper':''}" style="grid-template-columns:${leider?'auto 1fr auto auto auto':'auto 1fr auto'}">${pop(l,24)}<span>${esc(l.naam)}${kop?' ★':''}</span>${leider?`<button class="plus" data-min="${l.id}" aria-label="Punt eraf voor ${esc(l.naam)}">−</button>`:""}<span class="punten">${pt}</span>${leider?`<button class="plus" data-plus="${l.id}" aria-label="Punt erbij voor ${esc(l.naam)}">+</button>`:""}</div>`;}).join("")}</div>
+    ${leider?`<label>Spellen, één per regel<textarea data-spellen>${esc(it.tekst)}</textarea></label><button class="knop klein" data-opslaan>Spellen opslaan</button>`:""}
+  </div>`;
+}
+function gamesKnoppen(root){
+  root.querySelectorAll("[data-games]").forEach(el=>{ const it=S.inhoud.find(x=>x.id===el.dataset.games);
+    const opnieuw=()=>{ bewaar(); el.outerHTML=gamesHtml(it); gamesKnoppen(root); };
+    el.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>{ S.scores[b.dataset.plus]=(S.scores[b.dataset.plus]||0)+1; opnieuw(); });
+    el.querySelectorAll("[data-min]").forEach(b=>b.onclick=()=>{ S.scores[b.dataset.min]=Math.max(0,(S.scores[b.dataset.min]||0)-1); opnieuw(); });
+    el.querySelectorAll("[data-gespeeld]").forEach(c=>c.onchange=()=>{ const g=new Set(S.gespeeld[it.id]||[]); c.checked?g.add(+c.dataset.gespeeld):g.delete(+c.dataset.gespeeld); S.gespeeld[it.id]=[...g]; opnieuw(); });
+    const o=el.querySelector("[data-opslaan]"); if(o) o.onclick=()=>{ it.tekst=el.querySelector("[data-spellen]").value; opnieuw(); melding("Spellen opgeslagen"); };
+  });
+}
+
+/* ===== Lootjes en wensen (Sinterklaas op 26 december) ===== */
+function trekLootjes(){
+  const ids=S.leden.map(l=>l.id); let p;
+  do{ p=[...ids].sort(()=>Math.random()-.5); } while(p.some((x,i)=>x===ids[i]));
+  S.lootjes=Object.fromEntries(ids.map((id,i)=>[id,p[i]])); S.lootjeOpen={}; bewaar();
+}
+function lootjeHtml(){
+  const mijn=S.wensen.filter(w=>w.van===ik.id), getrokken=S.lootjes&&S.lootjes[ik.id], ander=getrokken?lid(getrokken):null, open=S.lootjeOpen[ik.id];
+  const wensRij=(w,weg)=>`<div class="wens ${w.soort}"><span class="hand">${esc(w.tekst)}</span>${weg?`<button class="mini-weg" data-wensweg="${w.id}">weg</button>`:`<span class="status">${w.soort==="doe"?"iets doen":"cadeautje"}</span>`}</div>`;
+  return `<div class="lootjesblok" style="display:grid;gap:12px">
+    <span class="kop2">Sinterklaas · 26 december</span>
+    ${ander?`<button class="lootje ${open?'':'dicht'}" data-lootje><span class="papier"><span class="uitleg">Jouw lootje</span>${open?`${pop(ander,46)}<span class="naam2">${esc(ander.naam)}</span>`:'<span class="hand" style="font-size:24px">tik om open te vouwen</span>'}</span></button>
+      ${open?`<div style="display:grid;gap:6px"><b>Wensen van ${esc(ander.naam)}</b>${S.wensen.filter(w=>w.van===getrokken).map(w=>wensRij(w,false)).join("")||'<p class="uitleg">Nog geen wensen. Kijk later nog eens.</p>'}</div>`:""}`
+      :`<p class="uitleg">Griette trekt binnenkort de lootjes. Zet alvast je wensen erin!</p>`}
+    <div style="display:grid;gap:6px"><b>Mijn wensenlijstje</b><span class="uitleg">Alleen wie jou trekt, ziet dit. Wens gerust ook iets om samen te doen.</span>
+      ${mijn.map(w=>wensRij(w,true)).join("")}
+      <form data-wensform class="formrij"><input type="text" placeholder="Ik wens…" aria-label="Wens"><select aria-label="Soort wens"><option value="cadeau">Cadeautje</option><option value="doe">Iets doen</option></select><button class="knop">Erbij</button></form>
+    </div></div>`;
+}
+function lootjeKnoppen(root, herteken){
+  const l=root.querySelector("[data-lootje]"); if(l) l.onclick=()=>{ S.lootjeOpen[ik.id]=true; bewaar(); herteken(); };
+  root.querySelectorAll("[data-wensweg]").forEach(b=>b.onclick=()=>{ S.wensen=S.wensen.filter(w=>w.id!==b.dataset.wensweg); bewaar(); herteken(); });
+  const f=root.querySelector("[data-wensform]"); if(f) f.onsubmit=e=>{ e.preventDefault(); const t=f.querySelector("input").value.trim(); if(!t) return;
+    S.wensen.push({id:uid(), van:ik.id, soort:f.querySelector("select").value, tekst:t}); bewaar(); herteken(); melding("Wens opgeslagen"); };
+}
+
+/* ===== Samen doen: ideeën verzamelen ===== */
+function ideeenHtml(){
+  const lijst=[...S.ideeen].sort((a,b)=>b.stemmen.length-a.stemmen.length);
+  return `<div style="display:grid;gap:8px;margin-top:12px"><p class="uitleg">Wat wil jij deze maand samen doen? Tik op het hartje als je ook wilt.</p>
+    ${lijst.map(i=>`<div class="idee"><div><span class="hand">${esc(i.tekst)}</span><br><span class="status">idee van ${esc(lid(i.van).naam)}${i.uitje?` · gepland op ${i.uitje} december`:""}</span></div><button class="hartje" data-hart="${i.id}" aria-pressed="${i.stemmen.includes(ik.id)}">♥ ${i.stemmen.length}</button></div>`).join("")||'<p class="uitleg">Nog geen ideeën.</p>'}
+    <form data-ideeform class="formrij"><input type="text" placeholder="Bijv. schaatsen, filmavond…" aria-label="Idee"><button class="knop">Erbij</button></form></div>`;
+}
+function ideeKnoppen(root, herteken){
+  root.querySelectorAll("[data-hart]").forEach(b=>b.onclick=()=>{ const i=S.ideeen.find(x=>x.id===b.dataset.hart); i.stemmen=i.stemmen.includes(ik.id)?i.stemmen.filter(x=>x!==ik.id):[...i.stemmen,ik.id]; bewaar(); herteken(); });
+  const f=root.querySelector("[data-ideeform]"); if(f) f.onsubmit=e=>{ e.preventDefault(); const t=f.querySelector("input").value.trim(); if(!t) return;
+    S.ideeen.push({id:uid(), van:ik.id, tekst:t, stemmen:[ik.id]}); bewaar(); herteken(); melding("Idee in de brievenbus"); };
 }
 
 /* ===== Brievenbus ===== */
@@ -689,6 +834,8 @@ function brievenbus(tab){
     <div class="tabs" role="tablist">
       <button role="tab" aria-selected="${tab==="posten"}" data-tab="posten">Posten</button>
       <button role="tab" aria-selected="${tab==="mijn"}" data-tab="mijn">Mijn post${ongelezen()?` (${ongelezen()})`:""}</button>
+      <button role="tab" aria-selected="${tab==="lootjes"}" data-tab="lootjes">Lootjes 26/12</button>
+      <button role="tab" aria-selected="${tab==="samen"}" data-tab="samen">Samen doen</button>
       <button role="tab" aria-selected="${tab==="diner"}" data-tab="diner">Kerstdiner</button>
     </div>
     ${tab==="posten"?`<form id="busform" style="display:grid;gap:10px;margin-top:12px">
@@ -702,10 +849,14 @@ function brievenbus(tab){
         <span class="status">${POSTSOORT[p.soort]}${p.aan?` · aan ${esc(lid(p.aan).naam)}`:""} · ${p.status==="nieuw"?"onderweg":p.status==="bezorgd"?"bezorgd":p.status==="beantwoord"?"beantwoord":"gezien"}</span>
         <span class="hand">${esc(p.tekst)}</span>${p.beeld?`<img src="${p.beeld}" alt="">`:""}
         ${p.antwoord?`<span class="antw"><b>Griette:</b> <span class="hand">${esc(p.antwoord)}</span></span>`:""}</div>`).join(""):'<p class="uitleg">Je hebt nog niets gepost.</p>'}</div>`:""}
+    ${tab==="lootjes"?`<div style="margin-top:12px">${lootjeHtml()}</div>`:""}
+    ${tab==="samen"?ideeenHtml():""}
     ${tab==="diner"?`<div style="display:grid;gap:10px;margin-top:12px"><p class="uitleg">Wie neemt wat mee naar het kerstdiner?</p>
       <div class="diner">${S.diner.map(d=>`<div><b>${esc(d.wie)}</b>: ${esc(d.wat)}</div>`).join("")||'<p class="uitleg">Nog niemand.</p>'}</div>
       <form id="dinerform" class="rij"><input type="text" id="dw" placeholder="Ik neem mee…" aria-label="Wat neem je mee"><button class="knop">Zet erbij</button></form></div>`:""}`;
   v.podium.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{ v.lag.remove(); brievenbus(b.dataset.tab); });
+  const herteken=()=>{ v.lag.remove(); brievenbus(tab); };
+  lootjeKnoppen(v.podium, herteken); ideeKnoppen(v.podium, herteken);
   const f=$("#busform");
   if(f){
     const wissel=()=>{ const s=$("#ps").value; $("#aanveld").hidden=s!=="briefje"; $("#fotoveld").hidden=s!=="foto";
@@ -741,7 +892,7 @@ function tekenBeheer(){
         <span class="hand">${esc(p.tekst)}</span>${p.beeld?`<img src="${p.beeld}" alt="" style="max-width:160px">`:""}
         ${p.antwoord?`<span class="antw">Jouw antwoord: <span class="hand">${esc(p.antwoord)}</span></span>`:""}
         ${p.status==="nieuw"?`<div class="knoppen">
-          ${p.soort==="briefje"?`<button class="knop klein" data-bezorg="${p.id}">Morgen in hun raampje (${Math.min(24,demoDag+1)} dec)</button>`:""}
+          ${p.soort==="briefje"?`<button class="knop klein" data-bezorg="${p.id}">Morgen in hun raampje (${Math.min(26,demoDag+1)} dec)</button>`:""}
           ${p.soort==="vraag"?`<input type="text" id="antw-${p.id}" placeholder="Jouw antwoord…" aria-label="Antwoord"><button class="knop klein" data-antw="${p.id}">Antwoord sturen</button>`:""}
           ${p.soort==="foto"?`<button class="knop klein" data-gezien="${p.id}">In het jaaroverzicht</button>`:""}
           <button class="knop klein licht" data-postweg="${p.id}">Weggooien</button></div>`:""}
@@ -749,11 +900,18 @@ function tekenBeheer(){
       ${ingewisseld.length?`<h3 class="kapitaal" style="margin-top:8px">Ingewisselde bonnen</h3>${ingewisseld.map(x=>`<div class="regel"><div><b>${esc(lid(x.wie).naam)}</b> · ${esc(x.it.tekst)} <span class="uitleg">(${esc(x.op)})</span></div></div>`).join("")}`:""}
       <h3 class="kapitaal" style="margin-top:8px">Kerstdiner</h3><div class="diner">${S.diner.map(d=>`<div><b>${esc(d.wie)}</b>: ${esc(d.wat)}</div>`).join("")}</div>
     </section>
+    <section class="paneel"><h2>Lootjes en samen doen</h2>
+      <p class="uitleg">${S.leden.map(l=>`${esc(l.naam)}: ${S.wensen.filter(w=>w.van===l.id).length} wens${S.wensen.filter(w=>w.van===l.id).length===1?"":"en"}`).join(" · ")}</p>
+      <div class="knoppen"><button class="knop klein" id="trek">${S.lootjes?"Opnieuw lootjes trekken":"Lootjes trekken"}</button>${S.lootjes?'<span class="uitleg">Getrokken! Wie wie heeft blijft geheim, ook voor jou.</span>':""}</div>
+      <h3 class="kapitaal" style="margin-top:6px">Ideeën uit de brievenbus</h3>
+      ${[...S.ideeen].sort((a,b)=>b.stemmen.length-a.stemmen.length).map(i=>`<div class="regel"><div><span class="hand" style="font-size:22px">${esc(i.tekst)}</span> <span class="uitleg">♥ ${i.stemmen.length} · van ${esc(lid(i.van).naam)}</span></div>${i.uitje?`<span class="uitleg">dag ${i.uitje}</span>`:`<button data-maakuitje="${i.id}" style="color:var(--den)">Uitje op dag ${beheerDag}</button>`}</div>`).join("")||'<p class="uitleg">Nog geen ideeën.</p>'}
+      <label>Spelleider van de Crazy Christmas Games<select id="leider">${S.leden.map(l=>`<option value="${l.id}" ${l.spelleider?"selected":""}>${esc(l.naam)}</option>`).join("")}</select></label>
+    </section>
     <section class="paneel"><h2>Kies een dag</h2>
-      <div class="dagkiezer">${Array.from({length:24},(_,i)=>i+1).map(d=>`<button data-d="${d}" class="${d===beheerDag?'aan':''}">${d}${tel(d)?`<span class="n">${tel(d)}</span>`:''}</button>`).join("")}</div>
+      <div class="dagkiezer">${Array.from({length:26},(_,i)=>i+1).map(d=>`<button data-d="${d}" class="${d===beheerDag?'aan':''}">${d}${tel(d)?`<span class="n">${tel(d)}</span>`:''}</button>`).join("")}</div>
     </section>
     <section class="paneel"><h2>Achter raampje ${beheerDag}</h2>
-      <div class="lijst">${vanDag.length? vanDag.map(x=>`<div class="regel"><div><b>${esc(naam(x.voor))}</b> · ${SOORTEN[x.soort]} · <i>${SPELLEN[x.spel||(beheerDag%2?"kras":"lintje")]}</i>${x.mini?` · miniatuur: ${MINIS[x.mini]}`:""}<br><span class="hand" style="font-size:22px">${esc(x.tekst||x.link||"(foto)")}</span>${x.waarde?` <b>${esc(x.waarde)}</b>`:""}</div><button data-weg="${x.id}">Weghalen</button></div>`).join("") : '<p class="uitleg">Nog niets. Voeg hieronder iets toe.</p>'}</div>
+      <div class="lijst">${vanDag.length? vanDag.map(x=>`<div class="regel"><div><b>${esc(naam(x.voor))}</b> · ${SOORTEN[x.soort]} · <i>${SPELLEN[x.spel||(beheerDag%2?"kras":"lintje")]}</i>${x.mini?` · miniatuur: ${MINIS[x.mini]}`:""}${x.clip?` · clip: ${CLIPS[x.clip][0]}`:""}${x.kamer?` · ${KAMERS[x.kamer]}`:""}<br><span class="hand" style="font-size:22px">${esc(x.tekst||x.link||"(foto)")}</span>${x.waarde?` <b>${esc(x.waarde)}</b>`:""}</div><button data-weg="${x.id}">Weghalen</button></div>`).join("") : '<p class="uitleg">Nog niets. Voeg hieronder iets toe.</p>'}</div>
     </section>
     <form class="paneel" id="nieuw"><h2>Iets achter raampje ${beheerDag} stoppen</h2>
       <div class="rij">
@@ -762,7 +920,15 @@ function tekenBeheer(){
         <label>Hoe gaat het open<select id="spel">${Object.entries(SPELLEN).map(([k,v])=>`<option value="${k}" ${k===(beheerDag%2?"kras":"lintje")?"selected":""}>${v}</option>`).join("")}</select></label>
         <label>Miniatuurtje in het raam<select id="mini">${Object.entries(MINIS).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></label>
       </div>
+      <div style="display:grid;gap:4px"><span class="uitleg" style="font-size:13px">Welk kamertje zit erachter?</span>
+        <div class="kamerkeuze" id="kamerkeuze"><button type="button" class="auto" data-kamer="" aria-pressed="true">vanzelf</button>${KAMERLIJST.map(k=>`<button type="button" data-kamer="${k}" aria-pressed="false" title="${KAMERS[k]}" aria-label="${KAMERS[k]}" style="background-image:url(kamers/${k}.jpg)"></button>`).join("")}</div></div>
       <label>Tekst of briefje<textarea id="tekst" placeholder="Schrijf hier je briefje, aanwijzing of wat de bon waard is…"></textarea></label>
+      <div id="veld-uitje" class="rij" hidden>
+        <label>Wanneer<input type="text" id="wanneer" placeholder="bijv. zaterdagmiddag"></label>
+        <label>Waar<input type="text" id="waar" placeholder="bijv. Groningen"></label>
+        <label>Laten stemmen (met komma's)<input type="text" id="keuzes" placeholder="Kerstmarkt, Kringloop"></label>
+      </div>
+      <label id="veld-clip" hidden>Kant-en-klare clip<select id="clip"><option value="">Eigen foto's uploaden</option>${Object.entries(CLIPS).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join("")}</select></label>
       <label id="veld-waarde" hidden>Waarde van de bon<input type="text" id="waarde" placeholder="bijv. € 5 of 1x afwassen"></label>
       <label id="veld-film" hidden>Foto's voor de stopmotion (kies ze allemaal tegelijk, in volgorde)<input type="file" id="frames" accept="image/*" multiple></label>
       <label>Link (liedje, filmpje)<input type="url" id="link" placeholder="https://"></label>
@@ -786,7 +952,7 @@ function tekenBeheer(){
   $$("[data-weg]").forEach(b=>b.onclick=()=>{ S.inhoud=S.inhoud.filter(x=>x.id!==b.dataset.weg); bewaar(); tekenBeheer(); melding("Weggehaald"); });
   const postVan = id => S.post.find(p=>p.id===id);
   $$("[data-bezorg]").forEach(b=>b.onclick=()=>{ const p=postVan(b.dataset.bezorg);
-    S.inhoud.push({id:uid(), dag:Math.min(24,demoDag+1), voor:p.aan, soort:"briefje", spel:"deurtje", mini:"briefje", tekst:`Van ${lid(p.van).naam}:\n${p.tekst}`});
+    S.inhoud.push({id:uid(), dag:Math.min(26,demoDag+1), voor:p.aan, soort:"briefje", spel:"deurtje", mini:"briefje", tekst:`Van ${lid(p.van).naam}:\n${p.tekst}`});
     p.status="bezorgd"; bewaar(); tekenBeheer(); melding(`Ligt morgen in het raampje van ${lid(p.aan).naam}`); });
   $$("[data-antw]").forEach(b=>b.onclick=()=>{ const p=postVan(b.dataset.antw), t=$("#antw-"+p.id).value.trim(); if(!t) return;
     p.antwoord=t; p.status="beantwoord"; p.gelezen=false; bewaar(); tekenBeheer(); melding("Antwoord verstuurd, het vlaggetje gaat omhoog"); });
@@ -797,14 +963,24 @@ function tekenBeheer(){
   $$("[data-reset]").forEach(b=>b.onclick=()=>{ S.geopend[b.dataset.reset]=[]; bewaar(); melding("Ramen weer dicht"); });
   $("#erbij").onclick=()=>{ S.leden.push({id:uid(), naam:"Lid "+(S.leden.length+1), pin:"1234"}); bewaar(); tekenBeheer(); melding("Gezinslid toegevoegd"); };
   $("#alles").onclick=()=>{ S=voorbeeld(); bewaar(); ik=S.leden[0]; tekenBeheer(); melding("Demo teruggezet"); };
-  const velden=()=>{ const s=$("#soort").value; $("#veld-waarde").hidden=s!=="bon"; $("#veld-film").hidden=s!=="stopmotion"; };
+  let kamerKeuze="";
+  $$("#kamerkeuze button").forEach(b=>b.onclick=()=>{ kamerKeuze=b.dataset.kamer; $$("#kamerkeuze button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); });
+  const velden=()=>{ const s=$("#soort").value; $("#veld-waarde").hidden=s!=="bon"; $("#veld-clip").hidden=s!=="stopmotion"; $("#veld-film").hidden=s!=="stopmotion"||!!$("#clip").value; $("#veld-uitje").hidden=s!=="uitje"; };
+  $("#clip").onchange=velden;
+  $("#trek").onclick=()=>{ if(S.leden.length<2) return; trekLootjes(); tekenBeheer(); melding("De lootjes zijn getrokken!"); };
+  $$("[data-maakuitje]").forEach(b=>b.onclick=()=>{ const i=S.ideeen.find(x=>x.id===b.dataset.maakuitje);
+    S.inhoud.push({id:uid(), dag:beheerDag, voor:"alle", soort:"uitje", spel:"kras", mini:"kaartje", tekst:i.tekst}); i.uitje=beheerDag; bewaar(); tekenBeheer(); melding(`Uitje staat achter raampje ${beheerDag}`); });
+  $("#leider").onchange=e=>{ S.leden.forEach(l=>l.spelleider = l.id===e.target.value && !l.beheer); bewaar(); melding("Spelleider ingesteld"); };
   $("#soort").onchange=velden; velden();
   $("#nieuw").onsubmit=async e=>{ e.preventDefault();
     const it={id:uid(), dag:beheerDag, voor:$("#voor").value, soort:$("#soort").value, spel:$("#spel").value, mini:$("#mini").value, tekst:$("#tekst").value.trim(), link:$("#link").value.trim()};
     if(it.soort==="bon") it.waarde=$("#waarde").value.trim();
+    if(kamerKeuze) it.kamer=kamerKeuze;
+    if(it.soort==="uitje"){ it.wanneer=$("#wanneer").value.trim(); it.waar=$("#waar").value.trim(); const k=$("#keuzes").value.split(",").map(x=>x.trim()).filter(Boolean); if(k.length) it.keuzes=k; }
+    if(it.soort==="stopmotion" && $("#clip").value) it.clip=$("#clip").value;
     const f=$("#beeld").files[0]; if(f) it.beeld=await verklein(f,600);
     const fr=[...$("#frames").files]; if(it.soort==="stopmotion" && fr.length){ melding("Filmpje maken…"); it.frames=[]; for(const x of fr.slice(0,24)) it.frames.push(await verklein(x,420,.7)); }
-    if(!it.tekst && !it.link && !it.beeld && !it.frames){ melding("Schrijf iets, plak een link of kies een foto"); return; }
+    if(!it.tekst && !it.link && !it.beeld && !it.frames && !it.clip){ melding("Schrijf iets, plak een link of kies een foto"); return; }
     S.inhoud.push(it); bewaar(); tekenBeheer(); melding(`Achter raampje ${beheerDag} gestopt`);
   };
 }
