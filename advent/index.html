@@ -354,6 +354,16 @@ textarea{min-height:90px;font-family:var(--f-hand);font-size:24px;line-height:1.
 .sier{color:var(--goud);font-size:12px}
 .taak{display:flex;gap:10px;align-items:center;background:#fff;padding:6px 10px;color:var(--inkt);font-size:15px}
 .taak.klaar span:last-child{text-decoration:line-through;opacity:.6}
+.sfeerfilm{position:relative}
+.startbeeld{position:absolute;inset:0;border:0;padding:0;background-size:cover;background-position:center;display:grid;place-items:center;cursor:pointer;border-radius:2px;margin-bottom:6px}
+.startbeeld::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,rgba(40,20,12,.15),rgba(40,20,12,.6))}
+.startkaart{position:relative;display:grid;justify-items:center;gap:2px;background:#fffdf6;padding:14px 22px 12px;border-radius:16px;max-width:86%;
+  box-shadow:0 0 0 3px #fffdf6,0 0 0 4.5px var(--goud),0 12px 22px -8px rgba(0,0,0,.55);transition:transform .2s}
+.startbeeld:hover .startkaart,.startbeeld:focus-visible .startkaart{transform:scale(1.03)}
+.startsoort{font-family:var(--f-titel);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht)}
+.starttitel{font-family:var(--f-hand);font-size:28px;line-height:1.05;color:var(--bordeaux);text-align:center}
+.startknop{margin-top:6px;background:var(--bordeaux);color:var(--creme);font-family:var(--f-titel);font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:7px 16px;border-radius:2px}
+.startgeluid{font-size:11px;color:var(--zacht);margin-top:2px}
 .sfeerfilm video{width:100%;display:block;border-radius:2px;background:#2a1a14;box-shadow:0 10px 20px -10px rgba(0,0,0,.5);margin-bottom:6px}
 .mandvak{position:relative;display:grid;justify-items:center;padding-top:10px}
 .mandvak img{width:min(260px,70%);position:relative;z-index:1;filter:drop-shadow(0 12px 12px rgba(0,0,0,.3))}
@@ -892,15 +902,15 @@ function onthul(dag,nieuw){
       if(it.soort==="lootje") return `<div class="item"><div class="tekst">${esc(it.tekst)}</div></div>${lootjeHtml()}`;
       return `<div class="item ${it.soort==="gedicht"?"gedicht":""}">
         <div class="soort">${SOORTEN[it.soort]}${it.voor==="alle"?'<span class="voorIedereen">voor iedereen</span>':''}</div>
-        ${it.soort==="film"&&FILMS[it.film]?`<div class="sfeerfilm"><video src="films/film-${it.film}.mp4" poster="films/film-${it.film}.jpg" autoplay muted loop playsinline controls aria-label="${esc(FILMS[it.film])}"></video></div>`:""}
-        ${it.soort==="stopmotion"&&it.clip&&CLIPS[it.clip]?`<div class="sfeerfilm"><video src="films/stop-${it.clip}.mp4" poster="films/stop-${it.clip}.jpg" autoplay muted loop playsinline controls aria-label="${esc(CLIPS[it.clip][0])}"></video></div>`:""}
+        ${it.soort==="film"&&FILMS[it.film]?videoHtml("film-"+it.film, FILMS[it.film], "Sfeerfilmpje"):""}
+        ${it.soort==="stopmotion"&&it.clip&&CLIPS[it.clip]?videoHtml("stop-"+it.clip, CLIPS[it.clip][0], "Stopmotion"):""}
         ${it.soort==="stopmotion"&&!it.clip?`<div class="film" data-id="${it.id}"><div class="beeld"><img src="${framesVan(it)[0]||""}" alt="Stopmotion-filmpje"><span class="korrel"></span></div><button class="speel">Pauze</button></div>`:""}
         ${it.tekst?`<div class="tekst">${esc(it.tekst)}</div>`:""}
         ${it.link?`<a href="${esc(it.link)}" target="_blank" rel="noopener">Open ${it.soort==="liedje"?"het liedje":it.soort==="video"?"het filmpje":"de link"} ↗</a>`:""}
         ${it.beeld?`<img src="${esc(it.beeld)}" alt="">`:""}
       </div>`;}).join("") : `<p class="uitleg">Nog leeg. Griëtte is bezig. Niet opjagen.</p>`}
     </div>`;
-  startFilms(p); bonKnoppen(p); uitjeKnoppen(p); gamesKnoppen(p); lootjeKnoppen(p, ()=>onthul(dag,false));
+  startbeelden(p); startFilms(p); bonKnoppen(p); uitjeKnoppen(p); gamesKnoppen(p); lootjeKnoppen(p, ()=>onthul(dag,false));
   if(dag===25){ const d=document.createElement("div"); d.style.marginTop="18px"; d.innerHTML=dinerHtml(); p.appendChild(d); dinerKnoppen(d, ()=>onthul(dag,false)); }
 }
 
@@ -925,6 +935,21 @@ function dinerKnoppen(root, herteken){
   root.querySelectorAll("[data-taak]").forEach(c=>c.onchange=()=>{ const t=S.taken.find(x=>x.id===c.dataset.taak); t.klaar=c.checked; bewaar(); herteken(); if(c.checked) melding("Taak afgevinkt!"); });
   const w=root.querySelector("[data-dinerwens]"); if(w) w.onsubmit=e=>{ e.preventDefault(); const t=w.querySelector("input").value.trim(); if(!t) return; S.dinerwensen.push({id:uid(), van:ik.id, tekst:t}); bewaar(); herteken(); melding("Je wens zit in de brievenbus"); };
   const m=root.querySelector("[data-meenemen]"); if(m) m.onsubmit=e=>{ e.preventDefault(); const t=m.querySelector("input").value.trim(); if(!t) return; S.diner.push({id:uid(), wie:ik.naam, wat:t}); bewaar(); herteken(); };
+}
+
+/* ===== Filmpjes: eerst een startbeeld, dan met geluid afspelen ===== */
+function videoHtml(naam, titel, soort){
+  return `<div class="sfeerfilm"><video src="films/${naam}.mp4" poster="films/${naam}.jpg" playsinline preload="metadata" aria-label="${esc(titel)}"></video>
+    <button class="startbeeld" type="button" aria-label="${esc(titel)} afspelen" style="background-image:url(films/${naam}.jpg)">
+      <span class="startkaart"><span class="startsoort">${esc(soort)}</span><span class="starttitel">${esc(titel)}</span><span class="startknop">▶ Afspelen</span><span class="startgeluid">met geluid</span></span>
+    </button></div>`;
+}
+function startbeelden(root){
+  root.querySelectorAll(".sfeerfilm").forEach(vak=>{
+    const v=vak.querySelector("video"), knop=vak.querySelector(".startbeeld"); if(!knop) return;
+    knop.onclick=()=>{ knop.hidden=true; v.controls=true; v.muted=false; v.currentTime=0; v.play().catch(()=>{ v.muted=true; v.play(); }); };
+    v.onended=()=>{ knop.hidden=false; knop.querySelector(".startknop").textContent="↻ Nog een keer"; v.controls=false; };
+  });
 }
 
 /* ===== Uitjes: ik ben erbij, en stemmen ===== */
