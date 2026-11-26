@@ -1,7 +1,7 @@
 <title>Ons Kersthuisje</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Karla:wght@400;600&family=Caveat:wght@500;700&family=Chewy&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Karla:wght@400;600&family=Caveat:wght@500;700&display=swap">
 <style>
 /* Layout: een getekend bordeaux huisje op lichtgrijs papier; elk raampje is een dag, het dakkapelletje is 24 december.
    Bewust één lichte papierwereld, zonder donkere modus. */
@@ -180,70 +180,10 @@ textarea{min-height:90px;font-family:var(--f-hand);font-size:24px;line-height:1.
 .lid{display:grid;grid-template-columns:1fr 72px auto;gap:8px;align-items:center}
 .melding{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--bordeaux);color:var(--creme);padding:8px 16px;border-radius:2px;font-size:14px;z-index:30}
 
-/* ---------- stijlkiezer ---------- */
-.stijlkiezer{display:flex;margin:0 auto 16px;width:max-content;border:1px solid var(--goud);border-radius:99px;overflow:hidden;background:var(--creme);position:relative;z-index:16}
-.stijlkiezer button{border:0;background:none;padding:6px 18px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--zacht)}
-.stijlkiezer button[aria-pressed="true"]{background:var(--bordeaux);color:var(--creme)}
-.titel span{display:inline-block}
-.lampjes,.sticker,.sneeuwlaag{display:none}
-
-/* ---------- variant DRUK: snoepkleuren, lampjes, dansende raampjes, sneeuw ---------- */
-:root[data-stijl="druk"]{--papier:#fff4e6;--creme:#fffdf8;--bordeaux:#d7263d;--bordeaux-donker:#a3122a;--goud:#f4b400;--goud-licht:#ffd75e;
-  --rood:#c8102e;--den:#1f9d55;--nacht:#22195e;--zacht:#8a5a63;--inkt:#3a1020;--f-titel:"Chewy","Fraunces",cursive}
-[data-stijl="druk"] body{background-image:radial-gradient(#ff8fab 2px,transparent 2.6px),radial-gradient(#7bdcb5 2px,transparent 2.6px),repeating-linear-gradient(45deg,transparent 0 22px,rgba(215,38,61,.06) 22px 44px);
-  background-size:46px 46px,46px 46px,auto;background-position:0 0,23px 23px,0 0}
-[data-stijl="druk"] .titel{font-size:clamp(40px,11.5vw,60px);line-height:1}
-[data-stijl="druk"] .titel span{text-shadow:2px 2px 0 #fff,4px 4px 0 rgba(58,16,32,.15);animation:hup 1.6s ease-in-out infinite}
-[data-stijl="druk"] .titel span:nth-child(5n+1){color:#d7263d;rotate:-6deg}
-[data-stijl="druk"] .titel span:nth-child(5n+2){color:#1f9d55;rotate:4deg}
-[data-stijl="druk"] .titel span:nth-child(5n+3){color:#f4a100;rotate:-3deg}
-[data-stijl="druk"] .titel span:nth-child(5n+4){color:#3d7fe0;rotate:7deg}
-[data-stijl="druk"] .titel span:nth-child(5n){color:#ff5c93;rotate:-4deg}
-@keyframes hup{50%{translate:0 -5px}}
-[data-stijl="druk"] .login h1 em{color:var(--den)}
-[data-stijl="druk"] .touw::before{height:4px;background:repeating-linear-gradient(90deg,#d7263d 0 8px,#fff 8px 16px)}
-[data-stijl="druk"] .label:nth-child(5n+1) .kaartje{background:#ffb3c7!important}
-[data-stijl="druk"] .label:nth-child(5n+2) .kaartje{background:#a8e6cf!important}
-[data-stijl="druk"] .label:nth-child(5n+3) .kaartje{background:#ffe066!important}
-[data-stijl="druk"] .label:nth-child(5n+4) .kaartje{background:#9ad0ff!important}
-[data-stijl="druk"] .label:nth-child(5n) .kaartje{background:#cdb4ff!important}
-[data-stijl="druk"] .knop{border-radius:99px;background:var(--den);font-family:var(--f-titel);text-transform:none;letter-spacing:.02em;font-size:17px;padding:8px 18px;box-shadow:0 3px 0 #11653a}
-[data-stijl="druk"] .knop.licht{background:#fff;color:var(--bordeaux);box-shadow:inset 0 0 0 2px var(--bordeaux),0 3px 0 var(--bordeaux)}
-[data-stijl="druk"] .stijlkiezer button[aria-pressed="true"]{background:var(--den)}
-[data-stijl="druk"] .dak{background:linear-gradient(transparent 90%,#fff 90%),repeating-linear-gradient(90deg,#fff 0 14px,#ff8fab 14px 28px)}
-[data-stijl="druk"] .gevel{background-size:30px 28px,19px 23px;box-shadow:inset 0 4px 0 #fff,inset 0 8px 0 var(--goud)}
-[data-stijl="druk"] .slinger{display:none}
-[data-stijl="druk"] .lampjes{display:block;width:100%;height:34px;margin:-4px 0 4px}
-.lampjes .lamp{animation:knipper 1.1s steps(2,jump-none) infinite}
-@keyframes knipper{50%{opacity:.3}}
-[data-stijl="druk"] .sticker{display:block;position:absolute;width:34px;z-index:3;pointer-events:none;filter:drop-shadow(0 2px 0 rgba(0,0,0,.2))}
-[data-stijl="druk"] .raam:not(.open) .glas{border:3px solid #fff;box-shadow:0 0 0 2px var(--goud)}
-[data-stijl="druk"] .ramen .raam:nth-child(5n+1):not(.open) .glas{background:#ffb3c7}
-[data-stijl="druk"] .ramen .raam:nth-child(5n+2):not(.open) .glas{background:#a8e6cf}
-[data-stijl="druk"] .ramen .raam:nth-child(5n+3):not(.open) .glas{background:#ffe066}
-[data-stijl="druk"] .ramen .raam:nth-child(5n+4):not(.open) .glas{background:#9ad0ff}
-[data-stijl="druk"] .ramen .raam:nth-child(5n):not(.open) .glas{background:#cdb4ff}
-[data-stijl="druk"] .kapel .raam:not(.open) .glas{background:#ffe066}
-[data-stijl="druk"] .raam .nr{font-family:"Chewy",cursive;font-weight:400;color:var(--rood);text-shadow:2px 2px 0 #fff}
-[data-stijl="druk"] .raam.open .nr{color:#ffe066;text-shadow:none}
-[data-stijl="druk"] .raam:disabled .nr{opacity:.35}
-[data-stijl="druk"] .raam .vensterbank{background:#fff;height:6px;border-radius:3px}
-[data-stijl="druk"] .raam:not(:disabled):not(.open){animation:dans 2.6s ease-in-out infinite}
-[data-stijl="druk"] .ramen .raam:nth-child(3n+1){animation-delay:-.9s}
-[data-stijl="druk"] .ramen .raam:nth-child(3n+2){animation-delay:-1.7s}
-@keyframes dans{0%,100%{rotate:0deg}25%{rotate:-3deg}75%{rotate:3deg}}
-[data-stijl="druk"] .sneeuwlaag{display:block;position:fixed;inset:0;pointer-events:none;z-index:15;overflow:hidden}
-.sneeuwlaag i{position:absolute;top:-14px;border-radius:50%;animation:val linear infinite}
-@keyframes val{to{transform:translate(40px,110vh) rotate(540deg)}}
-[data-stijl="druk"] .vel{border-radius:18px;border-top:0;box-shadow:0 0 0 4px #fff,0 0 0 8px var(--bordeaux),0 30px 60px -20px rgba(0,0,0,.5)}
-[data-stijl="druk"] .vel h2,[data-stijl="druk"] .paneel h2,[data-stijl="druk"] .pin h3{font-family:var(--f-titel)}
-[data-stijl="druk"] .paneel{border-radius:14px;border-top:0;box-shadow:0 0 0 3px #fff,0 0 0 5px var(--goud)}
-[data-stijl="druk"] .voorIedereen{background:var(--bordeaux)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
-<div class="sneeuwlaag" aria-hidden="true"></div>
-<div class="wrap"><nav class="stijlkiezer" aria-label="Stijl"><button type="button" data-stijl="rustig">Rustig</button><button type="button" data-stijl="druk">Druk</button></nav><div id="app" style="position:relative"></div></div>
+<div class="wrap"><div id="app" style="position:relative"></div></div>
 <div class="melding" id="melding" hidden></div>
 
 <script>
@@ -348,7 +288,7 @@ function tekenKalender(){
   const echt=vandaagDag();
   $("#app").innerHTML = `
   <header class="kop">
-    <div><div class="wie">voor ${esc(ik.naam)}</div><h1 class="titel">${titel("Crazy Christmas")}</h1></div>
+    <div><div class="wie">voor ${esc(ik.naam)}</div><h1>Crazy Christmas</h1></div>
     <div class="balk">${ik.beheer?'<button class="knop" id="naarBeheer">Beheer</button>':''}<button class="knop licht" id="uit">Uitloggen</button></div>
   </header>
   <div class="tijd"><span class="demo">Tijdreis</span>
@@ -357,7 +297,7 @@ function tekenKalender(){
   </div>
   <div class="huis">
     <div class="dakvak"><div class="dak"></div><div class="kapel">${raam(24,-1)}</div></div>
-    <div class="gevel">${SLINGER}${LAMPJES}${STICKERS}
+    <div class="gevel">${SLINGER}
       <div class="ramen">${GEVEL.map((d,i)=>raam(d,i)).join("")}</div>
       <div class="sneeuw"></div>
     </div>
@@ -424,8 +364,7 @@ const kort = t => t.length<=44 ? t : t.slice(0,44).replace(/\s+\S*$/,"")+"…";
 function onthul(dag,nieuw){
   const l=voorMij(dag), p=$("#podium"), eerste=l[0];
   const kop = eerste ? kort((eerste.tekst||SOORTEN[eerste.soort]).split("\n")[0]) : "Nog even geduld…";
-  const druk = stijl==="druk";
-  const sterren = nieuw ? Array.from({length:druk?44:16},(_,i)=>`<svg class="ster" viewBox="0 0 10 10" style="left:${Math.random()*100}%;animation-delay:${Math.random()*2.5}s"><path d="M5 0v10M0 5h10M1.5 1.5l7 7M8.5 1.5l-7 7" stroke="${(druk?["#ff5c93","#ffe066","#7bdcb5","#9ad0ff","#fff"]:["#fff","#d8bd7e","#fff"])[i%(druk?5:3)]}" stroke-width="${druk?2:1.2}"/></svg>`).join("") : "";
+  const sterren = nieuw ? Array.from({length:16},(_,i)=>`<svg class="ster" viewBox="0 0 10 10" style="left:${Math.random()*100}%;animation-delay:${Math.random()*2.5}s"><path d="M5 0v10M0 5h10M1.5 1.5l7 7M8.5 1.5l-7 7" stroke="${["#fff","#d8bd7e","#fff"][i%3]}" stroke-width="1.2"/></svg>`).join("") : "";
   p.innerHTML=`<div class="scene">${sterren}
       <span class="takje2">${TAKJE}</span>
       <svg class="tag" viewBox="0 0 50 80"><path d="M10 0h30l10 12v68H0V12z" fill="#d3b48a"/><circle cx="25" cy="12" r="4" fill="#7d4f2e" stroke="#fbf8f1" stroke-width="2"/><text x="25" y="52" text-anchor="middle" font-family="Caveat,cursive" font-size="22" fill="#7c1d26">${dag}</text></svg>
@@ -496,33 +435,6 @@ function tekenBeheer(){
 function verklein(f){ return new Promise(ok=>{ const r=new FileReader(); r.onload=()=>{ const im=new Image(); im.onload=()=>{
   const s=Math.min(1,600/Math.max(im.width,im.height)), c=document.createElement("canvas"); c.width=im.width*s; c.height=im.height*s;
   c.getContext("2d").drawImage(im,0,0,c.width,c.height); ok(c.toDataURL("image/jpeg",.8)); }; im.src=r.result; }; r.readAsDataURL(f); }); }
-
-/* ===== Stijl: rustig of druk ===== */
-let stijl = ["#druk","#rustig"].includes(location.hash) ? location.hash.slice(1) : "rustig";
-try{ if(!location.hash) stijl = localStorage.getItem("kersthuisje-stijl") || stijl; }catch(e){}
-function zetStijl(s){
-  stijl=s; document.documentElement.dataset.stijl=s;
-  try{ localStorage.setItem("kersthuisje-stijl",s); }catch(e){}
-  document.querySelectorAll(".stijlkiezer button").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.stijl===s)));
-}
-document.querySelectorAll(".stijlkiezer button").forEach(b=>b.onclick=()=>zetStijl(b.dataset.stijl));
-const titel = t => t.split("").map((ch,i)=>`<span style="animation-delay:${-i*.13}s">${ch===" "?"&nbsp;":esc(ch)}</span>`).join("");
-const LAMPKLEUR=["#ff3b3b","#ffd23f","#3bceac","#4d8dff","#ff7ad9"];
-const lampY = x => 5 + 13*Math.abs(Math.sin(Math.PI*x/100));
-const LAMPJES = `<svg class="lampjes" viewBox="0 0 400 34" preserveAspectRatio="none" aria-hidden="true"><polyline fill="none" stroke="#1f4d3a" stroke-width="2" points="${Array.from({length:81},(_,i)=>`${i*5},${lampY(i*5)}`).join(" ")}"/>${Array.from({length:15},(_,i)=>{const x=14+i*26.5,y=lampY(x);return `<g class="lamp" style="animation-delay:${(i%3)*.37}s" transform="translate(${x} ${y})"><rect x="-2.5" y="-1" width="5" height="4" fill="#2b3a33"/><ellipse cy="9" rx="4.2" ry="6.5" fill="${LAMPKLEUR[i%5]}"/><ellipse cx="-1.4" cy="6.5" rx="1.2" ry="2.2" fill="#fff" opacity=".6"/></g>`}).join("")}</svg>`;
-const STICKERSVG = {
-  ster:`<svg viewBox="0 0 40 40"><path d="M20 2l5 12 13 1-10 9 3 13-11-7-11 7 3-13L2 15l13-1z" fill="#ffd23f" stroke="#fff" stroke-width="2.5"/></svg>`,
-  zuurstok:`<svg viewBox="0 0 40 40"><path d="M14 38V14a8 8 0 0116 0" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/><path d="M14 38V14a8 8 0 0116 0" fill="none" stroke="#e0213a" stroke-width="8" stroke-dasharray="4 4" stroke-linecap="round"/></svg>`,
-  bal:`<svg viewBox="0 0 40 40"><rect x="16" y="2" width="8" height="6" fill="#f4b400"/><circle cx="20" cy="23" r="15" fill="#1f9d55" stroke="#fff" stroke-width="2.5"/><path d="M6 21q14 7 28 0" stroke="#ffd23f" stroke-width="3" fill="none"/><circle cx="14" cy="17" r="3" fill="#fff" opacity=".6"/></svg>`
-};
-const STICKERS = [["ster","-3%","8%",-14],["zuurstok","91%","27%",14],["bal","-4%","48%",0],["ster","92%","66%",22],["zuurstok","-2%","84%",-18]]
-  .map(([n,l,t,r])=>`<span class="sticker" style="left:${l};top:${t};rotate:${r}deg">${STICKERSVG[n]}</span>`).join("");
-(function sneeuw(){
-  const kl=["#fff","#fff","#ff8fab","#ffd23f","#7bdcb5","#9ad0ff"];
-  document.querySelector(".sneeuwlaag").innerHTML = Array.from({length:38},(_,i)=>{const z=4+Math.random()*7,c=kl[i%kl.length];
-    return `<i style="left:${Math.random()*100}%;width:${z}px;height:${z}px;background:${c};${c==="#fff"?"box-shadow:0 0 0 1px rgba(215,38,61,.25);":"border-radius:2px;"}animation-duration:${7+Math.random()*9}s;animation-delay:${-Math.random()*16}s"></i>`}).join("");
-})();
-zetStijl(stijl);
 
 teken();
 </script>
