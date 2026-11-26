@@ -402,7 +402,7 @@ const BUS = `<svg viewBox="0 0 60 80"><rect x="27" y="42" width="6" height="36" 
 const SOORTEN = {film:"Sfeerfilmpje", uitje:"Uitje samen", games:"Crazy Christmas Games", lootje:"Wensenlijstjes Sinterklaas", briefje:"Lief briefje", liedje:"Liedje", aanwijzing:"Aanwijzing", foto:"Foto", video:"Filmpje", cadeau:"Verrassing", bon:"Bon om in te wisselen", stopmotion:"Kerstclipje"};
 const SPELLEN = {kras:"Goudpapier krassen", lintje:"Lintje lostrekken", waslijn:"Was ophangen aan de waslijn", wasmand:"Graven in de wasmand", sneeuw:"Sneeuw wegvegen, voetstapjes volgen", deurtje:"Aankloppen bij het deurtje", laatjes:"Laatjes van het kastje"};
 const MINIS = {"":"Hoort bij de soort", oliebol:"Oliebol", kaartje:"Kaartje voor een uitje", reuzenrad:"Reuzenrad", lootje:"Lootje", waslijn:"Waslijntje", fles:"Flesje wasmiddel", slee:"Sleetje", lantaarn:"Lantaarntje", deurtje:"Deurtje", kastje:"Kastje", bezem:"Bezempje", cadeau:"Cadeautje", briefje:"Envelopje"};
-const POSTSOORT = {briefje:"Briefje aan iemand", vraag:"Vraag of wens aan Griette", foto:"Foto voor het jaaroverzicht", diner:"Wens voor het kerstdiner"};
+const POSTSOORT = {briefje:"Briefje aan iemand", vraag:"Vraag of wens aan Griëtte", foto:"Foto voor het jaaroverzicht", diner:"Wens voor het kerstdiner"};
 const FILMS = {intro:"Family Crazy Adventskalender", groningen:"Er gaat niks boven Groningen", rendiervous:"Rendier-vous bij de kachel", gluhckwens:"Glüh-ckwens!", piekfijn:"Piek-fijn!", mandatory:"Mand-atory", sleeperig:"Slee-perig?", hulstnodig:"Hulst nodig?", kerstraak:"Kerst-mis? Nee: kerst-raak!", navidad:"Feliz Navi-DAD"};
 const CLIPS = {slee:["Slee-perig onderweg: geen remmen, wel cadeaus",0], waslijn:["Was-echt een cadeau: hang er maar wat bij",0], welkom:["Mat-ig welkom: de deurmat liegt",0], voetstapjes:["Voet-sporen: er is iemand binnen geweest",0], kerstkamer:["Choco-mel-ding: de slagroom is op",0], mandje:["Mand-atory: alles moet erin",0], sneeuwtuin:["Koud kunstje: chocomel in de sneeuw",0], schilderijtjes:["Lijst-trekker: er hangt er weer een scheef",0], kastje:["Kast-anje? Lijk in de kast? Nee: cadeautjes",0], groningen:["Kermis-kiekjes: bewijs dat we het overleefd hebben",0]};
 const KAMERS = {huisje:"Wit huisje met lampjes", elfendeur:"Groen deurtje met postbus", trapje:"Touwladdertje en lantaarn", kerstkamer:"Kerstkamer", kastjeskamer:"Sterrenbehang", houtkamer:"Houten kamertje", kachelkamer:"Bij de kachel", cadeaus:"Cadeaus op de vloer", belletje:"Cadeauzakje met belletje", inpakken:"Inpaktafel", bankje:"Bankje in de sneeuw", picknick:"Chocomel in de sneeuw", dorp:"Dorpje in de sneeuw", meelvloer:"Voetstapjes in het meel", bedje:"Bedje en sterrenbehang", roodpapier:"Rood inpakpapier", cadeauzakjes:"Cadeauzakjes op de vloer", lantaarntje:"Rood lantaarntje op het bankje", sneeuwtuin:"Chocomel in de sneeuw", kachelhoek:"Kachelhoek met spiegel", lantaarnbankje:"Lantaarntje bij het deurtje", rodedeur:"Rode voordeur met post", stoeltjes:"Houten krukjes"};
@@ -412,13 +412,13 @@ const GEVEL = [20,16,17,2, 21,3,15,10, 14,18,9,22, 8,13,1,7, 19,5,12,4, 11,25,6]
 const vorm = (i,d) => d===25 ? "deur" : [9,10].includes(d)? "rond" : (Math.floor(i/4)%2===0 ? "boog" : "recht");
 
 /* ===== Opslag (demo: alleen op dit apparaat) ===== */
-const SLEUTEL = "familycrazy-v2";
+const SLEUTEL = "familycrazy-v3";
 const uid = () => Math.random().toString(36).slice(2,9);
 function voorbeeld(){
   return {
     leden:[
-      {id:"g", naam:"Griette", pin:"0000", beheer:true},
-      {id:"p", naam:"Papa", pin:"9999", spelleider:true},
+      {id:"g", naam:"Griëtte", pin:"0000", beheer:true},
+      {id:"p", naam:"Duurt", pin:"9999", spelleider:true},
       {id:"z", naam:"Zoon (19)", pin:"1111"},
       {id:"d", naam:"Dochter (21)", pin:"2222"},
       {id:"e", naam:"Tiener (16)", pin:"4444"},
@@ -457,7 +457,7 @@ function voorbeeld(){
       {id:uid(), dag:25, voor:"alle", soort:"games", spel:"deurtje", mini:"cadeau", kamer:"cadeaus", tekst:"Cadeau-estafette (niks breekbaars, we kennen jullie)\nKerst-pictionary\nWie ben ik? (existentieel, dus pas na het toetje)\nSokken-sneeuwballen gooien\nDe grote kerstquiz: de winnaar mag de rest de hele avond verbeteren"},
       {id:uid(), dag:26, voor:"alle", soort:"lootje", spel:"lintje", mini:"lootje", kamer:"belletje", tekst:"Sinterklaas! Hij was even zoek. Hieronder alle wensenlijstjes. Jij weet wie je hebt. Doe normaal."}
     ],
-    geopend:{}, post:[], diner:[{wie:"Griette", wat:"Kalkoen en jus"}], ingewisseld:{},
+    geopend:{}, post:[], diner:[{wie:"Griëtte", wat:"Kalkoen en jus"}], ingewisseld:{},
     reacties:{}, wensen:[{id:uid(), van:"z", soort:"cadeau", tekst:"Nieuwe koptelefoon"},{id:uid(), van:"d", soort:"doe", tekst:"Samen naar de film"}],
     lootjes:null, lootjeOpen:{}, ideeen:[{id:uid(), van:"d", tekst:"Samen kerstkoekjes bakken", stemmen:["g","z"]},{id:uid(), van:"z", tekst:"Filmavond met chips", stemmen:["d"]}],
     scores:{}, gespeeld:{},
@@ -608,7 +608,7 @@ function tekenLogin(){
     </form>`:""}
     ${ONLINE&&LEEG?`<div class="pin"><h3>Nieuwe kalender</h3><p class="uitleg">De database is nog leeg. Zet de voorbeeldkalender erin; daarna pas je in het beheer de namen, pincodes en inhoud aan.</p><button class="knop" id="init">Voorbeeldkalender klaarzetten</button></div>`:""}
   </section>`;
-  if($("#init")) $("#init").onclick=async()=>{ try{ await api("init",{docs:[...naarDocs(voorbeeld()).values()]}); await haalLeden(); melding("Klaar! Log in als Griette met 0000 en verander je pincode."); tekenLogin(); }catch(e){ melding(e.message); } };
+  if($("#init")) $("#init").onclick=async()=>{ try{ await api("init",{docs:[...naarDocs(voorbeeld()).values()]}); await haalLeden(); melding("Klaar! Log in als Griëtte met 0000 en verander je pincode."); tekenLogin(); }catch(e){ melding(e.message); } };
   $$(".label").forEach(b=>b.onclick=()=>{ kiesLid=S.leden.find(l=>l.id===b.dataset.id); tekenLogin(); $("#pinveld").focus(); });
   const f=$("#pinform");
   if(f) f.onsubmit=e=>{ e.preventDefault();
@@ -837,7 +837,7 @@ function bonKnoppen(root){
   root.querySelectorAll("[data-inwissel]").forEach(b=>b.onclick=()=>{
     S.ingewisseld[b.dataset.inwissel+"|"+ik.id]=`${demoDag} december`; bewaar();
     const it=S.inhoud.find(x=>x.id===b.dataset.inwissel); b.outerHTML=`<span class="stempel">Ingewisseld op ${demoDag} december</span>`;
-    melding("Ingewisseld! Griette ziet het in het beheer.");
+    melding("Ingewisseld! Griëtte ziet het in het beheer.");
   });
 }
 /* ===== Mijn mand: elk geopend raampje legt er een miniatuurtje in ===== */
@@ -881,7 +881,7 @@ function onthul(dag,nieuw){
         ${it.tekst?`<div class="tekst">${esc(it.tekst)}</div>`:""}
         ${it.link?`<a href="${esc(it.link)}" target="_blank" rel="noopener">Open ${it.soort==="liedje"?"het liedje":it.soort==="video"?"het filmpje":"de link"} ↗</a>`:""}
         ${it.beeld?`<img src="${esc(it.beeld)}" alt="">`:""}
-      </div>`;}).join("") : `<p class="uitleg">Dit raampje is nog leeg. Griette is ermee bezig. Niet opjagen, ze heeft een schaar.</p>`}
+      </div>`;}).join("") : `<p class="uitleg">Dit raampje is nog leeg. Griëtte is ermee bezig. Niet opjagen, ze heeft een schaar.</p>`}
     </div>`;
   startFilms(p); bonKnoppen(p); uitjeKnoppen(p); gamesKnoppen(p); lootjeKnoppen(p, ()=>onthul(dag,false));
   if(dag===25){ const d=document.createElement("div"); d.style.marginTop="18px"; d.innerHTML=dinerHtml(); p.appendChild(d); dinerKnoppen(d, ()=>onthul(dag,false)); }
@@ -895,9 +895,9 @@ function menuKaart(){
 }
 function dinerHtml(){
   return `<div class="dinerblok" style="display:grid;gap:16px">
-    ${S.menu?menuKaart():'<p class="uitleg">Griette zet het kerstmenu hier neer.</p>'}
+    ${S.menu?menuKaart():'<p class="uitleg">Griëtte zet het kerstmenu hier neer.</p>'}
     <div style="display:grid;gap:6px"><b>Taken</b>${S.taken.length?S.taken.map(t=>`<label class="taak ${t.klaar?'klaar':''}"><input type="checkbox" data-taak="${t.id}" ${t.klaar?'checked':''} ${t.wie===ik.id||ik.beheer?'':'disabled'}>${pop(lid(t.wie),22)}<span><b>${esc(lid(t.wie).naam)}</b>: ${esc(t.tekst)}</span></label>`).join(""):'<p class="uitleg">Nog geen taken verdeeld.</p>'}</div>
-    <div style="display:grid;gap:6px"><b>Wensen voor het kerstdiner</b><span class="uitleg">Waar heb jij zin in? Griette kiest het menu.</span>
+    <div style="display:grid;gap:6px"><b>Wensen voor het kerstdiner</b><span class="uitleg">Waar heb jij zin in? Griëtte kiest het menu.</span>
       ${S.dinerwensen.map(w=>`<div class="wens"><span class="hand">${esc(w.tekst)}</span><span class="status">${esc(lid(w.van).naam)}</span></div>`).join("")}
       <form data-dinerwens class="formrij"><input type="text" placeholder="Ik heb zin in…" aria-label="Wens voor het kerstdiner"><button class="knop">Erbij</button></form></div>
     <div style="display:grid;gap:6px"><b>Wie neemt wat mee?</b><div class="diner">${S.diner.map(d=>`<div><b>${esc(d.wie)}</b>: ${esc(d.wat)}</div>`).join("")}</div>
@@ -937,7 +937,7 @@ function gamesItem(){
 function gamesHtml(it){
   const lijst=(it.tekst||"").split("\n").map(x=>x.trim()).filter(Boolean), gs=S.gespeeld[it.id]||[], leider=spelleider();
   const max=Math.max(0,...S.leden.map(l=>S.scores[l.id]||0));
-  const leiders=S.leden.filter(l=>l.spelleider).map(l=>l.naam).join(" en ")||"Griette";
+  const leiders=S.leden.filter(l=>l.spelleider).map(l=>l.naam).join(" en ")||"Griëtte";
   return `<div class="games" data-games="${it.id}">
     <span class="kop2">Spelleider: ${esc(leiders)}</span>
     <div class="spellijst">${lijst.map((g,i)=>leider?`<label><input type="checkbox" data-gespeeld="${i}" ${gs.includes(i)?"checked":""}>${esc(g)}</label>`:`<div>${gs.includes(i)?"✓ ":"· "}${esc(g)}</div>`).join("")||'<p class="uitleg">De spelleider zet de spellen er nog in.</p>'}</div>
@@ -1013,12 +1013,12 @@ function brievenbus(tab){
       <label id="aanveld">Aan wie<select id="pa">${S.leden.filter(l=>l.id!==ik.id).map(l=>`<option value="${l.id}">${esc(l.naam)}</option>`).join("")}</select></label>
       <label>Je bericht<textarea id="pt" placeholder="Schrijf hier…"></textarea></label>
       <label id="fotoveld" hidden>Foto<input type="file" id="pf" accept="image/*"></label>
-      <p class="uitleg" id="pu">Griette leest je briefje eerst, dan ligt het de volgende ochtend in hun raampje.</p>
+      <p class="uitleg" id="pu">Griëtte leest je briefje eerst, dan ligt het de volgende ochtend in hun raampje.</p>
       <button class="knop">Op de bus doen</button></form>`:""}
     ${tab==="mijn"?`<div class="postlijst" style="margin-top:12px">${mijn.length?mijn.map(p=>`<div class="postje">
         <span class="status">${POSTSOORT[p.soort]}${p.aan?` · aan ${esc(lid(p.aan).naam)}`:""} · ${p.status==="nieuw"?"onderweg":p.status==="bezorgd"?"bezorgd":p.status==="beantwoord"?"beantwoord":"gezien"}</span>
         <span class="hand">${esc(p.tekst)}</span>${p.beeld?`<img src="${p.beeld}" alt="">`:""}
-        ${p.antwoord?`<span class="antw"><b>Griette:</b> <span class="hand">${esc(p.antwoord)}</span></span>`:""}</div>`).join(""):'<p class="uitleg">Je hebt nog niets gepost.</p>'}</div>`:""}
+        ${p.antwoord?`<span class="antw"><b>Griëtte:</b> <span class="hand">${esc(p.antwoord)}</span></span>`:""}</div>`).join(""):'<p class="uitleg">Je hebt nog niets gepost.</p>'}</div>`:""}
     ${tab==="lootjes"?`<div style="margin-top:12px">${lootjeHtml()}</div>`:""}
     ${tab==="samen"?ideeenHtml():""}
     ${tab==="diner"?`<div style="margin-top:12px">${dinerHtml()}</div>`:""}`;
@@ -1028,7 +1028,7 @@ function brievenbus(tab){
   const f=$("#busform");
   if(f){
     const wissel=()=>{ const s=$("#ps").value; $("#aanveld").hidden=s!=="briefje"; $("#fotoveld").hidden=s!=="foto";
-      $("#pu").textContent={briefje:"Griette leest je briefje eerst, dan ligt het de volgende ochtend in hun raampje.",vraag:"Het antwoord vind je straks onder 'Mijn post'. Dan gaat het vlaggetje van de brievenbus omhoog.",foto:"Alle foto's worden op 25 december samen een stopmotion van de maand.",diner:"Griette ziet je wens en kiest daarmee het kerstmenu."}[s]; };
+      $("#pu").textContent={briefje:"Griëtte leest je briefje eerst, dan ligt het de volgende ochtend in hun raampje.",vraag:"Het antwoord vind je straks onder 'Mijn post'. Dan gaat het vlaggetje van de brievenbus omhoog.",foto:"Alle foto's worden op 25 december samen een stopmotion van de maand.",diner:"Griëtte ziet je wens en kiest daarmee het kerstmenu."}[s]; };
     $("#ps").onchange=wissel; wissel();
     f.onsubmit=async e=>{ e.preventDefault();
       const s=$("#ps").value, t=$("#pt").value.trim(), fl=$("#pf").files[0];
