@@ -421,30 +421,31 @@ const GEVEL = [20,16,17,2, 21,3,15,10, 14,18,9,22, 8,13,1,7, 19,5,12,4, 11,25,6]
 const vorm = (i,d) => d===25 ? "deur" : [9,10].includes(d)? "rond" : (Math.floor(i/4)%2===0 ? "boog" : "recht");
 
 /* ===== Opslag (demo: alleen op dit apparaat) ===== */
-const SLEUTEL = "familycrazy-v4";
+const SLEUTEL = "familycrazy-v5";
 const uid = () => Math.random().toString(36).slice(2,9);
 function voorbeeld(){
   return {
     leden:[
       {id:"g", naam:"Griëtte", pin:"0000", beheer:true},
       {id:"p", naam:"Duurt", pin:"9999", spelleider:true},
-      {id:"z", naam:"Zoon (19)", pin:"1111"},
-      {id:"d", naam:"Dochter (21)", pin:"2222"},
-      {id:"e", naam:"Tiener (16)", pin:"4444"},
-      {id:"f", naam:"Jongste (11)", pin:"5555"}
+      {id:"d", naam:"Frederique", pin:"2222"},
+      {id:"z", naam:"Steijn", pin:"1111"},
+      {id:"e", naam:"Jort", pin:"4444"},
+      {id:"f", naam:"Lauren", pin:"5555"}
     ],
     inhoud:[
       {id:uid(), dag:1, voor:"alle", soort:"film", film:"intro", spel:"kras", mini:"cadeau", tekst:"Welkom. 26 dagen, elke dag een raampje.\nNiet zeuren."},
       {id:uid(), dag:1, voor:"alle", soort:"video", tekst:"Kijktip: Kerst met Linus. Elke dag een aflevering. Net als wij, maar met budget.", link:"https://www.tvgids.nl/serie/kerst-met-linus"},
       {id:uid(), dag:2, voor:"z", soort:"stopmotion", clip:"waslijn", spel:"waslijn", mini:"waslijn", tekst:"Er hangt iets aan de lijn. Voor jou."},
-      {id:uid(), dag:2, voor:"z", soort:"bon", tekst:"Wasbon. Eén week gratis wassen. Zakken leeg.", waarde:"€ 5"},
+      {id:uid(), dag:2, voor:"z", soort:"bon", tekst:"Wasbon. Eén week gratis wassen als je thuis bent. Zakken leeg.", waarde:"€ 5"},
       {id:uid(), dag:2, voor:"d", soort:"cadeau", spel:"wasmand", mini:"fles", kamer:"kachelkamer", tekst:"Kijk in je wasmand. Wasmiddel. Hint."},
       {id:uid(), dag:2, voor:"alle", soort:"aanwijzing", kamer:"elfendeur", tekst:"Pannenkoeken vanavond. Wie de laatste pakt, is onterfd."},
       {id:uid(), dag:3, voor:"alle", soort:"stopmotion", clip:"welkom", spel:"deurtje", mini:"deurtje", tekst:"De brievenbus is open. Post erin. Klachten niet."},
       {id:uid(), dag:4, voor:"alle", soort:"stopmotion", clip:"voetstapjes", spel:"sneeuw", mini:"bezem", tekst:"Voetstappen in het meel. Volg ze. Neem een koekenpan mee."},
+      {id:uid(), dag:4, voor:"f", soort:"briefje", kamer:"meelvloer", tekst:"Lauren, jij mag als eerste de voetstappen volgen. Jij hebt de beste ogen van het huis."},
       {id:uid(), dag:5, voor:"alle", soort:"stopmotion", clip:"kerstkamer", spel:"laatjes", mini:"kastje", tekst:"Chocomel vanavond. De slagroom is op. We weten wie."},
       {id:uid(), dag:6, voor:"alle", soort:"film", film:"rendiervous", spel:"lintje", mini:"briefje", tekst:"Pepernoten. De Sint komt pas op de 26e. File.\nWensen alvast in de brievenbus."},
-      {id:uid(), dag:7, voor:"alle", soort:"film", film:"gluhckwens", spel:"lintje", mini:"cadeau", tekst:"Jarig! 21 jaar. Geen weg terug.\nZingen om 18.00 uur. Vals mag."},
+      {id:uid(), dag:7, voor:"alle", soort:"film", film:"gluhckwens", spel:"lintje", mini:"cadeau", tekst:"Frederique is jarig! 21 jaar. Geen weg terug.\nZingen om 18.00 uur. Vals mag. Groningen hoort het wel."},
       {id:uid(), dag:7, voor:"d", soort:"briefje", kamer:"cadeauzakjes", tekst:"21. Vanaf nu gaat het bergaf.\nGefeliciteerd. Je cadeau ligt ergens in huis. Zoek."},
       {id:uid(), dag:8, voor:"alle", soort:"stopmotion", clip:"slee", spel:"lintje", mini:"slee", tekst:"Het sleetje komt. De rendieren zijn op."},
       {id:uid(), dag:9, voor:"alle", soort:"stopmotion", clip:"mandje", spel:"wasmand", mini:"cadeau", tekst:"Kijk in het mandje bij de kachel. Niet ín de kachel."},
@@ -452,14 +453,16 @@ function voorbeeld(){
       {id:uid(), dag:10, voor:"alle", soort:"stopmotion", clip:"kastje", spel:"laatjes", mini:"kastje", tekst:"Bovenste laatje. Niet het onderste. Nooit het onderste."},
       {id:uid(), dag:11, voor:"alle", soort:"film", film:"piekfijn", spel:"sneeuw", mini:"lantaarn", tekst:"Piek in de boom. De langste mag. Wie valt, heeft pech."},
       {id:uid(), dag:12, voor:"alle", soort:"stopmotion", clip:"sneeuwtuin", spel:"kras", mini:"lantaarn", tekst:"Wandelen. Het is koud. Het is december. Jas aan."},
+      {id:uid(), dag:12, voor:"z", soort:"briefje", kamer:"sneeuwtuin", tekst:"Lissabon: 17 graden. Hier: jas aan. Jij mist niks. Kom toch maar."},
       {id:uid(), dag:13, voor:"alle", soort:"uitje", spel:"kras", mini:"kaartje", kamer:"dorp", tekst:"Kerstmarkt of kringloop. Stemmen. De meerderheid wint, Griëtte beslist.", keuzes:["Kerstmarkt","Kringloop"], wanneer:"Zondag"},
       {id:uid(), dag:14, voor:"alle", soort:"stopmotion", clip:"schilderijtjes", spel:"deurtje", mini:"foto", tekst:"Je mooiste foto van dit jaar in de brievenbus. Hij komt aan de muur. Ook als je raar kijkt."},
       {id:uid(), dag:15, voor:"alle", soort:"film", film:"hulstnodig", spel:"lintje", mini:"cadeau", tekst:"Samen inpakken. Plakband voor drie cadeaus. Het zijn er veertig."},
+      {id:uid(), dag:15, voor:"e", soort:"briefje", kamer:"inpakken", tekst:"Jort: jij bent vanavond hoofd plakband. Verantwoordelijke functie. Geen salaris."},
       {id:uid(), dag:16, voor:"alle", soort:"film", film:"kerstraak", spel:"deurtje", mini:"briefje", tekst:"Post in de brievenbus. Geen rekening. Dit keer."},
       {id:uid(), dag:17, voor:"alle", soort:"film", film:"gluhckwens", spel:"kras", mini:"cadeau", tekst:"Glühwein voor de groten. Chocomel voor de rest. We tellen de bekers."},
       {id:uid(), dag:19, voor:"alle", soort:"film", film:"mandatory", spel:"wasmand", mini:"cadeau", tekst:"Je mand loopt vol. Nog vijf nachtjes. Ongeveer."},
       {id:uid(), dag:20, voor:"alle", soort:"film", film:"groningen", spel:"deurtje", mini:"reuzenrad", tekst:"Groningen. Kerstkermis. Reuzenrad op eigen risico."},
-      {id:uid(), dag:20, voor:"alle", soort:"uitje", mini:"reuzenrad", kamer:"bankje", tekst:"Kerstkermis Groningen. Iedereen mee. Ook met hoogtevrees.", wanneer:"Datum volgt", waar:"Groningen"},
+      {id:uid(), dag:20, voor:"alle", soort:"uitje", mini:"reuzenrad", kamer:"bankje", tekst:"Kerstkermis Groningen. Iedereen mee. Frederique weet de weg.", wanneer:"Datum volgt", waar:"Groningen"},
       {id:uid(), dag:21, voor:"alle", soort:"stopmotion", clip:"groningen", spel:"lintje", mini:"foto", tekst:"Kermisfoto's. We zijn er allemaal nog. Geteld."},
       {id:uid(), dag:24, voor:"alle", soort:"film", film:"sleeperig", spel:"kras", mini:"slee", tekst:"Nog één nacht. Slapen. Hij kijkt."},
       {id:uid(), dag:25, voor:"alle", soort:"film", film:"navidad", spel:"deurtje", mini:"cadeau", tekst:"Crazy Christmas Games. Verliezen mag. Afwassen moet."},
