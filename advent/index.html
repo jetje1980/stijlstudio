@@ -435,7 +435,7 @@ const GEVEL = [20,16,17,2, 21,3,15,10, 14,18,9,22, 8,13,1,7, 19,5,12,4, 11,25,6]
 const vorm = (i,d) => d===25 ? "deur" : [9,10].includes(d)? "rond" : (Math.floor(i/4)%2===0 ? "boog" : "recht");
 
 /* ===== Opslag (demo: alleen op dit apparaat) ===== */
-const SLEUTEL = "familycrazy-v6";
+const SLEUTEL = "familycrazy-v7";
 const uid = () => Math.random().toString(36).slice(2,9);
 function voorbeeld(){
   return {
@@ -448,7 +448,7 @@ function voorbeeld(){
       {id:"f", naam:"Lauren", pin:"5555"}
     ],
     inhoud:[
-      {id:uid(), dag:1, voor:"alle", soort:"film", film:"intro", spel:"kras", mini:"cadeau", tekst:"Welkom. 26 dagen, elke dag een raampje.\nNiet zeuren."},
+      {id:uid(), dag:1, voor:"alle", soort:"film", film:"intro", spel:"kras", mini:"cadeau", tekst:"Welkom. 26 dagen, elke dag een raampje."},
       {id:uid(), dag:1, voor:"alle", soort:"video", tekst:"Kijktip: Kerst met Linus. Elke dag een aflevering. Net als wij, maar met budget.", link:"https://www.tvgids.nl/serie/kerst-met-linus"},
       {id:uid(), dag:2, voor:"z", soort:"stopmotion", clip:"waslijn", spel:"waslijn", mini:"waslijn", tekst:"Er hangt iets aan de lijn. Voor jou."},
       {id:uid(), dag:2, voor:"z", soort:"bon", tekst:"Wasbon. Deze week betalen wij je was. In Lissabon. Zakken leeg.", waarde:"€ 5"},
