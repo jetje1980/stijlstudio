@@ -467,7 +467,89 @@ function voorbeeld(){
 let S;
 try{ S = JSON.parse(localStorage.getItem(SLEUTEL)) || voorbeeld(); }catch(e){ S = voorbeeld(); }
 S = Object.assign({geopend:{},post:[],diner:[],ingewisseld:{},reacties:{},wensen:[],lootjes:null,lootjeOpen:{},ideeen:[],scores:{},gespeeld:{},dinerwensen:[],menu:"",taken:[]}, S);
-function bewaar(){ try{ localStorage.setItem(SLEUTEL, JSON.stringify(S)); }catch(e){ melding("Het geheugen van deze demo is vol. Gebruik kleinere of minder foto's."); } }
+const API = "https://kjvufjkhfjbuxnuqdeev.supabase.co/functions/v1/advent";
+let ONLINE=false, TOKEN=null, VANDAAG=0, LEEG=false, SNAP=new Map(), syncTimer=null, bezigSync=false;
+const LIJSTEN=["leden","inhoud","post","wensen","ideeen","taken","dinerwensen","diner"];
+/* de staat S als losse documenten (zo kan iedereen tegelijk iets bewaren zonder elkaars werk te overschrijven) */
+function naarDocs(st){
+  const m=new Map(), zet=(col,id,data)=>m.set(col+"/"+id,{col,id:String(id),data});
+  for(const col of LIJSTEN) (st[col]||[]).forEach((x,i)=>{
+    x.id ||= uid();
+    if(col==="leden"||col==="inhoud") x.volgorde=i; else x.t ??= Date.now()+i;
+    zet(col, x.id, x);
+  });
+  Object.entries(st.geopend||{}).forEach(([k,v])=>zet("geopend",k,{dagen:v}));
+  Object.entries(st.reacties||{}).forEach(([it,per])=>Object.entries(per||{}).forEach(([l,v])=>zet("reacties",it+"|"+l,v)));
+  Object.entries(st.scores||{}).forEach(([k,v])=>zet("scores",k,{n:v}));
+  Object.entries(st.gespeeld||{}).forEach(([k,v])=>zet("gespeeld",k,{i:v}));
+  Object.entries(st.ingewisseld||{}).forEach(([k,v])=>zet("ingewisseld",k,{op:v}));
+  zet("config","menu",{tekst:st.menu||""});
+  return m;
+}
+function vanDocs(docs){
+  const st={leden:[],inhoud:[],post:[],wensen:[],ideeen:[],taken:[],dinerwensen:[],diner:[],geopend:{},reacties:{},scores:{},gespeeld:{},ingewisseld:{},menu:"",lootjes:null,lootjeOpen:{}};
+  for(const {col,id,data} of docs){
+    if(LIJSTEN.includes(col)) st[col].push({...data,id});
+    else if(col==="geopend") st.geopend[id]=data.dagen||[];
+    else if(col==="reacties"){ const [it,l]=id.split("|"); (st.reacties[it] ||= {})[l]=data; }
+    else if(col==="scores") st.scores[id]=data.n||0;
+    else if(col==="gespeeld") st.gespeeld[id]=data.i||[];
+    else if(col==="ingewisseld") st.ingewisseld[id]=data.op;
+    else if(col==="config"&&id==="menu") st.menu=data.tekst||"";
+  }
+  for(const col of LIJSTEN) st[col].sort((a,b)=>(a.volgorde??a.t??0)-(b.volgorde??b.t??0));
+  return st;
+}
+const zonderPinJson = d => JSON.stringify(d.col==="leden" ? {...d.data, pin:undefined} : d.data);
+async function api(actie, extra={}){
+  const r=await fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({actie,token:TOKEN,...extra})});
+  const j=await r.json().catch(()=>({fout:"Geen verbinding met de server."}));
+  if(!r.ok) throw Object.assign(new Error(j.fout||"Er ging iets mis."),{status:r.status});
+  return j;
+}
+function bewaar(){
+  if(!ONLINE){ try{ localStorage.setItem(SLEUTEL, JSON.stringify(S)); }catch(e){ melding("Het geheugen van deze demo is vol. Gebruik kleinere of minder foto's."); } return; }
+  clearTimeout(syncTimer); syncTimer=setTimeout(sync,250);
+}
+async function sync(){
+  syncTimer=null;
+  if(bezigSync){ syncTimer=setTimeout(sync,300); return; }
+  bezigSync=true;
+  try{
+    const nu=naarDocs(S), upserts=[], deletes=[];
+    for(const [k,d] of nu) if(SNAP.get(k)!==JSON.stringify(d.data)) upserts.push(d);
+    for(const k of SNAP.keys()) if(!nu.has(k)){ const i=k.indexOf("/"); deletes.push({col:k.slice(0,i), id:k.slice(i+1)}); }
+    if(!upserts.length && !deletes.length) return;
+    const res=await api("schrijf",{upserts,deletes});
+    for(const d of upserts) SNAP.set(d.col+"/"+d.id, zonderPinJson(d));
+    for(const d of deletes) SNAP.delete(d.col+"/"+d.id);
+    S.leden.forEach(l=>{ if("pin" in l) l.pin=undefined; });
+    if(res.geweigerd && res.geweigerd.length) melding("Een deel mocht niet worden opgeslagen.");
+  }catch(e){
+    melding(e.status===401 ? "Je bent uitgelogd. Log opnieuw in." : "Niet opgeslagen: "+e.message+" Probeer het zo nog eens.");
+  }finally{ bezigSync=false; }
+}
+async function haalAlles(){
+  const j=await api("lees");
+  S=vanDocs(j.docs); VANDAAG=j.vandaag;
+  SNAP=new Map([...naarDocs(S)].map(([k,d])=>[k,JSON.stringify(d.data)]));
+  ik=S.leden.find(l=>l.id===j.ik)||null;
+  demoDag = ik && ik.beheer ? (demoDag || VANDAAG || 1) : VANDAAG;
+}
+async function haalLeden(){
+  const j=await api("leden");
+  ONLINE=true; VANDAAG=j.vandaag; LEEG=j.leeg;
+  S=vanDocs([]); S.leden=j.leden.sort((a,b)=>a.volgorde-b.volgorde);
+}
+async function startOnline(){
+  try{ await haalLeden(); }catch(e){ ONLINE=false; return; }   /* geen server bereikbaar: dan is dit de demo */
+  try{ TOKEN=localStorage.getItem("familycrazy-token"); }catch(e){}
+  if(TOKEN){ try{ await haalAlles(); if(ik) scherm="kalender"; }catch(e){ TOKEN=null; } }
+}
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState!=="visible" || !ONLINE || !TOKEN || bezigSync || syncTimer || document.querySelector(".scherm")) return;
+  haalAlles().then(teken).catch(()=>{});
+});
 
 let ik=null, kiesLid=null, scherm="login", beheerDag=1, filmTimer=null;
 function vandaagDag(){ const nu=new Date(); return nu.getMonth()===11 ? Math.min(nu.getDate(),26) : 0; }
@@ -508,7 +590,7 @@ function tekenLogin(){
   $("#app").innerHTML = `
   <span class="takje" style="right:-10px;top:-6px">${TAKJE}</span>
   <section class="login">
-    <span class="demo">Voorstel · klikbare demo</span>
+    ${ONLINE?"":'<span class="demo">Voorstel · klikbare demo</span>'}
     <h1>Family <em>Crazy</em> Adventskalender</h1>
     <p>Elke dag vanaf 1 december een raampje open, en elke dag komt er iets in je mand. Kies je label, pincode erin. Den-k je eraan?</p>
     <div class="touw"><div class="mensen">
@@ -520,12 +602,21 @@ function tekenLogin(){
       <input id="pinveld" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="Pincode">
       <p class="fout" id="fout"></p>
       <button class="knop">Naar mijn huisje</button>
-      <p class="uitleg">Demo-pincode: ${esc(kiesLid.pin)}</p>
+      ${ONLINE?"":`<p class="uitleg">Demo-pincode: ${esc(kiesLid.pin)}</p>`}
     </form>`:""}
+    ${ONLINE&&LEEG?`<div class="pin"><h3>Nieuwe kalender</h3><p class="uitleg">De database is nog leeg. Zet de voorbeeldkalender erin; daarna pas je in het beheer de namen, pincodes en inhoud aan.</p><button class="knop" id="init">Voorbeeldkalender klaarzetten</button></div>`:""}
   </section>`;
+  if($("#init")) $("#init").onclick=async()=>{ try{ await api("init",{docs:[...naarDocs(voorbeeld()).values()]}); await haalLeden(); melding("Klaar! Log in als Griette met 0000 en verander je pincode."); tekenLogin(); }catch(e){ melding(e.message); } };
   $$(".label").forEach(b=>b.onclick=()=>{ kiesLid=S.leden.find(l=>l.id===b.dataset.id); tekenLogin(); $("#pinveld").focus(); });
   const f=$("#pinform");
   if(f) f.onsubmit=e=>{ e.preventDefault();
+    if(ONLINE){
+      api("login",{id:kiesLid.id, pin:$("#pinveld").value}).then(async j=>{
+        TOKEN=j.token; try{ localStorage.setItem("familycrazy-token",TOKEN); }catch(e){}
+        await haalAlles(); kiesLid=null; scherm="kalender"; teken();
+      }).catch(e=>{ $("#fout").textContent=e.message; });
+      return;
+    }
     if($("#pinveld").value===kiesLid.pin){ ik=kiesLid; kiesLid=null; scherm="kalender"; teken(); }
     else $("#fout").textContent="Die pincode klopt niet. Probeer het nog eens.";
   };
@@ -556,7 +647,7 @@ function tekenKalender(){
       ${ik.beheer?`<button class="knop" id="naarBeheer">Beheer${S.post.filter(p=>p.status==="nieuw").length?` · ${S.post.filter(p=>p.status==="nieuw").length} post`:""}</button>`:''}
       <button class="knop licht" id="uit">Uitloggen</button></div>
   </header>
-  <div class="tijd"><span class="demo">Tijdreis</span>
+  <div class="tijd" ${ONLINE&&!ik.beheer?"hidden":""}><span class="demo">${ONLINE?"Voorproefje (alleen jij)":"Tijdreis"}</span>
     <label for="tijd" style="display:contents"><span>Doe alsof het <b>${demoDag} december</b> is</span></label>
     <input type="range" id="tijd" min="1" max="26" value="${demoDag}">
   </div>
@@ -573,8 +664,10 @@ function tekenKalender(){
     <button class="bus ${post?'post':''}" id="bus" aria-label="Brievenbus${post?`, ${post} nieuw antwoord`:''}">${BUS}${post?`<span class="teller">${post}</span>`:""}</button>
   </div>
   <p class="samen">${iedereen?"Iedereen was er: lantaarn aan. Licht-elijk geslaagd!":`${al.length} van ${S.leden.length} hebben vandaag al gekeken`}</p>
-  <p class="legenda">${echt?`Vandaag is het echt ${echt} december.`:"Het is nog geen december, dus de tijdreis staat aan."}<br>Een rood stipje betekent dat er iets klaarligt. Tik op de brievenbus om zelf iets te posten.</p>`;
-  $("#uit").onclick=()=>{ ik=null; scherm="login"; teken(); };
+  <p class="legenda">${ONLINE ? (VANDAAG?`Vandaag is het ${VANDAAG} december.`:"Op 1 december gaat het eerste raampje open. Nog even geduld!") : (echt?`Vandaag is het echt ${echt} december.`:"Het is nog geen december, dus de tijdreis staat aan.")}<br>Een rood stipje betekent dat er iets klaarligt. Tik op de brievenbus om zelf iets te posten.</p>`;
+  $("#uit").onclick=async()=>{ ik=null; scherm="login";
+    if(ONLINE){ TOKEN=null; try{ localStorage.removeItem("familycrazy-token"); }catch(e){} try{ await haalLeden(); }catch(e){} }
+    teken(); };
   if($("#naarBeheer")) $("#naarBeheer").onclick=()=>{ scherm="beheer"; teken(); };
   if($("#bonnen")) $("#bonnen").onclick=toonBonnen;
   $("#mand").onclick=toonMand;
@@ -812,7 +905,7 @@ function dinerHtml(){
 function dinerKnoppen(root, herteken){
   root.querySelectorAll("[data-taak]").forEach(c=>c.onchange=()=>{ const t=S.taken.find(x=>x.id===c.dataset.taak); t.klaar=c.checked; bewaar(); herteken(); if(c.checked) melding("Taak afgevinkt!"); });
   const w=root.querySelector("[data-dinerwens]"); if(w) w.onsubmit=e=>{ e.preventDefault(); const t=w.querySelector("input").value.trim(); if(!t) return; S.dinerwensen.push({id:uid(), van:ik.id, tekst:t}); bewaar(); herteken(); melding("Je wens zit in de brievenbus"); };
-  const m=root.querySelector("[data-meenemen]"); if(m) m.onsubmit=e=>{ e.preventDefault(); const t=m.querySelector("input").value.trim(); if(!t) return; S.diner.push({wie:ik.naam, wat:t}); bewaar(); herteken(); };
+  const m=root.querySelector("[data-meenemen]"); if(m) m.onsubmit=e=>{ e.preventDefault(); const t=m.querySelector("input").value.trim(); if(!t) return; S.diner.push({id:uid(), wie:ik.naam, wat:t}); bewaar(); herteken(); };
 }
 
 /* ===== Uitjes: ik ben erbij, en stemmen ===== */
@@ -958,12 +1051,12 @@ function tekenBeheer(){
     <div class="balk"><button class="knop" id="terug">Naar het huisje</button></div></header>
   <div class="beheer">
     <section class="paneel" id="gezin"><h2>Gezinsleden</h2>
-      <p class="uitleg">Vul hier de namen en pincodes in. Tik op een poppetje om er een foto van te maken.</p>
+      <p class="uitleg">Vul hier de namen en pincodes in${ONLINE?" (een pincode zie je niet terug; vul alleen een nieuwe in als je hem wilt veranderen)":""}. Tik op een poppetje om er een foto van te maken.</p>
       <form id="gezinform" style="display:grid;gap:8px">
         ${S.leden.map((l,i)=>`<div class="lidkaart">
           <label class="lidfoto" title="Foto kiezen">${pop(l,34)}<input type="file" accept="image/*" data-foto="${i}" hidden></label>
           <label>Naam<input type="text" id="naam-${l.id}" value="${esc(l.naam)}" data-i="${i}" data-v="naam" autocomplete="off"></label>
-          <label>Pincode<input type="text" id="pin-${l.id}" value="${esc(l.pin)}" data-i="${i}" data-v="pin" maxlength="4" inputmode="numeric" autocomplete="off"></label>
+          <label>Pincode<input type="text" id="pin-${l.id}" value="${esc(l.pin)}" placeholder="${ONLINE?'nieuw?':''}" data-i="${i}" data-v="pin" maxlength="4" inputmode="numeric" autocomplete="off"></label>
           <div class="lid-acties">${l.beheer?'<span class="status">beheerder</span>':`${l.spelleider?'<span class="status">spelleider</span>':''}<button class="mini-weg" type="button" data-reset="${l.id}">ramen weer dicht</button><button class="mini-weg" type="button" data-lidweg="${l.id}">verwijderen</button>`}</div>
         </div>`).join("")}
         <div class="balk"><button class="knop">Namen opslaan</button><button class="knop licht" id="erbij" type="button">+ Gezinslid erbij</button></div>
@@ -1029,9 +1122,9 @@ function tekenBeheer(){
       <label>Foto<input type="file" id="beeld" accept="image/*"></label>
       <button class="knop">Stop achter raampje ${beheerDag}</button>
     </form>
-    <section class="paneel"><h2>Demo</h2><p class="uitleg">Alles staat nu alleen op dit toestel.</p>
+    ${ONLINE?`<section class="paneel"><h2>Opslag</h2><p class="uitleg">Alles wat je hier aanpast, wordt meteen in de database bewaard en is voor het hele gezin te zien.</p></section>`:`<section class="paneel"><h2>Demo</h2><p class="uitleg">Alles staat nu alleen op dit toestel.</p>
       <div class="balk"><button class="knop licht" id="alles" type="button">Demo terugzetten</button></div>
-    </section>
+    </section>`}
   </div>`;
   $("#terug").onclick=()=>{ scherm="kalender"; teken(); };
   $$("[data-d]").forEach(b=>b.onclick=()=>{ beheerDag=+b.dataset.d; tekenBeheer(); });
@@ -1054,7 +1147,7 @@ function tekenBeheer(){
   $$("[data-foto]").forEach(inp=>inp.onchange=async()=>{ const f=inp.files[0]; if(!f) return; S.leden[+inp.dataset.foto].foto=await verklein(f,240); bewaar(); tekenBeheer(); melding("Poppetje gemaakt"); });
   $$("[data-reset]").forEach(b=>b.onclick=()=>{ S.geopend[b.dataset.reset]=[]; bewaar(); melding("Ramen weer dicht"); });
   $("#erbij").onclick=()=>{ S.leden.push({id:uid(), naam:"Lid "+(S.leden.length+1), pin:"1234"}); bewaar(); tekenBeheer(); melding("Gezinslid toegevoegd"); };
-  $("#alles").onclick=()=>{ S=voorbeeld(); bewaar(); ik=S.leden[0]; tekenBeheer(); melding("Demo teruggezet"); };
+  if($("#alles")) $("#alles").onclick=()=>{ S=voorbeeld(); bewaar(); ik=S.leden[0]; tekenBeheer(); melding("Demo teruggezet"); };
   let kamerKeuze="";
   $$("#kamerkeuze button").forEach(b=>b.onclick=()=>{ kamerKeuze=b.dataset.kamer; $$("#kamerkeuze button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); });
   const velden=()=>{ const s=$("#soort").value; $("#veld-waarde").hidden=s!=="bon"; $("#veld-clip").hidden=s!=="stopmotion"; $("#veld-film").hidden=s!=="stopmotion"||!!$("#clip").value; $("#veld-uitje").hidden=s!=="uitje"; $("#veld-sfeerfilm").hidden=s!=="film"; };
@@ -1086,4 +1179,5 @@ function verklein(f,max=600,q=.8){ return new Promise(ok=>{ const r=new FileRead
   c.getContext("2d").drawImage(im,0,0,c.width,c.height); ok(c.toDataURL("image/jpeg",q)); }; im.src=r.result; }; r.readAsDataURL(f); }); }
 
 teken();
+startOnline().then(teken);
 </script>
