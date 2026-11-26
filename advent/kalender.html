@@ -417,8 +417,8 @@ const SOORTEN = {gedicht:"Gedichtje", film:"Sfeerfilmpje", uitje:"Uitje samen", 
 const SPELLEN = {kras:"Goudpapier krassen", lintje:"Lintje lostrekken", waslijn:"Was ophangen aan de waslijn", wasmand:"Graven in de wasmand", sneeuw:"Sneeuw wegvegen, voetstapjes volgen", deurtje:"Aankloppen bij het deurtje", laatjes:"Laatjes van het kastje"};
 const MINIS = {"":"Hoort bij de soort", oliebol:"Oliebol", kaartje:"Kaartje voor een uitje", reuzenrad:"Reuzenrad", lootje:"Lootje", waslijn:"Waslijntje", fles:"Flesje wasmiddel", slee:"Sleetje", lantaarn:"Lantaarntje", deurtje:"Deurtje", kastje:"Kastje", bezem:"Bezempje", cadeau:"Cadeautje", briefje:"Envelopje"};
 const POSTSOORT = {briefje:"Briefje aan iemand", vraag:"Vraag of wens aan Griëtte", foto:"Foto voor het jaaroverzicht", diner:"Wens voor het kerstdiner"};
-const FILMS = {intro:"Family Crazy Adventskalender", groningen:"Groningen", rendiervous:"Rendier-vous", gluhckwens:"Glüh-ckwens", piekfijn:"Piek-fijn", mandatory:"Mand-atory", sleeperig:"Slee-perig?", hulstnodig:"Hulst nodig?", kerstraak:"Kerst-raak", navidad:"Feliz Navi-DAD"};
-const CLIPS = {slee:["Sleetje. Geen remmen.",0], waslijn:["Waslijn. Er hangt iets.",0], welkom:["Welkom. Voeten vegen.",0], voetstapjes:["Voetstappen. Iemand was hier.",0], kerstkamer:["Chocomel. Slagroom is op.",0], mandje:["Mandje. Alles erin.",0], sneeuwtuin:["Sneeuwtuin. Koud.",0], schilderijtjes:["Lijstjes. Eén hangt scheef.",0], kastje:["Kastje. Geen lijk.",0], groningen:["Kermis. Overleefd.",0]};
+const FILMS = {intro:"Family Crazy Adventskalender", groningen:"Groningen", rendiervous:"Rendier-vous", gluhckwens:"Glüh-ckwens", piekfijn:"Piek-fijn", mandatory:"Mand-atory", sleeperig:"Slee-perig?", hulstnodig:"Hulst nodig?", kerstraak:"Kerst-raak", navidad:"Feliz Navi-DAD", jarig:"Frederique 21", lampjes:"Lampjes", drienachten:"Drie nachten"};
+const CLIPS = {slee:["Sleetje. Geen remmen.",0], waslijn:["Waslijn. Er hangt iets.",0], welkom:["Welkom. Voeten vegen.",0], voetstapjes:["Voetstappen. Iemand was hier.",0], kerstkamer:["Chocomel. Slagroom is op.",0], mandje:["Mandje. Alles erin.",0], sneeuwtuin:["Sneeuwtuin. Koud.",0], schilderijtjes:["Lijstjes. Eén hangt scheef.",0], kastje:["Kastje. Geen lijk.",0], groningen:["Kermis. Overleefd.",0], kringloop:["Kringloop. Alles moet weg.",0], wensen:["Wensen. Ze zijn binnen.",0], sinterklaas:["Sinterklaas. Eindelijk.",0]};
 const KAMERS = {huisje:"Wit huisje met lampjes", elfendeur:"Groen deurtje met postbus", trapje:"Touwladdertje en lantaarn", kerstkamer:"Kerstkamer", kastjeskamer:"Sterrenbehang", houtkamer:"Houten kamertje", kachelkamer:"Bij de kachel", cadeaus:"Cadeaus op de vloer", belletje:"Cadeauzakje met belletje", inpakken:"Inpaktafel", bankje:"Bankje in de sneeuw", picknick:"Chocomel in de sneeuw", dorp:"Dorpje in de sneeuw", meelvloer:"Voetstapjes in het meel", bedje:"Bedje en sterrenbehang", roodpapier:"Rood inpakpapier", cadeauzakjes:"Cadeauzakjes op de vloer", lantaarntje:"Rood lantaarntje op het bankje", sneeuwtuin:"Chocomel in de sneeuw", kachelhoek:"Kachelhoek met spiegel", lantaarnbankje:"Lantaarntje bij het deurtje", rodedeur:"Rode voordeur met post", stoeltjes:"Houten krukjes"};
 const KAMERLIJST = Object.keys(KAMERS), BUITEN = ["bankje","picknick","dorp"];
 const LABELKLEUR = ["#fbf8f1","#d3b48a","#e9d9c4","#d7e0d6","#f0dcd8","#d3b48a"];
@@ -426,7 +426,7 @@ const GEVEL = [20,16,17,2, 21,3,15,10, 14,18,9,22, 8,13,1,7, 19,5,12,4, 11,25,6]
 const vorm = (i,d) => d===25 ? "deur" : [9,10].includes(d)? "rond" : (Math.floor(i/4)%2===0 ? "boog" : "recht");
 
 /* ===== Opslag (demo: alleen op dit apparaat) ===== */
-const SLEUTEL = "familycrazy-v7";
+const SLEUTEL = "familycrazy-v8";
 const uid = () => Math.random().toString(36).slice(2,9);
 function voorbeeld(){
   return {
@@ -450,7 +450,7 @@ function voorbeeld(){
       {id:uid(), dag:4, voor:"f", soort:"briefje", kamer:"meelvloer", tekst:"Lauren, jij mag als eerste de voetstappen volgen. Jij hebt de beste ogen van het huis."},
       {id:uid(), dag:5, voor:"alle", soort:"stopmotion", clip:"kerstkamer", spel:"laatjes", mini:"kastje", tekst:"Chocomel vanavond. De slagroom is op. We weten wie."},
       {id:uid(), dag:6, voor:"alle", soort:"film", film:"rendiervous", spel:"lintje", mini:"briefje", tekst:"Pepernoten. De Sint komt pas op de 26e. File.\nWensen alvast in de brievenbus."},
-      {id:uid(), dag:7, voor:"alle", soort:"film", film:"gluhckwens", spel:"lintje", mini:"cadeau", tekst:"Frederique is jarig! 21 jaar. Geen weg terug.\nZingen om 18.00 uur. Vals mag. Groningen hoort het wel."},
+      {id:uid(), dag:7, voor:"alle", soort:"film", film:"jarig", spel:"lintje", mini:"cadeau", tekst:"Frederique is jarig! 21 jaar. Geen weg terug.\nZingen om 18.00 uur. Vals mag. Groningen hoort het wel."},
       {id:uid(), dag:7, voor:"d", soort:"briefje", kamer:"cadeauzakjes", tekst:"21. Vanaf nu gaat het bergaf.\nGefeliciteerd. Je cadeau ligt ergens in huis. Zoek."},
       {id:uid(), dag:8, voor:"alle", soort:"stopmotion", clip:"slee", spel:"lintje", mini:"slee", tekst:"Het sleetje komt. De rendieren zijn op."},
       {id:uid(), dag:9, voor:"alle", soort:"stopmotion", clip:"mandje", spel:"wasmand", mini:"cadeau", tekst:"Kijk in het mandje bij de kachel. Niet ín de kachel."},
@@ -459,19 +459,24 @@ function voorbeeld(){
       {id:uid(), dag:11, voor:"alle", soort:"film", film:"piekfijn", spel:"sneeuw", mini:"lantaarn", tekst:"Piek in de boom. De langste mag. Wie valt, heeft pech."},
       {id:uid(), dag:12, voor:"alle", soort:"stopmotion", clip:"sneeuwtuin", spel:"kras", mini:"lantaarn", tekst:"Wandelen. Het is koud. Het is december. Jas aan."},
       {id:uid(), dag:12, voor:"z", soort:"briefje", kamer:"sneeuwtuin", tekst:"Lissabon: 17 graden. Hier: jas aan. Jij mist niks. Kom toch maar."},
+      {id:uid(), dag:13, voor:"alle", soort:"stopmotion", clip:"kringloop", spel:"kras", mini:"kaartje", tekst:"Kringloop. Alles moet weg. Behalve wij."},
       {id:uid(), dag:13, voor:"alle", soort:"uitje", spel:"kras", mini:"kaartje", kamer:"dorp", tekst:"Kerstmarkt of kringloop. Stemmen. De meerderheid wint, Griëtte beslist.", keuzes:["Kerstmarkt","Kringloop"], wanneer:"Zondag"},
       {id:uid(), dag:14, voor:"alle", soort:"stopmotion", clip:"schilderijtjes", spel:"deurtje", mini:"foto", tekst:"Je mooiste foto van dit jaar in de brievenbus. Hij komt aan de muur. Ook als je raar kijkt."},
       {id:uid(), dag:15, voor:"alle", soort:"film", film:"hulstnodig", spel:"lintje", mini:"cadeau", tekst:"Samen inpakken. Plakband voor drie cadeaus. Het zijn er veertig."},
       {id:uid(), dag:15, voor:"e", soort:"briefje", kamer:"inpakken", tekst:"Jort: jij bent vanavond hoofd plakband. Verantwoordelijke functie. Geen salaris."},
       {id:uid(), dag:16, voor:"alle", soort:"film", film:"kerstraak", spel:"deurtje", mini:"briefje", tekst:"Post in de brievenbus. Geen rekening. Dit keer."},
       {id:uid(), dag:17, voor:"alle", soort:"film", film:"gluhckwens", spel:"kras", mini:"cadeau", tekst:"Glühwein voor de groten. Chocomel voor de rest. We tellen de bekers."},
+      {id:uid(), dag:18, voor:"alle", soort:"film", film:"lampjes", spel:"sneeuw", mini:"lantaarn", tekst:"Er doet één lampje het niet. Welke? Zoek maar. Wie hem vindt, mag hem vervangen."},
       {id:uid(), dag:19, voor:"alle", soort:"film", film:"mandatory", spel:"wasmand", mini:"cadeau", tekst:"Je mand loopt vol. Nog vijf nachtjes. Ongeveer."},
       {id:uid(), dag:20, voor:"alle", soort:"film", film:"groningen", spel:"deurtje", mini:"reuzenrad", tekst:"Groningen. Kerstkermis. Reuzenrad op eigen risico."},
       {id:uid(), dag:20, voor:"alle", soort:"uitje", mini:"reuzenrad", kamer:"bankje", tekst:"Kerstkermis Groningen. Iedereen mee. Frederique weet de weg.", wanneer:"Datum volgt", waar:"Groningen"},
       {id:uid(), dag:21, voor:"alle", soort:"stopmotion", clip:"groningen", spel:"lintje", mini:"foto", tekst:"Kermisfoto's. We zijn er allemaal nog. Geteld."},
+      {id:uid(), dag:22, voor:"alle", soort:"stopmotion", clip:"wensen", spel:"deurtje", mini:"briefje", tekst:"De wensen zijn binnen. Zes van de zes. De Sint heeft het er druk mee."},
+      {id:uid(), dag:23, voor:"alle", soort:"film", film:"drienachten", spel:"kras", mini:"slee", tekst:"Nog drie nachten. Tellen helpt niet."},
       {id:uid(), dag:24, voor:"alle", soort:"film", film:"sleeperig", spel:"kras", mini:"slee", tekst:"Nog één nacht. Slapen. Hij kijkt."},
       {id:uid(), dag:25, voor:"alle", soort:"film", film:"navidad", spel:"deurtje", mini:"cadeau", tekst:"Crazy Christmas Games. Verliezen mag. Afwassen moet."},
       {id:uid(), dag:25, voor:"alle", soort:"games", spel:"deurtje", mini:"cadeau", kamer:"cadeaus", tekst:"Cadeau-estafette\nKerst-pictionary\nWie ben ik?\nSokken-sneeuwballen\nDe grote kerstquiz"},
+      {id:uid(), dag:26, voor:"alle", soort:"stopmotion", clip:"sinterklaas", spel:"lintje", mini:"lootje", tekst:"Sinterklaas. Eindelijk."},
       {id:uid(), dag:26, voor:"alle", soort:"lootje", spel:"lintje", mini:"lootje", kamer:"belletje", tekst:"Sinterklaas. Eindelijk. Alle wensenlijstjes staan hieronder. Jij weet wie je hebt."}
     ],
     geopend:{}, post:[], diner:[{wie:"Griëtte", wat:"Kalkoen en jus"}], ingewisseld:{},
