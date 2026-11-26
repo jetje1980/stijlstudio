@@ -300,7 +300,7 @@ textarea{min-height:90px;font-family:var(--f-hand);font-size:24px;line-height:1.
   border-radius:16px;box-shadow:0 0 0 3px #fffdf6,0 0 0 4.5px var(--goud),0 10px 18px -6px rgba(0,0,0,.45);position:relative}
 .labelkaart .kaart::before{content:"";position:absolute;inset:5px;border:1px dashed rgba(184,146,74,.6);border-radius:12px;pointer-events:none}
 @keyframes hangin{from{transform:translate(-50%,-120%) rotate(-8deg)}70%{transform:translate(-50%,0) rotate(3deg)}to{transform:translate(-50%,0) rotate(-1.5deg)}}
-.kamerkeuze{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.kamerkeuze{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
 .kamerkeuze button{border:2px solid transparent;padding:0;aspect-ratio:4/3;background-size:cover;background-position:center;border-radius:2px}
 .kamerkeuze button[aria-pressed="true"]{border-color:var(--bordeaux);box-shadow:0 0 0 2px var(--goud-licht)}
 .kamerkeuze button.auto{background:var(--papier);font-size:11px;color:var(--zacht)}
@@ -334,6 +334,9 @@ textarea{min-height:90px;font-family:var(--f-hand);font-size:24px;line-height:1.
 .score .punten{font-family:var(--f-hand);font-weight:700;font-size:30px;color:var(--bordeaux);min-width:2ch;text-align:right;font-variant-numeric:tabular-nums}
 .score.koploper{box-shadow:inset 0 0 0 2px var(--goud)}
 .plus{border:1px solid var(--goud);background:var(--creme);border-radius:50%;width:34px;height:34px;font-size:18px;line-height:1;padding:0}
+.lidkaart{display:grid;grid-template-columns:auto 1fr 80px;gap:10px;align-items:end;background:#fff;padding:10px 12px;border-left:3px solid var(--goud)}
+.lidkaart .lidfoto{cursor:pointer;align-self:center}
+.lid-acties{grid-column:1/-1;display:flex;gap:14px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
 .formrij{display:flex;gap:8px;flex-wrap:wrap}
 .formrij input{flex:1;min-width:140px}
 
@@ -384,15 +387,15 @@ const SOORTEN = {uitje:"Uitje samen", games:"Crazy Christmas Games", lootje:"Loo
 const SPELLEN = {kras:"Goudpapier krassen", lintje:"Lintje lostrekken", waslijn:"Was ophangen aan de waslijn", wasmand:"Graven in de wasmand", sneeuw:"Sneeuw wegvegen, voetstapjes volgen", deurtje:"Aankloppen bij het deurtje", laatjes:"Laatjes van het kastje"};
 const MINIS = {"":"Hoort bij de soort", oliebol:"Oliebol", kaartje:"Kaartje voor een uitje", reuzenrad:"Reuzenrad", lootje:"Lootje", waslijn:"Waslijntje", fles:"Flesje wasmiddel", slee:"Sleetje", lantaarn:"Lantaarntje", deurtje:"Deurtje", kastje:"Kastje", bezem:"Bezempje", cadeau:"Cadeautje", briefje:"Envelopje"};
 const POSTSOORT = {briefje:"Briefje aan iemand", vraag:"Vraag of wens aan Griette", foto:"Foto voor het jaaroverzicht", diner:"Ik neem mee naar het kerstdiner"};
-const CLIPS = {slee:["Sleetje door de sneeuw",22], waslijn:["De was aan de lijn, met wasbon",22], welkom:["Welkom bij het deurtje",22], voetstapjes:["Voetstapjes in het meel",22], kerstkamer:["Chocomel in de kerstkamer",20]};
-const KAMERS = {huisje:"Wit huisje met lampjes", elfendeur:"Groen deurtje met postbus", trapje:"Touwladdertje en lantaarn", kerstkamer:"Kerstkamer", kastjeskamer:"Sterrenbehang", houtkamer:"Houten kamertje", kachelkamer:"Bij de kachel", cadeaus:"Cadeaus op de vloer", belletje:"Cadeauzakje met belletje", inpakken:"Inpaktafel", bankje:"Bankje in de sneeuw", picknick:"Chocomel in de sneeuw", dorp:"Dorpje in de sneeuw"};
+const CLIPS = {slee:["Sleetje door de sneeuw",22], waslijn:["De was aan de lijn, met wasbon",22], welkom:["Welkom bij het deurtje",22], voetstapjes:["Voetstapjes in het meel",22], kerstkamer:["Chocomel in de kerstkamer",20], mandje:["Cadeautjes springen in het mandje",24], sneeuwtuin:["Lantaarntje en chocomel in de sneeuw",24], schilderijtjes:["Schilderijtjes ophangen",24], kastje:["Cadeautjes op het kastje",22]};
+const KAMERS = {huisje:"Wit huisje met lampjes", elfendeur:"Groen deurtje met postbus", trapje:"Touwladdertje en lantaarn", kerstkamer:"Kerstkamer", kastjeskamer:"Sterrenbehang", houtkamer:"Houten kamertje", kachelkamer:"Bij de kachel", cadeaus:"Cadeaus op de vloer", belletje:"Cadeauzakje met belletje", inpakken:"Inpaktafel", bankje:"Bankje in de sneeuw", picknick:"Chocomel in de sneeuw", dorp:"Dorpje in de sneeuw", meelvloer:"Voetstapjes in het meel", bedje:"Bedje en sterrenbehang", roodpapier:"Rood inpakpapier", cadeauzakjes:"Cadeauzakjes op de vloer", lantaarntje:"Rood lantaarntje op het bankje", sneeuwtuin:"Chocomel in de sneeuw", kachelhoek:"Kachelhoek met spiegel", lantaarnbankje:"Lantaarntje bij het deurtje", rodedeur:"Rode voordeur met post", stoeltjes:"Houten krukjes"};
 const KAMERLIJST = Object.keys(KAMERS), BUITEN = ["bankje","picknick","dorp"];
 const LABELKLEUR = ["#fbf8f1","#d3b48a","#e9d9c4","#d7e0d6","#f0dcd8","#d3b48a"];
 const GEVEL = [20,16,17,2, 21,3,15,10, 14,18,9,22, 8,13,1,7, 19,5,12,4, 11,25,6];  /* 23 en 26 zitten als dakraampjes in het dak, 24 in de dakkapel, 25 is de voordeur */
 const vorm = (i,d) => d===25 ? "deur" : [9,10].includes(d)? "rond" : (Math.floor(i/4)%2===0 ? "boog" : "recht");
 
 /* ===== Opslag (demo: alleen op dit apparaat) ===== */
-const SLEUTEL = "kersthuisje-v3";
+const SLEUTEL = "kersthuisje-v4";
 const uid = () => Math.random().toString(36).slice(2,9);
 function voorbeeld(){
   return {
@@ -416,6 +419,11 @@ function voorbeeld(){
       {id:uid(), dag:6, voor:"alle", soort:"briefje", spel:"lintje", kamer:"kastjeskamer", tekst:"Pepernoten bij de koffie!\nSinterklaas vieren we op 26 december: zet je wensen alvast in de brievenbus, bij Lootjes."},
       {id:uid(), dag:7, voor:"alle", soort:"uitje", spel:"kras", mini:"oliebol", kamer:"picknick", tekst:"Oliebollen eten met z'n allen", wanneer:"Zaterdagmiddag", waar:"Thuis aan de keukentafel"},
       {id:uid(), dag:8, voor:"alle", soort:"stopmotion", clip:"slee", spel:"lintje", mini:"slee", tekst:"Het sleetje is onderweg met iets lekkers."},
+      {id:uid(), dag:9, voor:"alle", soort:"stopmotion", clip:"mandje", spel:"wasmand", mini:"cadeau", tekst:"Kijk vanavond in het mandje bij de kachel!"},
+      {id:uid(), dag:10, voor:"alle", soort:"stopmotion", clip:"kastje", spel:"laatjes", mini:"kastje", tekst:"Er ligt een briefje in het bovenste laatje van de kast."},
+      {id:uid(), dag:11, voor:"alle", soort:"briefje", spel:"sneeuw", mini:"lantaarn", kamer:"lantaarntje", tekst:"Vanavond gaan alle lampjes uit en steken we kaarsjes aan."},
+      {id:uid(), dag:12, voor:"alle", soort:"stopmotion", clip:"sneeuwtuin", spel:"kras", mini:"lantaarn", tekst:"Wie gaat er mee wandelen in de kou? Daarna chocomel!"},
+      {id:uid(), dag:14, voor:"alle", soort:"stopmotion", clip:"schilderijtjes", spel:"deurtje", mini:"foto", tekst:"Zoek je mooiste foto van dit jaar en stop hem in de brievenbus."},
       {id:uid(), dag:13, voor:"alle", soort:"uitje", spel:"kras", mini:"kaartje", kamer:"dorp", tekst:"Samen op pad! Waar gaan we heen?", keuzes:["Kerstmarkt","Kringloop"], wanneer:"Zondag"},
       {id:uid(), dag:20, voor:"alle", soort:"uitje", spel:"deurtje", mini:"reuzenrad", kamer:"bankje", tekst:"Kerstkermis in Groningen", wanneer:"Datum volgt", waar:"Groningen"},
       {id:uid(), dag:25, voor:"alle", soort:"games", spel:"deurtje", mini:"cadeau", kamer:"cadeaus", tekst:"Cadeau-estafette\nKerst-pictionary\nWie ben ik?\nSokken-sneeuwballen gooien\nDe grote kerstquiz"},
@@ -886,6 +894,18 @@ function tekenBeheer(){
   <header class="kop"><div><div class="wie">achter de schermen</div><h1>Beheer</h1></div>
     <div class="balk"><button class="knop" id="terug">Naar het huisje</button></div></header>
   <div class="beheer">
+    <section class="paneel" id="gezin"><h2>Gezinsleden</h2>
+      <p class="uitleg">Vul hier de namen en pincodes in. Tik op een poppetje om er een foto van te maken.</p>
+      <form id="gezinform" style="display:grid;gap:8px">
+        ${S.leden.map((l,i)=>`<div class="lidkaart">
+          <label class="lidfoto" title="Foto kiezen">${pop(l,34)}<input type="file" accept="image/*" data-foto="${i}" hidden></label>
+          <label>Naam<input type="text" id="naam-${l.id}" value="${esc(l.naam)}" data-i="${i}" data-v="naam" autocomplete="off"></label>
+          <label>Pincode<input type="text" id="pin-${l.id}" value="${esc(l.pin)}" data-i="${i}" data-v="pin" maxlength="4" inputmode="numeric" autocomplete="off"></label>
+          <div class="lid-acties">${l.beheer?'<span class="status">beheerder</span>':`${l.spelleider?'<span class="status">spelleider</span>':''}<button class="mini-weg" type="button" data-reset="${l.id}">ramen weer dicht</button><button class="mini-weg" type="button" data-lidweg="${l.id}">verwijderen</button>`}</div>
+        </div>`).join("")}
+        <div class="balk"><button class="knop">Namen opslaan</button><button class="knop licht" id="erbij" type="button">+ Gezinslid erbij</button></div>
+      </form>
+    </section>
     <section class="paneel"><h2>Postvak${S.post.filter(p=>p.status==="nieuw").length?` (${S.post.filter(p=>p.status==="nieuw").length} nieuw)`:""}</h2>
       <div class="postlijst">${post.length?post.map(p=>`<div class="postje">
         <span class="status ${p.status==="nieuw"?"nieuw":""}">${esc(lid(p.van).naam)} · ${POSTSOORT[p.soort]}${p.aan?` → ${esc(lid(p.aan).naam)}`:""} · ${p.status}</span>
@@ -935,16 +955,8 @@ function tekenBeheer(){
       <label>Foto<input type="file" id="beeld" accept="image/*"></label>
       <button class="knop">Stop achter raampje ${beheerDag}</button>
     </form>
-    <section class="paneel"><h2>Gezinsleden</h2>
-      <p class="uitleg">Namen, pincodes en een foto voor je uitknippoppetje. Er kunnen later meer mensen bij.</p>
-      <div class="leden">${S.leden.map((l,i)=>`<div class="lid" style="grid-template-columns:auto 1fr 64px auto">
-        <label style="cursor:pointer" title="Foto kiezen">${pop(l,30)}<input type="file" accept="image/*" data-foto="${i}" hidden></label>
-        <input type="text" id="naam-${l.id}" value="${esc(l.naam)}" data-i="${i}" data-v="naam" aria-label="Naam">
-        <input type="text" id="pin-${l.id}" value="${esc(l.pin)}" data-i="${i}" data-v="pin" maxlength="4" inputmode="numeric" aria-label="Pincode">
-        ${l.beheer?'<small class="uitleg">beheer</small>':`<button class="knop licht klein" data-reset="${l.id}" type="button">Ramen dicht</button>`}</div>`).join("")}</div>
-      <p class="uitleg">Tik op een poppetje om er een foto van te maken.</p>
-      <div class="balk"><button class="knop licht" id="erbij" type="button">+ Gezinslid erbij</button>
-        <button class="knop licht" id="alles" type="button">Demo terugzetten</button></div>
+    <section class="paneel"><h2>Demo</h2><p class="uitleg">Alles staat nu alleen op dit toestel.</p>
+      <div class="balk"><button class="knop licht" id="alles" type="button">Demo terugzetten</button></div>
     </section>
   </div>`;
   $("#terug").onclick=()=>{ scherm="kalender"; teken(); };
@@ -958,7 +970,13 @@ function tekenBeheer(){
     p.antwoord=t; p.status="beantwoord"; p.gelezen=false; bewaar(); tekenBeheer(); melding("Antwoord verstuurd, het vlaggetje gaat omhoog"); });
   $$("[data-gezien]").forEach(b=>b.onclick=()=>{ postVan(b.dataset.gezien).status="in album"; bewaar(); tekenBeheer(); });
   $$("[data-postweg]").forEach(b=>b.onclick=()=>{ S.post=S.post.filter(p=>p.id!==b.dataset.postweg); bewaar(); tekenBeheer(); });
-  $$(".lid input[type=text]").forEach(inp=>inp.onchange=()=>{ const l=S.leden[+inp.dataset.i]; l[inp.dataset.v]=inp.value.trim()||l[inp.dataset.v]; bewaar(); melding("Opgeslagen"); });
+  $("#gezinform").onsubmit=e=>{ e.preventDefault();
+    $$("#gezinform input[type=text]").forEach(inp=>{ const l=S.leden[+inp.dataset.i], v=inp.value.trim(); if(v) l[inp.dataset.v]=v; });
+    bewaar(); tekenBeheer(); melding("Namen opgeslagen"); };
+  $$("[data-lidweg]").forEach(b=>b.onclick=()=>{
+    if(b.dataset.zeker!=="ja"){ b.dataset.zeker="ja"; b.textContent="zeker weten? tik nog eens"; return; }
+    const id=b.dataset.lidweg; S.leden=S.leden.filter(l=>l.id!==id); S.geopend[id]=[]; S.inhoud=S.inhoud.filter(x=>x.voor!==id); bewaar(); tekenBeheer(); melding("Gezinslid verwijderd"); });
+  $$("#gezinform input[type=text]").forEach(inp=>inp.onchange=()=>{ const l=S.leden[+inp.dataset.i]; l[inp.dataset.v]=inp.value.trim()||l[inp.dataset.v]; bewaar(); melding("Opgeslagen"); });
   $$("[data-foto]").forEach(inp=>inp.onchange=async()=>{ const f=inp.files[0]; if(!f) return; S.leden[+inp.dataset.foto].foto=await verklein(f,240); bewaar(); tekenBeheer(); melding("Poppetje gemaakt"); });
   $$("[data-reset]").forEach(b=>b.onclick=()=>{ S.geopend[b.dataset.reset]=[]; bewaar(); melding("Ramen weer dicht"); });
   $("#erbij").onclick=()=>{ S.leden.push({id:uid(), naam:"Lid "+(S.leden.length+1), pin:"1234"}); bewaar(); tekenBeheer(); melding("Gezinslid toegevoegd"); };
