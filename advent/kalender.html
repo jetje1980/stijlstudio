@@ -353,6 +353,10 @@ textarea{min-height:90px;font-family:var(--f-hand);font-size:24px;line-height:1.
 .mandding svg{width:44px;height:32px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
 .mandding b{font-family:var(--f-hand);font-size:14px;color:var(--bordeaux);line-height:1;margin-top:-4px}
 @keyframes inmand{from{transform:translateY(-30px) rotate(var(--r));opacity:0}}
+.item.gedicht{border-left:0;text-align:center;padding:10px 6px;background:#fffdf6;box-shadow:0 0 0 1px var(--goud-licht)}
+.item.gedicht .tekst{font-size:27px;line-height:1.25}
+.bewerkt{font-size:11px;color:var(--zacht);letter-spacing:.04em}
+.paneel.bewerken{box-shadow:0 0 0 3px var(--goud)}
 .formrij{display:flex;gap:8px;flex-wrap:wrap}
 .formrij input{flex:1;min-width:140px}
 
@@ -399,7 +403,7 @@ const SLINGER = `<svg class="slinger" viewBox="0 0 400 30" preserveAspectRatio="
 const LANTAARN = aan => `<svg class="lantaarn ${aan?'aan':''}" viewBox="0 0 40 110" aria-label="${aan?'Lantaarn brandt':'Lantaarn uit'}"><path d="M20 2l-11 11h22z" fill="#222"/><rect x="11" y="13" width="18" height="20" class="licht" stroke="#222" stroke-width="2.5"/><path d="M20 13v20" stroke="#222" stroke-width="1.4"/><path d="M8 33h24v4H8z" fill="#222"/><rect x="17" y="37" width="6" height="62" fill="#222"/><circle cx="20" cy="52" r="8" fill="none" stroke="#2f5a47" stroke-width="4"/><path d="M15 47l5 5 5-5" stroke="#c22a33" stroke-width="2" fill="none"/><path d="M10 99h20v9H10z" fill="#222"/></svg>`;
 const BUS = `<svg viewBox="0 0 60 80"><rect x="27" y="42" width="6" height="36" fill="#8a5a36"/><path d="M6 10h40v34H6z" fill="#7c1d26" stroke="#b8924a" stroke-width="2"/><path d="M6 10q20-12 40 0" fill="#5e141c" stroke="#b8924a" stroke-width="2"/><rect x="14" y="20" width="24" height="4" rx="2" fill="#2b1013" stroke="#b8924a"/><text x="26" y="37" text-anchor="middle" font-family="Fraunces,serif" font-size="8" letter-spacing="1.5" fill="#d8bd7e">POST</text><g class="vlag"><rect x="46" y="20" width="3" height="22" fill="#b8924a"/><rect x="46" y="20" width="10" height="7" fill="#c22a33"/></g></svg>`;
 
-const SOORTEN = {film:"Sfeerfilmpje", uitje:"Uitje samen", games:"Crazy Christmas Games", lootje:"Wensenlijstjes Sinterklaas", briefje:"Lief briefje", liedje:"Liedje", aanwijzing:"Aanwijzing", foto:"Foto", video:"Filmpje", cadeau:"Verrassing", bon:"Bon om in te wisselen", stopmotion:"Kerstclipje"};
+const SOORTEN = {gedicht:"Gedichtje", film:"Sfeerfilmpje", uitje:"Uitje samen", games:"Crazy Christmas Games", lootje:"Wensenlijstjes Sinterklaas", briefje:"Lief briefje", liedje:"Liedje", aanwijzing:"Aanwijzing", foto:"Foto", video:"Filmpje", cadeau:"Verrassing", bon:"Bon om in te wisselen", stopmotion:"Kerstclipje"};
 const SPELLEN = {kras:"Goudpapier krassen", lintje:"Lintje lostrekken", waslijn:"Was ophangen aan de waslijn", wasmand:"Graven in de wasmand", sneeuw:"Sneeuw wegvegen, voetstapjes volgen", deurtje:"Aankloppen bij het deurtje", laatjes:"Laatjes van het kastje"};
 const MINIS = {"":"Hoort bij de soort", oliebol:"Oliebol", kaartje:"Kaartje voor een uitje", reuzenrad:"Reuzenrad", lootje:"Lootje", waslijn:"Waslijntje", fles:"Flesje wasmiddel", slee:"Sleetje", lantaarn:"Lantaarntje", deurtje:"Deurtje", kastje:"Kastje", bezem:"Bezempje", cadeau:"Cadeautje", briefje:"Envelopje"};
 const POSTSOORT = {briefje:"Briefje aan iemand", vraag:"Vraag of wens aan Griëtte", foto:"Foto voor het jaaroverzicht", diner:"Wens voor het kerstdiner"};
@@ -412,13 +416,13 @@ const GEVEL = [20,16,17,2, 21,3,15,10, 14,18,9,22, 8,13,1,7, 19,5,12,4, 11,25,6]
 const vorm = (i,d) => d===25 ? "deur" : [9,10].includes(d)? "rond" : (Math.floor(i/4)%2===0 ? "boog" : "recht");
 
 /* ===== Opslag (demo: alleen op dit apparaat) ===== */
-const SLEUTEL = "familycrazy-v5";
+const SLEUTEL = "familycrazy-v6";
 const uid = () => Math.random().toString(36).slice(2,9);
 function voorbeeld(){
   return {
     leden:[
       {id:"g", naam:"Griëtte", pin:"0000", beheer:true},
-      {id:"p", naam:"Duurt", pin:"9999", spelleider:true},
+      {id:"p", naam:"Duurt", pin:"9999", beheer:true, spelleider:true},
       {id:"d", naam:"Frederique", pin:"2222"},
       {id:"z", naam:"Steijn", pin:"1111"},
       {id:"e", naam:"Jort", pin:"4444"},
@@ -428,7 +432,7 @@ function voorbeeld(){
       {id:uid(), dag:1, voor:"alle", soort:"film", film:"intro", spel:"kras", mini:"cadeau", tekst:"Welkom. 26 dagen, elke dag een raampje.\nNiet zeuren."},
       {id:uid(), dag:1, voor:"alle", soort:"video", tekst:"Kijktip: Kerst met Linus. Elke dag een aflevering. Net als wij, maar met budget.", link:"https://www.tvgids.nl/serie/kerst-met-linus"},
       {id:uid(), dag:2, voor:"z", soort:"stopmotion", clip:"waslijn", spel:"waslijn", mini:"waslijn", tekst:"Er hangt iets aan de lijn. Voor jou."},
-      {id:uid(), dag:2, voor:"z", soort:"bon", tekst:"Wasbon. Eén week gratis wassen als je thuis bent. Zakken leeg.", waarde:"€ 5"},
+      {id:uid(), dag:2, voor:"z", soort:"bon", tekst:"Wasbon. Deze week betalen wij je was. In Lissabon. Zakken leeg.", waarde:"€ 5"},
       {id:uid(), dag:2, voor:"d", soort:"cadeau", spel:"wasmand", mini:"fles", kamer:"kachelkamer", tekst:"Kijk in je wasmand. Wasmiddel. Hint."},
       {id:uid(), dag:2, voor:"alle", soort:"aanwijzing", kamer:"elfendeur", tekst:"Pannenkoeken vanavond. Wie de laatste pakt, is onterfd."},
       {id:uid(), dag:3, voor:"alle", soort:"stopmotion", clip:"welkom", spel:"deurtje", mini:"deurtje", tekst:"De brievenbus is open. Post erin. Klachten niet."},
@@ -530,6 +534,7 @@ async function sync(){
     for(const d of deletes) SNAP.delete(d.col+"/"+d.id);
     S.leden.forEach(l=>{ if("pin" in l) l.pin=undefined; });
     if(res.geweigerd && res.geweigerd.length) melding("Een deel mocht niet worden opgeslagen.");
+    else if(scherm==="beheer") melding("Opgeslagen ✓ voor iedereen");
   }catch(e){
     melding(e.status===401 ? "Je bent uitgelogd. Log opnieuw in." : "Niet opgeslagen: "+e.message+" Probeer het zo nog eens.");
   }finally{ bezigSync=false; }
@@ -556,7 +561,7 @@ document.addEventListener("visibilitychange",()=>{
   haalAlles().then(teken).catch(()=>{});
 });
 
-let ik=null, kiesLid=null, scherm="login", beheerDag=1, filmTimer=null;
+let ik=null, kiesLid=null, scherm="login", beheerDag=1, filmTimer=null, bewerkId=null;
 function vandaagDag(){ const nu=new Date(); return nu.getMonth()===11 ? Math.min(nu.getDate(),26) : 0; }
 let demoDag = vandaagDag() || 8;
 
@@ -876,7 +881,7 @@ function onthul(dag,nieuw){
       if(it.soort==="uitje") return uitjeHtml(it);
       if(it.soort==="games") return gamesHtml(it);
       if(it.soort==="lootje") return `<div class="item"><div class="tekst">${esc(it.tekst)}</div></div>${lootjeHtml()}`;
-      return `<div class="item">
+      return `<div class="item ${it.soort==="gedicht"?"gedicht":""}">
         <div class="soort">${SOORTEN[it.soort]}${it.voor==="alle"?'<span class="voorIedereen">voor iedereen</span>':''}</div>
         ${it.soort==="film"&&FILMS[it.film]?`<div class="sfeerfilm"><video src="films/film-${it.film}.mp4" poster="films/film-${it.film}.jpg" autoplay muted loop playsinline controls aria-label="${esc(FILMS[it.film])}"></video></div>`:""}
         ${it.soort==="stopmotion"&&it.clip&&CLIPS[it.clip]?`<div class="sfeerfilm"><video src="films/stop-${it.clip}.mp4" poster="films/stop-${it.clip}.jpg" autoplay muted loop playsinline controls aria-label="${esc(CLIPS[it.clip][0])}"></video></div>`:""}
@@ -1062,9 +1067,9 @@ function tekenBeheer(){
           <label class="lidfoto" title="Foto kiezen">${pop(l,34)}<input type="file" accept="image/*" data-foto="${i}" hidden></label>
           <label>Naam<input type="text" id="naam-${l.id}" value="${esc(l.naam)}" data-i="${i}" data-v="naam" autocomplete="off"></label>
           <label>Pincode<input type="text" id="pin-${l.id}" value="${esc(l.pin)}" placeholder="${ONLINE?'nieuw?':''}" data-i="${i}" data-v="pin" maxlength="4" inputmode="numeric" autocomplete="off"></label>
-          <div class="lid-acties">${l.beheer?'<span class="status">beheerder</span>':`${l.spelleider?'<span class="status">spelleider</span>':''}<button class="mini-weg" type="button" data-reset="${l.id}">ramen weer dicht</button><button class="mini-weg" type="button" data-lidweg="${l.id}">verwijderen</button>`}</div>
+          <div class="lid-acties">${l.id!==ik.id?`<label style="display:flex;gap:6px;align-items:center;font-size:13px;color:var(--inkt)"><input type="checkbox" data-beheer="${i}" ${l.beheer?"checked":""}>beheerder</label>`:'<span class="status">beheerder (jij)</span>'}${l.beheer?'':`${l.spelleider?'<span class="status">spelleider</span>':''}<button class="mini-weg" type="button" data-reset="${l.id}">ramen weer dicht</button><button class="mini-weg" type="button" data-lidweg="${l.id}">verwijderen</button>`}</div>
         </div>`).join("")}
-        <div class="balk"><button class="knop">Namen opslaan</button><button class="knop licht" id="erbij" type="button">+ Gezinslid erbij</button></div>
+        <div class="balk"><button class="knop">Opslaan</button><button class="knop licht" id="erbij" type="button">+ Gezinslid erbij</button></div>
       </form>
     </section>
     <section class="paneel"><h2>Postvak${S.post.filter(p=>p.status==="nieuw").length?` (${S.post.filter(p=>p.status==="nieuw").length} nieuw)`:""}</h2>
@@ -1102,9 +1107,9 @@ function tekenBeheer(){
       <div class="dagkiezer">${Array.from({length:26},(_,i)=>i+1).map(d=>`<button data-d="${d}" class="${d===beheerDag?'aan':''}">${d}${tel(d)?`<span class="n">${tel(d)}</span>`:''}</button>`).join("")}</div>
     </section>
     <section class="paneel"><h2>Achter raampje ${beheerDag}</h2>
-      <div class="lijst">${vanDag.length? vanDag.map(x=>`<div class="regel"><div><b>${esc(naam(x.voor))}</b> · ${SOORTEN[x.soort]} · <i>${SPELLEN[x.spel||(beheerDag%2?"kras":"lintje")]}</i>${x.mini?` · miniatuur: ${MINIS[x.mini]}`:""}${x.clip?` · clip: ${CLIPS[x.clip][0]}`:""}${x.film?` · filmpje: ${FILMS[x.film]}`:""}${x.kamer?` · ${KAMERS[x.kamer]}`:""}<br><span class="hand" style="font-size:22px">${esc(x.tekst||x.link||"(foto)")}</span>${x.waarde?` <b>${esc(x.waarde)}</b>`:""}</div><button data-weg="${x.id}">Weghalen</button></div>`).join("") : '<p class="uitleg">Nog niets. Voeg hieronder iets toe.</p>'}</div>
+      <div class="lijst">${vanDag.length? vanDag.map(x=>`<div class="regel"><div><b>${esc(naam(x.voor))}</b> · ${SOORTEN[x.soort]} · <i>${SPELLEN[x.spel||(beheerDag%2?"kras":"lintje")]}</i>${x.mini?` · miniatuur: ${MINIS[x.mini]}`:""}${x.clip?` · clip: ${CLIPS[x.clip][0]}`:""}${x.film?` · filmpje: ${FILMS[x.film]}`:""}${x.kamer?` · ${KAMERS[x.kamer]}`:""}<br><span class="hand" style="font-size:22px">${esc(x.tekst||x.link||"(foto)")}</span>${x.waarde?` <b>${esc(x.waarde)}</b>`:""}${x.door?`<br><span class="bewerkt">laatst aangepast door ${esc(x.door)}${x.wanneerBewerkt?`, ${esc(x.wanneerBewerkt)}`:""}</span>`:""}</div><div style="display:grid;gap:6px;flex:none"><button data-bewerk="${x.id}" style="color:var(--den)">Aanpassen</button><button data-weg="${x.id}">Weghalen</button></div></div>`).join("") : '<p class="uitleg">Nog niets. Voeg hieronder iets toe.</p>'}</div>
     </section>
-    <form class="paneel" id="nieuw"><h2>Iets achter raampje ${beheerDag} stoppen</h2>
+    <form class="paneel ${bewerkId?"bewerken":""}" id="nieuw"><h2>${bewerkId?`Raampje ${beheerDag} aanpassen`:`Iets achter raampje ${beheerDag} stoppen`}</h2>
       <div class="rij">
         <label>Voor wie<select id="voor"><option value="alle">Iedereen (zelfde bericht)</option>${S.leden.map(l=>`<option value="${l.id}">${esc(l.naam)}</option>`).join("")}</select></label>
         <label>Wat<select id="soort">${Object.entries(SOORTEN).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></label>
@@ -1125,14 +1130,14 @@ function tekenBeheer(){
       <label id="veld-film" hidden>Foto's voor de stopmotion (kies ze allemaal tegelijk, in volgorde)<input type="file" id="frames" accept="image/*" multiple></label>
       <label>Link (liedje, filmpje)<input type="url" id="link" placeholder="https://"></label>
       <label>Foto<input type="file" id="beeld" accept="image/*"></label>
-      <button class="knop">Stop achter raampje ${beheerDag}</button>
+      <div class="balk"><button class="knop">${bewerkId?"Opslaan":`Stop achter raampje ${beheerDag}`}</button>${bewerkId?'<button class="knop licht" type="button" id="annuleer">Annuleren</button>':""}</div>
     </form>
     ${ONLINE?`<section class="paneel"><h2>Opslag</h2><p class="uitleg">Alles wat je hier aanpast, wordt meteen in de database bewaard en is voor het hele gezin te zien.</p></section>`:`<section class="paneel"><h2>Demo</h2><p class="uitleg">Alles staat nu alleen op dit toestel.</p>
       <div class="balk"><button class="knop licht" id="alles" type="button">Demo terugzetten</button></div>
     </section>`}
   </div>`;
   $("#terug").onclick=()=>{ scherm="kalender"; teken(); };
-  $$("[data-d]").forEach(b=>b.onclick=()=>{ beheerDag=+b.dataset.d; tekenBeheer(); });
+  $$("[data-d]").forEach(b=>b.onclick=()=>{ beheerDag=+b.dataset.d; bewerkId=null; tekenBeheer(); });
   $$("[data-weg]").forEach(b=>b.onclick=()=>{ S.inhoud=S.inhoud.filter(x=>x.id!==b.dataset.weg); bewaar(); tekenBeheer(); melding("Weggehaald"); });
   const postVan = id => S.post.find(p=>p.id===id);
   $$("[data-bezorg]").forEach(b=>b.onclick=()=>{ const p=postVan(b.dataset.bezorg);
@@ -1144,7 +1149,8 @@ function tekenBeheer(){
   $$("[data-postweg]").forEach(b=>b.onclick=()=>{ S.post=S.post.filter(p=>p.id!==b.dataset.postweg); bewaar(); tekenBeheer(); });
   $("#gezinform").onsubmit=e=>{ e.preventDefault();
     $$("#gezinform input[type=text]").forEach(inp=>{ const l=S.leden[+inp.dataset.i], v=inp.value.trim(); if(v) l[inp.dataset.v]=v; });
-    bewaar(); tekenBeheer(); melding("Namen opgeslagen"); };
+    $$("#gezinform [data-beheer]").forEach(c=>{ S.leden[+c.dataset.beheer].beheer=c.checked; });
+    bewaar(); tekenBeheer(); melding("Opgeslagen"); };
   $$("[data-lidweg]").forEach(b=>b.onclick=()=>{
     if(b.dataset.zeker!=="ja"){ b.dataset.zeker="ja"; b.textContent="zeker weten? tik nog eens"; return; }
     const id=b.dataset.lidweg; S.leden=S.leden.filter(l=>l.id!==id); S.geopend[id]=[]; S.inhoud=S.inhoud.filter(x=>x.voor!==id); bewaar(); tekenBeheer(); melding("Gezinslid verwijderd"); });
@@ -1166,8 +1172,20 @@ function tekenBeheer(){
   $("#taakform").onsubmit=e=>{ e.preventDefault(); const t=$("#taaktekst").value.trim(); if(!t) return; S.taken.push({id:uid(), wie:$("#taakwie").value, tekst:t, klaar:false}); bewaar(); tekenBeheer(); melding(`Taak gegeven aan ${lid(S.taken.at(-1).wie).naam}`); };
   $("#leider").onchange=e=>{ S.leden.forEach(l=>l.spelleider = l.id===e.target.value && !l.beheer); bewaar(); melding("Spelleider ingesteld"); };
   $("#soort").onchange=velden; velden();
+  $$("[data-bewerk]").forEach(b=>b.onclick=()=>{ bewerkId=b.dataset.bewerk; tekenBeheer(); $("#nieuw").scrollIntoView({behavior:"smooth"}); });
+  if($("#annuleer")) $("#annuleer").onclick=()=>{ bewerkId=null; tekenBeheer(); };
+  const oud = bewerkId && S.inhoud.find(x=>x.id===bewerkId);
+  if(bewerkId && !oud) bewerkId=null;
+  if(oud){  /* het formulier vullen met wat er al staat */
+    $("#voor").value=oud.voor; $("#soort").value=oud.soort; $("#spel").value=oud.spel||(beheerDag%2?"kras":"lintje"); $("#mini").value=oud.mini||"";
+    $("#tekst").value=oud.tekst||""; $("#link").value=oud.link||""; $("#waarde").value=oud.waarde||"";
+    $("#wanneer").value=oud.wanneer||""; $("#waar").value=oud.waar||""; $("#keuzes").value=(oud.keuzes||[]).join(", ");
+    if(oud.clip) $("#clip").value=oud.clip; if(oud.film) $("#sfeerfilm").value=oud.film;
+    kamerKeuze=oud.kamer||""; $$("#kamerkeuze button").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.kamer===kamerKeuze)));
+    velden();
+  }
   $("#nieuw").onsubmit=async e=>{ e.preventDefault();
-    const it={id:uid(), dag:beheerDag, voor:$("#voor").value, soort:$("#soort").value, spel:$("#spel").value, mini:$("#mini").value, tekst:$("#tekst").value.trim(), link:$("#link").value.trim()};
+    const it={id:oud?oud.id:uid(), dag:beheerDag, voor:$("#voor").value, soort:$("#soort").value, spel:$("#spel").value, mini:$("#mini").value, tekst:$("#tekst").value.trim(), link:$("#link").value.trim()};
     if(it.soort==="bon") it.waarde=$("#waarde").value.trim();
     if(kamerKeuze) it.kamer=kamerKeuze;
     if(it.soort==="uitje"){ it.wanneer=$("#wanneer").value.trim(); it.waar=$("#waar").value.trim(); const k=$("#keuzes").value.split(",").map(x=>x.trim()).filter(Boolean); if(k.length) it.keuzes=k; }
@@ -1175,8 +1193,11 @@ function tekenBeheer(){
     if(it.soort==="film") it.film=$("#sfeerfilm").value;
     const f=$("#beeld").files[0]; if(f) it.beeld=await verklein(f,600);
     const fr=[...$("#frames").files]; if(it.soort==="stopmotion" && fr.length){ melding("Filmpje maken…"); it.frames=[]; for(const x of fr.slice(0,24)) it.frames.push(await verklein(x,420,.7)); }
+    if(oud){ if(!it.beeld && oud.beeld) it.beeld=oud.beeld; if(!it.frames && oud.frames) it.frames=oud.frames; }
     if(!it.tekst && !it.link && !it.beeld && !it.frames && !it.clip && !it.film){ melding("Schrijf iets, plak een link of kies een foto"); return; }
-    S.inhoud.push(it); bewaar(); tekenBeheer(); melding(`Achter raampje ${beheerDag} gestopt`);
+    it.door=ik.naam; it.wanneerBewerkt=new Date().toLocaleString("nl-NL",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+    if(oud){ S.inhoud[S.inhoud.indexOf(oud)]=it; bewerkId=null; bewaar(); tekenBeheer(); melding("Opgeslagen"); }
+    else { S.inhoud.push(it); bewaar(); tekenBeheer(); melding(`Achter raampje ${beheerDag} gestopt`); }
   };
 }
 function verklein(f,max=600,q=.8){ return new Promise(ok=>{ const r=new FileReader(); r.onload=()=>{ const im=new Image(); im.onload=()=>{
