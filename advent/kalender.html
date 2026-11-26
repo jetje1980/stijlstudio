@@ -180,6 +180,103 @@ textarea{min-height:90px;font-family:var(--f-hand);font-size:24px;line-height:1.
 .lid{display:grid;grid-template-columns:1fr 72px auto;gap:8px;align-items:center}
 .melding{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--bordeaux);color:var(--creme);padding:8px 16px;border-radius:2px;font-size:14px;z-index:30}
 
+/* ---------- uitknippoppetjes ---------- */
+.pop{--m:40px;display:inline-grid;justify-items:center;flex:none}
+.pop .hoofd{width:var(--m);height:calc(var(--m)*1.18);border-radius:48% 48% 40% 40%;overflow:hidden;background:var(--kraft);
+  box-shadow:0 0 0 3px #fff,0 4px 6px rgba(0,0,0,.25);display:grid;place-items:center;font-family:var(--f-hand);font-weight:700;font-size:calc(var(--m)*.62);color:var(--bordeaux)}
+.pop img{width:100%;height:100%;object-fit:cover;display:block}
+.pop .stokje{width:3px;height:calc(var(--m)*.45);background:#c9a27a;border-radius:2px;margin-top:3px}
+.label .pop{margin-bottom:6px}
+
+/* ---------- stoepje voor het huis: lantaarn, wie er al was, brievenbus ---------- */
+.stoep{max-width:440px;margin:0 auto;display:flex;align-items:end;justify-content:space-between;gap:6px;padding:12px 4px 10px;border-bottom:3px solid #d9d3c8;position:relative}
+.stoep .wie-al{display:flex;align-items:end;gap:6px;flex-wrap:wrap;justify-content:center;flex:1;min-width:0}
+.stoep .wie-al .pop{--m:28px;transition:opacity .3s,filter .3s}
+.stoep .wie-al .pop.weg{opacity:.35;filter:grayscale(1)}
+.lantaarn{width:38px;flex:none}
+.lantaarn .licht{fill:#5b5f6e;transition:fill .4s}
+.lantaarn.aan .licht{fill:#ffd977}
+.lantaarn.aan{filter:drop-shadow(0 0 10px rgba(255,210,110,.9))}
+.bus{border:0;background:none;padding:0;width:58px;flex:none;position:relative}
+.bus .vlag{transform-origin:47px 20px;transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.bus.post .vlag{transform:rotate(-80deg)}
+.bus .teller{position:absolute;right:-4px;top:-4px;background:var(--rood);color:#fff;font-size:11px;font-weight:600;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
+.samen{text-align:center;font-family:var(--f-hand);font-size:22px;color:var(--bordeaux);margin:8px 0 0;line-height:1.1}
+
+/* ---------- spelletjes met miniaturen ---------- */
+.spel{position:relative;aspect-ratio:4/3;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;border:2px solid var(--goud)}
+.spel.muur{background:var(--bordeaux);background-image:radial-gradient(rgba(216,189,126,.55) 1.2px,transparent 1.8px);background-size:22px 22px}
+.spel.zolder{background:linear-gradient(#efe7da,#e3d6c2)}
+.spel .vloer{position:absolute;inset:auto 0 0;height:22%;background:repeating-linear-gradient(90deg,#c9a77c 0 38px,#bf9d70 38px 40px)}
+.kledje{position:absolute;width:19%;transform:translate(-50%,-50%);cursor:grab;transition:left .25s,top .25s;filter:drop-shadow(0 3px 2px rgba(0,0,0,.25));touch-action:none}
+.kledje.sleep{transition:none;cursor:grabbing;z-index:3}
+.kledje .knijper{display:none;position:absolute;left:50%;top:-14%;width:12%;height:30%;margin-left:-6%;background:#f6efe3;border:1px solid #cdbfa8;border-radius:2px}
+.kledje.hangt .knijper{display:block}
+.kledje.hangt{animation:zwaai 2.4s ease-in-out infinite;transform-origin:50% 0}
+@keyframes zwaai{0%,100%{transform:translate(-50%,-10%) rotate(-4deg)}50%{transform:translate(-50%,-10%) rotate(4deg)}}
+.mand{position:absolute;left:50%;bottom:6%;width:46%;transform:translateX(-50%);border:0;background:none;padding:0}
+.mand.schud{animation:schud .3s}
+.vlieg{position:absolute;left:50%;top:60%;width:16%;pointer-events:none;animation:vlieg 1s ease-out forwards}
+@keyframes vlieg{to{transform:translate(var(--dx),-160%) rotate(var(--rot));opacity:0}}
+.gevonden{position:absolute;left:50%;top:44%;width:22%;transform:translate(-50%,-50%);animation:rijs 1s cubic-bezier(.2,.9,.3,1.3) both;filter:drop-shadow(0 0 14px rgba(255,214,120,.95))}
+@keyframes rijs{from{transform:translate(-50%,40%) scale(.3);opacity:0}}
+.deurvak{position:absolute;left:50%;bottom:0;width:38%;height:78%;transform:translateX(-50%);perspective:600px}
+.deurvak .achter{position:absolute;inset:0;border-radius:50% 50% 0 0/26% 26% 0 0;background:radial-gradient(ellipse at 50% 80%,#ffe3a1,#f4b860 45%,#6e3a1e);display:grid;place-items:center}
+.deurvak .achter svg{width:60%}
+.deur-blad{position:absolute;inset:0;border:0;padding:0;border-radius:50% 50% 0 0/26% 26% 0 0;transform-origin:0 50%;transition:transform 1s cubic-bezier(.5,.1,.3,1);
+  background:repeating-linear-gradient(90deg,#6e2f22 0 13%,#5f281d 13% 14%);box-shadow:inset 0 0 0 3px var(--goud)}
+.deur-blad::after{content:"";position:absolute;left:50%;top:20%;width:18%;aspect-ratio:1;margin-left:-9%;background:var(--creme);clip-path:path("M10 18L2 9a5 5 0 018-6 5 5 0 018 6z");transform:scale(1.2)}
+.deur-blad .knop-rond{position:absolute;right:12%;top:58%;width:9%;aspect-ratio:1;border-radius:50%;background:var(--goud)}
+.deur-blad.open{transform:rotateY(-105deg)}
+.klop{position:absolute;font-family:var(--f-hand);font-size:26px;color:var(--creme);pointer-events:none;animation:klop .8s ease-out forwards}
+@keyframes klop{from{transform:scale(.6);opacity:1}to{transform:translateY(-30px) scale(1.1);opacity:0}}
+.kastje{position:absolute;left:50%;bottom:16%;width:44%;transform:translateX(-50%);background:#f7f4ee;border:2px solid #d8d0c3;border-radius:3px 3px 0 0;padding:26% 7% 8%;display:grid;gap:7%;box-shadow:0 10px 12px -8px rgba(0,0,0,.35)}
+.kastje::before{content:"";position:absolute;left:7%;right:7%;top:8%;height:16%;border:2px solid #d8d0c3;border-bottom-width:5px;background:#ece6dc}
+.la{border:2px solid #d8d0c3;background:#fbf9f5;height:clamp(34px,9vw,48px);position:relative;border-radius:2px;transition:transform .5s cubic-bezier(.3,1.4,.5,1);padding:0}
+.la::after{content:"";position:absolute;left:50%;top:50%;width:9px;height:9px;margin:-4.5px;border-radius:50%;background:#e9e2d6;box-shadow:inset -1px -1px 0 #cfc4b2}
+.la.open{transform:translateY(22%) scale(1.12);z-index:2;box-shadow:0 8px 10px -4px rgba(0,0,0,.3)}
+.la .inhoud{position:absolute;inset:-70% 15% 40%;display:grid;place-items:center;font-family:var(--f-hand);font-size:20px;color:var(--zacht)}
+.la .inhoud svg{width:70%;filter:drop-shadow(0 0 10px rgba(255,214,120,.95))}
+.spel-uitleg{font-size:14px;color:var(--zacht);margin:0}
+
+/* ---------- stopmotion-speler ---------- */
+.film{position:relative;background:#111;padding:14px 0;border-radius:3px}
+.film::before,.film::after{content:"";position:absolute;left:0;right:0;height:8px;background:repeating-linear-gradient(90deg,transparent 0 6px,#e9e2d2 6px 12px,transparent 12px 18px);opacity:.8}
+.film::before{top:3px}.film::after{bottom:3px}
+.film .beeld{position:relative;aspect-ratio:4/3;overflow:hidden}
+.film img{width:100%;height:100%;object-fit:cover;display:block}
+.film .korrel{position:absolute;inset:0;pointer-events:none;opacity:.18;mix-blend-mode:multiply;
+  background:radial-gradient(#000 .6px,transparent .9px) 0 0/4px 4px,radial-gradient(#000 .5px,transparent .8px) 2px 1px/5px 5px;animation:korrel .25s steps(2) infinite}
+@keyframes korrel{50%{background-position:1px 2px,3px 0}}
+.film .speel{position:absolute;right:8px;bottom:22px;border:0;background:rgba(0,0,0,.55);color:#fff;border-radius:99px;font-size:12px;padding:4px 10px}
+
+/* ---------- bonnen ---------- */
+.bon{position:relative;background:var(--kraft);color:var(--inkt);padding:16px 22px;display:grid;gap:4px;
+  -webkit-mask:radial-gradient(circle at 0 50%,transparent 9px,#000 9.5px) left/51% 100% no-repeat,radial-gradient(circle at 100% 50%,transparent 9px,#000 9.5px) right/51% 100% no-repeat;
+  mask:radial-gradient(circle at 0 50%,transparent 9px,#000 9.5px) left/51% 100% no-repeat,radial-gradient(circle at 100% 50%,transparent 9px,#000 9.5px) right/51% 100% no-repeat}
+.bon::before{content:"";position:absolute;left:12px;right:12px;top:6px;bottom:6px;border:1.5px dashed rgba(124,29,38,.45);pointer-events:none}
+.bon .bon-kop{font-family:var(--f-titel);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--bordeaux)}
+.bon .bon-tekst{font-family:var(--f-hand);font-size:24px;line-height:1.1}
+.bon .waarde{font-family:var(--f-hand);font-weight:700;font-size:40px;line-height:1;color:var(--bordeaux)}
+.bon .stempel{justify-self:start;margin-top:6px;border:2px solid var(--rood);color:var(--rood);font-family:var(--f-titel);text-transform:uppercase;letter-spacing:.12em;font-size:12px;padding:3px 10px;transform:rotate(-4deg)}
+.bon .knop{justify-self:start;margin-top:6px;position:relative;z-index:1}
+
+/* ---------- brievenbus ---------- */
+.tabs{display:flex;gap:6px;border-bottom:1px dashed var(--goud-licht)}
+.tabs button{border:0;background:none;padding:6px 10px;font-family:var(--f-titel);text-transform:uppercase;letter-spacing:.12em;font-size:12px;color:var(--zacht);border-bottom:2px solid transparent}
+.tabs button[aria-selected="true"]{color:var(--bordeaux);border-color:var(--bordeaux)}
+.postlijst{display:grid;gap:10px}
+.postje{background:#fff;padding:10px 12px;border-left:3px solid var(--goud);display:grid;gap:4px;font-size:14px;min-width:0;overflow-wrap:anywhere}
+.postje .hand{font-size:22px;line-height:1.1}
+.postje .antw{border-top:1px dashed var(--goud-licht);padding-top:6px;color:var(--bordeaux)}
+.status{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--zacht)}
+.status.nieuw{color:var(--rood)}
+.plof{animation:plof .7s ease-in forwards}
+@keyframes plof{40%{transform:translateY(-10px) rotate(-4deg)}to{transform:translateY(60px) scale(.2);opacity:0}}
+.knoppen{display:flex;flex-wrap:wrap;gap:6px}
+.knop.klein{padding:5px 10px;font-size:11px}
+.diner{display:grid;gap:4px;font-family:var(--f-hand);font-size:22px}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -196,68 +293,110 @@ const SVG = {
   foto:`<svg viewBox="0 0 60 44"><g transform="rotate(-7 30 22)"><rect x="14" y="3" width="32" height="38" fill="#fff" stroke="${G}" stroke-width="1.5"/><rect x="18" y="7" width="24" height="22" fill="#c9d3dd"/><path d="M18 29l8-9 6 6 4-4 6 7z" fill="${D}"/></g></svg>`,
   video:`<svg viewBox="0 0 60 44"><rect x="6" y="9" width="48" height="28" rx="3" fill="none" stroke="${C}" stroke-width="1.8"/><path d="M25 16l11 7-11 7z" fill="${C}"/><path d="M6 14h48M6 32h48" stroke="${G}" stroke-dasharray="3 3"/></svg>`,
   cadeau:`<svg viewBox="0 0 60 44"><rect x="13" y="17" width="34" height="25" fill="${C}" stroke="${G}" stroke-width="1.5"/><rect x="10" y="11" width="40" height="7" fill="${C}" stroke="${G}" stroke-width="1.5"/><path d="M30 11v31" stroke="${R}" stroke-width="4"/><path d="M30 11q-13-11-12 0M30 11q13-11 12 0" fill="none" stroke="${R}" stroke-width="2.2"/></svg>`,
+  bon:`<svg viewBox="0 0 60 44"><path d="M6 10h48v8a4 4 0 000 8v8H6v-8a4 4 0 000-8z" fill="#d3b48a" stroke="${G}" stroke-width="1.4"/><path d="M14 18h24M14 24h16" stroke="#7c1d26" stroke-width="2"/><text x="46" y="27" text-anchor="middle" font-family="Caveat,cursive" font-weight="700" font-size="11" fill="#7c1d26">€</text></svg>`,
+  stopmotion:`<svg viewBox="0 0 60 44"><rect x="4" y="8" width="52" height="28" fill="#222"/><g fill="${C}">${[8,16,24,32,40,48].map(x=>`<rect x="${x}" y="10" width="4" height="3"/><rect x="${x}" y="31" width="4" height="3"/>`).join("")}</g><rect x="10" y="15" width="18" height="14" fill="#d3b48a"/><rect x="32" y="15" width="18" height="14" fill="#d3b48a"/><path d="M13 26l5-5 3 3 3-2 3 4z" fill="${R}"/><path d="M37 26l5-5 3 3 3-2 3 4z" fill="${R}"/></svg>`,
+  /* miniaturen die ergens voor staan */
+  waslijn:`<svg viewBox="0 0 60 44"><path d="M8 40V6M52 40V10" stroke="#e2cfa8" stroke-width="2.5"/><ellipse cx="8" cy="41" rx="5" ry="2" fill="#8a5a36"/><ellipse cx="52" cy="41" rx="5" ry="2" fill="#8a5a36"/><path d="M8 8Q30 20 52 12" fill="none" stroke="#fff" stroke-width="1"/><path d="M15 11v8l-4 2a2 2 0 002 3l5-3v-9z" fill="${R}"/><path d="M24 15h10l3 4-3 1v8h-10v-8l-3-1z" fill="${R}"/><path d="M24 23h10" stroke="#222" stroke-width="1.6"/><path d="M41 14l8-1-6 12z" fill="${R}"/><circle cx="43" cy="25" r="2" fill="#fff"/></svg>`,
+  fles:`<svg viewBox="0 0 60 44"><rect x="26" y="3" width="10" height="6" rx="1" fill="${R}"/><path d="M24 10h14l4 6v24a3 3 0 01-3 3H23a3 3 0 01-3-3V16z" fill="#f4f1ff" stroke="${G}" stroke-width="1.4"/><path d="M20 22h22v12H20z" fill="#d9cde3"/><path d="M27 26q4-4 8 0t-4 6q-6-2-4-6" fill="${R}"/></svg>`,
+  slee:`<svg viewBox="0 0 60 44"><rect x="22" y="8" width="12" height="10" fill="${D}"/><rect x="32" y="11" width="10" height="7" fill="#c9d3dd"/><path d="M8 18h40l6-6v8l-6 8H12z" fill="${R}"/><path d="M8 32h42q6 0 6-5M14 28v4M44 28v4" fill="none" stroke="${R}" stroke-width="2.4" stroke-linecap="round"/></svg>`,
+  lantaarn:`<svg viewBox="0 0 60 44"><path d="M30 2l-6 6h12z" fill="#222"/><rect x="25" y="8" width="10" height="11" fill="#ffd977" stroke="#222" stroke-width="1.6"/><rect x="28.5" y="19" width="3" height="20" fill="#222"/><circle cx="30" cy="25" r="4.5" fill="none" stroke="${D}" stroke-width="2.4"/><path d="M28 21l2 2 2-2" stroke="${R}" stroke-width="1.4" fill="none"/><path d="M24 39h12v3H24z" fill="#222"/></svg>`,
+  deurtje:`<svg viewBox="0 0 60 44"><path d="M18 42V14a12 12 0 0124 0v28z" fill="#6e2f22" stroke="${G}" stroke-width="1.4"/><path d="M30 12l-3-3a2 2 0 013-2 2 2 0 013 2z" fill="${C}"/><circle cx="37" cy="29" r="1.6" fill="${G}"/></svg>`,
+  kastje:`<svg viewBox="0 0 60 44"><path d="M17 4h26v38H17z" fill="#f7f4ee" stroke="#cfc6b8" stroke-width="1.4"/><path d="M19 7h22v8H19z" fill="#ece6dc" stroke="#cfc6b8"/><rect x="19" y="18" width="22" height="10" fill="none" stroke="#cfc6b8"/><rect x="19" y="30" width="22" height="10" fill="none" stroke="#cfc6b8"/><circle cx="30" cy="23" r="1.5" fill="#cfc6b8"/><circle cx="30" cy="35" r="1.5" fill="#cfc6b8"/><rect x="24" y="2" width="9" height="7" fill="${R}"/></svg>`,
+  bezem:`<svg viewBox="0 0 60 44"><path d="M40 3L26 26" stroke="#e2cfa8" stroke-width="2.4"/><path d="M26 24l-10 16 14 2 2-14z" fill="#c9a24d"/><path d="M24 27l6 3" stroke="${R}" stroke-width="2"/></svg>`,
   groot_cadeau:`<svg viewBox="0 0 120 110"><rect x="18" y="40" width="84" height="64" fill="#7c1d26" stroke="${G}" stroke-width="2.5"/><g fill="#fff" opacity=".8"><circle cx="34" cy="56" r="1.6"/><circle cx="80" cy="70" r="1.6"/><circle cx="50" cy="90" r="1.4"/><circle cx="90" cy="92" r="1.4"/><circle cx="36" cy="80" r="1.2"/></g><rect x="12" y="26" width="96" height="16" fill="#7c1d26" stroke="${G}" stroke-width="2.5"/><path d="M60 26v78" stroke="${G}" stroke-width="7"/><path d="M60 26q-30-28-28 0M60 26q30-28 28 0" fill="none" stroke="${G}" stroke-width="4"/><path d="M60 26l-12 16M60 26l12 16" stroke="${G}" stroke-width="3"/></svg>`
+};
+const KLEREN = {
+  sok:`<svg viewBox="0 0 40 50"><path d="M12 2h16v26l8 8a6 6 0 01-8 9L12 34z" fill="${R}"/><path d="M12 2h16v8H12z" fill="#fff"/></svg>`,
+  pakje:`<svg viewBox="0 0 50 50"><path d="M14 4h22l12 10-6 6-6-4v30H14V16l-6 4-6-6z" fill="${R}"/><path d="M14 4h22M25 4v42" stroke="#fff" stroke-width="3"/><path d="M14 32h22" stroke="#222" stroke-width="4"/><rect x="22" y="29" width="6" height="6" fill="none" stroke="#e5a72a" stroke-width="1.6"/></svg>`,
+  muts:`<svg viewBox="0 0 40 50"><path d="M4 8h30L22 40z" fill="${R}"/><path d="M3 4h34v7H3z" fill="#fff"/><circle cx="22" cy="42" r="5" fill="#fff"/></svg>`,
+  handdoek:`<svg viewBox="0 0 40 40"><rect x="4" y="6" width="32" height="28" rx="3" fill="#c9d3dd"/><path d="M4 12h32M4 28h32" stroke="#fff" stroke-width="2"/></svg>`
 };
 const TAKJE = `<svg viewBox="0 0 120 60"><path d="M4 50Q60 30 116 8" stroke="#5a3b28" stroke-width="2" fill="none"/>${Array.from({length:18},(_,i)=>{const t=i/17,x=4+112*t,y=50-42*t-6*Math.sin(t*3);return `<path d="M${x} ${y}l${-6+i%3} ${-12}M${x} ${y}l${8} ${8-i%2*2}" stroke="#2f5a47" stroke-width="2.4" stroke-linecap="round"/>`}).join("")}</svg>`;
 const SLINGER = `<svg class="slinger" viewBox="0 0 400 30" preserveAspectRatio="none"><path d="M0 4Q50 30 100 6Q150 30 200 6Q250 30 300 6Q350 30 400 4" fill="none" stroke="#2f5a47" stroke-width="5" stroke-dasharray="2 3" stroke-linecap="round"/><path d="M0 4Q50 30 100 6Q150 30 200 6Q250 30 300 6Q350 30 400 4" fill="none" stroke="#c22a33" stroke-width="1.2"/>${[100,200,300].map(x=>`<g transform="translate(${x} 7)"><path d="M0 0q-9-7-9 0t9 0q9-7 9 0t-9 0" fill="#c22a33"/><path d="M0 0l-4 10M0 0l4 10" stroke="#c22a33" stroke-width="2"/></g>`).join("")}</svg>`;
+const LANTAARN = aan => `<svg class="lantaarn ${aan?'aan':''}" viewBox="0 0 40 110" aria-label="${aan?'Lantaarn brandt':'Lantaarn uit'}"><path d="M20 2l-11 11h22z" fill="#222"/><rect x="11" y="13" width="18" height="20" class="licht" stroke="#222" stroke-width="2.5"/><path d="M20 13v20" stroke="#222" stroke-width="1.4"/><path d="M8 33h24v4H8z" fill="#222"/><rect x="17" y="37" width="6" height="62" fill="#222"/><circle cx="20" cy="52" r="8" fill="none" stroke="#2f5a47" stroke-width="4"/><path d="M15 47l5 5 5-5" stroke="#c22a33" stroke-width="2" fill="none"/><path d="M10 99h20v9H10z" fill="#222"/></svg>`;
+const BUS = `<svg viewBox="0 0 60 80"><rect x="27" y="42" width="6" height="36" fill="#8a5a36"/><path d="M6 10h40v34H6z" fill="#7c1d26" stroke="#b8924a" stroke-width="2"/><path d="M6 10q20-12 40 0" fill="#5e141c" stroke="#b8924a" stroke-width="2"/><rect x="14" y="20" width="24" height="4" rx="2" fill="#2b1013" stroke="#b8924a"/><text x="26" y="37" text-anchor="middle" font-family="Fraunces,serif" font-size="8" letter-spacing="1.5" fill="#d8bd7e">POST</text><g class="vlag"><rect x="46" y="20" width="3" height="22" fill="#b8924a"/><rect x="46" y="20" width="10" height="7" fill="#c22a33"/></g></svg>`;
 
-const SOORTEN = {briefje:"Lief briefje", liedje:"Liedje", aanwijzing:"Aanwijzing", foto:"Foto", video:"Filmpje", cadeau:"Verrassing"};
+const SOORTEN = {briefje:"Lief briefje", liedje:"Liedje", aanwijzing:"Aanwijzing", foto:"Foto", video:"Filmpje", cadeau:"Verrassing", bon:"Bon om in te wisselen", stopmotion:"Stopmotion-filmpje"};
+const SPELLEN = {kras:"Goudpapier krassen", lintje:"Lintje lostrekken", waslijn:"Was ophangen aan de waslijn", wasmand:"Graven in de wasmand", sneeuw:"Sneeuw wegvegen, voetstapjes volgen", deurtje:"Aankloppen bij het deurtje", laatjes:"Laatjes van het kastje"};
+const MINIS = {"":"Hoort bij de soort", waslijn:"Waslijntje", fles:"Flesje wasmiddel", slee:"Sleetje", lantaarn:"Lantaarntje", deurtje:"Deurtje", kastje:"Kastje", bezem:"Bezempje", cadeau:"Cadeautje", briefje:"Envelopje"};
+const POSTSOORT = {briefje:"Briefje aan iemand", vraag:"Vraag of wens aan Griette", foto:"Foto voor het jaaroverzicht", diner:"Ik neem mee naar het kerstdiner"};
 const LABELKLEUR = ["#fbf8f1","#d3b48a","#e9d9c4","#d7e0d6","#f0dcd8","#d3b48a"];
-/* volgorde van de raampjes in de gevel, door elkaar zoals op een echte kalender; 24 zit in het dakkapelletje, de deur is dag 6 */
 const GEVEL = [20,16,17,2, 21,3,15,10, 14,18,9,22, 8,13,1,7, 19,5,12,4, 11,6,23];
 const vorm = (i,d) => d===6 ? "deur" : [9,10].includes(d)? "rond" : (Math.floor(i/4)%2===0 ? "boog" : "recht");
 
 /* ===== Opslag (demo: alleen op dit apparaat) ===== */
-const SLEUTEL = "kersthuisje-v1";
+const SLEUTEL = "kersthuisje-v2";
+const uid = () => Math.random().toString(36).slice(2,9);
 function voorbeeld(){
   return {
     leden:[
       {id:"g", naam:"Griette", pin:"0000", beheer:true},
-      {id:"a", naam:"Lid 2", pin:"1111"},
-      {id:"b", naam:"Lid 3", pin:"2222"},
+      {id:"z", naam:"Zoon", pin:"1111"},
+      {id:"d", naam:"Dochter", pin:"2222"},
       {id:"c", naam:"Lid 4", pin:"3333"},
-      {id:"d", naam:"Lid 5", pin:"4444"},
-      {id:"e", naam:"Lid 6", pin:"5555"}
+      {id:"e", naam:"Lid 5", pin:"4444"},
+      {id:"f", naam:"Lid 6", pin:"5555"}
     ],
     inhoud:[
-      {dag:1, voor:"alle", soort:"briefje", tekst:"Welkom in ons kersthuisje!\nElke ochtend gaat er één lichtje aan."},
-      {dag:2, voor:"a", soort:"aanwijzing", tekst:"Kijk eens onder je kussen…"},
-      {dag:2, voor:"b", soort:"liedje", tekst:"Ons vakantieliedje van deze zomer", link:"https://open.spotify.com/"},
-      {dag:3, voor:"alle", soort:"cadeau", tekst:"Vanavond warme chocomel met slagroom, voor iedereen."},
-      {dag:4, voor:"g", soort:"briefje", tekst:"Testbriefje voor de beheerder."},
-      {dag:6, voor:"alle", soort:"briefje", tekst:"Sinterklaas is langs geweest. Kijk bij de voordeur!"}
+      {id:uid(), dag:1, voor:"alle", soort:"briefje", spel:"kras", tekst:"Welkom in ons kersthuisje!\nElke ochtend gaat er één lichtje aan. Als iedereen geweest is, brandt de lantaarn."},
+      {id:uid(), dag:2, voor:"z", soort:"bon", spel:"waslijn", mini:"waslijn", tekst:"Wasbon: deze week draai ik jouw was. Gratis!", waarde:"€ 5"},
+      {id:uid(), dag:2, voor:"d", soort:"cadeau", spel:"wasmand", mini:"fles", tekst:"Kijk vandaag in je wasmand: daar staat een fles wasmiddel voor je klaar. Pak 'm eruit!"},
+      {id:uid(), dag:2, voor:"alle", soort:"aanwijzing", spel:"lintje", tekst:"Vanavond eten we pannenkoeken."},
+      {id:uid(), dag:3, voor:"alle", soort:"stopmotion", spel:"deurtje", mini:"slee", tekst:"Het sleetje is onderweg…", frames:"demo"},
+      {id:uid(), dag:4, voor:"alle", soort:"aanwijzing", spel:"sneeuw", mini:"bezem", tekst:"Volg de voetstapjes: kijk achter de kerstboom."},
+      {id:uid(), dag:5, voor:"alle", soort:"cadeau", spel:"laatjes", mini:"kastje", tekst:"Vanavond warme chocomel met slagroom, voor iedereen."},
+      {id:uid(), dag:6, voor:"alle", soort:"briefje", spel:"lintje", tekst:"Sinterklaas is langs geweest. Kijk bij de voordeur!"}
     ],
-    geopend:{}
+    geopend:{}, post:[], diner:[{wie:"Griette", wat:"Kalkoen en jus"}], ingewisseld:{}
   };
 }
 let S;
 try{ S = JSON.parse(localStorage.getItem(SLEUTEL)) || voorbeeld(); }catch(e){ S = voorbeeld(); }
-function bewaar(){ try{ localStorage.setItem(SLEUTEL, JSON.stringify(S)); }catch(e){} }
+function bewaar(){ try{ localStorage.setItem(SLEUTEL, JSON.stringify(S)); }catch(e){ melding("Het geheugen van deze demo is vol. Gebruik kleinere of minder foto's."); } }
 
-let ik=null, kiesLid=null, scherm="login", beheerDag=1;
+let ik=null, kiesLid=null, scherm="login", beheerDag=1, filmTimer=null;
 function vandaagDag(){ const nu=new Date(); return nu.getMonth()===11 ? Math.min(nu.getDate(),24) : 0; }
-let demoDag = vandaagDag() || 1;
+let demoDag = vandaagDag() || 6;
 
 const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
 const esc = s => String(s??"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function melding(t){ const m=$("#melding"); m.textContent=t; m.hidden=false; clearTimeout(melding.t); melding.t=setTimeout(()=>m.hidden=true,1800); }
+function melding(t){ const m=$("#melding"); m.textContent=t; m.hidden=false; clearTimeout(melding.t); melding.t=setTimeout(()=>m.hidden=true,2200); }
+const lid = id => S.leden.find(l=>l.id===id) || {naam:"?"};
 const voorMij = dag => S.inhoud.filter(x => x.dag===dag && (x.voor==="alle" || x.voor===ik.id));
-const geopend = dag => (S.geopend[ik.id]||[]).includes(dag);
-const hoofdSoort = dag => { const l=voorMij(dag); return (l.find(x=>x.voor!=="alle")||l[0]||{soort:"cadeau"}).soort; };
+const geopendDoor = (id,dag) => (S.geopend[id]||[]).includes(dag);
+const geopend = dag => geopendDoor(ik.id,dag);
+const hoofd = dag => { const l=voorMij(dag); return l.find(x=>x.voor!=="alle") || l[0] || null; };
+const miniVan = dag => { const h=hoofd(dag); return h ? (h.mini || h.soort) : "cadeau"; };
+const spelVan = dag => { const h=hoofd(dag); return (h && h.spel) || (dag%2 ? "kras" : "lintje"); };
+const kort = t => t.length<=44 ? t : t.slice(0,44).replace(/\s+\S*$/,"")+"…";
+const pop = (l,m) => `<span class="pop" style="--m:${m||40}px" title="${esc(l.naam)}"><span class="hoofd">${l.foto?`<img src="${l.foto}" alt="">`:esc((l.naam||"?")[0])}</span><span class="stokje"></span></span>`;
+const ongelezen = () => S.post.filter(p=>p.van===ik.id && p.antwoord && !p.gelezen).length;
 
 function teken(){ scherm==="login" ? tekenLogin() : scherm==="beheer" ? tekenBeheer() : tekenKalender(); }
+
+/* ===== Modaal venster ===== */
+function venster(titel, html){
+  const lag=document.createElement("div"); lag.className="scherm";
+  lag.innerHTML=`<div class="vel" role="dialog" aria-label="${esc(titel)}"><button class="sluit" aria-label="Sluiten">×</button><h2>${titel}</h2><div class="podium">${html||""}</div></div>`;
+  document.body.appendChild(lag);
+  const dicht=()=>{ clearInterval(filmTimer); lag.remove(); teken(); };
+  lag.querySelector(".sluit").onclick=dicht;
+  lag.onclick=e=>{ if(e.target===lag) dicht(); };
+  return {lag, podium:lag.querySelector(".podium"), dicht};
+}
 
 /* ===== Inloggen ===== */
 function tekenLogin(){
   $("#app").innerHTML = `
   <span class="takje" style="right:-10px;top:-6px">${TAKJE}</span>
   <section class="login">
-    <span class="demo">Eerste voorstel · klikbare demo</span>
+    <span class="demo">Voorstel · klikbare demo</span>
     <h1>Wie zet vandaag <em>een lichtje</em> aan?</h1>
     <p>Kies je label en vul je pincode in. Iedereen heeft z'n eigen raampjes, en soms krijgt het hele gezin hetzelfde briefje.</p>
     <div class="touw"><div class="mensen">
       ${S.leden.map((l,i)=>`<button class="label" data-id="${l.id}"><span class="draad"></span>
-        <span class="kaartje" style="background:${LABELKLEUR[i%LABELKLEUR.length]}"><span class="naam">${esc(l.naam)}</span>${l.beheer?'<small>beheerder</small>':'<small>&nbsp;</small>'}</span></button>`).join("")}
+        <span class="kaartje" style="background:${LABELKLEUR[i%LABELKLEUR.length]}">${pop(l,34)}<span class="naam">${esc(l.naam)}</span>${l.beheer?'<small>beheerder</small>':'<small>&nbsp;</small>'}</span></button>`).join("")}
     </div></div>
     ${kiesLid?`<form class="pin" id="pinform">
       <h3>Hoi ${esc(kiesLid.naam)}</h3>
@@ -267,7 +406,7 @@ function tekenLogin(){
       <p class="uitleg">Demo-pincode: ${esc(kiesLid.pin)}</p>
     </form>`:""}
   </section>`;
-  document.querySelectorAll(".label").forEach(b=>b.onclick=()=>{ kiesLid=S.leden.find(l=>l.id===b.dataset.id); tekenLogin(); $("#pinveld").focus(); });
+  $$(".label").forEach(b=>b.onclick=()=>{ kiesLid=S.leden.find(l=>l.id===b.dataset.id); tekenLogin(); $("#pinveld").focus(); });
   const f=$("#pinform");
   if(f) f.onsubmit=e=>{ e.preventDefault();
     if($("#pinveld").value===kiesLid.pin){ ik=kiesLid; kiesLid=null; scherm="kalender"; teken(); }
@@ -280,16 +419,23 @@ function raam(d,i){
   const open=geopend(d), mag=d<=demoDag, heeft=voorMij(d).length>0, v=i===-1?"boog":vorm(i,d);
   return `<button class="raam ${v} ${open?'open':''} ${d===demoDag&&!open?'vandaag':''}" data-dag="${d}" ${(!mag&&!open)?'disabled':''}
      aria-label="${d} december${open?', geopend':mag?'':', nog op slot'}">
-     <span class="glas">${open?`<span class="mini">${SVG[hoofdSoort(d)]}</span>`:'<span class="roede"></span>'}</span>
+     <span class="glas">${open?`<span class="mini">${SVG[miniVan(d)]||SVG.cadeau}</span>`:'<span class="roede"></span>'}</span>
      <span class="nr">${d}</span>${mag&&!open&&heeft?'<span class="stip" title="Er zit iets in"></span>':''}
      <span class="vensterbank"></span></button>`;
 }
+function mijnBonnen(){ return S.inhoud.filter(x=>x.soort==="bon" && (x.voor===ik.id||x.voor==="alle") && geopend(x.dag)); }
 function tekenKalender(){
   const echt=vandaagDag();
+  const al = S.leden.filter(l=>geopendDoor(l.id,demoDag));
+  const iedereen = al.length===S.leden.length;
+  const post = ongelezen(), bonnen = mijnBonnen();
   $("#app").innerHTML = `
   <header class="kop">
     <div><div class="wie">voor ${esc(ik.naam)}</div><h1>Crazy Christmas</h1></div>
-    <div class="balk">${ik.beheer?'<button class="knop" id="naarBeheer">Beheer</button>':''}<button class="knop licht" id="uit">Uitloggen</button></div>
+    <div class="balk">
+      ${bonnen.length?`<button class="knop licht" id="bonnen">Mijn bonnen (${bonnen.length})</button>`:""}
+      ${ik.beheer?`<button class="knop" id="naarBeheer">Beheer${S.post.filter(p=>p.status==="nieuw").length?` · ${S.post.filter(p=>p.status==="nieuw").length} post`:""}</button>`:''}
+      <button class="knop licht" id="uit">Uitloggen</button></div>
   </header>
   <div class="tijd"><span class="demo">Tijdreis</span>
     <label for="tijd" style="display:contents"><span>Doe alsof het <b>${demoDag} december</b> is</span></label>
@@ -302,70 +448,216 @@ function tekenKalender(){
       <div class="sneeuw"></div>
     </div>
   </div>
-  <p class="legenda">${echt?`Vandaag is het echt ${echt} december.`:"Het is nog geen december, dus de tijdreis staat aan."}<br>Oneven dagen kras je open, even dagen pak je uit. Een rood stipje betekent dat er iets klaarligt.</p>`;
+  <div class="stoep">
+    ${LANTAARN(iedereen)}
+    <div class="wie-al">${S.leden.map(l=>pop(l,28).replace('class="pop"',`class="pop ${geopendDoor(l.id,demoDag)?'':'weg'}"`)).join("")}</div>
+    <button class="bus ${post?'post':''}" id="bus" aria-label="Brievenbus${post?`, ${post} nieuw antwoord`:''}">${BUS}${post?`<span class="teller">${post}</span>`:""}</button>
+  </div>
+  <p class="samen">${iedereen?"Iedereen is vandaag geweest: de lantaarn brandt!":`${al.length} van ${S.leden.length} hebben vandaag al gekeken`}</p>
+  <p class="legenda">${echt?`Vandaag is het echt ${echt} december.`:"Het is nog geen december, dus de tijdreis staat aan."}<br>Een rood stipje betekent dat er iets klaarligt. Tik op de brievenbus om zelf iets te posten.</p>`;
   $("#uit").onclick=()=>{ ik=null; scherm="login"; teken(); };
   if($("#naarBeheer")) $("#naarBeheer").onclick=()=>{ scherm="beheer"; teken(); };
+  if($("#bonnen")) $("#bonnen").onclick=toonBonnen;
+  $("#bus").onclick=()=>brievenbus("posten");
   $("#tijd").oninput=e=>{ demoDag=+e.target.value; tekenKalender(); $("#tijd").focus(); };
-  document.querySelectorAll(".raam").forEach(b=>b.onclick=()=>openDag(+b.dataset.dag));
+  $$(".raam").forEach(b=>b.onclick=()=>openDag(+b.dataset.dag));
 }
 
 /* ===== Een raampje openen ===== */
+let V=null;
 function openDag(dag){
-  const lag=document.createElement("div"); lag.className="scherm";
-  lag.innerHTML=`<div class="vel" role="dialog" aria-label="${dag} december"><button class="sluit" aria-label="Sluiten">×</button>
-    <h2>${dag} december</h2><div id="podium"></div></div>`;
-  document.body.appendChild(lag);
-  const dicht=()=>{ lag.remove(); tekenKalender(); };
-  lag.querySelector(".sluit").onclick=dicht;
-  lag.onclick=e=>{ if(e.target===lag) dicht(); };
+  V = venster(`${dag} december`);
   if(geopend(dag)) return onthul(dag,false);
-  dag%2 ? krassen(dag) : uitpakken(dag);
+  (SPEL[spelVan(dag)]||SPEL.kras)(dag);
 }
 function markeer(dag){ (S.geopend[ik.id] ||= []); if(!geopend(dag)) S.geopend[ik.id].push(dag); bewaar(); }
+function klaar(dag,wacht){ markeer(dag); setTimeout(()=>onthul(dag,true), wacht??350); }
+const SPEL = {
+  kras: d=>krassen(d,"goud"), sneeuw: d=>krassen(d,"sneeuw"),
+  lintje: uitpakken, waslijn, wasmand, deurtje, laatjes
+};
 
-function krassen(dag){
-  const p=$("#podium");
-  p.innerHTML=`<div class="krasvak"><div class="onder"><div class="hand" style="font-size:32px">wat zou het zijn…</div></div><canvas></canvas></div>
-    <p class="uitleg">Kras met je vinger het goudpapier weg.</p>`;
+function krassen(dag, soort){
+  const p=V.podium, sneeuw = soort==="sneeuw";
+  const voetjes = sneeuw ? `<svg viewBox="0 0 100 75" style="position:absolute;inset:0;width:100%;height:100%">${Array.from({length:11},(_,i)=>{const x=10+i*7.6,y=66-i*5.2+(i%2?3.5:-3.5);return `<g transform="translate(${x} ${y}) rotate(${-35})"><ellipse rx="1.8" ry="3.2" fill="#7a5a44" opacity=".75"/><circle cx="-1" cy="-4.4" r=".6" fill="#7a5a44"/><circle cx=".3" cy="-4.7" r=".6" fill="#7a5a44"/><circle cx="1.4" cy="-4.2" r=".55" fill="#7a5a44"/></g>`}).join("")}<g transform="translate(92 10)">${SVG.cadeau.replace('<svg viewBox="0 0 60 44"','<svg x="-8" y="-6" width="16" height="12" viewBox="0 0 60 44"')}</g></svg>` : "";
+  p.innerHTML=`<div class="krasvak" style="${sneeuw?'background:repeating-linear-gradient(94deg,#a98a6c 0 22px,#b39474 22px 46px,#9c7e61 46px 48px)':''}"><div class="onder">${voetjes}${sneeuw?'':'<div class="hand" style="font-size:32px">wat zou het zijn…</div>'}</div><canvas></canvas></div>
+    <p class="spel-uitleg">${sneeuw?"Veeg met het bezempje de sneeuw weg en volg de voetstapjes.":"Kras met je vinger het goudpapier weg."}</p>`;
   const c=p.querySelector("canvas"), vak=p.querySelector(".krasvak");
   const r=vak.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
   c.width=r.width*dpr; c.height=r.height*dpr;
   const x=c.getContext("2d"); x.scale(dpr,dpr);
-  const gr=x.createLinearGradient(0,0,r.width,r.height); gr.addColorStop(0,"#c9a45e"); gr.addColorStop(.5,"#e6cf98"); gr.addColorStop(1,"#b38a42");
-  x.fillStyle=gr; x.fillRect(0,0,r.width,r.height);
-  for(let i=0;i<120;i++){ x.fillStyle=i%2?"rgba(255,255,255,.55)":"rgba(124,29,38,.35)"; x.beginPath(); x.arc(Math.random()*r.width,Math.random()*r.height,Math.random()*1.8+.5,0,7); x.fill(); }
-  x.fillStyle="#c22a33"; x.font="700 84px Caveat, cursive"; x.textAlign="center"; x.textBaseline="middle"; x.fillText(dag,r.width/2,r.height/2);
-  x.globalCompositeOperation="destination-out"; x.lineCap="round"; x.lineWidth=34;
-  let bezig=false, vorige=null, klaar=false;
+  if(sneeuw){
+    const gr=x.createLinearGradient(0,0,0,r.height); gr.addColorStop(0,"#ffffff"); gr.addColorStop(1,"#e4ecf2");
+    x.fillStyle=gr; x.fillRect(0,0,r.width,r.height);
+    for(let i=0;i<160;i++){ x.fillStyle=i%4?"rgba(190,205,220,.5)":"rgba(216,189,126,.6)"; x.beginPath(); x.arc(Math.random()*r.width,Math.random()*r.height,Math.random()*1.6+.4,0,7); x.fill(); }
+  } else {
+    const gr=x.createLinearGradient(0,0,r.width,r.height); gr.addColorStop(0,"#c9a45e"); gr.addColorStop(.5,"#e6cf98"); gr.addColorStop(1,"#b38a42");
+    x.fillStyle=gr; x.fillRect(0,0,r.width,r.height);
+    for(let i=0;i<120;i++){ x.fillStyle=i%2?"rgba(255,255,255,.55)":"rgba(124,29,38,.35)"; x.beginPath(); x.arc(Math.random()*r.width,Math.random()*r.height,Math.random()*1.8+.5,0,7); x.fill(); }
+    x.fillStyle="#c22a33"; x.font="700 84px Caveat, cursive"; x.textAlign="center"; x.textBaseline="middle"; x.fillText(dag,r.width/2,r.height/2);
+  }
+  x.globalCompositeOperation="destination-out"; x.lineCap="round"; x.lineWidth=sneeuw?48:34;
+  let bezig=false, vorige=null, af=false;
   const punt=e=>{ const b=c.getBoundingClientRect(); return [e.clientX-b.left,e.clientY-b.top]; };
   c.onpointerdown=e=>{ bezig=true; vorige=punt(e); c.setPointerCapture(e.pointerId); };
   c.onpointerup=c.onpointercancel=()=>{ bezig=false; check(); };
-  c.onpointermove=e=>{ if(!bezig||klaar) return; const n=punt(e); x.beginPath(); x.moveTo(...vorige); x.lineTo(...n); x.stroke(); vorige=n; };
+  c.onpointermove=e=>{ if(!bezig||af) return; const n=punt(e); x.beginPath(); x.moveTo(...vorige); x.lineTo(...n); x.stroke(); vorige=n; };
   function check(){
     const d=x.getImageData(0,0,c.width,c.height).data; let leeg=0;
     for(let i=3;i<d.length;i+=64) if(d[i]===0) leeg++;
-    if(leeg/(d.length/64)>.5 && !klaar){ klaar=true; markeer(dag); onthul(dag,true); }
+    if(leeg/(d.length/64)>.5 && !af){ af=true; c.style.transition="opacity .6s"; c.style.opacity=0; klaar(dag, sneeuw?1400:350); }
   }
 }
 
 function uitpakken(dag){
-  const p=$("#podium"); let tikken=0; const nodig=4;
+  const p=V.podium; let tikken=0; const nodig=4;
   p.innerHTML=`<div class="pakket"><button aria-label="Pak uit">${SVG.groot_cadeau}</button></div>
-    <p class="uitleg" id="tel">Tik ${nodig} keer om het lintje los te trekken.</p>`;
+    <p class="spel-uitleg" id="tel">Tik ${nodig} keer om het lintje los te trekken.</p>`;
   const pk=p.querySelector(".pakket");
   pk.querySelector("button").onclick=()=>{
     tikken++; pk.classList.remove("schud"); void pk.offsetWidth; pk.classList.add("schud");
     $("#tel").textContent = tikken<nodig ? `Nog ${nodig-tikken} keer…` : "Daar gaat ie!";
-    if(tikken>=nodig){ markeer(dag); setTimeout(()=>onthul(dag,true),300); }
+    if(tikken===nodig) klaar(dag);
   };
 }
 
-const kort = t => t.length<=44 ? t : t.slice(0,44).replace(/\s+\S*$/,"")+"…";
+/* Waslijn: hang de drie kerstkleertjes op met een knijper */
+function waslijn(dag){
+  const p=V.podium;
+  const plek=[[28,33],[50,38],[72,34]], start=[[20,78],[50,80],[80,78]], namen=["sok","pakje","muts"];
+  p.innerHTML=`<div class="spel zolder" id="lijn">
+      <svg viewBox="0 0 100 75" style="position:absolute;inset:0;width:100%;height:100%" preserveAspectRatio="none">
+        <rect x="9" y="12" width="2" height="50" fill="#e2cfa8"/><rect x="89" y="16" width="2" height="46" fill="#e2cfa8"/>
+        <ellipse cx="10" cy="62" rx="6" ry="2.2" fill="#8a5a36"/><ellipse cx="90" cy="62" rx="6" ry="2.2" fill="#8a5a36"/>
+        <path d="M10 14Q50 30 90 18" fill="none" stroke="#fff" stroke-width=".7"/><path d="M10 14Q50 30 90 18" fill="none" stroke="#cdbfa8" stroke-width=".25"/>
+      </svg>
+      ${namen.map((n,i)=>`<div class="kledje" data-i="${i}" style="left:${start[i][0]}%;top:${start[i][1]}%"><span class="knijper"></span>${KLEREN[n]}</div>`).join("")}
+    </div><p class="spel-uitleg">Sleep de kerstkleertjes naar de waslijn, of tik erop.</p>`;
+  const vak=$("#lijn"); const bezet=[false,false,false]; let hangend=0;
+  const hang=(el)=>{ if(el.classList.contains("hangt")) return; const i=bezet.findIndex(b=>!b); if(i<0) return; bezet[i]=true;
+    el.style.left=plek[i][0]+"%"; el.style.top=plek[i][1]+"%"; el.classList.add("hangt"); hangend++;
+    if(hangend===3){ $(".spel-uitleg").textContent="Alles hangt te drogen!"; klaar(dag,1100); } };
+  vak.querySelectorAll(".kledje").forEach(el=>{
+    let sx,sy,bewogen=false;
+    el.onpointerdown=e=>{ if(el.classList.contains("hangt")) return; el.setPointerCapture(e.pointerId); el.classList.add("sleep"); sx=e.clientX; sy=e.clientY; bewogen=false; };
+    el.onpointermove=e=>{ if(!el.classList.contains("sleep")) return; if(Math.hypot(e.clientX-sx,e.clientY-sy)>6) bewogen=true;
+      const b=vak.getBoundingClientRect(); el.style.left=((e.clientX-b.left)/b.width*100)+"%"; el.style.top=((e.clientY-b.top)/b.height*100)+"%"; };
+    el.onpointerup=e=>{ if(!el.classList.contains("sleep")) return; el.classList.remove("sleep");
+      const b=vak.getBoundingClientRect(), y=(e.clientY-b.top)/b.height*100;
+      if(!bewogen || y<52) hang(el); else { const i=+el.dataset.i; el.style.left=start[i][0]+"%"; el.style.top=start[i][1]+"%"; } };
+  });
+}
+
+/* Wasmand: graaf door de was tot de miniatuur boven komt */
+function wasmand(dag){
+  const p=V.podium; let tikken=0; const nodig=5;
+  p.innerHTML=`<div class="spel zolder" id="wm"><div class="vloer"></div>
+      <button class="mand" aria-label="Graaf in de wasmand"><svg viewBox="0 0 100 70"><path d="M6 14h88l-8 54H14z" fill="#d3b48a" stroke="#8a5a36" stroke-width="2"/>
+        ${Array.from({length:7},(_,i)=>`<path d="M${10+i*13} 16l6 50" stroke="#b8925f" stroke-width="1.4"/>`).join("")}
+        ${Array.from({length:5},(_,i)=>`<path d="M${8+i*2} ${24+i*9}h${84-i*4}" stroke="#b8925f" stroke-width="1.4"/>`).join("")}
+        <path d="M10 14q15-14 30-4t25-6t28 10z" fill="#c9d3dd"/><path d="M30 12q10-10 22-2" fill="#f0dcd8"/><path d="M56 10q10-8 22 2" fill="#c22a33"/></svg></button>
+    </div><p class="spel-uitleg" id="tel">Tik op de wasmand om erin te graven.</p>`;
+  const mand=p.querySelector(".mand"), vak=$("#wm");
+  mand.onclick=()=>{
+    if(tikken>=nodig) return; tikken++;
+    mand.classList.remove("schud"); void mand.offsetWidth; mand.classList.add("schud");
+    const v=document.createElement("div"); v.className="vlieg";
+    v.style.setProperty("--dx",(Math.random()*240-120)+"%"); v.style.setProperty("--rot",(Math.random()*360-180)+"deg");
+    v.innerHTML=Object.values(KLEREN)[tikken%4]; vak.appendChild(v); setTimeout(()=>v.remove(),1000);
+    $("#tel").textContent = tikken<nodig ? `Nog ${nodig-tikken} keer graven…` : "Hé, wat zit daar?";
+    if(tikken===nodig){ const g=document.createElement("div"); g.className="gevonden"; g.innerHTML=SVG[miniVan(dag)]||SVG.cadeau; vak.appendChild(g); klaar(dag,1500); }
+  };
+}
+
+/* Deurtje: klop drie keer, dan zwaait het open */
+function deurtje(dag){
+  const p=V.podium; let klop=0;
+  p.innerHTML=`<div class="spel muur" id="dv"><div class="vloer" style="height:10%"></div>
+      <div class="deurvak"><div class="achter">${SVG[miniVan(dag)]||SVG.cadeau}</div><button class="deur-blad" aria-label="Klop op het deurtje"><span class="knop-rond"></span></button></div>
+    </div><p class="spel-uitleg" id="tel">Klop drie keer op het deurtje.</p>`;
+  const blad=p.querySelector(".deur-blad"), vak=$("#dv");
+  blad.onclick=e=>{
+    if(klop>=3) return; klop++;
+    const b=vak.getBoundingClientRect(), k=document.createElement("span"); k.className="klop"; k.textContent="klop!";
+    k.style.left=(e.clientX-b.left-20)+"px"; k.style.top=(e.clientY-b.top-30)+"px"; vak.appendChild(k); setTimeout(()=>k.remove(),800);
+    $("#tel").textContent = klop<3 ? `Nog ${3-klop} keer…` : "Er doet iemand open!";
+    if(klop===3){ setTimeout(()=>blad.classList.add("open"),300); klaar(dag,1700); }
+  };
+}
+
+/* Kastje: welk laatje? */
+function laatjes(dag){
+  const p=V.podium, goed=Math.random()<.5?0:1; let af=false;
+  p.innerHTML=`<div class="spel muur"><div class="vloer"></div>
+      <div class="kastje">${[0,1].map(i=>`<button class="la" data-i="${i}" aria-label="Laatje ${i+1}"><span class="inhoud"></span></button>`).join("")}</div>
+    </div><p class="spel-uitleg" id="tel">In welk laatje zit het? Kies er één.</p>`;
+  p.querySelectorAll(".la").forEach(la=>la.onclick=()=>{
+    if(af||la.classList.contains("open")) return; la.classList.add("open");
+    if(+la.dataset.i===goed){ af=true; la.querySelector(".inhoud").innerHTML=SVG[miniVan(dag)]||SVG.cadeau; $("#tel").textContent="Gevonden!"; klaar(dag,1300); }
+    else { la.querySelector(".inhoud").textContent="leeg…"; $("#tel").textContent="Dit laatje is leeg. Probeer de andere!"; }
+  });
+}
+
+/* ===== Stopmotion ===== */
+let demoFrames=null;
+function maakDemoFilm(){
+  if(demoFrames) return demoFrames;
+  const c=document.createElement("canvas"); c.width=320; c.height=240; const x=c.getContext("2d");
+  const vlokken=Array.from({length:26},()=>[Math.random()*320,Math.random()*240,Math.random()*2+1]);
+  demoFrames=Array.from({length:16},(_,f)=>{
+    const jx=Math.random()*2-1, jy=Math.random()*2-1; x.save(); x.translate(jx,jy);
+    for(let i=0;i<8;i++){ x.fillStyle=["#7d4f2e","#8a5a36","#74472a","#93633e"][i%4]; x.fillRect(i*42-4,-4,44,250); }
+    x.fillStyle="rgba(255,255,255,.85)"; x.fillRect(-4,150,330,95);
+    for(let i=0;i<40;i++){ x.fillStyle="rgba(200,215,230,.6)"; x.beginPath(); x.arc((i*53)%320,160+(i*29)%80,2,0,7); x.fill(); }
+    const sx=-60+f*24, sy=150+Math.sin(f*1.3)*2;
+    x.fillStyle="#2f5a47"; x.fillRect(sx+22,sy-34,22,20); x.fillStyle="#c22a33"; x.fillRect(sx+31,sy-34,4,20);
+    x.fillStyle="#e9d9c4"; x.fillRect(sx+46,sy-26,16,12);
+    x.fillStyle="#c22a33"; x.beginPath(); x.moveTo(sx,sy-14); x.lineTo(sx+78,sy-14); x.lineTo(sx+88,sy-26); x.lineTo(sx+88,sy-10); x.lineTo(sx+76,sy+2); x.lineTo(sx+8,sy+2); x.closePath(); x.fill();
+    x.strokeStyle="#c22a33"; x.lineWidth=4; x.lineCap="round"; x.beginPath(); x.moveTo(sx-2,sy+12); x.lineTo(sx+82,sy+12); x.quadraticCurveTo(sx+94,sy+12,sx+94,sy); x.stroke();
+    x.beginPath(); x.moveTo(sx+14,sy+2); x.lineTo(sx+14,sy+12); x.moveTo(sx+66,sy+2); x.lineTo(sx+66,sy+12); x.stroke();
+    x.fillStyle="#fff"; vlokken.forEach(v=>{ x.beginPath(); x.arc(v[0]+f*2,(v[1]+f*9)%240,v[2],0,7); x.fill(); });
+    x.restore();
+    x.fillStyle=`rgba(255,220,160,${.06+Math.random()*.06})`; x.fillRect(0,0,320,240);
+    return c.toDataURL("image/jpeg",.75);
+  });
+  return demoFrames;
+}
+const framesVan = it => it.frames==="demo" ? maakDemoFilm() : (it.frames||[]);
+function startFilms(root){
+  clearInterval(filmTimer);
+  const films=[...root.querySelectorAll(".film")]; if(!films.length) return;
+  const st=films.map(f=>({f, fr:framesVan(S.inhoud.find(x=>x.id===f.dataset.id)||{}), i:0, aan:true}));
+  st.forEach(s=>s.f.querySelector(".speel").onclick=()=>{ s.aan=!s.aan; s.f.querySelector(".speel").textContent=s.aan?"Pauze":"Speel"; });
+  filmTimer=setInterval(()=>st.forEach(s=>{ if(!s.aan||!s.fr.length) return; s.i=(s.i+1)%s.fr.length; const img=s.f.querySelector("img"); img.src=s.fr[s.i];
+    img.style.transform=`translate(${(Math.random()-.5)*1.5}px,${(Math.random()-.5)*1.5}px)`; }),125);
+}
+
+/* ===== Bonnen ===== */
+function bonHtml(it){
+  const sl=it.id+"|"+ik.id, op=S.ingewisseld[sl];
+  return `<div class="bon"><span class="bon-kop">Bon · ${it.dag} december</span>
+    ${it.waarde?`<span class="waarde">${esc(it.waarde)}</span>`:""}<span class="bon-tekst">${esc(it.tekst)}</span>
+    ${op?`<span class="stempel">Ingewisseld op ${esc(op)}</span>`:`<button class="knop" data-inwissel="${it.id}">Inwisselen</button>`}</div>`;
+}
+function bonKnoppen(root){
+  root.querySelectorAll("[data-inwissel]").forEach(b=>b.onclick=()=>{
+    S.ingewisseld[b.dataset.inwissel+"|"+ik.id]=`${demoDag} december`; bewaar();
+    const it=S.inhoud.find(x=>x.id===b.dataset.inwissel); b.outerHTML=`<span class="stempel">Ingewisseld op ${demoDag} december</span>`;
+    melding("Ingewisseld! Griette ziet het in het beheer.");
+  });
+}
+function toonBonnen(){
+  const v=venster("Mijn bonnen", `<div class="items">${mijnBonnen().map(bonHtml).join("")}</div>`);
+  bonKnoppen(v.podium);
+}
+
+/* ===== Onthulling ===== */
 function onthul(dag,nieuw){
-  const l=voorMij(dag), p=$("#podium"), eerste=l[0];
+  const l=voorMij(dag), p=V.podium, eerste=l[0];
+  const film=l.find(x=>x.soort==="stopmotion");
   const kop = eerste ? kort((eerste.tekst||SOORTEN[eerste.soort]).split("\n")[0]) : "Nog even geduld…";
   const sterren = nieuw ? Array.from({length:16},(_,i)=>`<svg class="ster" viewBox="0 0 10 10" style="left:${Math.random()*100}%;animation-delay:${Math.random()*2.5}s"><path d="M5 0v10M0 5h10M1.5 1.5l7 7M8.5 1.5l-7 7" stroke="${["#fff","#d8bd7e","#fff"][i%3]}" stroke-width="1.2"/></svg>`).join("") : "";
-  p.innerHTML=`<div class="scene">${sterren}
+  const scene = film ? "" : `<div class="scene">${sterren}
       <span class="takje2">${TAKJE}</span>
       <svg class="tag" viewBox="0 0 50 80"><path d="M10 0h30l10 12v68H0V12z" fill="#d3b48a"/><circle cx="25" cy="12" r="4" fill="#7d4f2e" stroke="#fbf8f1" stroke-width="2"/><text x="25" y="52" text-anchor="middle" font-family="Caveat,cursive" font-size="22" fill="#7c1d26">${dag}</text></svg>
       <svg class="env" viewBox="0 0 120 80"><path d="M2 4l4 1 4-2 5 2 4-1 5 1 4-2 5 2 5-1 4 1 5-2 4 2 5-1 4 1 5-2 5 2 4-1 4 1 5-2 4 2 5-1 4 1 5-2 4 2 5-1 3 1v72H2z" fill="#f4eee2"/>
@@ -373,68 +665,152 @@ function onthul(dag,nieuw){
         <path d="M2 4l58 42 58-42" fill="#ece4d4" stroke="#d9ceba" stroke-width="1.2"/>
         <g class="zegel"><circle cx="60" cy="46" r="10" fill="#c22a33"/><circle cx="60" cy="46" r="6.5" fill="none" stroke="#9c1c25" stroke-width="1.2"/><path d="M60 41v10M55 46h10M56.5 42.5l7 7M63.5 42.5l-7 7" stroke="#9c1c25" stroke-width="1"/></g></svg>
       <div class="briefje">${esc(kop)}</div>
-    </div>
-    <div class="items">${l.length? l.map(it=>`<div class="item">
+    </div>`;
+  p.innerHTML=`${scene}
+    <div class="items">${l.length? l.map(it=>{
+      if(it.soort==="bon") return bonHtml(it);
+      return `<div class="item">
         <div class="soort">${SOORTEN[it.soort]}${it.voor==="alle"?'<span class="voorIedereen">voor iedereen</span>':''}</div>
+        ${it.soort==="stopmotion"?`<div class="film" data-id="${it.id}"><div class="beeld"><img src="${framesVan(it)[0]||""}" alt="Stopmotion-filmpje"><span class="korrel"></span></div><button class="speel">Pauze</button></div>`:""}
         ${it.tekst?`<div class="tekst">${esc(it.tekst)}</div>`:""}
         ${it.link?`<a href="${esc(it.link)}" target="_blank" rel="noopener">Open ${it.soort==="liedje"?"het liedje":it.soort==="video"?"het filmpje":"de link"} ↗</a>`:""}
         ${it.beeld?`<img src="${esc(it.beeld)}" alt="">`:""}
-      </div>`).join("") : `<p class="uitleg">Dit raampje is nog leeg. De beheerder kan er tot die dag nog iets in stoppen.</p>`}
+      </div>`;}).join("") : `<p class="uitleg">Dit raampje is nog leeg. De beheerder kan er tot die dag nog iets in stoppen.</p>`}
     </div>`;
+  startFilms(p); bonKnoppen(p);
+}
+
+/* ===== Brievenbus ===== */
+function brievenbus(tab){
+  const v=venster("De brievenbus");
+  const mijn=S.post.filter(p=>p.van===ik.id).reverse();
+  if(tab==="mijn") mijn.forEach(p=>{ if(p.antwoord) p.gelezen=true; }), bewaar();
+  v.podium.innerHTML=`
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="${tab==="posten"}" data-tab="posten">Posten</button>
+      <button role="tab" aria-selected="${tab==="mijn"}" data-tab="mijn">Mijn post${ongelezen()?` (${ongelezen()})`:""}</button>
+      <button role="tab" aria-selected="${tab==="diner"}" data-tab="diner">Kerstdiner</button>
+    </div>
+    ${tab==="posten"?`<form id="busform" style="display:grid;gap:10px;margin-top:12px">
+      <label>Wat wil je posten?<select id="ps">${Object.entries(POSTSOORT).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></label>
+      <label id="aanveld">Aan wie<select id="pa">${S.leden.filter(l=>l.id!==ik.id).map(l=>`<option value="${l.id}">${esc(l.naam)}</option>`).join("")}</select></label>
+      <label>Je bericht<textarea id="pt" placeholder="Schrijf hier…"></textarea></label>
+      <label id="fotoveld" hidden>Foto<input type="file" id="pf" accept="image/*"></label>
+      <p class="uitleg" id="pu">Griette leest je briefje eerst, dan ligt het de volgende ochtend in hun raampje.</p>
+      <button class="knop">Op de bus doen</button></form>`:""}
+    ${tab==="mijn"?`<div class="postlijst" style="margin-top:12px">${mijn.length?mijn.map(p=>`<div class="postje">
+        <span class="status">${POSTSOORT[p.soort]}${p.aan?` · aan ${esc(lid(p.aan).naam)}`:""} · ${p.status==="nieuw"?"onderweg":p.status==="bezorgd"?"bezorgd":p.status==="beantwoord"?"beantwoord":"gezien"}</span>
+        <span class="hand">${esc(p.tekst)}</span>${p.beeld?`<img src="${p.beeld}" alt="">`:""}
+        ${p.antwoord?`<span class="antw"><b>Griette:</b> <span class="hand">${esc(p.antwoord)}</span></span>`:""}</div>`).join(""):'<p class="uitleg">Je hebt nog niets gepost.</p>'}</div>`:""}
+    ${tab==="diner"?`<div style="display:grid;gap:10px;margin-top:12px"><p class="uitleg">Wie neemt wat mee naar het kerstdiner?</p>
+      <div class="diner">${S.diner.map(d=>`<div><b>${esc(d.wie)}</b>: ${esc(d.wat)}</div>`).join("")||'<p class="uitleg">Nog niemand.</p>'}</div>
+      <form id="dinerform" class="rij"><input type="text" id="dw" placeholder="Ik neem mee…" aria-label="Wat neem je mee"><button class="knop">Zet erbij</button></form></div>`:""}`;
+  v.podium.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{ v.lag.remove(); brievenbus(b.dataset.tab); });
+  const f=$("#busform");
+  if(f){
+    const wissel=()=>{ const s=$("#ps").value; $("#aanveld").hidden=s!=="briefje"; $("#fotoveld").hidden=s!=="foto";
+      $("#pu").textContent={briefje:"Griette leest je briefje eerst, dan ligt het de volgende ochtend in hun raampje.",vraag:"Het antwoord vind je straks onder 'Mijn post'. Dan gaat het vlaggetje van de brievenbus omhoog.",foto:"Alle foto's worden op 25 december samen een stopmotion van de maand.",diner:"Dit komt meteen op het lijstje voor het kerstdiner."}[s]; };
+    $("#ps").onchange=wissel; wissel();
+    f.onsubmit=async e=>{ e.preventDefault();
+      const s=$("#ps").value, t=$("#pt").value.trim(), fl=$("#pf").files[0];
+      if(!t && !fl){ melding("Schrijf eerst iets."); return; }
+      if(s==="diner"){ S.diner.push({wie:ik.naam, wat:t}); }
+      else S.post.push({id:uid(), van:ik.id, aan:s==="briefje"?$("#pa").value:null, soort:s, tekst:t, beeld:fl?await verklein(fl,500):null, status:"nieuw", dag:demoDag});
+      bewaar(); v.lag.querySelector(".vel").classList.add("plof");
+      setTimeout(()=>{ v.dicht(); melding("Plof! Je post zit in de bus."); },650);
+    };
+  }
+  const df=$("#dinerform");
+  if(df) df.onsubmit=e=>{ e.preventDefault(); const t=$("#dw").value.trim(); if(!t) return; S.diner.push({wie:ik.naam, wat:t}); bewaar(); v.lag.remove(); brievenbus("diner"); };
 }
 
 /* ===== Beheer ===== */
 function tekenBeheer(){
   const tel = d => S.inhoud.filter(x=>x.dag===d).length;
-  const vanDag = S.inhoud.map((x,i)=>({...x,i})).filter(x=>x.dag===beheerDag);
-  const naam = id => id==="alle" ? "Iedereen" : (S.leden.find(l=>l.id===id)||{naam:"?"}).naam;
+  const vanDag = S.inhoud.filter(x=>x.dag===beheerDag);
+  const naam = id => id==="alle" ? "Iedereen" : lid(id).naam;
+  const post = [...S.post].sort((a,b)=>(a.status==="nieuw"?0:1)-(b.status==="nieuw"?0:1));
+  const ingewisseld = Object.entries(S.ingewisseld).map(([k,op])=>{ const [id,wie]=k.split("|"); const it=S.inhoud.find(x=>x.id===id); return it?{it,wie,op}:null; }).filter(Boolean);
   $("#app").innerHTML=`
   <header class="kop"><div><div class="wie">achter de schermen</div><h1>Beheer</h1></div>
     <div class="balk"><button class="knop" id="terug">Naar het huisje</button></div></header>
   <div class="beheer">
+    <section class="paneel"><h2>Postvak${S.post.filter(p=>p.status==="nieuw").length?` (${S.post.filter(p=>p.status==="nieuw").length} nieuw)`:""}</h2>
+      <div class="postlijst">${post.length?post.map(p=>`<div class="postje">
+        <span class="status ${p.status==="nieuw"?"nieuw":""}">${esc(lid(p.van).naam)} · ${POSTSOORT[p.soort]}${p.aan?` → ${esc(lid(p.aan).naam)}`:""} · ${p.status}</span>
+        <span class="hand">${esc(p.tekst)}</span>${p.beeld?`<img src="${p.beeld}" alt="" style="max-width:160px">`:""}
+        ${p.antwoord?`<span class="antw">Jouw antwoord: <span class="hand">${esc(p.antwoord)}</span></span>`:""}
+        ${p.status==="nieuw"?`<div class="knoppen">
+          ${p.soort==="briefje"?`<button class="knop klein" data-bezorg="${p.id}">Morgen in hun raampje (${Math.min(24,demoDag+1)} dec)</button>`:""}
+          ${p.soort==="vraag"?`<input type="text" id="antw-${p.id}" placeholder="Jouw antwoord…" aria-label="Antwoord"><button class="knop klein" data-antw="${p.id}">Antwoord sturen</button>`:""}
+          ${p.soort==="foto"?`<button class="knop klein" data-gezien="${p.id}">In het jaaroverzicht</button>`:""}
+          <button class="knop klein licht" data-postweg="${p.id}">Weggooien</button></div>`:""}
+      </div>`).join(""):'<p class="uitleg">Nog geen post. Alles wat het gezin in de brievenbus doet, komt hier binnen.</p>'}</div>
+      ${ingewisseld.length?`<h3 class="kapitaal" style="margin-top:8px">Ingewisselde bonnen</h3>${ingewisseld.map(x=>`<div class="regel"><div><b>${esc(lid(x.wie).naam)}</b> · ${esc(x.it.tekst)} <span class="uitleg">(${esc(x.op)})</span></div></div>`).join("")}`:""}
+      <h3 class="kapitaal" style="margin-top:8px">Kerstdiner</h3><div class="diner">${S.diner.map(d=>`<div><b>${esc(d.wie)}</b>: ${esc(d.wat)}</div>`).join("")}</div>
+    </section>
     <section class="paneel"><h2>Kies een dag</h2>
       <div class="dagkiezer">${Array.from({length:24},(_,i)=>i+1).map(d=>`<button data-d="${d}" class="${d===beheerDag?'aan':''}">${d}${tel(d)?`<span class="n">${tel(d)}</span>`:''}</button>`).join("")}</div>
     </section>
     <section class="paneel"><h2>Achter raampje ${beheerDag}</h2>
-      <div class="lijst">${vanDag.length? vanDag.map(x=>`<div class="regel"><div><b>${esc(naam(x.voor))}</b> · ${SOORTEN[x.soort]}<br><span class="hand" style="font-size:22px">${esc(x.tekst||x.link||"(foto)")}</span></div><button data-weg="${x.i}">Weghalen</button></div>`).join("") : '<p class="uitleg">Nog niets. Voeg hieronder iets toe.</p>'}</div>
+      <div class="lijst">${vanDag.length? vanDag.map(x=>`<div class="regel"><div><b>${esc(naam(x.voor))}</b> · ${SOORTEN[x.soort]} · <i>${SPELLEN[x.spel||(beheerDag%2?"kras":"lintje")]}</i>${x.mini?` · miniatuur: ${MINIS[x.mini]}`:""}<br><span class="hand" style="font-size:22px">${esc(x.tekst||x.link||"(foto)")}</span>${x.waarde?` <b>${esc(x.waarde)}</b>`:""}</div><button data-weg="${x.id}">Weghalen</button></div>`).join("") : '<p class="uitleg">Nog niets. Voeg hieronder iets toe.</p>'}</div>
     </section>
     <form class="paneel" id="nieuw"><h2>Iets achter raampje ${beheerDag} stoppen</h2>
       <div class="rij">
         <label>Voor wie<select id="voor"><option value="alle">Iedereen (zelfde bericht)</option>${S.leden.map(l=>`<option value="${l.id}">${esc(l.naam)}</option>`).join("")}</select></label>
         <label>Wat<select id="soort">${Object.entries(SOORTEN).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></label>
+        <label>Hoe gaat het open<select id="spel">${Object.entries(SPELLEN).map(([k,v])=>`<option value="${k}" ${k===(beheerDag%2?"kras":"lintje")?"selected":""}>${v}</option>`).join("")}</select></label>
+        <label>Miniatuurtje in het raam<select id="mini">${Object.entries(MINIS).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></label>
       </div>
-      <label>Tekst of briefje<textarea id="tekst" placeholder="Schrijf hier je briefje of aanwijzing…"></textarea></label>
+      <label>Tekst of briefje<textarea id="tekst" placeholder="Schrijf hier je briefje, aanwijzing of wat de bon waard is…"></textarea></label>
+      <label id="veld-waarde" hidden>Waarde van de bon<input type="text" id="waarde" placeholder="bijv. € 5 of 1x afwassen"></label>
+      <label id="veld-film" hidden>Foto's voor de stopmotion (kies ze allemaal tegelijk, in volgorde)<input type="file" id="frames" accept="image/*" multiple></label>
       <label>Link (liedje, filmpje)<input type="url" id="link" placeholder="https://"></label>
       <label>Foto<input type="file" id="beeld" accept="image/*"></label>
       <button class="knop">Stop achter raampje ${beheerDag}</button>
     </form>
     <section class="paneel"><h2>Gezinsleden</h2>
-      <p class="uitleg">Namen en pincodes aanpassen. Er kunnen later meer mensen bij.</p>
-      <div class="leden">${S.leden.map((l,i)=>`<div class="lid">
+      <p class="uitleg">Namen, pincodes en een foto voor je uitknippoppetje. Er kunnen later meer mensen bij.</p>
+      <div class="leden">${S.leden.map((l,i)=>`<div class="lid" style="grid-template-columns:auto 1fr 64px auto">
+        <label style="cursor:pointer" title="Foto kiezen">${pop(l,30)}<input type="file" accept="image/*" data-foto="${i}" hidden></label>
         <input type="text" id="naam-${l.id}" value="${esc(l.naam)}" data-i="${i}" data-v="naam" aria-label="Naam">
         <input type="text" id="pin-${l.id}" value="${esc(l.pin)}" data-i="${i}" data-v="pin" maxlength="4" inputmode="numeric" aria-label="Pincode">
-        ${l.beheer?'<small class="uitleg">beheer</small>':`<button class="knop licht" data-reset="${l.id}" type="button" style="padding:4px 8px;font-size:11px">Ramen dicht</button>`}</div>`).join("")}</div>
+        ${l.beheer?'<small class="uitleg">beheer</small>':`<button class="knop licht klein" data-reset="${l.id}" type="button">Ramen dicht</button>`}</div>`).join("")}</div>
+      <p class="uitleg">Tik op een poppetje om er een foto van te maken.</p>
       <div class="balk"><button class="knop licht" id="erbij" type="button">+ Gezinslid erbij</button>
         <button class="knop licht" id="alles" type="button">Demo terugzetten</button></div>
     </section>
   </div>`;
   $("#terug").onclick=()=>{ scherm="kalender"; teken(); };
-  document.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{ beheerDag=+b.dataset.d; tekenBeheer(); });
-  document.querySelectorAll("[data-weg]").forEach(b=>b.onclick=()=>{ S.inhoud.splice(+b.dataset.weg,1); bewaar(); tekenBeheer(); melding("Weggehaald"); });
-  document.querySelectorAll(".lid input").forEach(inp=>inp.onchange=()=>{ const l=S.leden[+inp.dataset.i]; l[inp.dataset.v]=inp.value.trim()||l[inp.dataset.v]; bewaar(); melding("Opgeslagen"); });
-  document.querySelectorAll("[data-reset]").forEach(b=>b.onclick=()=>{ S.geopend[b.dataset.reset]=[]; bewaar(); melding("Ramen weer dicht"); });
-  $("#erbij").onclick=()=>{ S.leden.push({id:"x"+Date.now(), naam:"Lid "+(S.leden.length+1), pin:"1234"}); bewaar(); tekenBeheer(); melding("Gezinslid toegevoegd"); };
+  $$("[data-d]").forEach(b=>b.onclick=()=>{ beheerDag=+b.dataset.d; tekenBeheer(); });
+  $$("[data-weg]").forEach(b=>b.onclick=()=>{ S.inhoud=S.inhoud.filter(x=>x.id!==b.dataset.weg); bewaar(); tekenBeheer(); melding("Weggehaald"); });
+  const postVan = id => S.post.find(p=>p.id===id);
+  $$("[data-bezorg]").forEach(b=>b.onclick=()=>{ const p=postVan(b.dataset.bezorg);
+    S.inhoud.push({id:uid(), dag:Math.min(24,demoDag+1), voor:p.aan, soort:"briefje", spel:"deurtje", mini:"briefje", tekst:`Van ${lid(p.van).naam}:\n${p.tekst}`});
+    p.status="bezorgd"; bewaar(); tekenBeheer(); melding(`Ligt morgen in het raampje van ${lid(p.aan).naam}`); });
+  $$("[data-antw]").forEach(b=>b.onclick=()=>{ const p=postVan(b.dataset.antw), t=$("#antw-"+p.id).value.trim(); if(!t) return;
+    p.antwoord=t; p.status="beantwoord"; p.gelezen=false; bewaar(); tekenBeheer(); melding("Antwoord verstuurd, het vlaggetje gaat omhoog"); });
+  $$("[data-gezien]").forEach(b=>b.onclick=()=>{ postVan(b.dataset.gezien).status="in album"; bewaar(); tekenBeheer(); });
+  $$("[data-postweg]").forEach(b=>b.onclick=()=>{ S.post=S.post.filter(p=>p.id!==b.dataset.postweg); bewaar(); tekenBeheer(); });
+  $$(".lid input[type=text]").forEach(inp=>inp.onchange=()=>{ const l=S.leden[+inp.dataset.i]; l[inp.dataset.v]=inp.value.trim()||l[inp.dataset.v]; bewaar(); melding("Opgeslagen"); });
+  $$("[data-foto]").forEach(inp=>inp.onchange=async()=>{ const f=inp.files[0]; if(!f) return; S.leden[+inp.dataset.foto].foto=await verklein(f,240); bewaar(); tekenBeheer(); melding("Poppetje gemaakt"); });
+  $$("[data-reset]").forEach(b=>b.onclick=()=>{ S.geopend[b.dataset.reset]=[]; bewaar(); melding("Ramen weer dicht"); });
+  $("#erbij").onclick=()=>{ S.leden.push({id:uid(), naam:"Lid "+(S.leden.length+1), pin:"1234"}); bewaar(); tekenBeheer(); melding("Gezinslid toegevoegd"); };
   $("#alles").onclick=()=>{ S=voorbeeld(); bewaar(); ik=S.leden[0]; tekenBeheer(); melding("Demo teruggezet"); };
+  const velden=()=>{ const s=$("#soort").value; $("#veld-waarde").hidden=s!=="bon"; $("#veld-film").hidden=s!=="stopmotion"; };
+  $("#soort").onchange=velden; velden();
   $("#nieuw").onsubmit=async e=>{ e.preventDefault();
-    const it={dag:beheerDag, voor:$("#voor").value, soort:$("#soort").value, tekst:$("#tekst").value.trim(), link:$("#link").value.trim()};
-    const f=$("#beeld").files[0]; if(f) it.beeld=await verklein(f);
-    if(!it.tekst && !it.link && !it.beeld){ melding("Schrijf iets, plak een link of kies een foto"); return; }
+    const it={id:uid(), dag:beheerDag, voor:$("#voor").value, soort:$("#soort").value, spel:$("#spel").value, mini:$("#mini").value, tekst:$("#tekst").value.trim(), link:$("#link").value.trim()};
+    if(it.soort==="bon") it.waarde=$("#waarde").value.trim();
+    const f=$("#beeld").files[0]; if(f) it.beeld=await verklein(f,600);
+    const fr=[...$("#frames").files]; if(it.soort==="stopmotion" && fr.length){ melding("Filmpje maken…"); it.frames=[]; for(const x of fr.slice(0,24)) it.frames.push(await verklein(x,420,.7)); }
+    if(!it.tekst && !it.link && !it.beeld && !it.frames){ melding("Schrijf iets, plak een link of kies een foto"); return; }
     S.inhoud.push(it); bewaar(); tekenBeheer(); melding(`Achter raampje ${beheerDag} gestopt`);
   };
 }
-function verklein(f){ return new Promise(ok=>{ const r=new FileReader(); r.onload=()=>{ const im=new Image(); im.onload=()=>{
-  const s=Math.min(1,600/Math.max(im.width,im.height)), c=document.createElement("canvas"); c.width=im.width*s; c.height=im.height*s;
-  c.getContext("2d").drawImage(im,0,0,c.width,c.height); ok(c.toDataURL("image/jpeg",.8)); }; im.src=r.result; }; r.readAsDataURL(f); }); }
+function verklein(f,max=600,q=.8){ return new Promise(ok=>{ const r=new FileReader(); r.onload=()=>{ const im=new Image(); im.onload=()=>{
+  const s=Math.min(1,max/Math.max(im.width,im.height)), c=document.createElement("canvas"); c.width=im.width*s; c.height=im.height*s;
+  c.getContext("2d").drawImage(im,0,0,c.width,c.height); ok(c.toDataURL("image/jpeg",q)); }; im.src=r.result; }; r.readAsDataURL(f); }); }
 
 teken();
 </script>
