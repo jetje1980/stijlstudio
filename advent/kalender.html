@@ -445,6 +445,12 @@ textarea{min-height:90px;font-family:var(--f-hand);font-size:24px;line-height:1.
 .ev-datum{font-family:var(--f-hand);font-size:22px;color:var(--rood);line-height:1}
 .event .balk{margin-top:6px;align-items:center}
 .event a{font-size:14px;color:var(--bordeaux)}
+#muziekbalk{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--bordeaux);padding:6px 8px calc(6px + env(safe-area-inset-bottom));box-shadow:0 -6px 18px rgba(0,0,0,.25)}
+#muziekbalk iframe{display:block;border-radius:10px;max-width:640px;margin:0 auto}
+.mb-kop{display:flex;justify-content:space-between;align-items:center;color:var(--creme);font-size:13px;max-width:640px;margin:0 auto 4px}
+.mb-dicht{border:0;background:none;color:var(--creme);font-size:24px;line-height:1;padding:0 6px}
+body.met-muziek{padding-bottom:120px}
+.muziekkaart{display:grid;gap:6px;justify-items:start;background:#fff;border:1px dashed var(--goud);padding:10px 12px}
 .formrij{display:flex;gap:8px;flex-wrap:wrap}
 .formrij input{flex:1;min-width:140px}
 
@@ -505,7 +511,8 @@ const SPELINFO = {
 };
 const MINIS = {"":"Hoort bij de soort", oliebol:"Oliebol", kaartje:"Kaartje voor een uitje", reuzenrad:"Reuzenrad", lootje:"Lootje", waslijn:"Waslijntje", fles:"Flesje wasmiddel", slee:"Sleetje", lantaarn:"Lantaarntje", deurtje:"Deurtje", kastje:"Kastje", bezem:"Bezempje", cadeau:"Cadeautje", briefje:"Envelopje"};
 const POSTSOORT = {briefje:"Briefje aan iemand", vraag:"Vraag of wens aan Griëtte", foto:"Foto voor het jaaroverzicht", diner:"Wens voor het kerstdiner"};
-const FILMS = {intro:"Family Crazy Adventskalender", groningen:"Groningen", rendiervous:"Rendier-vous", gluhckwens:"Glüh-ckwens", piekfijn:"Piek-fijn", mandatory:"Mand-atory", sleeperig:"Slee-perig?", hulstnodig:"Hulst nodig?", kerstraak:"Kerst-raak", navidad:"Feliz Navi-DAD", jarig:"Frederique 21", lampjes:"Lampjes", drienachten:"Drie nachten"};
+const FILMS = {intro:"Family Crazy Adventskalender", groningen:"Groningen", rendiervous:"Rendier-vous", gluhckwens:"Glüh-ckwens", piekfijn:"Piek-fijn", mandatory:"Mand-atory", sleeperig:"Slee-perig?", hulstnodig:"Hulst nodig?", kerstraak:"Kerst-raak", navidad:"Feliz Navi-DAD", jarig:"Frederique 21", lampjes:"Lampjes", drienachten:"Drie nachten",
+  sneeuwpret:"Sneeuw-pret", kerstdorp:"Kerst-dorp", haardcore:"Haard-core", pakket:"Pak-ket", slaapzacht:"Slaap-zacht", elfie:"Elf-ie", lichtzinnig:"Licht-zinnig"};
 const CLIPS = {slee:["Sleetje. Geen remmen.",0], waslijn:["Waslijn. Er hangt iets.",0], welkom:["Welkom. Voeten vegen.",0], voetstapjes:["Voetstappen. Iemand was hier.",0], kerstkamer:["Chocomel. Slagroom is op.",0], mandje:["Mandje. Alles erin.",0], sneeuwtuin:["Sneeuwtuin. Koud.",0], schilderijtjes:["Lijstjes. Eén hangt scheef.",0], kastje:["Kastje. Geen lijk.",0], groningen:["Kermis. Overleefd.",0], kringloop:["Kringloop. Alles moet weg.",0], wensen:["Wensen. Ze zijn binnen.",0], sinterklaas:["Sinterklaas. Eindelijk.",0]};
 const KAMERS = {huisje:"Wit huisje met lampjes", elfendeur:"Groen deurtje met postbus", trapje:"Touwladdertje en lantaarn", kerstkamer:"Kerstkamer", kastjeskamer:"Sterrenbehang", houtkamer:"Houten kamertje", kachelkamer:"Bij de kachel", cadeaus:"Cadeaus op de vloer", belletje:"Cadeauzakje met belletje", inpakken:"Inpaktafel", bankje:"Bankje in de sneeuw", picknick:"Chocomel in de sneeuw", dorp:"Dorpje in de sneeuw", meelvloer:"Voetstapjes in het meel", bedje:"Bedje en sterrenbehang", roodpapier:"Rood inpakpapier", cadeauzakjes:"Cadeauzakjes op de vloer", lantaarntje:"Rood lantaarntje op het bankje", sneeuwtuin:"Chocomel in de sneeuw", kachelhoek:"Kachelhoek met spiegel", lantaarnbankje:"Lantaarntje bij het deurtje", rodedeur:"Rode voordeur met post", stoeltjes:"Houten krukjes"};
 const KAMERLIJST = Object.keys(KAMERS), BUITEN = ["bankje","picknick","dorp"];
@@ -578,7 +585,7 @@ function voorbeeld(){
 }
 let S;
 try{ S = JSON.parse(localStorage.getItem(SLEUTEL)) || voorbeeld(); }catch(e){ S = voorbeeld(); }
-S = Object.assign({geopend:{},post:[],diner:[],ingewisseld:{},reacties:{},wensen:[],lootjes:null,lootjeOpen:{},ideeen:[],scores:{},gespeeld:{},dinerwensen:[],menu:"",taken:[]}, S);
+S = Object.assign({geopend:{},post:[],diner:[],ingewisseld:{},reacties:{},wensen:[],lootjes:null,lootjeOpen:{},ideeen:[],scores:{},gespeeld:{},dinerwensen:[],menu:"",muziek:"",taken:[]}, S);
 const API = "https://kjvufjkhfjbuxnuqdeev.supabase.co/functions/v1/advent";
 let ONLINE=false, TOKEN=null, VANDAAG=0, LEEG=false, SNAP=new Map(), syncTimer=null, bezigSync=false;
 let VOORBEELD=null, GAST=false;   /* VOORBEELD: beheerder kijkt mee als iemand anders. GAST: rondleiding. In beide gevallen wordt niets bewaard. */
@@ -597,6 +604,7 @@ function naarDocs(st){
   Object.entries(st.gespeeld||{}).forEach(([k,v])=>zet("gespeeld",k,{i:v}));
   Object.entries(st.ingewisseld||{}).forEach(([k,v])=>zet("ingewisseld",k,{op:v}));
   zet("config","menu",{tekst:st.menu||""});
+  zet("config","muziek",{link:st.muziek||""});
   return m;
 }
 function vanDocs(docs){
@@ -609,6 +617,7 @@ function vanDocs(docs){
     else if(col==="gespeeld") st.gespeeld[id]=data.i||[];
     else if(col==="ingewisseld") st.ingewisseld[id]=data.op;
     else if(col==="config"&&id==="menu") st.menu=data.tekst||"";
+    else if(col==="config"&&id==="muziek") st.muziek=data.link||"";
   }
   for(const col of LIJSTEN) st[col].sort((a,b)=>(a.volgorde??a.t??0)-(b.volgorde??b.t??0));
   return st;
@@ -780,6 +789,7 @@ function tekenKalender(){
       ${bonnen.length?`<button class="knop licht" id="bonnen">Mijn bonnen (${bonnen.length})</button>`:""}
       ${spelleider()?`<button class="knop licht" id="games">Games</button>`:""}
       ${ik.beheer?`<button class="knop" id="naarBeheer">Beheer${S.post.filter(p=>p.status==="nieuw").length?` · ${S.post.filter(p=>p.status==="nieuw").length} post`:""}</button>`:''}
+      ${spotifyEmbed(S.muziek)?`<button class="knop licht" id="huismuziek">🎵 Muziek</button>`:""}
       ${ONLINE&&!VOORBEELD?`<button class="knop licht" id="bel" aria-label="Meldingen">🔔 Meldingen</button>`:""}
       ${VOORBEELD||GAST?"":`<button class="knop licht" id="uit">Uitloggen</button>`}</div>
   </header>
@@ -806,6 +816,8 @@ function tekenKalender(){
   if($("#stopvb")) $("#stopvb").onclick=stopVoorbeeld;
   if($("#gastopnieuw")) $("#gastopnieuw").onclick=()=>{ startGast(); window.scrollTo(0,0); };
   if($("#bel")) $("#bel").onclick=openMeldingen;
+  if($("#huismuziek")) $("#huismuziek").onclick=()=>{ const v=venster("Muziek in het huisje", `<p>De kerstplaylist van het huis speelt onderin, ook als je raampjes openmaakt.</p><p class="uitleg">${SPOTIFY_UITLEG}</p><div class="balk"><button class="knop" id="speelhuis">▶ Aanzetten</button></div>`);
+    $("#speelhuis").onclick=()=>{ muziekBalk(S.muziek,"Kerstmuziek van het huis"); v.lag.remove(); melding("Druk op ▶ in de balk onderin"); }; };
   if($("#uit")) $("#uit").onclick=async()=>{ ik=null; scherm="login";
     if(ONLINE){ TOKEN=null; try{ localStorage.removeItem("familycrazy-token"); }catch(e){} try{ await haalLeden(); }catch(e){} }
     teken(); };
@@ -1217,11 +1229,11 @@ function onthul(dag,nieuw){
         ${filmVan(it)}
         ${!it.clip&&it.frames&&it.frames.length?`<div class="film" data-id="${it.id}"><div class="beeld"><img src="${framesVan(it)[0]||""}" alt="Stopmotion-filmpje"><span class="korrel"></span></div><button class="speel">Pauze</button></div>`:""}
         ${it.tekst?`<div class="tekst">${esc(it.tekst)}</div>`:""}
-        ${it.link?`<a href="${esc(it.link)}" target="_blank" rel="noopener">Open ${it.soort==="liedje"?"het liedje":it.soort==="video"?"het filmpje":"de link"} ↗</a>`:""}
+        ${it.link&&spotifyEmbed(it.link)?muziekKaart(it):it.link?`<a href="${esc(it.link)}" target="_blank" rel="noopener">Open ${it.soort==="liedje"?"het liedje":it.soort==="video"?"het filmpje":"de link"} ↗</a>`:""}
         ${it.beeld?`<img src="${esc(it.beeld)}" alt="">`:""}
       </div>`;}).join("") : `<p class="uitleg">Nog leeg. Griëtte is bezig. Niet opjagen.</p>`}
     </div>`;
-  startbeelden(p); laadMedia(p); startFilms(p); bonKnoppen(p); uitjeKnoppen(p); gamesKnoppen(p); lootjeKnoppen(p, ()=>onthul(dag,false));
+  startbeelden(p); spotifyKnoppen(p); laadMedia(p); startFilms(p); bonKnoppen(p); uitjeKnoppen(p); gamesKnoppen(p); lootjeKnoppen(p, ()=>onthul(dag,false));
   if(dag===25){ const d=document.createElement("div"); d.style.marginTop="18px"; d.innerHTML=dinerHtml(); p.appendChild(d); dinerKnoppen(d, ()=>onthul(dag,false)); }
 }
 
@@ -1286,6 +1298,28 @@ function startbeelden(root){
     v.onended=()=>{ knop.hidden=false; knop.querySelector(".startknop").textContent="↻ Nog een keer"; v.controls=false; };
   });
 }
+
+/* ===== Muziek: Spotify speelt in het huisje, in een balk onderin.
+   Pas na een tik wordt Spotify geladen (Spotify plaatst dan cookies; dat staat erbij). ===== */
+function spotifyEmbed(link){
+  const m=String(link||"").match(/open\.spotify\.com\/(?:intl-[a-z]+\/)?(track|playlist|album|episode|show)\/([A-Za-z0-9]{10,40})/) || String(link||"").match(/^spotify:(track|playlist|album|episode|show):([A-Za-z0-9]{10,40})$/);
+  return m ? `https://open.spotify.com/embed/${m[1]}/${m[2]}?utm_source=generator&theme=0` : null;
+}
+function muziekBalk(link, titel){
+  const src=spotifyEmbed(link); if(!src) return;
+  let b=document.getElementById("muziekbalk");
+  if(!b){ b=document.createElement("div"); b.id="muziekbalk"; document.body.appendChild(b); document.body.classList.add("met-muziek"); }
+  b.innerHTML=`<div class="mb-kop"><span>🎵 ${esc(titel||"Muziek in het huisje")}</span><button type="button" class="mb-dicht" aria-label="Muziek stoppen">×</button></div>
+    <iframe src="${src}" width="100%" height="80" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" title="Spotify-speler"></iframe>`;
+  b.querySelector(".mb-dicht").onclick=()=>{ b.remove(); document.body.classList.remove("met-muziek"); };
+}
+const SPOTIFY_UITLEG = "Speelt af via Spotify. Spotify kan daarbij cookies plaatsen. Zonder Spotify-account hoor je een stukje van 30 seconden.";
+function muziekKaart(it){
+  return `<div class="muziekkaart"><span class="kop2">🎵 ${it.soort==="liedje"?"Liedje van vandaag":"Muziek erbij"}</span>
+    <button type="button" class="knop" data-spotify="${esc(it.link)}" data-titel="${esc(kort((it.tekst||"Liedje").split("\n")[0]))}">▶ Speel af in het huisje</button>
+    <span class="uitleg" style="font-size:12px">${SPOTIFY_UITLEG}</span></div>`;
+}
+function spotifyKnoppen(root){ root.querySelectorAll("[data-spotify]").forEach(b=>b.onclick=()=>{ muziekBalk(b.dataset.spotify, b.dataset.titel); melding("Druk op ▶ in de balk onderin"); }); }
 
 /* ===== Beheer: alle filmpjes met plaatje, en kijken zonder het formulier kwijt te raken ===== */
 const filmNaam = x => x.film&&FILMS[x.film] ? "film-"+x.film : x.clip&&CLIPS[x.clip] ? "stop-"+x.clip : null;
@@ -1520,6 +1554,10 @@ function tekenBeheer(){
       ${[...S.ideeen].sort((a,b)=>b.stemmen.length-a.stemmen.length).map(i=>`<div class="regel"><div><span class="hand" style="font-size:22px">${esc(i.tekst)}</span> <span class="uitleg">♥ ${i.stemmen.length} · van ${esc(lid(i.van).naam)}</span></div>${i.uitje?`<span class="uitleg">dag ${i.uitje}</span>`:`<button data-maakuitje="${i.id}" style="color:var(--den)">Uitje op dag ${beheerDag}</button>`}</div>`).join("")||'<p class="uitleg">Nog geen ideeën.</p>'}
       <label>Spelleider van de Crazy Christmas Games<select id="leider">${S.leden.map(l=>`<option value="${l.id}" ${l.spelleider?"selected":""}>${esc(l.naam)}</option>`).join("")}</select></label>
     </section>
+    <section class="paneel" id="muziekpaneel"><h2>Muziek in het huisje</h2>
+      <p class="uitleg">Plak een Spotify-link van een playlist, album of nummer (in Spotify: Delen → Link kopiëren). Iedereen krijgt dan een knop 🎵 Muziek en de muziek speelt onderin door terwijl ze raampjes openen. Een Spotify-link bij een raampje (veld Link) wordt daar een knop "Speel af in het huisje".</p>
+      <form id="muziekform" class="rij"><label>Spotify-link<input type="url" id="muzieklink" value="${esc(S.muziek||"")}" placeholder="https://open.spotify.com/playlist/…"></label><button class="knop">Opslaan</button></form>
+    </section>
     <section class="paneel" id="meekijkpaneel"><h2>Bekijk als</h2>
       <p class="uitleg">Zie het huisje precies zoals iemand het ziet. Met de tijdreis kijk je ook naar toekomstige dagen. Je kunt raampjes openen en spelletjes spelen; er wordt niets opgeslagen.</p>
       <div class="chips">${S.leden.filter(l=>l.id!==ik.id).map(l=>`<button type="button" data-alsid="${l.id}">${esc(l.naam)}</button>`).join("")}</div>
@@ -1587,7 +1625,7 @@ function tekenBeheer(){
       <label id="veld-clip" hidden style="display:none">Kant-en-klare kerstclip (stopmotion met vloeiende sfeer)<select id="clip"><option value="">Eigen foto's uploaden als stopmotion</option>${Object.entries(CLIPS).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join("")}</select></label>
       <label id="veld-waarde" hidden>Waarde van de bon<input type="text" id="waarde" placeholder="bijv. € 5 of 1x afwassen"></label>
       <label id="veld-film" hidden>Foto's voor de stopmotion (kies ze allemaal tegelijk, in volgorde)<input type="file" id="frames" accept="image/*" multiple></label>
-      <label>Link (liedje, filmpje)<input type="url" id="link" placeholder="https://"></label>
+      <label>Link (Spotify speelt in het huisje; andere links openen apart)<input type="url" id="link" placeholder="https://"></label>
       <label>Eigen foto of video ${ONLINE?"(gaat veilig de kluis in: alleen te zien na inloggen)":"(in de demo alleen foto's)"}<input type="file" id="beeld" accept="image/*,video/*"></label>
       <label class="vinkje"><input type="checkbox" id="openbaar"> <span><b>Openbaar</b>: ook zonder inlog te bekijken via een deellink. Laat uit voor alles wat alleen voor het gezin is.</span></label>
       <div class="balk"><button class="knop">${bewerkId?"Opslaan":`Stop achter raampje ${beheerDag}`}</button>${bewerkId?'<button class="knop licht" type="button" id="annuleer">Annuleren</button>':""}</div>
@@ -1638,6 +1676,9 @@ function tekenBeheer(){
   $("#leider").onchange=e=>{ S.leden.forEach(l=>l.spelleider = l.id===e.target.value && !l.beheer); bewaar(); melding("Spelleider ingesteld"); };
   $("#soort").onchange=velden; velden();
   $$("[data-alsid]").forEach(b=>b.onclick=()=>startVoorbeeld(b.dataset.alsid));
+  $("#muziekform").onsubmit=e=>{ e.preventDefault(); const l=$("#muzieklink").value.trim();
+    if(l && !spotifyEmbed(l)){ melding("Dat is geen Spotify-link. Kopieer hem via Delen → Link kopiëren."); return; }
+    S.muziek=l; bewaar(); melding(l?"Muziek ingesteld":"Muziek uitgezet"); };
   if(ONLINE) api("meldingenStatus").then(({per})=>{ if($("#meldstatus")) $("#meldstatus").textContent=S.leden.map(l=>`${l.naam}: ${per[l.id]?`aan${per[l.id]>1?` (${per[l.id]} toestellen)`:""}`:"uit"}`).join(" · "); }).catch(()=>{ if($("#meldstatus")) $("#meldstatus").textContent=""; });
   $("#meldform").onsubmit=async e=>{ e.preventDefault(); if(!ONLINE) return;
     try{ const r=await api("stuur",{aan:$("#meldaan").value, tekst:$("#meldtekst").value}); melding(r.toestellen?`Verstuurd naar ${r.verstuurd} van ${r.toestellen} toestel${r.toestellen>1?"len":""}`:"Niemand heeft daar meldingen aan"); if(r.verstuurd) $("#meldtekst").value=""; }
