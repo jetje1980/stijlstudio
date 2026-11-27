@@ -386,6 +386,10 @@ textarea{min-height:90px;font-family:var(--f-hand);font-size:24px;line-height:1.
 .ovitem{border:0;background:#fff;text-align:left;padding:5px 8px;font-size:14px;border-left:3px solid var(--bordeaux);overflow-wrap:anywhere}
 .ovitem.alle{border-left-color:var(--goud-licht);color:var(--zacht)}
 .ovplus{border:1px solid var(--goud);background:var(--creme);border-radius:50%;width:30px;height:30px;font-size:18px;line-height:1;padding:0;color:var(--bordeaux)}
+.vinkje{display:flex!important;gap:10px;align-items:flex-start;color:var(--inkt)!important;font-size:14px!important;background:#fff;padding:8px 10px;border:1px dashed var(--goud-licht)}
+.vinkje input{margin-top:3px}
+.kluis{margin-bottom:6px}
+.kluis video,.kluis img{width:100%;display:block;border-radius:2px;box-shadow:0 10px 20px -10px rgba(0,0,0,.5)}
 .formrij{display:flex;gap:8px;flex-wrap:wrap}
 .formrij input{flex:1;min-width:140px}
 
@@ -925,7 +929,7 @@ function onthul(dag,nieuw){
         ${it.beeld?`<img src="${esc(it.beeld)}" alt="">`:""}
       </div>`;}).join("") : `<p class="uitleg">Nog leeg. Griëtte is bezig. Niet opjagen.</p>`}
     </div>`;
-  startbeelden(p); startFilms(p); bonKnoppen(p); uitjeKnoppen(p); gamesKnoppen(p); lootjeKnoppen(p, ()=>onthul(dag,false));
+  startbeelden(p); laadMedia(p); startFilms(p); bonKnoppen(p); uitjeKnoppen(p); gamesKnoppen(p); lootjeKnoppen(p, ()=>onthul(dag,false));
   if(dag===25){ const d=document.createElement("div"); d.style.marginTop="18px"; d.innerHTML=dinerHtml(); p.appendChild(d); dinerKnoppen(d, ()=>onthul(dag,false)); }
 }
 
@@ -953,10 +957,29 @@ function dinerKnoppen(root, herteken){
 }
 
 /* ===== Filmpjes: eerst een startbeeld, dan met geluid afspelen ===== */
-function filmVan(it){
-  if(it.film&&FILMS[it.film]) return videoHtml("film-"+it.film, FILMS[it.film], "Sfeerfilmpje");
-  if(it.clip&&CLIPS[it.clip]) return videoHtml("stop-"+it.clip, CLIPS[it.clip][0], "Stopmotion");
-  return "";
+function filmVan(it, mediaUrl){
+  let h="";
+  if(it.film&&FILMS[it.film]) h+=videoHtml("film-"+it.film, FILMS[it.film], "Sfeerfilmpje");
+  if(it.clip&&CLIPS[it.clip]) h+=videoHtml("stop-"+it.clip, CLIPS[it.clip][0], "Stopmotion");
+  if(it.media&&it.media.pad) h+=`<div class="kluis" data-pad="${esc(it.media.pad)}" data-type="${it.media.type}">${mediaUrl?mediaTag(it.media.type,mediaUrl):'<span class="uitleg">🔒 Even ophalen uit de kluis…</span>'}</div>`;
+  return h;
+}
+const mediaTag=(type,url)=> type==="video" ? `<video src="${esc(url)}" controls playsinline preload="metadata"></video>` : `<img src="${esc(url)}" alt="">`;
+async function laadMedia(root){
+  const vakken=[...root.querySelectorAll(".kluis")].filter(v=>!v.querySelector("video,img")); if(!vakken.length) return;
+  if(!ONLINE){ vakken.forEach(v=>v.innerHTML='<span class="uitleg">Eigen foto\'s en video\'s zie je in de echte versie.</span>'); return; }
+  try{
+    const {urls}=await api("media",{paden:vakken.map(v=>v.dataset.pad)});
+    vakken.forEach(v=>{ const u=urls[v.dataset.pad]; v.innerHTML=u?mediaTag(v.dataset.type,u):'<span class="uitleg">Dit bestand mag je (nog) niet zien.</span>'; });
+  }catch(e){ vakken.forEach(v=>v.innerHTML=`<span class="uitleg">Ophalen mislukt: ${esc(e.message)}</span>`); }
+}
+async function uploadMedia(f){
+  let bestand=f;
+  if(f.type.startsWith("image/")){ const d=await verklein(f,1600,.85); bestand=await (await fetch(d)).blob(); }
+  const {pad,url}=await api("uploadUrl",{naam:f.name});
+  const r=await fetch(url,{method:"PUT",headers:{"content-type":bestand.type||f.type||"application/octet-stream","x-upsert":"true"},body:bestand});
+  if(!r.ok) throw new Error("de kluis weigerde het bestand");
+  return {pad, type:(f.type||"").startsWith("video/")?"video":"image"};
 }
 function videoHtml(naam, titel, soort){
   return `<div class="sfeerfilm"><video src="films/${naam}.mp4" poster="films/${naam}.jpg" playsinline preload="metadata" aria-label="${esc(titel)}"></video>
@@ -1121,7 +1144,7 @@ function tekenBeheer(){
           <label class="lidfoto" title="Foto kiezen">${pop(l,34)}<input type="file" accept="image/*" data-foto="${i}" hidden></label>
           <label>Naam<input type="text" id="naam-${l.id}" value="${esc(l.naam)}" data-i="${i}" data-v="naam" autocomplete="off"></label>
           <label>Pincode<input type="text" id="pin-${l.id}" value="${esc(l.pin)}" placeholder="${ONLINE?'nieuw?':''}" data-i="${i}" data-v="pin" maxlength="4" inputmode="numeric" autocomplete="off"></label>
-          <div class="lid-acties">${l.id!==ik.id?`<label style="display:flex;gap:6px;align-items:center;font-size:13px;color:var(--inkt)"><input type="checkbox" data-beheer="${i}" ${l.beheer?"checked":""}>beheerder</label>`:'<span class="status">beheerder (jij)</span>'}${l.beheer?'':`${l.spelleider?'<span class="status">spelleider</span>':''}<button class="mini-weg" type="button" data-reset="${l.id}">ramen weer dicht</button><button class="mini-weg" type="button" data-lidweg="${l.id}">verwijderen</button>`}</div>
+          <div class="lid-acties">${l.id!==ik.id?`<label style="display:flex;gap:6px;align-items:center;font-size:13px;color:var(--inkt)"><input type="checkbox" data-beheer="${i}" ${l.beheer?"checked":""}>beheerder</label>`:'<span class="status">beheerder (jij)</span>'}<label style="display:flex;gap:6px;align-items:center;font-size:13px;color:var(--inkt)"><input type="checkbox" data-fotoopen="${i}" ${l.fotoOpenbaar?"checked":""}>foto op inlogscherm</label>${l.beheer?'':`${l.spelleider?'<span class="status">spelleider</span>':''}<button class="mini-weg" type="button" data-reset="${l.id}">ramen weer dicht</button><button class="mini-weg" type="button" data-lidweg="${l.id}">verwijderen</button>`}</div>
         </div>`).join("")}
         <div class="balk"><button class="knop">Opslaan</button><button class="knop licht" id="erbij" type="button">+ Gezinslid erbij</button></div>
       </form>
@@ -1162,14 +1185,14 @@ function tekenBeheer(){
       <div class="chips">${[{id:"alle",naam:"Iedereen"},...S.leden].map(l=>`<button type="button" data-wie="${l.id}" aria-pressed="${beheerWie===l.id}">${esc(l.naam)}</button>`).join("")}</div>
       <div class="overzicht">${Array.from({length:26},(_,i)=>i+1).map(d=>{
         const its=S.inhoud.filter(x=>x.dag===d && (beheerWie==="alle" ? x.voor==="alle" : (x.voor==="alle"||x.voor===beheerWie)));
-        return `<div class="ovrij"><span class="ovdag">${d}</span><div class="ovitems">${its.map(x=>`<button type="button" class="ovitem ${x.voor==="alle"&&beheerWie!=="alle"?"alle":"eigen"}" data-ovdag="${d}" data-ovid="${x.id}">${x.film||x.clip?"🎞 ":""}${esc(kort((x.tekst||SOORTEN[x.soort]||"").split("\n")[0]))}${x.voor==="alle"&&beheerWie!=="alle"?' <i>· iedereen</i>':''}</button>`).join("")||'<span class="uitleg">nog niets</span>'}</div>
+        return `<div class="ovrij"><span class="ovdag">${d}</span><div class="ovitems">${its.map(x=>`<button type="button" class="ovitem ${x.voor==="alle"&&beheerWie!=="alle"?"alle":"eigen"}" data-ovdag="${d}" data-ovid="${x.id}">${x.openbaar?"🔓 ":""}${x.film||x.clip?"🎞 ":""}${x.media?"📷 ":""}${esc(kort((x.tekst||SOORTEN[x.soort]||"").split("\n")[0]))}${x.voor==="alle"&&beheerWie!=="alle"?' <i>· iedereen</i>':''}</button>`).join("")||'<span class="uitleg">nog niets</span>'}</div>
           <button type="button" class="ovplus" data-plusdag="${d}" aria-label="Iets toevoegen op dag ${d}">+</button></div>`; }).join("")}</div>
     </section>
     <section class="paneel"><h2>Kies een dag</h2>
       <div class="dagkiezer">${Array.from({length:26},(_,i)=>i+1).map(d=>`<button data-d="${d}" class="${d===beheerDag?'aan':''}">${d}${tel(d)?`<span class="n">${tel(d)}</span>`:''}</button>`).join("")}</div>
     </section>
     <section class="paneel"><h2>Achter raampje ${beheerDag}</h2>
-      <div class="lijst">${vanDag.length? vanDag.map(x=>`<div class="regel"><div><b>${esc(naam(x.voor))}</b> · ${SOORTEN[x.soort]} · <i>${SPELLEN[x.spel||(beheerDag%2?"kras":"lintje")]}</i>${x.mini?` · miniatuur: ${MINIS[x.mini]}`:""}${x.clip?` · clip: ${CLIPS[x.clip][0]}`:""}${x.film?` · filmpje: ${FILMS[x.film]}`:""}${x.kamer?` · ${KAMERS[x.kamer]}`:""}<br><span class="hand" style="font-size:22px">${esc(x.tekst||x.link||"(foto)")}</span>${x.waarde?` <b>${esc(x.waarde)}</b>`:""}${x.door?`<br><span class="bewerkt">laatst aangepast door ${esc(x.door)}${x.wanneerBewerkt?`, ${esc(x.wanneerBewerkt)}`:""}</span>`:""}</div><div style="display:grid;gap:6px;flex:none"><button data-bewerk="${x.id}" style="color:var(--den)">Aanpassen</button><button data-weg="${x.id}">Weghalen</button></div></div>`).join("") : '<p class="uitleg">Nog niets. Voeg hieronder iets toe.</p>'}</div>
+      <div class="lijst">${vanDag.length? vanDag.map(x=>`<div class="regel"><div><b>${esc(naam(x.voor))}</b> · ${SOORTEN[x.soort]} · <i>${SPELLEN[x.spel||(beheerDag%2?"kras":"lintje")]}</i>${x.mini?` · miniatuur: ${MINIS[x.mini]}`:""}${x.clip?` · clip: ${CLIPS[x.clip][0]}`:""}${x.film?` · filmpje: ${FILMS[x.film]}`:""}${x.kamer?` · ${KAMERS[x.kamer]}`:""}<br><span class="hand" style="font-size:22px">${esc(x.tekst||x.link||"(foto)")}</span>${x.waarde?` <b>${esc(x.waarde)}</b>`:""}${x.door?`<br><span class="bewerkt">laatst aangepast door ${esc(x.door)}${x.wanneerBewerkt?`, ${esc(x.wanneerBewerkt)}`:""}</span>`:""}</div><div style="display:grid;gap:6px;flex:none"><button data-bewerk="${x.id}" style="color:var(--den)">Aanpassen</button><button data-weg="${x.id}">Weghalen</button>${x.openbaar?`<button data-deel="${x.id}" style="color:var(--goud)">Deellink</button>`:""}</div></div>`).join("") : '<p class="uitleg">Nog niets. Voeg hieronder iets toe.</p>'}</div>
     </section>
     <form class="paneel ${bewerkId?"bewerken":""}" id="nieuw"><h2>${bewerkId?`Raampje ${beheerDag} aanpassen`:`Iets achter raampje ${beheerDag} stoppen`}</h2>
       <div class="rij">
@@ -1195,7 +1218,8 @@ function tekenBeheer(){
       <label id="veld-waarde" hidden>Waarde van de bon<input type="text" id="waarde" placeholder="bijv. € 5 of 1x afwassen"></label>
       <label id="veld-film" hidden>Foto's voor de stopmotion (kies ze allemaal tegelijk, in volgorde)<input type="file" id="frames" accept="image/*" multiple></label>
       <label>Link (liedje, filmpje)<input type="url" id="link" placeholder="https://"></label>
-      <label>Foto<input type="file" id="beeld" accept="image/*"></label>
+      <label>Eigen foto of video ${ONLINE?"(gaat veilig de kluis in: alleen te zien na inloggen)":"(in de demo alleen foto's)"}<input type="file" id="beeld" accept="image/*,video/*"></label>
+      <label class="vinkje"><input type="checkbox" id="openbaar"> <span><b>Openbaar</b>: ook zonder inlog te bekijken via een deellink. Laat uit voor alles wat alleen voor het gezin is.</span></label>
       <div class="balk"><button class="knop">${bewerkId?"Opslaan":`Stop achter raampje ${beheerDag}`}</button>${bewerkId?'<button class="knop licht" type="button" id="annuleer">Annuleren</button>':""}</div>
     </form>
     ${ONLINE?`<section class="paneel"><h2>Opslag</h2><p class="uitleg">Alles wat je hier aanpast, wordt meteen in de database bewaard en is voor het hele gezin te zien.</p></section>`:`<section class="paneel"><h2>Demo</h2><p class="uitleg">Alles staat nu alleen op dit toestel.</p>
@@ -1216,6 +1240,7 @@ function tekenBeheer(){
   $("#gezinform").onsubmit=e=>{ e.preventDefault();
     $$("#gezinform input[type=text]").forEach(inp=>{ const l=S.leden[+inp.dataset.i], v=inp.value.trim(); if(v) l[inp.dataset.v]=v; });
     $$("#gezinform [data-beheer]").forEach(c=>{ S.leden[+c.dataset.beheer].beheer=c.checked; });
+    $$("#gezinform [data-fotoopen]").forEach(c=>{ S.leden[+c.dataset.fotoopen].fotoOpenbaar=c.checked; });
     bewaar(); tekenBeheer(); melding("Opgeslagen"); };
   $$("[data-lidweg]").forEach(b=>b.onclick=()=>{
     if(b.dataset.zeker!=="ja"){ b.dataset.zeker="ja"; b.textContent="zeker weten? tik nog eens"; return; }
@@ -1242,6 +1267,10 @@ function tekenBeheer(){
   $$("[data-wie]").forEach(b=>b.onclick=()=>{ beheerWie=b.dataset.wie; tekenBeheer(); $("#perpersoon").scrollIntoView(); });
   $$("[data-ovid]").forEach(b=>b.onclick=()=>{ beheerDag=+b.dataset.ovdag; bewerkId=b.dataset.ovid; tekenBeheer(); $("#nieuw").scrollIntoView({behavior:"smooth"}); });
   $$("[data-plusdag]").forEach(b=>b.onclick=()=>{ beheerDag=+b.dataset.plusdag; bewerkId=null; voorKeuze=beheerWie; tekenBeheer(); $("#nieuw").scrollIntoView({behavior:"smooth"}); });
+  $$("[data-deel]").forEach(b=>b.onclick=async()=>{
+    const link=location.origin+location.pathname+"#deel-"+b.dataset.deel;
+    try{ await navigator.clipboard.writeText(link); melding("Deellink gekopieerd"); }catch(e){ melding(link); }
+  });
   $$("[data-bewerk]").forEach(b=>b.onclick=()=>{ bewerkId=b.dataset.bewerk; tekenBeheer(); $("#nieuw").scrollIntoView({behavior:"smooth"}); });
   if($("#annuleer")) $("#annuleer").onclick=()=>{ bewerkId=null; tekenBeheer(); };
   const oud = bewerkId && S.inhoud.find(x=>x.id===bewerkId);
@@ -1249,7 +1278,7 @@ function tekenBeheer(){
   if(oud){  /* het formulier vullen met wat er al staat */
     $("#voor").value=oud.voor; $("#soort").value=SOORTKEUZE.includes(oud.soort)?oud.soort:"briefje";
     $("#filmpje").value = oud.film?"film:"+oud.film : oud.clip?"stop:"+oud.clip : (oud.frames&&oud.frames.length)?"eigen":""; $("#spel").value=oud.spel||(beheerDag%2?"kras":"lintje"); $("#mini").value=oud.mini||"";
-    $("#tekst").value=oud.tekst||""; $("#link").value=oud.link||""; $("#waarde").value=oud.waarde||"";
+    $("#openbaar").checked=!!oud.openbaar; $("#tekst").value=oud.tekst||""; $("#link").value=oud.link||""; $("#waarde").value=oud.waarde||"";
     $("#wanneer").value=oud.wanneer||""; $("#waar").value=oud.waar||""; $("#keuzes").value=(oud.keuzes||[]).join(", ");
 
     kamerKeuze=oud.kamer||""; $$("#kamerkeuze button").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.kamer===kamerKeuze)));
@@ -1262,10 +1291,16 @@ function tekenBeheer(){
     if(it.soort==="uitje"){ it.wanneer=$("#wanneer").value.trim(); it.waar=$("#waar").value.trim(); const k=$("#keuzes").value.split(",").map(x=>x.trim()).filter(Boolean); if(k.length) it.keuzes=k; }
     const fk=$("#filmpje").value;
     if(fk.startsWith("film:")) it.film=fk.slice(5); else if(fk.startsWith("stop:")) it.clip=fk.slice(5);
-    const f=$("#beeld").files[0]; if(f) it.beeld=await verklein(f,600);
+    const f=$("#beeld").files[0];
+    if(f){
+      if(ONLINE){ melding("Uploaden naar de kluis…"); try{ it.media=await uploadMedia(f); }catch(e){ melding("Uploaden mislukt: "+e.message); return; } }
+      else if(f.type.startsWith("video/")){ melding("Video's uploaden kan alleen in de echte versie."); return; }
+      else it.beeld=await verklein(f,600);
+    }
+    it.openbaar=$("#openbaar").checked;
     const fr=[...$("#frames").files]; if(fk==="eigen" && fr.length){ melding("Filmpje maken…"); it.frames=[]; for(const x of fr.slice(0,24)) it.frames.push(await verklein(x,420,.7)); }
-    if(oud){ if(!it.beeld && oud.beeld) it.beeld=oud.beeld; if(!it.frames && oud.frames && fk==="eigen") it.frames=oud.frames; }
-    if(!it.tekst && !it.link && !it.beeld && !it.frames && !it.clip && !it.film){ melding("Schrijf iets, plak een link of kies een foto"); return; }
+    if(oud){ if(!it.media && oud.media) it.media=oud.media; if(!it.beeld && oud.beeld) it.beeld=oud.beeld; if(!it.frames && oud.frames && fk==="eigen") it.frames=oud.frames; }
+    if(!it.tekst && !it.link && !it.beeld && !it.media && !it.frames && !it.clip && !it.film){ melding("Schrijf iets, plak een link of kies een foto"); return; }
     it.door=ik.naam; it.wanneerBewerkt=new Date().toLocaleString("nl-NL",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
     if(oud){ S.inhoud[S.inhoud.indexOf(oud)]=it; bewerkId=null; bewaar(); tekenBeheer(); melding("Opgeslagen"); }
     else { S.inhoud.push(it); bewaar(); tekenBeheer(); melding(`Achter raampje ${beheerDag} gestopt`); }
@@ -1275,8 +1310,16 @@ function verklein(f,max=600,q=.8){ return new Promise(ok=>{ const r=new FileRead
   const s=Math.min(1,max/Math.max(im.width,im.height)), c=document.createElement("canvas"); c.width=im.width*s; c.height=im.height*s;
   c.getContext("2d").drawImage(im,0,0,c.width,c.height); ok(c.toDataURL("image/jpeg",q)); }; im.src=r.result; }; r.readAsDataURL(f); }); }
 
-teken();
-startOnline().then(teken);
+async function toonDeel(id){
+  $("#app").innerHTML=`<section class="login"><span class="kop2">Family Crazy Adventskalender</span><div class="vel" style="margin:0 auto" id="deel"><p class="uitleg">Even ophalen…</p></div></section>`;
+  try{
+    const {item:it, mediaUrl}=await api("openbaar",{id});
+    $("#deel").innerHTML=`<h2>${it.dag} december</h2>${filmVan(it, mediaUrl)}${it.beeld?`<img src="${esc(it.beeld)}" alt="">`:""}<div class="item ${it.soort==="gedicht"?"gedicht":""}"><div class="tekst">${esc(it.tekst||"")}</div></div>`;
+    startbeelden($("#deel"));
+  }catch(e){ $("#deel").innerHTML=`<p class="uitleg">Deze link werkt niet (meer). Misschien staat het niet meer op openbaar.</p>`; }
+}
+if(location.hash.startsWith("#deel-")){ toonDeel(location.hash.slice(6)); }
+else { teken(); startOnline().then(teken); }
 </script>
 
 </body>

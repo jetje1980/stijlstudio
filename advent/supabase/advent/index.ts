@@ -43,6 +43,8 @@ async function alles(): Promise<Doc[]> {
   return uit;
 }
 const zonderPin = (l: any) => { const { pin, pinhash, ...rest } = l || {}; return rest; };
+const KLUIS = "advent-media";
+const ZES_UUR = 60 * 60 * 6;
 
 const mislukt = new Map<string, { n: number; tot: number }>();
 
@@ -54,7 +56,7 @@ Deno.serve(async (req) => {
 
     if (b.actie === "leden") {
       const l = await docs("leden");
-      return antw({ leeg: l.length === 0, vandaag: vandaag(), leden: l.map((r: any) => ({ id: r.id, naam: r.data.naam, beheer: !!r.data.beheer, spelleider: !!r.data.spelleider, foto: r.data.foto || null, volgorde: r.data.volgorde ?? 0 })) });
+      return antw({ leeg: l.length === 0, vandaag: vandaag(), leden: l.map((r: any) => ({ id: r.id, naam: r.data.naam, beheer: !!r.data.beheer, spelleider: !!r.data.spelleider, foto: r.data.fotoOpenbaar ? (r.data.foto || null) : null, volgorde: r.data.volgorde ?? 0 })) });
     }
 
     if (b.actie === "init") {
@@ -67,6 +69,14 @@ Deno.serve(async (req) => {
       }
       const { error } = await sb.from("advent_doc").upsert(rijen); if (error) throw error;
       return antw({ ok: true });
+    }
+
+    if (b.actie === "openbaar") {
+      const { data } = await sb.from("advent_doc").select("data").eq("col", "inhoud").eq("id", String(b.id || "")).maybeSingle();
+      if (!data || !data.data.openbaar) return antw({ fout: "Dit is niet (meer) openbaar." }, 404);
+      const it = data.data; let mediaUrl = null;
+      if (it.media?.pad) mediaUrl = (await sb.storage.from(KLUIS).createSignedUrl(it.media.pad, ZES_UUR)).data?.signedUrl || null;
+      return antw({ item: { ...it, id: b.id }, mediaUrl });
     }
 
     if (b.actie === "login") {
@@ -96,6 +106,25 @@ Deno.serve(async (req) => {
         return true;
       }).map((d) => d.col === "leden" ? { ...d, data: zonderPin(d.data) } : d);
       return antw({ docs: uit, vandaag: dag, ik });
+    }
+
+    if (b.actie === "uploadUrl") {
+      if (!beheer) return antw({ fout: "Alleen beheerders kunnen uploaden." }, 403);
+      const ext = String(b.naam || "").split(".").pop()!.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 5) || "bin";
+      const pad = `${new Date().getFullYear()}/${crypto.randomUUID()}.${ext}`;
+      const { data, error } = await sb.storage.from(KLUIS).createSignedUploadUrl(pad);
+      if (error) throw error;
+      return antw({ pad, url: data.signedUrl });
+    }
+
+    if (b.actie === "media") {
+      // alleen bestanden van items die deze persoon mag zien
+      const mag = new Set(alle.filter((d) => d.col === "inhoud" && d.data.media?.pad && (beheer || ((d.data.voor === "alle" || d.data.voor === ik) && d.data.dag <= dag))).map((d) => d.data.media.pad));
+      const paden = ((b.paden || []) as string[]).filter((x) => mag.has(x)).slice(0, 50);
+      if (!paden.length) return antw({ urls: {} });
+      const { data, error } = await sb.storage.from(KLUIS).createSignedUrls(paden, ZES_UUR);
+      if (error) throw error;
+      return antw({ urls: Object.fromEntries((data || []).map((x: any) => [x.path, x.signedUrl])) });
     }
 
     if (b.actie === "schrijf") {
@@ -139,6 +168,7 @@ Deno.serve(async (req) => {
         if (!magWeg(d.col, d.id, oud)) { fouten.push(d.col + "/" + d.id); continue; }
         if (d.col === "leden" && d.id === ik) { fouten.push("jezelf verwijderen"); continue; }
         await sb.from("advent_doc").delete().eq("col", d.col).eq("id", d.id);
+        if (d.col === "inhoud" && oud?.media?.pad) await sb.storage.from(KLUIS).remove([oud.media.pad]);
       }
       return antw({ ok: true, geweigerd: fouten });
     }
