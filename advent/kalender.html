@@ -424,6 +424,9 @@ textarea{min-height:90px;font-family:var(--f-hand);font-size:24px;line-height:1.
 .wielen{display:flex;gap:6px}
 .wiel{width:clamp(28px,8vw,38px);height:46px;border:2px solid #222;background:#f6efe1;font:700 28px var(--f-hand);color:var(--bordeaux);border-radius:4px;padding:0}
 #kcode{width:100%;font-size:20px;text-align:center;text-transform:uppercase;padding:6px}
+.meekijk{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:#fffdf6;border:2px dashed var(--goud);padding:10px 12px;margin:10px 0;font-size:15px}
+.meekijk span{flex:1 1 200px}
+.stappen{margin:8px 0 0;padding-left:20px;display:grid;gap:6px}
 .formrij{display:flex;gap:8px;flex-wrap:wrap}
 .formrij input{flex:1;min-width:140px}
 
@@ -560,6 +563,7 @@ try{ S = JSON.parse(localStorage.getItem(SLEUTEL)) || voorbeeld(); }catch(e){ S 
 S = Object.assign({geopend:{},post:[],diner:[],ingewisseld:{},reacties:{},wensen:[],lootjes:null,lootjeOpen:{},ideeen:[],scores:{},gespeeld:{},dinerwensen:[],menu:"",taken:[]}, S);
 const API = "https://kjvufjkhfjbuxnuqdeev.supabase.co/functions/v1/advent";
 let ONLINE=false, TOKEN=null, VANDAAG=0, LEEG=false, SNAP=new Map(), syncTimer=null, bezigSync=false;
+let VOORBEELD=null, GAST=false;   /* VOORBEELD: beheerder kijkt mee als iemand anders. GAST: rondleiding. In beide gevallen wordt niets bewaard. */
 const LIJSTEN=["leden","inhoud","post","wensen","ideeen","taken","dinerwensen","diner"];
 /* de staat S als losse documenten (zo kan iedereen tegelijk iets bewaren zonder elkaars werk te overschrijven) */
 function naarDocs(st){
@@ -599,6 +603,7 @@ async function api(actie, extra={}){
   return j;
 }
 function bewaar(){
+  if(VOORBEELD||GAST) return;
   if(!ONLINE){ try{ localStorage.setItem(SLEUTEL, JSON.stringify(S)); }catch(e){ melding("Het geheugen van deze demo is vol. Gebruik kleinere of minder foto's."); } return; }
   clearTimeout(syncTimer); syncTimer=setTimeout(sync,250);
 }
@@ -639,7 +644,7 @@ async function startOnline(){
   if(TOKEN){ try{ await haalAlles(); if(ik) scherm="kalender"; }catch(e){ TOKEN=null; } }
 }
 document.addEventListener("visibilitychange",()=>{
-  if(document.visibilityState!=="visible" || !ONLINE || !TOKEN || bezigSync || syncTimer || document.querySelector(".scherm")) return;
+  if(document.visibilityState!=="visible" || VOORBEELD || GAST || !ONLINE || !TOKEN || bezigSync || syncTimer || document.querySelector(".scherm")) return;
   haalAlles().then(teken).catch(()=>{});
 });
 
@@ -687,6 +692,7 @@ function tekenLogin(){
     ${(()=>{ const vd=ONLINE?VANDAAG:(vandaagDag()||0), n=aftellen();
       return `${huisDicht(vd)}<p class="startregel hand">${vd?`Vandaag gaat raampje ${vd} open.`:n===1?"Morgen gaat het eerste raampje open.":`Nog ${n} nachtjes tot het eerste raampje.`}</p>`; })()}
     <p>Elke dag vanaf 1 december een raampje open, en elke dag komt er iets in je mand. Wie ben jij? Kies je label, pincode erin. Pincode vergeten? Jammer.</p>
+    <p class="uitleg" style="margin-top:-8px">Nieuwsgierig maar niet van de familie? <a href="#gast" id="naargast">Kijk mee in de rondleiding</a>.</p>
     <div class="touw" id="touw"><div class="mensen">
       ${S.leden.map((l,i)=>`<button class="label" data-id="${l.id}"><span class="draad"></span>
         <span class="kaartje" style="background:${LABELKLEUR[i%LABELKLEUR.length]}">${pop(l,34)}<span class="naam">${esc(l.naam)}</span>${l.beheer?'<small>beheerder</small>':'<small>&nbsp;</small>'}</span></button>`).join("")}
@@ -700,6 +706,7 @@ function tekenLogin(){
     </form>`:""}
     ${ONLINE&&LEEG?`<div class="pin"><h3>Nieuwe kalender</h3><p class="uitleg">De database is nog leeg. Zet de voorbeeldkalender erin; daarna pas je in het beheer de namen, pincodes en inhoud aan.</p><button class="knop" id="init">Voorbeeldkalender klaarzetten</button></div>`:""}
   </section>`;
+  if($("#naargast")) $("#naargast").onclick=e=>{ e.preventDefault(); history.replaceState(null,"","#gast"); startGast(); };
   if($("#init")) $("#init").onclick=async()=>{ try{ await api("init",{docs:[...naarDocs(voorbeeld()).values()]}); await haalLeden(); melding("Klaar! Log in als Griëtte met 0000 en verander je pincode."); tekenLogin(); }catch(e){ melding(e.message); } };
   $$(".label").forEach(b=>b.onclick=()=>{ kiesLid=S.leden.find(l=>l.id===b.dataset.id); tekenLogin(); $("#pinform").scrollIntoView({behavior:"smooth",block:"center"}); $("#pinveld").focus({preventScroll:true}); });
   $$("#starthuis .raam").forEach(b=>b.onclick=()=>{ melding("Eerst even zeggen wie je bent."); $("#touw").scrollIntoView({behavior:"smooth",block:"center"}); });
@@ -754,9 +761,12 @@ function tekenKalender(){
       ${bonnen.length?`<button class="knop licht" id="bonnen">Mijn bonnen (${bonnen.length})</button>`:""}
       ${spelleider()?`<button class="knop licht" id="games">Games</button>`:""}
       ${ik.beheer?`<button class="knop" id="naarBeheer">Beheer${S.post.filter(p=>p.status==="nieuw").length?` · ${S.post.filter(p=>p.status==="nieuw").length} post`:""}</button>`:''}
-      <button class="knop licht" id="uit">Uitloggen</button></div>
+      ${ONLINE&&!VOORBEELD?`<button class="knop licht" id="bel" aria-label="Meldingen">🔔 Meldingen</button>`:""}
+      ${VOORBEELD||GAST?"":`<button class="knop licht" id="uit">Uitloggen</button>`}</div>
   </header>
-  <div class="tijd" ${ONLINE&&!ik.beheer?"hidden":""}><span class="demo">${ONLINE?"Voorproefje (alleen jij)":"Tijdreis"}</span>
+  ${VOORBEELD?`<div class="meekijk"><span>👀 Zo ziet <b>${esc(ik.naam)}</b> het. Je kunt alles proberen; er wordt niets opgeslagen.</span><button class="knop" id="stopvb">Terug naar beheer</button></div>`:""}
+  ${GAST?`<div class="meekijk"><span>👋 Rondleiding. Dit gezin is verzonnen en er wordt niets bewaard. Tik op een raampje, of schuif met de tijdreis.</span><button class="knop licht" id="gastopnieuw">Opnieuw</button></div>`:""}
+  <div class="tijd" ${ONLINE&&!ik.beheer&&!VOORBEELD?"hidden":""}><span class="demo">${VOORBEELD?"Tijdreis (alleen in het voorbeeld)":ONLINE?"Voorproefje (alleen jij)":"Tijdreis"}</span>
     <label for="tijd" style="display:contents"><span>Doe alsof het <b>${demoDag} december</b> is</span></label>
     <input type="range" id="tijd" min="1" max="26" value="${demoDag}">
   </div>
@@ -774,7 +784,10 @@ function tekenKalender(){
   </div>
   <p class="samen">${iedereen?"Iedereen was er. Lantaarn aan.":`${al.length} van ${S.leden.length} geweest. De rest slaapt nog.`}</p>
   <p class="legenda">${ONLINE ? (VANDAAG?`Vandaag is het ${VANDAAG} december.`:"Op 1 december gaat het eerste raampje open. Nog even geduld!") : (echt?`Vandaag is het echt ${echt} december.`:"Het is nog geen december, dus de tijdreis staat aan.")}<br>Een rood stipje betekent dat er iets klaarligt. Tik op de brievenbus om zelf iets te posten.</p>`;
-  $("#uit").onclick=async()=>{ ik=null; scherm="login";
+  if($("#stopvb")) $("#stopvb").onclick=stopVoorbeeld;
+  if($("#gastopnieuw")) $("#gastopnieuw").onclick=()=>{ startGast(); window.scrollTo(0,0); };
+  if($("#bel")) $("#bel").onclick=openMeldingen;
+  if($("#uit")) $("#uit").onclick=async()=>{ ik=null; scherm="login";
     if(ONLINE){ TOKEN=null; try{ localStorage.removeItem("familycrazy-token"); }catch(e){} try{ await haalLeden(); }catch(e){} }
     teken(); };
   if($("#naarBeheer")) $("#naarBeheer").onclick=()=>{ scherm="beheer"; teken(); };
@@ -784,6 +797,90 @@ function tekenKalender(){
   $("#bus").onclick=()=>brievenbus("posten");
   $("#tijd").oninput=e=>{ demoDag=+e.target.value; tekenKalender(); $("#tijd").focus(); };
   $$(".raam").forEach(b=>b.onclick=()=>openDag(+b.dataset.dag));
+}
+
+/* ===== Meekijken als iemand anders (alleen beheer, niets wordt opgeslagen) ===== */
+function startVoorbeeld(id){
+  const l=S.leden.find(x=>x.id===id); if(!l) return;
+  VOORBEELD={wie:ik.id, S:JSON.stringify(S), dag:demoDag};
+  ik={...l, beheer:false}; demoDag=demoDag||VANDAAG||1; scherm="kalender"; teken(); window.scrollTo(0,0);
+}
+function stopVoorbeeld(){
+  if(!VOORBEELD) return;
+  S=JSON.parse(VOORBEELD.S); ik=S.leden.find(x=>x.id===VOORBEELD.wie); demoDag=VOORBEELD.dag; VOORBEELD=null;
+  document.querySelectorAll(".scherm").forEach(x=>x.remove()); scherm="beheer"; teken(); window.scrollTo(0,0);
+}
+
+/* ===== Meldingen op de telefoon ===== */
+const b64naarBytes = t => { const b=atob(t.replace(/-/g,"+").replace(/_/g,"/")+"=".repeat((4-t.length%4)%4)); return Uint8Array.from(b,c=>c.charCodeAt(0)); };
+async function openMeldingen(){
+  const v=venster("Meldingen");
+  const ios=/iPhone|iPad|iPod/.test(navigator.userAgent), losseApp=window.matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+  if(ios && !losseApp){ v.podium.innerHTML=`<p>Op een iPhone werken meldingen alleen vanuit de app op je beginscherm.</p>
+    <ol class="stappen"><li>Tik onderin Safari op <b>Deel</b> (het vierkantje met de pijl).</li><li>Kies <b>Zet op beginscherm</b>.</li><li>Open de kalender via het huisje op je beginscherm en tik daar op 🔔 Meldingen.</li></ol>`; return; }
+  if(!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)){ v.podium.innerHTML=`<p>Deze browser kan geen meldingen ontvangen. Probeer Chrome of Safari, of zet de app op je beginscherm.</p>`; return; }
+  v.podium.innerHTML=`<p class="uitleg">Even kijken…</p>`;
+  let reg; try{ reg=await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready; }catch(e){ v.podium.innerHTML=`<p>Meldingen lukken hier niet (${esc(e.message)}).</p>`; return; }
+  const toon=async()=>{
+    const sub=await reg.pushManager.getSubscription(), geblokt=Notification.permission==="denied";
+    v.podium.innerHTML=`<p>${sub?"Meldingen staan <b>aan</b> op dit toestel.":"Elke ochtend om 7 uur een seintje: raampje open. Meer niet. Geen inhoud, geen verklappers."}</p>
+      ${geblokt?`<p class="fout">Meldingen voor deze site zijn geblokkeerd. Zet ze aan in de instellingen van je telefoon of browser.</p>`:""}
+      <div class="balk">${sub?`<button class="knop licht" id="melduit">Zet uit</button>`:geblokt?"":`<button class="knop" id="meldaan">Zet aan</button>`}</div>`;
+    if($("#meldaan")) $("#meldaan").onclick=async()=>{
+      try{
+        if(await Notification.requestPermission()!=="granted"){ melding("Geen toestemming. Dan niet."); return toon(); }
+        const {sleutel}=await api("vapid");
+        const nieuw=await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:b64naarBytes(sleutel)});
+        await api("abonneer",{sub:nieuw.toJSON()}); melding("Meldingen staan aan");
+      }catch(e){ melding("Lukt niet: "+e.message); }
+      toon(); };
+    if($("#melduit")) $("#melduit").onclick=async()=>{
+      try{ const s=await reg.pushManager.getSubscription(); if(s){ await api("afmelden",{endpoint:s.endpoint}).catch(()=>{}); await s.unsubscribe(); } melding("Meldingen staan uit"); }catch(e){ melding(e.message); }
+      toon(); };
+  };
+  toon();
+}
+
+/* ===== Rondleiding voor gasten: een verzonnen gezin, alles in het geheugen ===== */
+function startGast(){ GAST=true; ONLINE=false; TOKEN=null; S=gastKalender(); ik=S.leden[0]; demoDag=26; scherm="kalender";
+  document.querySelectorAll(".scherm").forEach(x=>x.remove()); teken(); }
+function gastKalender(){
+  const it=(dag,spel,o)=>({id:uid(), dag, voor:"gast", spel, ...o});
+  return {
+    leden:[{id:"gast",naam:"Gast"},{id:"t",naam:"Oma Toos"},{id:"k",naam:"Kees"},{id:"m",naam:"Mila"},{id:"b",naam:"Bram"}],
+    inhoud:[
+      it(1,"kras",{soort:"briefje", film:"intro", mini:"cadeau", tekst:"Welkom. 26 raampjes, elke dag één. Dit is de rondleiding."}),
+      it(2,"waslijn",{soort:"bon", clip:"waslijn", mini:"waslijn", waarde:"€ 5", tekst:"Wasbon. Deze week doen wij je was. Zakken leeg."}),
+      it(3,"deurtje",{soort:"aanwijzing", clip:"welkom", mini:"deurtje", tekst:"De brievenbus is open. Post erin. Klachten niet."}),
+      it(4,"sneeuw",{soort:"aanwijzing", clip:"voetstapjes", mini:"bezem", tekst:"Voetstappen in het meel. Volg ze. Neem een koekenpan mee."}),
+      it(5,"laatjes",{soort:"gedicht", clip:"kerstkamer", mini:"kastje", tekst:"De slagroom is op,\nde schuldige zwijgt,\nwie het meest likt\nhet minste krijgt."}),
+      it(6,"schudden",{soort:"cadeau", film:"rendiervous", mini:"fles", hints:["Het klotst.","Het ruikt fris.","Niet opdrinken."], tekst:"Kijk in je wasmand. Wasmiddel. Hint."}),
+      it(7,"raden",{soort:"uitje", mini:"oliebol", antwoord:"OLIEBOL", hints:["Rond.","Vet.","Met poedersuiker."], tekst:"Oliebollen. Gezond is anders. Iedereen komt.", wanneer:"Zaterdagmiddag", waar:"Keukentafel"}),
+      it(8,"lintje",{soort:"liedje", clip:"slee", mini:"slee", tekst:"Liedje van de dag: Jingle Bells. Hard zingen. Vals mag."}),
+      it(9,"wasmand",{soort:"cadeau", clip:"mandje", mini:"cadeau", tekst:"Kijk in het mandje bij de kachel. Niet ín de kachel."}),
+      it(10,"kluis",{soort:"cadeau", mini:"cadeau", antwoord:"1012", hints:["Eerst de dag van vandaag.","Dan de maand."], tekst:"Open. Je cadeau ligt achter de bank. Zoek."}),
+      it(11,"zaklamp",{soort:"aanwijzing", film:"piekfijn", mini:"lantaarn", hints:["Kijk omhoog.","De boom.","Helemaal bovenin."], tekst:"Piek in de boom. De langste mag. Wie valt, heeft pech."}),
+      it(12,"warmkoud",{soort:"briefje", clip:"sneeuwtuin", mini:"lantaarn", kamer:"sneeuwtuin", tekst:"Wandelen. Het is koud. Het is december. Jas aan."}),
+      it(13,"puzzel",{soort:"uitje", clip:"kringloop", mini:"kaartje", tekst:"Kerstmarkt of kringloop. Stemmen. De meerderheid wint, de beheerder beslist.", keuzes:["Kerstmarkt","Kringloop"], wanneer:"Zondag"}),
+      it(14,"kras",{soort:"bon", clip:"schilderijtjes", mini:"briefje", waarde:"1x", tekst:"Niet afwassen. Eén keer. Kies je moment."}),
+      it(15,"deurtje",{soort:"briefje", film:"hulstnodig", mini:"cadeau", tekst:"Samen inpakken. Plakband voor drie cadeaus. Het zijn er veertig."}),
+      it(16,"lintje",{soort:"bon", film:"kerstraak", mini:"cadeau", waarde:"Ontbijt", tekst:"Ontbijt op bed. Kruimels zijn jouw probleem."}),
+      it(17,"sneeuw",{soort:"gedicht", film:"gluhckwens", mini:"cadeau", tekst:"Glühwein voor de groten,\nchocomel voor de rest,\nwie de bekers telt\nweet het het best."}),
+      it(18,"warmkoud",{soort:"aanwijzing", film:"lampjes", mini:"lantaarn", tekst:"Er doet één lampje het niet. Welke? Wie hem vindt, mag hem vervangen."}),
+      it(19,"wasmand",{soort:"cadeau", film:"mandatory", mini:"cadeau", tekst:"Je mand loopt vol. Nog vijf nachtjes. Ongeveer."}),
+      it(20,"zaklamp",{soort:"uitje", film:"groningen", mini:"reuzenrad", hints:["Draait.","Hoog.","Met lampjes."], tekst:"Kerstkermis. Reuzenrad op eigen risico.", wanneer:"Datum volgt", waar:"In de stad"}),
+      it(21,"laatjes",{soort:"aanwijzing", clip:"groningen", mini:"foto", tekst:"Kermisfoto's. We zijn er allemaal nog. Geteld."}),
+      it(22,"schudden",{soort:"cadeau", clip:"wensen", mini:"briefje", hints:["Papier.","Een lijstje.","Van jou."], tekst:"De wensen zijn binnen. Kijk bij raampje 26."}),
+      it(23,"kras",{soort:"briefje", film:"drienachten", mini:"slee", tekst:"Nog drie nachten. Tellen helpt niet."}),
+      it(24,"kluis",{soort:"briefje", film:"sleeperig", mini:"slee", antwoord:"2412", hints:["Vandaag.","Deze maand."], tekst:"Nog één nacht. Slapen. Hij kijkt."}),
+      it(25,"deurtje",{soort:"games", film:"navidad", mini:"cadeau", tekst:"Cadeau-estafette\nKerst-pictionary\nWie ben ik?\nSokken-sneeuwballen\nDe grote kerstquiz"}),
+      it(26,"lintje",{soort:"lootje", clip:"sinterklaas", mini:"lootje", tekst:"Sinterklaas. Eindelijk. Alle wensenlijstjes staan hieronder."})
+    ],
+    geopend:{}, post:[], diner:[{wie:"Oma Toos", wat:"Kalkoen en jus"}], ingewisseld:{}, reacties:{},
+    wensen:[{id:uid(), van:"k", soort:"cadeau", tekst:"Nieuwe koptelefoon"},{id:uid(), van:"m", soort:"doe", tekst:"Samen naar de film"},{id:uid(), van:"t", soort:"cadeau", tekst:"Warme sokken. Echt."}],
+    lootjes:null, lootjeOpen:{}, ideeen:[{id:uid(), van:"m", tekst:"Samen kerstkoekjes bakken", stemmen:["k","b"]},{id:uid(), van:"b", tekst:"Filmavond met chips", stemmen:["t"]}],
+    scores:{}, gespeeld:{}, dinerwensen:[], menu:"Voorgerecht: soep\nHoofdgerecht: gourmet\nToetje: alles wat over is", taken:[{id:uid(), wie:"gast", tekst:"Kaarsjes aansteken", klaar:false}]
+  };
 }
 
 /* ===== Een raampje openen ===== */
@@ -1356,6 +1453,17 @@ function tekenBeheer(){
       ${[...S.ideeen].sort((a,b)=>b.stemmen.length-a.stemmen.length).map(i=>`<div class="regel"><div><span class="hand" style="font-size:22px">${esc(i.tekst)}</span> <span class="uitleg">♥ ${i.stemmen.length} · van ${esc(lid(i.van).naam)}</span></div>${i.uitje?`<span class="uitleg">dag ${i.uitje}</span>`:`<button data-maakuitje="${i.id}" style="color:var(--den)">Uitje op dag ${beheerDag}</button>`}</div>`).join("")||'<p class="uitleg">Nog geen ideeën.</p>'}
       <label>Spelleider van de Crazy Christmas Games<select id="leider">${S.leden.map(l=>`<option value="${l.id}" ${l.spelleider?"selected":""}>${esc(l.naam)}</option>`).join("")}</select></label>
     </section>
+    <section class="paneel" id="meekijkpaneel"><h2>Bekijk als</h2>
+      <p class="uitleg">Zie het huisje precies zoals iemand het ziet. Met de tijdreis kijk je ook naar toekomstige dagen. Je kunt raampjes openen en spelletjes spelen; er wordt niets opgeslagen.</p>
+      <div class="chips">${S.leden.filter(l=>l.id!==ik.id).map(l=>`<button type="button" data-alsid="${l.id}">${esc(l.naam)}</button>`).join("")}</div>
+    </section>
+    <section class="paneel" id="meldpaneel"><h2>Meldingen</h2>
+      <p class="uitleg">Van 1 t/m 26 december krijgt iedereen die meldingen aan heeft om 07:05 een seintje: "Raampje 5 is open". Zelf iets sturen kan hieronder. Zet er niets geheims in: een melding staat op het vergrendelscherm.</p>
+      <p class="uitleg" id="meldstatus">${ONLINE?"Even kijken wie ze aan heeft…":"Meldingen werken alleen in de echte versie."}</p>
+      <form id="meldform" class="rij"><label>Aan<select id="meldaan"><option value="alle">Iedereen</option>${S.leden.map(l=>`<option value="${l.id}">${esc(l.naam)}</option>`).join("")}</select></label>
+        <label>Tekst<input id="meldtekst" maxlength="140" placeholder="Iedereen naar beneden. Nu."></label>
+        <button class="knop" ${ONLINE?"":"disabled"}>Stuur</button></form>
+    </section>
     <section class="paneel" id="perpersoon"><h2>Per persoon</h2>
       <p class="uitleg">Kies iemand en zie wat die persoon elke dag krijgt. Tik op een regel om hem aan te passen, of op + om iets voor deze persoon toe te voegen.</p>
       <div class="chips">${[{id:"alle",naam:"Iedereen"},...S.leden].map(l=>`<button type="button" data-wie="${l.id}" aria-pressed="${beheerWie===l.id}">${esc(l.naam)}</button>`).join("")}</div>
@@ -1448,6 +1556,11 @@ function tekenBeheer(){
   $("#taakform").onsubmit=e=>{ e.preventDefault(); const t=$("#taaktekst").value.trim(); if(!t) return; S.taken.push({id:uid(), wie:$("#taakwie").value, tekst:t, klaar:false}); bewaar(); tekenBeheer(); melding(`Taak gegeven aan ${lid(S.taken.at(-1).wie).naam}`); };
   $("#leider").onchange=e=>{ S.leden.forEach(l=>l.spelleider = l.id===e.target.value && !l.beheer); bewaar(); melding("Spelleider ingesteld"); };
   $("#soort").onchange=velden; velden();
+  $$("[data-alsid]").forEach(b=>b.onclick=()=>startVoorbeeld(b.dataset.alsid));
+  if(ONLINE) api("meldingenStatus").then(({per})=>{ if($("#meldstatus")) $("#meldstatus").textContent=S.leden.map(l=>`${l.naam}: ${per[l.id]?`aan${per[l.id]>1?` (${per[l.id]} toestellen)`:""}`:"uit"}`).join(" · "); }).catch(()=>{ if($("#meldstatus")) $("#meldstatus").textContent=""; });
+  $("#meldform").onsubmit=async e=>{ e.preventDefault(); if(!ONLINE) return;
+    try{ const r=await api("stuur",{aan:$("#meldaan").value, tekst:$("#meldtekst").value}); melding(r.toestellen?`Verstuurd naar ${r.verstuurd} van ${r.toestellen} toestel${r.toestellen>1?"len":""}`:"Niemand heeft daar meldingen aan"); if(r.verstuurd) $("#meldtekst").value=""; }
+    catch(err){ melding(err.message); } };
   $$("[data-wie]").forEach(b=>b.onclick=()=>{ beheerWie=b.dataset.wie; tekenBeheer(); $("#perpersoon").scrollIntoView(); });
   $$("[data-ovid]").forEach(b=>b.onclick=()=>{ beheerDag=+b.dataset.ovdag; bewerkId=b.dataset.ovid; tekenBeheer(); $("#nieuw").scrollIntoView({behavior:"smooth"}); });
   $$("[data-plusdag]").forEach(b=>b.onclick=()=>{ beheerDag=+b.dataset.plusdag; bewerkId=null; voorKeuze=beheerWie; tekenBeheer(); $("#nieuw").scrollIntoView({behavior:"smooth"}); });
@@ -1506,5 +1619,6 @@ async function toonDeel(id){
   }catch(e){ $("#deel").innerHTML=`<p class="uitleg">Deze link werkt niet (meer). Misschien staat het niet meer op openbaar.</p>`; }
 }
 if(location.hash.startsWith("#deel-")){ toonDeel(location.hash.slice(6)); }
+else if(location.hash==="#gast"){ startGast(); }
 else { teken(); startOnline().then(teken); }
 </script>

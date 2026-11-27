@@ -1,5 +1,6 @@
 // Family Crazy Adventskalender: de enige toegang tot de database.
-// Acties: leden (openbaar: namen voor het inlogscherm), init (eenmalig vullen), login, lees, schrijf.
+// Acties: leden (openbaar: namen voor het inlogscherm), init (eenmalig vullen), login, lees, schrijf,
+// en meldingen: vapid, abonneer, afmelden, meldingenStatus, stuur (beheer) en dagelijks (alleen pg_cron).
 // Pincodes worden gehasht bewaard; wat iemand mag lezen en schrijven wordt hier gecontroleerd.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
@@ -48,6 +49,44 @@ const ZES_UUR = 60 * 60 * 6;
 
 const mislukt = new Map<string, { n: number; tot: number }>();
 
+/* ===== Meldingen (Web Push) =====
+   De sleutels staan in de tabel advent_geheim (RLS aan, geen policies: alleen deze functie kan erbij).
+   Een abonnement is per toestel, in advent_doc col "meldingen", id "<lid>|<hash van het adres>".
+   In een melding staat nooit persoonlijke inhoud: alleen dat er een raampje open is. */
+async function geheim(naam: string) {
+  const { data } = await sb.from("advent_geheim").select("waarde").eq("naam", naam).maybeSingle();
+  return data?.waarde as string | undefined;
+}
+async function vapid() {
+  let pub = await geheim("vapid_public"), priv = await geheim("vapid_private");
+  if (!pub || !priv) {
+    const kp = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]);
+    pub = b64(await crypto.subtle.exportKey("raw", kp.publicKey));
+    priv = (await crypto.subtle.exportKey("jwk", kp.privateKey)).d!;
+    await sb.from("advent_geheim").upsert([{ naam: "vapid_public", waarde: pub }, { naam: "vapid_private", waarde: priv }], { onConflict: "naam", ignoreDuplicates: true });
+    pub = await geheim("vapid_public"); priv = await geheim("vapid_private");   // wie het eerst schreef, wint
+  }
+  return { pub: pub!, priv: priv! };
+}
+async function stuurMeldingen(rijen: { id: string; data: any }[], bericht: (wie: string) => { titel: string; tekst: string }) {
+  if (!rijen.length) return 0;
+  const webpush = (await import("npm:web-push@3.6.7")).default;
+  const { pub, priv } = await vapid();
+  webpush.setVapidDetails("https://adventscalender.app", pub, priv);
+  let n = 0;
+  await Promise.all(rijen.map(async (r) => {
+    try { await webpush.sendNotification(r.data.sub, JSON.stringify({ ...bericht(r.data.wie), url: "./" }), { TTL: 60 * 60 * 12 }); n++; }
+    catch (e: any) { if (e?.statusCode === 404 || e?.statusCode === 410) await sb.from("advent_doc").delete().eq("col", "meldingen").eq("id", r.id); else console.error("melding mislukt", e?.statusCode); }
+  }));
+  return n;
+}
+const ZINNEN = ["Eerst open, dan ontbijt.", "Het wacht. Jij niet.", "Snel, voor iemand het verklapt.", "Niet tot vanavond wachten.", "Tanden poetsen mag daarna."];
+function dagBericht(dag: number, persoonlijk: boolean) {
+  if (dag === 25) return { titel: "Kerst. Raampje 25.", tekst: "Games vanavond. Verliezen mag." };
+  if (dag === 26) return { titel: "Raampje 26. Het laatste.", tekst: "Sinterklaas. Eindelijk." };
+  return { titel: `Raampje ${dag} is open`, tekst: persoonlijk ? "Er zit vandaag iets in dat alleen voor jou is." : ZINNEN[dag % ZINNEN.length] };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   try {
@@ -79,6 +118,19 @@ Deno.serve(async (req) => {
       return antw({ item: { ...it, id: b.id }, mediaUrl });
     }
 
+    if (b.actie === "vapid") return antw({ sleutel: (await vapid()).pub });
+
+    if (b.actie === "dagelijks") {
+      const cron = await geheim("cron");
+      if (!cron || req.headers.get("x-cron-geheim") !== cron) return antw({ fout: "Nee." }, 403);
+      const maand = Number(new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Amsterdam" }).split("-")[1]);
+      const dag = vandaag();
+      if (maand !== 12 || dag < 1) return antw({ ok: true, overgeslagen: true });
+      const inhoud = await docs("inhoud"), abos = await docs("meldingen");
+      const n = await stuurMeldingen(abos, (wie) => dagBericht(dag, inhoud.some((r: any) => r.data.dag === dag && r.data.voor === wie)));
+      return antw({ ok: true, verstuurd: n });
+    }
+
     if (b.actie === "login") {
       const m = mislukt.get(b.id);
       if (m && m.n >= 5 && m.tot > Date.now()) return antw({ fout: "Te vaak een verkeerde pincode. Probeer het over een minuut opnieuw." }, 429);
@@ -98,8 +150,38 @@ Deno.serve(async (req) => {
     if (!mijRij) return antw({ fout: "Dit gezinslid bestaat niet meer." }, 401);
     const mij = mijRij.data, beheer = !!mij.beheer, leider = beheer || !!mij.spelleider, dag = vandaag();
 
+    if (b.actie === "abonneer") {
+      const sub = b.sub || {};
+      const geldig = typeof sub.endpoint === "string" && sub.endpoint.startsWith("https://") && sub.endpoint.length < 1000 && typeof sub.keys?.p256dh === "string" && typeof sub.keys?.auth === "string";
+      if (!geldig) return antw({ fout: "Dit toestel gaf geen geldig meldadres." }, 400);
+      if (alle.filter((d) => d.col === "meldingen" && d.data.wie === ik).length >= 5) return antw({ fout: "Je hebt al vijf toestellen met meldingen. Zet er eerst één uit." }, 400);
+      const id = ik + "|" + (await hash(sub.endpoint)).slice(0, 20);
+      await sb.from("advent_doc").upsert({ col: "meldingen", id, data: { wie: ik, sub: { endpoint: sub.endpoint, keys: { p256dh: sub.keys.p256dh, auth: sub.keys.auth } }, sinds: new Date().toISOString() }, door: ik });
+      return antw({ ok: true });
+    }
+    if (b.actie === "afmelden") {
+      const id = ik + "|" + (await hash(String(b.endpoint || ""))).slice(0, 20);
+      await sb.from("advent_doc").delete().eq("col", "meldingen").eq("id", id);
+      return antw({ ok: true });
+    }
+    if (b.actie === "meldingenStatus") {
+      if (!beheer) return antw({ fout: "Alleen voor beheerders." }, 403);
+      const per: Record<string, number> = {};
+      alle.filter((d) => d.col === "meldingen").forEach((d) => { per[d.data.wie] = (per[d.data.wie] || 0) + 1; });
+      return antw({ per });
+    }
+    if (b.actie === "stuur") {
+      if (!beheer) return antw({ fout: "Alleen beheerders kunnen meldingen sturen." }, 403);
+      const tekst = String(b.tekst || "").trim().slice(0, 140), aan = String(b.aan || "alle");
+      if (!tekst) return antw({ fout: "Schrijf eerst wat er in de melding moet staan." }, 400);
+      const abos = alle.filter((d) => d.col === "meldingen" && (aan === "alle" || d.data.wie === aan));
+      const n = await stuurMeldingen(abos, () => ({ titel: "Family Crazy Adventskalender", tekst }));
+      return antw({ ok: true, verstuurd: n, toestellen: abos.length });
+    }
+
     if (b.actie === "lees") {
       const uit = alle.filter((d) => {
+        if (d.col === "meldingen") return false;   // meldadressen gaan nooit naar de app
         if (beheer) return true;
         if (d.col === "inhoud") return (d.data.voor === "alle" || d.data.voor === ik) && d.data.dag <= dag;
         if (d.col === "post") return d.data.van === ik;
@@ -131,6 +213,7 @@ Deno.serve(async (req) => {
       const bestaand = new Map(alle.map((d) => [d.col + "/" + d.id, d.data]));
       const fouten: string[] = [];
       const magSchrijven = (d: Doc, oud: any): boolean => {
+        if (d.col === "meldingen") return false;   // alleen via abonneer/afmelden
         if (beheer) return true;
         const n = d.data || {};
         switch (d.col) {
@@ -147,6 +230,7 @@ Deno.serve(async (req) => {
         }
       };
       const magWeg = (col: string, id: string, oud: any) => {
+        if (col === "meldingen") return false;
         if (beheer) return true;
         if (!oud) return true;
         if (["wensen", "dinerwensen", "ideeen", "post"].includes(col)) return oud.van === ik;
@@ -168,6 +252,7 @@ Deno.serve(async (req) => {
         if (!magWeg(d.col, d.id, oud)) { fouten.push(d.col + "/" + d.id); continue; }
         if (d.col === "leden" && d.id === ik) { fouten.push("jezelf verwijderen"); continue; }
         await sb.from("advent_doc").delete().eq("col", d.col).eq("id", d.id);
+        if (d.col === "leden") await sb.from("advent_doc").delete().eq("col", "meldingen").like("id", d.id + "|%");
         if (d.col === "inhoud" && oud?.media?.pad) await sb.storage.from(KLUIS).remove([oud.media.pad]);
       }
       return antw({ ok: true, geweigerd: fouten });
