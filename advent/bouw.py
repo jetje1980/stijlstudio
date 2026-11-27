@@ -1,4 +1,4 @@
-"""Maakt index.html voor de echte website (adventcalender.app) van kalender.html (de bron, ook voor de claude.ai-preview)."""
+"""Maakt index.html voor de echte website (adventscalender.app) van kalender.html (de bron, ook voor de claude.ai-preview)."""
 from pathlib import Path
 hier = Path(__file__).parent
 bron = (hier / "kalender.html").read_text()
