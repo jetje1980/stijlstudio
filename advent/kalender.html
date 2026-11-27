@@ -427,6 +427,24 @@ textarea{min-height:90px;font-family:var(--f-hand);font-size:24px;line-height:1.
 .meekijk{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:#fffdf6;border:2px dashed var(--goud);padding:10px 12px;margin:10px 0;font-size:15px}
 .meekijk span{flex:1 1 200px}
 .stappen{margin:8px 0 0;padding-left:20px;display:grid;gap:6px}
+.filmgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.filmgrid.klein{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));max-height:340px;overflow:auto;padding:4px;border:1px dashed var(--goud-licht);background:#fff}
+.filmtegel{position:relative}
+.filmtegel .kies{display:grid;gap:2px;width:100%;border:2px solid transparent;background:#fff;padding:0 0 6px;text-align:left;box-shadow:0 2px 6px rgba(0,0,0,.12);min-height:100%}
+.filmtegel img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.filmtegel.gekozen .kies{border-color:var(--rood);box-shadow:0 0 0 3px rgba(194,42,51,.25)}
+.ft-soort{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--zacht);padding:2px 6px 0}
+.ft-titel{font-family:var(--f-hand);font-size:20px;line-height:1.05;color:var(--bordeaux);padding:0 6px}
+.ft-gebruik{font-size:12px;color:var(--inkt);padding:2px 6px 0;line-height:1.35}
+.ft-leeg{display:grid;place-items:center;aspect-ratio:4/3;font-family:var(--f-hand);font-size:20px;color:var(--bordeaux);text-align:center;padding:6px}
+.filmtegel .kijk{position:absolute;right:6px;top:6px;width:34px;height:34px;border-radius:50%;border:0;background:rgba(124,29,38,.88);color:#fff;font-size:14px;padding:0}
+.ovthumb{width:38px;height:28px;object-fit:cover;vertical-align:middle;margin-right:6px;border:1px solid var(--goud-licht)}
+.lijstfilm{white-space:nowrap}
+.agenda{display:grid;gap:8px;margin-top:10px}
+.event{display:grid;gap:2px;background:#fff;border-left:3px solid var(--goud);padding:8px 10px}
+.ev-datum{font-family:var(--f-hand);font-size:22px;color:var(--rood);line-height:1}
+.event .balk{margin-top:6px;align-items:center}
+.event a{font-size:14px;color:var(--bordeaux)}
 .formrij{display:flex;gap:8px;flex-wrap:wrap}
 .formrij input{flex:1;min-width:140px}
 
@@ -648,6 +666,7 @@ document.addEventListener("visibilitychange",()=>{
   haalAlles().then(teken).catch(()=>{});
 });
 
+let uitjeVoorstel=null, agendaRegio="alle";
 let ik=null, kiesLid=null, scherm="login", beheerDag=1, filmTimer=null, bewerkId=null, beheerWie="alle", voorKeuze=null;
 function vandaagDag(){ const nu=new Date(); return nu.getMonth()===11 ? Math.min(nu.getDate(),26) : 0; }
 let demoDag = vandaagDag() || 8;
@@ -1268,6 +1287,54 @@ function startbeelden(root){
   });
 }
 
+/* ===== Beheer: alle filmpjes met plaatje, en kijken zonder het formulier kwijt te raken ===== */
+const filmNaam = x => x.film&&FILMS[x.film] ? "film-"+x.film : x.clip&&CLIPS[x.clip] ? "stop-"+x.clip : null;
+const FILMLIJST = () => [
+  ...Object.entries(FILMS).map(([k,v])=>({fk:"film:"+k, naam:"film-"+k, titel:v, soort:"Sfeerfilmpje"})),
+  ...Object.entries(CLIPS).map(([k,v])=>({fk:"stop:"+k, naam:"stop-"+k, titel:v[0], soort:"Stopmotion"}))];
+function filmGebruik(naam){
+  return S.inhoud.filter(x=>filmNaam(x)===naam).sort((a,b)=>a.dag-b.dag).map(x=>`${x.dag} dec · ${x.voor==="alle"?"iedereen":esc(lid(x.voor).naam)}`);
+}
+function filmTegel(f, metGebruik){
+  const g = metGebruik ? filmGebruik(f.naam) : [];
+  return `<div class="filmtegel" data-fk="${f.fk}"><button type="button" class="kies" aria-label="Kies ${esc(f.titel)}"><img src="films/${f.naam}.jpg" alt="" loading="lazy">
+      <span class="ft-soort">${f.soort}</span><span class="ft-titel">${esc(f.titel)}</span>${metGebruik?`<span class="ft-gebruik">${g.length?g.join("<br>"):"nog niet gebruikt"}</span>`:""}</button>
+    <button type="button" class="kijk" data-kijk="${f.naam}" data-titel="${esc(f.titel)}" data-soort="${f.soort}" aria-label="Bekijk ${esc(f.titel)}">▶</button></div>`;
+}
+function kijkFilm(naam,titel,soort){
+  const lag=document.createElement("div"); lag.className="scherm";
+  lag.innerHTML=`<div class="vel" role="dialog" aria-label="${esc(titel)}"><button class="sluit" aria-label="Sluiten">×</button><h2>${esc(titel)}</h2><div class="podium">${videoHtml(naam,titel,soort)}<p class="uitleg">${esc(soort)} · films/${esc(naam)}.mp4</p></div></div>`;
+  document.body.appendChild(lag); startbeelden(lag);
+  const dicht=()=>{ lag.querySelectorAll("video").forEach(v=>v.pause()); lag.remove(); };
+  lag.querySelector(".sluit").onclick=dicht; lag.onclick=e=>{ if(e.target===lag) dicht(); };
+  lag.querySelector(".startbeeld").click();
+}
+
+/* ===== Agenda december (alleen beheer). Bronnen nagekeken op 27 november 2026; tijden kunnen nog veranderen. ===== */
+const AGENDA = [
+  {regio:"schalkwijk", van:18, datum:"vr 18 december, 16.00–20.00", titel:"Kerstmarkt Oude Dorp Houten", waar:"Het Plein, Oude Dorp, Houten", wat:"Streekproducten, ambachten, eten en muziek.", bron:"https://www.houtensnieuws.nl/lokaal/activiteiten/1326581/kerstmarkt-op-het-oude-dorp-van-houten-op-18-december-2026"},
+  {regio:"schalkwijk", van:21, datum:"ma 21 december, 19.30–21.00", titel:"Kerstmeditatie Hart & Ziel", waar:"Schalkwijk", wat:"Rustig moment voor de drukte.", bron:"https://www.houtensnieuws.nl/agenda"},
+  {regio:"schalkwijk", van:24, datum:"do 24 december, 19.00", titel:"Kerst gezinsviering", waar:"H. Michaëlkerk, Jonkheer Ramweg 18, Schalkwijk", wat:"Woord- en gebedsviering, ook voor kinderen.", bron:"https://pj23.nl/blog/viering/kerst-gezinsviering-schalkwijk/"},
+  {regio:"schalkwijk", van:25, datum:"vr 25 december, 09.30", titel:"Eerste kerstdag: eucharistieviering", waar:"H. Michaëlkerk, Schalkwijk", wat:"Kerstmis in de dorpskerk.", bron:"https://pj23.nl/blog/viering/kerstdag-schalkwijk/"},
+  {regio:"schalkwijk", van:10, datum:"10 t/m 26 december", titel:"Schaatsbaan Jaarbeursplein Utrecht", waar:"Jaarbeursplein, Utrecht", wat:"Gratis schaatsen. Maar één bron gevonden: eerst checken.", bron:"https://www.bartsboekje.com/es/leukste-kerstmarkten-in-nederland/", check:true},
+  {regio:"groningen", van:1, datum:"t/m 3 januari, dagelijks", titel:"Winterstad Groningen", waar:"Grote Markt en Waagplein, Groningen", wat:"Schaatsbaan, reuzenrad, kersttrein en chalets. Attracties betaald.", bron:"https://www.visitgroningen.nl/nl/doen/uitgaan/1725469147/winterstad-groningen-1"},
+  {regio:"groningen", van:11, datum:"vr 11 t/m zo 13 december, vanaf 12.00", titel:"WinterWelVaart", waar:"A-kwartier, Groningen", wat:"Verlichte historische schepen, markt, optredens. Gratis.", bron:"https://www.uitzinnig.nl/evenement/4388-winterwelvaart-stad-groningen.aspx"},
+  {regio:"groningen", van:12, datum:"za 12 en zo 13 december, 10.00–17.00", titel:"Zweedse Kerstmarkt", waar:"Oude Suikerfabriek, Suikerlaan 10, Groningen", wat:"Ruim 100 kraampjes. Entree € 10.", bron:"https://zweedsekerstmarkt.nl/"},
+  {regio:"groningen", van:18, datum:"vr 18 december", titel:"Candlelight: Christmas Classics", waar:"Martinikerk, Groningen", wat:"Kerstconcert bij kaarslicht, vanaf € 24,50.", bron:"https://feverup.com/nl/groningen/candlelight-christmas-concerts"},
+  {regio:"groningen", van:24, datum:"do 24 december", titel:"Kerstnachtdienst Martinikerk", waar:"Martinikerk, Groningen", wat:"Tijd nog niet gevonden. Kijk op martinikerk.nl.", bron:"https://www.martinikerk.nl/", check:true},
+  {regio:"lissabon", van:1, datum:"t/m 3 januari", titel:"Wonderland Lisboa", waar:"Parque Eduardo VII, Lissabon", wat:"Reuzenrad, ijsbaan, huis van de kerstman en markt. Toegang gratis, attracties betaald.", bron:"https://wonderlandlisboa.iol.pt/"},
+  {regio:"lissabon", van:1, datum:"t/m 21 december", titel:"Kerstmarkt Rossio", waar:"Praça Dom Pedro IV (Rossio), Lissabon", wat:"Kraampjes midden in de stad.", bron:"https://lisbohemian.com/pt/mercado-natal-lisboa-2026-datas-precos/"},
+  {regio:"lissabon", van:10, datum:"10 t/m 20 december", titel:"Kerstmarkt Alvalade", waar:"Alvalade, Lissabon", wat:"Buurtmarkt, rustiger dan Rossio.", bron:"https://lisbohemian.com/pt/mercado-natal-lisboa-2026-datas-precos/"},
+  {regio:"lissabon", van:24, datum:"do 24 december, laat", titel:"Missa do Galo (nachtmis)", waar:"Sé de Lisboa (kathedraal)", wat:"Tijd voor 2026 nog niet gepubliceerd; eerdere jaren rond middernacht.", bron:"https://www.visitlisboa.com/", check:true}
+];
+const REGIO = {alle:"Alles", schalkwijk:"Schalkwijk en Houten", groningen:"Groningen", lissabon:"Lissabon"};
+function agendaHtml(){
+  const l=AGENDA.filter(e=>agendaRegio==="alle"||e.regio===agendaRegio).sort((a,b)=>a.van-b.van);
+  return `<div class="chips">${Object.entries(REGIO).map(([k,v])=>`<button type="button" data-regio="${k}" aria-pressed="${agendaRegio===k}">${v}</button>`).join("")}</div>
+    <div class="agenda">${l.map((e,i)=>`<div class="event"><span class="ev-datum">${esc(e.datum)}</span><b>${esc(e.titel)}</b><span>${esc(e.waar)}</span><span class="uitleg">${esc(e.wat)}</span>
+      <div class="balk"><button type="button" class="knop licht" data-evuitje="${AGENDA.indexOf(e)}">Maak er een uitje van</button><a href="${e.bron}" target="_blank" rel="noopener">${e.check?"⚠ Eerst checken":"Meer info"}</a></div></div>`).join("")}</div>`;
+}
+
 /* ===== Uitjes: ik ben erbij, en stemmen ===== */
 function uitjeHtml(it){
   const r=S.reacties[it.id]||{}, mij=r[ik.id]||{}, erbij=S.leden.filter(l=>(r[l.id]||{}).erbij), keuzes=it.keuzes||[];
@@ -1464,31 +1531,45 @@ function tekenBeheer(){
         <label>Tekst<input id="meldtekst" maxlength="140" placeholder="Iedereen naar beneden. Nu."></label>
         <button class="knop" ${ONLINE?"":"disabled"}>Stuur</button></form>
     </section>
+    <section class="paneel" id="filmpaneel"><h2>Alle filmpjes</h2>
+      <p class="uitleg">Elk filmpje met zijn startbeeld, en op welke dag en voor wie het staat. Tik op ▶ om te kijken.</p>
+      <div class="filmgrid">${FILMLIJST().map(f=>filmTegel(f,true)).join("")}</div>
+    </section>
+    <section class="paneel" id="agendapaneel"><h2>Agenda december</h2>
+      <p class="uitleg">Kerstmarkten, diensten en andere uitjes rond Schalkwijk, Groningen en Lissabon. Alleen jij ziet dit. Met "Maak er een uitje van" zet je het meteen klaar in een raampje.</p>
+      <div id="agenda">${agendaHtml()}</div>
+    </section>
     <section class="paneel" id="perpersoon"><h2>Per persoon</h2>
       <p class="uitleg">Kies iemand en zie wat die persoon elke dag krijgt. Tik op een regel om hem aan te passen, of op + om iets voor deze persoon toe te voegen.</p>
       <div class="chips">${[{id:"alle",naam:"Iedereen"},...S.leden].map(l=>`<button type="button" data-wie="${l.id}" aria-pressed="${beheerWie===l.id}">${esc(l.naam)}</button>`).join("")}</div>
       <div class="overzicht">${Array.from({length:26},(_,i)=>i+1).map(d=>{
         const its=S.inhoud.filter(x=>x.dag===d && (beheerWie==="alle" ? x.voor==="alle" : (x.voor==="alle"||x.voor===beheerWie)));
-        return `<div class="ovrij"><span class="ovdag">${d}</span><div class="ovitems">${its.map(x=>`<button type="button" class="ovitem ${x.voor==="alle"&&beheerWie!=="alle"?"alle":"eigen"}" data-ovdag="${d}" data-ovid="${x.id}">${x.openbaar?"🔓 ":""}${x.film||x.clip?"🎞 ":""}${x.media?"📷 ":""}${esc(kort((x.tekst||SOORTEN[x.soort]||"").split("\n")[0]))}${x.voor==="alle"&&beheerWie!=="alle"?' <i>· iedereen</i>':''}</button>`).join("")||'<span class="uitleg">nog niets</span>'}</div>
+        return `<div class="ovrij"><span class="ovdag">${d}</span><div class="ovitems">${its.map(x=>`<button type="button" class="ovitem ${x.voor==="alle"&&beheerWie!=="alle"?"alle":"eigen"}" data-ovdag="${d}" data-ovid="${x.id}">${x.openbaar?"🔓 ":""}${filmNaam(x)?`<img class="ovthumb" src="films/${filmNaam(x)}.jpg" alt="">`:""}${x.media?"📷 ":""}${esc(kort((x.tekst||SOORTEN[x.soort]||"").split("\n")[0]))}${x.voor==="alle"&&beheerWie!=="alle"?' <i>· iedereen</i>':''}</button>`).join("")||'<span class="uitleg">nog niets</span>'}</div>
           <button type="button" class="ovplus" data-plusdag="${d}" aria-label="Iets toevoegen op dag ${d}">+</button></div>`; }).join("")}</div>
     </section>
     <section class="paneel"><h2>Kies een dag</h2>
       <div class="dagkiezer">${Array.from({length:26},(_,i)=>i+1).map(d=>`<button data-d="${d}" class="${d===beheerDag?'aan':''}">${d}${tel(d)?`<span class="n">${tel(d)}</span>`:''}</button>`).join("")}</div>
     </section>
     <section class="paneel"><h2>Achter raampje ${beheerDag}</h2>
-      <div class="lijst">${vanDag.length? vanDag.map(x=>`<div class="regel"><div><b>${esc(naam(x.voor))}</b> · ${SOORTEN[x.soort]} · <i>${SPELLEN[x.spel||(beheerDag%2?"kras":"lintje")]}</i>${x.antwoord?` · antwoord: <b>${esc(x.antwoord)}</b>`:""}${x.hints?` · ${x.hints.length} hint${x.hints.length>1?"s":""}`:""}${x.mini?` · miniatuur: ${MINIS[x.mini]}`:""}${x.clip?` · clip: ${CLIPS[x.clip][0]}`:""}${x.film?` · filmpje: ${FILMS[x.film]}`:""}${x.kamer?` · ${KAMERS[x.kamer]}`:""}<br><span class="hand" style="font-size:22px">${esc(x.tekst||x.link||"(foto)")}</span>${x.waarde?` <b>${esc(x.waarde)}</b>`:""}${x.door?`<br><span class="bewerkt">laatst aangepast door ${esc(x.door)}${x.wanneerBewerkt?`, ${esc(x.wanneerBewerkt)}`:""}</span>`:""}</div><div style="display:grid;gap:6px;flex:none"><button data-bewerk="${x.id}" style="color:var(--den)">Aanpassen</button><button data-weg="${x.id}">Weghalen</button>${x.openbaar?`<button data-deel="${x.id}" style="color:var(--goud)">Deellink</button>`:""}</div></div>`).join("") : '<p class="uitleg">Nog niets. Voeg hieronder iets toe.</p>'}</div>
+      <div class="lijst">${vanDag.length? vanDag.map(x=>`<div class="regel"><div><b>${esc(naam(x.voor))}</b> · ${SOORTEN[x.soort]} · <i>${SPELLEN[x.spel||(beheerDag%2?"kras":"lintje")]}</i>${x.antwoord?` · antwoord: <b>${esc(x.antwoord)}</b>`:""}${x.hints?` · ${x.hints.length} hint${x.hints.length>1?"s":""}`:""}${x.mini?` · miniatuur: ${MINIS[x.mini]}`:""}${filmNaam(x)?` · <span class="lijstfilm"><img class="ovthumb" src="films/${filmNaam(x)}.jpg" alt="">${x.clip?"stopmotion":"sfeerfilmpje"}: <b>${esc(x.clip?CLIPS[x.clip][0]:FILMS[x.film])}</b></span>`:""}${x.kamer?` · ${KAMERS[x.kamer]}`:""}<br><span class="hand" style="font-size:22px">${esc(x.tekst||x.link||"(foto)")}</span>${x.waarde?` <b>${esc(x.waarde)}</b>`:""}${x.door?`<br><span class="bewerkt">laatst aangepast door ${esc(x.door)}${x.wanneerBewerkt?`, ${esc(x.wanneerBewerkt)}`:""}</span>`:""}</div><div style="display:grid;gap:6px;flex:none"><button data-bewerk="${x.id}" style="color:var(--den)">Aanpassen</button><button data-weg="${x.id}">Weghalen</button>${x.openbaar?`<button data-deel="${x.id}" style="color:var(--goud)">Deellink</button>`:""}</div></div>`).join("") : '<p class="uitleg">Nog niets. Voeg hieronder iets toe.</p>'}</div>
     </section>
     <form class="paneel ${bewerkId?"bewerken":""}" id="nieuw"><h2>${bewerkId?`Raampje ${beheerDag} aanpassen`:`Iets achter raampje ${beheerDag} stoppen`}</h2>
       <div class="rij">
         <label>Voor wie<select id="voor"><option value="alle">Iedereen (zelfde bericht)</option>${S.leden.map(l=>`<option value="${l.id}">${esc(l.naam)}</option>`).join("")}</select></label>
         <label>Wat is het<select id="soort">${SOORTKEUZE.map(k=>`<option value="${k}">${SOORTEN[k]}</option>`).join("")}</select></label>
-        <label>Filmpje erbij<select id="filmpje"><option value="">Geen filmpje</option>
+        <label style="display:none">Filmpje erbij<select id="filmpje"><option value="">Geen filmpje</option>
           <optgroup label="Sfeerfilmpjes">${Object.entries(FILMS).map(([k,v])=>`<option value="film:${k}">${v}</option>`).join("")}</optgroup>
           <optgroup label="Stopmotions">${Object.entries(CLIPS).map(([k,v])=>`<option value="stop:${k}">${v[0]}</option>`).join("")}</optgroup>
           <optgroup label="Zelf maken"><option value="eigen">Eigen foto's als stopmotion</option></optgroup></select></label>
         <label>Hoe gaat het open<select id="spel">${Object.entries(SPELLEN).map(([k,v])=>`<option value="${k}" ${k===(beheerDag%2?"kras":"lintje")?"selected":""}>${v}</option>`).join("")}</select></label>
         <label>Miniatuurtje in het raam<select id="mini">${Object.entries(MINIS).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></label>
       </div>
+      <div style="display:grid;gap:4px"><span class="uitleg" style="font-size:13px">Filmpje erbij<span id="filmgekozen"></span></span>
+        <div class="filmgrid klein" id="filmkiezer">
+          <div class="filmtegel" data-fk=""><button type="button" class="kies"><span class="ft-leeg">Geen filmpje</span></button></div>
+          ${FILMLIJST().map(f=>filmTegel(f,false)).join("")}
+          <div class="filmtegel" data-fk="eigen"><button type="button" class="kies"><span class="ft-leeg">Eigen foto's als stopmotion</span></button></div>
+        </div></div>
       <div style="display:grid;gap:4px"><span class="uitleg" style="font-size:13px">Welk kamertje zit erachter?</span>
         <div class="kamerkeuze" id="kamerkeuze"><button type="button" class="auto" data-kamer="" aria-pressed="true">vanzelf</button>${KAMERLIJST.map(k=>`<button type="button" data-kamer="${k}" aria-pressed="false" title="${KAMERS[k]}" aria-label="${KAMERS[k]}" style="background-image:url(kamers/${k}.jpg)"></button>`).join("")}</div></div>
       <div id="veld-spel" hidden style="display:grid;gap:8px;background:#fff;padding:10px;border:1px dashed var(--goud-licht)">
@@ -1582,6 +1663,19 @@ function tekenBeheer(){
     kamerKeuze=oud.kamer||""; $$("#kamerkeuze button").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.kamer===kamerKeuze)));
     velden();
   }
+  if(uitjeVoorstel){ const e=uitjeVoorstel; uitjeVoorstel=null;
+    $("#soort").value="uitje"; $("#spel").value="kras"; $("#mini").value="kaartje"; $("#tekst").value=`${e.titel}. Wie gaat er mee?`; $("#wanneer").value=e.datum; $("#waar").value=e.waar; velden(); }
+  const markeerFilm=()=>{ const v=$("#filmpje").value; $$("#filmkiezer .filmtegel").forEach(t=>t.classList.toggle("gekozen",t.dataset.fk===v));
+    const f=FILMLIJST().find(x=>x.fk===v); $("#filmgekozen").textContent = f?`: ${f.titel} (${f.soort.toLowerCase()})`:v==="eigen"?": eigen foto's":": geen"; };
+  $$("#filmkiezer .kies").forEach(b=>b.onclick=()=>{ $("#filmpje").value=b.parentElement.dataset.fk; $("#filmpje").onchange&&$("#filmpje").onchange(); markeerFilm(); });
+  markeerFilm();
+  $$("[data-kijk]").forEach(b=>b.onclick=()=>kijkFilm(b.dataset.kijk,b.dataset.titel,b.dataset.soort));
+  $$("#filmpaneel .kies").forEach(b=>b.onclick=()=>{ const k=b.parentElement.querySelector(".kijk"); kijkFilm(k.dataset.kijk,k.dataset.titel,k.dataset.soort); });
+  const agendaKnoppen=()=>{
+    $$("[data-regio]").forEach(b=>b.onclick=()=>{ agendaRegio=b.dataset.regio; $("#agenda").innerHTML=agendaHtml(); agendaKnoppen(); });
+    $$("[data-evuitje]").forEach(b=>b.onclick=()=>{ const e=AGENDA[+b.dataset.evuitje]; uitjeVoorstel=e; beheerDag=Math.max(1,Math.min(26,e.van)); bewerkId=null; tekenBeheer(); $("#nieuw").scrollIntoView({behavior:"smooth"}); melding("Klaargezet als uitje. Kies voor wie en sla op."); });
+  };
+  agendaKnoppen();
   $("#nieuw").onsubmit=async e=>{ e.preventDefault();
     const it={id:oud?oud.id:uid(), dag:beheerDag, voor:$("#voor").value, soort:$("#soort").value, spel:$("#spel").value, mini:$("#mini").value, tekst:$("#tekst").value.trim(), link:$("#link").value.trim()};
     if(it.soort==="bon") it.waarde=$("#waarde").value.trim();
