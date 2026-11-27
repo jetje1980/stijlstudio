@@ -40,6 +40,8 @@ h1,h2,h3{font-family:var(--f-titel);font-weight:400;text-wrap:balance;margin:0}
 .login h1{font-size:clamp(32px,8vw,46px);line-height:1.08;color:var(--bordeaux)}
 .login h1 em{font-family:var(--f-hand);font-style:normal;color:var(--rood);font-size:1.15em}
 .login p{margin:0;color:var(--zacht);max-width:34em}
+.login .huis{width:100%}
+.login .startregel{font-size:28px;color:var(--rood);text-align:center;line-height:1.1;margin-top:-6px}
 .touw{position:relative;padding-top:18px}
 .touw::before{content:"";position:absolute;left:-8px;right:-8px;top:8px;height:2px;background:repeating-linear-gradient(90deg,var(--goud) 0 6px,var(--goud-licht) 6px 9px);border-radius:2px}
 .mensen{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 10px}
@@ -682,8 +684,10 @@ function tekenLogin(){
   <section class="login">
     ${ONLINE?"":'<span class="demo">Voorstel · klikbare demo</span>'}
     <h1>Family <em>Crazy</em> Adventskalender</h1>
-    <p>Elke dag vanaf 1 december een raampje open, en elke dag komt er iets in je mand. Kies je label, pincode erin. Pincode vergeten? Jammer.</p>
-    <div class="touw"><div class="mensen">
+    ${(()=>{ const vd=ONLINE?VANDAAG:(vandaagDag()||0), n=aftellen();
+      return `${huisDicht(vd)}<p class="startregel hand">${vd?`Vandaag gaat raampje ${vd} open.`:n===1?"Morgen gaat het eerste raampje open.":`Nog ${n} nachtjes tot het eerste raampje.`}</p>`; })()}
+    <p>Elke dag vanaf 1 december een raampje open, en elke dag komt er iets in je mand. Wie ben jij? Kies je label, pincode erin. Pincode vergeten? Jammer.</p>
+    <div class="touw" id="touw"><div class="mensen">
       ${S.leden.map((l,i)=>`<button class="label" data-id="${l.id}"><span class="draad"></span>
         <span class="kaartje" style="background:${LABELKLEUR[i%LABELKLEUR.length]}">${pop(l,34)}<span class="naam">${esc(l.naam)}</span>${l.beheer?'<small>beheerder</small>':'<small>&nbsp;</small>'}</span></button>`).join("")}
     </div></div>
@@ -697,7 +701,8 @@ function tekenLogin(){
     ${ONLINE&&LEEG?`<div class="pin"><h3>Nieuwe kalender</h3><p class="uitleg">De database is nog leeg. Zet de voorbeeldkalender erin; daarna pas je in het beheer de namen, pincodes en inhoud aan.</p><button class="knop" id="init">Voorbeeldkalender klaarzetten</button></div>`:""}
   </section>`;
   if($("#init")) $("#init").onclick=async()=>{ try{ await api("init",{docs:[...naarDocs(voorbeeld()).values()]}); await haalLeden(); melding("Klaar! Log in als Griëtte met 0000 en verander je pincode."); tekenLogin(); }catch(e){ melding(e.message); } };
-  $$(".label").forEach(b=>b.onclick=()=>{ kiesLid=S.leden.find(l=>l.id===b.dataset.id); tekenLogin(); $("#pinveld").focus(); });
+  $$(".label").forEach(b=>b.onclick=()=>{ kiesLid=S.leden.find(l=>l.id===b.dataset.id); tekenLogin(); $("#pinform").scrollIntoView({behavior:"smooth",block:"center"}); $("#pinveld").focus({preventScroll:true}); });
+  $$("#starthuis .raam").forEach(b=>b.onclick=()=>{ melding("Eerst even zeggen wie je bent."); $("#touw").scrollIntoView({behavior:"smooth",block:"center"}); });
   const f=$("#pinform");
   if(f) f.onsubmit=e=>{ e.preventDefault();
     if(ONLINE){
@@ -713,6 +718,20 @@ function tekenLogin(){
 }
 
 /* ===== Het huisje ===== */
+function raamDicht(d,i,vd){
+  const v=i===-1?"boog":i===-2?"rond":vorm(i,d);
+  return `<button class="raam ${v} ${d===vd?'vandaag':''}" data-dag="${d}" aria-label="${d} december"><span class="glas"><span class="roede"></span></span><span class="nr">${d}</span><span class="vensterbank"></span></button>`;
+}
+function huisDicht(vd){
+  return `<div class="huis" id="starthuis">
+    <div class="dakvak"><div class="dak"></div><div class="dakraam links">${raamDicht(23,-2,vd)}</div><div class="kapel">${raamDicht(24,-1,vd)}</div><div class="dakraam rechts">${raamDicht(26,-2,vd)}</div></div>
+    <div class="gevel">${SLINGER}<div class="ramen">${GEVEL.map((d,i)=>raamDicht(d,i,vd)).join("")}</div><div class="sneeuw"></div></div>
+  </div>`;
+}
+function aftellen(){
+  const nu=new Date(), een=new Date(nu.getFullYear(),11,1);
+  return Math.ceil((een-new Date(nu.getFullYear(),nu.getMonth(),nu.getDate()))/864e5);
+}
 function raam(d,i){
   const open=geopend(d), mag=d<=demoDag, heeft=voorMij(d).length>0, v=i===-1?"boog":i===-2?"rond":vorm(i,d);
   return `<button class="raam ${v} ${open?'open':''} ${d===demoDag&&!open?'vandaag':''}" data-dag="${d}" ${(!mag&&!open)?'disabled':''}
